@@ -1,0 +1,32 @@
+[
+    {
+        "id": "1755803887_6872",
+        "name": "Snapdragon 8 Gen 3",
+        "description": "Flagship 4nm processor",
+        "created_at": 1755803887
+    },
+    {
+        "id": "1755803888_5120",
+        "name": "Snapdragon 7 Gen 3",
+        "description": "Mid-range 4nm processor",
+        "created_at": 1755803887
+    },
+    {
+        "id": "1755803889_3229",
+        "name": "Exynos 2400",
+        "description": "Samsung flagship processor",
+        "created_at": 1755803887
+    },
+    {
+        "id": "1755803890_7572",
+        "name": "MediaTek Dimensity 9300",
+        "description": "MediaTek flagship chipset",
+        "created_at": 1755803887
+    },
+    {
+        "id": "1755803891_9496",
+        "name": "Apple A17 Pro",
+        "description": "Apple 3nm bionic chip",
+        "created_at": 1755803887
+    }
+]
