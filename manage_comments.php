@@ -419,7 +419,7 @@ $recent_approved = array_slice($recent_approved, 0, 20);
     </div>
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
-    <script src="js/scripts.js"></script>
+    <script src="js2/scripts.js"></script>
 
     <script>
         // Auto-dismiss alerts after 5 seconds

@@ -424,7 +424,7 @@ $popular_tags = array_slice($all_tags, 0, 10, true);
     </footer>
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
-    <script src="js/scripts.js"></script>
+    <script src="js2/scripts.js"></script>
 </body>
 
 </html>
