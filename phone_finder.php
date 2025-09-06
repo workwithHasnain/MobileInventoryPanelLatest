@@ -33,7 +33,7 @@ sort($device_os);
     <!-- Font Awesome for icons -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <!-- Custom CSS -->
-    <link rel="stylesheet" href="css2/styles.css">
+    <link rel="stylesheet" href="css/styles.css">
     <style>
         .filter-header {
             background: linear-gradient(135deg, #28a745, #20c997);
