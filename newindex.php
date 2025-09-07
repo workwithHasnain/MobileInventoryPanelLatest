@@ -338,18 +338,14 @@ if ($_POST && isset($_POST['action'])) {
             <a href="#">Privacy</a>
         </div>
         <div class="brand-grid">
-            <a href="#">Samsung</a>
-            <a href="#">Xiaomi</a>
-            <a href="#">OnePlus</a>
-            <a href="#">Google</a>
-            <a href="#">Apple</a>
-            <a href="#">Sony</a>
-            <a href="#">Motorola</a>
-            <a href="#">Vivo</a>
-            <a href="#">Huawei</a>
-            <a href="#">Honor</a>
-            <a href="#">Oppo</a>
-            <a href="#">[...]</a>
+            <?php
+            $brandChunks = array_chunk($brands, 1); // Create chunks of 1 brand per row
+            foreach ($brandChunks as $brandRow):
+                foreach ($brandRow as $brand): ?>
+                    <a href="#" class="brand-cell" data-brand-id="<?php echo $brand['id']; ?>"><?php echo htmlspecialchars($brand['name']); ?></a>
+            <?php endforeach;
+            endforeach; ?>
+            <a href="brands.php">[...]</a>
         </div>
         <div class="menu-buttons d-flex justify-content-center ">
             <button class="btn btn-danger w-50">📱 Phone Finder</button>
@@ -420,7 +416,6 @@ if ($_POST && isset($_POST['action'])) {
                     <img class="review-list-item-image "
                         src="https://fdn.gsmarena.com/imgroot/reviews/25/motorola-moto-g-stylus-2025/-347x151/gsmarena_001.jpg"
                         alt="Moto G Stylus 5G (2025) review">
-
                     <h1>Mooto G Stylus 5G (2025) review</h1>
                     <img class="review-list-item-image"
                         src="https://fdn.gsmarena.com/imgroot/reviews/25/google-pixel-9a/-347x151/gsmarena_001.jpg"
@@ -459,93 +454,31 @@ if ($_POST && isset($_POST['action'])) {
                     <i class="fa-solid fa-mobile fa-sm mx-2" style="color: white;"></i>
                     Phone Finder</button>
                 <div class="devor">
-                    <button class="px-3 py-1 ">Samsung</button>
-                    <button class="px-3 py-1 ">Xiaomi</button>
-                    <button class="px-3 py-1 ">Asus</button>
-                    <button class="px-3 py-1 ">Infinix</button>
-                    <button class="px-3 py-1 ">Apple</button>
-                    <button class="px-3 py-1 ">Google</button>
-                    <button class="px-3 py-1 ">AlCatel</button>
-                    <button class="px-3 py-1 ">Ulefone</button>
-                    <button class="px-3 py-1 ">Huawei</button>
-                    <button class="px-3 py-1 ">Honor</button>
-                    <button class="px-3 py-1 ">Zte</button>
-                    <button class="px-3 py-1 ">Tecno</button>
-                    <button class="px-3 py-1 ">Nokia</button>
-                    <button class="px-3 py-1 ">Oppo</button>
-                    <button class="px-3 py-1 ">Microsoft </button>
-                    <button class="px-3 py-1 ">Dooge</button>
-                    <button class="px-3 py-1 ">Sony</button>
-                    <button class="px-3 py-1 ">Realme</button>
-                    <button class="px-3 py-1 ">Unidegi</button>
-                    <button class="px-3 py-1 ">Blackview</button>
-                    <button class="px-3 py-1 ">Lg </button>
-                    <button class="px-3 py-1 ">OnePlus</button>
-                    <button class="px-3 py-1 ">Coolpad</button>
-                    <button class="px-3 py-1 ">Cubot</button>
-                    <button class="px-3 py-1 ">HTc</button>
-                    <button class="px-3 py-1 ">Nothing</button>
-                    <button class="px-3 py-1 ">Oscal</button>
-                    <button class="px-3 py-1 ">oukitel</button>
-                    <button class="px-3 py-1 ">Motrola</button>
-                    <button class="px-3 py-1 ">Vivo</button>
-                    <button class="px-3 py-1 ">Shrap</button>
-                    <button class="px-3 py-1 ">Itel</button>
-                    <button class="px-3 py-1 ">Lenovo</button>
-                    <button class="px-3 py-1 ">meizu</button>
-                    <button class="px-3 py-1 ">Micromax</button>
-                    <button class="px-3 py-1 ">Tcl</button>
+                    <?php
+                    if (empty($brands)): ?>
+                        <button class="px-3 py-1" style="cursor: default;" disabled>No brands available.</button>
+                        <?php else:
+                        $brandChunks = array_chunk($brands, 1); // Create chunks of 1 brand per row
+                        foreach ($brandChunks as $brandRow):
+                            foreach ($brandRow as $brand):
+                        ?>
+                                <button class="px-3 py-1 brand-cell" style="cursor: pointer;" data-brand-id="<?php echo $brand['id']; ?>"><?php echo htmlspecialchars($brand['name']); ?></button>
+                    <?php
+                            endforeach;
+                        endforeach;
+                    endif;
+                    ?>
                 </div>
-                <button class="solid w-50 py-2">
-                    <i class="fa-solid fa-bars fa-sm mx-2"></i>
-                    All Brands</button>
+                <a href="brands.php">
+                    <button class="solid w-50 py-2">
+                        <i class="fa-solid fa-bars fa-sm mx-2"></i>
+                        All Brands</button></a>
                 <button class="solid py-2" style="    width: 177px;">
                     <i class="fa-solid fa-volume-high fa-sm mx-2"></i>
                     RUMORS MILL</button>
             </div>
         </div>
-        <div class="row">
-            <div class="col-lg-4 col-6 conjection-froud  bobile">
-                <div class="review-column-list-item review-column-list-item-secondary ">
-                    <img class="review-list-item-image"
-                        src="https://cdn.prod.website-files.com/67f21c9d62aa4c4c685a7277/6842d8cb8981edbf2586e945_gsmarena_003.jpg"
-                        alt="Google Pixel 9a review">
-                    <h1>Nubia Z705 Ultra Review</h1>
-                    <img class="review-list-item-image"
-                        src="https://cdn.prod.website-files.com/67f21c9d62aa4c4c685a7277/6842cab2e7b8dbeab787e9ab_gsmarena_001.jpg"
-                        alt="Google Pixel 9a review">
-                    <h1>OnePlus 13s hands on review</h1>
-                </div>
-            </div>
-            <div class="col-6 col-lg-4 conjection-froud " style="margin-left: 7px;">
-                <div class="comfort d-md-none d-block">
-
-                    <div class="conjection position-absolute  mx-3 my-2 end-0">
-                        <i class="fa-solid fa-comment fa-sm" style="color: white;"></i>
-                        <span class="text-white ">80</span>
-                    </div>
-                    <img src="https://fdn.gsmarena.com/imgroot/reviews/25/nothing-cmf-phone-2-pro/-728x314/gsmarena_001.jpg"
-                        alt="Nothing CMF Phone 2 Pro">
-                    <h1 class="position-absolute">Nothing CMF Phone 2 Pro review</h1>
-                </div>
-                <div class="review-column-list-item review-column-list-item-secondary">
-                    <img class="review-list-item-image"
-                        src="https://cdn.prod.website-files.com/67f21c9d62aa4c4c685a7277/6842cab2e7b8dbeab787e9ab_gsmarena_001.jpg"
-                        alt="Google Pixel 9a review">
-                    <h1>OnePlus 13s hands on review</h1>
-                    <img class="review-list-item-image"
-                        src="https://cdn.prod.website-files.com/67f21c9d62aa4c4c685a7277/6842d8cb8981edbf2586e945_gsmarena_003.jpg"
-                        alt="Google Pixel 9a review">
-                    <h1>Nubia Z705 Ultra Review</h1>
-                </div>
-            </div>
-            <div class="col-6 col-md-4" style=" position: relative; left: 28px;">
-                <img class="w-100 d-none d-lg-inline"
-                    src="https://fdn.gsmarena.com/imgroot/static/banners/self/review-iphone-16-300x250.jpg"
-                    style="height: 95%;" alt="">
-
-            </div>
-        </div>
+        
     </div>
     <div class="container mt-0 varasat">
         <div class="row">
@@ -557,163 +490,6 @@ if ($_POST && isset($_POST['action'])) {
                     </i>
                 </h1>
                 <p class="d-none d-md-inline">The Cheat Sheet To The Best Phones to Get Right Now</p>
-            </div>
-            <div class="col-lg-4 col-md-6 wrapper sentizer-er ">
-
-                <div class="review-card">
-                    <img src="https://fdn.gsmarena.com/imgroot/news/25/04/samsung-galaxy-a55-one-ui-7-beta-update/-344x215/gsmarena_001.jpg"
-                        alt="Moto G Stylus 5G">
-                    <div class="review-card-body">
-                        <div class="review-card-title">Samsung Galaxy A55 receives One UI 7 update in Europe</div>
-                        <div class="review-card-meta">
-                            <span>02 May 2025</span>
-                            <span><i class="bi bi-chat-dots-fill"></i>40 comments</span>
-                        </div>
-                    </div>
-                </div>
-                <div class="review-card">
-                    <img src="https://fdn.gsmarena.com/imgroot/news/25/05/vivo-x200-fe-certified/-344x215/gsmarena_000.jpg"
-                        alt="Moto G Stylus 5G">
-                    <div class="review-card-body">
-                        <div class="review-card-title"> vivo X200 FE gets certified on launch</div>
-                        <div class="review-card-meta">
-                            <span>02 May 2025</span>
-                            <span><i class="bi bi-chat-dots-fill"></i>40 comments</span>
-                        </div>
-                    </div>
-                </div>
-                <div class="review-card">
-                    <img src="https://fdn.gsmarena.com/imgroot/news/25/05/iqoo-neo10-pro-plus-specs-leak-again/-344x215/gsmarena_000.jpg"
-                        alt="Moto G Stylus 5G">
-                    <div class="review-card-body">
-                        <div class="review-card-title">
-                            Here's aur first look at Redmi Pad 2 </div>
-                        <div class="review-card-meta">
-                            <span>02 May 2025</span>
-                            <span><i class="bi bi-chat-dots-fill"></i>40 comments</span>
-                        </div>
-                    </div>
-                </div>
-            </div>
-            <div class="col-lg-4 col-md-6 wrapper sentizer-er ">
-                <div class="review-card">
-                    <img src="https://fdn.gsmarena.com/imgroot/news/25/05/realme-c71-geekbench/-344x215/gsmarena_000.jpg"
-                        alt="Moto G Stylus 5G">
-                    <div class="review-card-body">
-                        <div class="review-card-title">Realme C71 Surface in becchmark and certificates </div>
-                        <div class="review-card-meta">
-                            <span>02 May 2025</span>
-                            <span><i class="bi bi-chat-dots-fill"></i>40 comments</span>
-                        </div>
-                    </div>
-                </div>
-                <div class="review-card">
-                    <img src="https://fdn.gsmarena.com/imgroot/news/25/05/iqoo-neo10-pro-plus-specs-leak-again/-344x215/gsmarena_000.jpg"
-                        alt="Moto G Stylus 5G">
-                    <div class="review-card-body">
-                        <div class="review-card-title">
-                            iQOO Neo10 Pro+ specs leak again </div>
-                        <div class="review-card-meta">
-                            <span>02 May 2025</span>
-                            <span><i class="bi bi-chat-dots-fill"></i>40 comments</span>
-                        </div>
-                    </div>
-                </div>
-                <div class="review-card">
-                    <img src="https://fdn.gsmarena.com/imgroot/news/25/05/samsung-galaxy-watch8-charging/-344x215/gsmarena_000.jpg"
-                        alt="Moto G Stylus 5G">
-                    <div class="review-card-body">
-                        <div class="review-card-title">Samsung Galaxy Watch8 and Watch8 Classic charging s outed</div>
-                        <div class="review-card-meta">
-                            <span>02 May 2025</span>
-                            <span><i class="bi bi-chat-dots-fill"></i>40 comments</span>
-                        </div>
-                    </div>
-                </div>
-            </div>
-            <div class="col-lg-4  col-12  bg-white ">
-                <h6 style="color: #090E21; text-transform: uppercase; font-weight: 900;" class=" mt-2 ">Latest Devices
-                </h6>
-                <div class="cent">
-
-                    <div class="d-flex">
-                        <div class="canel">
-                            <img class="shrink" src="https://fdn2.gsmarena.com/vv/bigpic/vivoiy300-gt.jpg" alt="">
-                            <p>Vivo y300 Gt</p>
-                        </div>
-                        <div class="canel mx-4">
-                            <img class="shrink" src="https://fdn2.gsmarena.com/vv/bigpic/samsung-galaxy-m56-5g.jpg"
-                                alt="">
-                            <p>Sumsung Galaxy f56</p>
-                        </div>
-                        <div class="canel ">
-                            <img class="shrink" src="https://fdn2.gsmarena.com/vv/bigpic/vivo-x200-pro-mini.jpg" alt="">
-                            <p>Vivo x200 FE</p>
-                        </div>
-                    </div>
-                    <div class="d-flex">
-                        <div class="canel">
-                            <img class="shrink" src="https://fdn2.gsmarena.com/vv/bigpic/vivo-x-fold3.jpg" alt="">
-                            <p>Vivo X Fold5</p>
-                        </div>
-                        <div class="canel mx-4">
-                            <img class="shrink" src="https://fdn2.gsmarena.com/vv/bigpic/itel-a90.jpg" alt="">
-                            <p>Itel A90</p>
-                        </div>
-                        <div class="canel ">
-                            <img class="shrink" src="https://fdn2.gsmarena.com/vv/bigpic/oscal-pad-100.jpg" alt="">
-                            <p>OScal pad 100</p>
-                        </div>
-                    </div>
-                    <div class="d-flex">
-                        <div class="canel">
-                            <img class="shrink" src="https://fdn2.gsmarena.com/vv/bigpic/itel-city-100.jpg" alt="">
-                            <p>itel city 100</p>
-                        </div>
-                        <div class="canel mx-4">
-                            <img class="shrink" src="https://fdn2.gsmarena.com/vv/bigpic/motorola-edge-60-fusion.jpg"
-                                alt="">
-                            <p>Motorla Edge 60</p>
-                        </div>
-                        <div class="canel ">
-                            <img class="shrink" src="https://fdn2.gsmarena.com/vv/bigpic/sony-xperia-1-vi-red.jpg"
-                                alt="">
-                            <p>Song xperia -1 VII</p>
-                        </div>
-                    </div>
-                </div>
-
-
-                <h6 style="border-left: solid 5px grey ; color: #090E21; text-transform: uppercase; font-weight: 900; margin-top: 12px;"
-                    class="px-3">Popular comparisons</h6>
-
-                <div class="sentizer bg-white mt-2 p-3 rounded shadow-sm" style="    text-transform: Uppercase;
-                                            font-size: 13px;
-                                            font-weight: 700;">
-                    <div class="row">
-                        <div class="col-12">
-                            <?php if (empty($topComparisons)): ?>
-                                <p class="mb-2" style=" text-transform: capitalize;">No Comparisons Yet</p>
-                            <?php else: ?>
-                                <?php foreach ($topComparisons as $index => $comparison): ?>
-                                    <!-- if $index is odd -->
-                                    <?php if((($index+1)%2)!=0): ?>
-                                        <p class="mb-2 clickable-comparison" data-device1-id="<?php echo $comparison['device1_id'] ?? ''; ?>"
-                                            data-device2-id="<?php echo $comparison['device2_id'] ?? ''; ?>"
-                                            style="cursor: pointer; background-color: #ffe6f0; color: #090E21; text-transform: capitalize;"><?php echo htmlspecialchars($comparison['device1_name'] ?? $comparison['device1'] ?? 'Unknown'); ?> vs.
-                                            <?php echo htmlspecialchars($comparison['device2_name'] ?? $comparison['device2'] ?? 'Unknown'); ?></p>
-                                    <?php else: ?>
-                                            <!-- else if $index is even -->
-                                            <p class="mb-2 clickable-comparison" data-device1-id="<?php echo $comparison['device1_id'] ?? ''; ?>"
-                                            data-device2-id="<?php echo $comparison['device2_id'] ?? ''; ?>" style="cursor: pointer; text-transform: capitalize;"><?php echo htmlspecialchars($comparison['device1_name'] ?? $comparison['device1'] ?? 'Unknown'); ?> vs. <?php echo htmlspecialchars($comparison['device2_name'] ?? $comparison['device2'] ?? 'Unknown'); ?></p>
-                                    <?php endif; ?>    
-                                <?php endforeach; ?>
-                            <?php endif; ?>
-                        </div>
-                    </div>
-                </div>
-
-
             </div>
         </div>
     </div>
@@ -731,143 +507,8 @@ if ($_POST && isset($_POST['action'])) {
                         </div>
                     </div>
                 </div>
-                <div class="review-card">
-                    <img src="https://fdn.gsmarena.com/imgroot/news/25/05/xiaomi-civi-5-pro-processor-battery-confirmed/-344x215/gsmarena_001.jpg"
-                        alt="Moto G Stylus 5G">
-                    <div class="review-card-body">
-                        <div class="review-card-title">Xiomo Civi Pro PRocceser</div>
-                        <div class="review-card-meta">
-                            <span>02 May 2025</span>
-                            <span><i class="bi bi-chat-dots-fill"></i>40 comments</span>
-                        </div>
-                    </div>
-                </div>
-                <div class="review-card">
-                    <img src="https://fdn.gsmarena.com/imgroot/news/19/04/top10-trending-phones/-344x215/gsmarena_002.jpg"
-                        alt="Google Pixel 9a">
-                    <div class="review-card-body">
-                        <div class="review-card-title">Top 10 trending phones of week</div>
-                        <div class="review-card-meta">
-                            <span>04 May 2025</span>
-                            <span><i class="bi bi-chat-dots-fill"></i>28 comments</span>
-                        </div>
-                    </div>
-                </div>
-                <div class="review-card">
-                    <img src="https://fdn.gsmarena.com/imgroot/news/25/04/android-16-identity-check/-344x215/gsmarena_000.jpg"
-                        alt="Google Pixel 9a">
-                    <div class="review-card-body">
-                        <div class="review-card-title">
-                            Desktop Mode Comming Andriod</div>
-                        <div class="review-card-meta">
-                            <span>04 May 2025</span>
-                            <span><i class="bi bi-chat-dots-fill"></i>28 comments</span>
-                        </div>
-                    </div>
-                </div>
-                <div class="review-card">
-                    <img src="https://fdn.gsmarena.com/imgroot/news/25/05/realme-gt-7-dream-edition-launch-date/-344x215/gsmarena_001.jpg"
-                        alt="Google Pixel 9a">
-                    <div class="review-card-body">
-                        <div class="review-card-title">
-                            Realme Gt-7 Dream Edition</div>
-                        <div class="review-card-meta">
-                            <span>04 May 2025</span>
-                            <span><i class="bi bi-chat-dots-fill"></i>28 comments</span>
-                        </div>
-                    </div>
-                </div>
-                <div class="review-card">
-                    <img src="https://fdn.gsmarena.com/imgroot/news/25/05/oneplus-ace-5-racing-ace-5-ultra-leaked-live-image/-344x215/gsmarena_000.jpg"
-                        alt="Google Pixel 9a">
-                    <div class="review-card-body">
-                        <div class="review-card-title"> One Plus Ace 5 Racing and Ace 5 Ultra</div>
-                        <div class="review-card-meta">
-                            <span>04 May 2025</span>
-                            <span><i class="bi bi-chat-dots-fill"></i>28 comments</span>
-                        </div>
-                    </div>
-                </div>
-                <div class="review-card">
-                    <img src="https://fdn.gsmarena.com/imgroot/news/25/05/iphone-fold-under-display-camera/-344x215/gsmarena_000.jpg"
-                        alt="Google Pixel 9a">
-                    <div class="review-card-body">
-                        <div class="review-card-title"> Iphone Fold now being tested</div>
-                        <div class="review-card-meta">
-                            <span>04 May 2025</span>
-                            <span><i class="bi bi-chat-dots-fill"></i>28 comments</span>
-                        </div>
-                    </div>
-                </div>
-                <div class="review-card">
-                    <img src="https://fdn.gsmarena.com/imgroot/news/25/05/new-redmi-poco-phone-certified/-344x215/gsmarena_000.jpg"
-                        alt="Google Pixel 9a">
-                    <div class="review-card-body">
-                        <div class="review-card-title"> Mystery Redmi phone gets certified with big battery</div>
-                        <div class="review-card-meta">
-                            <span>04 May 2025</span>
-                            <span><i class="bi bi-chat-dots-fill"></i>28 comments</span>
-                        </div>
-                    </div>
-                </div>
-                <div class="review-card">
-                    <img src="https://fdn.gsmarena.com/imgroot/news/25/05/xiaomi-civi-5-pro-first-img/-344x215/gsmarena_001.jpg"
-                        alt="Google Pixel 9a">
-                    <div class="review-card-body">
-                        <div class="review-card-title"> Xiomo Civi 5 pro tested three 50mp </div>
-                        <div class="review-card-meta">
-                            <span>04 May 2025</span>
-                            <span><i class="bi bi-chat-dots-fill"></i>28 comments</span>
-                        </div>
-                    </div>
-                </div>
-                <div class="review-card">
-                    <img src="https://fdn.gsmarena.com/imgroot/news/25/05/iphone-17-air-vs-iphone-16-plus/-344x215/gsmarena_000.jpg"
-                        alt="Google Pixel 9a">
-                    <div class="review-card-body">
-                        <div class="review-card-title">Iphone 17 gets compared to iphone 16 plus </div>
-                        <div class="review-card-meta">
-                            <span>04 May 2025</span>
-                            <span><i class="bi bi-chat-dots-fill"></i>28 comments</span>
-                        </div>
-                    </div>
-                </div>
-                <div class="review-card">
-                    <img src="https://fdn.gsmarena.com/imgroot/news/25/05/oneplus-13s-india-june/-344x215/gsmarena_000.jpg"
-                        alt="Google Pixel 9a">
-                    <div class="review-card-body">
-                        <div class="review-card-title">OnePlus 13s launch in India on Jine 5 </div>
-                        <div class="review-card-meta">
-                            <span>04 May 2025</span>
-                            <span><i class="bi bi-chat-dots-fill"></i>28 comments</span>
-                        </div>
-                    </div>
-                </div>
-                <div class="review-card">
-                    <img src="https://fdn.gsmarena.com/imgroot/news/25/04/delayed-siri-features-launch-timeframe-rumor/-344x215/gsmarena_000.jpg"
-                        alt="Google Pixel 9a">
-                    <div class="review-card-body">
-                        <div class="review-card-title">Reports : Apple Consider letting you replace Siri </div>
-                        <div class="review-card-meta">
-                            <span>04 May 2025</span>
-                            <span><i class="bi bi-chat-dots-fill"></i>28 comments</span>
-                        </div>
-                    </div>
-                </div>
-                <div class="review-card">
-                    <img src="https://fdn.gsmarena.com/imgroot/news/25/05/honor-india-rip/-344x215/gsmarena_001.jpg"
-                        alt="Google Pixel 9a">
-                    <div class="review-card-body">
-                        <div class="review-card-title">Honor abruptly cancels its comeback in India (UPDATED)</div>
-                        <div class="review-card-meta">
-                            <span>04 May 2025</span>
-                            <span><i class="bi bi-chat-dots-fill"></i>28 comments</span>
-                        </div>
-                    </div>
-                </div>
             </div>
             <div class="col-lg-4 col-md-6 col-12 sentizer-er" style="background-color: #EEEEEE;">
-
                 <div class="review-card">
                     <img src="https://fdn.gsmarena.com/imgroot/reviews/25/google-pixel-9a/-347x151/gsmarena_001.jpg"
                         alt="Google Pixel 9a">
@@ -879,148 +520,70 @@ if ($_POST && isset($_POST['action'])) {
                         </div>
                     </div>
                 </div>
-
-                <div class="review-card">
-                    <img src="https://fdn.gsmarena.com/imgroot/news/25/05/weekly-poll-samsung-galaxy-s25-edge/-344x215/gsmarena_000.jpg"
-                        alt="Google Pixel 9a">
-                    <div class="review-card-body">
-                        <div class="review-card-title">
-                            SamSung Galaxy S25 Edge,</div>
-                        <div class="review-card-meta">
-                            <span>04 May 2025</span>
-                            <span><i class="bi bi-chat-dots-fill"></i>28 comments</span>
-                        </div>
-                    </div>
-                </div>
-                <div class="review-card">
-                    <img src="https://fdn.gsmarena.com/imgroot/news/25/05/weekly-poll-results-cmf-phone-2-pro/-344x215/gsmarena_000.jpg"
-                        alt="Google Pixel 9a">
-                    <div class="review-card-body">
-                        <div class="review-card-title">
-                            CMF Phone 2 Pro</div>
-                        <div class="review-card-meta">
-                            <span>04 May 2025</span>
-                            <span><i class="bi bi-chat-dots-fill"></i>28 comments</span>
-                        </div>
-                    </div>
-                </div>
-                <div class="review-card">
-                    <img src="https://fdn.gsmarena.com/imgroot/news/25/03/apple-iphone-17-air-portfree/-344x215/gsmarena_001.jpg"
-                        alt="Google Pixel 9a">
-                    <div class="review-card-body">
-                        <div class="review-card-title">
-                            Iphone 17 Air bettery</div>
-                        <div class="review-card-meta">
-                            <span>04 May 2025</span>
-                            <span><i class="bi bi-chat-dots-fill"></i>28 comments</span>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="review-card">
-                    <img src="https://fdn.gsmarena.com/imgroot/news/25/05/samsung-galaxy-s25-fe-telephoto-ultrawide/-344x215/gsmarena_000.jpg"
-                        alt="Google Pixel 9a">
-                    <div class="review-card-body">
-                        <div class="review-card-title">
-                            Samsung galaxy s25 telephone</div>
-                        <div class="review-card-meta">
-                            <span>04 May 2025</span>
-                            <span><i class="bi bi-chat-dots-fill"></i>28 comments</span>
-                        </div>
-                    </div>
-                </div>
-                <div class="review-card">
-                    <img src="https://fdn.gsmarena.com/imgroot/news/25/05/realme-gt-7t-more-leaked-renders/-344x215/gsmarena_000.jpg"
-                        alt="Google Pixel 9a">
-                    <div class="review-card-body">
-                        <div class="review-card-title"> Realme GT 7T renders leak showing all colors</div>
-                        <div class="review-card-meta">
-                            <span>04 May 2025</span>
-                            <span><i class="bi bi-chat-dots-fill"></i>28 comments</span>
-                        </div>
-                    </div>
-                </div>
-                <div class="review-card">
-                    <img src="https://fdn.gsmarena.com/imgroot/news/25/05/oppo-k13x-surfaces/-344x215/gsmarena_000.jpg"
-                        alt="Google Pixel 9a">
-                    <div class="review-card-body">
-                        <div class="review-card-title"> Oppo K13 Surface in google</div>
-                        <div class="review-card-meta">
-                            <span>04 May 2025</span>
-                            <span><i class="bi bi-chat-dots-fill"></i>28 comments</span>
-                        </div>
-                    </div>
-                </div>
-                <div class="review-card">
-                    <img src="https://fdn.gsmarena.com/imgroot/news/25/05/nothing-headphones-officially-confirmed/-344x215/gsmarena_000.jpg"
-                        alt="Google Pixel 9a">
-                    <div class="review-card-body">
-                        <div class="review-card-title"> Nothing Offical Confirms that's it making over earbuds</div>
-                        <div class="review-card-meta">
-                            <span>04 May 2025</span>
-                            <span><i class="bi bi-chat-dots-fill"></i>28 comments</span>
-                        </div>
-                    </div>
-                </div>
-                <div class="review-card">
-                    <img src="https://fdn.gsmarena.com/imgroot/news/25/05/samsung-galaxy-m36-listed/-344x215/gsmarena_000.jpg"
-                        alt="Google Pixel 9a">
-                    <div class="review-card-body">
-                        <div class="review-card-title"> Galaxy M36 now listed on samsung </div>
-                        <div class="review-card-meta">
-                            <span>04 May 2025</span>
-                            <span><i class="bi bi-chat-dots-fill"></i>28 comments</span>
-                        </div>
-                    </div>
-                </div>
-                <div class="review-card">
-                    <img src="https://fdn.gsmarena.com/imgroot/news/25/05/oneplus-pad-3-europe/-344x215/gsmarena_000.jpg"
-                        alt="Google Pixel 9a">
-                    <div class="review-card-body">
-                        <div class="review-card-title">OnePlus Pad 2 Pro will launched as Oneplus Pad 3 </div>
-                        <div class="review-card-meta">
-                            <span>04 May 2025</span>
-                            <span><i class="bi bi-chat-dots-fill"></i>28 comments</span>
-                        </div>
-                    </div>
-                </div>
-                <div class="review-card">
-                    <img src="https://fdn.gsmarena.com/imgroot/news/25/05/samsung-galaxy-a35-one-ui-7/-344x215/gsmarena_000.jpg"
-                        alt="Google Pixel 9a">
-                    <div class="review-card-body">
-                        <div class="review-card-title">Samsung Galaxy a35 recive One UI 7 Updates in Europe </div>
-                        <div class="review-card-meta">
-                            <span>04 May 2025</span>
-                            <span><i class="bi bi-chat-dots-fill"></i>28 comments</span>
-                        </div>
-                    </div>
-                </div>
-                <div class="review-card">
-                    <img src="https://fdn.gsmarena.com/imgroot/news/25/05/vivo-s30-date/-344x215/gsmarena_001.jpg"
-                        alt="Google Pixel 9a">
-                    <div class="review-card-body">
-                        <div class="review-card-title">Vivo sets S30 launch date , revels phone design </div>
-                        <div class="review-card-meta">
-                            <span>04 May 2025</span>
-                            <span><i class="bi bi-chat-dots-fill"></i>28 comments</span>
-                        </div>
-                    </div>
-                </div>
-                <div class="review-card">
-                    <img src="https://fdn.gsmarena.com/imgroot/news/25/05/honor-400-geekbench-sd7g4/-344x215/gsmarena_001.jpg"
-                        alt="Google Pixel 9a">
-                    <div class="review-card-body">
-                        <div class="review-card-title">Honor 400 appears Geekbench, Snapdragon 7
-                            Gen 4 </div>
-                        <div class="review-card-meta">
-                            <span>04 May 2025</span>
-                            <span><i class="bi bi-chat-dots-fill"></i>28 comments</span>
-                        </div>
-                    </div>
-                </div>
             </div>
 
             <div class="col-lg-4  col-12 sentizer-er  bg-white p-3">
+                <h6 style="color: #090E21; text-transform: uppercase; font-weight: 900;" class=" mt-2 ">Latest Devices
+                </h6>
+                <div class="cent">
+                    <?php if (empty($devices)): ?>
+                        <div class="text-center py-5">
+                            <i class="fas fa-mobile-alt fa-3x text-muted mb-3"></i>
+                            <h4 class="text-muted">No Devices Available</h4>
+                            <p class="text-muted">Check back later for new devices!</p>
+                        </div>
+                    <?php else: ?>
+                        <?php $chunks = array_chunk($devices, 3); ?>
+                        <?php foreach ($chunks as $row): ?>
+                            <div class="d-flex">
+                                <?php foreach ($row as $i => $device): ?>
+                                    <div class="device-card canel<?php echo $i == 1 ? ' mx-4' : ($i == 0 ? '' : ''); ?>" data-device-id="<?php echo $device['id']; ?>" style="cursor: pointer;">
+                                        <?php if (isset($device['images']) && !empty($device['images'])): ?>
+                                            <img class="shrink" src="<?php echo htmlspecialchars($device['images'][0]); ?>" alt="">
+                                        <?php elseif (isset($device['image']) && !empty($device['image'])): ?>
+                                            <img class="shrink" src="<?php echo htmlspecialchars($device['image']); ?>" alt="">
+                                        <?php else: ?>
+                                            <img class="shrink" src="" alt="">
+                                        <?php endif; ?>
+                                        <p><?php echo htmlspecialchars($device['name'] ?? ''); ?></p>
+                                    </div>
+                                <?php endforeach; ?>
+                                <?php for ($j = count($row); $j < 3; $j++): ?>
+                                    <div class="canel<?php echo $j == 1 ? ' mx-4' : ($j == 0 ? '' : ''); ?>"></div>
+                                <?php endfor; ?>
+                            </div>
+                        <?php endforeach; ?>
+                    <?php endif; ?>
+                </div>
+
+                <h6 style="border-left: solid 5px grey ; color: #090E21; text-transform: uppercase; font-weight: 900; margin-top: 12px;"
+                    class="px-3">Popular comparisons</h6>
+
+                <div class="sentizer bg-white mt-2 p-3 rounded shadow-sm" style="    text-transform: Uppercase;
+                                            font-size: 13px;
+                                            font-weight: 700;">
+                    <div class="row">
+                        <div class="col-12">
+                            <?php if (empty($topComparisons)): ?>
+                                <p class="mb-2" style=" text-transform: capitalize;">No Comparisons Yet</p>
+                            <?php else: ?>
+                                <?php foreach ($topComparisons as $index => $comparison): ?>
+                                    <!-- if $index is odd -->
+                                    <?php if ((($index + 1) % 2) != 0): ?>
+                                        <p class="mb-2 clickable-comparison" data-device1-id="<?php echo $comparison['device1_id'] ?? ''; ?>"
+                                            data-device2-id="<?php echo $comparison['device2_id'] ?? ''; ?>"
+                                            style="cursor: pointer; background-color: #ffe6f0; color: #090E21; text-transform: capitalize;"><?php echo htmlspecialchars($comparison['device1_name'] ?? $comparison['device1'] ?? 'Unknown'); ?> vs.
+                                            <?php echo htmlspecialchars($comparison['device2_name'] ?? $comparison['device2'] ?? 'Unknown'); ?></p>
+                                    <?php else: ?>
+                                        <!-- else if $index is even -->
+                                        <p class="mb-2 clickable-comparison" data-device1-id="<?php echo $comparison['device1_id'] ?? ''; ?>"
+                                            data-device2-id="<?php echo $comparison['device2_id'] ?? ''; ?>" style="cursor: pointer; text-transform: capitalize;"><?php echo htmlspecialchars($comparison['device1_name'] ?? $comparison['device1'] ?? 'Unknown'); ?> vs. <?php echo htmlspecialchars($comparison['device2_name'] ?? $comparison['device2'] ?? 'Unknown'); ?></p>
+                                    <?php endif; ?>
+                                <?php endforeach; ?>
+                            <?php endif; ?>
+                        </div>
+                    </div>
+                </div>
                 <h6 style="border-left: 7px solid #EFEBE9 ; font-weight: 900; color: #090E21; text-transform: uppercase;"
                     class=" px-2 mt-2 d-inline mt-4">Top 10
                     Daily Interest</h6>
@@ -1035,56 +598,30 @@ if ($_POST && isset($_POST['action'])) {
                             </tr>
                         </thead>
                         <tbody>
-                            <tr>
-                                <th scope="row">1</th>
-                                <td class="text-start">Samsung Galaxy A56</td>
-                                <td class="text-end">29,819</td>
-                            </tr>
-                            <tr class="highlight">
-                                <th scope="row" class="text-white">2</th>
-                                <td class="text-start">Xiaomi Redmi Turbo 4 Pro</td>
-                                <td class="text-end">27,589</td>
-                            </tr>
-                            <tr>
-                                <th scope="row">3</th>
-                                <td class="text-start">Samsung Galaxy S25 Ultra</td>
-                                <td class="text-end">23,387</td>
-                            </tr>
-                            <tr class="highlight">
-                                <th scope="row" class="text-white">4</th>
-                                <td class="text-start">Sony Xperia 1 VII 5G</td>
-                                <td class="text-end">20,008</td>
-                            </tr>
-                            <tr>
-                                <th scope="row">5</th>
-                                <td class="text-start">Xiaomi Poco X7 Pro</td>
-                                <td class="text-end">19,249</td>
-                            </tr>
-                            <tr class="highlight" class="text-white">
-                                <th scope="row" class="text-white">6</th>
-                                <td class="text-start">OnePlus 13T 5G</td>
-                                <td class="text-end">18,523</td>
-                            </tr>
-                            <tr>
-                                <th scope="row">7</th>
-                                <td class="text-start">Apple iPhone 16 Pro Max</td>
-                                <td class="text-end">17,800</td>
-                            </tr>
-                            <tr class="highlight" class="text-white">
-                                <th scope="row" class="text-white">8</th>
-                                <td class="text-start">Nothing CMF Phone 2 Pro 5G</td>
-                                <td class="text-end">17,330</td>
-                            </tr>
-                            <tr>
-                                <th scope="row">9</th>
-                                <td class="text-start">Samsung Galaxy A36</td>
-                                <td class="text-end">16,592</td>
-                            </tr>
-                            <tr class="highlight">
-                                <th scope="row" class="text-white">10</th>
-                                <td class="text-start">Motorola Edge 60 Pro</td>
-                                <td class="text-end">16,433</td>
-                            </tr>
+                            <?php if (empty($topViewedDevices)): ?>
+                                <tr>
+                                    <th scope="row"></th>
+                                    <td class="text-start">Not Enough Data Exists</td>
+                                    <td class="text-end"></td>
+                                </tr>
+                            <?php else: ?>
+                                <?php foreach ($topViewedDevices as $index => $device):
+                                    if (($index + 1) % 2 != 0): ?>
+                                        <tr class="clickable-row" data-device-id="<?php echo $device['id']; ?>" style="cursor: pointer;">
+                                            <th scope="row"><?php echo $index + 1; ?></th>
+                                            <td class="text-start"><?php echo htmlspecialchars($device['brand_name']); ?> <?php echo htmlspecialchars($device['name']); ?></td>
+                                            <td class="text-end"><?php echo $device['view_count']; ?></td>
+                                        </tr>
+                                    <?php else: ?>
+                                        <tr class="highlight clickable-row" data-device-id="<?php echo $device['id']; ?>" style="cursor: pointer;">
+                                            <th scope="row" class="text-white"><?php echo $index + 1; ?></th>
+                                            <td class="text-start"><?php echo htmlspecialchars($device['brand_name']); ?> <?php echo htmlspecialchars($device['name']); ?></td>
+                                            <td class="text-end"><?php echo $device['view_count']; ?></td>
+                                        </tr>
+                            <?php
+                                    endif;
+                                endforeach;
+                            endif; ?>
                         </tbody>
                     </table>
                 </div>
@@ -1097,116 +634,65 @@ if ($_POST && isset($_POST['action'])) {
                             <tr class="text-white" style="background-color: #14222D;">
                                 <th style="color: white;  font-size: 15px;  ">#</th>
                                 <th style="color: white;  font-size: 15px;">Device</th>
-                                <th style="color: white;  font-size: 15px;">Favorites</th>
+                                <th style="color: white;  font-size: 15px;">Reviews</th>
                             </tr>
                         </thead>
                         <tbody>
-                            <tr>
-                                <th scope="row">1</th>
-                                <td class="text-start">Samsung Galaxy S24 Ultra</td>
-                                <td class="text-end">1,722</td>
-                            </tr>
-                            <tr class="highlight-12">
-                                <th scope="row">2</th>
-                                <td class="text-start">Xiaomi Poco X6 Pro</td>
-                                <td class="text-end">911</td>
-                            </tr>
-                            <tr>
-                                <th scope="row">3</th>
-                                <td class="text-start">Samsung Galaxy S25 Ultra</td>
-                                <td class="text-end">926</td>
-                            </tr>
-                            <tr class="highlight-12">
-                                <th scope="row">4</th>
-                                <td class="text-start">OnePlus 12</td>
-                                <td class="text-end">746</td>
-                            </tr>
-                            <tr>
-                                <th scope="row">5</th>
-                                <td class="text-start">Samsung Galaxy A55</td>
-                                <td class="text-end">634</td>
-                            </tr>
-                            <tr class="highlight-12">
-                                <th scope="row">6</th>
-                                <td class="text-start">Xiaomi 14 Ultra</td>
-                                <td class="text-end">597</td>
-                            </tr>
-                            <tr>
-                                <th scope="row">7</th>
-                                <td class="text-start">OnePlus 13</td>
-                                <td class="text-end">564</td>
-                            </tr>
-                            <tr class="highlight-12">
-                                <th scope="row">8</th>
-                                <td class="text-start">Sony Xperia 1 VI</td>
-                                <td class="text-end">554</td>
-                            </tr>
-                            <tr>
-                                <th scope="row">9</th>
-                                <td class="text-start">Samsung Galaxy S24</td>
-                                <td class="text-end">546</td>
-                            </tr>
-                            <tr class="highlight-12">
-                                <th scope="row">10</th>
-                                <td class="text-start">Apple iPhone 16 Pro Max</td>
-                                <td class="text-end">538</td>
-                            </tr>
+                            <?php if (empty($topReviewedDevices)): ?>
+                                <tr>
+                                    <th scope="row"></th>
+                                    <td class="text-start">Not Enough Data Exists</td>
+                                    <td class="text-end"></td>
+                                </tr>
+                            <?php else: ?>
+                                <?php foreach ($topReviewedDevices as $index => $device):
+                                    if (($index + 1) % 2 != 0): ?>
+                                        <tr class="clickable-row" data-device-id="<?php echo $device['id']; ?>" style="cursor: pointer;">
+                                            <th scope="row"><?php echo $index + 1; ?></th>
+                                            <td class="text-start"><?php echo htmlspecialchars($device['brand_name']); ?> <?php echo htmlspecialchars($device['name']); ?></td>
+                                            <td class="text-end"><?php echo $device['review_count']; ?></td>
+                                        </tr>
+                                    <?php else: ?>
+                                        <tr class="highlight-12 clickable-row" data-device-id="<?php echo $device['id']; ?>" style="cursor: pointer;">
+                                            <th scope="row" class="text-white"><?php echo $index + 1; ?></th>
+                                            <td class="text-start"><?php echo htmlspecialchars($device['brand_name']); ?> <?php echo htmlspecialchars($device['name']); ?></td>
+                                            <td class="text-end"><?php echo $device['review_count']; ?></td>
+                                        </tr>
+                            <?php
+                                    endif;
+                                endforeach;
+                            endif; ?>
                         </tbody>
                     </table>
                 </div>
                 <h6 style="border-left: 7px solid #EFEBE9 ; font-weight: 900; color: #090E21; text-transform: uppercase;"
                     class=" px-2 mt-2 d-inline mt-4">In
-                    Storeies
+                    Stores
                     Now</h6>
 
                 <div class="cent">
-
-                    <div class="d-flex">
-                        <div class="canel">
-                            <img class="shrink" src="https://fdn2.gsmarena.com/vv/bigpic/nothing-cmf-phone-2-pro.jpg"
-                                alt="">
-                            <p>Nothing Cmf 2 </p>
+                    <?php if (empty($latestDevices)): ?>
+                        <div class="text-center py-5">
+                            <i class="fas fa-mobile-alt fa-3x text-muted mb-3"></i>
+                            <h4 class="text-muted">No Devices Available</h4>
+                            <p class="text-muted">Check back later for new devices!</p>
                         </div>
-                        <div class="canel mx-4">
-                            <img class="shrink" src="https://fdn2.gsmarena.com/vv/bigpic/motorola-edge-60-pro.jpg"
-                                alt="">
-                            <p>Motrola edge 60 </p>
-                        </div>
-                        <div class="canel ">
-                            <img class="shrink" src="https://fdn2.gsmarena.com/vv/bigpic/vivo-x200-ultra.jpg" alt="">
-                            <p>Vivo x200 Ultra</p>
-                        </div>
-                    </div>
-                    <div class="d-flex">
-                        <div class="canel">
-                            <img class="shrink" src="https://fdn2.gsmarena.com/vv/bigpic/vivo-t4.jpg" alt="">
-                            <p>Vivo t4</p>
-                        </div>
-                        <div class="canel mx-4">
-                            <img class="shrink" src="https://fdn2.gsmarena.com/vv/bigpic/motorola-edge-60.jpg" alt="">
-                            <p>Motrola Edge 16</p>
-                        </div>
-                        <div class="canel ">
-                            <img class="shrink" src="https://fdn2.gsmarena.com/vv/bigpic/motorola-razr-60-ultra-5g.jpg"
-                                alt="">
-                            <p>motorola razr 60 ultra</p>
-                        </div>
-                    </div>
-                    <div class="d-flex">
-                        <div class="canel">
-                            <img class="shrink" src="https://fdn2.gsmarena.com/vv/bigpic/vivo-iqoo-z10x.jpg" alt="">
-                            <p>Vivo iQ00 Z10 x</p>
-                        </div>
-                        <div class="canel mx-4">
-                            <img class="shrink"
-                                src="https://fdn2.gsmarena.com/vv/bigpic/motorola-moto-g-stylus-5g-2025.jpg" alt="">
-                            <p>Motrola Moto G </p>
-                        </div>
-                        <div class="canel ">
-                            <img class="shrink" src="https://fdn2.gsmarena.com/vv/bigpic/google-pixel-9a.jpg" alt="">
-                            <p>Google Pixel 9a </p>
-                        </div>
-                    </div>
+                    <?php else: ?>
+                        <?php $chunks = array_chunk($latestDevices, 3); ?>
+                        <?php foreach ($chunks as $row): ?>
+                            <div class="d-flex">
+                                <?php foreach ($row as $i => $device): ?>
+                                    <div class="device-card canel<?php echo $i == 1 ? ' mx-4' : ($i == 0 ? '' : ''); ?>" data-device-id="<?php echo $device['id']; ?>" style="cursor: pointer;">
+                                        <img class="shrink" src="<?php echo htmlspecialchars($device['image'] ?? ''); ?>" alt="">
+                                        <p><?php echo htmlspecialchars($device['name'] ?? ''); ?></p>
+                                    </div>
+                                <?php endforeach; ?>
+                                <?php for ($j = count($row); $j < 3; $j++): ?>
+                                    <div class="canel<?php echo $j == 1 ? ' mx-4' : ($j == 0 ? '' : ''); ?>"></div>
+                                <?php endfor; ?>
+                            </div>
+                        <?php endforeach; ?>
+                    <?php endif; ?>
                 </div>
                 <h6 style="border-left: solid 5px grey ; font-weight: 900; color: #090E21; text-transform: uppercase;"
                     class="px-3 py-2 mt-3">Electric Vehicles</h6>
@@ -1261,10 +747,10 @@ if ($_POST && isset($_POST['action'])) {
                     </div>
                 </div>
 
-                <div style="position: sticky; top: 10px;">
+                <!-- <div style="position: sticky; top: 10px;">
                     <img src="https://fdn.gsmarena.com/imgroot/static/banners/self/review-pixel-9-pro-300x250.jpg"
                         class=" d-block mx-auto" style="width: 300px;">
-                </div>
+                </div> -->
 
             </div>
 
@@ -1302,7 +788,120 @@ if ($_POST && isset($_POST['action'])) {
             </div>
         </div>
     </div>
+    <script>
+        // Handle clickable table rows for devices
+        document.addEventListener('DOMContentLoaded', function() {
+            // Handle device row clicks (for views and reviews tables)
+            document.querySelectorAll('.clickable-row').forEach(function(row) {
+                row.addEventListener('click', function() {
+                    const deviceId = this.getAttribute('data-device-id');
+                    if (deviceId) {
+                        // Track the view
+                        fetch('track_device_view.php', {
+                            method: 'POST',
+                            headers: {
+                                'Content-Type': 'application/x-www-form-urlencoded',
+                            },
+                            body: 'device_id=' + encodeURIComponent(deviceId)
+                        });
 
+                        // Show device details modal
+                        showDeviceDetails(deviceId);
+                    }
+                });
+            });
+
+            // Handle device card clicks (for latest devices grid)
+            document.querySelectorAll('.device-card').forEach(function(card) {
+                card.addEventListener('click', function() {
+                    const deviceId = this.getAttribute('data-device-id');
+                    if (deviceId) {
+                        // Track the view
+                        fetch('track_device_view.php', {
+                            method: 'POST',
+                            headers: {
+                                'Content-Type': 'application/x-www-form-urlencoded',
+                            },
+                            body: 'device_id=' + encodeURIComponent(deviceId)
+                        });
+
+                        // Show device details modal
+                        showDeviceDetails(deviceId);
+                    }
+                });
+            });
+
+            // Handle brand cell clicks
+            document.querySelectorAll('.brand-cell').forEach(function(cell) {
+                cell.addEventListener('click', function() {
+                    const brandId = this.getAttribute('data-brand-id');
+                    if (brandId) {
+                        // Redirect to brands page with specific brand filter
+                        window.location.href = `brands.php?brand=${brandId}`;
+                    }
+                });
+            });
+
+            // Handle comparison row clicks
+            document.querySelectorAll('.clickable-comparison').forEach(function(row) {
+                row.addEventListener('click', function() {
+                    const device1Id = this.getAttribute('data-device1-id');
+                    const device2Id = this.getAttribute('data-device2-id');
+                    if (device1Id && device2Id) {
+                        // Track the comparison
+                        fetch('track_device_comparison.php', {
+                            method: 'POST',
+                            headers: {
+                                'Content-Type': 'application/x-www-form-urlencoded',
+                            },
+                            body: 'device1_id=' + encodeURIComponent(device1Id) + '&device2_id=' + encodeURIComponent(device2Id)
+                        });
+
+                        // Redirect to comparison page
+                        window.location.href = `compare_phones.php?phone1=${device1Id}&phone2=${device2Id}`;
+                    }
+                });
+            });
+        });
+
+        // Show post details in modal
+        function showPostDetails(postId) {
+            fetch(`get_post_details.php?id=${postId}`)
+                .then(response => response.text())
+                .then(data => {
+                    document.getElementById('postModalBody').innerHTML = data;
+                    new bootstrap.Modal(document.getElementById('postModal')).show();
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                    alert('Failed to load post details');
+                });
+        }
+
+        // Show device details in modal
+        function showDeviceDetails(deviceId) {
+            fetch(`get_device_details.php?id=${deviceId}`)
+                .then(response => response.text())
+                .then(data => {
+                    window.location.href = `device.php?id=${deviceId}`;
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                    alert('Failed to load device details');
+                });
+        }
+
+
+
+        // Auto-dismiss alerts after 5 seconds
+        setTimeout(function() {
+            var alerts = document.querySelectorAll('.alert');
+            alerts.forEach(function(alert) {
+                var bsAlert = new bootstrap.Alert(alert);
+                bsAlert.close();
+            });
+        }, 5000);
+    </script>
     <script src="script.js"></script>
 
 

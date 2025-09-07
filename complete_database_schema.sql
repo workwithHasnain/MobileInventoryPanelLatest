@@ -256,7 +256,7 @@ CREATE TABLE IF NOT EXISTS content_views (
     ip_address INET,
     user_agent TEXT,
     viewed_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    UNIQUE(content_type, content_id, ip_address, DATE(viewed_at))
+    UNIQUE(content_type, content_id, ip_address)
 );
 
 -- =====================================================
