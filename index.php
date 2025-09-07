@@ -661,58 +661,7 @@ if ($_POST && isset($_POST['action'])) {
                         <?php endforeach; ?>
                     <?php endif; ?>
                 </div>
-                <h6 style="border-left: solid 5px grey ; font-weight: 900; color: #090E21; text-transform: uppercase;"
-                    class="px-3 py-2 mt-3">Electric Vehicles</h6>
-                <div class="d-flex">
-                    <div class="col-md-4">
-                        <img style="height: 60px;"
-                            src="https://st.arenaev.com/news/25/05/mercedes-amg-ev-sedan-teaser-images/-344x215/arenaev_000.jpg"
-                            class="img-fluid rounded" alt="News Image">
-                    </div>
-                    <div class="col-md-8 py-2">
-                        <p class="fw-bold mb-1 wanted-12">
-                            mercedes amg starts teasing its first ev sedan here are the pictures news
-                        </p>
-                    </div>
-                </div>
-                <div class="d-flex my-3">
-                    <div class="col-md-4">
-                        <img style="height: 60px;"
-                            src="https://st.arenaev.com/news/25/05/xiaomi-signs-partnership-deal-with-nurburgring/-344x215/arenaev_001.jpg"
-                            class="img-fluid rounded" alt="News Image">
-                    </div>
-                    <div class="col-md-8 py-2">
-                        <p class="fw-bold mb-1 wanted-12">
-                            Xiomo Sign Partnership agreement with nurbugging
-                        </p>
-                    </div>
-                </div>
-
-                <div class="d-flex">
-                    <div class="col-md-4">
-                        <img style="height: 60px;"
-                            src="https://st.arenaev.com/news/25/05/li-auto-refreshes-electric-suv-lineup-with-tech-boost/-344x215/arenaev_001.jpg"
-                            class="img-fluid rounded" alt="News Image">
-                    </div>
-                    <div class="col-md-8 py-2">
-                        <p class="fw-bold mb-1 wanted-12">
-                            Li auto refreshes electric suv lineup with tech boost keep prices steady news
-                        </p>
-                    </div>
-                </div>
-                <div class="d-flex my-3">
-                    <div class="col-md-4">
-                        <img style="height: 60px;"
-                            src="https://st.arenaev.com/news/25/01/polestar-3-triumphs-in-winter-range-test/-344x215/arenaev_001.jpg"
-                            class="img-fluid rounded" alt="News Image">
-                    </div>
-                    <div class="col-md-8 py-2">
-                        <p class="fw-bold mb-1 wanted-12">
-                            polestar 3 triumphs in winter range test news
-                        </p>
-
-                    </div>
-                </div>
+                
 
                 <!-- <div style="position: sticky; top: 10px;">
                     <img src="https://fdn.gsmarena.com/imgroot/static/banners/self/review-pixel-9-pro-300x250.jpg"
