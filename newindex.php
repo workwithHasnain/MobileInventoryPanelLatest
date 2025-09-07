@@ -376,79 +376,48 @@ if ($_POST && isset($_POST['action'])) {
     <div class="container featured ">
         <h2 class="section">Featured</h2>
         <div class="featured-section">
-
-            <div class="div-block">
-                <img src="https://fdn.gsmarena.com/imgroot/news/25/07/sony-wh-1000-xm6-review/-184x111/gsmarena_100.jpg"
-                    alt="">
-                <h3 class="sony-tv">Sony WH-1000XM6 headphones review</h3>
-            </div>
-            <div class="div-block ">
-                <img src="https://fdn.gsmarena.com/imgroot/news/25/07/galaxy-watch8-ifr/-184x111/gsmarena_000.jpg"
-                    alt="">
-                <h3 class="sony-tv">Samsung Galaxy Watch8 in for review</h3>
-            </div>
-            <div class="div-block ">
-                <img src="https://fdn.gsmarena.com/imgroot/news/25/07/vivo-x-fold5-ifr/-184x111/gsmarena_000.jpg"
-                    alt="">
-                <h3 class="sony-tv">vivo X Fold5 in for review</h3>
-            </div>
-            <div class="div-block ">
-                <img src="https://fdn.gsmarena.com/imgroot/news/25/07/weekly-poll-samsung-galaxy-zfold7-zflip7-zflip7fe/-184x111/gsmarena_000.jpg"
-                    alt="">
-                <h3 class="sony-tv">Weekly poll: Samsung Galaxy Z Fold7, Z Flip7 or Z Flip7 FE?</h3>
-            </div>
-            <div class="div-block ">
-                <img src="https://fdn.gsmarena.com/imgroot/news/25/07/galaxy-watch8-classic-ifr/-184x111/gsmarena_000.jpg"
-                    alt="">
-                <h3 class="sony-tv">Samsung Galaxy Watch8 Classic in for review</h3>
-            </div>
-            <div class="div-block ">
-                <img src="https://fdn.gsmarena.com/imgroot/news/25/07/samsung-galaxy-z-flip7-ifr/-184x111/gsmarena_000.jpg"
-                    alt="">
-                <h3 class="sony-tv">Samsung Galaxy Z Flip7 in for review</h3>
-            </div>
+            <?php if (empty($posts)): ?>
+                <div class="text-center py-5">
+                    <i class="fas fa-newspaper fa-3x text-muted mb-3"></i>
+                    <h4 class="text-muted">No Featured Posts Available</h4>
+                    <p class="text-muted">Check back later for new content!</p>
+                </div>
+            <?php else: ?>
+                <?php foreach ($posts as $post): ?>
+                    <div class="div-block" style="cursor:pointer;" onclick="window.location.href='post.php?slug=<?php echo urlencode($post['slug']); ?>'">
+                        <?php if (!empty($post['featured_image'])): ?>
+                            <img src="<?php echo htmlspecialchars($post['featured_image']); ?>" alt="Featured Image">
+                        <?php endif; ?>
+                        <h3 class="sony-tv"><?php echo htmlspecialchars($post['title']); ?></h3>
+                        <?php if (!empty($post['short_description'])): ?>
+                            <p class="text-muted" style="font-size:13px; margin-bottom:0;">
+                                <?php echo htmlspecialchars($post['short_description']); ?>
+                            </p>
+                        <?php endif; ?>
+                    </div>
+                <?php endforeach; ?>
+            <?php endif; ?>
         </div>
     </div>
     <div class="container support content-wrapper" id="Top">
         <div class="row">
-            <div class="col-lg-4 col-6 conjection-froud  bobile">
-                <div class="review-column-list-item review-column-list-item-secondary ">
-                    <img class="review-list-item-image "
-                        src="https://fdn.gsmarena.com/imgroot/reviews/25/motorola-moto-g-stylus-2025/-347x151/gsmarena_001.jpg"
-                        alt="Moto G Stylus 5G (2025) review">
-                    <h1>Mooto G Stylus 5G (2025) review</h1>
-                    <img class="review-list-item-image"
-                        src="https://fdn.gsmarena.com/imgroot/reviews/25/google-pixel-9a/-347x151/gsmarena_001.jpg"
-                        alt="Google Pixel 9a review">
-                    <h1>Google pIxel 9a Review</h1>
-                </div>
-            </div>
-            <div class="col-6 col-lg-4 conjection-froud " style="margin-left: 7px;">
-                <div class="comfort d-md-none d-block">
-                    <div class="conjection position-absolute mx-2  my-2 ">
-                        <i class="fa-solid fa-clock fa-sm" style="color: white;"></i>
-                        <span clas s="text-white font-bold pb-5" style="font-size: 13px;">8 may 2025 </span>
+            <?php
+            // Show up to 4 featured posts in two columns, 2 per column
+            $featuredPreview = array_slice($posts, 0, 4);
+            $chunks = array_chunk($featuredPreview, 2);
+            foreach ($chunks as $colIndex => $colPosts):
+            ?>
+                <div class="<?php echo $colIndex === 0 ? 'col-lg-4 col-6 conjection-froud  bobile' : 'col-6 col-lg-4 conjection-froud'; ?>" <?php echo $colIndex === 1 ? ' style="margin-left: 7px;"' : ''; ?>>
+                    <div class="review-column-list-item review-column-list-item-secondary ">
+                        <?php foreach ($colPosts as $post): ?>
+                            <?php if (!empty($post['featured_image'])): ?>
+                                <img class="review-list-item-image" src="<?php echo htmlspecialchars($post['featured_image']); ?>" alt="<?php echo htmlspecialchars($post['title']); ?>">
+                            <?php endif; ?>
+                            <h1><?php echo htmlspecialchars($post['title']); ?></h1>
+                        <?php endforeach; ?>
                     </div>
-                    <div class="conjection position-absolute  mx-3 my-2 end-0">
-                        <i class="fa-solid fa-comment fa-sm" style="color: white;"></i>
-                        <span class="text-white ">80</span>
-                    </div>
-                    <img src="https://fdn.gsmarena.com/imgroot/reviews/25/nothing-cmf-phone-2-pro/-728x314/gsmarena_001.jpg"
-                        alt="Nothing CMF Phone 2 Pro">
-                    <h1 class="position-absolute">Nothing CMF Phone 2 Pro review</h1>
                 </div>
-                <div class="review-column-list-item review-column-list-item-secondary">
-                    <img class="review-list-item-image "
-                        src="https://fdn.gsmarena.com/imgroot/reviews/25/motorola-moto-g-stylus-2025/-347x151/gsmarena_001.jpg"
-                        alt="Moto G Stylus 5G (2025) review">
-
-                    <h1>Mooto G Stylus 5G (2025) review</h1>
-                    <img class="review-list-item-image"
-                        src="https://fdn.gsmarena.com/imgroot/reviews/25/google-pixel-9a/-347x151/gsmarena_001.jpg"
-                        alt="Google Pixel 9a review">
-                    <h1>Google pIxel 9a Review</h1>
-                </div>
-            </div>
+            <?php endforeach; ?>
             <div class="col-md-4 col-5 d-none d-lg-block" style="position: relative; left: 40px;">
                 <button class="solid w-100 py-2">
                     <i class="fa-solid fa-mobile fa-sm mx-2" style="color: white;"></i>
@@ -473,12 +442,12 @@ if ($_POST && isset($_POST['action'])) {
                     <button class="solid w-50 py-2">
                         <i class="fa-solid fa-bars fa-sm mx-2"></i>
                         All Brands</button></a>
-                <button class="solid py-2" style="    width: 177px;">
+                <button class="solid py-2" style="width: 177px;">
                     <i class="fa-solid fa-volume-high fa-sm mx-2"></i>
                     RUMORS MILL</button>
             </div>
         </div>
-        
+
     </div>
     <div class="container mt-0 varasat">
         <div class="row">
@@ -495,32 +464,28 @@ if ($_POST && isset($_POST['action'])) {
     </div>
     <div class="container mt-0 war ">
         <div class="row">
-            <div class="col-lg-4 col-md-6 col-12 sentizer-erx    " style="background-color: #EEEEEE;">
-                <div class="review-card">
-                    <img src="https://fdn.gsmarena.com/imgroot/news/25/05/honor-magic-v5-thickness-rumor/-344x215/gsmarena_000.jpg"
-                        alt="Moto G Stylus 5G">
-                    <div class="review-card-body">
-                        <div class="review-card-title">The Honor Magic V5 </div>
-                        <div class="review-card-meta">
-                            <span>02 May 2025</span>
-                            <span><i class="bi bi-chat-dots-fill"></i>40 comments</span>
+            <?php
+            $maxPosts = 6;
+            $postChunks = array_chunk(array_slice($posts, 0, $maxPosts), ceil($maxPosts / 2));
+            foreach ($postChunks as $colIndex => $colPosts):
+            ?>
+                <div class="col-lg-4 col-md-6 col-12 sentizer-erx" style="background-color: #EEEEEE;">
+                    <?php foreach ($colPosts as $post): ?>
+                        <div class="review-card mb-4">
+                            <?php if (isset($post['featured_image']) && !empty($post['featured_image'])): ?>
+                                <img src="<?php echo htmlspecialchars($post['featured_image']); ?>" alt="<?php echo htmlspecialchars($post['title']); ?>">
+                            <?php endif; ?>
+                            <div class="review-card-body">
+                                <div class="review-card-title"><?php echo htmlspecialchars($post['title']); ?></div>
+                                <div class="review-card-meta">
+                                    <span><?php echo date('M j, Y', strtotime($post['created_at'])); ?></span>
+                                    <span><i class="bi bi-chat-dots-fill"></i><?php echo $post['comment_count']; ?> comments</span>
+                                </div>
+                            </div>
                         </div>
-                    </div>
+                    <?php endforeach; ?>
                 </div>
-            </div>
-            <div class="col-lg-4 col-md-6 col-12 sentizer-er" style="background-color: #EEEEEE;">
-                <div class="review-card">
-                    <img src="https://fdn.gsmarena.com/imgroot/reviews/25/google-pixel-9a/-347x151/gsmarena_001.jpg"
-                        alt="Google Pixel 9a">
-                    <div class="review-card-body">
-                        <div class="review-card-title">Google Pixel 9a review</div>
-                        <div class="review-card-meta">
-                            <span>04 May 2025</span>
-                            <span><i class="bi bi-chat-dots-fill"></i>28 comments</span>
-                        </div>
-                    </div>
-                </div>
-            </div>
+            <?php endforeach; ?>
 
             <div class="col-lg-4  col-12 sentizer-er  bg-white p-3">
                 <h6 style="color: #090E21; text-transform: uppercase; font-weight: 900;" class=" mt-2 ">Latest Devices
@@ -869,8 +834,7 @@ if ($_POST && isset($_POST['action'])) {
             fetch(`get_post_details.php?id=${postId}`)
                 .then(response => response.text())
                 .then(data => {
-                    document.getElementById('postModalBody').innerHTML = data;
-                    new bootstrap.Modal(document.getElementById('postModal')).show();
+                    window.location.href = `post.php?id=${postId}`;
                 })
                 .catch(error => {
                     console.error('Error:', error);
