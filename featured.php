@@ -9,7 +9,8 @@ $posts_stmt = $pdo->prepare("
     SELECT p.*, 
     (SELECT COUNT(*) FROM post_comments pc WHERE pc.post_id = p.id AND pc.status = 'approved') as comment_count
     FROM posts p 
-    WHERE p.status ILIKE 'published' 
+    WHERE p.status ILIKE 'published'
+    AND p.is_featured = TRUE 
     ORDER BY p.created_at DESC 
     LIMIT 6
 ");
@@ -113,100 +114,16 @@ $brands_stmt = $pdo->prepare("
 $brands_stmt->execute();
 $brands = $brands_stmt->fetchAll();
 
-// Get comments for posts
-function getPostComments($post_id)
-{
-    global $pdo;
-    $stmt = $pdo->prepare("SELECT * FROM post_comments WHERE post_id = ? AND status = 'approved' ORDER BY created_at DESC");
-    $stmt->execute([$post_id]);
-    return $stmt->fetchAll();
-}
 
-// Get comments for devices
-function getDeviceComments($device_id)
-{
-    global $pdo;
-    $stmt = $pdo->prepare("SELECT * FROM device_comments WHERE device_id = ? AND status = 'approved' ORDER BY created_at DESC");
-    $stmt->execute([$device_id]);
-    return $stmt->fetchAll();
-}
 
-// Handle comment submissions and newsletter subscriptions
-$comment_success = '';
-$comment_error = '';
-$newsletter_success = '';
-$newsletter_error = '';
-
-if ($_POST && isset($_POST['action'])) {
-    $action = $_POST['action'];
-
-    if ($action === 'newsletter_subscribe') {
-        $email = trim($_POST['newsletter_email'] ?? '');
-        $name = trim($_POST['newsletter_name'] ?? '');
-
-        if (empty($email)) {
-            $newsletter_error = 'Email address is required.';
-        } elseif (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
-            $newsletter_error = 'Please enter a valid email address.';
-        } else {
-            // Check if email already exists
-            $check_stmt = $pdo->prepare("SELECT id FROM newsletter_subscribers WHERE email = ?");
-            $check_stmt->execute([$email]);
-
-            if ($check_stmt->fetch()) {
-                $newsletter_error = 'This email is already subscribed to our newsletter.';
-            } else {
-                $insert_stmt = $pdo->prepare("INSERT INTO newsletter_subscribers (email, name, status, subscribed_at) VALUES (?, ?, 'active', NOW())");
-                if ($insert_stmt->execute([$email, $name])) {
-                    $newsletter_success = 'Thank you for subscribing to our newsletter! You\'ll receive the latest tech updates and device reviews.';
-                } else {
-                    $newsletter_error = 'Failed to subscribe. Please try again.';
-                }
-            }
-        }
-    } else {
-        // Handle comment submissions
-        $name = trim($_POST['name'] ?? '');
-        $email = trim($_POST['email'] ?? '');
-        $comment = trim($_POST['comment'] ?? '');
-
-        if (empty($name) || empty($email) || empty($comment)) {
-            $comment_error = 'All fields are required.';
-        } elseif (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
-            $comment_error = 'Please enter a valid email address.';
-        } elseif (strlen($comment) < 10) {
-            $comment_error = 'Comment must be at least 10 characters long.';
-        } else {
-            if ($action === 'comment_post') {
-                $post_id = $_POST['post_id'] ?? '';
-                $stmt = $pdo->prepare("INSERT INTO post_comments (post_id, name, email, comment, status, created_at) VALUES (?, ?, ?, ?, 'pending', NOW())");
-                if ($stmt->execute([$post_id, $name, $email, $comment])) {
-                    $comment_success = 'Your comment has been submitted and is pending approval.';
-                } else {
-                    $comment_error = 'Failed to submit comment. Please try again.';
-                }
-            } elseif ($action === 'comment_device') {
-                $device_id = $_POST['device_id'] ?? '';
-                $parent_id = !empty($_POST['parent_id']) ? $_POST['parent_id'] : null;
-                $stmt = $pdo->prepare("INSERT INTO device_comments (device_id, name, email, comment, parent_id, status, created_at) VALUES (?, ?, ?, ?, ?, 'pending', NOW())");
-                if ($stmt->execute([$device_id, $name, $email, $comment, $parent_id])) {
-                    $comment_success = 'Your comment has been submitted and is pending approval.';
-                } else {
-                    $comment_error = 'Failed to submit comment. Please try again.';
-                }
-            }
-        }
-    }
-}
 ?>
-
 <!DOCTYPE html>
 <html lang="en">
 
 <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>GSMArena</title>
+    <title>GSMArena New Page</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/css/bootstrap.min.css" rel="stylesheet"
         integrity="sha384-rbsA2VBKQhggwzxH7pPCaAqO46MgnOM80zW1RWuH61DGLwZJEdK2Kadq2F9CUG65" crossorigin="anonymous">
     <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
@@ -218,9 +135,7 @@ if ($_POST && isset($_POST['action'])) {
     <!-- Font Awesome (for icons) -->
     <script src="https://kit.fontawesome.com/your-kit-code.js" crossorigin="anonymous"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" />
-    <script>
 
-    </script>
 
     <link rel="stylesheet" href="style.css">
 </head>
@@ -289,7 +204,6 @@ if ($_POST && isset($_POST['action'])) {
                     </button>
                 </div>
             </div>
-
         </nav>
 
     </div>
@@ -372,53 +286,34 @@ if ($_POST && isset($_POST['action'])) {
             </div>
         </div>
     </div>
-
-    <div class="container featured ">
-        <h2 class="section">Featured</h2>
-        <div class="featured-section">
-            <?php if (empty($posts)): ?>
-                <div class="text-center py-5">
-                    <i class="fas fa-newspaper fa-3x text-muted mb-3"></i>
-                    <h4 class="text-muted">No Featured Posts Available</h4>
-                    <p class="text-muted">Check back later for new content!</p>
-                </div>
-            <?php else: ?>
-                <?php foreach ($posts as $post): ?>
-                    <div class="div-block" style="cursor:pointer;" onclick="window.location.href='post.php?slug=<?php echo urlencode($post['slug']); ?>'">
-                        <?php if (!empty($post['featured_image'])): ?>
-                            <img src="<?php echo htmlspecialchars($post['featured_image']); ?>" alt="Featured Image" style="cursor:pointer;" onclick="window.location.href='post.php?slug=<?php echo urlencode($post['slug']); ?>'">
-                        <?php endif; ?>
-                        <h3 class="sony-tv" style="cursor:pointer;" onclick="window.location.href='post.php?slug=<?php echo urlencode($post['slug']); ?>'"><?php echo htmlspecialchars($post['title']); ?></h3>
-                        <?php if (!empty($post['short_description'])): ?>
-                            <p class="text-muted" style="font-size:13px; margin-bottom:0;" style="cursor:pointer;" onclick="window.location.href='post.php?slug=<?php echo urlencode($post['slug']); ?>'">
-                                <?php echo htmlspecialchars($post['short_description']); ?>
-                            </p>
-                        <?php endif; ?>
-                    </div>
-                <?php endforeach; ?>
-            <?php endif; ?>
-        </div>
-    </div>
     <div class="container support content-wrapper" id="Top">
         <div class="row">
-            <?php
-            // Show up to 4 featured posts in two columns, 2 per column
-            $featuredPreview = array_slice($posts, 0, 4);
-            $chunks = array_chunk($featuredPreview, 2);
-            foreach ($chunks as $colIndex => $colPosts):
-            ?>
-                <div class="<?php echo $colIndex === 0 ? 'col-lg-4 col-6 conjection-froud  bobile' : 'col-6 col-lg-4 conjection-froud'; ?>" <?php echo $colIndex === 1 ? ' style="margin-left: 7px;"' : ''; ?>>
-                    <div class="review-column-list-item review-column-list-item-secondary " style="cursor:pointer;" onclick="window.location.href='post.php?slug=<?php echo urlencode($post['slug']); ?>'">
-                        <?php foreach ($colPosts as $post): ?>
-                            <?php if (!empty($post['featured_image'])): ?>
-                                <img class="review-list-item-image" src="<?php echo htmlspecialchars($post['featured_image']); ?>" alt="<?php echo htmlspecialchars($post['title']); ?>" style="cursor:pointer;" onclick="window.location.href='post.php?slug=<?php echo urlencode($post['slug']); ?>'">
-                            <?php endif; ?>
-                            <h1 style="cursor:pointer;" onclick="window.location.href='post.php?slug=<?php echo urlencode($post['slug']); ?>'"><?php echo htmlspecialchars($post['title']); ?></h1>
-                        <?php endforeach; ?>
+
+            <div class="col-md-8 col-5  d-lg-inline d-none col-12 ">
+                <div class="comfort-life position-absolute">
+                    <img class="w-100 h-100" src="imges/Screenshot (163).png"
+                        style="background-repeat: no-repeat; background-size: cover;" alt="">
+                    <div class="position-absolute d-flex mt-1">
+                        <label class="text-white whitening ">Popular Tags</label>
+                        <button class="mobiles-button">Featured</button>
+                        <button class="mobiles-button">Android</button>
+                        <button class="mobiles-button">Samsung</button>
+                        <button class="mobiles-button">Nokia</button>
+                        <button class="mobiles-button">Sony</button>
+                        <button class="mobiles-button">Rumors</button>
+                        <button class="mobiles-button">Apple</button>
+                        <button class="mobiles-button">Motorola</button>
+                    </div>
+
+                    <div class="comon">
+                        <label for="" class="text-white whitening ">Search For</label>
+                        <input type="text" class="bg-white">
+                        <button class="mobiles-button bg-white">Android</button>
                     </div>
                 </div>
-            <?php endforeach; ?>
-            <div class="col-md-4 col-5 d-none d-lg-block" style="position: relative; left: 40px;">
+
+            </div>
+            <div class="col-md-4 col-5 d-none d-lg-block" style="position: relative; left: 25px;">
                 <button class="solid w-100 py-2">
                     <i class="fa-solid fa-mobile fa-sm mx-2" style="color: white;"></i>
                     Phone Finder</button>
@@ -442,27 +337,14 @@ if ($_POST && isset($_POST['action'])) {
                     <button class="solid w-50 py-2">
                         <i class="fa-solid fa-bars fa-sm mx-2"></i>
                         All Brands</button></a>
-                <button class="solid py-2" style="width: 177px;">
+                <button class="solid py-2" style="    width: 177px;">
                     <i class="fa-solid fa-volume-high fa-sm mx-2"></i>
                     RUMORS MILL</button>
             </div>
-        </div>
 
-    </div>
-    <div class="container mt-0 varasat">
-        <div class="row">
-            <div class="rena w-100">
-                <h1 class=" d-flex align-items-center justify-content-start warently  text-center m-auto">SmartPhone
-                    Buyer's Guide
-                    <i class="fa-solid fa-bell fa-lg  d-flex justify-content-end align-items-end m-auto px-auto"
-                        style="color: #8c8c8c;">
-                    </i>
-                </h1>
-                <p class="d-none d-md-inline">The Cheat Sheet To The Best Phones to Get Right Now</p>
-            </div>
         </div>
     </div>
-    <div class="container mt-0 war ">
+    <div class="container mt-0  ">
         <div class="row">
             <?php
             $maxPosts = 6;
@@ -489,76 +371,17 @@ if ($_POST && isset($_POST['action'])) {
                 </div>
             <?php endforeach; ?>
 
-            <div class="col-lg-4  col-12 sentizer-er  bg-white p-3">
-                <h6 style="color: #090E21; text-transform: uppercase; font-weight: 900;" class=" mt-2 ">Latest Devices
-                </h6>
-                <div class="cent">
-                    <?php if (empty($devices)): ?>
-                        <div class="text-center py-5">
-                            <i class="fas fa-mobile-alt fa-3x text-muted mb-3"></i>
-                            <h4 class="text-muted">No Devices Available</h4>
-                            <p class="text-muted">Check back later for new devices!</p>
-                        </div>
-                    <?php else: ?>
-                        <?php $chunks = array_chunk($devices, 3); ?>
-                        <?php foreach ($chunks as $row): ?>
-                            <div class="d-flex">
-                                <?php foreach ($row as $i => $device): ?>
-                                    <div class="device-card canel<?php echo $i == 1 ? ' mx-4' : ($i == 0 ? '' : ''); ?>" data-device-id="<?php echo $device['id']; ?>" style="cursor: pointer;">
-                                        <?php if (isset($device['images']) && !empty($device['images'])): ?>
-                                            <img class="shrink" src="<?php echo htmlspecialchars($device['images'][0]); ?>" alt="">
-                                        <?php elseif (isset($device['image']) && !empty($device['image'])): ?>
-                                            <img class="shrink" src="<?php echo htmlspecialchars($device['image']); ?>" alt="">
-                                        <?php else: ?>
-                                            <img class="shrink" src="" alt="">
-                                        <?php endif; ?>
-                                        <p><?php echo htmlspecialchars($device['name'] ?? ''); ?></p>
-                                    </div>
-                                <?php endforeach; ?>
-                                <?php for ($j = count($row); $j < 3; $j++): ?>
-                                    <div class="canel<?php echo $j == 1 ? ' mx-4' : ($j == 0 ? '' : ''); ?>"></div>
-                                <?php endfor; ?>
-                            </div>
-                        <?php endforeach; ?>
-                    <?php endif; ?>
+            <div class="col-lg-4  col-12  bg-white p-3">
+
+                
+                <div class="d-flex">
+                    <h5 class="text-secondary mt-2 d-inline fw-bold " style="text-transform: uppercase;">top 10 by Daily
+                        Interest </h5>
                 </div>
-
-                <h6 style="border-left: solid 5px grey ; color: #090E21; text-transform: uppercase; font-weight: 900; margin-top: 12px;"
-                    class="px-3">Popular comparisons</h6>
-
-                <div class="sentizer bg-white mt-2 p-3 rounded shadow-sm" style="    text-transform: Uppercase;
-                                            font-size: 13px;
-                                            font-weight: 700;">
-                    <div class="row">
-                        <div class="col-12">
-                            <?php if (empty($topComparisons)): ?>
-                                <p class="mb-2" style=" text-transform: capitalize;">No Comparisons Yet</p>
-                            <?php else: ?>
-                                <?php foreach ($topComparisons as $index => $comparison): ?>
-                                    <!-- if $index is odd -->
-                                    <?php if ((($index + 1) % 2) != 0): ?>
-                                        <p class="mb-2 clickable-comparison" data-device1-id="<?php echo $comparison['device1_id'] ?? ''; ?>"
-                                            data-device2-id="<?php echo $comparison['device2_id'] ?? ''; ?>"
-                                            style="cursor: pointer; background-color: #ffe6f0; color: #090E21; text-transform: capitalize;"><?php echo htmlspecialchars($comparison['device1_name'] ?? $comparison['device1'] ?? 'Unknown'); ?> vs.
-                                            <?php echo htmlspecialchars($comparison['device2_name'] ?? $comparison['device2'] ?? 'Unknown'); ?></p>
-                                    <?php else: ?>
-                                        <!-- else if $index is even -->
-                                        <p class="mb-2 clickable-comparison" data-device1-id="<?php echo $comparison['device1_id'] ?? ''; ?>"
-                                            data-device2-id="<?php echo $comparison['device2_id'] ?? ''; ?>" style="cursor: pointer; text-transform: capitalize;"><?php echo htmlspecialchars($comparison['device1_name'] ?? $comparison['device1'] ?? 'Unknown'); ?> vs. <?php echo htmlspecialchars($comparison['device2_name'] ?? $comparison['device2'] ?? 'Unknown'); ?></p>
-                                    <?php endif; ?>
-                                <?php endforeach; ?>
-                            <?php endif; ?>
-                        </div>
-                    </div>
-                </div>
-                <h6 style="border-left: 7px solid #EFEBE9 ; font-weight: 900; color: #090E21; text-transform: uppercase;"
-                    class=" px-2 mt-2 d-inline mt-4">Top 10
-                    Daily Interest</h6>
-
-                <div class="center">
+                <div class="center w-100">
                     <table class="table table-sm custom-table">
                         <thead>
-                            <tr style="background-color: #4c7273; color: white;">
+                            <tr class="text-white " style="background-color: #4C7273;">
                                 <th style="color: white;">#</th>
                                 <th style="color: white;">Devices</th>
                                 <th style="color: white;">Daily Hits</th>
@@ -592,10 +415,10 @@ if ($_POST && isset($_POST['action'])) {
                         </tbody>
                     </table>
                 </div>
-                <h6 style="border-left: 7px solid #EFEBE9 ; font-weight: 900; color: #090E21; text-transform: uppercase;"
-                    class=" px-2 mt-2 d-inline mt-4">Top 10 by
-                    Fans</h6>
-                <div class="center" style="margin-top: 12px;">
+                <div class="center w-100 " style="margin-top: 12px;">
+                    <h5 class="text-secondary mt-2 d-inline fw-bold " style="text-transform: uppercase;">top 10 by Fans
+                    </h5>
+
                     <table class="table table-sm custom-table">
                         <thead>
                             <tr class="text-white" style="background-color: #14222D;">
@@ -632,41 +455,10 @@ if ($_POST && isset($_POST['action'])) {
                         </tbody>
                     </table>
                 </div>
-                <h6 style="border-left: 7px solid #EFEBE9 ; font-weight: 900; color: #090E21; text-transform: uppercase;"
-                    class=" px-2 mt-2 d-inline mt-4">In
-                    Stores
-                    Now</h6>
-
-                <div class="cent">
-                    <?php if (empty($latestDevices)): ?>
-                        <div class="text-center py-5">
-                            <i class="fas fa-mobile-alt fa-3x text-muted mb-3"></i>
-                            <h4 class="text-muted">No Devices Available</h4>
-                            <p class="text-muted">Check back later for new devices!</p>
-                        </div>
-                    <?php else: ?>
-                        <?php $chunks = array_chunk($latestDevices, 3); ?>
-                        <?php foreach ($chunks as $row): ?>
-                            <div class="d-flex">
-                                <?php foreach ($row as $i => $device): ?>
-                                    <div class="device-card canel<?php echo $i == 1 ? ' mx-4' : ($i == 0 ? '' : ''); ?>" data-device-id="<?php echo $device['id']; ?>" style="cursor: pointer;">
-                                        <img class="shrink" src="<?php echo htmlspecialchars($device['image'] ?? ''); ?>" alt="">
-                                        <p><?php echo htmlspecialchars($device['name'] ?? ''); ?></p>
-                                    </div>
-                                <?php endforeach; ?>
-                                <?php for ($j = count($row); $j < 3; $j++): ?>
-                                    <div class="canel<?php echo $j == 1 ? ' mx-4' : ($j == 0 ? '' : ''); ?>"></div>
-                                <?php endfor; ?>
-                            </div>
-                        <?php endforeach; ?>
-                    <?php endif; ?>
-                </div>
-
             </div>
-
         </div>
     </div>
-    <div id="bottom" class="container d-flex py-3" style="max-width: 1034px;">
+    <div id="bottom" class="container d-flex mt-3" style="max-width: 1034px;">
         <div class="row align-items-center">
             <div class="col-md-2 m-auto col-4 d-flex justify-content-center align-items-center "> <img
                     src="https://fdn2.gsmarena.com/w/css/logo-gsmarena-com.png" alt="">
@@ -690,7 +482,7 @@ if ($_POST && isset($_POST['action'])) {
                     <a href="#">Mobile version</a>
                     <a href="#">Android app</a>
                     <a href="#">Tools</a>
-                    <a href="contact.php">Contact us</a>
+                    <a href="#">Contact us</a>
                     <a href="#">Merch store</a>
                     <a href="#">Privacy</a>
                     <a href="#">Terms of use</a>
@@ -751,27 +543,6 @@ if ($_POST && isset($_POST['action'])) {
                     }
                 });
             });
-
-            // Handle comparison row clicks
-            document.querySelectorAll('.clickable-comparison').forEach(function(row) {
-                row.addEventListener('click', function() {
-                    const device1Id = this.getAttribute('data-device1-id');
-                    const device2Id = this.getAttribute('data-device2-id');
-                    if (device1Id && device2Id) {
-                        // Track the comparison
-                        fetch('track_device_comparison.php', {
-                            method: 'POST',
-                            headers: {
-                                'Content-Type': 'application/x-www-form-urlencoded',
-                            },
-                            body: 'device1_id=' + encodeURIComponent(device1Id) + '&device2_id=' + encodeURIComponent(device2Id)
-                        });
-
-                        // Redirect to comparison page
-                        window.location.href = `compare_phones.php?phone1=${device1Id}&phone2=${device2Id}`;
-                    }
-                });
-            });
         });
 
         // Show post details in modal
@@ -812,8 +583,6 @@ if ($_POST && isset($_POST['action'])) {
         }, 5000);
     </script>
     <script src="script.js"></script>
-
-
 </body>
 
 </html>
