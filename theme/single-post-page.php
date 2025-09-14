@@ -1,10 +1,11 @@
 <!DOCTYPE html>
 <html lang="en">
 
+ 
 <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>GSMArena New Page</title>
+    <title>GSMArena Single Device Page</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/css/bootstrap.min.css" rel="stylesheet"
         integrity="sha384-rbsA2VBKQhggwzxH7pPCaAqO46MgnOM80zW1RWuH61DGLwZJEdK2Kadq2F9CUG65" crossorigin="anonymous">
     <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
@@ -16,13 +17,15 @@
     <!-- Font Awesome (for icons) -->
     <script src="https://kit.fontawesome.com/your-kit-code.js" crossorigin="anonymous"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" />
+    <script>
 
+    </script>
 
     <link rel="stylesheet" href="style.css">
 </head>
 
-<body style="background-color: #EFEBE9;">
-      <!-- Desktop Navbar of Gsmarecn -->
+<body style="background-color: #EFEBE9; overflow-x: hidden;">
+    <!-- Desktop Navbar of Gsmarecn -->
     <div class="main-wrapper">
         <!-- Top Navbar -->
         <nav class="navbar navbar-dark  d-lg-inline d-none" id="navbar">
@@ -85,6 +88,7 @@
                     </button>
                 </div>
             </div>
+
         </nav>
 
     </div>
@@ -171,40 +175,59 @@
             </div>
         </div>
     </div>
+
+    <div class=" mt-4 d-lg-none d-block bg-white">
+        <h3 style="font-size: 23px;
+        font-weight: 600; font-family: 'oswald';" class="mx-3 my-5">LG is pushing Apple to use the iPad Pro's Tandem OLED tech in
+            future iPhones</h3>
+        <img style="    height: 100%;
+    width: -webkit-fill-available;" src="/imges/ever1.jpg" alt="">
+
+    </div>
     <div class="container support content-wrapper" id="Top">
         <div class="row">
 
-            <div class="col-md-8 col-5  d-lg-inline d-none col-12 ">
-                <div class="comfort-life position-absolute">
-                    <img class="w-100 h-100" src="imges/Screenshot (163).png"
-                        style="background-repeat: no-repeat; background-size: cover;" alt="">
-                    <div class="position-absolute d-flex mt-1">
-                        <label class="text-white whitening ">Popular Tags</label>
-                        <button class="mobiles-button">Featured</button>
-                        <button class="mobiles-button">Android</button>
-                        <button class="mobiles-button">Samsung</button>
-                        <button class="mobiles-button">Nokia</button>
-                        <button class="mobiles-button">Sony</button>
-                        <button class="mobiles-button">Rumors</button>
-                        <button class="mobiles-button">Apple</button>
-                        <button class="mobiles-button">Motorola</button>
+            <div class="col-md-8 col-5 d-md-inline  " style="border: 1px solid #e0e0e0;">
+                <div class="comfort-life-23 position-absolute d-flex justify-content-between  ">
+                    <div class="article-info">
+                        <div class="bg-blur">
+                            <svg class="float-end mx-3 mt-1" xmlns="http://www.w3.org/2000/svg" height="34" width="34"
+                                viewBox="0 0 640 640"><!--!Font Awesome Free v7.0.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free Copyright 2025 Fonticons, Inc.-->
+                                <path fill="#ffffff"
+                                    d="M448 256C501 256 544 213 544 160C544 107 501 64 448 64C395 64 352 107 352 160C352 165.4 352.5 170.8 353.3 176L223.6 248.1C206.7 233.1 184.4 224 160 224C107 224 64 267 64 320C64 373 107 416 160 416C184.4 416 206.6 406.9 223.6 391.9L353.3 464C352.4 469.2 352 474.5 352 480C352 533 395 576 448 576C501 576 544 533 544 480C544 427 501 384 448 384C423.6 384 401.4 393.1 384.4 408.1L254.7 336C255.6 330.8 256 325.5 256 320C256 314.5 255.5 309.2 254.7 304L384.4 231.9C401.3 246.9 423.6 256 448 256z" />
+                            </svg>
+                        </div>
+                    </div>
+                    <div style="    display: flex;  flex-direction: column;">
+                        <h1 class="article-info-name">LG is pushing Apple to use the iPad Pro's Tandem OLED tech in
+                            future iPhones</h1>
+                        <div class="article-info">
+                            <div class="bg-blur">
+                                <div class="d-flex justify-content-end">
+                                    <div class="d-flex flexiable ">
+                                        <img src="/imges/download-removebg-preview.png" alt="">
+                                        <h5 style="font-family:'oswald' ; font-size: 17px" class="mt-2">COMMENTS (17)
+                                        </h5>
+                                    </div>
+                                    <div class="d-flex flexiable ">
+                                        <img src="/imges/download-removebg-preview.png" alt="">
+                                        <h5 style="font-family:'oswald' ; font-size: 17px;" class="mt-2">POST YOUR
+                                            COMMENT </h5>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
                     </div>
 
-                    <div class="comon">
-                        <label for="" class="text-white whitening ">Search For</label>
-                        <input type="text" class="bg-white">
-                        <button class="mobiles-button bg-white">Android</button>
-                    </div>
                 </div>
-
             </div>
-             <div class="col-md-4 col-5 d-none d-lg-block" style="position: relative; left: 25px;">
+            <div class="col-md-4 col-5 d-none d-lg-block" style="position: relative; left: 25px;">
                 <button class="solid w-100 py-2">
                     <i class="fa-solid fa-mobile fa-sm mx-2" style="color: white;"></i>
                     Phone Finder</button>
                 <div class="devor">
+                    <button class="px-3 py-1 ">Sumsung</button>
                     <button class="px-3 py-1 ">Xiaomi</button>
-                    <button class="px-3 py-1 ">Xiome</button>
                     <button class="px-3 py-1 ">Asus</button>
                     <button class="px-3 py-1 ">Infinix</button>
                     <button class="px-3 py-1 ">Apple</button>
@@ -247,203 +270,191 @@
                     <i class="fa-solid fa-volume-high fa-sm mx-2"></i>
                     RUMORS MILL</button>
             </div>
-
         </div>
+
     </div>
-    <div class="container mt-0  ">
+    <div class="container bg-white" style="border: 1px solid #e0e0e0;">
         <div class="row">
-            <div class="col-lg-4 col-md-6 col-12  sentizer-er" style="background-color: #EEEEEE; ">
+            <div class="col-lg-8 py-3" style=" padding-left: 0; padding-right: 0; border: 1px solid #e0e0e0;">
+                <div>
+                    <div class="d-flex align-items-center justify-content-between  gap-portion">
+                        <div class="d-flex">
 
-                <div class="review-card">
-                    <img src="https://fdn.gsmarena.com/imgroot/news/25/05/honor-400-pro-ifr/-344x215/gsmarena_000.jpg"
-                        alt="Moto G Stylus 5G">
-                    <div class="review-card-body">
-                        <div class="review-card-title">Honor 400 Pro in for review in gsmarena</div>
-                        <div class="review-card-meta">
-                            <span>02 May 2025</span>
-                            <span><i class="bi bi-chat-dots-fill"></i>40 comments</span>
+                            <button class="section-button">Vlad</button>
+                            <p class="my-2 portion-headline mx-1">27 Augest 2025</p>
+                        </div>
+                        <div>
+                            <button class="section-button">Apple</button>
+                            <button class="section-button">IOs</button>
+                            <button class="section-button">Rumors</button>
                         </div>
                     </div>
                 </div>
-                <div class="review-card">
-                    <img src="https://fdn.gsmarena.com/imgroot/news/25/05/vivo-x200-ultra-vs-x100-ultra/-344x215/gsmarena_00.jpg"
-                        alt="Moto G Stylus 5G">
-                    <div class="review-card-body">
-                        <div class="review-card-title">Camera battle: vivo X200 Ultra vs X100 Ultra</div>
-                        <div class="review-card-meta">
-                            <span>02 May 2025</span>
-                            <span><i class="bi bi-chat-dots-fill"></i>40 comments</span>
-                        </div>
-                    </div>
-                </div>
-                <div class="review-card">
-                    <img src="https://fdn.gsmarena.com/imgroot/news/25/05/samsung-galaxy-s25-edge-ifr/-344x215/gsmarena_000.jpg"
-                        alt="Moto G Stylus 5G">
-                    <div class="review-card-body">
-                        <div class="review-card-title">Samsung Galaxy S25 Edge</div>
-                        <div class="review-card-meta">
-                            <span>02 May 2025</span>
-                            <span><i class="bi bi-chat-dots-fill"></i>40 comments</span>
-                        </div>
-                    </div>
-                </div>
-                <div class="review-card">
-                    <img src="https://fdn.gsmarena.com/imgroot/news/25/05/huawei-watch-fit-4-pro-review/-344x215/gsmarena_001.jpg"
-                        alt="Moto G Stylus 5G">
-                    <div class="review-card-body">
-                        <div class="review-card-title">Huawei Watch Fit 4 Pro review</div>
-                        <div class="review-card-meta">
-                            <span>02 May 2025</span>
-                            <span><i class="bi bi-chat-dots-fill"></i>40 comments</span>
-                        </div>
-                    </div>
-                </div>
-                <div class="review-card">
-                    <img src="https://fdn.gsmarena.com/imgroot/news/25/05/vivo-x200-ultra-ifr/-344x215/gsmarena_000.jpg"
-                        alt="Moto G Stylus 5G">
-                    <div class="review-card-body">
-                        <div class="review-card-title">vivo X200 Ultra for review </div>
-                        <div class="review-card-meta">
-                            <span>02 May 2025</span>
-                            <span><i class="bi bi-chat-dots-fill"></i>40 comments</span>
-                        </div>
-                    </div>
-                </div>
-                <div class="review-card">
-                    <img src="https://fdn.gsmarena.com/imgroot/news/25/04/samsung-galaxy-a56-vs-galaxy-s24-fe/-344x215/gsmarena_001.jpg"
-                        alt="Moto G Stylus 5G">
-                    <div class="review-card-body">
-                        <div class="review-card-title">Samsung Galaxy A56 vs. Galaxy S24 FE</div>
-                        <div class="review-card-meta">
-                            <span>02 May 2025</span>
-                            <span><i class="bi bi-chat-dots-fill"></i>40 comments</span>
-                        </div>
-                    </div>
-                </div>
+                <div class="document-section">
+                    <p class="classy gap-portion">Apple's newest iPad Pros are using Tandem OLED display panels provided
+                        primarily by LG Display, and the Korean company has been trying to convince Apple to take the
+                        same tech and put it into future iPhones.
+                    <p>
 
-                <div class="review-card">
-                    <img src="https://fdn.gsmarena.com/imgroot/news/25/04/week-in-review-16/-344x215/gsmarena_001.jpg"
-                        alt="Moto G Stylus 5G">
-                    <div class="review-card-body">
-                        <div class="review-card-title"> Galaxy M56 arrives, new Moto tablet and laptop, Week 16 in
-                            review</div>
-                        <div class="review-card-meta">
-                            <span>02 May 2025</span>
-                            <span><i class="bi bi-chat-dots-fill"></i>40 comments</span>
+                    <p class="classy gap-portion">It hasn't succeeded thus far, but according to a new report, Apple
+                        might incorporate Tandem OLED panels in the 2028 iPhones (so presumably the iPhone 20 family -
+                        or will that be XX?</p>
+                    <img class="center-img" src="imges/gsmarena_001 (1)--12.jpg" alt="">
+
+                    <p class="classy gap-portion">No decision has been made by Apple so far, but of course LG would like
+                        the Cupertino company to choose this tech, since that would mean it would either be the sole
+                        supplier for displays for the 2028 iPhones, or its share would grow substantially vs. Samsung
+                        Display, Apple's other main supplier of displays. LG holds 348 patents in the US in the Tandem
+                        OLED field.
+                    </p>
+                    <p class="classy gap-portion">Tandem OLEDs stack two OLED layers on top of each other, thus
+                        improving brightness and extending the lifespan of the display, while somehow also improving
+                        power efficiency in the process.
+                    </p>
+                    <p class="classy gap-portion">According to a previous report, Apple is open to the idea, but for
+                        iPhones it only wants to stack two layers for the blue subpixels, not the entire matrix - so the
+                        red and green subpixels would remain on a single layer. The industry refers to this as
+                        "simplified tandem" and it's a more cost-effective solution to blue subpixel degradation.
+
+                        Source (in Korean)
+                    </p>
+
+                </div>
+                <div class="blogs-div mt-4">
+                    <h4 class="related-articles-heading">Related Articles</h4>
+                    <div class="blog-post">
+                        <div class="box-es">
+                            <img src="imges/fms-.jpg" alt="">
+                            <h6>
+                                Gurman: Apple working on three major iPhone redesigns
+                            </h6>
+                        </div>
+                        <div class="box-es">
+                            <img src="imges/gsmarena_00012.jpg" alt="">
+                            <h6>
+                                Apple wants to bring Touch ID to its watches starting next year
+                            </h6>
+                        </div>
+                        <div class="box-es">
+                            <img src="imges/gsmarena_000-5666.jpg" alt="">
+                            <h6>
+                                No one is using the iPhone Camera Control and Apple will drop it, sketchy rumor claims
+                            </h6>
+                        </div>
+                        <div class="box-es">
+                            <img src="imges/gsmarena_000-80-088.jpg" alt="">
+                            <h6> Apple's entire iPhone 17 family to be made in India for the US market from the
+                                beginning
+
+                            </h6>
                         </div>
                     </div>
                 </div>
+                <div class="comments">
+                    <h5 class="border-bottom reader  py-3 mx-2">READER COMMENTS</h5>
+                    <div class="first-user" style="background-color: #EDEEEE;">
+                        <div class="user-thread">
+                            <div class="uavatar">
+                                <img src="https://www.gravatar.com/avatar/e029eb57250a4461ec444c00df28c33e?r=g&amp;s=50"
+                                    alt="">
+                            </div>
+                            <ul class="uinfo2">
 
+                                <li class="uname"><a href="" style="color: #555; text-decoration: none;">jiyen235</a>
+                                </li>
+                                <li class="ulocation">
+                                    <i class="fa-solid fa-location-dot fa-sm"></i>
+                                    <span title="Encoded anonymized location">XNA</span>
+                                </li>
+                                <li class="upost"> <i class="fa-regular fa-clock fa-sm mx-1"></i>7 hours ago</time></li>
+
+                            </ul>
+                            <p class="uopin">ofc it does, samsung sells phones in every price range</p>
+                            <ul class="uinfo">
+                                <li class="ureply" style="list-style: none;">
+                                    <span title="Reply to this post">
+                                        <p href="">Reply</p>
+                                    </span>
+                                </li>
+                            </ul>
+
+
+                        </div>
+                        <div class="user-thread">
+                            <div class="uavatar">
+                                <img src="https://www.gravatar.com/avatar/e029eb57250a4461ec444c00df28c33e?r=g&amp;s=50"
+                                    alt="">
+                            </div>
+                            <ul class="uinfo2">
+
+                                <li class="uname"><a href="" style="color: #555; text-decoration: none;">jiyen235</a>
+                                </li>
+                                <li class="ulocation">
+                                    <i class="fa-solid fa-location-dot fa-sm"></i>
+                                    <span title="Encoded anonymized location">nyc</span>
+                                </li>
+                                <li class="upost"> <i class="fa-regular fa-clock fa-sm mx-1"></i>15 Minates ago</time>
+                                </li>
+
+                            </ul>
+                            <p class="uopin">what's your point?</p>
+                            <ul class="uinfo">
+                                <li class="ureply" style="list-style: none;">
+                                    <span title="Reply to this post">
+                                        <p href="">Reply</p>
+                                    </span>
+                                </li>
+                            </ul>
+
+
+                        </div>
+                        <div class="user-thread">
+                            <div class="uavatar">
+                                <span class="avatar-box">D</span>
+                            </div>
+                            <ul class="uinfo2">
+
+                                <li class="uname"><a href="" style="color: #555; text-decoration: none;">jiyen235</a>
+                                </li>
+                                <li class="ulocation">
+                                    <i class="fa-solid fa-location-dot fa-sm"></i>
+                                    <span title="Encoded anonymized location">QNA</span>
+                                </li>
+                                <li class="upost"> <i class="fa-regular fa-clock fa-sm mx-1"></i>14 hours ago</time>
+                                </li>
+
+                            </ul>
+                            <p class="uopin">There are other phone brands bro... Lower the fanboy speak a bit..</p>
+                            <ul class="uinfo">
+                                <li class="ureply" style="list-style: none;">
+                                    <span title="Reply to this post">
+                                        <p href="">Reply</p>
+                                    </span>
+                                </li>
+                            </ul>
+                        </div>
+                        <div class="button-secondary-div d-flex justify-content-between align-items-center ">
+                            <div class="d-flex">
+                                <button class="button-links">read all comments</button>
+                                <button class="button-links">post your comment</button>
+                            </div>
+                            <p class="div-last">Total reader comments: <b>34</b> </p>
+                        </div>
+                    </div>
+                </div>
             </div>
-            <div class="col-lg-4 col-md-6 col-12  sentizer-er" style="background-color: #EEEEEE; ">
-
-                <div class="review-card">
-                    <img src="https://fdn.gsmarena.com/imgroot/news/25/04/motorola-edge-60-ifrs/-344x215/gsmarena_005.jpg"
-                        alt="Moto G Stylus 5G">
-                    <div class="review-card-body">
-                        <div class="review-card-title">Motorola Edge 60 in for review in gsmarena</div>
-                        <div class="review-card-meta">
-                            <span>02 May 2025</span>
-                            <span><i class="bi bi-chat-dots-fill"></i>40 comments</span>
-                        </div>
-                    </div>
-                </div>
-                <div class="review-card">
-                    <img src="http://fdn.gsmarena.com/imgroot/news/25/04/tecno-camon-40-premier-battery-charging-test/-344x215/gsmarena_000.jpg"
-                        alt="Moto G Stylus 5G">
-                    <div class="review-card-body">
-                        <div class="review-card-title">Tecno Camon 40 Premier battery And Charging test </div>
-                        <div class="review-card-meta">
-                            <span>02 May 2025</span>
-                            <span><i class="bi bi-chat-dots-fill"></i>40 comments</span>
-                        </div>
-                    </div>
-                </div>
-                <div class="review-card">
-                    <img src="https://fdn.gsmarena.com/imgroot/news/25/04/cmf-phone-2-pro-ifr/-344x215/gsmarena_000.jpg"
-                        alt="Moto G Stylus 5G">
-                    <div class="review-card-body">
-                        <div class="review-card-title">CMF Phone 2 Pro in For Review</div>
-                        <div class="review-card-meta">
-                            <span>02 May 2025</span>
-                            <span><i class="bi bi-chat-dots-fill"></i>40 comments</span>
-                        </div>
-                    </div>
-                </div>
-                <div class="review-card">
-                    <img src="https://fdn.gsmarena.com/imgroot/news/25/04/oppo-k13/-344x215/gsmarena_001.jpg"
-                        alt="Moto G Stylus 5G">
-                    <div class="review-card-body">
-                        <div class="review-card-title">Oppo K13 Hands On</div>
-                        <div class="review-card-meta">
-                            <span>02 May 2025</span>
-                            <span><i class="bi bi-chat-dots-fill"></i>40 comments</span>
-                        </div>
-                    </div>
-                </div>
-                <div class="review-card">
-                    <img src="https://fdn.gsmarena.com/imgroot/news/25/04/google-pixel-9a-ifr/-344x215/gsmarena_000.jpg"
-                        alt="Moto G Stylus 5G">
-                    <div class="review-card-body">
-                        <div class="review-card-title">Google Pixel 9a in for full review </div>
-                        <div class="review-card-meta">
-                            <span>02 May 2025</span>
-                            <span><i class="bi bi-chat-dots-fill"></i>40 comments</span>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="review-card">
-                    <img src="https://fdn.gsmarena.com/imgroot/news/25/04/samsung-galaxy-a36-vs-samsung-galaxy-a35/-344x215/gsmarena_100.jpg"
-                        alt="Moto G Stylus 5G">
-                    <div class="review-card-body">
-                        <div class="review-card-title">Battle Of: Samsung Galaxy A36 vs. Samsung Galaxy A35</div>
-                        <div class="review-card-meta">
-                            <span>02 May 2025</span>
-                            <span><i class="bi bi-chat-dots-fill"></i>40 comments</span>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="review-card">
-                    <img src="https://fdn.gsmarena.com/imgroot/news/25/04/oppo-find-x8-ultra-china/-344x215/gsmarena_000.jpg"
-                        alt="Moto G Stylus 5G">
-                    <div class="review-card-body">
-                        <div class="review-card-title">Gallery: Here are some Oppo Find X8 Ultra camera samples from a
-                            photo walk around Xi'an
-                        </div>
-                        <div class="review-card-meta">
-                            <span>02 May 2025</span>
-                            <span><i class="bi bi-chat-dots-fill"></i>40 comments</span>
-                        </div>
-                    </div>
-                </div>
-
-            </div>
-
             <div class="col-lg-4  col-12  bg-white p-3">
-
-                <img src="https://fdn.gsmarena.com/imgroot/static/banners/self/arenaev-300x250.jpg" class="w-100 "
-                    style="width: 400px;" alt="">
-                <div class="review-column-list-item review-column-list-item-secondary mt-3 w-100">
-                    <img class="review-list-item-image w-100"
-                        src="https://fdn.gsmarena.com/imgroot/reviews/25/motorola-moto-g-stylus-2025/-347x151/gsmarena_001.jpg"
-                        alt="Moto G Stylus 5G (2025) review" style="margin-left: -10px;">
-
-                    <h1 class="common"> Mooto G Stylus 5G (2025) review</h1>
-                    <img class="review-list-item-image w-100"
-                        src="https://fdn.gsmarena.com/imgroot/reviews/25/google-pixel-9a/-347x151/gsmarena_001.jpg"
-                        alt="Google Pixel 9a review" style="margin-left: -10px;">
-                    <h1 class="common">Google pIxel 9a Review</h1>
-                </div>
+                <img src="https://fdn.gsmarena.com/imgroot/static/banners/self/review-pixel-9-pro-300x250.jpg"
+                    class=" d-block mx-auto" style="width: 300px;">
                 <div class="d-flex">
-                    <h5 class="text-secondary mt-2 d-inline fw-bold " style="text-transform: uppercase;" >top 10 by Daily Interest </h5>
+                    <h5 class="text-secondary mt-2 d-inline fw-bold " style="text-transform: uppercase;">top 10 by Daily
+                        Interest </h5>
                 </div>
                 <div class="center w-100">
                     <table class="table table-sm custom-table">
                         <thead>
-                            <tr class="text-white " style="background-color: #4C7273;">
-                                <th  style="color: white;">#</th>
+                            <tr class="text-white " style="background-color: #4C7273; color: white;">
+                                <th style="color: white;">#</th>
                                 <th style="color: white;">Devices</th>
                                 <th style="color: white;">Daily Hits</th>
                             </tr>
@@ -502,75 +513,12 @@
                         </tbody>
                     </table>
                 </div>
-                <div class="center w-100 " style="margin-top: 12px;">
-                    <h5 class="text-secondary mt-2 d-inline fw-bold " style="text-transform: uppercase;" >top 10 by Fans </h5>
-                    
-                    <table class="table table-sm custom-table">
-                        <thead>
-                        <tr class="text-white" style="background-color: #14222D;">
-                                <th style="color: white;  font-size: 15px;  ">#</th>
-                                <th style="color: white;  font-size: 15px;">Device</th>
-                                <th style="color: white;  font-size: 15px;">Favorites</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            <tr>
-                                <th scope="row">1</th>
-                                <td class="text-start">Samsung Galaxy S24 Ultra</td>
-                                <td class="text-end">1,722</td>
-                            </tr>
-                            <tr class="highlight-12">
-                                <th scope="row">2</th>
-                                <td class="text-start">Samsung Galaxy S25 Ultra</td>
-                                <td class="text-end">926</td>
-                            </tr>
-                            <tr>
-                                <th scope="row">3</th>
-                                <td class="text-start">Samsung Galaxy A55</td>
-                                <td class="text-end">911</td>
-                            </tr>
-                            <tr class="highlight-12">
-                                <th scope="row">4</th>
-                                <td class="text-start">OnePlus 12</td>
-                                <td class="text-end">746</td>
-                            </tr>
-                            <tr>
-                                <th scope="row">5</th>
-                                <td class="text-start">Xiaomi Poco X6 Pro</td>
-                                <td class="text-end">634</td>
-                            </tr>
-                            <tr class="highlight-12">
-                                <th scope="row">6</th>
-                                <td class="text-start">Xiaomi 14 Ultra</td>
-                                <td class="text-end">597</td>
-                            </tr>
-                            <tr>
-                                <th scope="row">7</th>
-                                <td class="text-start">OnePlus 13</td>
-                                <td class="text-end">564</td>
-                            </tr>
-                            <tr class="highlight-12">
-                                <th scope="row">8</th>
-                                <td class="text-start">Sony Xperia 1 VI</td>
-                                <td class="text-end">554</td>
-                            </tr>
-                            <tr>
-                                <th scope="row">9</th>
-                                <td class="text-start">Samsung Galaxy S24</td>
-                                <td class="text-end">546</td>
-                            </tr>
-                            <tr class="highlight-12">
-                                <th scope="row">10</th>
-                                <td class="text-start">Apple iPhone 16 Pro Max</td>
-                                <td class="text-end">538</td>
-                            </tr>
-                        </tbody>
-                    </table>
-                </div>
-                <h5 style="border-left: solid 5px grey ; text-transform: uppercase;" class=" fw-bold px-3 text-secondary py-1">Electric Vehicles</h5>
+
+                <h6 style="border-left: solid 5px grey ; text-transform: uppercase;"
+                    class=" fw-bold px-3 text-secondary py-1">Electric Vehicles</h6>
                 <div style="background-color: #f2f2f2; height: 260px">
                     <div class="col-md-12">
-                        <img src="https://st.arenaev.com/news/25/05/xiaomi-su7-faces-quality-concerns/-344x215/arenaev_001.jpg"
+                        <img src="https://st.arenaev.com/news/25/08/2026-porsche-macan-electric/-344x215/arenaev_000.jpg"
                             class=" rounded" alt="News Image">
                         <p class="fw-bold mb-1 wanted-12 mt-2 mx-auto text-center">
                             Xiaomi SU7 faces quality concerns, some owners sue the company
@@ -580,7 +528,7 @@
 
                 <div class="d-flex my-3" style="background-color: #f2f2f2;">
                     <div class="col-md-12 py-2">
-                        <p class="fw-bold mb-1 wanted-12">
+                        <p class="fw-bold mb-1 wanted-12 text-center">
                             Xiomo Sign Partnership agreement with nurbugging
                         </p>
                     </div>
@@ -594,14 +542,15 @@
                     </div>
                 </div>
 
-                <div style="position: sticky;margin-top: 12px; ">
-                    <img src="https://fdn.gsmarena.com/imgroot/static/banners/self/review-pixel-9-pro-300x250.jpg"
+                <div style="position: sticky;margin-top: 12px; top: 0;">
+                    <img src="https://fdn.gsmarena.com/imgroot/static/banners/self/review-galaxy-s25-300x250.jpg"
                         class=" d-block mx-auto" style="width: 300px;">
                 </div>
 
             </div>
         </div>
     </div>
+
     <div id="bottom" class="container d-flex mt-3" style="max-width: 1034px;">
         <div class="row align-items-center">
             <div class="col-md-2 m-auto col-4 d-flex justify-content-center align-items-center "> <img
@@ -626,7 +575,7 @@
                     <a href="#">Mobile version</a>
                     <a href="#">Android app</a>
                     <a href="#">Tools</a>
-                    <a href="#">Contact us</a>
+                    <a href="contact.html">Contact us</a>
                     <a href="#">Merch store</a>
                     <a href="#">Privacy</a>
                     <a href="#">Terms of use</a>
@@ -634,6 +583,7 @@
             </div>
         </div>
     </div>
+
     <script src="script.js"></script>
 </body>
 

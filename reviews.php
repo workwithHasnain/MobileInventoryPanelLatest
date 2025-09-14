@@ -10,7 +10,6 @@ $posts_stmt = $pdo->prepare("
     (SELECT COUNT(*) FROM post_comments pc WHERE pc.post_id = p.id AND pc.status = 'approved') as comment_count
     FROM posts p 
     WHERE p.status ILIKE 'published'
-    AND p.is_featured = TRUE 
     ORDER BY p.created_at DESC 
     LIMIT 6
 ");
@@ -254,11 +253,10 @@ $brands = $brands_stmt->fetchAll();
     <div class="container support content-wrapper" id="Top">
         <div class="row">
 
-            <div class="col-md-8 col-5  d-lg-inline d-none col-12 ">
-                <div class="comfort-life position-absolute">
-                    <img class="w-100 h-100" src="imges/Screenshot (163).png"
-                        style="background-repeat: no-repeat; background-size: cover;" alt="">
-                    <div class="position-absolute d-flex mt-1">
+            <div class="col-md-8 col-5  d-md-inline col-12 ">
+                <div class="comfort-life-zone d-none d-lg-block position-absolute">
+                    <img src="imges/Screenshot (160).png" alt="">
+                    <div class="position-absolute d-flex mt-1" style="top: 0;">
                         <label class="text-white whitening ">Popular Tags</label>
                         <button class="mobiles-button">Featured</button>
                         <button class="mobiles-button">Android</button>
@@ -278,7 +276,6 @@ $brands = $brands_stmt->fetchAll();
                 </div>
 
             </div>
-            
             <div class="col-md-4 col-5 d-none d-lg-block" style="position: relative; left: 25px;">
                 <button class="solid w-100 py-2">
                     <i class="fa-solid fa-mobile fa-sm mx-2" style="color: white;"></i>
@@ -320,7 +317,7 @@ $brands = $brands_stmt->fetchAll();
                 <div class="col-lg-4 col-md-6 col-12 sentizer-erx" style="background-color: #EEEEEE;">
                     <?php foreach ($colPosts as $post): ?>
                         <a href="post.php?slug=<?php echo urlencode($post['slug']); ?>">
-                            <div class="review-card" style="cursor:pointer;" onclick="window.location.href='post.php?slug=<?php echo urlencode($post['slug']); ?>'">
+                            <div class="review-card mb-4" style="cursor:pointer;" onclick="window.location.href='post.php?slug=<?php echo urlencode($post['slug']); ?>'">
                                 <?php if (isset($post['featured_image']) && !empty($post['featured_image'])): ?>
                                     <img style="cursor:pointer;" onclick="window.location.href='post.php?slug=<?php echo urlencode($post['slug']); ?>'" src="<?php echo htmlspecialchars($post['featured_image']); ?>" alt="<?php echo htmlspecialchars($post['title']); ?>">
                                 <?php endif; ?>
@@ -336,7 +333,7 @@ $brands = $brands_stmt->fetchAll();
                     <?php endforeach; ?>
                 </div>
             <?php endforeach; ?>
-                                    
+
             <div class="col-lg-4  col-12  bg-white p-3">
 
                 

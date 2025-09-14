@@ -22,7 +22,7 @@
 </head>
 
 <body style="background-color: #EFEBE9;">
-    <!-- Desktop Navbar of Gsmarecn -->
+       <!-- Desktop Navbar of Gsmarecn -->
     <div class="main-wrapper">
         <!-- Top Navbar -->
         <nav class="navbar navbar-dark  d-lg-inline d-none" id="navbar">
@@ -119,13 +119,13 @@
             <i class="fas fa-share-alt"></i>
         </div>
         <div class="column">
-            <a href="index.php">Home</a>
-            <a href="news.php">News</a>
-            <a href="reviews.php">Reviews</a>
-            <a href="videos.php">Videos</a>
-            <a href="featured.php">Featured</a>
-            <a href="phonefinder.php">Phone Finder</a>
-            <a href="compare.php">Compare</a>
+            <a href="index.html">Home</a>
+            <a href="news.html">News</a>
+            <a href="rewies.html">Reviews</a>
+            <a href="videos.html">Videos</a>
+            <a href="featured.html">Featured</a>
+            <a href="phonefinder.html">Phone Finder</a>
+            <a href="compare.html">Compare</a>
             <a href="#">Coverage</a>
             <a href="contact">Contact Us</a>
             <a href="#">Merch</a>
@@ -155,14 +155,14 @@
     <div id="leftMenu" class="container show">
         <div class="row">
             <div class="col-12 d-flex align-items-center   colums-gap">
-                <a href="index.php" class="nav-link">Home</a>
-                <a href="compare.php" class="nav-link">Compare</a>
-                <a href="videos.php" class="nav-link">Videos</a>
-                <a href="reviews.php" class="nav-link ">Reviews</a>
-                <a href="news.php" class="nav-link d-lg-block d-none">News</a>
-                <a href="featured.php" class="nav-link d-lg-block d-none">Featured</a>
-                <a href="phonefinder.php" class="nav-link d-lg-block d-none">Phone Finder</a>
-                <a href="contact.php" class="nav-link d-lg-block d-none">Contact</a>
+                <a href="index.html" class="nav-link">Home</a>
+                <a href="compare.html" class="nav-link">Compare</a>
+                <a href="videos.html" class="nav-link">Videos</a>
+                <a href="rewies.html" class="nav-link ">Reviews</a>
+                <a href="news.html" class="nav-link d-lg-block d-none">News</a>
+                <a href="featured.html" class="nav-link d-lg-block d-none">Featured</a>
+                <a href="phonefinder.html" class="nav-link d-lg-block d-none">Phone Finder</a>
+                <a href="contact.html" class="nav-link d-lg-block d-none">Contact</a>
                 <div style="background-color: #d50000; border-radius: 7px;" class="d-lg-none py-2"><svg
                         xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" height="16" width="16" class="mx-3">
                         <path fill="#ffffff"
@@ -198,7 +198,7 @@
                 </div>
 
             </div>
-            <div class="col-md-4 col-5 d-none d-lg-block" style="position: relative; left: 25px;">
+             <div class="col-md-4 col-5 d-none d-lg-block" style="position: relative; left: 25px;">
                 <button class="solid w-100 py-2">
                     <i class="fa-solid fa-mobile fa-sm mx-2" style="color: white;"></i>
                     Phone Finder</button>
@@ -502,8 +502,7 @@
                     <h1 class="common">Google pIxel 9a Review</h1>
                 </div>
                 <div class="d-flex">
-                    <h5 class="text-secondary mt-2 d-inline fw-bold " style="text-transform: uppercase;">top 10 by Daily
-                        Interest </h5>
+                    <h5 class="text-secondary mt-2 d-inline fw-bold " style="text-transform: uppercase;">top 10 by Daily Interest </h5>
                 </div>
                 <div class="center w-100">
                     <table class="table table-sm custom-table">
@@ -569,8 +568,7 @@
                     </table>
                 </div>
                 <div class="center w-100 " style="margin-top: 12px;">
-                    <h5 class="text-secondary mt-2 d-inline fw-bold " style="text-transform: uppercase;">top 10 by Fans
-                    </h5>
+                    <h5 class="text-secondary mt-2 d-inline fw-bold " style="text-transform: uppercase;">top 10 by Fans </h5>
 
                     <table class="table table-sm custom-table">
                         <thead>
@@ -634,8 +632,7 @@
                         </tbody>
                     </table>
                 </div>
-                <h6 style="border-left: solid 5px grey ; text-transform: uppercase;"
-                    class=" fw-bold px-3 text-secondary py-1">Electric Vehicles</h6>
+                <h6 style="border-left: solid 5px grey ; text-transform: uppercase;" class=" fw-bold px-3 text-secondary py-1">Electric Vehicles</h6>
                 <div style="background-color: #f2f2f2; height: 260px">
                     <div class="col-md-12">
                         <img src="https://st.arenaev.com/news/25/05/xiaomi-su7-faces-quality-concerns/-344x215/arenaev_001.jpg"
@@ -648,7 +645,7 @@
 
                 <div class="d-flex my-3" style="background-color: #f2f2f2;">
                     <div class="col-md-12 py-2">
-                        <p class="fw-bold mb-1 wanted-12">
+                        <p class="fw-bold mb-1 wanted-12 text text-center">
                             Xiomo Sign Partnership agreement with nurbugging
                         </p>
                     </div>
@@ -694,7 +691,7 @@
                     <a href="#">Mobile version</a>
                     <a href="#">Android app</a>
                     <a href="#">Tools</a>
-                    <a href="contact.php">Contact us</a>
+                    <a href="contact.html">Contact us</a>
                     <a href="#">Merch store</a>
                     <a href="#">Privacy</a>
                     <a href="#">Terms of use</a>

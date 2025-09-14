@@ -4,7 +4,7 @@
 <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>GSMArena New Page</title>
+    <title>GSMArena Rewies Page</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/css/bootstrap.min.css" rel="stylesheet"
         integrity="sha384-rbsA2VBKQhggwzxH7pPCaAqO46MgnOM80zW1RWuH61DGLwZJEdK2Kadq2F9CUG65" crossorigin="anonymous">
     <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
@@ -12,8 +12,10 @@
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/js/bootstrap.bundle.min.js"
         integrity="sha384-kenU1KFdBIe4zVF0s0G1M5b4hcpxyD9F7jL+jjXkk+Q2h455rYXK/7HAuoJl+0I4"
         crossorigin="anonymous"></script>
+    <!-- Optional Bootstrap Icons (for the chat icon) -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css" rel="stylesheet">
 
-    <!-- Font Awesome (for icons) -->
+
     <script src="https://kit.fontawesome.com/your-kit-code.js" crossorigin="anonymous"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" />
 
@@ -174,11 +176,10 @@
     <div class="container support content-wrapper" id="Top">
         <div class="row">
 
-            <div class="col-md-8 col-5  d-lg-inline d-none col-12 ">
-                <div class="comfort-life position-absolute">
-                    <img class="w-100 h-100" src="imges/Screenshot (163).png"
-                        style="background-repeat: no-repeat; background-size: cover;" alt="">
-                    <div class="position-absolute d-flex mt-1">
+            <div class="col-md-8 col-5  d-md-inline col-12 ">
+                <div class="comfort-life-zone d-none d-lg-block position-absolute">
+                    <img src="imges/Screenshot (160).png" alt="">
+                    <div class="position-absolute d-flex mt-1" style="top: 0;">
                         <label class="text-white whitening ">Popular Tags</label>
                         <button class="mobiles-button">Featured</button>
                         <button class="mobiles-button">Android</button>
@@ -198,13 +199,14 @@
                 </div>
 
             </div>
-             <div class="col-md-4 col-5 d-none d-lg-block" style="position: relative; left: 25px;">
+
+           <div class="col-md-4 col-5 d-none d-lg-block" style="position: relative; left: 25px;">
                 <button class="solid w-100 py-2">
                     <i class="fa-solid fa-mobile fa-sm mx-2" style="color: white;"></i>
                     Phone Finder</button>
                 <div class="devor">
+                    <button class="px-3 py-1 ">Samsung</button>
                     <button class="px-3 py-1 ">Xiaomi</button>
-                    <button class="px-3 py-1 ">Xiome</button>
                     <button class="px-3 py-1 ">Asus</button>
                     <button class="px-3 py-1 ">Infinix</button>
                     <button class="px-3 py-1 ">Apple</button>
@@ -247,203 +249,409 @@
                     <i class="fa-solid fa-volume-high fa-sm mx-2"></i>
                     RUMORS MILL</button>
             </div>
-
         </div>
     </div>
-    <div class="container mt-0  ">
+    <div class="container mt-0 varasat">
         <div class="row">
-            <div class="col-lg-4 col-md-6 col-12  sentizer-er" style="background-color: #EEEEEE; ">
+
+
+            <div class="col-lg-4 col-md-6  mt-2">
+                <div class="review-card">
+                    <img src="https://fdn.gsmarena.com/imgroot/reviews/25/motorola-moto-g-stylus-2025/-347x151/gsmarena_001.jpg"
+                        alt="Moto G Stylus 5G">
+                    <div class="review-card-body">
+                        <div class="review-card-title">Moto G Stylus 5G (2025) review</div>
+                        <div class="review-card-meta">
+                            <span>02 May 2025</span>
+                            <span><i class="bi bi-chat-dots-fill"></i>40 comments</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="review-card">
+                    <img src="https://fdn.gsmarena.com/imgroot/reviews/25/google-pixel-9a/-347x151/gsmarena_001.jpg"
+                        alt="Google Pixel 9a">
+                    <div class="review-card-body">
+                        <div class="review-card-title">Google Pixel 9a review</div>
+                        <div class="review-card-meta">
+                            <span>04 May 2025</span>
+                            <span><i class="bi bi-chat-dots-fill"></i>28 comments</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="review-card">
+                    <img src="https://fdn.gsmarena.com/imgroot/reviews/25/oppo-find-x8-ultra/-347x151/gsmarena_001.jpg"
+                        alt="Google Pixel 9a">
+                    <div class="review-card-body">
+                        <div class="review-card-title">Oppo Find X8 Ultra review</div>
+                        <div class="review-card-meta">
+                            <span>04 May 2025</span>
+                            <span><i class="bi bi-chat-dots-fill"></i>28 comments</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="review-card">
+                    <img src="https://fdn.gsmarena.com/imgroot/reviews/25/motorola-razr-60-ultra/-347x151/gsmarena_002.jpg"
+                        alt="Google Pixel 9a">
+                    <div class="review-card-body">
+                        <div class="review-card-title">Motorola Razr 60 Ultra review</div>
+                        <div class="review-card-meta">
+                            <span>04 May 2025</span>
+                            <span><i class="bi bi-chat-dots-fill"></i>28 comments</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="review-card">
+                    <img src="https://fdn.gsmarena.com/imgroot/reviews/25/pixel-9a-handson/-347x151/gsmarena_001.jpg"
+                        alt="Google Pixel 9a">
+                    <div class="review-card-body">
+                        <div class="review-card-title">Google Pixel 9a Hands-on </div>
+                        <div class="review-card-meta">
+                            <span>04 May 2025</span>
+                            <span><i class="bi bi-chat-dots-fill"></i>28 comments</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="review-card">
+                    <img src="https://fdn.gsmarena.com/imgroot/reviews/25/ai-erasers-compared/-347x151/gsmarena_000.jpg"
+                        alt="Nothing CMF Phone 2 Pro">
+                    <div class="review-card-body">
+                        <div class="review-card-title">AI Object - which phone is best?
+
+                        </div>
+                        <div class="review-card-meta">
+                            <span>11 April 2025 </span>
+                            <span><i class="bi bi-chat-dots-fill"></i>24 Comments</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="review-card">
+                    <img src="https://fdn.gsmarena.com/imgroot/reviews/25/nothing-phone-3a/-347x151/gsmarena_001.jpg"
+                        alt="Nothing CMF Phone 2 Pro">
+                    <div class="review-card-body">
+                        <div class="review-card-title">Nothing Phone (3a) review</div>
+                        <div class="review-card-meta">
+                            <span>03 May 2025</span>
+                            <span><i class="bi bi-chat-dots-fill"></i>33 comments</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="review-card">
+                    <img src="https://fdn.gsmarena.com/imgroot/reviews/25/nothing-phone-3a-pro/-347x151/gsmarena_001.jpg"
+                        alt="Nothing CMF Phone 2 Pro">
+                    <div class="review-card-body">
+                        <div class="review-card-title">Nothing Phone (3a) Pro review</div>
+                        <div class="review-card-meta">
+                            <span>03 May 2025</span>
+                            <span><i class="bi bi-chat-dots-fill"></i>33 comments</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="review-card">
+                    <img src="https://fdn.gsmarena.com/imgroot/reviews/25/oppo-reno13/-347x151/gsmarena_000.jpg"
+                        alt="Nothing CMF Phone 2 Pro">
+                    <div class="review-card-body">
+                        <div class="review-card-title ">Oppo Reno 13 Review</div>
+                        <div class="review-card-meta">
+                            <span>23 April 2025 </span>
+                            <span><i class="bi bi-chat-dots-fill"></i>13 comments</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="review-card">
+                    <img src="https://fdn.gsmarena.com/imgroot/reviews/25/apple-iphone-16e/-347x151/gsmarena_002.jpg"
+                        alt="Nothing CMF Phone 2 Pro">
+                    <div class="review-card-body">
+                        <div class="review-card-title">Apple 16a review </div>
+                        <div class="review-card-meta">
+                            <span>15 April 2025 </span>
+                            <span><i class="bi bi-chat-dots-fill"></i>103 comments</span>
+                        </div>
+                    </div>
+                </div>
 
                 <div class="review-card">
-                    <img src="https://fdn.gsmarena.com/imgroot/news/25/05/honor-400-pro-ifr/-344x215/gsmarena_000.jpg"
-                        alt="Moto G Stylus 5G">
+                    <img src="https://fdn.gsmarena.com/imgroot/reviews/24/xiaomi-pad-6s-pro-12-4/-347x151/gsmarena_001.jpg"
+                        alt="Nothing CMF Phone 2 Pro">
                     <div class="review-card-body">
-                        <div class="review-card-title">Honor 400 Pro in for review in gsmarena</div>
+                        <div class="review-card-title">Xiaomi Pad 6S Pro 12.4 review</div>
                         <div class="review-card-meta">
-                            <span>02 May 2025</span>
-                            <span><i class="bi bi-chat-dots-fill"></i>40 comments</span>
+                            <span>15 April 2025 </span>
+                            <span><i class="bi bi-chat-dots-fill"></i>103 comments</span>
                         </div>
                     </div>
                 </div>
                 <div class="review-card">
-                    <img src="https://fdn.gsmarena.com/imgroot/news/25/05/vivo-x200-ultra-vs-x100-ultra/-344x215/gsmarena_00.jpg"
-                        alt="Moto G Stylus 5G">
+                    <img src="https://fdn.gsmarena.com/imgroot/reviews/24/tecno-camon-30-pro/-347x151/gsmarena_002.jpg"
+                        alt="Nothing CMF Phone 2 Pro">
                     <div class="review-card-body">
-                        <div class="review-card-title">Camera battle: vivo X200 Ultra vs X100 Ultra</div>
+                        <div class="review-card-title">Tecno Spark 30 Pro review </div>
                         <div class="review-card-meta">
-                            <span>02 May 2025</span>
-                            <span><i class="bi bi-chat-dots-fill"></i>40 comments</span>
+                            <span>11 April 2025 </span>
+                            <span><i class="bi bi-chat-dots-fill"></i>24 Comments</span>
                         </div>
                     </div>
                 </div>
                 <div class="review-card">
-                    <img src="https://fdn.gsmarena.com/imgroot/news/25/05/samsung-galaxy-s25-edge-ifr/-344x215/gsmarena_000.jpg"
-                        alt="Moto G Stylus 5G">
+                    <img src="https://fdn.gsmarena.com/imgroot/reviews/23/iphone-15/-347x151/gsmarena_001.jpg"
+                        alt="Nothing CMF Phone 2 Pro">
                     <div class="review-card-body">
-                        <div class="review-card-title">Samsung Galaxy S25 Edge</div>
+                        <div class="review-card-title">Apple 15 review </div>
                         <div class="review-card-meta">
-                            <span>02 May 2025</span>
-                            <span><i class="bi bi-chat-dots-fill"></i>40 comments</span>
+                            <span>15 April 2025 </span>
+                            <span><i class="bi bi-chat-dots-fill"></i>103 comments</span>
                         </div>
                     </div>
                 </div>
-                <div class="review-card">
-                    <img src="https://fdn.gsmarena.com/imgroot/news/25/05/huawei-watch-fit-4-pro-review/-344x215/gsmarena_001.jpg"
-                        alt="Moto G Stylus 5G">
-                    <div class="review-card-body">
-                        <div class="review-card-title">Huawei Watch Fit 4 Pro review</div>
-                        <div class="review-card-meta">
-                            <span>02 May 2025</span>
-                            <span><i class="bi bi-chat-dots-fill"></i>40 comments</span>
-                        </div>
-                    </div>
-                </div>
-                <div class="review-card">
-                    <img src="https://fdn.gsmarena.com/imgroot/news/25/05/vivo-x200-ultra-ifr/-344x215/gsmarena_000.jpg"
-                        alt="Moto G Stylus 5G">
-                    <div class="review-card-body">
-                        <div class="review-card-title">vivo X200 Ultra for review </div>
-                        <div class="review-card-meta">
-                            <span>02 May 2025</span>
-                            <span><i class="bi bi-chat-dots-fill"></i>40 comments</span>
-                        </div>
-                    </div>
-                </div>
-                <div class="review-card">
-                    <img src="https://fdn.gsmarena.com/imgroot/news/25/04/samsung-galaxy-a56-vs-galaxy-s24-fe/-344x215/gsmarena_001.jpg"
-                        alt="Moto G Stylus 5G">
-                    <div class="review-card-body">
-                        <div class="review-card-title">Samsung Galaxy A56 vs. Galaxy S24 FE</div>
-                        <div class="review-card-meta">
-                            <span>02 May 2025</span>
-                            <span><i class="bi bi-chat-dots-fill"></i>40 comments</span>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="review-card">
-                    <img src="https://fdn.gsmarena.com/imgroot/news/25/04/week-in-review-16/-344x215/gsmarena_001.jpg"
-                        alt="Moto G Stylus 5G">
-                    <div class="review-card-body">
-                        <div class="review-card-title"> Galaxy M56 arrives, new Moto tablet and laptop, Week 16 in
-                            review</div>
-                        <div class="review-card-meta">
-                            <span>02 May 2025</span>
-                            <span><i class="bi bi-chat-dots-fill"></i>40 comments</span>
-                        </div>
-                    </div>
-                </div>
-
             </div>
-            <div class="col-lg-4 col-md-6 col-12  sentizer-er" style="background-color: #EEEEEE; ">
+            <div class="col-lg-4 col-md-6 mt-2 ">
+                <div class="review-card">
+                    <img src="https://fdn.gsmarena.com/imgroot/reviews/25/nothing-cmf-phone-2-pro/-347x151/gsmarena_001.jpg"
+                        alt="Nothing CMF Phone 2 Pro">
+                    <div class="review-card-body">
+                        <div class="review-card-title">Nothing CMF Phone 2 Pro review</div>
+                        <div class="review-card-meta">
+                            <span>03 May 2025</span>
+                            <span><i class="bi bi-chat-dots-fill"></i>33 comments</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="review-card">
+                    <img src="https://fdn.gsmarena.com/imgroot/reviews/25/sony-xperia-1-vii/rev13/-347x151/gsmarena_001.jpg"
+                        alt="Nothing CMF Phone 2 Pro">
+                    <div class="review-card-body">
+                        <div class="review-card-title">Sony Xperia 1 VII review</div>
+                        <div class="review-card-meta">
+                            <span>03 May 2025</span>
+                            <span><i class="bi bi-chat-dots-fill"></i>33 comments</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="review-card">
+                    <img src="https://fdn.gsmarena.com/imgroot/reviews/25/redmagic-10-air/-347x151/gsmarena_011.jpg"
+                        alt="Nothing CMF Phone 2 Pro">
+                    <div class="review-card-body">
+                        <div class="review-card-title">nubia RedMagic 10 Air review
+
+                        </div>
+                        <div class="review-card-meta">
+                            <span>23 April 2025 </span>
+                            <span><i class="bi bi-chat-dots-fill"></i>13 comments</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="review-card">
+                    <img src="https://fdn.gsmarena.com/imgroot/reviews/25/infinix-note-50-pro-4g/-347x151/gsmarena_003.jpg"
+                        alt="Nothing CMF Phone 2 Pro">
+                    <div class="review-card-body">
+                        <div class="review-card-title">Infinix Note 50 Pro 4G review
+
+                        </div>
+                        <div class="review-card-meta">
+                            <span>15 April 2025 </span>
+                            <span><i class="bi bi-chat-dots-fill"></i>103 comments</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="review-card">
+                    <img src="https://fdn.gsmarena.com/imgroot/reviews/25/motorola-edge-60-fusion/-347x151/gsmarena_000.jpg"
+                        alt="Nothing CMF Phone 2 Pro">
+                    <div class="review-card-body">
+                        <div class="review-card-title">Motorola Edge 60 Fusion review
+                        </div>
+                        <div class="review-card-meta">
+                            <span>11 April 2025 </span>
+                            <span><i class="bi bi-chat-dots-fill"></i>24 Comments</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="review-card">
+                    <img src="https://fdn.gsmarena.com/imgroot/reviews/25/vivo-v50/-347x151/gsmarena_001.jpg"
+                        alt="Nothing CMF Phone 2 Pro">
+                    <div class="review-card-body">
+                        <div class="review-card-title">Vivo V50 review</div>
+                        <div class="review-card-meta">
+                            <span>03 May 2025</span>
+                            <span><i class="bi bi-chat-dots-fill"></i>33 comments</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="review-card">
+                    <img src="https://fdn.gsmarena.com/imgroot/reviews/25/infinix-note-50-pro-plus/-347x151/gsmarena_001.jpg"
+                        alt="Nothing CMF Phone 2 Pro">
+                    <div class="review-card-body">
+                        <div class="review-card-title">Infinix Note 50 Pro+ Preview</div>
+                        <div class="review-card-meta">
+                            <span>03 May 2025</span>
+                            <span><i class="bi bi-chat-dots-fill"></i>33 comments</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="review-card">
+                    <img src="https://fdn.gsmarena.com/imgroot/reviews/25/poco-f7-pro/-347x151/gsmarena_001.jpg"
+                        alt="Nothing CMF Phone 2 Pro">
+                    <div class="review-card-body">
+                        <div class="review-card-title">Poco F7 Pro review
+                        </div>
+                        <div class="review-card-meta">
+                            <span>23 April 2025 </span>
+                            <span><i class="bi bi-chat-dots-fill"></i>13 comments</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="review-card">
+                    <img src="https://fdn.gsmarena.com/imgroot/reviews/25/poco-f7-ultra/re/-347x151/gsmarena_002.jpg"
+                        alt="Nothing CMF Phone 2 Pro">
+                    <div class="review-card-body">
+                        <div class="review-card-title">Poco F7 Ultra Review
+                        </div>
+                        <div class="review-card-meta">
+                            <span>15 April 2025 </span>
+                            <span><i class="bi bi-chat-dots-fill"></i>103 comments</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="review-card">
+                    <img src="https://fdn.gsmarena.com/imgroot/reviews/25/samsung-galaxy-a36/-347x151/gsmarena_003.jpg"
+                        alt="Nothing CMF Phone 2 Pro">
+                    <div class="review-card-body">
+                        <div class="review-card-title">Samsung Galaxy A36 review </div>
+                        <div class="review-card-meta">
+                            <span>11 April 2025 </span>
+                            <span><i class="bi bi-chat-dots-fill"></i>24 Comments</span>
+                        </div>
+                    </div>
+                </div>
 
                 <div class="review-card">
-                    <img src="https://fdn.gsmarena.com/imgroot/news/25/04/motorola-edge-60-ifrs/-344x215/gsmarena_005.jpg"
-                        alt="Moto G Stylus 5G">
+                    <img src="https://fdn.gsmarena.com/imgroot/reviews/24/honor-200-pro/-347x151/gsmarena_001.jpg"
+                        alt="Nothing CMF Phone 2 Pro">
                     <div class="review-card-body">
-                        <div class="review-card-title">Motorola Edge 60 in for review in gsmarena</div>
+                        <div class="review-card-title">Honor 200 Pro review </div>
                         <div class="review-card-meta">
-                            <span>02 May 2025</span>
-                            <span><i class="bi bi-chat-dots-fill"></i>40 comments</span>
+                            <span>15 April 2025 </span>
+                            <span><i class="bi bi-chat-dots-fill"></i>103 comments</span>
                         </div>
                     </div>
                 </div>
                 <div class="review-card">
-                    <img src="http://fdn.gsmarena.com/imgroot/news/25/04/tecno-camon-40-premier-battery-charging-test/-344x215/gsmarena_000.jpg"
-                        alt="Moto G Stylus 5G">
+                    <img src="https://fdn.gsmarena.com/imgroot/reviews/24/motorola-edge-50-fusion/-347x151/gsmarena_001.jpg"
+                        alt="Nothing CMF Phone 2 Pro">
                     <div class="review-card-body">
-                        <div class="review-card-title">Tecno Camon 40 Premier battery And Charging test </div>
+                        <div class="review-card-title">Motorola Edge 50 Fusion review </div>
                         <div class="review-card-meta">
-                            <span>02 May 2025</span>
-                            <span><i class="bi bi-chat-dots-fill"></i>40 comments</span>
+                            <span>11 April 2025 </span>
+                            <span><i class="bi bi-chat-dots-fill"></i>24 Comments</span>
                         </div>
                     </div>
                 </div>
                 <div class="review-card">
-                    <img src="https://fdn.gsmarena.com/imgroot/news/25/04/cmf-phone-2-pro-ifr/-344x215/gsmarena_000.jpg"
-                        alt="Moto G Stylus 5G">
+                    <img src="https://fdn.gsmarena.com/imgroot/reviews/23/apple-iphone-15-pro-max/-347x151/gsmarena_003.jpg"
+                        alt="Nothing CMF Phone 2 Pro">
                     <div class="review-card-body">
-                        <div class="review-card-title">CMF Phone 2 Pro in For Review</div>
+                        <div class="review-card-title">Apple 15 pro max review </div>
                         <div class="review-card-meta">
-                            <span>02 May 2025</span>
-                            <span><i class="bi bi-chat-dots-fill"></i>40 comments</span>
+                            <span>15 April 2025 </span>
+                            <span><i class="bi bi-chat-dots-fill"></i>103 comments</span>
                         </div>
                     </div>
                 </div>
-                <div class="review-card">
-                    <img src="https://fdn.gsmarena.com/imgroot/news/25/04/oppo-k13/-344x215/gsmarena_001.jpg"
-                        alt="Moto G Stylus 5G">
-                    <div class="review-card-body">
-                        <div class="review-card-title">Oppo K13 Hands On</div>
-                        <div class="review-card-meta">
-                            <span>02 May 2025</span>
-                            <span><i class="bi bi-chat-dots-fill"></i>40 comments</span>
-                        </div>
-                    </div>
-                </div>
-                <div class="review-card">
-                    <img src="https://fdn.gsmarena.com/imgroot/news/25/04/google-pixel-9a-ifr/-344x215/gsmarena_000.jpg"
-                        alt="Moto G Stylus 5G">
-                    <div class="review-card-body">
-                        <div class="review-card-title">Google Pixel 9a in for full review </div>
-                        <div class="review-card-meta">
-                            <span>02 May 2025</span>
-                            <span><i class="bi bi-chat-dots-fill"></i>40 comments</span>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="review-card">
-                    <img src="https://fdn.gsmarena.com/imgroot/news/25/04/samsung-galaxy-a36-vs-samsung-galaxy-a35/-344x215/gsmarena_100.jpg"
-                        alt="Moto G Stylus 5G">
-                    <div class="review-card-body">
-                        <div class="review-card-title">Battle Of: Samsung Galaxy A36 vs. Samsung Galaxy A35</div>
-                        <div class="review-card-meta">
-                            <span>02 May 2025</span>
-                            <span><i class="bi bi-chat-dots-fill"></i>40 comments</span>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="review-card">
-                    <img src="https://fdn.gsmarena.com/imgroot/news/25/04/oppo-find-x8-ultra-china/-344x215/gsmarena_000.jpg"
-                        alt="Moto G Stylus 5G">
-                    <div class="review-card-body">
-                        <div class="review-card-title">Gallery: Here are some Oppo Find X8 Ultra camera samples from a
-                            photo walk around Xi'an
-                        </div>
-                        <div class="review-card-meta">
-                            <span>02 May 2025</span>
-                            <span><i class="bi bi-chat-dots-fill"></i>40 comments</span>
-                        </div>
-                    </div>
-                </div>
-
             </div>
 
-            <div class="col-lg-4  col-12  bg-white p-3">
+            <div class="col-md-4  bg-white ">
+                <img src="https://fdn.gsmarena.com/imgroot/static/banners/self/review-iphone-16-pro-300x250.jpg"
+                    class="w-100 mt-2" alt="">
+                <h6 class="text-secondary mt-2 fw-bold" style="text-transform: uppercase;">Latest Devices</h6>
+                <div class="cent">
 
-                <img src="https://fdn.gsmarena.com/imgroot/static/banners/self/arenaev-300x250.jpg" class="w-100 "
-                    style="width: 400px;" alt="">
-                <div class="review-column-list-item review-column-list-item-secondary mt-3 w-100">
-                    <img class="review-list-item-image w-100"
-                        src="https://fdn.gsmarena.com/imgroot/reviews/25/motorola-moto-g-stylus-2025/-347x151/gsmarena_001.jpg"
-                        alt="Moto G Stylus 5G (2025) review" style="margin-left: -10px;">
-
-                    <h1 class="common"> Mooto G Stylus 5G (2025) review</h1>
-                    <img class="review-list-item-image w-100"
-                        src="https://fdn.gsmarena.com/imgroot/reviews/25/google-pixel-9a/-347x151/gsmarena_001.jpg"
-                        alt="Google Pixel 9a review" style="margin-left: -10px;">
-                    <h1 class="common">Google pIxel 9a Review</h1>
+                    <div class="d-flex">
+                        <div class="canel">
+                            <img class="shrink" src="https://fdn2.gsmarena.com/vv/bigpic/vivoiy300-gt.jpg" alt="">
+                            <p>Vivo y300 Gt</p>
+                        </div>
+                        <div class="canel mx-4">
+                            <img class="shrink" src="https://fdn2.gsmarena.com/vv/bigpic/samsung-galaxy-m56-5g.jpg"
+                                alt="">
+                            <p>Sumsung Galaxy f56</p>
+                        </div>
+                        <div class="canel ">
+                            <img class="shrink" src="https://fdn2.gsmarena.com/vv/bigpic/vivo-x200-pro-mini.jpg" alt="">
+                            <p>Vivo x200 FE</p>
+                        </div>
+                    </div>
+                    <div class="d-flex">
+                        <div class="canel">
+                            <img class="shrink" src="https://fdn2.gsmarena.com/vv/bigpic/vivo-x-fold3.jpg" alt="">
+                            <p>Vivo X Fold5</p>
+                        </div>
+                        <div class="canel mx-4">
+                            <img class="shrink" src="https://fdn2.gsmarena.com/vv/bigpic/itel-a90.jpg" alt="">
+                            <p>Itel A90</p>
+                        </div>
+                        <div class="canel ">
+                            <img class="shrink" src="https://fdn2.gsmarena.com/vv/bigpic/oscal-pad-100.jpg" alt="">
+                            <p>OScal pad 100</p>
+                        </div>
+                    </div>
+                    <div class="d-flex">
+                        <div class="canel">
+                            <img class="shrink" src="https://fdn2.gsmarena.com/vv/bigpic/itel-city-100.jpg" alt="">
+                            <p>itel city 100</p>
+                        </div>
+                        <div class="canel mx-4">
+                            <img class="shrink" src="https://fdn2.gsmarena.com/vv/bigpic/motorola-edge-60-fusion.jpg"
+                                alt="">
+                            <p>Motorla Edge 60</p>
+                        </div>
+                        <div class="canel ">
+                            <img class="shrink" src="https://fdn2.gsmarena.com/vv/bigpic/sony-xperia-1-vi-red.jpg"
+                                alt="">
+                            <p>Song xperia -1 VII</p>
+                        </div>
+                    </div>
                 </div>
+                <h6 style="border-left: solid 5px grey ;text-transform: uppercase;" class=" fw-bold px-3 text-secondary mt-3" >Popular comparisons</h6>
+                 <div class="sentizer bg-white mt-2 p-3 rounded shadow-sm" style="    text-transform: Uppercase;
+                                            font-size: 13px;
+                                            font-weight: 700;">
+                    <div class="row">
+                        <div class="col-12">
+                            <p class="mb-2"
+                                style="background-color: #ffe6f0; color: #090E21; text-transform: capitalize;">Samsung
+                                Galaxy A55 vs.
+                                Galaxy A56</p>
+                            <p class="mb-2" style=" text-transform: capitalize;">Apple iPhone 16 Pro Max vs. Galaxy S25
+                                Ultra</p>
+                            <p class="mb-2" style="background-color: #ffe6f0; text-transform: capitalize; ">Samsung
+                                Galaxy S24 Ultra vs. Galaxy S25
+                                Ultra</p>
+                            <p class="mb-2" style=" text-transform: capitalize;">Samsung Galaxy A36 vs. Galaxy A56</p>
+                            <p class="mb-2" style="background-color: #ffe6f0; text-transform: capitalize;">Samsung
+                                Galaxy S24 FE vs. Galaxy A56</p>
+                            <p class="mb-2" style=" text-transform: capitalize;">Apple iPhone 13 vs. Apple iPhone 14</p>
+                            <p class="mb-2" style="background-color: #ffe6f0;text-transform: capitalize;">Samsung Galaxy
+                                S23 Ultra vs. Galaxy S24
+                                Ultra</p>
+                            <p class="mb-2" style=" text-transform: capitalize;">Samsung Galaxy S24 vs. Galaxy S24 FE
+                            </p>
+                            <p class="mb-2" style="background-color: #ffe6f0;text-transform: capitalize;">Xiaomi Redmi
+                                Note 14 Pro+ vs.
+                                Redmi 14 Pro </p>
+                            <p class="mb-2" style=" text-transform: capitalize;">Apple iPhone 16 Pro Max vs. iPhone 16
+                                Pro</p>
+                            <p class="mb-0" style="background-color: #ffe6f0;text-transform: capitalize;">Samsung Galaxy
+                                S24 vs. Galaxy S25</p>
+                        </div>
+                    </div>
+                </div>
+
                 <div class="d-flex">
-                    <h5 class="text-secondary mt-2 d-inline fw-bold " style="text-transform: uppercase;" >top 10 by Daily Interest </h5>
+                    <h6 class="text-secondary mt-2 d-inline fw-bold" style="text-transform: uppercase;">top 10 by Daily Interest </h6>
                 </div>
                 <div class="center w-100">
                     <table class="table table-sm custom-table">
                         <thead>
-                            <tr class="text-white " style="background-color: #4C7273;">
-                                <th  style="color: white;">#</th>
+                            <tr class="text-white " style="background-color: #4C7273; color: white;">
+                                <th style="color: white;">#</th>
                                 <th style="color: white;">Devices</th>
                                 <th style="color: white;">Daily Hits</th>
                             </tr>
@@ -503,11 +711,12 @@
                     </table>
                 </div>
                 <div class="center w-100 " style="margin-top: 12px;">
-                    <h5 class="text-secondary mt-2 d-inline fw-bold " style="text-transform: uppercase;" >top 10 by Fans </h5>
-                    
+                    <h6 class="text-secondary mt-2 d-inline" style="text-transform: uppercase;">top 10 by Fans </h6>
+
                     <table class="table table-sm custom-table">
                         <thead>
-                        <tr class="text-white" style="background-color: #14222D;">
+                            
+                               <tr class="text-white" style="background-color: #14222D;">
                                 <th style="color: white;  font-size: 15px;  ">#</th>
                                 <th style="color: white;  font-size: 15px;">Device</th>
                                 <th style="color: white;  font-size: 15px;">Favorites</th>
@@ -567,38 +776,59 @@
                         </tbody>
                     </table>
                 </div>
-                <h5 style="border-left: solid 5px grey ; text-transform: uppercase;" class=" fw-bold px-3 text-secondary py-1">Electric Vehicles</h5>
-                <div style="background-color: #f2f2f2; height: 260px">
-                    <div class="col-md-12">
-                        <img src="https://st.arenaev.com/news/25/05/xiaomi-su7-faces-quality-concerns/-344x215/arenaev_001.jpg"
-                            class=" rounded" alt="News Image">
-                        <p class="fw-bold mb-1 wanted-12 mt-2 mx-auto text-center">
-                            Xiaomi SU7 faces quality concerns, some owners sue the company
+                <h6 style="border-left: 7px solid #EFEBE9 ; text-transform: uppercase;" class=" fw-bold px-2 text-secondary mt-2 d-inline mt-4">In Storeies
+                    Now</h6>
+                
+                <div class="cent mb-4">
+                
+                    <div class="d-flex">
+                        <div class="canel">
+                            <img class="shrink" src="https://fdn2.gsmarena.com/vv/bigpic/nothing-cmf-phone-2-pro.jpg" alt="">
+                            <p>Nothing Cmf 2 </p>
+                        </div>
+                        <div class="canel mx-4">
+                            <img class="shrink" src="https://fdn2.gsmarena.com/vv/bigpic/motorola-edge-60-pro.jpg" alt="">
+                            <p>Motrola edge 60 </p>
+                        </div>
+                        <div class="canel ">
+                            <img class="shrink" src="https://fdn2.gsmarena.com/vv/bigpic/vivo-x200-ultra.jpg" alt="">
+                            <p>Vivo x200 Ultra</p>
+                        </div>
                     </div>
-
-                </div>
-
-                <div class="d-flex my-3" style="background-color: #f2f2f2;">
-                    <div class="col-md-12 py-2">
-                        <p class="fw-bold mb-1 wanted-12">
-                            Xiomo Sign Partnership agreement with nurbugging
-                        </p>
+                    <div class="d-flex">
+                        <div class="canel">
+                            <img class="shrink" src="https://fdn2.gsmarena.com/vv/bigpic/vivo-t4.jpg" alt="">
+                            <p>Vivo t4</p>
+                        </div>
+                        <div class="canel mx-4">
+                            <img class="shrink" src="https://fdn2.gsmarena.com/vv/bigpic/motorola-edge-60.jpg" alt="">
+                            <p>Motrola Edge 16</p>
+                        </div>
+                        <div class="canel ">
+                            <img class="shrink" src="https://fdn2.gsmarena.com/vv/bigpic/motorola-razr-60-ultra-5g.jpg" alt="">
+                            <p>motorola razr 60 ultra</p>
+                        </div>
+                    </div>
+                    <div class="d-flex">
+                        <div class="canel">
+                            <img class="shrink" src="https://fdn2.gsmarena.com/vv/bigpic/vivo-iqoo-z10x.jpg" alt="">
+                            <p>Vivo iQ00 Z10 x</p>
+                        </div>
+                        <div class="canel mx-4">
+                            <img class="shrink" src="https://fdn2.gsmarena.com/vv/bigpic/motorola-moto-g-stylus-5g-2025.jpg" alt="">
+                            <p>Motrola Moto G </p>
+                        </div>
+                        <div class="canel ">
+                            <img class="shrink" src="https://fdn2.gsmarena.com/vv/bigpic/google-pixel-9a.jpg" alt="">
+                            <p>Google Pixel 9a </p>
+                        </div>
                     </div>
                 </div>
-                <div class="d-flex" style="background-color: #f2f2f2;">
-
-                    <div class="col-md-12 py-2">
-                        <p class="fw-bold mb-1 wanted-12 text-center ">
-                            Li auto refreshes electric suv lineup with tech boost keep prices steady news
-                        </p>
-                    </div>
-                </div>
-
-                <div style="position: sticky;margin-top: 12px; ">
+  
+                <div style="position: sticky; top: 10px;">
                     <img src="https://fdn.gsmarena.com/imgroot/static/banners/self/review-pixel-9-pro-300x250.jpg"
                         class=" d-block mx-auto" style="width: 300px;">
                 </div>
-
             </div>
         </div>
     </div>
@@ -626,7 +856,7 @@
                     <a href="#">Mobile version</a>
                     <a href="#">Android app</a>
                     <a href="#">Tools</a>
-                    <a href="#">Contact us</a>
+                    <a href="contact.html">Contact us</a>
                     <a href="#">Merch store</a>
                     <a href="#">Privacy</a>
                     <a href="#">Terms of use</a>

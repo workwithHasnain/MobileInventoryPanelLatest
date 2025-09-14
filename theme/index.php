@@ -16,7 +16,7 @@
     <!-- Font Awesome (for icons) -->
     <script src="https://kit.fontawesome.com/your-kit-code.js" crossorigin="anonymous"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" />
-    <script>
+    <script>    
 
     </script>
 
@@ -87,7 +87,7 @@
                     </button>
                 </div>
             </div>
-
+           
         </nav>
 
     </div>
@@ -122,13 +122,13 @@
             <i class="fas fa-share-alt"></i>
         </div>
         <div class="column">
-            <a href="index.php">Home</a>
-            <a href="news.php">News</a>
-            <a href="reviews.php">Reviews</a>
-            <a href="videos.php">Videos</a>
-            <a href="featured.php">Featured</a>
-            <a href="phonefinder.php">Phone Finder</a>
-            <a href="compare.php">Compare</a>
+            <a href="index.html">Home</a>
+            <a href="news.html">News</a>
+            <a href="rewies.html">Reviews</a>
+            <a href="videos.html">Videos</a>
+            <a href="featured.html">Featured</a>
+            <a href="phonefinder.html">Phone Finder</a>
+            <a href="compare.html">Compare</a>
             <a href="#">Coverage</a>
             <a href="contact">Contact Us</a>
             <a href="#">Merch</a>
@@ -154,18 +154,21 @@
             <button class="btn btn-primary w-50">📲 My Phone</button>
         </div>
     </div>
-    <!-- Display Menu of Gsmarecn -->
+      <!-- Display Menu of Gsmarecn -->
     <div id="leftMenu" class="container show">
         <div class="row">
             <div class="col-12 d-flex align-items-center   colums-gap">
-                <a href="index.php" class="nav-link">Home</a>
-                <a href="compare.php" class="nav-link">Compare</a>
-                <a href="videos.php" class="nav-link">Videos</a>
-                <a href="reviews.php" class="nav-link ">Reviews</a>
-                <a href="news.php" class="nav-link d-lg-block d-none">News</a>
-                <a href="featured.php" class="nav-link d-lg-block d-none">Featured</a>
-                <a href="phonefinder.php" class="nav-link d-lg-block d-none">Phone Finder</a>
-                <a href="contact.php" class="nav-link d-lg-block d-none">Contact</a>
+                <a href="single-post-page.html" class="nav-link">Post Page</a>
+                <a href="single-divice-page.html" class="nav-link">Post Device</a>
+
+                <a href="index.html" class="nav-link">Home</a>
+                <a href="compare.html" class="nav-link">Compare</a>
+                <a href="videos.html" class="nav-link">Videos</a>
+                <a href="rewies.html" class="nav-link ">Reviews</a>
+                <a href="news.html" class="nav-link d-lg-block d-none">News</a>
+                <a href="featured.html" class="nav-link d-lg-block d-none">Featured</a>
+                <a href="phonefinder.html" class="nav-link d-lg-block d-none">Phone Finder</a>
+                <a href="contact.html" class="nav-link d-lg-block d-none">Contact</a>
                 <div style="background-color: #d50000; border-radius: 7px;" class="d-lg-none py-2"><svg
                         xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" height="16" width="16" class="mx-3">
                         <path fill="#ffffff"
@@ -174,7 +177,7 @@
             </div>
         </div>
     </div>
-
+   
     <div class="container featured ">
         <h2 class="section">Featured</h2>
         <div class="featured-section">
@@ -302,10 +305,10 @@
                     RUMORS MILL</button>
             </div>
         </div>
-        <div class="row">
+         <div class="row">
             <div class="col-lg-4 col-6 conjection-froud  bobile">
                 <div class="review-column-list-item review-column-list-item-secondary ">
-                    <img class="review-list-item-image"
+                     <img class="review-list-item-image"
                         src="https://cdn.prod.website-files.com/67f21c9d62aa4c4c685a7277/6842d8cb8981edbf2586e945_gsmarena_003.jpg"
                         alt="Google Pixel 9a review">
                     <h1>Nubia Z705 Ultra Review</h1>
@@ -317,7 +320,7 @@
             </div>
             <div class="col-6 col-lg-4 conjection-froud " style="margin-left: 7px;">
                 <div class="comfort d-md-none d-block">
-
+                   
                     <div class="conjection position-absolute  mx-3 my-2 end-0">
                         <i class="fa-solid fa-comment fa-sm" style="color: white;"></i>
                         <span class="text-white ">80</span>
@@ -337,10 +340,9 @@
                     <h1>Nubia Z705 Ultra Review</h1>
                 </div>
             </div>
-            <div class="col-6 col-md-4" style=" position: relative; left: 28px;">
+              <div class="col-6 col-md-4" style=" position: relative; left: 28px;">
                 <img class="w-100 d-none d-lg-inline"
-                    src="https://fdn.gsmarena.com/imgroot/static/banners/self/review-iphone-16-300x250.jpg"
-                    style="height: 95%;" alt="">
+                    src="https://fdn.gsmarena.com/imgroot/static/banners/self/review-iphone-16-300x250.jpg" style="height: 95%;" alt="">
 
             </div>
         </div>
@@ -430,8 +432,7 @@
                 </div>
             </div>
             <div class="col-lg-4  col-12  bg-white ">
-                <h6 style="color: #090E21; text-transform: uppercase; font-weight: 900;" class=" mt-2 ">Latest Devices
-                </h6>
+                <h6 style="color: #090E21; text-transform: uppercase; font-weight: 900;" class=" mt-2 ">Latest Devices</h6>
                 <div class="cent">
 
                     <div class="d-flex">
@@ -482,8 +483,7 @@
                 </div>
 
 
-                <h6 style="border-left: solid 5px grey ; color: #090E21; text-transform: uppercase; font-weight: 900; margin-top: 12px;"
-                    class="px-3">Popular comparisons</h6>
+                <h6 style="border-left: solid 5px grey ; color: #090E21; text-transform: uppercase; font-weight: 900; margin-top: 12px;" class="px-3">Popular comparisons</h6>
 
                 <div class="sentizer bg-white mt-2 p-3 rounded shadow-sm" style="    text-transform: Uppercase;
                                             font-size: 13px;
@@ -827,8 +827,7 @@
             </div>
 
             <div class="col-lg-4  col-12 sentizer-er  bg-white p-3">
-                <h6 style="border-left: 7px solid #EFEBE9 ; font-weight: 900; color: #090E21; text-transform: uppercase;"
-                    class=" px-2 mt-2 d-inline mt-4">Top 10
+                <h6 style="border-left: 7px solid #EFEBE9 ; font-weight: 900; color: #090E21; text-transform: uppercase;" class=" px-2 mt-2 d-inline mt-4">Top 10
                     Daily Interest</h6>
 
                 <div class="center">
@@ -866,7 +865,7 @@
                                 <td class="text-start">Xiaomi Poco X7 Pro</td>
                                 <td class="text-end">19,249</td>
                             </tr>
-                            <tr class="highlight" class="text-white">
+                            <tr class="highlight"  class="text-white">
                                 <th scope="row" class="text-white">6</th>
                                 <td class="text-start">OnePlus 13T 5G</td>
                                 <td class="text-end">18,523</td>
@@ -886,16 +885,15 @@
                                 <td class="text-start">Samsung Galaxy A36</td>
                                 <td class="text-end">16,592</td>
                             </tr>
-                            <tr class="highlight">
-                                <th scope="row" class="text-white">10</th>
+                            <tr class="highlight" >
+                                <th scope="row"class="text-white">10</th>
                                 <td class="text-start">Motorola Edge 60 Pro</td>
                                 <td class="text-end">16,433</td>
                             </tr>
                         </tbody>
                     </table>
                 </div>
-                <h6 style="border-left: 7px solid #EFEBE9 ; font-weight: 900; color: #090E21; text-transform: uppercase;"
-                    class=" px-2 mt-2 d-inline mt-4">Top 10 by
+                <h6 style="border-left: 7px solid #EFEBE9 ; font-weight: 900; color: #090E21; text-transform: uppercase;" class=" px-2 mt-2 d-inline mt-4">Top 10 by
                     Fans</h6>
                 <div class="center" style="margin-top: 12px;">
                     <table class="table table-sm custom-table">
@@ -960,8 +958,7 @@
                         </tbody>
                     </table>
                 </div>
-                <h6 style="border-left: 7px solid #EFEBE9 ; font-weight: 900; color: #090E21; text-transform: uppercase;"
-                    class=" px-2 mt-2 d-inline mt-4">In
+                <h6 style="border-left: 7px solid #EFEBE9 ; font-weight: 900; color: #090E21; text-transform: uppercase;" class=" px-2 mt-2 d-inline mt-4">In
                     Storeies
                     Now</h6>
 
@@ -1014,8 +1011,7 @@
                         </div>
                     </div>
                 </div>
-                <h6 style="border-left: solid 5px grey ; font-weight: 900; color: #090E21; text-transform: uppercase;"
-                    class="px-3 py-2 mt-3">Electric Vehicles</h6>
+                <h6 style="border-left: solid 5px grey ; font-weight: 900; color: #090E21; text-transform: uppercase;" class="px-3 py-2 mt-3">Electric Vehicles</h6>
                 <div class="d-flex">
                     <div class="col-md-4">
                         <img style="height: 60px;"
@@ -1100,7 +1096,7 @@
                     <a href="#">Mobile version</a>
                     <a href="#">Android app</a>
                     <a href="#">Tools</a>
-                    <a href="contact.php">Contact us</a>
+                    <a href="contact.html">Contact us</a>
                     <a href="#">Merch store</a>
                     <a href="#">Privacy</a>
                     <a href="#">Terms of use</a>
