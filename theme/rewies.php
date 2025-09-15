@@ -24,7 +24,7 @@
 </head>
 
 <body style="background-color: #EFEBE9;">
-      <!-- Desktop Navbar of Gsmarecn -->
+    <!-- Desktop Navbar of Gsmarecn -->
     <div class="main-wrapper">
         <!-- Top Navbar -->
         <nav class="navbar navbar-dark  d-lg-inline d-none" id="navbar">
@@ -51,19 +51,11 @@
                             <img src="iccons/instagram-color-svgrepo-com.svg" alt="Instagram" width="22px">
                         </button>
 
-                        <button type="button" class="btn" data-bs-toggle="tooltip" data-bs-placement="left"
-                            title="WiFi">
-                            <i class="fa-solid fa-wifi fa-lg" style="color: #ffffff;"></i>
-                        </button>
 
-                        <button type="button" class="btn" data-bs-toggle="tooltip" data-bs-placement="left" title="Car">
-                            <i class="fa-solid fa-car fa-lg" style="color: #ffffff;"></i>
-                        </button>
 
-                        <button type="button" class="btn" data-bs-toggle="tooltip" data-bs-placement="left"
-                            title="Cart">
-                            <i class="fa-solid fa-cart-shopping fa-lg" style="color: #ffffff;"></i>
-                        </button>
+
+
+
                     </div>
                 </div>
 
@@ -75,17 +67,7 @@
                     </svg>
                 </form>
 
-                <div>
-                    <button type="button" class="btn mb-2" data-bs-toggle="tooltip" data-bs-placement="left"
-                        title="Login">
-                        <i class="fa-solid fa-right-to-bracket fa-lg" style="color: #ffffff;"></i>
-                    </button>
 
-                    <button type="button" class="btn mb-2" data-bs-toggle="tooltip" data-bs-placement="left"
-                        title="Register">
-                        <i class="fa-solid fa-user-plus fa-lg" style="color: #ffffff;"></i>
-                    </button>
-                </div>
             </div>
         </nav>
 
@@ -200,7 +182,7 @@
 
             </div>
 
-           <div class="col-md-4 col-5 d-none d-lg-block" style="position: relative; left: 25px;">
+            <div class="col-md-4 col-5 d-none d-lg-block" style="position: relative; left: 25px;">
                 <button class="solid w-100 py-2">
                     <i class="fa-solid fa-mobile fa-sm mx-2" style="color: white;"></i>
                     Phone Finder</button>
@@ -609,8 +591,8 @@
                         </div>
                     </div>
                 </div>
-                <h6 style="border-left: solid 5px grey ;text-transform: uppercase;" class=" fw-bold px-3 text-secondary mt-3" >Popular comparisons</h6>
-                 <div class="sentizer bg-white mt-2 p-3 rounded shadow-sm" style="    text-transform: Uppercase;
+                <h6 style="border-left: solid 5px grey ;text-transform: uppercase;" class=" fw-bold px-3 text-secondary mt-3">Popular comparisons</h6>
+                <div class="sentizer bg-white mt-2 p-3 rounded shadow-sm" style="    text-transform: Uppercase;
                                             font-size: 13px;
                                             font-weight: 700;">
                     <div class="row">
@@ -715,8 +697,8 @@
 
                     <table class="table table-sm custom-table">
                         <thead>
-                            
-                               <tr class="text-white" style="background-color: #14222D;">
+
+                            <tr class="text-white" style="background-color: #14222D;">
                                 <th style="color: white;  font-size: 15px;  ">#</th>
                                 <th style="color: white;  font-size: 15px;">Device</th>
                                 <th style="color: white;  font-size: 15px;">Favorites</th>
@@ -778,9 +760,9 @@
                 </div>
                 <h6 style="border-left: 7px solid #EFEBE9 ; text-transform: uppercase;" class=" fw-bold px-2 text-secondary mt-2 d-inline mt-4">In Storeies
                     Now</h6>
-                
+
                 <div class="cent mb-4">
-                
+
                     <div class="d-flex">
                         <div class="canel">
                             <img class="shrink" src="https://fdn2.gsmarena.com/vv/bigpic/nothing-cmf-phone-2-pro.jpg" alt="">
@@ -824,7 +806,7 @@
                         </div>
                     </div>
                 </div>
-  
+
                 <div style="position: sticky; top: 10px;">
                     <img src="https://fdn.gsmarena.com/imgroot/static/banners/self/review-pixel-9-pro-300x250.jpg"
                         class=" d-block mx-auto" style="width: 300px;">
@@ -840,7 +822,7 @@
             <div class="col-10 nav-wrap m-auto text-center ">
                 <div class="nav-container">
                     <a href="#">Home</a>
-                    <a href="#">News</a>
+
                     <a href="#">Reviews</a>
                     <a href="#">Compare</a>
                     <a href="#">Coverage</a>

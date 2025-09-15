@@ -132,19 +132,11 @@ $brands = $brands_stmt->fetchAll();
                             <img src="iccons/instagram-color-svgrepo-com.svg" alt="Instagram" width="22px">
                         </button>
 
-                        <button type="button" class="btn" data-bs-toggle="tooltip" data-bs-placement="left"
-                            title="WiFi">
-                            <i class="fa-solid fa-wifi fa-lg" style="color: #ffffff;"></i>
-                        </button>
 
-                        <button type="button" class="btn" data-bs-toggle="tooltip" data-bs-placement="left" title="Car">
-                            <i class="fa-solid fa-car fa-lg" style="color: #ffffff;"></i>
-                        </button>
 
-                        <button type="button" class="btn" data-bs-toggle="tooltip" data-bs-placement="left"
-                            title="Cart">
-                            <i class="fa-solid fa-cart-shopping fa-lg" style="color: #ffffff;"></i>
-                        </button>
+
+
+
                     </div>
                 </div>
 
@@ -156,17 +148,7 @@ $brands = $brands_stmt->fetchAll();
                     </svg>
                 </form>
 
-                <div>
-                    <button type="button" class="btn mb-2" data-bs-toggle="tooltip" data-bs-placement="left"
-                        title="Login">
-                        <i class="fa-solid fa-right-to-bracket fa-lg" style="color: #ffffff;"></i>
-                    </button>
 
-                    <button type="button" class="btn mb-2" data-bs-toggle="tooltip" data-bs-placement="left"
-                        title="Register">
-                        <i class="fa-solid fa-user-plus fa-lg" style="color: #ffffff;"></i>
-                    </button>
-                </div>
             </div>
         </nav>
 
@@ -203,7 +185,7 @@ $brands = $brands_stmt->fetchAll();
         </div>
         <div class="column">
             <a href="index.php">Home</a>
-            <a href="news.php">News</a>
+
             <a href="reviews.php">Reviews</a>
             <a href="videos.php">Videos</a>
             <a href="featured.php">Featured</a>
@@ -238,7 +220,7 @@ $brands = $brands_stmt->fetchAll();
                 <a href="compare.php" class="nav-link">Compare</a>
                 <a href="videos.php" class="nav-link">Videos</a>
                 <a href="reviews.php" class="nav-link ">Reviews</a>
-                <a href="news.php" class="nav-link d-lg-block d-none">News</a>
+
                 <a href="featured.php" class="nav-link d-lg-block d-none">Featured</a>
                 <a href="phonefinder.php" class="nav-link d-lg-block d-none">Phone Finder</a>
                 <a href="contact.php" class="nav-link d-lg-block d-none">Contact</a>
@@ -337,7 +319,7 @@ $brands = $brands_stmt->fetchAll();
 
             <div class="col-lg-4  col-12  bg-white p-3">
 
-                
+
                 <div class="d-flex">
                     <h5 class="text-secondary mt-2 d-inline fw-bold " style="text-transform: uppercase;">top 10 by Daily
                         Interest </h5>
@@ -430,7 +412,7 @@ $brands = $brands_stmt->fetchAll();
             <div class="col-10 nav-wrap m-auto text-center ">
                 <div class="nav-container">
                     <a href="#">Home</a>
-                    <a href="#">News</a>
+
                     <a href="#">Reviews</a>
                     <a href="#">Compare</a>
                     <a href="#">Coverage</a>

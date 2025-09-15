@@ -16,7 +16,7 @@
     <!-- Font Awesome (for icons) -->
     <script src="https://kit.fontawesome.com/your-kit-code.js" crossorigin="anonymous"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" />
-    <script>    
+    <script>
 
     </script>
 
@@ -51,19 +51,11 @@
                             <img src="iccons/instagram-color-svgrepo-com.svg" alt="Instagram" width="22px">
                         </button>
 
-                        <button type="button" class="btn" data-bs-toggle="tooltip" data-bs-placement="left"
-                            title="WiFi">
-                            <i class="fa-solid fa-wifi fa-lg" style="color: #ffffff;"></i>
-                        </button>
 
-                        <button type="button" class="btn" data-bs-toggle="tooltip" data-bs-placement="left" title="Car">
-                            <i class="fa-solid fa-car fa-lg" style="color: #ffffff;"></i>
-                        </button>
 
-                        <button type="button" class="btn" data-bs-toggle="tooltip" data-bs-placement="left"
-                            title="Cart">
-                            <i class="fa-solid fa-cart-shopping fa-lg" style="color: #ffffff;"></i>
-                        </button>
+
+
+
                     </div>
                 </div>
 
@@ -75,19 +67,9 @@
                     </svg>
                 </form>
 
-                <div>
-                    <button type="button" class="btn mb-2" data-bs-toggle="tooltip" data-bs-placement="left"
-                        title="Login">
-                        <i class="fa-solid fa-right-to-bracket fa-lg" style="color: #ffffff;"></i>
-                    </button>
 
-                    <button type="button" class="btn mb-2" data-bs-toggle="tooltip" data-bs-placement="left"
-                        title="Register">
-                        <i class="fa-solid fa-user-plus fa-lg" style="color: #ffffff;"></i>
-                    </button>
-                </div>
             </div>
-           
+
         </nav>
 
     </div>
@@ -154,7 +136,7 @@
             <button class="btn btn-primary w-50">📲 My Phone</button>
         </div>
     </div>
-      <!-- Display Menu of Gsmarecn -->
+    <!-- Display Menu of Gsmarecn -->
     <div id="leftMenu" class="container show">
         <div class="row">
             <div class="col-12 d-flex align-items-center   colums-gap">
@@ -177,7 +159,7 @@
             </div>
         </div>
     </div>
-   
+
     <div class="container featured ">
         <h2 class="section">Featured</h2>
         <div class="featured-section">
@@ -305,10 +287,10 @@
                     RUMORS MILL</button>
             </div>
         </div>
-         <div class="row">
+        <div class="row">
             <div class="col-lg-4 col-6 conjection-froud  bobile">
                 <div class="review-column-list-item review-column-list-item-secondary ">
-                     <img class="review-list-item-image"
+                    <img class="review-list-item-image"
                         src="https://cdn.prod.website-files.com/67f21c9d62aa4c4c685a7277/6842d8cb8981edbf2586e945_gsmarena_003.jpg"
                         alt="Google Pixel 9a review">
                     <h1>Nubia Z705 Ultra Review</h1>
@@ -320,7 +302,7 @@
             </div>
             <div class="col-6 col-lg-4 conjection-froud " style="margin-left: 7px;">
                 <div class="comfort d-md-none d-block">
-                   
+
                     <div class="conjection position-absolute  mx-3 my-2 end-0">
                         <i class="fa-solid fa-comment fa-sm" style="color: white;"></i>
                         <span class="text-white ">80</span>
@@ -340,7 +322,7 @@
                     <h1>Nubia Z705 Ultra Review</h1>
                 </div>
             </div>
-              <div class="col-6 col-md-4" style=" position: relative; left: 28px;">
+            <div class="col-6 col-md-4" style=" position: relative; left: 28px;">
                 <img class="w-100 d-none d-lg-inline"
                     src="https://fdn.gsmarena.com/imgroot/static/banners/self/review-iphone-16-300x250.jpg" style="height: 95%;" alt="">
 
@@ -865,7 +847,7 @@
                                 <td class="text-start">Xiaomi Poco X7 Pro</td>
                                 <td class="text-end">19,249</td>
                             </tr>
-                            <tr class="highlight"  class="text-white">
+                            <tr class="highlight" class="text-white">
                                 <th scope="row" class="text-white">6</th>
                                 <td class="text-start">OnePlus 13T 5G</td>
                                 <td class="text-end">18,523</td>
@@ -885,8 +867,8 @@
                                 <td class="text-start">Samsung Galaxy A36</td>
                                 <td class="text-end">16,592</td>
                             </tr>
-                            <tr class="highlight" >
-                                <th scope="row"class="text-white">10</th>
+                            <tr class="highlight">
+                                <th scope="row" class="text-white">10</th>
                                 <td class="text-start">Motorola Edge 60 Pro</td>
                                 <td class="text-end">16,433</td>
                             </tr>
@@ -1080,7 +1062,7 @@
             <div class="col-10 nav-wrap m-auto text-center ">
                 <div class="nav-container">
                     <a href="#">Home</a>
-                    <a href="#">News</a>
+
                     <a href="#">Reviews</a>
                     <a href="#">Compare</a>
                     <a href="#">Coverage</a>

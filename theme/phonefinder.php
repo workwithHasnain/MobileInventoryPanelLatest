@@ -22,7 +22,7 @@
 </head>
 
 <body style="background-color: #EFEBE9;">
-      <!-- Desktop Navbar of Gsmarecn -->
+    <!-- Desktop Navbar of Gsmarecn -->
     <div class="main-wrapper">
         <!-- Top Navbar -->
         <nav class="navbar navbar-dark  d-lg-inline d-none" id="navbar">
@@ -49,19 +49,11 @@
                             <img src="iccons/instagram-color-svgrepo-com.svg" alt="Instagram" width="22px">
                         </button>
 
-                        <button type="button" class="btn" data-bs-toggle="tooltip" data-bs-placement="left"
-                            title="WiFi">
-                            <i class="fa-solid fa-wifi fa-lg" style="color: #ffffff;"></i>
-                        </button>
 
-                        <button type="button" class="btn" data-bs-toggle="tooltip" data-bs-placement="left" title="Car">
-                            <i class="fa-solid fa-car fa-lg" style="color: #ffffff;"></i>
-                        </button>
 
-                        <button type="button" class="btn" data-bs-toggle="tooltip" data-bs-placement="left"
-                            title="Cart">
-                            <i class="fa-solid fa-cart-shopping fa-lg" style="color: #ffffff;"></i>
-                        </button>
+
+
+
                     </div>
                 </div>
 
@@ -73,17 +65,7 @@
                     </svg>
                 </form>
 
-                <div>
-                    <button type="button" class="btn mb-2" data-bs-toggle="tooltip" data-bs-placement="left"
-                        title="Login">
-                        <i class="fa-solid fa-right-to-bracket fa-lg" style="color: #ffffff;"></i>
-                    </button>
 
-                    <button type="button" class="btn mb-2" data-bs-toggle="tooltip" data-bs-placement="left"
-                        title="Register">
-                        <i class="fa-solid fa-user-plus fa-lg" style="color: #ffffff;"></i>
-                    </button>
-                </div>
             </div>
         </nav>
 
@@ -173,7 +155,7 @@
     </div>
     <div class="container support content-wrapper" id="Top">
         <div class="row">
-           
+
             <div class="col-md-8 col-5  d-md-inline  ">
                 <div class="comfort-life position-absolute d-lg-block d-none ">
                     <img class="w-100 h-100" src="imges/magnifient sectton.jpeg"
@@ -1296,7 +1278,7 @@
             <div class="col-10 nav-wrap m-auto text-center ">
                 <div class="nav-container">
                     <a href="#">Home</a>
-                    <a href="#">News</a>
+
                     <a href="#">Reviews</a>
                     <a href="#">Compare</a>
                     <a href="#">Coverage</a>
