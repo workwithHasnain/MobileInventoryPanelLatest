@@ -1663,7 +1663,7 @@ if ($_POST && isset($_POST['submit_comment'])) {
           });
 
           // Redirect to comparison page
-          window.location.href = `compare_phones.php?phone1=${device1Id}&phone2=${device2Id}`;
+          window.location.href = `compare.php?phone1=${device1Id}&phone2=${device2Id}`;
         }
       });
     });

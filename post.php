@@ -1,7 +1,117 @@
 <?php
-// Individual post page with SEO optimization
+// Public home page - no authentication required
 require_once 'database_functions.php';
+require_once 'phone_data.php';
+
+// Get posts and devices for display (case-insensitive status check) with comment counts
 $pdo = getConnection();
+$posts_stmt = $pdo->prepare("
+    SELECT p.*, 
+    (SELECT COUNT(*) FROM post_comments pc WHERE pc.post_id = p.id AND pc.status = 'approved') as comment_count
+    FROM posts p 
+    WHERE p.status ILIKE 'published' 
+    ORDER BY p.created_at DESC 
+    LIMIT 6
+");
+$posts_stmt->execute();
+$posts = $posts_stmt->fetchAll();
+
+// Get devices from database
+$devices = getAllPhones();
+$devices = array_slice($devices, 0, 6); // Limit to 6 devices for home page
+
+// Add comment counts to devices
+foreach ($devices as $index => $device) {
+    $comment_stmt = $pdo->prepare("SELECT COUNT(*) as count FROM device_comments WHERE device_id = CAST(? AS VARCHAR) AND status = 'approved'");
+    $comment_stmt->execute([$device['id']]);
+    $devices[$index]['comment_count'] = $comment_stmt->fetch()['count'] ?? 0;
+}
+
+// Get data for the three tables
+$topViewedDevices = [];
+$topReviewedDevices = [];
+$topComparisons = [];
+
+// Get top viewed devices
+try {
+    $stmt = $pdo->prepare("
+        SELECT p.*, b.name as brand_name, COUNT(cv.id) as view_count
+        FROM phones p 
+        LEFT JOIN brands b ON p.brand_id = b.id
+        LEFT JOIN content_views cv ON CAST(p.id AS VARCHAR) = cv.content_id AND cv.content_type = 'device'
+        GROUP BY p.id, b.name
+        ORDER BY view_count DESC
+        LIMIT 10
+    ");
+    $stmt->execute();
+    $topViewedDevices = $stmt->fetchAll();
+} catch (Exception $e) {
+    $topViewedDevices = [];
+}
+
+// Get top reviewed devices (by comment count)
+try {
+    $stmt = $pdo->prepare("
+        SELECT p.*, b.name as brand_name, COUNT(dc.id) as review_count
+        FROM phones p 
+        LEFT JOIN brands b ON p.brand_id = b.id
+        LEFT JOIN device_comments dc ON CAST(p.id AS VARCHAR) = dc.device_id AND dc.status = 'approved'
+        GROUP BY p.id, b.name
+        ORDER BY review_count DESC
+        LIMIT 10
+    ");
+    $stmt->execute();
+    $topReviewedDevices = $stmt->fetchAll();
+} catch (Exception $e) {
+    $topReviewedDevices = [];
+}
+
+// Get top comparisons (simulated for now)
+$topComparisons = [
+    [
+        'device1_id' => 3,
+        'device2_id' => 1,
+        'comparison_count' => 45,
+        'device1_name' => 'iPhone 15 Pro',
+        'device2_name' => 'Galaxy S24',
+        'device1_image' => 'uploads/device_1755632616_68a4d3e8945a8_1.png',
+        'device2_image' => 'uploads/device_1755632662_68a4d416172aa_1.png'
+    ],
+    [
+        'device1_id' => 6,
+        'device2_id' => 5,
+        'comparison_count' => 38,
+        'device1_name' => 'OnePlus 12',
+        'device2_name' => 'Xiaomi 14 Pro',
+        'device1_image' => 'uploads/device_1755632707_68a4d4435da26_1.jpg',
+        'device2_image' => 'uploads/phone_1755633457_68a4d7318f660_1.png'
+    ],
+    [
+        'device1_id' => 7,
+        'device2_id' => 8,
+        'comparison_count' => 32,
+        'device1_name' => 'Google Pixel 8 Pro',
+        'device2_name' => 'Nothing Phone (2)',
+        'device1_image' => '',
+        'device2_image' => ''
+    ],
+];
+
+// Get latest 9 devices for the new section
+$latestDevices = getAllPhones();
+$latestDevices = array_slice(array_reverse($latestDevices), 0, 9); // Get latest 9 devices
+
+// Get only brands that have devices for the brands table
+$brands_stmt = $pdo->prepare("
+    SELECT b.*, COUNT(p.id) as device_count 
+    FROM brands b 
+    INNER JOIN phones p ON b.id = p.brand_id 
+    GROUP BY b.id, b.name 
+    ORDER BY b.name ASC 
+    LIMIT 36
+");
+$brands_stmt->execute();
+$brands = $brands_stmt->fetchAll();
 
 // Get post by slug or ID
 $slug = $_GET['slug'] ?? $_GET['id'] ?? null;
@@ -27,6 +137,10 @@ if (!$post) {
     exit;
 }
 
+// Get post comments and comment count
+$postComments = getPostComments($post['id']);
+$postCommentCount = getPostCommentCount($post['id']);
+
 // Track view for this post (one per IP per day)
 $user_ip = $_SERVER['REMOTE_ADDR'] ?? '127.0.0.1';
 $user_agent = $_SERVER['HTTP_USER_AGENT'] ?? '';
@@ -42,370 +156,730 @@ try {
     // Silently ignore view tracking errors
 }
 
-// Get comments for this post (parent comments and their replies)
-$comments_stmt = $pdo->prepare("
-    WITH RECURSIVE comment_tree AS (
-        -- Get parent comments (no parent_id)
-        SELECT id, post_id, name, email, comment, status, created_at, parent_id, 0 as depth
-        FROM post_comments 
-        WHERE post_id = ? AND status = 'approved' AND parent_id IS NULL
-        
-        UNION ALL
-        
-        -- Get replies recursively
-        SELECT pc.id, pc.post_id, pc.name, pc.email, pc.comment, pc.status, pc.created_at, pc.parent_id, ct.depth + 1
-        FROM post_comments pc
-        INNER JOIN comment_tree ct ON pc.parent_id = ct.id
-        WHERE pc.status = 'approved'
-    )
-    SELECT * FROM comment_tree ORDER BY created_at ASC
-");
-$comments_stmt->execute([$post['id']]);
-$all_comments = $comments_stmt->fetchAll();
+// Get comments for posts
+function getPostComments($post_id)
+{
+    global $pdo;
+    $stmt = $pdo->prepare("SELECT * FROM post_comments WHERE post_id = ? AND status = 'approved' ORDER BY created_at DESC");
+    $stmt->execute([$post_id]);
+    return $stmt->fetchAll();
+}
 
-// Organize comments into a nested structure
-$comments = [];
-$comment_lookup = [];
+// Get post comment count
+function getPostCommentCount($post_id)
+{
+    global $pdo;
+    $stmt = $pdo->prepare("SELECT COUNT(*) as count FROM post_comments WHERE post_id = ? AND status = 'approved'");
+    $stmt->execute([$post_id]);
+    return $stmt->fetch(PDO::FETCH_ASSOC)['count'] ?? 0;
+}
 
-foreach ($all_comments as $comment) {
-    $comment_lookup[$comment['id']] = $comment;
-    if ($comment['parent_id'] === null) {
-        $comment['replies'] = [];
-        $comments[] = $comment;
+// Function to generate gravatar URL
+function getGravatarUrl($email, $size = 50)
+{
+    $hash = md5(strtolower(trim($email)));
+    return "https://www.gravatar.com/avatar/{$hash}?r=g&s={$size}&d=identicon";
+}
+
+// Function to format time ago
+function timeAgo($datetime)
+{
+    $time = time() - strtotime($datetime);
+
+    if ($time < 60) return 'just now';
+    if ($time < 3600) return floor($time / 60) . ' minutes ago';
+    if ($time < 86400) return floor($time / 3600) . ' hours ago';
+    if ($time < 2592000) return floor($time / 86400) . ' days ago';
+    if ($time < 31536000) return floor($time / 2592000) . ' months ago';
+
+    return floor($time / 31536000) . ' years ago';
+}
+
+// Function to generate avatar display
+function getAvatarDisplay($name, $email)
+{
+    if (!empty($email)) {
+        return '<img src="' . getGravatarUrl($email) . '" alt="' . htmlspecialchars($name) . '">';
+    } else {
+        $initials = strtoupper(substr($name, 0, 1));
+        $colors = ['#007bff', '#28a745', '#dc3545', '#ffc107', '#17a2b8', '#6f42c1', '#e83e8c'];
+        $color = $colors[abs(crc32($name)) % count($colors)];
+        return '<span class="avatar-box" style="background-color: ' . $color . '; color: white;">' . $initials . '</span>';
     }
 }
 
-// Add replies to their parent comments
-foreach ($all_comments as $comment) {
-    if ($comment['parent_id'] !== null) {
-        for ($i = 0; $i < count($comments); $i++) {
-            if ($comments[$i]['id'] == $comment['parent_id']) {
-                if (!isset($comments[$i]['replies'])) {
-                    $comments[$i]['replies'] = [];
-                }
-                $comments[$i]['replies'][] = $comment;
-                break;
-            }
-            // Check nested replies
-            if (isset($comments[$i]['replies'])) {
-                for ($j = 0; $j < count($comments[$i]['replies']); $j++) {
-                    if ($comments[$i]['replies'][$j]['id'] == $comment['parent_id']) {
-                        if (!isset($comments[$i]['replies'][$j]['replies'])) {
-                            $comments[$i]['replies'][$j]['replies'] = [];
-                        }
-                        $comments[$i]['replies'][$j]['replies'][] = $comment;
-                        break;
-                    }
-                }
-            }
-        }
-    }
+// Get comments for devices
+function getDeviceComments($device_id)
+{
+    global $pdo;
+    $stmt = $pdo->prepare("SELECT * FROM device_comments WHERE device_id = ? AND status = 'approved' ORDER BY created_at DESC");
+    $stmt->execute([$device_id]);
+    return $stmt->fetchAll();
 }
 
-// Handle new comment submission
-if ($_POST && isset($_POST['submit_comment'])) {
-    $name = trim($_POST['name'] ?? '');
-    $email = trim($_POST['email'] ?? '');
-    $comment = trim($_POST['comment'] ?? '');
-    $parent_id = !empty($_POST['parent_id']) ? (int)$_POST['parent_id'] : null;
+// Handle comment submissions and newsletter subscriptions
+$comment_success = '';
+$comment_error = '';
+$newsletter_success = '';
+$newsletter_error = '';
 
-    if ($name && $email && $comment) {
-        $insert_stmt = $pdo->prepare("INSERT INTO post_comments (post_id, name, email, comment, parent_id, status, created_at) VALUES (?, ?, ?, ?, ?, 'pending', NOW())");
-        if ($insert_stmt->execute([$post['id'], $name, $email, $comment, $parent_id])) {
-            $success_message = $parent_id ? "Thank you! Your reply has been submitted and is pending approval." : "Thank you! Your comment has been submitted and is pending approval.";
+if ($_POST && isset($_POST['action'])) {
+    $action = $_POST['action'];
+
+    if ($action === 'newsletter_subscribe') {
+        $email = trim($_POST['newsletter_email'] ?? '');
+        $name = trim($_POST['newsletter_name'] ?? '');
+
+        if (empty($email)) {
+            $newsletter_error = 'Email address is required.';
+        } elseif (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
+            $newsletter_error = 'Please enter a valid email address.';
         } else {
-            $error_message = "Sorry, there was an error submitting your comment. Please try again.";
+            // Check if email already exists
+            $check_stmt = $pdo->prepare("SELECT id FROM newsletter_subscribers WHERE email = ?");
+            $check_stmt->execute([$email]);
+
+            if ($check_stmt->fetch()) {
+                $newsletter_error = 'This email is already subscribed to our newsletter.';
+            } else {
+                $insert_stmt = $pdo->prepare("INSERT INTO newsletter_subscribers (email, name, status, subscribed_at) VALUES (?, ?, 'active', NOW())");
+                if ($insert_stmt->execute([$email, $name])) {
+                    $newsletter_success = 'Thank you for subscribing to our newsletter! You\'ll receive the latest tech updates and device reviews.';
+                } else {
+                    $newsletter_error = 'Failed to subscribe. Please try again.';
+                }
+            }
         }
     } else {
-        $error_message = "Please fill in all required fields.";
-    }
-}
+        // Handle comment submissions
+        $name = trim($_POST['name'] ?? '');
+        $email = trim($_POST['email'] ?? '');
+        $comment = trim($_POST['comment'] ?? '');
 
-// Parse gallery images
-$gallery_images = [];
-if ($post['media_gallery']) {
-    $gallery_data = json_decode($post['media_gallery'], true);
-    if ($gallery_data && is_array($gallery_data)) {
-        $gallery_images = $gallery_data;
+        if (empty($name) || empty($email) || empty($comment)) {
+            $comment_error = 'All fields are required.';
+        } elseif (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
+            $comment_error = 'Please enter a valid email address.';
+        } elseif (strlen($comment) < 10) {
+            $comment_error = 'Comment must be at least 10 characters long.';
+        } else {
+            if ($action === 'comment_post') {
+                $post_id = $_POST['post_id'] ?? '';
+                $stmt = $pdo->prepare("INSERT INTO post_comments (post_id, name, email, comment, status, created_at) VALUES (?, ?, ?, ?, 'pending', NOW())");
+                if ($stmt->execute([$post_id, $name, $email, $comment])) {
+                    $comment_success = 'Your comment has been submitted and is pending approval.';
+                } else {
+                    $comment_error = 'Failed to submit comment. Please try again.';
+                }
+            } elseif ($action === 'comment_device') {
+                $device_id = $_POST['device_id'] ?? '';
+                $parent_id = !empty($_POST['parent_id']) ? $_POST['parent_id'] : null;
+                $stmt = $pdo->prepare("INSERT INTO device_comments (device_id, name, email, comment, parent_id, status, created_at) VALUES (?, ?, ?, ?, ?, 'pending', NOW())");
+                if ($stmt->execute([$device_id, $name, $email, $comment, $parent_id])) {
+                    $comment_success = 'Your comment has been submitted and is pending approval.';
+                } else {
+                    $comment_error = 'Failed to submit comment. Please try again.';
+                }
+            }
+        }
     }
 }
 ?>
-
 <!DOCTYPE html>
 <html lang="en">
 
+
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title><?php echo htmlspecialchars($post['meta_title'] ?: $post['title']); ?></title>
-    <meta name="description" content="<?php echo htmlspecialchars($post['meta_description'] ?: $post['short_description']); ?>">
-    <meta name="keywords" content="<?php echo htmlspecialchars($post['tags'] ?? ''); ?>">
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="description" content="<?php echo htmlspecialchars($post['meta_description'] ?? $post['short_description'] ?? substr($post['content_body'], 0, 160) . '...'); ?>" />
+    <title><?php echo htmlspecialchars($post['meta_title'] ?? $post['title']); ?> - GSMArena</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/css/bootstrap.min.css" rel="stylesheet"
+        integrity="sha384-rbsA2VBKQhggwzxH7pPCaAqO46MgnOM80zW1RWuH61DGLwZJEdK2Kadq2F9CUG65" crossorigin="anonymous">
+    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.6/dist/umd/popper.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/js/bootstrap.bundle.min.js"
+        integrity="sha384-kenU1KFdBIe4zVF0s0G1M5b4hcpxyD9F7jL+jjXkk+Q2h455rYXK/7HAuoJl+0I4"
+        crossorigin="anonymous"></script>
 
-    <!-- Open Graph / Facebook -->
-    <meta property="og:type" content="article">
-    <meta property="og:title" content="<?php echo htmlspecialchars($post['title']); ?>">
-    <meta property="og:description" content="<?php echo htmlspecialchars($post['short_description'] ?? ''); ?>">
-    <?php if ($post['featured_image']): ?>
-        <meta property="og:image" content="<?php echo $_SERVER['HTTP_HOST'] . '/' . htmlspecialchars($post['featured_image']); ?>">
-    <?php endif; ?>
+    <!-- Font Awesome (for icons) -->
+    <script src="https://kit.fontawesome.com/your-kit-code.js" crossorigin="anonymous"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" />
+    <script>
 
-    <!-- Twitter -->
-    <meta property="twitter:card" content="summary_large_image">
-    <meta property="twitter:title" content="<?php echo htmlspecialchars($post['title']); ?>">
-    <meta property="twitter:description" content="<?php echo htmlspecialchars($post['short_description'] ?? ''); ?>">
+    </script>
 
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet">
-    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
-    <link href="css/styles.css" rel="stylesheet">
+    <link rel="stylesheet" href="style.css">
 
     <style>
-        .post-header {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            color: white;
-            padding: 4rem 0 2rem;
+        /* Avatar and Comment Styles */
+        .avatar-box {
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            overflow: hidden;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 18px;
+            font-weight: 600;
+            text-transform: uppercase;
         }
 
-        .post-meta {
-            background: rgba(255, 255, 255, 0.1);
-            border-radius: 15px;
-            padding: 1rem;
-            margin-bottom: 2rem;
+        .uavatar img {
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            object-fit: cover;
         }
 
-        .post-content {
-            font-size: 1.1rem;
-            line-height: 1.8;
+        .document-section .classy {
+            color: #333;
+            line-height: 1.6;
         }
 
-        .post-content h1,
-        .post-content h2,
-        .post-content h3 {
-            margin-top: 2rem;
-            margin-bottom: 1rem;
+        .media-gallery img {
+            max-width: 100%;
+            height: auto;
+            margin: 10px 0;
         }
 
         .comment-form {
             background: #f8f9fa;
-            border-radius: 15px;
-            padding: 2rem;
+            padding: 20px;
+            border-radius: 8px;
+            margin-top: 20px;
         }
 
-        .comment-item {
-            background: white;
-            border-left: 4px solid #667eea;
-            padding: 1.5rem;
-            margin-bottom: 1rem;
-            border-radius: 8px;
+        .comment-form textarea {
+            resize: vertical;
+            min-height: 100px;
+        }
+
+        .comment-form .btn-primary {
+            background-color: #007bff;
+            border-color: #007bff;
         }
     </style>
 </head>
 
-<body>
-    <!-- Navigation -->
-    <nav class="navbar navbar-expand-lg navbar-dark bg-primary">
-        <div class="container">
-            <a class="navbar-brand" href="index.php">
-                <i class="fas fa-mobile-alt me-2"></i>TechSpecs
-            </a>
-            <div class="navbar-nav ms-auto">
-                <a class="nav-link" href="index.php">Home</a>
-                <a class="nav-link" href="login.php">Admin</a>
+<body style="background-color: #EFEBE9; overflow-x: hidden;">
+    <!-- Desktop Navbar of Gsmarecn -->
+    <div class="main-wrapper">
+        <!-- Top Navbar -->
+        <nav class="navbar navbar-dark  d-lg-inline d-none" id="navbar">
+            <div class="container const d-flex align-items-center justify-content-between">
+                <button class="navbar-toggler mb-2" type="button" onclick="toggleMenu()">
+                    <img style="height: 40px;"
+                        src="https://cdn.prod.website-files.com/67f21c9d62aa4c4c685a7277/684091b39228b431a556d811_download-removebg-preview.png"
+                        alt="">
+                </button>
+
+                <a class="navbar-brand d-flex align-items-center" href="#">
+                    <img src="imges/download.png" alt="GSMArena Logo" />
+                </a>
+
+                <div class="controvecy mb-2">
+                    <div class="icon-container">
+                        <button type="button" class="btn border-right" data-bs-toggle="tooltip" data-bs-placement="left"
+                            title="YouTube">
+                            <img src="iccons/youtube-color-svgrepo-com.svg" alt="YouTube" width="30px">
+                        </button>
+
+                        <button type="button" class="btn" data-bs-toggle="tooltip" data-bs-placement="left"
+                            title="Instagram">
+                            <img src="iccons/instagram-color-svgrepo-com.svg" alt="Instagram" width="22px">
+                        </button>
+
+
+
+
+
+
+                    </div>
+                </div>
+
+                <form action="" class="central d-flex align-items-center">
+                    <input type="text" class="no-focus-border" placeholder="Search">
+                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" height="24" width="24" class="ms-2">
+                        <path fill="#ffffff"
+                            d="M416 208c0 45.9-14.9 88.3-40 122.7L502.6 457.4c12.5 12.5 12.5 32.8 0 45.3s-32.8 12.5-45.3 0L330.7 376c-34.4 25.2-76.8 40-122.7 40C93.1 416 0 322.9 0 208S93.1 0 208 0S416 93.1 416 208zM208 352a144 144 0 1 0 0-288 144 144 0 1 0 0 288z" />
+                    </svg>
+                </form>
+
+
             </div>
+
+        </nav>
+
+    </div>
+    <!-- Mobile Navbar of Gsmarecn -->
+    <nav id="navbar" class="mobile-navbar d-lg-none d-flex justify-content-between  align-items-center">
+
+        <button class="navbar-toggler text-white" type="button" data-bs-toggle="collapse" data-bs-target="#mobileMenu"
+            aria-controls="mobileMenu" aria-expanded="false" aria-label="Toggle navigation">
+            <img style="height: 40px;"
+                src="https://cdn.prod.website-files.com/67f21c9d62aa4c4c685a7277/684091b39228b431a556d811_download-removebg-preview.png"
+                alt="">
+        </button>
+        <a class="navbar-brand d-flex align-items-center" href="#">
+            <a class="logo text-white " href="#">GSMArena</a>
+        </a>
+        <div class="d-flex justify-content-end">
+            <button type="button" class="btn float-end ml-5" data-bs-toggle="tooltip" data-bs-placement="left">
+                <i class="fa-solid fa-right-to-bracket fa-lg" style="color: #ffffff;"></i>
+            </button>
+            <button type="button" class="btn float-end " data-bs-toggle="tooltip" data-bs-placement="left">
+                <i class="fa-solid fa-user-plus fa-lg" style="color: #ffffff;"></i>
+            </button>
         </div>
     </nav>
-
-    <!-- Post Header -->
-    <div class="post-header">
-        <div class="container">
-            <div class="row">
-                <div class="col-lg-8 mx-auto text-center">
-                    <div class="post-meta">
-                        <span class="badge bg-light text-primary fs-6 me-3">
-                            <i class="fas fa-folder me-1"></i><?php echo htmlspecialchars($post['categories'] ?? 'General'); ?>
-                        </span>
-                        <span class="text-light">
-                            <i class="fas fa-calendar-alt me-1"></i>
-                            <?php echo date('F j, Y', strtotime($post['created_at'])); ?>
-                        </span>
-                        <span class="text-light ms-3">
-                            <i class="fas fa-user me-1"></i>
-                            <?php echo htmlspecialchars($post['author'] ?? 'Admin'); ?>
-                        </span>
-                    </div>
-                    <h1 class="display-4 fw-bold mb-3"><?php echo htmlspecialchars($post['title']); ?></h1>
-                    <?php if ($post['short_description']): ?>
-                        <p class="lead"><?php echo htmlspecialchars($post['short_description']); ?></p>
-                    <?php endif; ?>
-                </div>
+    <!-- Mobile Collapse of Gsmarecn -->
+    <div class="collapse mobile-menu d-lg-none" id="mobileMenu">
+        <div class="menu-icons">
+            <i class="fas fa-home"></i>
+            <i class="fab fa-facebook-f"></i>
+            <i class="fab fa-instagram"></i>
+            <i class="fab fa-tiktok"></i>
+            <i class="fas fa-share-alt"></i>
+        </div>
+        <div class="column">
+            <a href="index.php">Home</a>
+            <a href="reviews.php">Reviews</a>
+            <a href="videos.php">Videos</a>
+            <a href="featured.php">Featured</a>
+            <a href="phonefinder.php">Phone Finder</a>
+            <a href="compare.php">Compare</a>
+            <a href="#">Coverage</a>
+            <a href="contact">Contact Us</a>
+            <a href="#">Merch</a>
+            <a href="#">Tip Us</a>
+            <a href="#">Privacy</a>
+        </div>
+        <div class="brand-grid">
+            <?php
+            $brandChunks = array_chunk($brands, 1); // Create chunks of 1 brand per row
+            foreach ($brandChunks as $brandRow):
+                foreach ($brandRow as $brand): ?>
+                    <a href="#" class="brand-cell" data-brand-id="<?php echo $brand['id']; ?>"><?php echo htmlspecialchars($brand['name']); ?></a>
+            <?php endforeach;
+            endforeach; ?>
+            <a href="brands.php">[...]</a>
+        </div>
+        <div class="menu-buttons d-flex justify-content-center ">
+            <button class="btn btn-danger w-50">📱 Phone Finder</button>
+            <button class="btn btn-primary w-50">📲 My Phone</button>
+        </div>
+    </div>
+    <!-- Display Menu of Gsmarecn -->
+    <div id="leftMenu" class="container show">
+        <div class="row">
+            <div class="col-12 d-flex align-items-center   colums-gap">
+                <a href="index.php" class="nav-link">Home</a>
+                <a href="compare.php" class="nav-link">Compare</a>
+                <a href="videos.php" class="nav-link">Videos</a>
+                <a href="reviews.php" class="nav-link ">Reviews</a>
+                <a href="featured.php" class="nav-link d-lg-block d-none">Featured</a>
+                <a href="phonefinder.php" class="nav-link d-lg-block d-none">Phone Finder</a>
+                <a href="contact.php" class="nav-link d-lg-block d-none">Contact</a>
+                <div style="background-color: #d50000; border-radius: 7px;" class="d-lg-none py-2"><svg
+                        xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" height="16" width="16" class="mx-3">
+                        <path fill="#ffffff"
+                            d="M416 208c0 45.9-14.9 88.3-40 122.7L502.6 457.4c12.5 12.5 12.5 32.8 0 45.3s-32.8 12.5-45.3 0L330.7 376c-34.4 25.2-76.8 40-122.7 40C93.1 416 0 322.9 0 208S93.1 0 208 0S416 93.1 416 208zM208 352a144 144 0 1 0 0-288 144 144 0 1 0 0 288z" />
+                    </svg></div>
             </div>
         </div>
     </div>
 
-    <!-- Post Content -->
-    <div class="container my-5">
+    <div class=" mt-4 d-lg-none d-block bg-white">
+        <h3 style="font-size: 23px;
+        font-weight: 600; font-family: 'oswald';" class="mx-3 my-5"><?php echo htmlspecialchars($post['title']); ?></h3>
+        <?php if (!empty($post['featured_image'])): ?>
+            <img style="height: 100%; width: -webkit-fill-available;" src="<?php echo htmlspecialchars($post['featured_image']); ?>" alt="<?php echo htmlspecialchars($post['title']); ?>">
+        <?php else: ?>
+            <img style="height: 100%; width: -webkit-fill-available;" src="/imges/ever1.jpg" alt="">
+        <?php endif; ?>
+    </div>
+    <div class="container support content-wrapper" id="Top">
         <div class="row">
-            <div class="col-lg-8 mx-auto">
-                <!-- Featured Image -->
-                <?php if ($post['featured_image']): ?>
-                    <div class="text-center mb-4">
-                        <img src="<?php echo htmlspecialchars($post['featured_image']); ?>"
-                            class="img-fluid rounded shadow" alt="<?php echo htmlspecialchars($post['title']); ?>">
-                    </div>
-                <?php endif; ?>
 
-                <!-- Content Body -->
-                <div class="post-content">
-                    <?php echo $post['content_body']; ?>
-                </div>
-
-                <!-- Gallery -->
-                <?php if (!empty($gallery_images)): ?>
-                    <div class="my-5">
-                        <h4 class="mb-4"><i class="fas fa-images me-2"></i>Gallery</h4>
-                        <div class="row">
-                            <?php foreach ($gallery_images as $image): ?>
-                                <div class="col-md-4 mb-4">
-                                    <img src="<?php echo htmlspecialchars($image); ?>"
-                                        class="img-fluid rounded shadow-sm" alt="Gallery Image"
-                                        style="height: 200px; width: 100%; object-fit: cover;">
-                                </div>
-                            <?php endforeach; ?>
+            <div class="col-md-8 col-5 d-md-inline  " style="border: 1px solid #e0e0e0;">
+                <div class="comfort-life-23 position-absolute d-flex justify-content-between  ">
+                    <div class="article-info">
+                        <div class="bg-blur">
+                            <svg class="float-end mx-3 mt-1" xmlns="http://www.w3.org/2000/svg" height="34" width="34"
+                                viewBox="0 0 640 640"><!--!Font Awesome Free v7.0.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free Copyright 2025 Fonticons, Inc.-->
+                                <path fill="#ffffff"
+                                    d="M448 256C501 256 544 213 544 160C544 107 501 64 448 64C395 64 352 107 352 160C352 165.4 352.5 170.8 353.3 176L223.6 248.1C206.7 233.1 184.4 224 160 224C107 224 64 267 64 320C64 373 107 416 160 416C184.4 416 206.6 406.9 223.6 391.9L353.3 464C352.4 469.2 352 474.5 352 480C352 533 395 576 448 576C501 576 544 533 544 480C544 427 501 384 448 384C423.6 384 401.4 393.1 384.4 408.1L254.7 336C255.6 330.8 256 325.5 256 320C256 314.5 255.5 309.2 254.7 304L384.4 231.9C401.3 246.9 423.6 256 448 256z" />
+                            </svg>
                         </div>
                     </div>
-                <?php endif; ?>
-
-                <!-- Tags -->
-                <?php if ($post['tags']): ?>
-                    <div class="my-4">
-                        <h6>Tags:</h6>
-                        <?php
-                        $tags = explode(',', $post['tags']);
-                        foreach ($tags as $tag): ?>
-                            <span class="badge bg-secondary me-2"><?php echo htmlspecialchars(trim($tag)); ?></span>
-                        <?php endforeach; ?>
-                    </div>
-                <?php endif; ?>
-
-                <hr class="my-5">
-
-                <!-- Back to Home -->
-                <div class="text-center mb-4">
-                    <a href="index.php" class="btn btn-outline-primary">
-                        <i class="fas fa-arrow-left me-2"></i>Back to Home
-                    </a>
-                </div>
-
-                <!-- Comments Section -->
-                <div class="comments-section">
-                    <h4 class="mb-4">
-                        <i class="fas fa-comments me-2"></i>Comments (<?php echo count($all_comments); ?>)
-                    </h4>
-
-                    <!-- Success/Error Messages -->
-                    <?php if (isset($success_message)): ?>
-                        <div class="alert alert-success">
-                            <i class="fas fa-check-circle me-2"></i><?php echo $success_message; ?>
-                        </div>
-                    <?php endif; ?>
-
-                    <?php if (isset($error_message)): ?>
-                        <div class="alert alert-danger">
-                            <i class="fas fa-exclamation-circle me-2"></i><?php echo $error_message; ?>
-                        </div>
-                    <?php endif; ?>
-
-                    <!-- Comment Form -->
-                    <div class="comment-form mb-5" id="main-comment-form">
-                        <h5 class="mb-3">Leave a Comment</h5>
-                        <form method="post">
-                            <div class="row">
-                                <div class="col-md-6 mb-3">
-                                    <label for="name" class="form-label">Name *</label>
-                                    <input type="text" class="form-control" id="name" name="name" required>
-                                </div>
-                                <div class="col-md-6 mb-3">
-                                    <label for="email" class="form-label">Email *</label>
-                                    <input type="email" class="form-control" id="email" name="email" required>
-                                </div>
-                            </div>
-                            <div class="mb-3">
-                                <label for="comment" class="form-label">Comment *</label>
-                                <textarea class="form-control" id="comment" name="comment" rows="4" required></textarea>
-                            </div>
-                            <input type="hidden" name="parent_id" value="">
-                            <button type="submit" name="submit_comment" class="btn btn-primary">
-                                <i class="fas fa-paper-plane me-2"></i>Submit Comment
-                            </button>
-                            <button type="button" class="btn btn-secondary ms-2 cancel-reply" style="display: none;">
-                                <i class="fas fa-times me-2"></i>Cancel Reply
-                            </button>
-                        </form>
-                    </div>
-
-                    <!-- Existing Comments -->
-                    <?php if (empty($comments)): ?>
-                        <div class="text-center py-5 text-muted">
-                            <i class="fas fa-comment-slash fa-3x mb-3"></i>
-                            <h5>No comments yet</h5>
-                            <p>Be the first to leave a comment!</p>
-                        </div>
-                    <?php else: ?>
-                        <?php
-                        function displayComment($comment, $depth = 0)
-                        {
-                            $margin_left = $depth * 40; // 40px per depth level
-                        ?>
-                            <div class="comment-item mb-4" style="margin-left: <?php echo $margin_left; ?>px;">
-                                <div class="card">
-                                    <div class="card-body">
-                                        <div class="d-flex justify-content-between align-items-start mb-2">
-                                            <div>
-                                                <strong class="text-primary"><?php echo htmlspecialchars($comment['name']); ?></strong>
-                                                <small class="text-muted ms-2">
-                                                    <i class="fas fa-clock me-1"></i>
-                                                    <?php echo date('M j, Y \a\t g:i A', strtotime($comment['created_at'])); ?>
-                                                </small>
-                                            </div>
-                                            <button class="btn btn-sm btn-outline-primary reply-btn"
-                                                data-comment-id="<?php echo $comment['id']; ?>"
-                                                data-comment-author="<?php echo htmlspecialchars($comment['name']); ?>">
-                                                <i class="fas fa-reply me-1"></i>Reply
-                                            </button>
-                                        </div>
-                                        <p class="mb-0"><?php echo nl2br(htmlspecialchars($comment['comment'])); ?></p>
+                    <div style="    display: flex;  flex-direction: column;">
+                        <h1 class="article-info-name"><?php echo htmlspecialchars($post['title']); ?></h1>
+                        <div class="article-info">
+                            <div class="bg-blur">
+                                <div class="d-flex justify-content-end">
+                                    <div class="d-flex flexiable ">
+                                        <img src="/imges/download-removebg-preview.png" alt="">
+                                        <h5 style="font-family:'oswald' ; font-size: 17px" class="mt-2">COMMENTS (<?php echo $postCommentCount; ?>)
+                                        </h5>
+                                    </div>
+                                    <div class="d-flex flexiable " onclick="document.querySelector('.comment-form').scrollIntoView()">
+                                        <img src="/imges/download-removebg-preview.png" alt="">
+                                        <h5 style="font-family:'oswald' ; font-size: 17px;" class="mt-2">POST YOUR
+                                            COMMENT </h5>
                                     </div>
                                 </div>
+                            </div>
+                        </div>
+                    </div>
 
-                                <!-- Placeholder for reply form -->
-                                <div class="reply-form-placeholder mt-3" data-comment-id="<?php echo $comment['id']; ?>"></div>
+                </div>
+            </div>
+            <div class="col-md-4 col-5 d-none d-lg-block" style="position: relative; left: 25px;">
+                <button class="solid w-100 py-2">
+                    <i class="fa-solid fa-mobile fa-sm mx-2" style="color: white;"></i>
+                    Phone Finder</button>
+                <div class="devor">
+                    <?php
+                    if (empty($brands)): ?>
+                        <button class="px-3 py-1" style="cursor: default;" disabled>No brands available.</button>
+                        <?php else:
+                        $brandChunks = array_chunk($brands, 1); // Create chunks of 1 brand per row
+                        foreach ($brandChunks as $brandRow):
+                            foreach ($brandRow as $brand):
+                        ?>
+                                <button class="px-3 py-1 brand-cell" style="cursor: pointer;" data-brand-id="<?php echo $brand['id']; ?>"><?php echo htmlspecialchars($brand['name']); ?></button>
+                    <?php
+                            endforeach;
+                        endforeach;
+                    endif;
+                    ?>
+                </div>
+                <button class="solid w-50 py-2">
+                    <i class="fa-solid fa-bars fa-sm mx-2"></i>
+                    All Brands</button>
+                <button class="solid py-2" style="    width: 177px;">
+                    <i class="fa-solid fa-volume-high fa-sm mx-2"></i>
+                    RUMORS MILL</button>
+            </div>
+        </div>
 
-                                <!-- Display replies -->
-                                <?php if (isset($comment['replies']) && !empty($comment['replies'])): ?>
-                                    <?php foreach ($comment['replies'] as $reply): ?>
-                                        <?php displayComment($reply, $depth + 1); ?>
+    </div>
+    <div class="container bg-white" style="border: 1px solid #e0e0e0;">
+        <div class="row">
+            <div class="col-lg-8 py-3" style=" padding-left: 0; padding-right: 0; border: 1px solid #e0e0e0;">
+                <div>
+                    <div class="d-flex align-items-center justify-content-between  gap-portion">
+                        <div class="d-flex">
+                            <button class="section-button"><?php echo htmlspecialchars($post['author']); ?></button>
+                            <p class="my-2 portion-headline mx-1"><?php echo !empty($post['publish_date']) ? date('j F Y', strtotime($post['publish_date'])) : date('j F Y', strtotime($post['created_at'])); ?></p>
+                        </div>
+                        <div>
+                            <?php
+                            $categories = $post['categories'];
+                            if (!empty($categories)):
+                                // Handle PostgreSQL array format
+                                if (is_string($categories)) {
+                                    // Parse PostgreSQL array string like {Apple,iOS,Rumors}
+                                    $categories = trim($categories, '{}');
+                                    $categories = explode(',', $categories);
+                                }
+                                if (is_array($categories)):
+                            ?>
+                                    <?php foreach ($categories as $category): ?>
+                                        <button class="section-button"><?php echo htmlspecialchars(trim($category)); ?></button>
                                     <?php endforeach; ?>
                                 <?php endif; ?>
-                            </div>
-                        <?php
-                        }
+                            <?php else: ?>
+                                <button class="section-button">News</button>
+                                <button class="section-button">Tech</button>
+                            <?php endif; ?>
+                        </div>
+                    </div>
+                </div>
+                <div class="document-section">
+                    <?php if (!empty($post['short_description'])): ?>
+                        <p class="classy gap-portion"><?php echo nl2br(htmlspecialchars($post['short_description'])); ?></p>
+                    <?php endif; ?>
 
-                        foreach ($comments as $comment):
-                            displayComment($comment);
-                        endforeach;
-                        ?>
+                    <?php if (!empty($post['featured_image'])): ?>
+                        <img class="center-img" src="<?php echo htmlspecialchars($post['featured_image']); ?>" alt="<?php echo htmlspecialchars($post['title']); ?>">
+                    <?php endif; ?>
+
+                    <?php if (!empty($post['content_body'])): ?>
+                        <div class="gap-portion">
+                            <?php
+                            // Handle both plain text and rich content
+                            $content = $post['content_body'];
+                            // Check if content contains HTML tags
+                            if (strip_tags($content) != $content) {
+                                // Content has HTML, display as-is but sanitize
+                                echo $content;
+                            } else {
+                                // Plain text content, convert line breaks
+                                echo nl2br(htmlspecialchars($content));
+                            }
+                            ?>
+                        </div>
+                    <?php else: ?>
+                        <p class="classy gap-portion">Content is being updated. Please check back later for the full article.</p>
+                    <?php endif; ?>
+
+                    <?php
+                    $media_gallery = $post['media_gallery'];
+                    if (!empty($media_gallery)):
+                        // Handle PostgreSQL array format
+                        if (is_string($media_gallery)) {
+                            // Parse PostgreSQL array string
+                            $media_gallery = trim($media_gallery, '{}');
+                            $media_gallery = explode(',', $media_gallery);
+                        }
+                        if (is_array($media_gallery)):
+                    ?>
+                            <div class="media-gallery mt-4">
+                                <?php foreach ($media_gallery as $media): ?>
+                                    <img class="center-img my-2" src="<?php echo htmlspecialchars(trim($media)); ?>" alt="Media from <?php echo htmlspecialchars($post['title']); ?>">
+                                <?php endforeach; ?>
+                            </div>
+                        <?php endif; ?>
                     <?php endif; ?>
                 </div>
+
+                <div class="comments">
+                    <h5 class="border-bottom reader  py-3 mx-2">READER COMMENTS</h5>
+                    <div class="first-user" style="background-color: #EDEEEE;">
+
+                        <?php if (!empty($postComments)): ?>
+                            <?php foreach ($postComments as $comment): ?>
+                                <div class="user-thread">
+                                    <div class="uavatar">
+                                        <?php echo getAvatarDisplay($comment['name'], $comment['email']); ?>
+                                    </div>
+                                    <ul class="uinfo2">
+                                        <li class="uname">
+                                            <a href="#" style="color: #555; text-decoration: none;">
+                                                <?php echo htmlspecialchars($comment['name']); ?>
+                                            </a>
+                                        </li>
+                                        <li class="ulocation">
+                                            <i class="fa-solid fa-location-dot fa-sm"></i>
+                                            <span title="Anonymous location">---</span>
+                                        </li>
+                                        <li class="upost">
+                                            <i class="fa-regular fa-clock fa-sm mx-1"></i>
+                                            <?php echo timeAgo($comment['created_at']); ?>
+                                        </li>
+                                    </ul>
+                                    <p class="uopin"><?php echo nl2br(htmlspecialchars($comment['comment'])); ?></p>
+                                    <ul class="uinfo">
+                                        <li class="ureply" style="list-style: none;">
+                                            <span title="Reply to this post">
+                                                <p href="#">Reply</p>
+                                            </span>
+                                        </li>
+                                    </ul>
+                                </div>
+                            <?php endforeach; ?>
+                        <?php else: ?>
+                            <div class="user-thread text-center py-4">
+                                <p class="uopin text-muted">No comments yet. Be the first to share your opinion!</p>
+                            </div>
+                        <?php endif; ?>
+
+                        <!-- Comment Form -->
+                        <div class="comment-form mt-4 mx-2 mb-3">
+                            <h6 class="mb-3">Share Your Opinion</h6>
+
+                            <?php if (!empty($comment_success)): ?>
+                                <div class="alert alert-success"><?php echo htmlspecialchars($comment_success); ?></div>
+                            <?php endif; ?>
+
+                            <?php if (!empty($comment_error)): ?>
+                                <div class="alert alert-danger"><?php echo htmlspecialchars($comment_error); ?></div>
+                            <?php endif; ?>
+
+                            <form method="POST" action="">
+                                <input type="hidden" name="action" value="comment_post">
+                                <input type="hidden" name="post_id" value="<?php echo $post['id']; ?>">
+
+                                <div class="row">
+                                    <div class="col-md-6 mb-3">
+                                        <input type="text" class="form-control" name="name" placeholder="Your Name" required value="<?php echo htmlspecialchars($_POST['name'] ?? ''); ?>">
+                                    </div>
+                                    <div class="col-md-6 mb-3">
+                                        <input type="email" class="form-control" name="email" placeholder="Your Email" required value="<?php echo htmlspecialchars($_POST['email'] ?? ''); ?>">
+                                    </div>
+                                </div>
+                                <div class="mb-3">
+                                    <textarea class="form-control" name="comment" rows="4" placeholder="Share your thoughts about this article..." required><?php echo htmlspecialchars($_POST['comment'] ?? ''); ?></textarea>
+                                </div>
+                                <div class="d-flex justify-content-between align-items-center">
+                                    <button type="submit" class="button-links">Post Your Comment</button>
+                                    <small class="text-muted">Comments are moderated and will appear after approval.</small>
+                                </div>
+                            </form>
+                        </div>
+
+                        <div class="button-secondary-div d-flex justify-content-between align-items-center ">
+
+                            <p class="div-last">Total reader comments: <b><?php echo $postCommentCount; ?></b></p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-lg-4  col-12  bg-white p-3">
+                <h6 style="color: #090E21; text-transform: uppercase; font-weight: 900;" class=" mt-2 ">Latest Devices
+                </h6>
+                <div class="cent">
+                    <?php if (empty($devices)): ?>
+                        <div class="text-center py-5">
+                            <i class="fas fa-mobile-alt fa-3x text-muted mb-3"></i>
+                            <h4 class="text-muted">No Devices Available</h4>
+                            <p class="text-muted">Check back later for new devices!</p>
+                        </div>
+                    <?php else: ?>
+                        <?php $chunks = array_chunk($devices, 3); ?>
+                        <?php foreach ($chunks as $row): ?>
+                            <div class="d-flex">
+                                <?php foreach ($row as $i => $device): ?>
+                                    <div class="device-card canel<?php echo $i == 1 ? ' mx-4' : ($i == 0 ? '' : ''); ?>" data-device-id="<?php echo $device['id']; ?>" style="cursor: pointer;">
+                                        <?php if (isset($device['images']) && !empty($device['images'])): ?>
+                                            <img class="shrink" src="<?php echo htmlspecialchars($device['images'][0]); ?>" alt="">
+                                        <?php elseif (isset($device['image']) && !empty($device['image'])): ?>
+                                            <img class="shrink" src="<?php echo htmlspecialchars($device['image']); ?>" alt="">
+                                        <?php else: ?>
+                                            <img class="shrink" src="" alt="">
+                                        <?php endif; ?>
+                                        <p><?php echo htmlspecialchars($device['name'] ?? ''); ?></p>
+                                    </div>
+                                <?php endforeach; ?>
+                                <?php for ($j = count($row); $j < 3; $j++): ?>
+                                    <div class="canel<?php echo $j == 1 ? ' mx-4' : ($j == 0 ? '' : ''); ?>"></div>
+                                <?php endfor; ?>
+                            </div>
+                        <?php endforeach; ?>
+                    <?php endif; ?>
+                </div>
+                <div class="d-flex">
+                    <h5 class="text-secondary mt-2 d-inline fw-bold " style="text-transform: uppercase;">top 10 by Daily
+                        Interest </h5>
+                </div>
+                <div class="center w-100">
+                    <table class="table table-sm custom-table">
+                        <thead>
+                            <tr class="text-white " style="background-color: #4C7273; color: white;">
+                                <th style="color: white;">#</th>
+                                <th style="color: white;">Devices</th>
+                                <th style="color: white;">Daily Hits</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <?php if (empty($topViewedDevices)): ?>
+                                <tr>
+                                    <th scope="row"></th>
+                                    <td class="text-start">Not Enough Data Exists</td>
+                                    <td class="text-end"></td>
+                                </tr>
+                            <?php else: ?>
+                                <?php foreach ($topViewedDevices as $index => $device):
+                                    if (($index + 1) % 2 != 0): ?>
+                                        <tr class="clickable-row" data-device-id="<?php echo $device['id']; ?>" style="cursor: pointer;">
+                                            <th scope="row"><?php echo $index + 1; ?></th>
+                                            <td class="text-start"><?php echo htmlspecialchars($device['brand_name']); ?> <?php echo htmlspecialchars($device['name']); ?></td>
+                                            <td class="text-end"><?php echo $device['view_count']; ?></td>
+                                        </tr>
+                                    <?php else: ?>
+                                        <tr class="highlight clickable-row" data-device-id="<?php echo $device['id']; ?>" style="cursor: pointer;">
+                                            <th scope="row" class="text-white"><?php echo $index + 1; ?></th>
+                                            <td class="text-start"><?php echo htmlspecialchars($device['brand_name']); ?> <?php echo htmlspecialchars($device['name']); ?></td>
+                                            <td class="text-end"><?php echo $device['view_count']; ?></td>
+                                        </tr>
+                            <?php
+                                    endif;
+                                endforeach;
+                            endif; ?>
+                        </tbody>
+                    </table>
+                </div>
+                <h6 style="border-left: 7px solid #EFEBE9 ; font-weight: 900; color: #090E21; text-transform: uppercase;"
+                    class=" px-2 mt-2 d-inline mt-4">Top 10 by
+                    Fans</h6>
+                <div class="center" style="margin-top: 12px;">
+                    <table class="table table-sm custom-table">
+                        <thead>
+                            <tr class="text-white" style="background-color: #14222D;">
+                                <th style="color: white;  font-size: 15px;  ">#</th>
+                                <th style="color: white;  font-size: 15px;">Device</th>
+                                <th style="color: white;  font-size: 15px;">Reviews</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <?php if (empty($topReviewedDevices)): ?>
+                                <tr>
+                                    <th scope="row"></th>
+                                    <td class="text-start">Not Enough Data Exists</td>
+                                    <td class="text-end"></td>
+                                </tr>
+                            <?php else: ?>
+                                <?php foreach ($topReviewedDevices as $index => $device):
+                                    if (($index + 1) % 2 != 0): ?>
+                                        <tr class="clickable-row" data-device-id="<?php echo $device['id']; ?>" style="cursor: pointer;">
+                                            <th scope="row"><?php echo $index + 1; ?></th>
+                                            <td class="text-start"><?php echo htmlspecialchars($device['brand_name']); ?> <?php echo htmlspecialchars($device['name']); ?></td>
+                                            <td class="text-end"><?php echo $device['review_count']; ?></td>
+                                        </tr>
+                                    <?php else: ?>
+                                        <tr class="highlight-12 clickable-row" data-device-id="<?php echo $device['id']; ?>" style="cursor: pointer;">
+                                            <th scope="row" class="text-white"><?php echo $index + 1; ?></th>
+                                            <td class="text-start"><?php echo htmlspecialchars($device['brand_name']); ?> <?php echo htmlspecialchars($device['name']); ?></td>
+                                            <td class="text-end"><?php echo $device['review_count']; ?></td>
+                                        </tr>
+                            <?php
+                                    endif;
+                                endforeach;
+                            endif; ?>
+                        </tbody>
+                    </table>
+                </div>
+
+
             </div>
         </div>
     </div>
 
-    <!-- Footer -->
-    <footer class="bg-dark text-light py-4 mt-5">
-        <div class="container text-center">
-            <p>&copy; 2025 TechSpecs. Professional Mobile Device Management System.</p>
-        </div>
-    </footer>
+    <div id="bottom" class="container d-flex mt-3" style="max-width: 1034px;">
+        <div class="row align-items-center">
+            <div class="col-md-2 m-auto col-4 d-flex justify-content-center align-items-center "> <img
+                    src="https://fdn2.gsmarena.com/w/css/logo-gsmarena-com.png" alt="">
+            </div>
+            <div class="col-10 nav-wrap m-auto text-center ">
+                <div class="nav-container">
+                    <a href="#">Home</a>
 
+                    <a href="#">Reviews</a>
+                    <a href="#">Compare</a>
+                    <a href="#">Coverage</a>
+                    <a href="#">Glossary</a>
+                    <a href="#">FAQ</a>
+                    <a href="#"> <i class="fa-solid fa-wifi fa-sm"></i> RSS</a>
+                    <a href="#"> <i class="fa-brands fa-youtube fa-sm"></i> YouTube</a>
+                    <a href="#"> <i class="fa-brands fa-instagram fa-sm"></i> Instagram</a>
+                    <a href="#"> <i class="fa-brands fa-tiktok fa-sm"></i>TikTok</a>
+                    <a href="#"> <i class="fa-brands fa-facebook-f fa-sm"></i> Facebook</a>
+                    <a href="#"> <i class="fa-brands fa-twitter fa-sm"></i>Twitter</a>
+                    <a href="#">© 2000-2025 GSMArena.com</a>
+                    <a href="#">Mobile version</a>
+                    <a href="#">Android app</a>
+                    <a href="#">Tools</a>
+                    <a href="contact.php">Contact us</a>
+                    <a href="#">Merch store</a>
+                    <a href="#">Privacy</a>
+                    <a href="#">Terms of use</a>
+                </div>
+            </div>
+        </div>
+    </div>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
 
     <script>
@@ -464,7 +938,119 @@ if ($post['media_gallery']) {
                 commentForm.querySelector('#comment').value = '';
             });
         });
+        // Handle clickable table rows for devices
+        document.addEventListener('DOMContentLoaded', function() {
+            // Handle device row clicks (for views and reviews tables)
+            document.querySelectorAll('.clickable-row').forEach(function(row) {
+                row.addEventListener('click', function() {
+                    const deviceId = this.getAttribute('data-device-id');
+                    if (deviceId) {
+                        // Track the view
+                        fetch('track_device_view.php', {
+                            method: 'POST',
+                            headers: {
+                                'Content-Type': 'application/x-www-form-urlencoded',
+                            },
+                            body: 'device_id=' + encodeURIComponent(deviceId)
+                        });
+
+                        // Show device details modal
+                        showDeviceDetails(deviceId);
+                    }
+                });
+            });
+
+            // Handle device card clicks (for latest devices grid)
+            document.querySelectorAll('.device-card').forEach(function(card) {
+                card.addEventListener('click', function() {
+                    const deviceId = this.getAttribute('data-device-id');
+                    if (deviceId) {
+                        // Track the view
+                        fetch('track_device_view.php', {
+                            method: 'POST',
+                            headers: {
+                                'Content-Type': 'application/x-www-form-urlencoded',
+                            },
+                            body: 'device_id=' + encodeURIComponent(deviceId)
+                        });
+
+                        // Show device details modal
+                        showDeviceDetails(deviceId);
+                    }
+                });
+            });
+
+            // Handle brand cell clicks
+            document.querySelectorAll('.brand-cell').forEach(function(cell) {
+                cell.addEventListener('click', function() {
+                    const brandId = this.getAttribute('data-brand-id');
+                    if (brandId) {
+                        // Redirect to brands page with specific brand filter
+                        window.location.href = `brands.php?brand=${brandId}`;
+                    }
+                });
+            });
+
+            // Handle comparison row clicks
+            document.querySelectorAll('.clickable-comparison').forEach(function(row) {
+                row.addEventListener('click', function() {
+                    const device1Id = this.getAttribute('data-device1-id');
+                    const device2Id = this.getAttribute('data-device2-id');
+                    if (device1Id && device2Id) {
+                        // Track the comparison
+                        fetch('track_device_comparison.php', {
+                            method: 'POST',
+                            headers: {
+                                'Content-Type': 'application/x-www-form-urlencoded',
+                            },
+                            body: 'device1_id=' + encodeURIComponent(device1Id) + '&device2_id=' + encodeURIComponent(device2Id)
+                        });
+
+                        // Redirect to comparison page
+                        window.location.href = `compare.php?phone1=${device1Id}&phone2=${device2Id}`;
+                    }
+                });
+            });
+        });
+
+        // Show post details in modal
+        function showPostDetails(postId) {
+            fetch(`get_post_details.php?id=${postId}`)
+                .then(response => response.text())
+                .then(data => {
+                    window.location.href = `post.php?id=${postId}`;
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                    alert('Failed to load post details');
+                });
+        }
+
+        // Show device details in modal
+        function showDeviceDetails(deviceId) {
+            fetch(`get_device_details.php?id=${deviceId}`)
+                .then(response => response.text())
+                .then(data => {
+                    window.location.href = `device.php?id=${deviceId}`;
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                    alert('Failed to load device details');
+                });
+        }
+
+
+
+        // Auto-dismiss alerts after 5 seconds
+        setTimeout(function() {
+            var alerts = document.querySelectorAll('.alert');
+            alerts.forEach(function(alert) {
+                var bsAlert = new bootstrap.Alert(alert);
+                bsAlert.close();
+            });
+        }, 5000);
     </script>
+    <script src="script.js"></script>
 </body>
 
 </html>

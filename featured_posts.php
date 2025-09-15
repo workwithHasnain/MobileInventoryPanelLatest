@@ -236,7 +236,7 @@ $popular_tags = array_slice($all_tags, 0, 10, true);
                         </a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link" href="compare_phones.php">
+                        <a class="nav-link" href="compare.php">
                             <i class="fas fa-balance-scale me-1"></i>Compare Phones
                         </a>
                     </li>

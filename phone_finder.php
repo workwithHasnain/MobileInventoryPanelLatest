@@ -160,7 +160,7 @@ sort($device_os);
                         <a class="nav-link" href="index.php">Home</a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link" href="compare_phones.php">Compare Devices</a>
+                        <a class="nav-link" href="compare.php">Compare Devices</a>
                     </li>
                     <li class="nav-item">
                         <a class="nav-link active" href="phone_finder.php">Phone Finder</a>
@@ -1206,7 +1206,7 @@ sort($device_os);
                                         <a href="device.php?id=${device.id || index}" class="btn btn-outline-primary btn-sm">
                                             <i class="fas fa-eye"></i> View
                                         </a>
-                                        <a href="compare_phones.php?device1=${encodeURIComponent(deviceName)}&brand1=${encodeURIComponent(deviceBrand)}" class="btn btn-outline-success btn-sm">
+                                        <a href="compare.php?device1=${encodeURIComponent(deviceName)}&brand1=${encodeURIComponent(deviceBrand)}" class="btn btn-outline-success btn-sm">
                                             <i class="fas fa-exchange-alt"></i> Compare
                                         </a>
                                     </div>

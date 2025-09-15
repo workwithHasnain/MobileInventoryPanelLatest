@@ -157,7 +157,7 @@ Preferred communication style: Simple, everyday language.
 
 - **Database Functions Implementation**: Created comprehensive database_functions.php with PDO connections
 - **Core File Updates**: Completely rewrote brand_data.php and phone_data.php to use database queries
-- **Comparison Functionality**: Fixed compare_phones.php to work with database IDs and proper device selection
+- **Comparison Functionality**: Fixed compare.php to work with database IDs and proper device selection
 - **Error Handling**: Resolved PHP deprecation warnings with null value handling
 - **Data Cleanup**: Updated placeholder device names to proper product names (iPhone 15 Pro, Galaxy S24, etc.)
 
