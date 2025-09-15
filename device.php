@@ -25,9 +25,9 @@ $devices = array_slice($devices, 0, 6); // Limit to 6 devices for home page
 
 // Add comment counts to devices
 foreach ($devices as $index => $device) {
-    $comment_stmt = $pdo->prepare("SELECT COUNT(*) as count FROM device_comments WHERE device_id = CAST(? AS VARCHAR) AND status = 'approved'");
-    $comment_stmt->execute([$device['id']]);
-    $devices[$index]['comment_count'] = $comment_stmt->fetch()['count'] ?? 0;
+  $comment_stmt = $pdo->prepare("SELECT COUNT(*) as count FROM device_comments WHERE device_id = CAST(? AS VARCHAR) AND status = 'approved'");
+  $comment_stmt->execute([$device['id']]);
+  $devices[$index]['comment_count'] = $comment_stmt->fetch()['count'] ?? 0;
 }
 
 // Get data for the three tables
@@ -37,7 +37,7 @@ $topComparisons = [];
 
 // Get top viewed devices
 try {
-    $stmt = $pdo->prepare("
+  $stmt = $pdo->prepare("
         SELECT p.*, b.name as brand_name, COUNT(cv.id) as view_count
         FROM phones p 
         LEFT JOIN brands b ON p.brand_id = b.id
@@ -46,15 +46,15 @@ try {
         ORDER BY view_count DESC
         LIMIT 10
     ");
-    $stmt->execute();
-    $topViewedDevices = $stmt->fetchAll();
+  $stmt->execute();
+  $topViewedDevices = $stmt->fetchAll();
 } catch (Exception $e) {
-    $topViewedDevices = [];
+  $topViewedDevices = [];
 }
 
 // Get top reviewed devices (by comment count)
 try {
-    $stmt = $pdo->prepare("
+  $stmt = $pdo->prepare("
         SELECT p.*, b.name as brand_name, COUNT(dc.id) as review_count
         FROM phones p 
         LEFT JOIN brands b ON p.brand_id = b.id
@@ -63,10 +63,10 @@ try {
         ORDER BY review_count DESC
         LIMIT 10
     ");
-    $stmt->execute();
-    $topReviewedDevices = $stmt->fetchAll();
+  $stmt->execute();
+  $topReviewedDevices = $stmt->fetchAll();
 } catch (Exception $e) {
-    $topReviewedDevices = [];
+  $topReviewedDevices = [];
 }
 
 
@@ -90,117 +90,593 @@ $brands = $brands_stmt->fetchAll();
 $device_id = $_GET['id'] ?? '';
 
 if (!isset($_GET['id']) || $_GET['id'] === '') {
-    header("Location: index.php");
-    exit();
+  header("Location: index.php");
+  exit();
 }
 
 // Function to get device details
 function getDeviceDetails($pdo, $device_id)
 {
-    // Try JSON files first (primary data source for now)
-    $phones_json = 'data/phones.json';
-    if (file_exists($phones_json)) {
-        $phones_data = json_decode(file_get_contents($phones_json), true);
-
-        // JSON stores as array, so search by index
-        if (is_array($phones_data)) {
-            // Use numeric index as device ID
-            // Convert string ID to integer for array access
-            $numeric_id = is_numeric($device_id) ? (int)$device_id : $device_id;
-            if (isset($phones_data[$numeric_id])) {
-                $device = $phones_data[$numeric_id];
-
-                // Add computed fields for compatibility
-                $device['id'] = $device_id;
-                $device['image_1'] = $device['image'] ?? '';
-
-                // Fix image paths
-                if (isset($device['image'])) {
-                    $device['image_1'] = str_replace('\\', '/', $device['image']);
-                }
-
-                // Handle multiple images
-                if (!empty($device['images'])) {
-                    for ($i = 0; $i < count($device['images']) && $i < 5; $i++) {
-                        $device['image_' . ($i + 1)] = str_replace('\\', '/', $device['images'][$i]);
-                    }
-                }
-
-                return $device;
-            }
-        }
-    }
-
-    // Fallback to database if JSON fails
-    try {
-        $stmt = $pdo->prepare("
+  // Try database first (comprehensive data source)
+  try {
+    $stmt = $pdo->prepare("
             SELECT p.*, b.name as brand_name, c.name as chipset_name 
             FROM phones p 
             LEFT JOIN brands b ON p.brand_id = b.id 
             LEFT JOIN chipsets c ON p.chipset_id = c.id 
             WHERE p.id = ?
         ");
-        $stmt->execute([$device_id]);
-        $device = $stmt->fetch(PDO::FETCH_ASSOC);
+    $stmt->execute([$device_id]);
+    $device = $stmt->fetch(PDO::FETCH_ASSOC);
+
+    if ($device) {
+      // Fix image paths if needed
+      if (isset($device['image'])) {
+        $device['image'] = str_replace('\\', '/', $device['image']);
+        $device['image_1'] = $device['image'];
+      }
+      return $device;
+    }
+  } catch (PDOException $e) {
+    error_log("Database error: " . $e->getMessage());
+  }
+
+  // Fallback to JSON files if database fails
+  $phones_json = 'data/phones.json';
+  if (file_exists($phones_json)) {
+    $phones_data = json_decode(file_get_contents($phones_json), true);
+
+    // JSON stores as array, so search by index
+    if (is_array($phones_data)) {
+      // Use numeric index as device ID
+      // Convert string ID to integer for array access
+      $numeric_id = is_numeric($device_id) ? (int)$device_id : $device_id;
+      if (isset($phones_data[$numeric_id])) {
+        $device = $phones_data[$numeric_id];
+
+        // Add computed fields for compatibility
+        $device['id'] = $device_id;
+        $device['image_1'] = $device['image'] ?? '';
+
+        // Fix image paths
+        if (isset($device['image'])) {
+          $device['image_1'] = str_replace('\\', '/', $device['image']);
+        }
+
+        // Handle multiple images
+        if (!empty($device['images'])) {
+          for ($i = 0; $i < count($device['images']) && $i < 5; $i++) {
+            $device['image_' . ($i + 1)] = str_replace('\\', '/', $device['images'][$i]);
+          }
+        }
 
         return $device;
-    } catch (PDOException $e) {
-        error_log("Database error: " . $e->getMessage());
-        return null;
+      }
     }
+  }
+
+  return null;
+}
+
+// Function to format device specifications for display
+function formatDeviceSpecs($device)
+{
+  $specs = [];
+
+  // Network specifications
+  $network_tech = [];
+  if ($device['network_2g']) $network_tech[] = '2G';
+  if ($device['network_3g']) $network_tech[] = '3G';
+  if ($device['network_4g']) $network_tech[] = '4G';
+  if ($device['network_5g']) $network_tech[] = '5G';
+
+  if (!empty($network_tech)) {
+    $network_details = '<strong>Technology</strong> ' . implode(' / ', $network_tech);
+    if ($device['dual_sim']) $network_details .= '<br><strong>SIM</strong> Dual SIM';
+    if ($device['esim']) $network_details .= ', eSIM';
+    if ($device['sim_size']) $network_details .= ' (' . $device['sim_size'] . ')';
+    $specs['NETWORK'] = $network_details;
+  }
+
+  // Launch specifications
+  if ($device['release_date'] || $device['availability']) {
+    $launch_details = '';
+    if ($device['release_date']) {
+      $launch_details .= '<strong>Released</strong> ' . date('F j, Y', strtotime($device['release_date']));
+    }
+    if ($device['availability']) {
+      if ($launch_details) $launch_details .= '<br>';
+      $launch_details .= '<strong>Status</strong> ' . $device['availability'];
+    }
+    if ($device['price']) {
+      $launch_details .= '<br><strong>Price</strong> $' . number_format($device['price'], 2);
+    }
+    $specs['LAUNCH'] = $launch_details;
+  }
+
+  // Body specifications
+  if ($device['dimensions_length'] || $device['dimensions_width'] || $device['dimensions_thickness'] || $device['weight']) {
+    $body_details = '';
+    if ($device['dimensions_length'] && $device['dimensions_width'] && $device['dimensions_thickness']) {
+      $body_details .= '<strong>Dimensions</strong> ' .
+        $device['dimensions_length'] . ' x ' .
+        $device['dimensions_width'] . ' x ' .
+        $device['dimensions_thickness'] . ' mm';
+    }
+    if ($device['weight']) {
+      if ($body_details) $body_details .= '<br>';
+      $body_details .= '<strong>Weight</strong> ' . $device['weight'] . ' g';
+    }
+    $specs['BODY'] = $body_details;
+  }
+
+  // Display specifications
+  if ($device['display_type'] || $device['display_size'] || $device['display_resolution']) {
+    $display_details = '';
+    if ($device['display_type']) {
+      $display_details .= '<strong>Type</strong> ' . $device['display_type'];
+      if ($device['display_technology']) $display_details .= ', ' . $device['display_technology'];
+      if ($device['refresh_rate']) $display_details .= ', ' . $device['refresh_rate'] . 'Hz';
+      if ($device['hdr']) $display_details .= ', HDR';
+      if ($device['billion_colors']) $display_details .= ', 1B colors';
+    }
+    if ($device['display_size']) {
+      if ($display_details) $display_details .= '<br>';
+      $display_details .= '<strong>Size</strong> ' . $device['display_size'] . ' inches';
+    }
+    if ($device['display_resolution']) {
+      if ($display_details) $display_details .= '<br>';
+      $display_details .= '<strong>Resolution</strong> ' . $device['display_resolution'];
+    }
+    $specs['DISPLAY'] = $display_details;
+  }
+
+  // Platform specifications
+  if ($device['os'] || $device['chipset_name'] || $device['cpu_cores'] || $device['gpu']) {
+    $platform_details = '';
+    if ($device['os']) {
+      $platform_details .= '<strong>OS</strong> ' . $device['os'];
+    }
+    if ($device['chipset_name']) {
+      if ($platform_details) $platform_details .= '<br>';
+      $platform_details .= '<strong>Chipset</strong> ' . $device['chipset_name'];
+    }
+    if ($device['cpu_cores'] || $device['cpu_frequency']) {
+      if ($platform_details) $platform_details .= '<br>';
+      $platform_details .= '<strong>CPU</strong> ';
+      if ($device['cpu_cores']) $platform_details .= $device['cpu_cores'] . '-core';
+      if ($device['cpu_frequency']) $platform_details .= ' (' . $device['cpu_frequency'] . ' GHz)';
+    }
+    if ($device['gpu']) {
+      if ($platform_details) $platform_details .= '<br>';
+      $platform_details .= '<strong>GPU</strong> ' . $device['gpu'];
+    }
+    $specs['PLATFORM'] = $platform_details;
+  }
+
+  // Memory specifications
+  if ($device['ram_internal'] || $device['storage_internal'] || $device['card_slot']) {
+    $memory_details = '';
+    if ($device['card_slot'] !== null) {
+      $memory_details .= '<strong>Card slot</strong> ' . ($device['card_slot'] ? 'Yes' : 'No');
+      if ($device['storage_expandable']) $memory_details .= ' (' . $device['storage_expandable'] . ')';
+    }
+    if ($device['storage_internal'] || $device['ram_internal']) {
+      if ($memory_details) $memory_details .= '<br>';
+      $memory_details .= '<strong>Internal</strong> ';
+      if ($device['storage_internal']) $memory_details .= $device['storage_internal'];
+      if ($device['ram_internal']) $memory_details .= ' RAM: ' . $device['ram_internal'];
+    }
+    $specs['MEMORY'] = $memory_details;
+  }
+
+  // Main Camera specifications
+  if ($device['main_camera_resolution'] || $device['main_camera_count']) {
+    $camera_details = '';
+    if ($device['main_camera_count'] > 1) {
+      $camera_details .= '<strong>' . ucfirst(convertNumberToWord($device['main_camera_count'])) . '</strong><br>';
+    } else {
+      $camera_details .= '<strong>Single</strong><br>';
+    }
+    if ($device['main_camera_resolution']) {
+      $camera_details .= $device['main_camera_resolution'];
+    }
+
+    // Camera features
+    $features = [];
+    if ($device['main_camera_ois']) $features[] = 'OIS';
+    if ($device['main_camera_telephoto']) $features[] = 'Telephoto';
+    if ($device['main_camera_ultrawide']) $features[] = 'Ultrawide';
+    if ($device['main_camera_macro']) $features[] = 'Macro';
+    if ($device['main_camera_flash']) $features[] = 'Flash';
+    if ($device['main_camera_features'] && is_array($device['main_camera_features'])) {
+      $features = array_merge($features, $device['main_camera_features']);
+    } elseif ($device['main_camera_features'] && is_string($device['main_camera_features'])) {
+      // Handle PostgreSQL array string format
+      $array_features = str_replace(['{', '}'], '', $device['main_camera_features']);
+      $array_features = explode(',', $array_features);
+      $features = array_merge($features, array_map('trim', $array_features));
+    }
+
+    if (!empty($features)) {
+      $camera_details .= '<br><strong>Features</strong> ' . implode(', ', $features);
+    }
+    if ($device['main_camera_video']) {
+      $camera_details .= '<br><strong>Video</strong> ' . $device['main_camera_video'];
+    }
+    $specs['MAIN CAMERA'] = $camera_details;
+  }
+
+  // Selfie Camera specifications
+  if ($device['selfie_camera_resolution'] || $device['selfie_camera_count']) {
+    $selfie_details = '';
+    if ($device['selfie_camera_count'] > 1) {
+      $selfie_details .= '<strong>' . ucfirst(convertNumberToWord($device['selfie_camera_count'])) . '</strong> ';
+    } else {
+      $selfie_details .= '<strong>Single</strong> ';
+    }
+    if ($device['selfie_camera_resolution']) {
+      $selfie_details .= $device['selfie_camera_resolution'];
+    }
+    if ($device['selfie_camera_features'] && is_array($device['selfie_camera_features'])) {
+      $selfie_details .= '<br><strong>Features</strong> ' . implode(', ', $device['selfie_camera_features']);
+    } elseif ($device['selfie_camera_features'] && is_string($device['selfie_camera_features'])) {
+      // Handle PostgreSQL array string format
+      $array_features = str_replace(['{', '}'], '', $device['selfie_camera_features']);
+      $array_features = explode(',', $array_features);
+      $selfie_details .= '<br><strong>Features</strong> ' . implode(', ', array_map('trim', $array_features));
+    }
+    if ($device['selfie_camera_video']) {
+      $selfie_details .= '<br><strong>Video</strong> ' . $device['selfie_camera_video'];
+    }
+    $specs['SELFIE CAMERA'] = $selfie_details;
+  }
+
+  // Sound specifications
+  if ($device['loudspeaker'] !== null || $device['audio_jack_35mm'] !== null) {
+    $sound_details = '';
+    if ($device['loudspeaker'] !== null) {
+      $sound_details .= '<strong>Loudspeaker</strong> ' . ($device['loudspeaker'] ? 'Yes' : 'No');
+    }
+    if ($device['audio_jack_35mm'] !== null) {
+      if ($sound_details) $sound_details .= '<br>';
+      $sound_details .= '<strong>3.5mm jack</strong> ' . ($device['audio_jack_35mm'] ? 'Yes' : 'No');
+    }
+    $specs['SOUND'] = $sound_details;
+  }
+
+  // Communications specifications
+  $comms_details = '';
+  if ($device['wifi']) {
+    $comms_details .= '<strong>WLAN</strong> ' . $device['wifi'];
+  }
+  if ($device['bluetooth']) {
+    if ($comms_details) $comms_details .= '<br>';
+    $comms_details .= '<strong>Bluetooth</strong> ' . $device['bluetooth'];
+  }
+  if ($device['gps'] !== null) {
+    if ($comms_details) $comms_details .= '<br>';
+    $comms_details .= '<strong>Positioning</strong> ' . ($device['gps'] ? 'GPS' : 'No');
+  }
+  if ($device['nfc'] !== null) {
+    if ($comms_details) $comms_details .= '<br>';
+    $comms_details .= '<strong>NFC</strong> ' . ($device['nfc'] ? 'Yes' : 'No');
+  }
+  if ($device['radio'] !== null) {
+    if ($comms_details) $comms_details .= '<br>';
+    $comms_details .= '<strong>Radio</strong> ' . ($device['radio'] ? 'Yes' : 'No');
+  }
+  if ($device['usb']) {
+    if ($comms_details) $comms_details .= '<br>';
+    $comms_details .= '<strong>USB</strong> ' . $device['usb'];
+  }
+  if ($comms_details) {
+    $specs['COMMUNICATIONS'] = $comms_details;
+  }
+
+  // Features specifications
+  $features_details = '';
+  if ($device['fingerprint'] !== null) {
+    $features_details .= '<strong>Fingerprint</strong> ' . ($device['fingerprint'] ? 'Yes' : 'No');
+  }
+  if ($device['face_unlock'] !== null) {
+    if ($features_details) $features_details .= '<br>';
+    $features_details .= '<strong>Face unlock</strong> ' . ($device['face_unlock'] ? 'Yes' : 'No');
+  }
+  if ($device['sensors'] && is_array($device['sensors'])) {
+    if ($features_details) $features_details .= '<br>';
+    $features_details .= '<strong>Sensors</strong> ' . implode(', ', $device['sensors']);
+  } elseif ($device['sensors'] && is_string($device['sensors'])) {
+    // Handle PostgreSQL array string format
+    $array_sensors = str_replace(['{', '}'], '', $device['sensors']);
+    $array_sensors = explode(',', $array_sensors);
+    if ($features_details) $features_details .= '<br>';
+    $features_details .= '<strong>Sensors</strong> ' . implode(', ', array_map('trim', $array_sensors));
+  }
+  if ($features_details) {
+    $specs['FEATURES'] = $features_details;
+  }
+
+  // Battery specifications
+  if ($device['battery_capacity'] || $device['battery_type']) {
+    $battery_details = '';
+    if ($device['battery_type']) {
+      $battery_details .= '<strong>Type</strong> ' . $device['battery_type'];
+      if ($device['battery_capacity']) $battery_details .= ' ' . $device['battery_capacity'] . ' mAh';
+    } else if ($device['battery_capacity']) {
+      $battery_details .= '<strong>Capacity</strong> ' . $device['battery_capacity'] . ' mAh';
+    }
+
+    if ($device['battery_removable'] !== null) {
+      $battery_details .= '<br><strong>Removable</strong> ' . ($device['battery_removable'] ? 'Yes' : 'No');
+    }
+
+    // Charging information
+    $charging = [];
+    if ($device['charging_wired']) $charging[] = 'Wired: ' . $device['charging_wired'] . 'W';
+    if ($device['charging_wireless']) $charging[] = 'Wireless: ' . $device['charging_wireless'] . 'W';
+    if ($device['charging_reverse']) $charging[] = 'Reverse: ' . $device['charging_reverse'] . 'W';
+
+    if (!empty($charging)) {
+      $battery_details .= '<br><strong>Charging</strong> ' . implode(', ', $charging);
+    }
+
+    $specs['BATTERY'] = $battery_details;
+  }
+
+  // Colors
+  if ($device['colors'] && is_array($device['colors'])) {
+    $specs['COLORS'] = '<strong>Available</strong> ' . implode(', ', $device['colors']);
+  } elseif ($device['colors'] && is_string($device['colors'])) {
+    // Handle PostgreSQL array string format
+    $array_colors = str_replace(['{', '}'], '', $device['colors']);
+    $array_colors = explode(',', $array_colors);
+    $specs['COLORS'] = '<strong>Available</strong> ' . implode(', ', array_map('trim', $array_colors));
+  }
+
+  return $specs;
+}
+
+// Helper function to convert numbers to words
+function convertNumberToWord($num)
+{
+  $words = ['', 'single', 'dual', 'triple', 'quad', 'penta', 'hexa', 'hepta', 'octa'];
+  return isset($words[$num]) ? $words[$num] : $num;
+}
+
+// Function to generate device highlights for top section
+function generateDeviceHighlights($device)
+{
+  $highlights = [];
+
+  // Release date highlight
+  if ($device['release_date']) {
+    $release_date = date('F j, Y', strtotime($device['release_date']));
+    $highlights['release'] = "📅 Released " . $release_date;
+  } elseif ($device['year']) {
+    $highlights['release'] = "📅 Released " . $device['year'];
+  }
+
+  // Weight and dimensions highlight
+  $weight_dims = [];
+  if ($device['weight']) {
+    $weight_dims[] = $device['weight'] . 'g';
+  }
+  if ($device['dimensions_thickness']) {
+    $weight_dims[] = $device['dimensions_thickness'] . 'mm thickness';
+  }
+  if (!empty($weight_dims)) {
+    $highlights['weight_dims'] = "⚖️ " . implode(', ', $weight_dims);
+  }
+
+  // OS highlight
+  if ($device['os']) {
+    $highlights['os'] = "🆔 " . $device['os'];
+  }
+
+  // Storage highlight
+  $storage_parts = [];
+  if ($device['storage_internal']) {
+    $storage_parts[] = $device['storage_internal'] . ' storage';
+  }
+  if ($device['card_slot'] === false) {
+    $storage_parts[] = 'no card slot';
+  } elseif ($device['card_slot'] === true) {
+    $storage_parts[] = 'expandable';
+  }
+  if (!empty($storage_parts)) {
+    $highlights['storage'] = "💾 " . implode(', ', $storage_parts);
+  }
+
+  return $highlights;
+}
+
+// Function to generate device stats for the stats bar
+function generateDeviceStats($device)
+{
+  $stats = [];
+
+  // Display stats
+  $display_title = $device['display_size'] ? $device['display_size'] . '"' : 'N/A';
+  $display_subtitle = $device['display_resolution'] ?? 'Unknown';
+  $stats['display'] = [
+    'icon' => 'imges/vrer.png',
+    'title' => $display_title,
+    'subtitle' => $display_subtitle
+  ];
+
+  // Camera stats
+  $camera_title = 'N/A';
+  $camera_subtitle = 'N/A';
+  if ($device['main_camera_resolution']) {
+    // Extract MP from resolution
+    if (preg_match('/(\d+)\s*MP/', $device['main_camera_resolution'], $matches)) {
+      $camera_title = $matches[1] . 'MP';
+    }
+  }
+  if ($device['main_camera_video']) {
+    $camera_subtitle = $device['main_camera_video'];
+  } elseif (strpos($device['main_camera_resolution'], '4K') !== false) {
+    $camera_subtitle = '4K';
+  } else {
+    $camera_subtitle = '1080p';
+  }
+  $stats['camera'] = [
+    'icon' => 'imges/bett-removebg-preview.png',
+    'title' => $camera_title,
+    'subtitle' => $camera_subtitle
+  ];
+
+  // Performance stats (RAM + Chipset)
+  $perf_title = 'N/A';
+  $perf_subtitle = 'Unknown';
+  if ($device['ram_internal']) {
+    $perf_title = $device['ram_internal'];
+  }
+  if ($device['chipset_name']) {
+    // Simplify chipset name
+    $chipset = $device['chipset_name'];
+    if (strpos($chipset, 'Snapdragon') !== false) {
+      $perf_subtitle = 'Snapdragon';
+    } elseif (strpos($chipset, 'Apple') !== false) {
+      $perf_subtitle = 'Apple';
+    } elseif (strpos($chipset, 'Dimensity') !== false) {
+      $perf_subtitle = 'Dimensity';
+    } elseif (strpos($chipset, 'Exynos') !== false) {
+      $perf_subtitle = 'Exynos';
+    } else {
+      $perf_subtitle = $chipset;
+    }
+  }
+  $stats['performance'] = [
+    'icon' => 'imges/encypt-removebg-preview.png',
+    'title' => $perf_title,
+    'subtitle' => $perf_subtitle
+  ];
+
+  // Battery stats
+  $battery_title = $device['battery_capacity'] ? $device['battery_capacity'] . 'mAh' : 'N/A';
+  $battery_subtitle = 'N/A';
+  if ($device['charging_wired']) {
+    $battery_subtitle = $device['charging_wired'] . 'W';
+  } elseif ($device['charging_wireless']) {
+    $battery_subtitle = $device['charging_wireless'] . 'W wireless';
+  }
+  $stats['battery'] = [
+    'icon' => 'imges/lowtry-removebg-preview.png',
+    'title' => $battery_title,
+    'subtitle' => $battery_subtitle
+  ];
+
+  return $stats;
 }
 
 // Function to get device comments
 function getDeviceComments($pdo, $device_id)
 {
-    try {
-        $stmt = $pdo->prepare("
+  try {
+    $stmt = $pdo->prepare("
             SELECT * FROM device_comments 
             WHERE device_id = ? AND status = 'approved'
             ORDER BY created_at DESC
         ");
-        $stmt->execute([$device_id]);
-        return $stmt->fetchAll(PDO::FETCH_ASSOC);
-    } catch (PDOException $e) {
-        return [];
-    }
+    $stmt->execute([$device_id]);
+    return $stmt->fetchAll(PDO::FETCH_ASSOC);
+  } catch (PDOException $e) {
+    return [];
+  }
+}
+
+// Function to get device comment count
+function getDeviceCommentCount($pdo, $device_id)
+{
+  try {
+    $stmt = $pdo->prepare("
+            SELECT COUNT(*) as count 
+            FROM device_comments 
+            WHERE device_id = ? AND status = 'approved'
+        ");
+    $stmt->execute([$device_id]);
+    return $stmt->fetch(PDO::FETCH_ASSOC)['count'] ?? 0;
+  } catch (PDOException $e) {
+    return 0;
+  }
+}
+
+// Function to generate gravatar URL
+function getGravatarUrl($email, $size = 50)
+{
+  $hash = md5(strtolower(trim($email)));
+  return "https://www.gravatar.com/avatar/{$hash}?r=g&s={$size}&d=identicon";
+}
+
+// Function to format time ago
+function timeAgo($datetime)
+{
+  $time = time() - strtotime($datetime);
+
+  if ($time < 60) return 'just now';
+  if ($time < 3600) return floor($time / 60) . ' minutes ago';
+  if ($time < 86400) return floor($time / 3600) . ' hours ago';
+  if ($time < 2592000) return floor($time / 86400) . ' days ago';
+  if ($time < 31536000) return floor($time / 2592000) . ' months ago';
+
+  return floor($time / 31536000) . ' years ago';
+}
+
+// Function to generate avatar display
+function getAvatarDisplay($name, $email)
+{
+  if (!empty($email)) {
+    return '<img src="' . getGravatarUrl($email) . '" alt="' . htmlspecialchars($name) . '">';
+  } else {
+    $initial = strtoupper(substr($name, 0, 1));
+    return '<span class="avatar-box">' . htmlspecialchars($initial) . '</span>';
+  }
 }
 
 // Function to track view
 function trackDeviceView($pdo, $device_id, $ip_address)
 {
-    try {
-        $today = date('Y-m-d');
+  try {
+    $today = date('Y-m-d');
 
-        // Check if this IP already viewed this device today
-        $stmt = $pdo->prepare("
+    // Check if this IP already viewed this device today
+    $stmt = $pdo->prepare("
             SELECT COUNT(*) as count 
             FROM content_views 
             WHERE content_id = ? AND content_type = 'device' AND ip_address = ? AND DATE(viewed_at) = ?
         ");
-        $stmt->execute([$device_id, $ip_address, $today]);
-        $result = $stmt->fetch(PDO::FETCH_ASSOC);
+    $stmt->execute([$device_id, $ip_address, $today]);
+    $result = $stmt->fetch(PDO::FETCH_ASSOC);
 
-        if ($result['count'] == 0) {
-            // Insert new view record
-            $stmt = $pdo->prepare("
+    if ($result['count'] == 0) {
+      // Insert new view record
+      $stmt = $pdo->prepare("
                 INSERT INTO content_views (content_id, content_type, ip_address, viewed_at) 
                 VALUES (?, 'device', ?, NOW())
             ");
-            $stmt->execute([$device_id, $ip_address]);
-        }
-    } catch (PDOException $e) {
-        error_log("View tracking error: " . $e->getMessage());
+      $stmt->execute([$device_id, $ip_address]);
     }
+  } catch (PDOException $e) {
+    error_log("View tracking error: " . $e->getMessage());
+  }
 }
 
 // Get device details
 $device = getDeviceDetails($pdo, $device_id);
 
 if (!$device) {
-    header("Location: 404.php");
-    exit();
+  header("Location: 404.php");
+  exit();
 }
+
+// Format device specifications for display
+$deviceSpecs = formatDeviceSpecs($device);
+
+// Generate device highlights and stats for the top section
+$deviceHighlights = generateDeviceHighlights($device);
+$deviceStats = generateDeviceStats($device);
 
 // Track view
 $ip_address = $_SERVER['REMOTE_ADDR'] ?? 'unknown';
@@ -209,27 +685,34 @@ trackDeviceView($pdo, $device_id, $ip_address);
 // Get comments
 $comments = getDeviceComments($pdo, $device_id);
 
+// Get comment count
+$commentCount = getDeviceCommentCount($pdo, $device_id);
+
 // Handle comment submission
 if ($_POST && isset($_POST['submit_comment'])) {
-    $name = trim($_POST['name'] ?? '');
-    $email = trim($_POST['email'] ?? '');
-    $comment = trim($_POST['comment'] ?? '');
+  $name = trim($_POST['name'] ?? '');
+  $email = trim($_POST['email'] ?? '');
+  $comment = trim($_POST['comment'] ?? '');
 
-    if (!empty($name) && !empty($comment)) {
-        try {
-            $stmt = $pdo->prepare("
+  if (!empty($name) && !empty($comment)) {
+    try {
+      $stmt = $pdo->prepare("
                 INSERT INTO device_comments (device_id, name, email, comment, status, created_at) 
                 VALUES (?, ?, ?, ?, 'pending', NOW())
             ");
-            $stmt->execute([$device_id, $name, $email, $comment]);
+      $stmt->execute([$device_id, $name, $email, $comment]);
 
-            $success_message = "Thank you! Your comment has been submitted and is awaiting approval.";
-        } catch (PDOException $e) {
-            $error_message = "Error submitting comment. Please try again.";
-        }
-    } else {
-        $error_message = "Please fill in all required fields.";
+      $success_message = "Thank you! Your comment has been submitted and is awaiting approval.";
+
+      // Refresh comments and count after submission
+      $comments = getDeviceComments($pdo, $device_id);
+      $commentCount = getDeviceCommentCount($pdo, $device_id);
+    } catch (PDOException $e) {
+      $error_message = "Error submitting comment. Please try again.";
     }
+  } else {
+    $error_message = "Please fill in all required fields.";
+  }
 }
 ?>
 <!DOCTYPE html>
@@ -238,7 +721,7 @@ if ($_POST && isset($_POST['submit_comment'])) {
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>GSMArena Single Device Page</title>
+  <title><?php echo htmlspecialchars(($device['brand_name'] ?? '') . ' ' . ($device['name'] ?? 'Device')); ?> - Specifications & Reviews | GSMArena</title>
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/css/bootstrap.min.css" rel="stylesheet"
     integrity="sha384-rbsA2VBKQhggwzxH7pPCaAqO46MgnOM80zW1RWuH61DGLwZJEdK2Kadq2F9CUG65" crossorigin="anonymous">
   <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
@@ -366,13 +849,13 @@ if ($_POST && isset($_POST['submit_comment'])) {
     </div>
     <div class="brand-grid">
       <?php
-            $brandChunks = array_chunk($brands, 1); // Create chunks of 1 brand per row
-            foreach ($brandChunks as $brandRow):
-                foreach ($brandRow as $brand): ?>
-                    <a href="#" class="brand-cell" data-brand-id="<?php echo $brand['id']; ?>"><?php echo htmlspecialchars($brand['name']); ?></a>
-            <?php endforeach;
-            endforeach; ?>
-            <a href="brands.php">[...]</a>
+      $brandChunks = array_chunk($brands, 1); // Create chunks of 1 brand per row
+      foreach ($brandChunks as $brandRow):
+        foreach ($brandRow as $brand): ?>
+          <a href="#" class="brand-cell" data-brand-id="<?php echo $brand['id']; ?>"><?php echo htmlspecialchars($brand['name']); ?></a>
+      <?php endforeach;
+      endforeach; ?>
+      <a href="brands.php">[...]</a>
     </div>
     <div class="menu-buttons d-flex justify-content-center ">
       <button class="btn btn-danger w-50">📱 Phone Finder</button>
@@ -594,17 +1077,91 @@ if ($_POST && isset($_POST['submit_comment'])) {
       width: 90px;
       font-weight: 600;
     }
+
+    /* Avatar and Comment Styles */
+    .avatar-box {
+      width: 40px;
+      height: 40px;
+      border-radius: 50%;
+      overflow: hidden;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin-right: 15px;
+      flex-shrink: 0;
+    }
+
+    .avatar-box img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+
+    .avatar-initials {
+      font-size: 18px;
+      font-weight: 600;
+      color: white;
+      text-transform: uppercase;
+    }
+
+    .comment-item {
+      display: flex;
+      margin-bottom: 20px;
+      padding: 15px 0;
+      border-bottom: 1px solid #eee;
+    }
+
+    .comment-content {
+      flex: 1;
+    }
+
+    .comment-author {
+      font-weight: 600;
+      color: #333;
+      margin-bottom: 5px;
+    }
+
+    .comment-meta {
+      color: #666;
+      font-size: 13px;
+      margin-bottom: 10px;
+    }
+
+    .comment-text {
+      color: #444;
+      line-height: 1.6;
+    }
+
+    .comment-form {
+      background: #f8f9fa;
+      padding: 20px;
+      border-radius: 8px;
+      margin-top: 20px;
+    }
+
+    .comment-form textarea {
+      resize: vertical;
+      min-height: 100px;
+    }
+
+    .no-comments {
+      text-align: center;
+      color: #666;
+      padding: 40px 20px;
+      background: #f8f9fa;
+      border-radius: 8px;
+    }
   </style>
 
 
   <div class="d-lg-none d-block">
-    <div class="card" role="region" aria-label="Vivo V60 Phone Info">
+    <div class="card" role="region" aria-label="<?php echo htmlspecialchars(($device['brand_name'] ?? '') . ' ' . ($device['name'] ?? 'Device')); ?> Phone Info">
 
       <div class="article-info">
         <div class="bg-blur">
           <p class="vr-hide"
             style=" font-family: 'oswald'; text-transform: capitalize; text-shadow: 1px 1px 2px rgba(0, 0, 0, .4);">
-            vivo V60
+            <?php echo htmlspecialchars(($device['brand_name'] ?? '') . ' ' . ($device['name'] ?? 'Device')); ?>
           </p>
           <svg class="float-end mx-3 mt-1" xmlns="http://www.w3.org/2000/svg" height="34" width="34"
             viewBox="0 0 640 640"><!--!Font Awesome Free v7.0.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free Copyright 2025 Fonticons, Inc.-->
@@ -619,7 +1176,7 @@ if ($_POST && isset($_POST['submit_comment'])) {
         <div class="phone-image me-3 pt-2 px-2">
           <img style="    height: -webkit-fill-available;
     width: 100%;
-    padding: 12px;" src="https://fdn2.gsmarena.com/vv/bigpic/vivo-v60.jpg" alt="vivo V60 phone image" />
+    padding: 12px;" src="<?php echo htmlspecialchars($device['image'] ?? $device['image_1'] ?? 'https://via.placeholder.com/300x400?text=No+Image'); ?>" alt="<?php echo htmlspecialchars(($device['brand_name'] ?? '') . ' ' . ($device['name'] ?? 'Device')); ?> phone image" />
         </div>
 
         <!-- Right: Details + Stats + Specs -->
@@ -629,51 +1186,38 @@ if ($_POST && isset($_POST['submit_comment'])) {
           <div class="d-flex justify-content-between mb-3">
 
             <ul class="phone-details d-lg-block d-none list-unstyled mb-0">
-              <li><span>📅 Released 2025, August 19</span></li>
-              <li><span>⚖️ 192g or 201g, 7.5mm thickness</span></li>
-              <li><span>🆔 Android 15, up to 4 major upgrades</span></li>
-              <li><span>💾 128GB/256GB/512GB storage, no card slot</span></li>
+              <?php if (!empty($deviceHighlights)): ?>
+                <?php foreach ($deviceHighlights as $highlight): ?>
+                  <li><span><?php echo htmlspecialchars($highlight); ?></span></li>
+                <?php endforeach; ?>
+              <?php else: ?>
+                <li><span>📅 Release date not available</span></li>
+                <li><span>ℹ️ Specifications loading...</span></li>
+              <?php endif; ?>
             </ul>
-
-            <div class="d-flex stats-bar text-center">
-              <div class="stat-item">
-                <div>53%</div>
-                <div class="stat-label">605,568 HITS</div>
-              </div>
-              <div class="stat-item">
-                <div> <i class="fa-solid fa-heart fa-md" style="color: #ffffff;"></i> 80</div>
-                <div class="stat-label">BECOME A FAN</div>
-              </div>
-            </div>
           </div>
 
           <!-- Specs Row (aligned with image) -->
-           <div class="row text-center d-block g-0  pt-2 specs-bar">
-                <div class="col-3 spec-item">
-                  <img src="imges/vrer.png" style="width: 25px;" alt="">
-
-                  <div class="spec-title"> 6.77"</div>
-                  <div class="spec-subtitle">1080x2392 px</div>
+          <div class="row text-center d-block g-0  pt-2 specs-bar">
+            <?php
+            $statKeys = ['display', 'camera', 'performance', 'battery'];
+            $colIndex = 0;
+            foreach ($statKeys as $key):
+              if (isset($deviceStats[$key])):
+                $stat = $deviceStats[$key];
+                $borderClass = $colIndex > 0 ? 'border-start' : '';
+            ?>
+                <div class="col-3 spec-item <?php echo $borderClass; ?>">
+                  <img src="<?php echo htmlspecialchars($stat['icon']); ?>" style="width: 25px;" alt="" onerror="this.style.display='none'">
+                  <div class="spec-title"><?php echo htmlspecialchars($stat['title']); ?></div>
+                  <div class="spec-subtitle"><?php echo htmlspecialchars($stat['subtitle']); ?></div>
                 </div>
-                <div class="col-3 spec-item border-start">
-                  <img src="imges/bett-removebg-preview.png" style="width: 35px;" alt="">
-
-                  <div class="spec-title">50MP</div>
-                  <div class="spec-subtitle">2160p</div>
-                </div>
-                <div class="col-3 spec-item border-start">
-                  <img src="imges/encypt-removebg-preview.png" style="width: 38px;" alt="">
-
-                  <div class="spec-title">8-16GB</div>
-                  <div class="spec-subtitle">Snapdragon 7</div>
-                </div>
-                <div class="col-3 spec-item border-start">
-                  <img src="imges/lowtry-removebg-preview.png" style="width: 35px;" alt="">
-
-                  <div class="spec-title">6500mAh</div>
-                  <div class="spec-subtitle">90W</div>
-                </div>
-              </div>
+            <?php
+                $colIndex++;
+              endif;
+            endforeach;
+            ?>
+          </div>
 
         </div>
       </div>
@@ -682,24 +1226,7 @@ if ($_POST && isset($_POST['submit_comment'])) {
           <div class="d-lg-none d-block justify-content-end">
             <div class="d-flex flexiable mt-2">
               <img src="/imges/download-removebg-preview.png" alt="">
-              <h5 style="font-family:'oswald' ; font-size: 16px" class="mt-2">Review (17)
-              </h5>
-            </div>
-            <div class="d-flex flexiable mt-2">
-              <img src="/imges/download-removebg-preview.png" alt="">
-              <h5 style="font-family:'oswald' ; font-size: 16px;" class="mt-2">OPINION </h5>
-            </div>
-            <div class="d-flex flexiable mt-2">
-              <img src="/imges/download-removebg-preview.png" alt="">
               <h5 style="font-family:'oswald' ; font-size: 16px;" class="mt-2">COMPARE </h5>
-            </div>
-            <div class="d-flex flexiable mt-2">
-              <img src="/imges/download-removebg-preview.png" alt="">
-              <h5 style="font-family:'oswald' ; font-size: 16px;" class="mt-2">PICTURES </h5>
-            </div>
-            <div class="d-flex flexiable mt-2">
-              <img src="/imges/download-removebg-preview.png" alt="">
-              <h5 style="font-family:'oswald' ; font-size: 16 px;" class="mt-2">PRICES</h5>
             </div>
           </div>
 
@@ -747,13 +1274,13 @@ if ($_POST && isset($_POST['submit_comment'])) {
     style=" margin-top: 2rem; padding-left: 0;">
     <div class="row">
       <div class="col-md-8 ">
-        <div class="card" role="region" aria-label="Vivo V60 Phone Info">
+        <div class="card" role="region" aria-label="<?php echo htmlspecialchars(($device['brand_name'] ?? '') . ' ' . ($device['name'] ?? 'Device')); ?> Phone Info">
 
           <div class="article-info">
             <div class="bg-blur">
               <p class="vr-hide"
                 style=" font-family: 'oswald'; text-transform: capitalize; text-shadow: 1px 1px 2px rgba(0, 0, 0, .4);">
-                vivo V60
+                <?php echo htmlspecialchars(($device['brand_name'] ?? '') . ' ' . ($device['name'] ?? 'Device')); ?>
               </p>
               <svg class="float-end mx-3 mt-1" xmlns="http://www.w3.org/2000/svg" height="34" width="34"
                 viewBox="0 0 640 640"><!--!Font Awesome Free v7.0.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free Copyright 2025 Fonticons, Inc.-->
@@ -768,7 +1295,7 @@ if ($_POST && isset($_POST['submit_comment'])) {
             <div class="phone-image me-3 pt-2 px-2">
               <img style="    height: -webkit-fill-available;
     width: 100%;
-    padding: 12px;" src="https://fdn2.gsmarena.com/vv/bigpic/vivo-v60.jpg" alt="vivo V60 phone image" />
+    padding: 12px;" src="<?php echo htmlspecialchars($device['image'] ?? $device['image_1'] ?? 'https://via.placeholder.com/300x400?text=No+Image'); ?>" alt="<?php echo htmlspecialchars(($device['brand_name'] ?? '') . ' ' . ($device['name'] ?? 'Device')); ?> phone image" />
             </div>
 
             <!-- Right: Details + Stats + Specs -->
@@ -778,50 +1305,37 @@ if ($_POST && isset($_POST['submit_comment'])) {
               <div class="d-flex justify-content-between mb-3">
 
                 <ul class="phone-details list-unstyled mb-0 d-lg-block d-none">
-                  <li><span>📅 Released 2025, August 19</span></li>
-                  <li><span>⚖️ 192g or 201g, 7.5mm thickness</span></li>
-                  <li><span>🆔 Android 15, up to 4 major upgrades</span></li>
-                  <li><span>💾 128GB/256GB/512GB storage, no card slot</span></li>
+                  <?php if (!empty($deviceHighlights)): ?>
+                    <?php foreach ($deviceHighlights as $highlight): ?>
+                      <li><span><?php echo htmlspecialchars($highlight); ?></span></li>
+                    <?php endforeach; ?>
+                  <?php else: ?>
+                    <li><span>📅 Release date not available</span></li>
+                    <li><span>ℹ️ Specifications loading...</span></li>
+                  <?php endif; ?>
                 </ul>
-
-                <div class="d-flex stats-bar text-center">
-                  <div class="stat-item">
-                    <div>53%</div>
-                    <div class="stat-label">605,568 HITS</div>
-                  </div>
-                  <div class="stat-item">
-                    <div> <i class="fa-solid fa-heart fa-md" style="color: #ffffff;"></i> 80</div>
-                    <div class="stat-label">BECOME A FAN</div>
-                  </div>
-                </div>
               </div>
 
               <!-- Specs Row (aligned with image) -->
               <div class="row text-center g-0  pt-2 specs-bar">
-                <div class="col-3 spec-item">
-                  <img src="imges/vrer.png" style="width: 25px;" alt="">
-
-                  <div class="spec-title"> 6.77"</div>
-                  <div class="spec-subtitle">1080x2392 px</div>
-                </div>
-                <div class="col-3 spec-item border-start">
-                  <img src="imges/bett-removebg-preview.png" style="width: 35px;" alt="">
-
-                  <div class="spec-title">50MP</div>
-                  <div class="spec-subtitle">2160p</div>
-                </div>
-                <div class="col-3 spec-item border-start">
-                  <img src="imges/encypt-removebg-preview.png" style="width: 38px;" alt="">
-
-                  <div class="spec-title">8-16GB</div>
-                  <div class="spec-subtitle">Snapdragon 7</div>
-                </div>
-                <div class="col-3 spec-item border-start">
-                  <img src="imges/lowtry-removebg-preview.png" style="width: 35px;" alt="">
-
-                  <div class="spec-title">6500mAh</div>
-                  <div class="spec-subtitle">90W</div>
-                </div>
+                <?php
+                $statKeys = ['display', 'camera', 'performance', 'battery'];
+                $colIndex = 0;
+                foreach ($statKeys as $key):
+                  if (isset($deviceStats[$key])):
+                    $stat = $deviceStats[$key];
+                    $borderClass = $colIndex > 0 ? 'border-start' : '';
+                ?>
+                    <div class="col-3 spec-item <?php echo $borderClass; ?>">
+                      <img src="<?php echo htmlspecialchars($stat['icon']); ?>" style="width: 25px;" alt="" onerror="this.style.display='none'">
+                      <div class="spec-title"><?php echo htmlspecialchars($stat['title']); ?></div>
+                      <div class="spec-subtitle"><?php echo htmlspecialchars($stat['subtitle']); ?></div>
+                    </div>
+                <?php
+                    $colIndex++;
+                  endif;
+                endforeach;
+                ?>
               </div>
 
             </div>
@@ -831,12 +1345,12 @@ if ($_POST && isset($_POST['submit_comment'])) {
               <div class="d-flex justify-content-end">
                 <div class="d-flex flexiable ">
                   <img src="/imges/download-removebg-preview.png" alt="">
-                  <h5 style="font-family:'oswald' ; font-size: 16px" class="mt-2">Review (17)
+                  <h5 style="font-family:'oswald' ; font-size: 16px" class="mt-2">
                   </h5>
                 </div>
                 <div class="d-flex flexiable ">
                   <img src="/imges/download-removebg-preview.png" alt="">
-                  <h5 style="font-family:'oswald' ; font-size: 16px;" class="mt-2">OPINION </h5>
+                  <h5 style="font-family:'oswald' ; font-size: 16px;" class="mt-2"> </h5>
                 </div>
                 <div class="d-flex flexiable ">
                   <img src="/imges/download-removebg-preview.png" alt="">
@@ -844,18 +1358,15 @@ if ($_POST && isset($_POST['submit_comment'])) {
                 </div>
                 <div class="d-flex flexiable ">
                   <img src="/imges/download-removebg-preview.png" alt="">
-                  <h5 style="font-family:'oswald' ; font-size: 16px;" class="mt-2">PICTURES </h5>
+                  <h5 style="font-family:'oswald' ; font-size: 16px;" class="mt-2"> </h5>
                 </div>
                 <div class="d-flex flexiable ">
                   <img src="/imges/download-removebg-preview.png" alt="">
-                  <h5 style="font-family:'oswald' ; font-size: 16 px;" class="mt-2">PRICES</h5>
+                  <h5 style="font-family:'oswald' ; font-size: 16 px;" class="mt-2"></h5>
                 </div>
               </div>
-
-
             </div>
           </div>
-
         </div>
 
 
@@ -866,19 +1377,19 @@ if ($_POST && isset($_POST['submit_comment'])) {
           Phone Finder</button>
         <div class="devor">
           <?php
-                    if (empty($brands)): ?>
-                        <button class="px-3 py-1" style="cursor: default;" disabled>No brands available.</button>
-                        <?php else:
-                        $brandChunks = array_chunk($brands, 1); // Create chunks of 1 brand per row
-                        foreach ($brandChunks as $brandRow):
-                            foreach ($brandRow as $brand):
-                        ?>
-                                <button class="px-3 py-1 brand-cell" style="cursor: pointer;" data-brand-id="<?php echo $brand['id']; ?>"><?php echo htmlspecialchars($brand['name']); ?></button>
-                    <?php
-                            endforeach;
-                        endforeach;
-                    endif;
-                    ?>
+          if (empty($brands)): ?>
+            <button class="px-3 py-1" style="cursor: default;" disabled>No brands available.</button>
+            <?php else:
+            $brandChunks = array_chunk($brands, 1); // Create chunks of 1 brand per row
+            foreach ($brandChunks as $brandRow):
+              foreach ($brandRow as $brand):
+            ?>
+                <button class="px-3 py-1 brand-cell" style="cursor: pointer;" data-brand-id="<?php echo $brand['id']; ?>"><?php echo htmlspecialchars($brand['name']); ?></button>
+          <?php
+              endforeach;
+            endforeach;
+          endif;
+          ?>
         </div>
         <button class="solid w-50 py-2">
           <i class="fa-solid fa-bars fa-sm mx-2"></i>
@@ -901,98 +1412,24 @@ if ($_POST && isset($_POST['submit_comment'])) {
 
           <table class="table forat">
             <tbody>
-              <tr>
-                <th class="spec-label">NETWORK</th>
-                <td><strong>Technology</strong> GSM / HSPA / LTE / 5G</td>
-              </tr>
-              <tr>
-                <th class="spec-label">LAUNCH</th>
-                <td>
-                  <strong>Announced</strong> 2025, August 12<br>
-                  <strong>Status</strong> Available. Released 2025, August 19
-                </td>
-              </tr>
-              <tr>
-                <th class="spec-label">DISPLAY</th>
-                <td>
-                  <strong>Type</strong> AMOLED, 1B colors, HDR10+, 120Hz, 1500 nits (HBM), 5000 nits (peak)<br>
-                  <strong>Size</strong> 6.77 inches, 110.9 cm<sup>2</sup> (~88.1% screen-to-body ratio)<br>
-                  <strong>Resolution</strong> 1080 x 2392 pixels (~388 ppi density)<br>
-                  <strong>Protection</strong> Schott Xensation Core
-                </td>
-              </tr>
-              <tr>
-                <th class="spec-label">PLATFORM</th>
-                <td>
-                  <strong>OS</strong> Android 15, up to 4 major Android upgrades, Funtouch 15<br>
-                  <strong>Chipset</strong> Qualcomm SM7750-AB Snapdragon 7 Gen 4 (4 nm)<br>
-                  <strong>CPU</strong> Octa-core (1x2.8 GHz Cortex-720 & 4x2.4 GHz Cortex-720 & 3x1.8 GHz
-                  Cortex-520)<br>
-                  <strong>GPU</strong> Adreno 722
-                </td>
-              </tr>
-              <tr>
-                <th class="spec-label">MEMORY</th>
-                <td>
-                  <strong>Card slot</strong> No<br>
-                  <strong>Internal</strong> 128GB 8GB RAM, 256GB 8GB RAM, 256GB 12GB RAM, 512GB 12GB RAM, 512GB 16GB
-                  RAM<br>
-                  UFS 2.2
-                </td>
-              </tr>
-              <tr>
-                <th class="spec-label">MAIN CAMERA</th>
-                <td>
-                  <strong>Triple</strong><br>
-                  50 MP, f/1.9, 23mm (wide), 1/1.56", 1.0µm, PDAF, OIS<br>
-                  50 MP, f/2.7, 73mm (periscope telephoto), 1/1.95", 0.8µm, PDAF, OIS, 3x optical zoom<br>
-                  8 MP, f/2.0, 15mm, 120° (ultrawide)<br>
-                  <strong>Features</strong> Zeiss optics, Ring-LED flash, panorama, HDR<br>
-                  <strong>Video</strong> 4K@30fps, 1080p@30fps, gyro-EIS, OIS
-                </td>
-              </tr>
-              <tr>
-                <th class="spec-label">SELFIE CAMERA</th>
-                <td>
-                  <strong>Single</strong> 50 MP, f/2.2, 21mm (wide), 1/2.76", 0.64µm, AF<br>
-                  <strong>Features</strong> Zeiss optics, HDR<br>
-                  <strong>Video</strong> 4K@30fps, 1080p@30fps
-                </td>
-              </tr>
-              <tr>
-                <th class="spec-label">SOUND</th>
-                <td>
-                  <strong>Loudspeaker</strong> Yes, with stereo speakers<br>
-                  <!-- <strong>3.5mm jack</strong> No -->
-                </td>
-              </tr>
-              <tr>
-                <th class="spec-label">COMS</th>
-                <td>
-                  <strong>WLAN</strong> Wi-Fi 802.11 a/b/g/n/ac, dual-band<br>
-                  <strong>bluetooth</strong>5.4, A2DP, LE<br>
-                  <strong>Positioning </strong>GPS, GALILEO, GLONASS, QZSS, BDS, NavIC<br>
-                  <strong>NFC </strong>Yes<br>
-
-                  <strong>Radio </strong>No<br>
-                  <strong>USB </strong>USB Type-C 2.0, OTG<br>
-                </td>
-              </tr>
-              <tr>
-                <th class="spec-label">TESTS</th>
-                <td> <STRong>loudspeaker</STRong> -24.7 LUFS (Very good)</td> <br>
-                <!-- <STRong>3.5mm jack</STRong>No -->
-              </tr>
-              <tr>
-                <th class="spec-label">SELFIE CAMERA</th>
-                <td> <STRong>Single</STRong> 50 MP, f/2.2, 21mm (wide), 1/2.76", 0.64µm, AF</td>
-                <!-- <STRong>Features</STRong> Zeiss optics, HDR <br> -->
-                <!-- <STRong>Video</STRong> 4K@30fps, 1080p@30fps <br> -->
-              </tr>
-              <tr>
-                <th class="spec-label">Battery</th>
-                <td> <strong>Type</strong> Si/C Li-Ion 6500 mAh</td>
-              </tr>
+              <?php if (!empty($deviceSpecs)): ?>
+                <?php foreach ($deviceSpecs as $category => $details): ?>
+                  <tr>
+                    <th class="spec-label"><?php echo strtoupper($category); ?></th>
+                    <td><?php echo $details; ?></td>
+                  </tr>
+                <?php endforeach; ?>
+              <?php else: ?>
+                <!-- Fallback if no database specs available -->
+                <tr>
+                  <th class="spec-label">DEVICE</th>
+                  <td><strong>Name</strong> <?php echo htmlspecialchars($device['name'] ?? 'Unknown Device'); ?><br>
+                    <?php if (isset($device['brand_name'])): ?>
+                      <strong>Brand</strong> <?php echo htmlspecialchars($device['brand_name']); ?>
+                    <?php endif; ?>
+                  </td>
+                </tr>
+              <?php endif; ?>
             </tbody>
           </table>
 
@@ -1001,94 +1438,81 @@ if ($_POST && isset($_POST['submit_comment'])) {
     padding: 6px 19px;"> <strong>Disclaimer:</strong>We can not guarantee that the information on this page is 100%
             correct.</p>
 
-          <div class="d-block d-lg-flex">  <button
-              class="pad">COMPARE</button> 
+          <div class="d-block d-lg-flex"> <button
+              class="pad">COMPARE</button>
           </div>
-          
-          <div class="comments">
-            <h5 class="border-bottom reader  py-3 mx-2">vivo V60 - user opinions and reviews</h5>
+
+          <div class="comments" id="comments">
+            <h5 class="border-bottom reader py-3 mx-2"><?php echo htmlspecialchars(($device['brand_name'] ?? '') . ' ' . ($device['name'] ?? 'Device')); ?> - user opinions and reviews</h5>
+
+            <?php if (isset($success_message)): ?>
+              <div class="alert alert-success mx-2"><?php echo htmlspecialchars($success_message); ?></div>
+            <?php endif; ?>
+
+            <?php if (isset($error_message)): ?>
+              <div class="alert alert-danger mx-2"><?php echo htmlspecialchars($error_message); ?></div>
+            <?php endif; ?>
+
             <div class="first-user" style="background-color: #EDEEEE;">
-              <div class="user-thread">
-                <div class="uavatar">
-                  <img src="https://www.gravatar.com/avatar/e029eb57250a4461ec444c00df28c33e?r=g&amp;s=50" alt="">
+
+              <?php if (!empty($comments)): ?>
+                <?php foreach ($comments as $comment): ?>
+                  <div class="user-thread">
+                    <div class="uavatar">
+                      <?php echo getAvatarDisplay($comment['name'], $comment['email']); ?>
+                    </div>
+                    <ul class="uinfo2">
+                      <li class="uname">
+                        <a href="#" style="color: #555; text-decoration: none;">
+                          <?php echo htmlspecialchars($comment['name']); ?>
+                        </a>
+                      </li>
+                      <li class="upost">
+                        <i class="fa-regular fa-clock fa-sm mx-1"></i>
+                        <?php echo timeAgo($comment['created_at']); ?>
+                      </li>
+                    </ul>
+                    <p class="uopin"><?php echo nl2br(htmlspecialchars($comment['comment'])); ?></p>
+                    <ul class="uinfo">
+                      <li class="ureply" style="list-style: none;">
+                        <span title="Reply to this post">
+                          <p href="#">Reply</p>
+                        </span>
+                      </li>
+                    </ul>
+                  </div>
+                <?php endforeach; ?>
+              <?php else: ?>
+                <div class="user-thread text-center py-4">
+                  <p class="uopin text-muted">No comments yet. Be the first to share your opinion!</p>
                 </div>
-                <ul class="uinfo2">
+              <?php endif; ?>
 
-                  <li class="uname"><a href="" style="color: #555; text-decoration: none;">jiyen235</a>
-                  </li>
-                  <li class="ulocation">
-                    <i class="fa-solid fa-location-dot fa-sm"></i>
-                    <span title="Encoded anonymized location">XNA</span>
-                  </li>
-                  <li class="upost"> <i class="fa-regular fa-clock fa-sm mx-1"></i>7 hours ago</time></li>
-
-                </ul>
-                <p class="uopin">ofc it does, samsung sells phones in every price range</p>
-                <ul class="uinfo">
-                  <li class="ureply" style="list-style: none;">
-                    <span title="Reply to this post">
-                      <p href="">Reply</p>
-                    </span>
-                  </li>
-                </ul>
-
-
+              <!-- Comment Form -->
+              <div class="comment-form mt-4 mx-2 mb-3">
+                <h6 class="mb-3">Share Your Opinion</h6>
+                <form method="POST" action="">
+                  <div class="row">
+                    <div class="col-md-6 mb-3">
+                      <input type="text" class="form-control" name="name" placeholder="Your Name" required value="<?php echo htmlspecialchars($_POST['name'] ?? ''); ?>">
+                    </div>
+                    <div class="col-md-6 mb-3">
+                      <input type="email" class="form-control" name="email" placeholder="Your Email (optional)" value="<?php echo htmlspecialchars($_POST['email'] ?? ''); ?>">
+                    </div>
+                  </div>
+                  <div class="mb-3">
+                    <textarea class="form-control" name="comment" rows="4" placeholder="Share your thoughts about this device..." required><?php echo htmlspecialchars($_POST['comment'] ?? ''); ?></textarea>
+                  </div>
+                  <div class="d-flex justify-content-between align-items-center">
+                    <button type="submit" name="submit_comment" class="button-links">Post Your Opinion</button>
+                    <small class="text-muted">Comments are moderated and will appear after approval.</small>
+                  </div>
+                </form>
               </div>
-              <div class="user-thread">
-                <div class="uavatar">
-                  <img src="https://www.gravatar.com/avatar/e029eb57250a4461ec444c00df28c33e?r=g&amp;s=50" alt="">
-                </div>
-                <ul class="uinfo2">
 
-                  <li class="uname"><a href="" style="color: #555; text-decoration: none;">jiyen235</a>
-                  </li>
-                  <li class="ulocation">
-                    <i class="fa-solid fa-location-dot fa-sm"></i>
-                    <span title="Encoded anonymized location">nyc</span>
-                  </li>
-                  <li class="upost"> <i class="fa-regular fa-clock fa-sm mx-1"></i>15 Minates ago</time>
-                  </li>
-
-                </ul>
-                <p class="uopin">what's your point?</p>
-                <ul class="uinfo">
-                  <li class="ureply" style="list-style: none;">
-                    <span title="Reply to this post">
-                      <p href="">Reply</p>
-                    </span>
-                  </li>
-                </ul>
-              </div>
-              <div class="user-thread">
-                <div class="uavatar">
-                  <span class="avatar-box">D</span>
-                </div>
-                <ul class="uinfo2">
-
-                  <li class="uname"><a href="" style="color: #555; text-decoration: none;">jiyen235</a>
-                  </li>
-                  <li class="ulocation">
-                    <i class="fa-solid fa-location-dot fa-sm"></i>
-                    <span title="Encoded anonymized location">QNA</span>
-                  </li>
-                  <li class="upost"> <i class="fa-regular fa-clock fa-sm mx-1"></i>14 hours ago</time>
-                  </li>
-
-                </ul>
-                <p class="uopin">There are other phone brands bro... Lower the fanboy speak a bit..</p>
-                <ul class="uinfo">
-                  <li class="ureply" style="list-style: none;">
-                    <span title="Reply to this post">
-                      <p href="">Reply</p>
-                    </span>
-                  </li>
-                </ul>
-              </div>
-              <div class="button-secondary-div d-flex justify-content-between align-items-center ">
-                <div class="d-flex">
-                  <button class="button-links">post your opinion</button>
-                </div>
-                <p class="div-last">Total reader comments: <b>34</b> </p>
+              <div class="button-secondary-div d-flex justify-content-between align-items-center">
+                
+                <p class="div-last">Total reader comments: <b><?php echo $commentCount; ?></b></p>
               </div>
             </div>
           </div>
@@ -1100,39 +1524,39 @@ if ($_POST && isset($_POST['submit_comment'])) {
       <!-- Left Section -->
       <div class="col-lg-4 bg-white col-md-5 order-1 order-md-2">
         <div class="mb-4">
-          
+
           <h6 style="border-left: solid 5px grey ;text-transform: uppercase;" class=" fw-bold px-3 text-secondary mt-3">
             RELATED PHONES</h6>
           <div class="cent">
 
             <?php if (empty($devices)): ?>
-                        <div class="text-center py-5">
-                            <i class="fas fa-mobile-alt fa-3x text-muted mb-3"></i>
-                            <h4 class="text-muted">No Devices Available</h4>
-                            <p class="text-muted">Check back later for new devices!</p>
-                        </div>
-                    <?php else: ?>
-                        <?php $chunks = array_chunk($devices, 3); ?>
-                        <?php foreach ($chunks as $row): ?>
-                            <div class="d-flex">
-                                <?php foreach ($row as $i => $device): ?>
-                                    <div class="device-card canel<?php echo $i == 1 ? ' mx-4' : ($i == 0 ? '' : ''); ?>" data-device-id="<?php echo $device['id']; ?>" style="cursor: pointer;">
-                                        <?php if (isset($device['images']) && !empty($device['images'])): ?>
-                                            <img class="shrink" src="<?php echo htmlspecialchars($device['images'][0]); ?>" alt="">
-                                        <?php elseif (isset($device['image']) && !empty($device['image'])): ?>
-                                            <img class="shrink" src="<?php echo htmlspecialchars($device['image']); ?>" alt="">
-                                        <?php else: ?>
-                                            <img class="shrink" src="" alt="">
-                                        <?php endif; ?>
-                                        <p><?php echo htmlspecialchars($device['name'] ?? ''); ?></p>
-                                    </div>
-                                <?php endforeach; ?>
-                                <?php for ($j = count($row); $j < 3; $j++): ?>
-                                    <div class="canel<?php echo $j == 1 ? ' mx-4' : ($j == 0 ? '' : ''); ?>"></div>
-                                <?php endfor; ?>
-                            </div>
-                        <?php endforeach; ?>
-                    <?php endif; ?>
+              <div class="text-center py-5">
+                <i class="fas fa-mobile-alt fa-3x text-muted mb-3"></i>
+                <h4 class="text-muted">No Devices Available</h4>
+                <p class="text-muted">Check back later for new devices!</p>
+              </div>
+            <?php else: ?>
+              <?php $chunks = array_chunk($devices, 3); ?>
+              <?php foreach ($chunks as $row): ?>
+                <div class="d-flex">
+                  <?php foreach ($row as $i => $device): ?>
+                    <div class="device-card canel<?php echo $i == 1 ? ' mx-4' : ($i == 0 ? '' : ''); ?>" data-device-id="<?php echo $device['id']; ?>" style="cursor: pointer;">
+                      <?php if (isset($device['images']) && !empty($device['images'])): ?>
+                        <img class="shrink" src="<?php echo htmlspecialchars($device['images'][0]); ?>" alt="">
+                      <?php elseif (isset($device['image']) && !empty($device['image'])): ?>
+                        <img class="shrink" src="<?php echo htmlspecialchars($device['image']); ?>" alt="">
+                      <?php else: ?>
+                        <img class="shrink" src="" alt="">
+                      <?php endif; ?>
+                      <p><?php echo htmlspecialchars($device['name'] ?? ''); ?></p>
+                    </div>
+                  <?php endforeach; ?>
+                  <?php for ($j = count($row); $j < 3; $j++): ?>
+                    <div class="canel<?php echo $j == 1 ? ' mx-4' : ($j == 0 ? '' : ''); ?>"></div>
+                  <?php endfor; ?>
+                </div>
+              <?php endforeach; ?>
+            <?php endif; ?>
           </div>
         </div>
       </div>
@@ -1183,7 +1607,7 @@ if ($_POST && isset($_POST['submit_comment'])) {
 <script>
   // Enable tooltips
   var tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'))
-  tooltipTriggerList.map(function (tooltipTriggerEl) {
+  tooltipTriggerList.map(function(tooltipTriggerEl) {
     return new bootstrap.Tooltip(tooltipTriggerEl)
   })
 </script>
@@ -1191,154 +1615,155 @@ if ($_POST && isset($_POST['submit_comment'])) {
 <script src="script.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
 
-    <script>
-      // Handle clickable table rows for devices
-        document.addEventListener('DOMContentLoaded', function() {
-            // Handle device row clicks (for views and reviews tables)
-            document.querySelectorAll('.clickable-row').forEach(function(row) {
-                row.addEventListener('click', function() {
-                    const deviceId = this.getAttribute('data-device-id');
-                    if (deviceId) {
-                        // Track the view
-                        fetch('track_device_view.php', {
-                            method: 'POST',
-                            headers: {
-                                'Content-Type': 'application/x-www-form-urlencoded',
-                            },
-                            body: 'device_id=' + encodeURIComponent(deviceId)
-                        });
+<script>
+  // Handle clickable table rows for devices
+  document.addEventListener('DOMContentLoaded', function() {
+    // Handle device row clicks (for views and reviews tables)
+    document.querySelectorAll('.clickable-row').forEach(function(row) {
+      row.addEventListener('click', function() {
+        const deviceId = this.getAttribute('data-device-id');
+        if (deviceId) {
+          // Track the view
+          fetch('track_device_view.php', {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/x-www-form-urlencoded',
+            },
+            body: 'device_id=' + encodeURIComponent(deviceId)
+          });
 
-                        // Show device details modal
-                        showDeviceDetails(deviceId);
-                    }
-                });
-            });
-
-            // Handle device card clicks (for latest devices grid)
-            document.querySelectorAll('.device-card').forEach(function(card) {
-                card.addEventListener('click', function() {
-                    const deviceId = this.getAttribute('data-device-id');
-                    if (deviceId) {
-                        // Track the view
-                        fetch('track_device_view.php', {
-                            method: 'POST',
-                            headers: {
-                                'Content-Type': 'application/x-www-form-urlencoded',
-                            },
-                            body: 'device_id=' + encodeURIComponent(deviceId)
-                        });
-
-                        // Show device details modal
-                        showDeviceDetails(deviceId);
-                    }
-                });
-            });
-
-            // Handle brand cell clicks
-            document.querySelectorAll('.brand-cell').forEach(function(cell) {
-                cell.addEventListener('click', function() {
-                    const brandId = this.getAttribute('data-brand-id');
-                    if (brandId) {
-                        // Redirect to brands page with specific brand filter
-                        window.location.href = `brands.php?brand=${brandId}`;
-                    }
-                });
-            });
-
-            // Handle comparison row clicks
-            document.querySelectorAll('.clickable-comparison').forEach(function(row) {
-                row.addEventListener('click', function() {
-                    const device1Id = this.getAttribute('data-device1-id');
-                    const device2Id = this.getAttribute('data-device2-id');
-                    if (device1Id && device2Id) {
-                        // Track the comparison
-                        fetch('track_device_comparison.php', {
-                            method: 'POST',
-                            headers: {
-                                'Content-Type': 'application/x-www-form-urlencoded',
-                            },
-                            body: 'device1_id=' + encodeURIComponent(device1Id) + '&device2_id=' + encodeURIComponent(device2Id)
-                        });
-
-                        // Redirect to comparison page
-                        window.location.href = `compare_phones.php?phone1=${device1Id}&phone2=${device2Id}`;
-                    }
-                });
-            });
-        });
-
-        // Show post details in modal
-        function showPostDetails(postId) {
-            fetch(`get_post_details.php?id=${postId}`)
-                .then(response => response.text())
-                .then(data => {
-                    window.location.href = `post.php?id=${postId}`;
-                })
-                .catch(error => {
-                    console.error('Error:', error);
-                    alert('Failed to load post details');
-                });
+          // Show device details modal
+          showDeviceDetails(deviceId);
         }
+      });
+    });
 
-        // Show device details in modal
-        function showDeviceDetails(deviceId) {
-            fetch(`get_device_details.php?id=${deviceId}`)
-                .then(response => response.text())
-                .then(data => {
-                    window.location.href = `device.php?id=${deviceId}`;
-                })
-                .catch(error => {
-                    console.error('Error:', error);
-                    alert('Failed to load device details');
-                });
+    // Handle device card clicks (for latest devices grid)
+    document.querySelectorAll('.device-card').forEach(function(card) {
+      card.addEventListener('click', function() {
+        const deviceId = this.getAttribute('data-device-id');
+        if (deviceId) {
+          // Track the view
+          fetch('track_device_view.php', {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/x-www-form-urlencoded',
+            },
+            body: 'device_id=' + encodeURIComponent(deviceId)
+          });
+
+          // Show device details modal
+          showDeviceDetails(deviceId);
         }
+      });
+    });
 
-
-
-        // Auto-dismiss alerts after 5 seconds
-        setTimeout(function() {
-            var alerts = document.querySelectorAll('.alert');
-            alerts.forEach(function(alert) {
-                var bsAlert = new bootstrap.Alert(alert);
-                bsAlert.close();
-            });
-        }, 5000);
-        function openImageModal(imageSrc) {
-            document.getElementById('modalImage').src = imageSrc;
-            new bootstrap.Modal(document.getElementById('imageModal')).show();
+    // Handle brand cell clicks
+    document.querySelectorAll('.brand-cell').forEach(function(cell) {
+      cell.addEventListener('click', function() {
+        const brandId = this.getAttribute('data-brand-id');
+        if (brandId) {
+          // Redirect to brands page with specific brand filter
+          window.location.href = `brands.php?brand=${brandId}`;
         }
+      });
+    });
 
-        function showAllImages() {
-            new bootstrap.Modal(document.getElementById('allImagesModal')).show();
+    // Handle comparison row clicks
+    document.querySelectorAll('.clickable-comparison').forEach(function(row) {
+      row.addEventListener('click', function() {
+        const device1Id = this.getAttribute('data-device1-id');
+        const device2Id = this.getAttribute('data-device2-id');
+        if (device1Id && device2Id) {
+          // Track the comparison
+          fetch('track_device_comparison.php', {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/x-www-form-urlencoded',
+            },
+            body: 'device1_id=' + encodeURIComponent(device1Id) + '&device2_id=' + encodeURIComponent(device2Id)
+          });
+
+          // Redirect to comparison page
+          window.location.href = `compare_phones.php?phone1=${device1Id}&phone2=${device2Id}`;
         }
+      });
+    });
+  });
 
-        // Smooth scroll to comments section
-        document.addEventListener('DOMContentLoaded', function() {
-            const reviewButton = document.querySelector('a[href="#comments"]');
-            if (reviewButton) {
-                reviewButton.addEventListener('click', function(e) {
-                    e.preventDefault();
-                    const commentsSection = document.getElementById('comments');
-                    if (commentsSection) {
-                        commentsSection.scrollIntoView({
-                            behavior: 'smooth',
-                            block: 'start'
-                        });
-                    }
-                });
-            }
-        });
+  // Show post details in modal
+  function showPostDetails(postId) {
+    fetch(`get_post_details.php?id=${postId}`)
+      .then(response => response.text())
+      .then(data => {
+        window.location.href = `post.php?id=${postId}`;
+      })
+      .catch(error => {
+        console.error('Error:', error);
+        alert('Failed to load post details');
+      });
+  }
 
-        // Auto-dismiss alerts
-        setTimeout(function() {
-            const alerts = document.querySelectorAll('.alert');
-            alerts.forEach(function(alert) {
-                if (alert.querySelector('.btn-close')) {
-                    alert.querySelector('.btn-close').click();
-                }
-            });
-        }, 5000);
-    </script>
+  // Show device details in modal
+  function showDeviceDetails(deviceId) {
+    fetch(`get_device_details.php?id=${deviceId}`)
+      .then(response => response.text())
+      .then(data => {
+        window.location.href = `device.php?id=${deviceId}`;
+      })
+      .catch(error => {
+        console.error('Error:', error);
+        alert('Failed to load device details');
+      });
+  }
+
+
+
+  // Auto-dismiss alerts after 5 seconds
+  setTimeout(function() {
+    var alerts = document.querySelectorAll('.alert');
+    alerts.forEach(function(alert) {
+      var bsAlert = new bootstrap.Alert(alert);
+      bsAlert.close();
+    });
+  }, 5000);
+
+  function openImageModal(imageSrc) {
+    document.getElementById('modalImage').src = imageSrc;
+    new bootstrap.Modal(document.getElementById('imageModal')).show();
+  }
+
+  function showAllImages() {
+    new bootstrap.Modal(document.getElementById('allImagesModal')).show();
+  }
+
+  // Smooth scroll to comments section
+  document.addEventListener('DOMContentLoaded', function() {
+    const reviewButton = document.querySelector('a[href="#comments"]');
+    if (reviewButton) {
+      reviewButton.addEventListener('click', function(e) {
+        e.preventDefault();
+        const commentsSection = document.getElementById('comments');
+        if (commentsSection) {
+          commentsSection.scrollIntoView({
+            behavior: 'smooth',
+            block: 'start'
+          });
+        }
+      });
+    }
+  });
+
+  // Auto-dismiss alerts
+  setTimeout(function() {
+    const alerts = document.querySelectorAll('.alert');
+    alerts.forEach(function(alert) {
+      if (alert.querySelector('.btn-close')) {
+        alert.querySelector('.btn-close').click();
+      }
+    });
+  }, 5000);
+</script>
 
 </body>
 
