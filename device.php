@@ -4,7 +4,87 @@
 
 // Database connection
 require_once 'database_functions.php';
+require_once 'phone_data.php';
+
+// Get posts and devices for display (case-insensitive status check) with comment counts
 $pdo = getConnection();
+$posts_stmt = $pdo->prepare("
+    SELECT p.*, 
+    (SELECT COUNT(*) FROM post_comments pc WHERE pc.post_id = p.id AND pc.status = 'approved') as comment_count
+    FROM posts p 
+    WHERE p.status ILIKE 'published' 
+    ORDER BY p.created_at DESC 
+    LIMIT 6
+");
+$posts_stmt->execute();
+$posts = $posts_stmt->fetchAll();
+
+// Get devices from database
+$devices = getAllPhones();
+$devices = array_slice($devices, 0, 6); // Limit to 6 devices for home page
+
+// Add comment counts to devices
+foreach ($devices as $index => $device) {
+    $comment_stmt = $pdo->prepare("SELECT COUNT(*) as count FROM device_comments WHERE device_id = CAST(? AS VARCHAR) AND status = 'approved'");
+    $comment_stmt->execute([$device['id']]);
+    $devices[$index]['comment_count'] = $comment_stmt->fetch()['count'] ?? 0;
+}
+
+// Get data for the three tables
+$topViewedDevices = [];
+$topReviewedDevices = [];
+$topComparisons = [];
+
+// Get top viewed devices
+try {
+    $stmt = $pdo->prepare("
+        SELECT p.*, b.name as brand_name, COUNT(cv.id) as view_count
+        FROM phones p 
+        LEFT JOIN brands b ON p.brand_id = b.id
+        LEFT JOIN content_views cv ON CAST(p.id AS VARCHAR) = cv.content_id AND cv.content_type = 'device'
+        GROUP BY p.id, b.name
+        ORDER BY view_count DESC
+        LIMIT 10
+    ");
+    $stmt->execute();
+    $topViewedDevices = $stmt->fetchAll();
+} catch (Exception $e) {
+    $topViewedDevices = [];
+}
+
+// Get top reviewed devices (by comment count)
+try {
+    $stmt = $pdo->prepare("
+        SELECT p.*, b.name as brand_name, COUNT(dc.id) as review_count
+        FROM phones p 
+        LEFT JOIN brands b ON p.brand_id = b.id
+        LEFT JOIN device_comments dc ON CAST(p.id AS VARCHAR) = dc.device_id AND dc.status = 'approved'
+        GROUP BY p.id, b.name
+        ORDER BY review_count DESC
+        LIMIT 10
+    ");
+    $stmt->execute();
+    $topReviewedDevices = $stmt->fetchAll();
+} catch (Exception $e) {
+    $topReviewedDevices = [];
+}
+
+
+// Get latest 9 devices for the new section
+$latestDevices = getAllPhones();
+$latestDevices = array_slice(array_reverse($latestDevices), 0, 9); // Get latest 9 devices
+
+// Get only brands that have devices for the brands table
+$brands_stmt = $pdo->prepare("
+    SELECT b.*, COUNT(p.id) as device_count 
+    FROM brands b 
+    INNER JOIN phones p ON b.id = p.brand_id 
+    GROUP BY b.id, b.name 
+    ORDER BY b.name ASC 
+    LIMIT 36
+");
+$brands_stmt->execute();
+$brands = $brands_stmt->fetchAll();
 
 // Get device ID from URL
 $device_id = $_GET['id'] ?? '';
@@ -152,430 +232,1077 @@ if ($_POST && isset($_POST['submit_comment'])) {
     }
 }
 ?>
-
 <!DOCTYPE html>
 <html lang="en">
 
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title><?php echo htmlspecialchars($device['name'] ?? 'Device Details'); ?> - Specifications</title>
-    <meta name="description" content="Detailed specifications and features of <?php echo htmlspecialchars($device['name'] ?? ''); ?>">
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
-    <link rel="stylesheet" href="css/styles.css">
-    <style>
-        .device-header {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            color: white;
-            padding: 3rem 0;
-        }
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>GSMArena Single Device Page</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/css/bootstrap.min.css" rel="stylesheet"
+    integrity="sha384-rbsA2VBKQhggwzxH7pPCaAqO46MgnOM80zW1RWuH61DGLwZJEdK2Kadq2F9CUG65" crossorigin="anonymous">
+  <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.6/dist/umd/popper.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/js/bootstrap.bundle.min.js"
+    integrity="sha384-kenU1KFdBIe4zVF0s0G1M5b4hcpxyD9F7jL+jjXkk+Q2h455rYXK/7HAuoJl+0I4"
+    crossorigin="anonymous"></script>
 
-        .device-image {
-            max-width: 100%;
-            height: auto;
-            border-radius: 10px;
-            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
-        }
+  <!-- Font Awesome (for icons) -->
+  <script src="https://kit.fontawesome.com/your-kit-code.js" crossorigin="anonymous"></script>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" />
+  <script>
 
-        .spec-section {
-            background: white;
-            border-radius: 10px;
-            padding: 1.5rem;
-            margin-bottom: 1.5rem;
-            box-shadow: 0 2px 15px rgba(0, 0, 0, 0.1);
-            border-left: 4px solid #667eea;
-        }
+  </script>
 
-        .spec-row {
-            border-bottom: 1px solid #f0f0f0;
-            padding: 0.75rem 0;
-        }
-
-        .spec-row:last-child {
-            border-bottom: none;
-        }
-
-        .spec-label {
-            font-weight: 600;
-            color: #555;
-            min-width: 120px;
-        }
-
-        .spec-value {
-            color: #333;
-        }
-
-        .comment-section {
-            background: #f8f9fa;
-            border-radius: 10px;
-            padding: 2rem;
-            margin-top: 3rem;
-        }
-
-        .comment-item {
-            background: white;
-            border-radius: 8px;
-            padding: 1.5rem;
-            margin-bottom: 1rem;
-            border-left: 4px solid #667eea;
-        }
-
-        .breadcrumb-nav {
-            background: rgba(255, 255, 255, 0.1);
-            border-radius: 50px;
-            padding: 0.5rem 1.5rem;
-            margin-bottom: 2rem;
-        }
-
-        .breadcrumb-nav a {
-            color: rgba(255, 255, 255, 0.8);
-            text-decoration: none;
-        }
-
-        .breadcrumb-nav a:hover {
-            color: white;
-        }
-    </style>
+  <link rel="stylesheet" href="style.css">
 </head>
 
-<body>
-    <!-- Header -->
-    <div class="device-header">
-        <div class="container">
-            <!-- Breadcrumb -->
-            <nav class="breadcrumb-nav">
-                <a href="index.php"><i class="fas fa-home me-2"></i>Home</a>
-                <span class="mx-2 text-white-50">/</span>
-                <span class="text-white"><?php echo htmlspecialchars($device['name'] ?? 'Device'); ?></span>
-            </nav>
+<body style="background-color: #EFEBE9; overflow-x: hidden;">
+  <!-- Desktop Navbar of Gsmarecn -->
+  <div class="main-wrapper">
+    <!-- Top Navbar -->
+    <nav class="navbar navbar-dark  d-lg-inline d-none" id="navbar">
+      <div class="container const d-flex align-items-center justify-content-between">
+        <button class="navbar-toggler mb-2" type="button" onclick="toggleMenu()">
+          <img style="height: 40px;"
+            src="https://cdn.prod.website-files.com/67f21c9d62aa4c4c685a7277/684091b39228b431a556d811_download-removebg-preview.png"
+            alt="">
+        </button>
 
-            <div class="row align-items-center">
-                <div class="col-md-8">
-                    <h1 class="display-4 mb-3"><?php echo htmlspecialchars($device['name'] ?? 'Device Details'); ?></h1>
-                    <p class="lead mb-4">
-                        <?php if (!empty($device['brand'])): ?>
-                            <span class="badge bg-light text-dark me-2"><?php echo htmlspecialchars($device['brand']); ?></span>
-                        <?php endif; ?>
-                        <?php if (!empty($device['category'])): ?>
-                            <span class="badge bg-light text-dark me-2"><?php echo htmlspecialchars($device['category']); ?></span>
-                        <?php endif; ?>
-                        <?php if (!empty($device['launch_date'])): ?>
-                            <span class="badge bg-light text-dark">Released: <?php echo date('M Y', strtotime($device['launch_date'])); ?></span>
-                        <?php endif; ?>
-                    </p>
-                </div>
-                <div class="col-md-4 text-center">
-                    <?php if (!empty($device['image_1'])): ?>
-                        <img src="<?php echo htmlspecialchars($device['image_1']); ?>"
-                            alt="<?php echo htmlspecialchars($device['name'] ?? ''); ?>"
-                            class="device-image">
-                    <?php else: ?>
-                        <div class="device-image bg-light d-flex align-items-center justify-content-center" style="height: 300px;">
-                            <i class="fas fa-mobile-alt fa-5x text-muted"></i>
-                        </div>
-                    <?php endif; ?>
+        <a class="navbar-brand d-flex align-items-center" href="#">
+          <img src="imges/download.png" alt="GSMArena Logo" />
+        </a>
 
-                    <!-- Action Buttons -->
-                    <div class="row mt-3 g-2">
-                        <div class="col-12">
-                            <a href="#comments" class="btn btn-success w-100 mb-2">
-                                <i class="fas fa-comments me-2"></i>
-                                Review/Comments
-                                <span class="badge bg-light text-success ms-2"><?php echo count($comments); ?></span>
-                            </a>
-                        </div>
-                        <div class="col-12">
-                            <button type="button" class="btn btn-info w-100 mb-2" onclick="showAllImages()">
-                                <i class="fas fa-images me-2"></i>Pictures
-                            </button>
-                        </div>
-                        <div class="col-12">
-                            <a href="compare_phones.php?device1=<?php echo urlencode($device['name'] ?? ''); ?>&brand1=<?php echo urlencode($device['brand'] ?? ''); ?>" class="btn btn-warning w-100">
-                                <i class="fas fa-balance-scale me-2"></i>Compare
-                            </a>
-                        </div>
-                    </div>
-                </div>
-            </div>
+        <div class="controvecy mb-2">
+          <div class="icon-container">
+            <button type="button" class="btn border-right" data-bs-toggle="tooltip" data-bs-placement="left"
+              title="YouTube">
+              <img src="iccons/youtube-color-svgrepo-com.svg" alt="YouTube" width="30px">
+            </button>
+
+            <button type="button" class="btn" data-bs-toggle="tooltip" data-bs-placement="left" title="Instagram">
+              <img src="iccons/instagram-color-svgrepo-com.svg" alt="Instagram" width="22px">
+            </button>
+
+            <button type="button" class="btn" data-bs-toggle="tooltip" data-bs-placement="left" title="WiFi">
+              <i class="fa-solid fa-wifi fa-lg" style="color: #ffffff;"></i>
+            </button>
+
+            <button type="button" class="btn" data-bs-toggle="tooltip" data-bs-placement="left" title="Car">
+              <i class="fa-solid fa-car fa-lg" style="color: #ffffff;"></i>
+            </button>
+
+            <button type="button" class="btn" data-bs-toggle="tooltip" data-bs-placement="left" title="Cart">
+              <i class="fa-solid fa-cart-shopping fa-lg" style="color: #ffffff;"></i>
+            </button>
+          </div>
         </div>
-    </div>
 
-    <div class="container my-5">
-        <?php if (isset($success_message)): ?>
-            <div class="alert alert-success alert-dismissible fade show" role="alert">
-                <i class="fas fa-check-circle me-2"></i><?php echo $success_message; ?>
-                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
-            </div>
-        <?php endif; ?>
+        <form action="" class="central d-flex align-items-center">
+          <input type="text" class="no-focus-border" placeholder="Search">
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" height="24" width="24" class="ms-2">
+            <path fill="#ffffff"
+              d="M416 208c0 45.9-14.9 88.3-40 122.7L502.6 457.4c12.5 12.5 12.5 32.8 0 45.3s-32.8 12.5-45.3 0L330.7 376c-34.4 25.2-76.8 40-122.7 40C93.1 416 0 322.9 0 208S93.1 0 208 0S416 93.1 416 208zM208 352a144 144 0 1 0 0-288 144 144 0 1 0 0 288z" />
+          </svg>
+        </form>
 
-        <?php if (isset($error_message)): ?>
-            <div class="alert alert-danger alert-dismissible fade show" role="alert">
-                <i class="fas fa-exclamation-circle me-2"></i><?php echo $error_message; ?>
-                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
-            </div>
-        <?php endif; ?>
+        <div>
+          <button type="button" class="btn mb-2" data-bs-toggle="tooltip" data-bs-placement="left" title="Login">
+            <i class="fa-solid fa-right-to-bracket fa-lg" style="color: #ffffff;"></i>
+          </button>
 
-        <!-- Device Images Gallery -->
-        <?php if (!empty($device['image_2']) || !empty($device['image_3']) || !empty($device['image_4']) || !empty($device['image_5'])): ?>
-            <div class="spec-section">
-                <h3 class="mb-3"><i class="fas fa-images me-2 text-primary"></i>Gallery</h3>
-                <div class="row">
-                    <?php
-                    for ($i = 2; $i <= 5; $i++) {
-                        $image_key = "image_$i";
-                        if (!empty($device[$image_key])):
-                    ?>
-                            <div class="col-md-3 col-sm-6 mb-3">
-                                <img src="<?php echo htmlspecialchars($device[$image_key]); ?>"
-                                    alt="<?php echo htmlspecialchars($device['name'] ?? ''); ?> - Image <?php echo $i; ?>"
-                                    class="img-fluid rounded shadow-sm"
-                                    style="cursor: pointer;"
-                                    onclick="openImageModal(this.src)">
-                            </div>
-                    <?php
-                        endif;
-                    }
-                    ?>
-                </div>
-            </div>
-        <?php endif; ?>
-
-        <!-- Device Specifications -->
-        <?php
-        $spec_sections = [
-            'General Information' => [
-                'name' => 'Name',
-                'brand' => 'Brand',
-                'category' => 'Category',
-                'launch_date' => 'Launch Date',
-                'price' => 'Price',
-                'availability' => 'Availability'
-            ],
-            'Network & Connectivity' => [
-                'network_2g' => '2G Network',
-                'network_3g' => '3G Network',
-                'network_4g' => '4G Network',
-                'network_5g' => '5G Network',
-                'sim_type' => 'SIM Type',
-                'wifi' => 'Wi-Fi',
-                'bluetooth' => 'Bluetooth',
-                'gps' => 'GPS'
-            ],
-            'Design & Display' => [
-                'dimensions' => 'Dimensions',
-                'weight' => 'Weight',
-                'build_materials' => 'Build',
-                'display_type' => 'Display Type',
-                'display_size' => 'Display Size',
-                'resolution' => 'Resolution',
-                'pixel_density' => 'Pixel Density',
-                'refresh_rate' => 'Refresh Rate'
-            ],
-            'Performance' => [
-                'chipset' => 'Chipset',
-                'cpu' => 'CPU',
-                'gpu' => 'GPU',
-                'ram' => 'RAM',
-                'internal_storage' => 'Internal Storage',
-                'expandable_storage' => 'Expandable Storage'
-            ],
-            'Camera System' => [
-                'main_camera' => 'Main Camera',
-                'main_camera_features' => 'Main Camera Features',
-                'main_camera_video' => 'Video Recording',
-                'selfie_camera' => 'Selfie Camera',
-                'selfie_camera_features' => 'Selfie Features',
-                'selfie_camera_video' => 'Selfie Video'
-            ],
-            'Battery & Charging' => [
-                'battery_capacity' => 'Battery Capacity',
-                'battery_type' => 'Battery Type',
-                'charging_wired' => 'Wired Charging',
-                'charging_wireless' => 'Wireless Charging',
-                'charging_reverse' => 'Reverse Charging'
-            ],
-            'Additional Features' => [
-                'operating_system' => 'Operating System',
-                'sensors' => 'Sensors',
-                'audio_features' => 'Audio',
-                'special_features' => 'Special Features',
-                'colors' => 'Available Colors'
-            ]
-        ];
-
-        foreach ($spec_sections as $section_title => $specs):
-            $has_content = false;
-            foreach ($specs as $key => $label) {
-                if (!empty($device[$key])) {
-                    $has_content = true;
-                    break;
-                }
-            }
-
-            if ($has_content):
-        ?>
-                <div class="spec-section">
-                    <h3 class="mb-3 text-primary"><?php echo $section_title; ?></h3>
-                    <?php foreach ($specs as $key => $label): ?>
-                        <?php if (!empty($device[$key])): ?>
-                            <div class="spec-row row">
-                                <div class="col-sm-4 spec-label"><?php echo $label; ?>:</div>
-                                <div class="col-sm-8 spec-value">
-                                    <?php
-                                    $value = $device[$key];
-                                    if ($key === 'launch_date') {
-                                        $value = date('F j, Y', strtotime($value));
-                                    } elseif ($key === 'price') {
-                                        $value = '$' . number_format($value);
-                                    } elseif (is_array($value)) {
-                                        $value = implode(', ', $value);
-                                    }
-                                    echo htmlspecialchars($value);
-                                    ?>
-                                </div>
-                            </div>
-                        <?php endif; ?>
-                    <?php endforeach; ?>
-                </div>
-        <?php
-            endif;
-        endforeach;
-        ?>
-
-        <!-- Comments Section -->
-        <div id="comments" class="comment-section">
-            <h3 class="mb-4"><i class="fas fa-comments me-2"></i>User Reviews & Comments</h3>
-
-            <!-- Comment Form -->
-            <div class="card mb-4">
-                <div class="card-body">
-                    <h5 class="card-title">Leave a Review</h5>
-                    <form method="POST">
-                        <div class="row">
-                            <div class="col-md-6 mb-3">
-                                <label for="name" class="form-label">Name <span class="text-danger">*</span></label>
-                                <input type="text" class="form-control" id="name" name="name" required>
-                            </div>
-                            <div class="col-md-6 mb-3">
-                                <label for="email" class="form-label">Email (optional)</label>
-                                <input type="email" class="form-control" id="email" name="email">
-                            </div>
-                        </div>
-                        <div class="mb-3">
-                            <label for="comment" class="form-label">Your Review <span class="text-danger">*</span></label>
-                            <textarea class="form-control" id="comment" name="comment" rows="4" required placeholder="Share your thoughts about this device..."></textarea>
-                        </div>
-                        <button type="submit" name="submit_comment" class="btn btn-primary">
-                            <i class="fas fa-paper-plane me-2"></i>Submit Review
-                        </button>
-                    </form>
-                </div>
-            </div>
-
-            <!-- Comments List -->
-            <?php if (!empty($comments)): ?>
-                <h5 class="mb-3">User Reviews (<?php echo count($comments); ?>)</h5>
-                <?php foreach ($comments as $comment): ?>
-                    <div class="comment-item">
-                        <div class="d-flex justify-content-between align-items-start mb-2">
-                            <h6 class="mb-0"><?php echo htmlspecialchars($comment['name']); ?></h6>
-                            <small class="text-muted">
-                                <i class="fas fa-clock me-1"></i>
-                                <?php echo date('M j, Y g:i A', strtotime($comment['created_at'])); ?>
-                            </small>
-                        </div>
-                        <p class="mb-0 text-muted"><?php echo nl2br(htmlspecialchars($comment['comment'])); ?></p>
-                    </div>
-                <?php endforeach; ?>
-            <?php else: ?>
-                <p class="text-muted text-center py-4">
-                    <i class="fas fa-comment-slash fa-2x mb-3 d-block"></i>
-                    No reviews yet. Be the first to share your thoughts!
-                </p>
-            <?php endif; ?>
+          <button type="button" class="btn mb-2" data-bs-toggle="tooltip" data-bs-placement="left" title="Register">
+            <i class="fa-solid fa-user-plus fa-lg" style="color: #ffffff;"></i>
+          </button>
         </div>
-    </div>
+      </div>
 
-    <!-- Image Modal -->
-    <div class="modal fade" id="imageModal" tabindex="-1" aria-hidden="true">
-        <div class="modal-dialog modal-lg modal-dialog-centered">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h5 class="modal-title">Device Image</h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                </div>
-                <div class="modal-body text-center">
-                    <img id="modalImage" src="" alt="Device Image" class="img-fluid">
-                </div>
-            </div>
+    </nav>
+
+  </div>
+  <!-- Mobile Navbar of Gsmarecn -->
+  <nav id="navbar" class="mobile-navbar d-lg-none d-flex justify-content-between  align-items-center">
+
+    <button class="navbar-toggler text-white" type="button" data-bs-toggle="collapse" data-bs-target="#mobileMenu"
+      aria-controls="mobileMenu" aria-expanded="false" aria-label="Toggle navigation">
+      <img style="height: 40px;"
+        src="https://cdn.prod.website-files.com/67f21c9d62aa4c4c685a7277/684091b39228b431a556d811_download-removebg-preview.png"
+        alt="">
+    </button>
+    <a class="navbar-brand d-flex align-items-center" href="#">
+      <a class="logo text-white " href="#">GSMArena</a>
+    </a>
+    <div class="d-flex justify-content-end">
+      <button type="button" class="btn float-end ml-5" data-bs-toggle="tooltip" data-bs-placement="left">
+        <i class="fa-solid fa-right-to-bracket fa-lg" style="color: #ffffff;"></i>
+      </button>
+      <button type="button" class="btn float-end " data-bs-toggle="tooltip" data-bs-placement="left">
+        <i class="fa-solid fa-user-plus fa-lg" style="color: #ffffff;"></i>
+      </button>
+    </div>
+  </nav>
+  <!-- Mobile Collapse of Gsmarecn -->
+  <div class="collapse mobile-menu d-lg-none" id="mobileMenu">
+    <div class="menu-icons">
+      <i class="fas fa-home"></i>
+      <i class="fab fa-facebook-f"></i>
+      <i class="fab fa-instagram"></i>
+      <i class="fab fa-tiktok"></i>
+      <i class="fas fa-share-alt"></i>
+    </div>
+    <div class="column">
+      <a href="index.php">Home</a>
+      <a href="news.php">News</a>
+      <a href="rewies.php">Reviews</a>
+      <a href="videos.php">Videos</a>
+      <a href="featured.php">Featured</a>
+      <a href="phonefinder.php">Phone Finder</a>
+      <a href="compare.php">Compare</a>
+      <a href="#">Coverage</a>
+      <a href="contact">Contact Us</a>
+      <a href="#">Merch</a>
+      <a href="#">Tip Us</a>
+      <a href="#">Privacy</a>
+    </div>
+    <div class="brand-grid">
+      <?php
+            $brandChunks = array_chunk($brands, 1); // Create chunks of 1 brand per row
+            foreach ($brandChunks as $brandRow):
+                foreach ($brandRow as $brand): ?>
+                    <a href="#" class="brand-cell" data-brand-id="<?php echo $brand['id']; ?>"><?php echo htmlspecialchars($brand['name']); ?></a>
+            <?php endforeach;
+            endforeach; ?>
+            <a href="brands.php">[...]</a>
+    </div>
+    <div class="menu-buttons d-flex justify-content-center ">
+      <button class="btn btn-danger w-50">📱 Phone Finder</button>
+      <button class="btn btn-primary w-50">📲 My Phone</button>
+    </div>
+  </div>
+  <!-- Display Menu of Gsmarecn -->
+  <div id="leftMenu" class="container show">
+    <div class="row">
+      <div class="col-12 d-flex align-items-center   colums-gap">
+        <a href="index.php" class="nav-link">Home</a>
+        <a href="compare.php" class="nav-link">Compare</a>
+        <a href="videos.php" class="nav-link">Videos</a>
+        <a href="rewies.php" class="nav-link ">Reviews</a>
+        <a href="news.php" class="nav-link d-lg-block d-none">News</a>
+        <a href="featured.php" class="nav-link d-lg-block d-none">Featured</a>
+        <a href="phonefinder.php" class="nav-link d-lg-block d-none">Phone Finder</a>
+        <a href="contact.php" class="nav-link d-lg-block d-none">Contact</a>
+        <div style="background-color: #d50000; border-radius: 7px;" class="d-lg-none py-2"><svg
+            xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" height="16" width="16" class="mx-3">
+            <path fill="#ffffff"
+              d="M416 208c0 45.9-14.9 88.3-40 122.7L502.6 457.4c12.5 12.5 12.5 32.8 0 45.3s-32.8 12.5-45.3 0L330.7 376c-34.4 25.2-76.8 40-122.7 40C93.1 416 0 322.9 0 208S93.1 0 208 0S416 93.1 416 208zM208 352a144 144 0 1 0 0-288 144 144 0 1 0 0 288z" />
+          </svg></div>
+      </div>
+    </div>
+  </div>
+  <style>
+    span {
+      font-family: 'oswald';
+      color: black;
+      font-size: 12px;
+      font-weight: 300;
+    }
+
+    .stat-item {
+      align-items: center;
+      height: 98px;
+      width: 131px;
+      justify-content: center;
+      align-items: center;
+      flex-direction: column;
+      display: flex;
+      margin: 5px 0 12px;
+      border-left: 1px solid #ccc;
+      float: left;
+      padding: 0px 10px;
+      text-shadow: 1px 1px 0px hsla(0, 0%, 100%, .4) !important;
+
+      position: relative;
+      z-index: 1;
+    }
+
+    /* Desktop (side by side) */
+    .specs-table tr {
+      display: grid;
+      grid-template-columns: 200px 1fr;
+      /* left fixed, right flexible */
+    }
+
+    /* Mobile (stack) */
+    @media (max-width: 768px) {
+      .specs-table tr {
+        grid-template-columns: 1fr;
+        /* single column */
+      }
+    }
+
+    .spec-title {
+      font-weight: 400;
+      font-family: 'oswald';
+      font-size: 1.5rem;
+      color: black;
+    }
+
+    .stat-item {
+      /* padding: 24px; */
+      border-left: 1px solid hsla(0, 0%, 100%, .5);
+    }
+
+    .spec-item {
+      padding: 20px;
+      display: flex;
+      row-gap: 8px;
+      flex-direction: column;
+      align-items: baseline;
+      justify-content: space-around;
+    }
+
+    .stat-item :nth-child(1) {
+      font-size: 1.6rem;
+      font-weight: 600;
+      text-shadow: 1px 1px 1px rgba(0, 0, 0, .4);
+    }
+
+    .stat-item :nth-child(2) {
+      font-family: 'oswald';
+      text-shadow: 1px 1px 1px rgba(0, 0, 0, .4);
+    }
+
+    .bg-blur {
+      position: relative;
+      z-index: 1;
+    }
+
+    .bg-blur::before {
+      content: "";
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      /* background: linear-gradient(135deg, rgba(107, 115, 255, 0.7), rgba(0, 13, 255, 0.7)); */
+      filter: blur(8px);
+      z-index: 0;
+      border-radius: 8px;
+    }
+
+    .bg-blur>* {
+      position: relative;
+      z-index: 2;
+    }
+
+
+    .spec-subtitle {
+      font-family: 'oswald';
+      font-weight: 100;
+      font-size: 14px;
+      color: black;
+    }
+
+
+    .card-header {
+      position: relative;
+      overflow: hidden;
+    }
+
+    .card-header::before {
+      content: "";
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: inherit;
+      /* same background lega */
+      filter: blur(5px);
+      z-index: 1;
+    }
+
+    .card-header * {
+      position: relative;
+      z-index: 2;
+      /* content clear dikhayega */
+    }
+
+    .vr-hide {
+      float: left;
+      padding-left: 10px;
+      font: 300 28px / 47px Google-Oswald, Arial, sans-serif;
+      text-shadow: none;
+      color: #fff;
+      margin-bottom: 0px;
+      margin-top: -2px;
+    }
+
+    .phone-image:after {
+      content: "";
+      position: absolute;
+      top: 0;
+      left: 165px;
+      width: 229px;
+      height: 100%;
+      background: linear-gradient(90deg, #fff 0%, #fcfeff 2%, rgba(125, 185, 232, 0));
+      z-index: 1;
+    }
+
+    .phone-image {
+      display: block;
+      height: -webkit-fill-available;
+      width: 165px;
+      position: relative;
+      z-index: 2;
+      background: #fff;
+    }
+
+    tr {
+      background-color: white;
+      margin-bottom: 10px;
+    }
+
+    table td,
+    table th {
+      vertical-align: top;
+      padding: 8px 12px;
+      font-family: Arial, sans-serif;
+      font-size: 14px;
+      line-height: 1.5;
+    }
+
+    table tbody tr {
+      background-color: white;
+      border-bottom: 1px solid #ddd;
+    }
+
+    table tbody tr:last-child {
+      border-bottom: none;
+    }
+
+    .spec-label {
+      width: 120px;
+      color: #d50000;
+      font-weight: 400;
+      text-transform: uppercase;
+    }
+
+    td strong {
+      display: inline-block;
+
+      width: 90px;
+      font-weight: 600;
+    }
+  </style>
+
+
+  <div class="d-lg-none d-block">
+    <div class="card" role="region" aria-label="Vivo V60 Phone Info">
+
+      <div class="article-info">
+        <div class="bg-blur">
+          <p class="vr-hide"
+            style=" font-family: 'oswald'; text-transform: capitalize; text-shadow: 1px 1px 2px rgba(0, 0, 0, .4);">
+            vivo V60
+          </p>
+          <svg class="float-end mx-3 mt-1" xmlns="http://www.w3.org/2000/svg" height="34" width="34"
+            viewBox="0 0 640 640"><!--!Font Awesome Free v7.0.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free Copyright 2025 Fonticons, Inc.-->
+            <path fill="#ffffff"
+              d="M448 256C501 256 544 213 544 160C544 107 501 64 448 64C395 64 352 107 352 160C352 165.4 352.5 170.8 353.3 176L223.6 248.1C206.7 233.1 184.4 224 160 224C107 224 64 267 64 320C64 373 107 416 160 416C184.4 416 206.6 406.9 223.6 391.9L353.3 464C352.4 469.2 352 474.5 352 480C352 533 395 576 448 576C501 576 544 533 544 480C544 427 501 384 448 384C423.6 384 401.4 393.1 384.4 408.1L254.7 336C255.6 330.8 256 325.5 256 320C256 314.5 255.5 309.2 254.7 304L384.4 231.9C401.3 246.9 423.6 256 448 256z" />
+          </svg>
         </div>
-    </div>
+      </div>
+      <div class="d-lg-flex  d-block" style="align-items: flex-start; ">
 
-    <!-- All Images Modal -->
-    <div class="modal fade" id="allImagesModal" tabindex="-1" aria-hidden="true">
-        <div class="modal-dialog modal-xl modal-dialog-centered">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h5 class="modal-title">
-                        <i class="fas fa-images me-2"></i>
-                        All Images - <?php echo htmlspecialchars($device['name'] ?? ''); ?>
-                    </h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        <!-- Left: Phone Image -->
+        <div class="phone-image me-3 pt-2 px-2">
+          <img style="    height: -webkit-fill-available;
+    width: 100%;
+    padding: 12px;" src="https://fdn2.gsmarena.com/vv/bigpic/vivo-v60.jpg" alt="vivo V60 phone image" />
+        </div>
+
+        <!-- Right: Details + Stats + Specs -->
+        <div class="flex-grow-1 position-relative" style="z-index: 100;">
+
+          <!-- Phone Details + Stats -->
+          <div class="d-flex justify-content-between mb-3">
+
+            <ul class="phone-details d-lg-block d-none list-unstyled mb-0">
+              <li><span>📅 Released 2025, August 19</span></li>
+              <li><span>⚖️ 192g or 201g, 7.5mm thickness</span></li>
+              <li><span>🆔 Android 15, up to 4 major upgrades</span></li>
+              <li><span>💾 128GB/256GB/512GB storage, no card slot</span></li>
+            </ul>
+
+            <div class="d-flex stats-bar text-center">
+              <div class="stat-item">
+                <div>53%</div>
+                <div class="stat-label">605,568 HITS</div>
+              </div>
+              <div class="stat-item">
+                <div> <i class="fa-solid fa-heart fa-md" style="color: #ffffff;"></i> 80</div>
+                <div class="stat-label">BECOME A FAN</div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Specs Row (aligned with image) -->
+           <div class="row text-center d-block g-0  pt-2 specs-bar">
+                <div class="col-3 spec-item">
+                  <img src="imges/vrer.png" style="width: 25px;" alt="">
+
+                  <div class="spec-title"> 6.77"</div>
+                  <div class="spec-subtitle">1080x2392 px</div>
                 </div>
-                <div class="modal-body">
-                    <div class="row g-3">
-                        <?php
-                        // Collect all available images
-                        $all_images = [];
-                        for ($i = 1; $i <= 5; $i++) {
-                            $image_key = "image_$i";
-                            if (!empty($device[$image_key])) {
-                                $all_images[] = $device[$image_key];
-                            }
-                        }
+                <div class="col-3 spec-item border-start">
+                  <img src="imges/bett-removebg-preview.png" style="width: 35px;" alt="">
 
-                        // Also check the images array if it exists
-                        if (!empty($device['images']) && is_array($device['images'])) {
-                            foreach ($device['images'] as $image) {
-                                if (!in_array($image, $all_images)) {
-                                    $all_images[] = str_replace('\\', '/', $image);
-                                }
-                            }
-                        }
+                  <div class="spec-title">50MP</div>
+                  <div class="spec-subtitle">2160p</div>
+                </div>
+                <div class="col-3 spec-item border-start">
+                  <img src="imges/encypt-removebg-preview.png" style="width: 38px;" alt="">
 
-                        if (!empty($all_images)):
-                            foreach ($all_images as $index => $image_url):
+                  <div class="spec-title">8-16GB</div>
+                  <div class="spec-subtitle">Snapdragon 7</div>
+                </div>
+                <div class="col-3 spec-item border-start">
+                  <img src="imges/lowtry-removebg-preview.png" style="width: 35px;" alt="">
+
+                  <div class="spec-title">6500mAh</div>
+                  <div class="spec-subtitle">90W</div>
+                </div>
+              </div>
+
+        </div>
+      </div>
+      <div class="article-info">
+        <div class="bg-blur">
+          <div class="d-lg-none d-block justify-content-end">
+            <div class="d-flex flexiable mt-2">
+              <img src="/imges/download-removebg-preview.png" alt="">
+              <h5 style="font-family:'oswald' ; font-size: 16px" class="mt-2">Review (17)
+              </h5>
+            </div>
+            <div class="d-flex flexiable mt-2">
+              <img src="/imges/download-removebg-preview.png" alt="">
+              <h5 style="font-family:'oswald' ; font-size: 16px;" class="mt-2">OPINION </h5>
+            </div>
+            <div class="d-flex flexiable mt-2">
+              <img src="/imges/download-removebg-preview.png" alt="">
+              <h5 style="font-family:'oswald' ; font-size: 16px;" class="mt-2">COMPARE </h5>
+            </div>
+            <div class="d-flex flexiable mt-2">
+              <img src="/imges/download-removebg-preview.png" alt="">
+              <h5 style="font-family:'oswald' ; font-size: 16px;" class="mt-2">PICTURES </h5>
+            </div>
+            <div class="d-flex flexiable mt-2">
+              <img src="/imges/download-removebg-preview.png" alt="">
+              <h5 style="font-family:'oswald' ; font-size: 16 px;" class="mt-2">PRICES</h5>
+            </div>
+          </div>
+
+
+        </div>
+      </div>
+
+    </div>
+  </div>
+  <div class="container d-lg-block d-none">
+    <div class="row">
+      <div class="article-info">
+        <div class="bg-blur">
+          <div class="d-block justify-content-end">
+            <div class="d-flex flexiable ">
+              <img src="/imges/download-removebg-preview.png" alt="">
+              <h5 style="font-family:'oswald' ; font-size: 16px" class="mt-2">Review (17)
+              </h5>
+            </div>
+            <div class="d-flex flexiable ">
+              <img src="/imges/download-removebg-preview.png" alt="">
+              <h5 style="font-family:'oswald' ; font-size: 16px;" class="mt-2">OPINION </h5>
+            </div>
+            <div class="d-flex flexiable ">
+              <img src="/imges/download-removebg-preview.png" alt="">
+              <h5 style="font-family:'oswald' ; font-size: 16px;" class="mt-2">COMPARE </h5>
+            </div>
+            <div class="d-flex flexiable ">
+              <img src="/imges/download-removebg-preview.png" alt="">
+              <h5 style="font-family:'oswald' ; font-size: 16px;" class="mt-2">PICTURES </h5>
+            </div>
+            <div class="d-flex flexiable ">
+              <img src="/imges/download-removebg-preview.png" alt="">
+              <h5 style="font-family:'oswald' ; font-size: 16 px;" class="mt-2">PRICES</h5>
+            </div>
+          </div>
+
+
+        </div>
+      </div>
+
+    </div>
+  </div>
+  <div class="container  d-lg-block d-none support content-wrapper" id="Top"
+    style=" margin-top: 2rem; padding-left: 0;">
+    <div class="row">
+      <div class="col-md-8 ">
+        <div class="card" role="region" aria-label="Vivo V60 Phone Info">
+
+          <div class="article-info">
+            <div class="bg-blur">
+              <p class="vr-hide"
+                style=" font-family: 'oswald'; text-transform: capitalize; text-shadow: 1px 1px 2px rgba(0, 0, 0, .4);">
+                vivo V60
+              </p>
+              <svg class="float-end mx-3 mt-1" xmlns="http://www.w3.org/2000/svg" height="34" width="34"
+                viewBox="0 0 640 640"><!--!Font Awesome Free v7.0.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free Copyright 2025 Fonticons, Inc.-->
+                <path fill="#ffffff"
+                  d="M448 256C501 256 544 213 544 160C544 107 501 64 448 64C395 64 352 107 352 160C352 165.4 352.5 170.8 353.3 176L223.6 248.1C206.7 233.1 184.4 224 160 224C107 224 64 267 64 320C64 373 107 416 160 416C184.4 416 206.6 406.9 223.6 391.9L353.3 464C352.4 469.2 352 474.5 352 480C352 533 395 576 448 576C501 576 544 533 544 480C544 427 501 384 448 384C423.6 384 401.4 393.1 384.4 408.1L254.7 336C255.6 330.8 256 325.5 256 320C256 314.5 255.5 309.2 254.7 304L384.4 231.9C401.3 246.9 423.6 256 448 256z" />
+              </svg>
+            </div>
+          </div>
+          <div class="d-flex" style="align-items: flex-start;">
+
+            <!-- Left: Phone Image -->
+            <div class="phone-image me-3 pt-2 px-2">
+              <img style="    height: -webkit-fill-available;
+    width: 100%;
+    padding: 12px;" src="https://fdn2.gsmarena.com/vv/bigpic/vivo-v60.jpg" alt="vivo V60 phone image" />
+            </div>
+
+            <!-- Right: Details + Stats + Specs -->
+            <div class="flex-grow-1 position-relative" style="z-index: 100;">
+
+              <!-- Phone Details + Stats -->
+              <div class="d-flex justify-content-between mb-3">
+
+                <ul class="phone-details list-unstyled mb-0 d-lg-block d-none">
+                  <li><span>📅 Released 2025, August 19</span></li>
+                  <li><span>⚖️ 192g or 201g, 7.5mm thickness</span></li>
+                  <li><span>🆔 Android 15, up to 4 major upgrades</span></li>
+                  <li><span>💾 128GB/256GB/512GB storage, no card slot</span></li>
+                </ul>
+
+                <div class="d-flex stats-bar text-center">
+                  <div class="stat-item">
+                    <div>53%</div>
+                    <div class="stat-label">605,568 HITS</div>
+                  </div>
+                  <div class="stat-item">
+                    <div> <i class="fa-solid fa-heart fa-md" style="color: #ffffff;"></i> 80</div>
+                    <div class="stat-label">BECOME A FAN</div>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Specs Row (aligned with image) -->
+              <div class="row text-center g-0  pt-2 specs-bar">
+                <div class="col-3 spec-item">
+                  <img src="imges/vrer.png" style="width: 25px;" alt="">
+
+                  <div class="spec-title"> 6.77"</div>
+                  <div class="spec-subtitle">1080x2392 px</div>
+                </div>
+                <div class="col-3 spec-item border-start">
+                  <img src="imges/bett-removebg-preview.png" style="width: 35px;" alt="">
+
+                  <div class="spec-title">50MP</div>
+                  <div class="spec-subtitle">2160p</div>
+                </div>
+                <div class="col-3 spec-item border-start">
+                  <img src="imges/encypt-removebg-preview.png" style="width: 38px;" alt="">
+
+                  <div class="spec-title">8-16GB</div>
+                  <div class="spec-subtitle">Snapdragon 7</div>
+                </div>
+                <div class="col-3 spec-item border-start">
+                  <img src="imges/lowtry-removebg-preview.png" style="width: 35px;" alt="">
+
+                  <div class="spec-title">6500mAh</div>
+                  <div class="spec-subtitle">90W</div>
+                </div>
+              </div>
+
+            </div>
+          </div>
+          <div class="article-info">
+            <div class="bg-blur">
+              <div class="d-flex justify-content-end">
+                <div class="d-flex flexiable ">
+                  <img src="/imges/download-removebg-preview.png" alt="">
+                  <h5 style="font-family:'oswald' ; font-size: 16px" class="mt-2">Review (17)
+                  </h5>
+                </div>
+                <div class="d-flex flexiable ">
+                  <img src="/imges/download-removebg-preview.png" alt="">
+                  <h5 style="font-family:'oswald' ; font-size: 16px;" class="mt-2">OPINION </h5>
+                </div>
+                <div class="d-flex flexiable ">
+                  <img src="/imges/download-removebg-preview.png" alt="">
+                  <h5 style="font-family:'oswald' ; font-size: 16px;" class="mt-2">COMPARE </h5>
+                </div>
+                <div class="d-flex flexiable ">
+                  <img src="/imges/download-removebg-preview.png" alt="">
+                  <h5 style="font-family:'oswald' ; font-size: 16px;" class="mt-2">PICTURES </h5>
+                </div>
+                <div class="d-flex flexiable ">
+                  <img src="/imges/download-removebg-preview.png" alt="">
+                  <h5 style="font-family:'oswald' ; font-size: 16 px;" class="mt-2">PRICES</h5>
+                </div>
+              </div>
+
+
+            </div>
+          </div>
+
+        </div>
+
+
+      </div>
+      <div class="col-md-4 col-5 d-none d-lg-block" style="position: relative; left: 25px;">
+        <button class="solid w-100 py-2">
+          <i class="fa-solid fa-mobile fa-sm mx-2" style="color: white;"></i>
+          Phone Finder</button>
+        <div class="devor">
+          <?php
+                    if (empty($brands)): ?>
+                        <button class="px-3 py-1" style="cursor: default;" disabled>No brands available.</button>
+                        <?php else:
+                        $brandChunks = array_chunk($brands, 1); // Create chunks of 1 brand per row
+                        foreach ($brandChunks as $brandRow):
+                            foreach ($brandRow as $brand):
                         ?>
-                                <div class="col-md-4 col-sm-6 mb-3">
-                                    <div class="position-relative">
-                                        <img src="<?php echo htmlspecialchars($image_url); ?>"
-                                            alt="<?php echo htmlspecialchars($device['name'] ?? ''); ?> - Image <?php echo $index + 1; ?>"
-                                            class="img-fluid rounded shadow-sm"
-                                            style="cursor: pointer; width: 100%; height: 200px; object-fit: cover;"
-                                            onclick="openImageModal('<?php echo htmlspecialchars($image_url); ?>')">
-                                        <div class="position-absolute top-0 end-0 bg-dark bg-opacity-75 text-white px-2 py-1 rounded-bottom-start">
-                                            <?php echo $index + 1; ?>
-                                        </div>
-                                    </div>
-                                </div>
-                            <?php
+                                <button class="px-3 py-1 brand-cell" style="cursor: pointer;" data-brand-id="<?php echo $brand['id']; ?>"><?php echo htmlspecialchars($brand['name']); ?></button>
+                    <?php
                             endforeach;
-                        else:
-                            ?>
-                            <div class="col-12 text-center py-5">
-                                <i class="fas fa-image fa-3x text-muted mb-3"></i>
-                                <p class="text-muted">No additional images available for this device.</p>
-                            </div>
-                        <?php endif; ?>
-                    </div>
-                </div>
-            </div>
+                        endforeach;
+                    endif;
+                    ?>
         </div>
+        <button class="solid w-50 py-2">
+          <i class="fa-solid fa-bars fa-sm mx-2"></i>
+          All Brands</button>
+        <button class="solid py-2" style="    width: 177px;">
+          <i class="fa-solid fa-volume-high fa-sm mx-2"></i>
+          RUMORS MILL</button>
+      </div>
     </div>
 
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
+  </div>
+
+  <div class="container my-2" style="
+    padding-left: 0;
+    padding-right: -2px;">
+    <div class="row">
+      <div class="col-lg-8 col-md-7 order-2 order-md-1">
+        <div class="bg-white">
+
+
+          <table class="table forat">
+            <tbody>
+              <tr>
+                <th class="spec-label">NETWORK</th>
+                <td><strong>Technology</strong> GSM / HSPA / LTE / 5G</td>
+              </tr>
+              <tr>
+                <th class="spec-label">LAUNCH</th>
+                <td>
+                  <strong>Announced</strong> 2025, August 12<br>
+                  <strong>Status</strong> Available. Released 2025, August 19
+                </td>
+              </tr>
+              <tr>
+                <th class="spec-label">DISPLAY</th>
+                <td>
+                  <strong>Type</strong> AMOLED, 1B colors, HDR10+, 120Hz, 1500 nits (HBM), 5000 nits (peak)<br>
+                  <strong>Size</strong> 6.77 inches, 110.9 cm<sup>2</sup> (~88.1% screen-to-body ratio)<br>
+                  <strong>Resolution</strong> 1080 x 2392 pixels (~388 ppi density)<br>
+                  <strong>Protection</strong> Schott Xensation Core
+                </td>
+              </tr>
+              <tr>
+                <th class="spec-label">PLATFORM</th>
+                <td>
+                  <strong>OS</strong> Android 15, up to 4 major Android upgrades, Funtouch 15<br>
+                  <strong>Chipset</strong> Qualcomm SM7750-AB Snapdragon 7 Gen 4 (4 nm)<br>
+                  <strong>CPU</strong> Octa-core (1x2.8 GHz Cortex-720 & 4x2.4 GHz Cortex-720 & 3x1.8 GHz
+                  Cortex-520)<br>
+                  <strong>GPU</strong> Adreno 722
+                </td>
+              </tr>
+              <tr>
+                <th class="spec-label">MEMORY</th>
+                <td>
+                  <strong>Card slot</strong> No<br>
+                  <strong>Internal</strong> 128GB 8GB RAM, 256GB 8GB RAM, 256GB 12GB RAM, 512GB 12GB RAM, 512GB 16GB
+                  RAM<br>
+                  UFS 2.2
+                </td>
+              </tr>
+              <tr>
+                <th class="spec-label">MAIN CAMERA</th>
+                <td>
+                  <strong>Triple</strong><br>
+                  50 MP, f/1.9, 23mm (wide), 1/1.56", 1.0µm, PDAF, OIS<br>
+                  50 MP, f/2.7, 73mm (periscope telephoto), 1/1.95", 0.8µm, PDAF, OIS, 3x optical zoom<br>
+                  8 MP, f/2.0, 15mm, 120° (ultrawide)<br>
+                  <strong>Features</strong> Zeiss optics, Ring-LED flash, panorama, HDR<br>
+                  <strong>Video</strong> 4K@30fps, 1080p@30fps, gyro-EIS, OIS
+                </td>
+              </tr>
+              <tr>
+                <th class="spec-label">SELFIE CAMERA</th>
+                <td>
+                  <strong>Single</strong> 50 MP, f/2.2, 21mm (wide), 1/2.76", 0.64µm, AF<br>
+                  <strong>Features</strong> Zeiss optics, HDR<br>
+                  <strong>Video</strong> 4K@30fps, 1080p@30fps
+                </td>
+              </tr>
+              <tr>
+                <th class="spec-label">SOUND</th>
+                <td>
+                  <strong>Loudspeaker</strong> Yes, with stereo speakers<br>
+                  <!-- <strong>3.5mm jack</strong> No -->
+                </td>
+              </tr>
+              <tr>
+                <th class="spec-label">COMS</th>
+                <td>
+                  <strong>WLAN</strong> Wi-Fi 802.11 a/b/g/n/ac, dual-band<br>
+                  <strong>bluetooth</strong>5.4, A2DP, LE<br>
+                  <strong>Positioning </strong>GPS, GALILEO, GLONASS, QZSS, BDS, NavIC<br>
+                  <strong>NFC </strong>Yes<br>
+
+                  <strong>Radio </strong>No<br>
+                  <strong>USB </strong>USB Type-C 2.0, OTG<br>
+                </td>
+              </tr>
+              <tr>
+                <th class="spec-label">TESTS</th>
+                <td> <STRong>loudspeaker</STRong> -24.7 LUFS (Very good)</td> <br>
+                <!-- <STRong>3.5mm jack</STRong>No -->
+              </tr>
+              <tr>
+                <th class="spec-label">SELFIE CAMERA</th>
+                <td> <STRong>Single</STRong> 50 MP, f/2.2, 21mm (wide), 1/2.76", 0.64µm, AF</td>
+                <!-- <STRong>Features</STRong> Zeiss optics, HDR <br> -->
+                <!-- <STRong>Video</STRong> 4K@30fps, 1080p@30fps <br> -->
+              </tr>
+              <tr>
+                <th class="spec-label">Battery</th>
+                <td> <strong>Type</strong> Si/C Li-Ion 6500 mAh</td>
+              </tr>
+            </tbody>
+          </table>
+
+          <p style="font-size: 13px;
+    text-transform: capitalize;
+    padding: 6px 19px;"> <strong>Disclaimer:</strong>We can not guarantee that the information on this page is 100%
+            correct.</p>
+
+          <div class="d-block d-lg-flex">  <button
+              class="pad">COMPARE</button> 
+          </div>
+          
+          <div class="comments">
+            <h5 class="border-bottom reader  py-3 mx-2">vivo V60 - user opinions and reviews</h5>
+            <div class="first-user" style="background-color: #EDEEEE;">
+              <div class="user-thread">
+                <div class="uavatar">
+                  <img src="https://www.gravatar.com/avatar/e029eb57250a4461ec444c00df28c33e?r=g&amp;s=50" alt="">
+                </div>
+                <ul class="uinfo2">
+
+                  <li class="uname"><a href="" style="color: #555; text-decoration: none;">jiyen235</a>
+                  </li>
+                  <li class="ulocation">
+                    <i class="fa-solid fa-location-dot fa-sm"></i>
+                    <span title="Encoded anonymized location">XNA</span>
+                  </li>
+                  <li class="upost"> <i class="fa-regular fa-clock fa-sm mx-1"></i>7 hours ago</time></li>
+
+                </ul>
+                <p class="uopin">ofc it does, samsung sells phones in every price range</p>
+                <ul class="uinfo">
+                  <li class="ureply" style="list-style: none;">
+                    <span title="Reply to this post">
+                      <p href="">Reply</p>
+                    </span>
+                  </li>
+                </ul>
+
+
+              </div>
+              <div class="user-thread">
+                <div class="uavatar">
+                  <img src="https://www.gravatar.com/avatar/e029eb57250a4461ec444c00df28c33e?r=g&amp;s=50" alt="">
+                </div>
+                <ul class="uinfo2">
+
+                  <li class="uname"><a href="" style="color: #555; text-decoration: none;">jiyen235</a>
+                  </li>
+                  <li class="ulocation">
+                    <i class="fa-solid fa-location-dot fa-sm"></i>
+                    <span title="Encoded anonymized location">nyc</span>
+                  </li>
+                  <li class="upost"> <i class="fa-regular fa-clock fa-sm mx-1"></i>15 Minates ago</time>
+                  </li>
+
+                </ul>
+                <p class="uopin">what's your point?</p>
+                <ul class="uinfo">
+                  <li class="ureply" style="list-style: none;">
+                    <span title="Reply to this post">
+                      <p href="">Reply</p>
+                    </span>
+                  </li>
+                </ul>
+              </div>
+              <div class="user-thread">
+                <div class="uavatar">
+                  <span class="avatar-box">D</span>
+                </div>
+                <ul class="uinfo2">
+
+                  <li class="uname"><a href="" style="color: #555; text-decoration: none;">jiyen235</a>
+                  </li>
+                  <li class="ulocation">
+                    <i class="fa-solid fa-location-dot fa-sm"></i>
+                    <span title="Encoded anonymized location">QNA</span>
+                  </li>
+                  <li class="upost"> <i class="fa-regular fa-clock fa-sm mx-1"></i>14 hours ago</time>
+                  </li>
+
+                </ul>
+                <p class="uopin">There are other phone brands bro... Lower the fanboy speak a bit..</p>
+                <ul class="uinfo">
+                  <li class="ureply" style="list-style: none;">
+                    <span title="Reply to this post">
+                      <p href="">Reply</p>
+                    </span>
+                  </li>
+                </ul>
+              </div>
+              <div class="button-secondary-div d-flex justify-content-between align-items-center ">
+                <div class="d-flex">
+                  <button class="button-links">post your opinion</button>
+                </div>
+                <p class="div-last">Total reader comments: <b>34</b> </p>
+              </div>
+            </div>
+          </div>
+
+          <img src="https://fdn.gsmarena.com/imgroot/static/banners/self/review-pixel-9-pro-xl-728x90.jpg" alt="">
+        </div>
+      </div>
+
+      <!-- Left Section -->
+      <div class="col-lg-4 bg-white col-md-5 order-1 order-md-2">
+        <div class="mb-4">
+          
+          <h6 style="border-left: solid 5px grey ;text-transform: uppercase;" class=" fw-bold px-3 text-secondary mt-3">
+            RELATED PHONES</h6>
+          <div class="cent">
+
+            <?php if (empty($devices)): ?>
+                        <div class="text-center py-5">
+                            <i class="fas fa-mobile-alt fa-3x text-muted mb-3"></i>
+                            <h4 class="text-muted">No Devices Available</h4>
+                            <p class="text-muted">Check back later for new devices!</p>
+                        </div>
+                    <?php else: ?>
+                        <?php $chunks = array_chunk($devices, 3); ?>
+                        <?php foreach ($chunks as $row): ?>
+                            <div class="d-flex">
+                                <?php foreach ($row as $i => $device): ?>
+                                    <div class="device-card canel<?php echo $i == 1 ? ' mx-4' : ($i == 0 ? '' : ''); ?>" data-device-id="<?php echo $device['id']; ?>" style="cursor: pointer;">
+                                        <?php if (isset($device['images']) && !empty($device['images'])): ?>
+                                            <img class="shrink" src="<?php echo htmlspecialchars($device['images'][0]); ?>" alt="">
+                                        <?php elseif (isset($device['image']) && !empty($device['image'])): ?>
+                                            <img class="shrink" src="<?php echo htmlspecialchars($device['image']); ?>" alt="">
+                                        <?php else: ?>
+                                            <img class="shrink" src="" alt="">
+                                        <?php endif; ?>
+                                        <p><?php echo htmlspecialchars($device['name'] ?? ''); ?></p>
+                                    </div>
+                                <?php endforeach; ?>
+                                <?php for ($j = count($row); $j < 3; $j++): ?>
+                                    <div class="canel<?php echo $j == 1 ? ' mx-4' : ($j == 0 ? '' : ''); ?>"></div>
+                                <?php endfor; ?>
+                            </div>
+                        <?php endforeach; ?>
+                    <?php endif; ?>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+  <div id="bottom" class="container d-flex mt-3" style="max-width: 1034px;">
+    <div class="row align-items-center">
+      <div class="col-md-2 m-auto col-4 d-flex justify-content-center align-items-center "> <img
+          src="https://fdn2.gsmarena.com/w/css/logo-gsmarena-com.png" alt="">
+      </div>
+      <div class="col-10 nav-wrap m-auto text-center ">
+        <div class="nav-container">
+          <a href="#">Home</a>
+          <a href="#">News</a>
+          <a href="#">Reviews</a>
+          <a href="#">Compare</a>
+          <a href="#">Coverage</a>
+          <a href="#">Glossary</a>
+          <a href="#">FAQ</a>
+          <a href="#"> <i class="fa-solid fa-wifi fa-sm"></i> RSS</a>
+          <a href="#"> <i class="fa-brands fa-youtube fa-sm"></i> YouTube</a>
+          <a href="#"> <i class="fa-brands fa-instagram fa-sm"></i> Instagram</a>
+          <a href="#"> <i class="fa-brands fa-tiktok fa-sm"></i>TikTok</a>
+          <a href="#"> <i class="fa-brands fa-facebook-f fa-sm"></i> Facebook</a>
+          <a href="#"> <i class="fa-brands fa-twitter fa-sm"></i>Twitter</a>
+          <a href="#">© 2000-2025 GSMArena.com</a>
+          <a href="#">Mobile version</a>
+          <a href="#">Android app</a>
+          <a href="#">Tools</a>
+          <a href="contact.php">Contact us</a>
+          <a href="#">Merch store</a>
+          <a href="#">Privacy</a>
+          <a href="#">Terms of use</a>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+
+</html>
+
+
+<!-- Bootstrap JS Bundle (Popper + Bootstrap JS) -->
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha3/dist/js/bootstrap.bundle.min.js"></script>
+<script>
+  // Enable tooltips
+  var tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'))
+  tooltipTriggerList.map(function (tooltipTriggerEl) {
+    return new bootstrap.Tooltip(tooltipTriggerEl)
+  })
+</script>
+
+<script src="script.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
+
     <script>
+      // Handle clickable table rows for devices
+        document.addEventListener('DOMContentLoaded', function() {
+            // Handle device row clicks (for views and reviews tables)
+            document.querySelectorAll('.clickable-row').forEach(function(row) {
+                row.addEventListener('click', function() {
+                    const deviceId = this.getAttribute('data-device-id');
+                    if (deviceId) {
+                        // Track the view
+                        fetch('track_device_view.php', {
+                            method: 'POST',
+                            headers: {
+                                'Content-Type': 'application/x-www-form-urlencoded',
+                            },
+                            body: 'device_id=' + encodeURIComponent(deviceId)
+                        });
+
+                        // Show device details modal
+                        showDeviceDetails(deviceId);
+                    }
+                });
+            });
+
+            // Handle device card clicks (for latest devices grid)
+            document.querySelectorAll('.device-card').forEach(function(card) {
+                card.addEventListener('click', function() {
+                    const deviceId = this.getAttribute('data-device-id');
+                    if (deviceId) {
+                        // Track the view
+                        fetch('track_device_view.php', {
+                            method: 'POST',
+                            headers: {
+                                'Content-Type': 'application/x-www-form-urlencoded',
+                            },
+                            body: 'device_id=' + encodeURIComponent(deviceId)
+                        });
+
+                        // Show device details modal
+                        showDeviceDetails(deviceId);
+                    }
+                });
+            });
+
+            // Handle brand cell clicks
+            document.querySelectorAll('.brand-cell').forEach(function(cell) {
+                cell.addEventListener('click', function() {
+                    const brandId = this.getAttribute('data-brand-id');
+                    if (brandId) {
+                        // Redirect to brands page with specific brand filter
+                        window.location.href = `brands.php?brand=${brandId}`;
+                    }
+                });
+            });
+
+            // Handle comparison row clicks
+            document.querySelectorAll('.clickable-comparison').forEach(function(row) {
+                row.addEventListener('click', function() {
+                    const device1Id = this.getAttribute('data-device1-id');
+                    const device2Id = this.getAttribute('data-device2-id');
+                    if (device1Id && device2Id) {
+                        // Track the comparison
+                        fetch('track_device_comparison.php', {
+                            method: 'POST',
+                            headers: {
+                                'Content-Type': 'application/x-www-form-urlencoded',
+                            },
+                            body: 'device1_id=' + encodeURIComponent(device1Id) + '&device2_id=' + encodeURIComponent(device2Id)
+                        });
+
+                        // Redirect to comparison page
+                        window.location.href = `compare_phones.php?phone1=${device1Id}&phone2=${device2Id}`;
+                    }
+                });
+            });
+        });
+
+        // Show post details in modal
+        function showPostDetails(postId) {
+            fetch(`get_post_details.php?id=${postId}`)
+                .then(response => response.text())
+                .then(data => {
+                    window.location.href = `post.php?id=${postId}`;
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                    alert('Failed to load post details');
+                });
+        }
+
+        // Show device details in modal
+        function showDeviceDetails(deviceId) {
+            fetch(`get_device_details.php?id=${deviceId}`)
+                .then(response => response.text())
+                .then(data => {
+                    window.location.href = `device.php?id=${deviceId}`;
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                    alert('Failed to load device details');
+                });
+        }
+
+
+
+        // Auto-dismiss alerts after 5 seconds
+        setTimeout(function() {
+            var alerts = document.querySelectorAll('.alert');
+            alerts.forEach(function(alert) {
+                var bsAlert = new bootstrap.Alert(alert);
+                bsAlert.close();
+            });
+        }, 5000);
         function openImageModal(imageSrc) {
             document.getElementById('modalImage').src = imageSrc;
             new bootstrap.Modal(document.getElementById('imageModal')).show();
@@ -612,6 +1339,7 @@ if ($_POST && isset($_POST['submit_comment'])) {
             });
         }, 5000);
     </script>
+
 </body>
 
 </html>
