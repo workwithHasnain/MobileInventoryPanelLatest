@@ -1,3 +1,237 @@
+<?php
+// Device Details - Public page for viewing individual device specifications
+// No authentication required
+
+// Database connection
+require_once 'database_functions.php';
+require_once 'phone_data.php';
+
+// Get posts and devices for display (case-insensitive status check) with comment counts
+$pdo = getConnection();
+$posts_stmt = $pdo->prepare("
+    SELECT p.*, 
+    (SELECT COUNT(*) FROM post_comments pc WHERE pc.post_id = p.id AND pc.status = 'approved') as comment_count
+    FROM posts p 
+    WHERE p.status ILIKE 'published' 
+    ORDER BY p.created_at DESC 
+    LIMIT 6
+");
+$posts_stmt->execute();
+$posts = $posts_stmt->fetchAll();
+
+// Get devices from database
+$devices = getAllPhones();
+$devices = array_slice($devices, 0, 6); // Limit to 6 devices for home page
+
+// Add comment counts to devices
+foreach ($devices as $index => $device) {
+    $comment_stmt = $pdo->prepare("SELECT COUNT(*) as count FROM device_comments WHERE device_id = CAST(? AS VARCHAR) AND status = 'approved'");
+    $comment_stmt->execute([$device['id']]);
+    $devices[$index]['comment_count'] = $comment_stmt->fetch()['count'] ?? 0;
+}
+
+// Get data for the three tables
+$topViewedDevices = [];
+$topReviewedDevices = [];
+$topComparisons = [];
+
+// Get top viewed devices
+try {
+    $stmt = $pdo->prepare("
+        SELECT p.*, b.name as brand_name, COUNT(cv.id) as view_count
+        FROM phones p 
+        LEFT JOIN brands b ON p.brand_id = b.id
+        LEFT JOIN content_views cv ON CAST(p.id AS VARCHAR) = cv.content_id AND cv.content_type = 'device'
+        GROUP BY p.id, b.name
+        ORDER BY view_count DESC
+        LIMIT 10
+    ");
+    $stmt->execute();
+    $topViewedDevices = $stmt->fetchAll();
+} catch (Exception $e) {
+    $topViewedDevices = [];
+}
+
+// Get top reviewed devices (by comment count)
+try {
+    $stmt = $pdo->prepare("
+        SELECT p.*, b.name as brand_name, COUNT(dc.id) as review_count
+        FROM phones p 
+        LEFT JOIN brands b ON p.brand_id = b.id
+        LEFT JOIN device_comments dc ON CAST(p.id AS VARCHAR) = dc.device_id AND dc.status = 'approved'
+        GROUP BY p.id, b.name
+        ORDER BY review_count DESC
+        LIMIT 10
+    ");
+    $stmt->execute();
+    $topReviewedDevices = $stmt->fetchAll();
+} catch (Exception $e) {
+    $topReviewedDevices = [];
+}
+
+
+// Get latest 9 devices for the new section
+$latestDevices = getAllPhones();
+$latestDevices = array_slice(array_reverse($latestDevices), 0, 9); // Get latest 9 devices
+
+// Get only brands that have devices for the brands table
+$brands_stmt = $pdo->prepare("
+    SELECT b.*, COUNT(p.id) as device_count 
+    FROM brands b 
+    INNER JOIN phones p ON b.id = p.brand_id 
+    GROUP BY b.id, b.name 
+    ORDER BY b.name ASC 
+    LIMIT 36
+");
+$brands_stmt->execute();
+$brands = $brands_stmt->fetchAll();
+
+// Get device ID from URL
+$device_id = $_GET['id'] ?? '';
+
+if (!isset($_GET['id']) || $_GET['id'] === '') {
+    header("Location: index.php");
+    exit();
+}
+
+// Function to get device details
+function getDeviceDetails($pdo, $device_id)
+{
+    // Try JSON files first (primary data source for now)
+    $phones_json = 'data/phones.json';
+    if (file_exists($phones_json)) {
+        $phones_data = json_decode(file_get_contents($phones_json), true);
+
+        // JSON stores as array, so search by index
+        if (is_array($phones_data)) {
+            // Use numeric index as device ID
+            // Convert string ID to integer for array access
+            $numeric_id = is_numeric($device_id) ? (int)$device_id : $device_id;
+            if (isset($phones_data[$numeric_id])) {
+                $device = $phones_data[$numeric_id];
+
+                // Add computed fields for compatibility
+                $device['id'] = $device_id;
+                $device['image_1'] = $device['image'] ?? '';
+
+                // Fix image paths
+                if (isset($device['image'])) {
+                    $device['image_1'] = str_replace('\\', '/', $device['image']);
+                }
+
+                // Handle multiple images
+                if (!empty($device['images'])) {
+                    for ($i = 0; $i < count($device['images']) && $i < 5; $i++) {
+                        $device['image_' . ($i + 1)] = str_replace('\\', '/', $device['images'][$i]);
+                    }
+                }
+
+                return $device;
+            }
+        }
+    }
+
+    // Fallback to database if JSON fails
+    try {
+        $stmt = $pdo->prepare("
+            SELECT p.*, b.name as brand_name, c.name as chipset_name 
+            FROM phones p 
+            LEFT JOIN brands b ON p.brand_id = b.id 
+            LEFT JOIN chipsets c ON p.chipset_id = c.id 
+            WHERE p.id = ?
+        ");
+        $stmt->execute([$device_id]);
+        $device = $stmt->fetch(PDO::FETCH_ASSOC);
+
+        return $device;
+    } catch (PDOException $e) {
+        error_log("Database error: " . $e->getMessage());
+        return null;
+    }
+}
+
+// Function to get device comments
+function getDeviceComments($pdo, $device_id)
+{
+    try {
+        $stmt = $pdo->prepare("
+            SELECT * FROM device_comments 
+            WHERE device_id = ? AND status = 'approved'
+            ORDER BY created_at DESC
+        ");
+        $stmt->execute([$device_id]);
+        return $stmt->fetchAll(PDO::FETCH_ASSOC);
+    } catch (PDOException $e) {
+        return [];
+    }
+}
+
+// Function to track view
+function trackDeviceView($pdo, $device_id, $ip_address)
+{
+    try {
+        $today = date('Y-m-d');
+
+        // Check if this IP already viewed this device today
+        $stmt = $pdo->prepare("
+            SELECT COUNT(*) as count 
+            FROM content_views 
+            WHERE content_id = ? AND content_type = 'device' AND ip_address = ? AND DATE(viewed_at) = ?
+        ");
+        $stmt->execute([$device_id, $ip_address, $today]);
+        $result = $stmt->fetch(PDO::FETCH_ASSOC);
+
+        if ($result['count'] == 0) {
+            // Insert new view record
+            $stmt = $pdo->prepare("
+                INSERT INTO content_views (content_id, content_type, ip_address, viewed_at) 
+                VALUES (?, 'device', ?, NOW())
+            ");
+            $stmt->execute([$device_id, $ip_address]);
+        }
+    } catch (PDOException $e) {
+        error_log("View tracking error: " . $e->getMessage());
+    }
+}
+
+// Get device details
+$device = getDeviceDetails($pdo, $device_id);
+
+if (!$device) {
+    header("Location: 404.php");
+    exit();
+}
+
+// Track view
+$ip_address = $_SERVER['REMOTE_ADDR'] ?? 'unknown';
+trackDeviceView($pdo, $device_id, $ip_address);
+
+// Get comments
+$comments = getDeviceComments($pdo, $device_id);
+
+// Handle comment submission
+if ($_POST && isset($_POST['submit_comment'])) {
+    $name = trim($_POST['name'] ?? '');
+    $email = trim($_POST['email'] ?? '');
+    $comment = trim($_POST['comment'] ?? '');
+
+    if (!empty($name) && !empty($comment)) {
+        try {
+            $stmt = $pdo->prepare("
+                INSERT INTO device_comments (device_id, name, email, comment, status, created_at) 
+                VALUES (?, ?, ?, ?, 'pending', NOW())
+            ");
+            $stmt->execute([$device_id, $name, $email, $comment]);
+
+            $success_message = "Thank you! Your comment has been submitted and is awaiting approval.";
+        } catch (PDOException $e) {
+            $error_message = "Error submitting comment. Please try again.";
+        }
+    } else {
+        $error_message = "Please fill in all required fields.";
+    }
+}
+?>
 <!DOCTYPE html>
 <html lang="en">
 
@@ -131,18 +365,14 @@
       <a href="#">Privacy</a>
     </div>
     <div class="brand-grid">
-      <a href="#">Samsung</a>
-      <a href="#">Xiaomi</a>
-      <a href="#">OnePlus</a>
-      <a href="#">Google</a>
-      <a href="#">Apple</a>
-      <a href="#">Sony</a>
-      <a href="#">Motorola</a>
-      <a href="#">Vivo</a>
-      <a href="#">Huawei</a>
-      <a href="#">Honor</a>
-      <a href="#">Oppo</a>
-      <a href="#">[...]</a>
+      <?php
+            $brandChunks = array_chunk($brands, 1); // Create chunks of 1 brand per row
+            foreach ($brandChunks as $brandRow):
+                foreach ($brandRow as $brand): ?>
+                    <a href="#" class="brand-cell" data-brand-id="<?php echo $brand['id']; ?>"><?php echo htmlspecialchars($brand['name']); ?></a>
+            <?php endforeach;
+            endforeach; ?>
+            <a href="brands.php">[...]</a>
     </div>
     <div class="menu-buttons d-flex justify-content-center ">
       <button class="btn btn-danger w-50">📱 Phone Finder</button>
@@ -635,42 +865,20 @@
           <i class="fa-solid fa-mobile fa-sm mx-2" style="color: white;"></i>
           Phone Finder</button>
         <div class="devor">
-          <button class="px-3 py-1 ">Sumsung</button>
-          <button class="px-3 py-1 ">Xiaomi</button>
-          <button class="px-3 py-1 ">Asus</button>
-          <button class="px-3 py-1 ">Infinix</button>
-          <button class="px-3 py-1 ">Apple</button>
-          <button class="px-3 py-1 ">Google</button>
-          <button class="px-3 py-1 ">AlCatel</button>
-          <button class="px-3 py-1 ">Ulefone</button>
-          <button class="px-3 py-1 ">Huawei</button>
-          <button class="px-3 py-1 ">Honor</button>
-          <button class="px-3 py-1 ">Zte</button>
-          <button class="px-3 py-1 ">Tecno</button>
-          <button class="px-3 py-1 ">Nokia</button>
-          <button class="px-3 py-1 ">Oppo</button>
-          <button class="px-3 py-1 ">Microsoft </button>
-          <button class="px-3 py-1 ">Dooge</button>
-          <button class="px-3 py-1 ">Sony</button>
-          <button class="px-3 py-1 ">Realme</button>
-          <button class="px-3 py-1 ">Unidegi</button>
-          <button class="px-3 py-1 ">Blackview</button>
-          <button class="px-3 py-1 ">Lg </button>
-          <button class="px-3 py-1 ">OnePlus</button>
-          <button class="px-3 py-1 ">Coolpad</button>
-          <button class="px-3 py-1 ">Cubot</button>
-          <button class="px-3 py-1 ">HTc</button>
-          <button class="px-3 py-1 ">Nothing</button>
-          <button class="px-3 py-1 ">Oscal</button>
-          <button class="px-3 py-1 ">oukitel</button>
-          <button class="px-3 py-1 ">Motrola</button>
-          <button class="px-3 py-1 ">Vivo</button>
-          <button class="px-3 py-1 ">Shrap</button>
-          <button class="px-3 py-1 ">Itel</button>
-          <button class="px-3 py-1 ">Lenovo</button>
-          <button class="px-3 py-1 ">meizu</button>
-          <button class="px-3 py-1 ">Micromax</button>
-          <button class="px-3 py-1 ">Tcl</button>
+          <?php
+                    if (empty($brands)): ?>
+                        <button class="px-3 py-1" style="cursor: default;" disabled>No brands available.</button>
+                        <?php else:
+                        $brandChunks = array_chunk($brands, 1); // Create chunks of 1 brand per row
+                        foreach ($brandChunks as $brandRow):
+                            foreach ($brandRow as $brand):
+                        ?>
+                                <button class="px-3 py-1 brand-cell" style="cursor: pointer;" data-brand-id="<?php echo $brand['id']; ?>"><?php echo htmlspecialchars($brand['name']); ?></button>
+                    <?php
+                            endforeach;
+                        endforeach;
+                    endif;
+                    ?>
         </div>
         <button class="solid w-50 py-2">
           <i class="fa-solid fa-bars fa-sm mx-2"></i>
@@ -790,60 +998,13 @@
 
           <p style="font-size: 13px;
     text-transform: capitalize;
-    padding: 6px 19px;"> <strong>Disclaimer</strong>. We can not guarantee that the information on this page is 100%
-            correct. Read more</p>
+    padding: 6px 19px;"> <strong>Disclaimer:</strong>We can not guarantee that the information on this page is 100%
+            correct.</p>
 
-          <div class="d-block d-lg-flex">
-            <button class="pad">REVIEW</button> <button class="pad">OPINION</button> <button
-              class="pad">COMPARE</button> <button class="pad">PICTURES</button> <button class="pad">PRICES</button>
+          <div class="d-block d-lg-flex">  <button
+              class="pad">COMPARE</button> 
           </div>
-          <table class="pricing inline widget" style="    border: unset;
-    border-left: 10px solid #17819f;">
-
-            <caption class="d-flex">
-
-              <h6 class="d-flex justify-content-between mx-3" style="font-size: 25px; font-weight: 600;">Pricing
-                <span data-bs-toggle="tooltip" title="Info" class="text-muted" style="cursor:pointer;"> &nbsp;
-                  &#9432;</span>
-              </h6>
-            </caption>
-            <tbody>
-              <tr>
-                <td style="vertical-align: middle;">128GB 8GB RAM</td>
-                <td><a>₹&thinsp;36,999</a><img alt="" style="height: 30px; margin-left: 12px;"
-                    src="https://fdn.gsmarena.com/imgroot/static/stores/amazon-co-in1.png"></td>
-              </tr>
-              <tr>
-                <td style="vertical-align: middle;">256GB 8GB RAM</td>
-
-                <td><a>₹&thinsp;38,999</a><img alt="" style="    height: 30px; margin-left: 12px;"
-                    src="https://fdn.gsmarena.com/imgroot/static/stores/amazon-co-in1.png"></td>
-
-                <td></td>
-              </tr>
-              <tr>
-                <td style="vertical-align: middle;">256GB 12GB RAM</td>
-
-                <td><a>₹&thinsp;40,999</a><img alt="" style="    height: 30px; margin-left: 12px;"
-                    src="https://fdn.gsmarena.com/imgroot/static/stores/amazon-co-in1.png"></td>
-
-                <td></td>
-              </tr>
-
-
-            </tbody>
-
-          </table>
-          <div class="review-widget d-flex my-4">
-            <img class="" src="https://fdn.gsmarena.com/imgroot/reviews/25/vivo-v60/-1220x526/gsmarena_001.jpg" alt="">
-            <div class="side">
-              <h3 class="text-white">vivo V60 review</h3>
-              <p>
-                The vivo V-series has long been about bringing premium-looking smartphones with a strong camera focus to
-                the mid-range market, and the new V60 carries that mission forward. As the successor to... </p>
-              <button class="red-button">READ</button>
-            </div>
-          </div>
+          
           <div class="comments">
             <h5 class="border-bottom reader  py-3 mx-2">vivo V60 - user opinions and reviews</h5>
             <div class="first-user" style="background-color: #EDEEEE;">
@@ -925,7 +1086,6 @@
               </div>
               <div class="button-secondary-div d-flex justify-content-between align-items-center ">
                 <div class="d-flex">
-                  <button class="button-links">read all optnions</button>
                   <button class="button-links">post your opinion</button>
                 </div>
                 <p class="div-last">Total reader comments: <b>34</b> </p>
@@ -940,137 +1100,40 @@
       <!-- Left Section -->
       <div class="col-lg-4 bg-white col-md-5 order-1 order-md-2">
         <div class="mb-4">
-          <img style="width: 100%;"
-            src="https://fdn.gsmarena.com/imgroot/static/banners/self/review-galaxy-a56-300x250.jpg" alt="vivo V60"
-            class="img-fluid" />
-          <h6
-            style="border-left: solid 5px grey ; color: #555; text-transform: uppercase; font-weight: 900; margin-top: 12px;"
-            class="px-3">Prices</h6>
-          <div class="price-section">
-            <h6 class="d-flex justify-content-between">vivo V60
-              <span data-bs-toggle="tooltip" title="Info" class="text-muted" style="cursor:pointer;">&#9432;</span>
-            </h6>
-            <!-- Price items -->
-            <div class="price-item">
-              <div><strong style="font-size: 14px;">128GB 8GB RAM</strong></div>
-              <div class="d-flex align-items-center mt-2 justify-content-between">
-                <img src="https://upload.wikimedia.org/wikipedia/commons/a/a9/Amazon_logo.svg" alt="amazon"
-                  class="amazon-logo" />
-                <div class="price-amount">₹ 36,999</div>
-              </div>
-            </div>
-            <div class="price-item">
-              <div><strong style="font-size: 14px;">256GB 8GB RAM</strong></div>
-              <div class="d-flex align-items-center mt-2 justify-content-between">
-                <img src="https://upload.wikimedia.org/wikipedia/commons/a/a9/Amazon_logo.svg" alt="amazon"
-                  class="amazon-logo" />
-                <div class="price-amount">₹ 38,999</div>
-              </div>
-            </div>
-            <div class="price-item">
-              <div><strong style="font-size: 14px;">256GB 12GB RAM</strong></div>
-              <div class="d-flex align-items-center mt-2  justify-content-between">
-                <img src="https://upload.wikimedia.org/wikipedia/commons/a/a9/Amazon_logo.svg" alt="amazon"
-                  class="amazon-logo" />
-                <div class="price-amount">₹ 40,999</div>
-              </div>
-            </div>
-            <button class="pad">SHOW ALL PRICES</button>
-          </div>
-          <h6
-            style="border-left: solid 5px grey ; color: #555; text-transform: uppercase; font-weight: 900; margin-top: 12px;"
-            class="px-3">VIVO V60 IN THE </h6>
-
-          <div class="news d-flex mt-2">
-            <img src="https://fdn.gsmarena.com/imgroot/news/25/08/vivo-v60-going-global/-184x111/gsmarena_000.jpg"
-              alt="" style="width: 99px;">
-            <h6 class="new-heading">
-              vivo V60 launches internationally, starting with Malaysia, Taiwan and Vietnam26 <strong class="rs"> <i
-                  class="fa-regular fa-clock fa-rotate-90 fa-sm" style="color: #444;"></i> Aug 2025</strong>
-            </h6>
-          </div>
-          <div class="news d-flex mt-2">
-            <img src="https://fdn.gsmarena.com/imgroot/news/25/08/vivo-t4-pro-official/-184x111/gsmarena_001.jpg" alt=""
-              style="width: 99px;">
-            <h6 class="new-heading">
-              vivo V60 launches internationally, starting with Malaysia, Taiwan and Vietnam26 <strong class="rs"> <i
-                  class="fa-regular fa-clock fa-rotate-90 fa-sm" style="color: #444;"></i>Aug 2025</strong>
-            </h6>
-          </div>
-          <div class="news d-flex mt-2">
-            <img src="https://fdn.gsmarena.com/imgroot/news/25/08/vivo-v60-lite-geekbench/-184x111/gsmarena_000.jpg"
-              alt="" style="width: 99px;">
-            <h6 class="new-heading">
-              vivo V60 launches internationally, starting with Malaysia, Taiwan and Vietnam26 <strong class="rs"> <i
-                  class="fa-regular fa-clock fa-rotate-90 fa-sm" style="color: #444;"></i> Aug 2025</strong>
-            </h6>
-          </div>
-          <div class="news d-flex mt-2">
-            <img
-              src="https://fdn.gsmarena.com/imgroot/news/25/08/vivo-t4-pro-key-specs-launch-date/-184x111/gsmarena_001.jpg"
-              alt="" style="width: 99px;">
-            <h6 class="new-heading">
-              vivo V60 launches internationally, starting with Malaysia, Taiwan and Vietnam26 <strong class="rs"> <i
-                  class="fa-regular fa-clock fa-rotate-90 fa-sm" style="color: #444;"></i> Aug 2025</strong>
-            </h6>
-          </div>
+          
           <h6 style="border-left: solid 5px grey ;text-transform: uppercase;" class=" fw-bold px-3 text-secondary mt-3">
             RELATED PHONES</h6>
           <div class="cent">
 
-            <div class="d-flex">
-              <div class="canel">
-                <img class="shrink" src="https://fdn2.gsmarena.com/vv/bigpic/vivoiy300-gt.jpg" alt="">
-                <p>Vivo y300 Gt</p>
-              </div>
-              <div class="canel mx-4">
-                <img class="shrink" src="https://fdn2.gsmarena.com/vv/bigpic/samsung-galaxy-m56-5g.jpg" alt="">
-                <p>Sumsung Galaxy f56</p>
-              </div>
-              <div class="canel ">
-                <img class="shrink" src="https://fdn2.gsmarena.com/vv/bigpic/vivo-x200-pro-mini.jpg" alt="">
-                <p>Vivo x200 FE</p>
-              </div>
-            </div>
-            <div class="d-flex">
-              <div class="canel">
-                <img class="shrink" src="https://fdn2.gsmarena.com/vv/bigpic/vivo-x-fold3.jpg" alt="">
-                <p>Vivo X Fold5</p>
-              </div>
-              <div class="canel mx-4">
-                <img class="shrink" src="https://fdn2.gsmarena.com/vv/bigpic/itel-a90.jpg" alt="">
-                <p>Itel A90</p>
-              </div>
-              <div class="canel ">
-                <img class="shrink" src="https://fdn2.gsmarena.com/vv/bigpic/oscal-pad-100.jpg" alt="">
-                <p>OScal pad 100</p>
-              </div>
-            </div>
-            <div class="d-flex">
-              <div class="canel">
-                <img class="shrink" src="https://fdn2.gsmarena.com/vv/bigpic/itel-city-100.jpg" alt="">
-                <p>itel city 100</p>
-              </div>
-              <div class="canel mx-4">
-                <img class="shrink" src="https://fdn2.gsmarena.com/vv/bigpic/motorola-edge-60-fusion.jpg" alt="">
-                <p>Motorla Edge 60</p>
-              </div>
-              <div class="canel ">
-                <img class="shrink" src="https://fdn2.gsmarena.com/vv/bigpic/sony-xperia-1-vi-red.jpg" alt="">
-                <p>Song xperia -1 VII</p>
-              </div>
-            </div>
+            <?php if (empty($devices)): ?>
+                        <div class="text-center py-5">
+                            <i class="fas fa-mobile-alt fa-3x text-muted mb-3"></i>
+                            <h4 class="text-muted">No Devices Available</h4>
+                            <p class="text-muted">Check back later for new devices!</p>
+                        </div>
+                    <?php else: ?>
+                        <?php $chunks = array_chunk($devices, 3); ?>
+                        <?php foreach ($chunks as $row): ?>
+                            <div class="d-flex">
+                                <?php foreach ($row as $i => $device): ?>
+                                    <div class="device-card canel<?php echo $i == 1 ? ' mx-4' : ($i == 0 ? '' : ''); ?>" data-device-id="<?php echo $device['id']; ?>" style="cursor: pointer;">
+                                        <?php if (isset($device['images']) && !empty($device['images'])): ?>
+                                            <img class="shrink" src="<?php echo htmlspecialchars($device['images'][0]); ?>" alt="">
+                                        <?php elseif (isset($device['image']) && !empty($device['image'])): ?>
+                                            <img class="shrink" src="<?php echo htmlspecialchars($device['image']); ?>" alt="">
+                                        <?php else: ?>
+                                            <img class="shrink" src="" alt="">
+                                        <?php endif; ?>
+                                        <p><?php echo htmlspecialchars($device['name'] ?? ''); ?></p>
+                                    </div>
+                                <?php endforeach; ?>
+                                <?php for ($j = count($row); $j < 3; $j++): ?>
+                                    <div class="canel<?php echo $j == 1 ? ' mx-4' : ($j == 0 ? '' : ''); ?>"></div>
+                                <?php endfor; ?>
+                            </div>
+                        <?php endforeach; ?>
+                    <?php endif; ?>
           </div>
-          <h6 style="border-left: solid 5px grey ;text-transform: uppercase;" class=" fw-bold px-3 text-secondary mt-3">
-            vivo v60 reviews</h6>
-          <img src="https://fdn.gsmarena.com/imgroot/reviews/25/vivo-v60/-347x151/gsmarena_001.jpg" alt="">
-          <div class="vivo-div">
-            <strong>VIVO V60 REVIEW</strong>
-          </div>
-
-          <img style="width: 100%;"
-            src="https://fdn.gsmarena.com/imgroot/static/banners/self/review-galaxy-s24-fe-300x250.jpg" alt="">
-
         </div>
       </div>
 
@@ -1126,6 +1189,156 @@
 </script>
 
 <script src="script.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
+
+    <script>
+      // Handle clickable table rows for devices
+        document.addEventListener('DOMContentLoaded', function() {
+            // Handle device row clicks (for views and reviews tables)
+            document.querySelectorAll('.clickable-row').forEach(function(row) {
+                row.addEventListener('click', function() {
+                    const deviceId = this.getAttribute('data-device-id');
+                    if (deviceId) {
+                        // Track the view
+                        fetch('track_device_view.php', {
+                            method: 'POST',
+                            headers: {
+                                'Content-Type': 'application/x-www-form-urlencoded',
+                            },
+                            body: 'device_id=' + encodeURIComponent(deviceId)
+                        });
+
+                        // Show device details modal
+                        showDeviceDetails(deviceId);
+                    }
+                });
+            });
+
+            // Handle device card clicks (for latest devices grid)
+            document.querySelectorAll('.device-card').forEach(function(card) {
+                card.addEventListener('click', function() {
+                    const deviceId = this.getAttribute('data-device-id');
+                    if (deviceId) {
+                        // Track the view
+                        fetch('track_device_view.php', {
+                            method: 'POST',
+                            headers: {
+                                'Content-Type': 'application/x-www-form-urlencoded',
+                            },
+                            body: 'device_id=' + encodeURIComponent(deviceId)
+                        });
+
+                        // Show device details modal
+                        showDeviceDetails(deviceId);
+                    }
+                });
+            });
+
+            // Handle brand cell clicks
+            document.querySelectorAll('.brand-cell').forEach(function(cell) {
+                cell.addEventListener('click', function() {
+                    const brandId = this.getAttribute('data-brand-id');
+                    if (brandId) {
+                        // Redirect to brands page with specific brand filter
+                        window.location.href = `brands.php?brand=${brandId}`;
+                    }
+                });
+            });
+
+            // Handle comparison row clicks
+            document.querySelectorAll('.clickable-comparison').forEach(function(row) {
+                row.addEventListener('click', function() {
+                    const device1Id = this.getAttribute('data-device1-id');
+                    const device2Id = this.getAttribute('data-device2-id');
+                    if (device1Id && device2Id) {
+                        // Track the comparison
+                        fetch('track_device_comparison.php', {
+                            method: 'POST',
+                            headers: {
+                                'Content-Type': 'application/x-www-form-urlencoded',
+                            },
+                            body: 'device1_id=' + encodeURIComponent(device1Id) + '&device2_id=' + encodeURIComponent(device2Id)
+                        });
+
+                        // Redirect to comparison page
+                        window.location.href = `compare_phones.php?phone1=${device1Id}&phone2=${device2Id}`;
+                    }
+                });
+            });
+        });
+
+        // Show post details in modal
+        function showPostDetails(postId) {
+            fetch(`get_post_details.php?id=${postId}`)
+                .then(response => response.text())
+                .then(data => {
+                    window.location.href = `post.php?id=${postId}`;
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                    alert('Failed to load post details');
+                });
+        }
+
+        // Show device details in modal
+        function showDeviceDetails(deviceId) {
+            fetch(`get_device_details.php?id=${deviceId}`)
+                .then(response => response.text())
+                .then(data => {
+                    window.location.href = `device.php?id=${deviceId}`;
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                    alert('Failed to load device details');
+                });
+        }
+
+
+
+        // Auto-dismiss alerts after 5 seconds
+        setTimeout(function() {
+            var alerts = document.querySelectorAll('.alert');
+            alerts.forEach(function(alert) {
+                var bsAlert = new bootstrap.Alert(alert);
+                bsAlert.close();
+            });
+        }, 5000);
+        function openImageModal(imageSrc) {
+            document.getElementById('modalImage').src = imageSrc;
+            new bootstrap.Modal(document.getElementById('imageModal')).show();
+        }
+
+        function showAllImages() {
+            new bootstrap.Modal(document.getElementById('allImagesModal')).show();
+        }
+
+        // Smooth scroll to comments section
+        document.addEventListener('DOMContentLoaded', function() {
+            const reviewButton = document.querySelector('a[href="#comments"]');
+            if (reviewButton) {
+                reviewButton.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    const commentsSection = document.getElementById('comments');
+                    if (commentsSection) {
+                        commentsSection.scrollIntoView({
+                            behavior: 'smooth',
+                            block: 'start'
+                        });
+                    }
+                });
+            }
+        });
+
+        // Auto-dismiss alerts
+        setTimeout(function() {
+            const alerts = document.querySelectorAll('.alert');
+            alerts.forEach(function(alert) {
+                if (alert.querySelector('.btn-close')) {
+                    alert.querySelector('.btn-close').click();
+                }
+            });
+        }, 5000);
+    </script>
 
 </body>
 
