@@ -8,11 +8,8 @@ $selectedBrandId = $_GET['brand'] ?? '';
 
 // Get only brands that have devices with device counts
 $brands_stmt = $pdo->prepare("
-    SELECT b.*, COUNT(p.id) as device_count 
-    FROM brands b 
-    INNER JOIN phones p ON b.id = p.brand_id 
-    GROUP BY b.id, b.name 
-    ORDER BY b.name ASC
+    SELECT * FROM brands
+    ORDER BY name ASC
 ");
 $brands_stmt->execute();
 $brands = $brands_stmt->fetchAll();

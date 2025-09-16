@@ -161,6 +161,22 @@ if ($_POST) {
         try {
             $stmt = $pdo->prepare("UPDATE posts SET title = ?, slug = ?, author = ?, publish_date = ?, featured_image = ?, short_description = ?, content_body = ?, media_gallery = ?, categories = ?, tags = ?, meta_title = ?, meta_description = ?, status = ?, is_featured = ?, updated_at = CURRENT_TIMESTAMP WHERE id = ?");
             
+
+            // Convert PHP arrays to PostgreSQL array literal format
+            function to_pg_array($set) {
+                if (empty($set)) return '{}';
+                foreach ($set as &$v) {
+                    $v = '"' . str_replace('"', '\"', $v) . '"';
+                }
+                return '{' . implode(",", $set) . '}';
+            }
+
+            $pg_media_gallery = to_pg_array($media_gallery);
+            $pg_categories = to_pg_array($selected_categories);
+            // Convert comma-separated tags to array
+            $tags_array = array_filter(array_map('trim', explode(',', $tags)));
+            $pg_tags = to_pg_array($tags_array);
+
             $stmt->execute([
                 $title,
                 $slug,
@@ -169,9 +185,9 @@ if ($_POST) {
                 $featured_image,
                 $short_description,
                 $content_body,
-                json_encode($media_gallery),
-                json_encode($selected_categories),
-                $tags,
+                $pg_media_gallery,
+                $pg_categories,
+                $pg_tags,
                 $meta_title ?: $title,
                 $meta_description,
                 $status,

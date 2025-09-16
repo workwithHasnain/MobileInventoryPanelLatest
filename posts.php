@@ -49,7 +49,7 @@ $where_clause = !empty($where_conditions) ? "WHERE " . implode(" AND ", $where_c
 
 // Get posts with filters and counts
 $query = "SELECT p.*, 
-    COALESCE(p.view_count, 0) as view_count,
+    COALESCE((SELECT COUNT(*) FROM content_views cv WHERE cv.content_type = 'post' AND cv.content_id = p.id::varchar), 0) as view_count,
     (SELECT COUNT(*) FROM post_comments pc WHERE pc.post_id = p.id) as comment_count
     FROM posts p $where_clause ORDER BY p.created_at DESC";
 $stmt = $pdo->prepare($query);
@@ -87,9 +87,9 @@ include 'includes/header.php';
                     <form method="GET" class="row g-3">
                         <div class="col-md-3">
                             <label for="search" class="form-label">Search</label>
-                            <input type="text" class="form-control" id="search" name="search" 
-                                   value="<?php echo htmlspecialchars($search); ?>" 
-                                   placeholder="Search posts...">
+                            <input type="text" class="form-control" id="search" name="search"
+                                value="<?php echo htmlspecialchars($search); ?>"
+                                placeholder="Search posts...">
                         </div>
                         <div class="col-md-3">
                             <label for="status" class="form-label">Status</label>
@@ -105,8 +105,8 @@ include 'includes/header.php';
                             <select class="form-select" id="category" name="category">
                                 <option value="">All Categories</option>
                                 <?php foreach ($categories as $category): ?>
-                                    <option value="<?php echo htmlspecialchars($category['name']); ?>" 
-                                            <?php echo $category_filter === $category['name'] ? 'selected' : ''; ?>>
+                                    <option value="<?php echo htmlspecialchars($category['name']); ?>"
+                                        <?php echo $category_filter === $category['name'] ? 'selected' : ''; ?>>
                                         <?php echo htmlspecialchars($category['name']); ?>
                                     </option>
                                 <?php endforeach; ?>
@@ -169,11 +169,11 @@ include 'includes/header.php';
                                         <tr>
                                             <td>
                                                 <?php if (!empty($post['featured_image'])): ?>
-                                                    <img src="<?php echo htmlspecialchars($post['featured_image']); ?>" 
-                                                         alt="Featured" class="img-thumbnail" style="width: 60px; height: 60px; object-fit: cover;">
+                                                    <img src="<?php echo htmlspecialchars($post['featured_image']); ?>"
+                                                        alt="Featured" class="img-thumbnail" style="width: 60px; height: 60px; object-fit: cover;">
                                                 <?php else: ?>
-                                                    <div class="bg-light d-flex align-items-center justify-content-center" 
-                                                         style="width: 60px; height: 60px;">
+                                                    <div class="bg-light d-flex align-items-center justify-content-center"
+                                                        style="width: 60px; height: 60px;">
                                                         <i class="fas fa-image text-muted"></i>
                                                     </div>
                                                 <?php endif; ?>
@@ -195,7 +195,7 @@ include 'includes/header.php';
                                             <td><?php echo htmlspecialchars($post['author']); ?></td>
                                             <td>
                                                 <?php
-                                                $status_class = match($post['status']) {
+                                                $status_class = match ($post['status']) {
                                                     'Published' => 'bg-success',
                                                     'Draft' => 'bg-warning',
                                                     'Archived' => 'bg-secondary',
@@ -207,7 +207,7 @@ include 'includes/header.php';
                                                 </span>
                                             </td>
                                             <td>
-                                                <?php 
+                                                <?php
                                                 $post_categories = json_decode($post['categories'], true) ?: [];
                                                 foreach ($post_categories as $cat): ?>
                                                     <span class="badge bg-info me-1"><?php echo htmlspecialchars($cat); ?></span>
@@ -229,18 +229,18 @@ include 'includes/header.php';
                                             </td>
                                             <td>
                                                 <div class="btn-group btn-group-sm">
-                                                    <a href="view_post.php?id=<?php echo $post['id']; ?>" 
-                                                       class="btn btn-outline-info" title="View">
+                                                    <a href="view_post.php?id=<?php echo $post['id']; ?>"
+                                                        class="btn btn-outline-info" title="View">
                                                         <i class="fas fa-eye"></i>
                                                     </a>
-                                                    <a href="edit_post.php?id=<?php echo $post['id']; ?>" 
-                                                       class="btn btn-outline-primary" title="Edit">
+                                                    <a href="edit_post.php?id=<?php echo $post['id']; ?>"
+                                                        class="btn btn-outline-primary" title="Edit">
                                                         <i class="fas fa-edit"></i>
                                                     </a>
                                                     <?php if ($user_role === 'admin'): ?>
-                                                        <button type="button" class="btn btn-outline-danger" 
-                                                                onclick="deletePost(<?php echo $post['id']; ?>, '<?php echo htmlspecialchars($post['title']); ?>')" 
-                                                                title="Delete">
+                                                        <button type="button" class="btn btn-outline-danger"
+                                                            onclick="deletePost(<?php echo $post['id']; ?>, '<?php echo htmlspecialchars($post['title']); ?>')"
+                                                            title="Delete">
                                                             <i class="fas fa-trash"></i>
                                                         </button>
                                                     <?php endif; ?>
@@ -283,20 +283,20 @@ include 'includes/header.php';
 </div>
 
 <script>
-function deletePost(postId, postTitle) {
-    document.getElementById('deletePostId').value = postId;
-    document.getElementById('postTitle').textContent = postTitle;
-    new bootstrap.Modal(document.getElementById('deleteModal')).show();
-}
+    function deletePost(postId, postTitle) {
+        document.getElementById('deletePostId').value = postId;
+        document.getElementById('postTitle').textContent = postTitle;
+        new bootstrap.Modal(document.getElementById('deleteModal')).show();
+    }
 
-// Auto-dismiss alerts after 5 seconds
-setTimeout(function() {
-    var alerts = document.querySelectorAll('.alert');
-    alerts.forEach(function(alert) {
-        var bsAlert = new bootstrap.Alert(alert);
-        bsAlert.close();
-    });
-}, 5000);
+    // Auto-dismiss alerts after 5 seconds
+    setTimeout(function() {
+        var alerts = document.querySelectorAll('.alert');
+        alerts.forEach(function(alert) {
+            var bsAlert = new bootstrap.Alert(alert);
+            bsAlert.close();
+        });
+    }, 5000);
 </script>
 
 <?php include 'includes/footer.php'; ?>

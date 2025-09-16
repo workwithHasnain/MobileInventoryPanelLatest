@@ -19,7 +19,8 @@ $categories_stmt = $pdo->query("SELECT * FROM post_categories ORDER BY name");
 $categories = $categories_stmt->fetchAll(PDO::FETCH_ASSOC);
 
 // Function to generate slug from title
-function generateSlug($title) {
+function generateSlug($title)
+{
     $slug = strtolower($title);
     $slug = preg_replace('/[^a-z0-9\s-]/', '', $slug);
     $slug = preg_replace('/[\s-]+/', '-', $slug);
@@ -139,7 +140,25 @@ if ($_POST) {
     if (empty($errors)) {
         try {
             $stmt = $pdo->prepare("INSERT INTO posts (title, slug, author, publish_date, featured_image, short_description, content_body, media_gallery, categories, tags, meta_title, meta_description, status, is_featured) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)");
-            
+
+
+            // Convert PHP arrays to PostgreSQL array literal format
+            function to_pg_array($set)
+            {
+                if (empty($set)) return '{}';
+                foreach ($set as &$v) {
+                    $v = '"' . str_replace('"', '\"', $v) . '"';
+                }
+                return '{' . implode(",", $set) . '}';
+            }
+
+
+            $pg_media_gallery = to_pg_array($media_gallery);
+            $pg_categories = to_pg_array($selected_categories);
+            // Convert comma-separated tags to array
+            $tags_array = array_filter(array_map('trim', explode(',', $tags)));
+            $pg_tags = to_pg_array($tags_array);
+
             $stmt->execute([
                 $title,
                 $slug,
@@ -148,9 +167,9 @@ if ($_POST) {
                 $featured_image,
                 $short_description,
                 $content_body,
-                json_encode($media_gallery),
-                json_encode($selected_categories),
-                $tags,
+                $pg_media_gallery,
+                $pg_categories,
+                $pg_tags,
                 $meta_title ?: $title,
                 $meta_description,
                 $status,
@@ -158,11 +177,10 @@ if ($_POST) {
             ]);
 
             $success = "Post created successfully!";
-            
+
             // Redirect to posts list after success
             header("Location: posts.php?success=" . urlencode($success));
             exit();
-            
         } catch (PDOException $e) {
             $errors[] = "Database error: " . $e->getMessage();
         }
@@ -204,31 +222,31 @@ include 'includes/header.php';
                             <div class="col-md-6">
                                 <div class="mb-3">
                                     <label for="title" class="form-label">Title <span class="text-danger">*</span></label>
-                                    <input type="text" class="form-control" id="title" name="title" 
-                                           value="<?php echo htmlspecialchars($_POST['title'] ?? ''); ?>" 
-                                           required onkeyup="generateSlugFromTitle()">
+                                    <input type="text" class="form-control" id="title" name="title"
+                                        value="<?php echo htmlspecialchars($_POST['title'] ?? ''); ?>"
+                                        required onkeyup="generateSlugFromTitle()">
                                 </div>
                             </div>
                             <div class="col-md-6">
                                 <div class="mb-3">
                                     <label for="slug" class="form-label">URL Slug</label>
-                                    <input type="text" class="form-control" id="slug" name="slug" 
-                                           value="<?php echo htmlspecialchars($_POST['slug'] ?? ''); ?>" 
-                                           placeholder="Auto-generated from title">
+                                    <input type="text" class="form-control" id="slug" name="slug"
+                                        value="<?php echo htmlspecialchars($_POST['slug'] ?? ''); ?>"
+                                        placeholder="Auto-generated from title">
                                 </div>
                             </div>
                             <div class="col-md-6">
                                 <div class="mb-3">
                                     <label for="author" class="form-label">Author</label>
-                                    <input type="text" class="form-control" id="author" name="author" 
-                                           value="<?php echo htmlspecialchars($_POST['author'] ?? $current_user); ?>">
+                                    <input type="text" class="form-control" id="author" name="author"
+                                        value="<?php echo htmlspecialchars($_POST['author'] ?? $current_user); ?>">
                                 </div>
                             </div>
                             <div class="col-md-6">
                                 <div class="mb-3">
                                     <label for="publish_date" class="form-label">Publish Date/Time <span class="text-danger">*</span></label>
-                                    <input type="datetime-local" class="form-control" id="publish_date" name="publish_date" 
-                                           value="<?php echo $_POST['publish_date'] ?? date('Y-m-d\TH:i'); ?>" required>
+                                    <input type="datetime-local" class="form-control" id="publish_date" name="publish_date"
+                                        value="<?php echo $_POST['publish_date'] ?? date('Y-m-d\TH:i'); ?>" required>
                                 </div>
                             </div>
                         </div>
@@ -243,16 +261,16 @@ include 'includes/header.php';
                     <div class="card-body">
                         <div class="mb-3">
                             <label for="featured_image" class="form-label">Featured Image <span class="text-danger">*</span></label>
-                            <input type="file" class="form-control" id="featured_image" name="featured_image" 
-                                   accept="image/*" required>
+                            <input type="file" class="form-control" id="featured_image" name="featured_image"
+                                accept="image/*" required>
                             <div class="form-text">Upload a featured image for your post (JPG, PNG, GIF, WebP)</div>
                         </div>
 
                         <div class="mb-3">
                             <label for="short_description" class="form-label">Short Description/Excerpt <span class="text-danger">*</span></label>
-                            <textarea class="form-control" id="short_description" name="short_description" 
-                                      rows="3" maxlength="200" required 
-                                      placeholder="Brief description of your post (max 200 characters)"><?php echo htmlspecialchars($_POST['short_description'] ?? ''); ?></textarea>
+                            <textarea class="form-control" id="short_description" name="short_description"
+                                rows="3" maxlength="200" required
+                                placeholder="Brief description of your post (max 200 characters)"><?php echo htmlspecialchars($_POST['short_description'] ?? ''); ?></textarea>
                             <div class="form-text">
                                 <span id="char_count">0</span>/200 characters
                             </div>
@@ -260,7 +278,7 @@ include 'includes/header.php';
 
                         <div class="mb-3">
                             <label for="content_body" class="form-label">Content Body <span class="text-danger">*</span></label>
-                            
+
                             <!-- Rich Text Editor Toolbar -->
                             <div class="border rounded-top p-2 bg-light" id="editor-toolbar">
                                 <div class="btn-group btn-group-sm me-2" role="group">
@@ -274,13 +292,13 @@ include 'includes/header.php';
                                         <i class="fas fa-underline"></i>
                                     </button>
                                 </div>
-                                
+
                                 <div class="btn-group btn-group-sm me-2" role="group">
                                     <button type="button" class="btn btn-outline-secondary" onclick="formatHeading('h1')" title="Heading 1">H1</button>
                                     <button type="button" class="btn btn-outline-secondary" onclick="formatHeading('h2')" title="Heading 2">H2</button>
                                     <button type="button" class="btn btn-outline-secondary" onclick="formatHeading('h3')" title="Heading 3">H3</button>
                                 </div>
-                                
+
                                 <div class="btn-group btn-group-sm me-2" role="group">
                                     <button type="button" class="btn btn-outline-secondary" onclick="formatList('insertUnorderedList')" title="Bullet List">
                                         <i class="fas fa-list-ul"></i>
@@ -289,7 +307,7 @@ include 'includes/header.php';
                                         <i class="fas fa-list-ol"></i>
                                     </button>
                                 </div>
-                                
+
                                 <div class="btn-group btn-group-sm me-2" role="group">
                                     <button type="button" class="btn btn-outline-secondary" onclick="formatText('justifyLeft')" title="Align Left">
                                         <i class="fas fa-align-left"></i>
@@ -302,23 +320,23 @@ include 'includes/header.php';
                                     </button>
                                 </div>
                             </div>
-                            
+
                             <!-- Rich Text Editor Content Area -->
-                            <div class="form-control" id="editor-content" 
-                                 contenteditable="true" 
-                                 style="min-height: 300px; border-top: none; border-top-left-radius: 0; border-top-right-radius: 0;"
-                                 placeholder="Write your post content here..."><?php echo $_POST['content_body'] ?? ''; ?></div>
-                            
+                            <div class="form-control" id="editor-content"
+                                contenteditable="true"
+                                style="min-height: 300px; border-top: none; border-top-left-radius: 0; border-top-right-radius: 0;"
+                                placeholder="Write your post content here..."><?php echo $_POST['content_body'] ?? ''; ?></div>
+
                             <!-- Hidden textarea to store the content for form submission -->
                             <textarea class="d-none" id="content_body" name="content_body" required><?php echo htmlspecialchars($_POST['content_body'] ?? ''); ?></textarea>
-                            
+
                             <div class="form-text">Full content of your post with rich text formatting</div>
                         </div>
 
                         <div class="mb-3">
                             <label for="media_gallery" class="form-label">Media Gallery (Optional)</label>
-                            <input type="file" class="form-control" id="media_gallery" name="media_gallery[]" 
-                                   accept="image/*" multiple>
+                            <input type="file" class="form-control" id="media_gallery" name="media_gallery[]"
+                                accept="image/*" multiple>
                             <div class="form-text">Upload additional images for your post gallery</div>
                         </div>
                     </div>
@@ -336,10 +354,10 @@ include 'includes/header.php';
                                     <label class="form-label">Categories</label>
                                     <?php foreach ($categories as $category): ?>
                                         <div class="form-check">
-                                            <input class="form-check-input" type="checkbox" 
-                                                   name="categories[]" value="<?php echo htmlspecialchars($category['name']); ?>" 
-                                                   id="cat_<?php echo $category['id']; ?>"
-                                                   <?php echo (isset($_POST['categories']) && in_array($category['name'], $_POST['categories'])) ? 'checked' : ''; ?>>
+                                            <input class="form-check-input" type="checkbox"
+                                                name="categories[]" value="<?php echo htmlspecialchars($category['name']); ?>"
+                                                id="cat_<?php echo $category['id']; ?>"
+                                                <?php echo (isset($_POST['categories']) && in_array($category['name'], $_POST['categories'])) ? 'checked' : ''; ?>>
                                             <label class="form-check-label" for="cat_<?php echo $category['id']; ?>">
                                                 <?php echo htmlspecialchars($category['name']); ?>
                                             </label>
@@ -350,9 +368,9 @@ include 'includes/header.php';
                             <div class="col-md-6">
                                 <div class="mb-3">
                                     <label for="tags" class="form-label">Tags/Keywords</label>
-                                    <input type="text" class="form-control" id="tags" name="tags" 
-                                           value="<?php echo htmlspecialchars($_POST['tags'] ?? ''); ?>" 
-                                           placeholder="mobile, smartphone, review, tech">
+                                    <input type="text" class="form-control" id="tags" name="tags"
+                                        value="<?php echo htmlspecialchars($_POST['tags'] ?? ''); ?>"
+                                        placeholder="mobile, smartphone, review, tech">
                                     <div class="form-text">Separate tags with commas</div>
                                 </div>
                             </div>
@@ -368,14 +386,14 @@ include 'includes/header.php';
                     <div class="card-body">
                         <div class="mb-3">
                             <label for="meta_title" class="form-label">Meta Title</label>
-                            <input type="text" class="form-control" id="meta_title" name="meta_title" 
-                                   value="<?php echo htmlspecialchars($_POST['meta_title'] ?? ''); ?>" 
-                                   placeholder="Leave empty to use post title">
+                            <input type="text" class="form-control" id="meta_title" name="meta_title"
+                                value="<?php echo htmlspecialchars($_POST['meta_title'] ?? ''); ?>"
+                                placeholder="Leave empty to use post title">
                         </div>
                         <div class="mb-3">
                             <label for="meta_description" class="form-label">Meta Description</label>
-                            <textarea class="form-control" id="meta_description" name="meta_description" 
-                                      rows="3" placeholder="Brief description for search engines"><?php echo htmlspecialchars($_POST['meta_description'] ?? ''); ?></textarea>
+                            <textarea class="form-control" id="meta_description" name="meta_description"
+                                rows="3" placeholder="Brief description for search engines"><?php echo htmlspecialchars($_POST['meta_description'] ?? ''); ?></textarea>
                         </div>
                     </div>
                 </div>
@@ -394,11 +412,11 @@ include 'includes/header.php';
                                 <option value="Archived" <?php echo ($_POST['status'] ?? '') === 'Archived' ? 'selected' : ''; ?>>Archived</option>
                             </select>
                         </div>
-                        
+
                         <div class="mb-3">
                             <div class="form-check">
                                 <input class="form-check-input" type="checkbox" id="is_featured" name="is_featured" value="1"
-                                       <?php echo isset($_POST['is_featured']) && $_POST['is_featured'] ? 'checked' : ''; ?>>
+                                    <?php echo isset($_POST['is_featured']) && $_POST['is_featured'] ? 'checked' : ''; ?>>
                                 <label class="form-check-label" for="is_featured">
                                     <i class="fas fa-star text-warning me-1"></i>
                                     <strong>Featured Post</strong>
@@ -424,82 +442,82 @@ include 'includes/header.php';
 </div>
 
 <script>
-// Generate slug from title
-function generateSlugFromTitle() {
-    const title = document.getElementById('title').value;
-    const slug = title.toLowerCase()
-                     .replace(/[^a-z0-9\s-]/g, '')
-                     .replace(/[\s-]+/g, '-')
-                     .replace(/^-+|-+$/g, '');
-    document.getElementById('slug').value = slug;
-}
-
-// Character counter for short description
-document.getElementById('short_description').addEventListener('input', function() {
-    const charCount = this.value.length;
-    document.getElementById('char_count').textContent = charCount;
-    
-    if (charCount > 200) {
-        document.getElementById('char_count').style.color = 'red';
-    } else {
-        document.getElementById('char_count').style.color = '';
+    // Generate slug from title
+    function generateSlugFromTitle() {
+        const title = document.getElementById('title').value;
+        const slug = title.toLowerCase()
+            .replace(/[^a-z0-9\s-]/g, '')
+            .replace(/[\s-]+/g, '-')
+            .replace(/^-+|-+$/g, '');
+        document.getElementById('slug').value = slug;
     }
-});
 
-// Update character count on page load
-document.getElementById('short_description').dispatchEvent(new Event('input'));
+    // Character counter for short description
+    document.getElementById('short_description').addEventListener('input', function() {
+        const charCount = this.value.length;
+        document.getElementById('char_count').textContent = charCount;
 
-// Rich Text Editor Functions
-function formatText(command) {
-    document.execCommand(command, false, null);
-    document.getElementById('editor-content').focus();
-    updateHiddenTextarea();
-}
-
-function formatHeading(tag) {
-    document.execCommand('formatBlock', false, tag);
-    document.getElementById('editor-content').focus();
-    updateHiddenTextarea();
-}
-
-function formatList(command) {
-    document.execCommand(command, false, null);
-    document.getElementById('editor-content').focus();
-    updateHiddenTextarea();
-}
-
-function updateHiddenTextarea() {
-    const editorContent = document.getElementById('editor-content').innerHTML;
-    document.getElementById('content_body').value = editorContent;
-}
-
-// Update hidden textarea when content changes
-document.getElementById('editor-content').addEventListener('input', updateHiddenTextarea);
-document.getElementById('editor-content').addEventListener('blur', updateHiddenTextarea);
-
-// Initialize editor with existing content
-document.addEventListener('DOMContentLoaded', function() {
-    const hiddenTextarea = document.getElementById('content_body');
-    const editorContent = document.getElementById('editor-content');
-    
-    if (hiddenTextarea.value) {
-        editorContent.innerHTML = hiddenTextarea.value;
-    }
-    
-    // Set placeholder behavior
-    editorContent.addEventListener('focus', function() {
-        if (this.innerHTML === '' || this.innerHTML === '<br>') {
-            this.innerHTML = '';
+        if (charCount > 200) {
+            document.getElementById('char_count').style.color = 'red';
+        } else {
+            document.getElementById('char_count').style.color = '';
         }
     });
-    
-    editorContent.addEventListener('blur', function() {
-        if (this.innerHTML === '' || this.innerHTML === '<br>') {
-            this.innerHTML = '';
-        }
+
+    // Update character count on page load
+    document.getElementById('short_description').dispatchEvent(new Event('input'));
+
+    // Rich Text Editor Functions
+    function formatText(command) {
+        document.execCommand(command, false, null);
+        document.getElementById('editor-content').focus();
         updateHiddenTextarea();
+    }
+
+    function formatHeading(tag) {
+        document.execCommand('formatBlock', false, tag);
+        document.getElementById('editor-content').focus();
+        updateHiddenTextarea();
+    }
+
+    function formatList(command) {
+        document.execCommand(command, false, null);
+        document.getElementById('editor-content').focus();
+        updateHiddenTextarea();
+    }
+
+    function updateHiddenTextarea() {
+        const editorContent = document.getElementById('editor-content').innerHTML;
+        document.getElementById('content_body').value = editorContent;
+    }
+
+    // Update hidden textarea when content changes
+    document.getElementById('editor-content').addEventListener('input', updateHiddenTextarea);
+    document.getElementById('editor-content').addEventListener('blur', updateHiddenTextarea);
+
+    // Initialize editor with existing content
+    document.addEventListener('DOMContentLoaded', function() {
+        const hiddenTextarea = document.getElementById('content_body');
+        const editorContent = document.getElementById('editor-content');
+
+        if (hiddenTextarea.value) {
+            editorContent.innerHTML = hiddenTextarea.value;
+        }
+
+        // Set placeholder behavior
+        editorContent.addEventListener('focus', function() {
+            if (this.innerHTML === '' || this.innerHTML === '<br>') {
+                this.innerHTML = '';
+            }
+        });
+
+        editorContent.addEventListener('blur', function() {
+            if (this.innerHTML === '' || this.innerHTML === '<br>') {
+                this.innerHTML = '';
+            }
+            updateHiddenTextarea();
+        });
     });
-});
 </script>
 
 <?php include 'includes/footer.php'; ?>
