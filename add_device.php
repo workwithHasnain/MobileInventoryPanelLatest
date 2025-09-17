@@ -1913,4 +1913,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     });
 </script>
 
+<!-- Form validation script -->
+<script src="js/form-validation.js"></script>
+
 <?php include 'includes/footer.php'; ?>
