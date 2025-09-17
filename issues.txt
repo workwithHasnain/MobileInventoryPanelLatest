@@ -1,0 +1,9 @@
+test and fix all fields of post and device with and without required fields.
+edit_device issue (urgent)
+edit post issue (urgent)
+sidebar tables in all pages
+compare button in device.php
+--
+
+photo modal in device.php
+brands.php page
