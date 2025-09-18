@@ -318,14 +318,77 @@ $brands = $brands_stmt->fetchAll();
             <div class="col-lg-4  col-12  bg-white p-3">
 
 
-                <div class="d-flex">
-                    <h5 class="text-secondary mt-2 d-inline fw-bold " style="text-transform: uppercase;">top 10 by Daily
-                        Interest </h5>
+                
+                <div class="center w-100 " style="margin-top: 12px;">
+                    <h6 style="color: #090E21; text-transform: uppercase; font-weight: 900;" class=" mt-2 ">Latest Devices
+                </h6>
+                <div class="cent">
+                    <?php if (empty($devices)): ?>
+                        <div class="text-center py-5">
+                            <i class="fas fa-mobile-alt fa-3x text-muted mb-3"></i>
+                            <h4 class="text-muted">No Devices Available</h4>
+                            <p class="text-muted">Check back later for new devices!</p>
+                        </div>
+                    <?php else: ?>
+                        <?php $chunks = array_chunk($devices, 3); ?>
+                        <?php foreach ($chunks as $row): ?>
+                            <div class="d-flex">
+                                <?php foreach ($row as $i => $device): ?>
+                                    <div class="device-card canel<?php echo $i == 1 ? ' mx-4' : ($i == 0 ? '' : ''); ?>" data-device-id="<?php echo $device['id']; ?>" style="cursor: pointer;">
+                                        <?php if (isset($device['images']) && !empty($device['images'])): ?>
+                                            <img class="shrink" src="<?php echo htmlspecialchars($device['images'][0]); ?>" alt="">
+                                        <?php elseif (isset($device['image']) && !empty($device['image'])): ?>
+                                            <img class="shrink" src="<?php echo htmlspecialchars($device['image']); ?>" alt="">
+                                        <?php else: ?>
+                                            <img class="shrink" src="" alt="">
+                                        <?php endif; ?>
+                                        <p><?php echo htmlspecialchars($device['name'] ?? ''); ?></p>
+                                    </div>
+                                <?php endforeach; ?>
+                                <?php for ($j = count($row); $j < 3; $j++): ?>
+                                    <div class="canel<?php echo $j == 1 ? ' mx-4' : ($j == 0 ? '' : ''); ?>"></div>
+                                <?php endfor; ?>
+                            </div>
+                        <?php endforeach; ?>
+                    <?php endif; ?>
                 </div>
-                <div class="center w-100">
+
+                <h6 style="border-left: solid 5px grey ; color: #090E21; text-transform: uppercase; font-weight: 900; margin-top: 12px;"
+                    class="px-3">Popular comparisons</h6>
+
+                <div class="sentizer bg-white mt-2 p-3 rounded shadow-sm" style="    text-transform: Uppercase;
+                                            font-size: 13px;
+                                            font-weight: 700;">
+                    <div class="row">
+                        <div class="col-12">
+                            <?php if (empty($topComparisons)): ?>
+                                <p class="mb-2" style=" text-transform: capitalize;">No Comparisons Yet</p>
+                            <?php else: ?>
+                                <?php foreach ($topComparisons as $index => $comparison): ?>
+                                    <!-- if $index is odd -->
+                                    <?php if ((($index + 1) % 2) != 0): ?>
+                                        <p class="mb-2 clickable-comparison" data-device1-id="<?php echo $comparison['device1_id'] ?? ''; ?>"
+                                            data-device2-id="<?php echo $comparison['device2_id'] ?? ''; ?>"
+                                            style="cursor: pointer; background-color: #ffe6f0; color: #090E21; text-transform: capitalize;"><?php echo htmlspecialchars($comparison['device1_name'] ?? $comparison['device1'] ?? 'Unknown'); ?> vs.
+                                            <?php echo htmlspecialchars($comparison['device2_name'] ?? $comparison['device2'] ?? 'Unknown'); ?></p>
+                                    <?php else: ?>
+                                        <!-- else if $index is even -->
+                                        <p class="mb-2 clickable-comparison" data-device1-id="<?php echo $comparison['device1_id'] ?? ''; ?>"
+                                            data-device2-id="<?php echo $comparison['device2_id'] ?? ''; ?>" style="cursor: pointer; text-transform: capitalize;"><?php echo htmlspecialchars($comparison['device1_name'] ?? $comparison['device1'] ?? 'Unknown'); ?> vs. <?php echo htmlspecialchars($comparison['device2_name'] ?? $comparison['device2'] ?? 'Unknown'); ?></p>
+                                    <?php endif; ?>
+                                <?php endforeach; ?>
+                            <?php endif; ?>
+                        </div>
+                    </div>
+                </div>
+                <h6 style="border-left: 7px solid #EFEBE9 ; font-weight: 900; color: #090E21; text-transform: uppercase;"
+                    class=" px-2 mt-2 d-inline mt-4">Top 10
+                    Daily Interest</h6>
+
+                <div class="center">
                     <table class="table table-sm custom-table">
                         <thead>
-                            <tr class="text-white " style="background-color: #4C7273;">
+                            <tr style="background-color: #4c7273; color: white;">
                                 <th style="color: white;">#</th>
                                 <th style="color: white;">Devices</th>
                                 <th style="color: white;">Daily Hits</th>
@@ -359,10 +422,10 @@ $brands = $brands_stmt->fetchAll();
                         </tbody>
                     </table>
                 </div>
-                <div class="center w-100 " style="margin-top: 12px;">
-                    <h5 class="text-secondary mt-2 d-inline fw-bold " style="text-transform: uppercase;">top 10 by Fans
-                    </h5>
-
+                <h6 style="border-left: 7px solid #EFEBE9 ; font-weight: 900; color: #090E21; text-transform: uppercase;"
+                    class=" px-2 mt-2 d-inline mt-4">Top 10 by
+                    Fans</h6>
+                <div class="center" style="margin-top: 12px;">
                     <table class="table table-sm custom-table">
                         <thead>
                             <tr class="text-white" style="background-color: #14222D;">
@@ -398,6 +461,35 @@ $brands = $brands_stmt->fetchAll();
                             endif; ?>
                         </tbody>
                     </table>
+                </div>
+                <h6 style="border-left: 7px solid #EFEBE9 ; font-weight: 900; color: #090E21; text-transform: uppercase;"
+                    class=" px-2 mt-2 d-inline mt-4">In
+                    Stores
+                    Now</h6>
+
+                <div class="cent">
+                    <?php if (empty($latestDevices)): ?>
+                        <div class="text-center py-5">
+                            <i class="fas fa-mobile-alt fa-3x text-muted mb-3"></i>
+                            <h4 class="text-muted">No Devices Available</h4>
+                            <p class="text-muted">Check back later for new devices!</p>
+                        </div>
+                    <?php else: ?>
+                        <?php $chunks = array_chunk($latestDevices, 3); ?>
+                        <?php foreach ($chunks as $row): ?>
+                            <div class="d-flex">
+                                <?php foreach ($row as $i => $device): ?>
+                                    <div class="device-card canel<?php echo $i == 1 ? ' mx-4' : ($i == 0 ? '' : ''); ?>" data-device-id="<?php echo $device['id']; ?>" style="cursor: pointer;">
+                                        <img class="shrink" src="<?php echo htmlspecialchars($device['image'] ?? ''); ?>" alt="">
+                                        <p><?php echo htmlspecialchars($device['name'] ?? ''); ?></p>
+                                    </div>
+                                <?php endforeach; ?>
+                                <?php for ($j = count($row); $j < 3; $j++): ?>
+                                    <div class="canel<?php echo $j == 1 ? ' mx-4' : ($j == 0 ? '' : ''); ?>"></div>
+                                <?php endfor; ?>
+                            </div>
+                        <?php endforeach; ?>
+                    <?php endif; ?>
                 </div>
             </div>
         </div>
