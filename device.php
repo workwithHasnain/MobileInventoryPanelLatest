@@ -90,6 +90,51 @@ if (!isset($_GET['id']) || $_GET['id'] === '') {
   exit();
 }
 
+// Function to get all device images
+function getDeviceImages($device)
+{
+  $images = [];
+
+  // Add main image if available
+  if (!empty($device['image'])) {
+    $images[] = $device['image'];
+  }
+
+  // Add additional numbered images if available (from JSON fallback)
+  for ($i = 1; $i <= 10; $i++) {
+    $imageKey = 'image_' . $i;
+    if (!empty($device[$imageKey])) {
+      if (!in_array($device[$imageKey], $images)) { // Avoid duplicates
+        $images[] = $device[$imageKey];
+      }
+    }
+  }
+
+  // Add images from 'images' array if available (from JSON)
+  if (!empty($device['images']) && is_array($device['images'])) {
+    foreach ($device['images'] as $image) {
+      if (!empty($image) && !in_array($image, $images)) { // Avoid duplicates
+        $images[] = $image;
+      }
+    }
+  }
+
+  // Filter out empty paths and ensure they are properly formatted
+  $validImages = [];
+  foreach ($images as $image) {
+    if (!empty($image)) {
+      // Clean up the path
+      $image = str_replace('\\', '/', $image);
+      // Add to valid images if not already included
+      if (!in_array($image, $validImages)) {
+        $validImages[] = $image;
+      }
+    }
+  }
+
+  return $validImages;
+}
+
 // Function to get device details
 function getDeviceDetails($pdo, $device_id)
 {
@@ -667,6 +712,9 @@ if (!$device) {
   exit();
 }
 
+// Get all available images for this device
+$deviceImages = getDeviceImages($device);
+
 // Format device specifications for display
 $deviceSpecs = formatDeviceSpecs($device);
 
@@ -1200,7 +1248,15 @@ if ($_POST && isset($_POST['submit_comment'])) {
           <div class="d-lg-none d-block justify-content-end">
             <div class="d-flex flexiable mt-2">
               <img src="/imges/download-removebg-preview.png" alt="">
-              <h5 style="font-family:'oswald' ; font-size: 16px;" class="mt-2">COMPARE </h5>
+              <h5 style="font-family:'oswald' ; font-size: 16px;" class="mt-2" onclick="document.getElementById('comments').scrollIntoView({behavior:'smooth', block:'start'});">OPINIONS </h5>
+            </div>
+            <div class="d-flex flexiable mt-2">
+              <img src="/imges/download-removebg-preview.png" alt="">
+              <h5 style="font-family:'oswald' ; font-size: 16px;" class="mt-2" onclick="window.location.href='compare.php?phone1=<?php echo $device['id']; ?>'">COMPARE </h5>
+            </div>
+            <div class="d-flex flexiable mt-2">
+              <img src="/imges/download-removebg-preview.png" alt="">
+              <h5 style="font-family:'oswald' ; font-size: 16px; cursor: pointer;" class="mt-2" onclick="showPicturesModal()">PICTURES </h5>
             </div>
           </div>
 
@@ -1214,34 +1270,30 @@ if ($_POST && isset($_POST['submit_comment'])) {
     <div class="row">
       <div class="article-info">
         <div class="bg-blur">
-          <div class="d-block justify-content-end">
+          <div class="d-flex justify-content-end">
             <div class="d-flex flexiable ">
               <img src="/imges/download-removebg-preview.png" alt="">
-              <h5 style="font-family:'oswald' ; font-size: 16px" class="mt-2">Review (17)
-              </h5>
+              <h5 style="font-family:'oswald' ; font-size: 16px; cursor:pointer;" class="mt-2" onclick="document.getElementById('comments').scrollIntoView({behavior:'smooth', block:'start'});">OPINIONS</h5>
             </div>
             <div class="d-flex flexiable ">
               <img src="/imges/download-removebg-preview.png" alt="">
-              <h5 style="font-family:'oswald' ; font-size: 16px;" class="mt-2">OPINION </h5>
+              <h5 style="font-family:'oswald' ; font-size: 16px; cursor: pointer;" class="mt-2" onclick="showPicturesModal()">PICTURES</h5>
             </div>
             <div class="d-flex flexiable ">
               <img src="/imges/download-removebg-preview.png" alt="">
-              <h5 style="font-family:'oswald' ; font-size: 16px;" class="mt-2">COMPARE </h5>
+              <h5 style="font-family:'oswald' ; font-size: 16px;" class="mt-2" onclick="window.location.href='compare.php?phone1=<?php echo $device['id']; ?>'">COMPARE </h5>
             </div>
             <div class="d-flex flexiable ">
               <img src="/imges/download-removebg-preview.png" alt="">
-              <h5 style="font-family:'oswald' ; font-size: 16px;" class="mt-2">PICTURES </h5>
+              <h5 style="font-family:'oswald' ; font-size: 16px;" class="mt-2"> </h5>
             </div>
             <div class="d-flex flexiable ">
               <img src="/imges/download-removebg-preview.png" alt="">
-              <h5 style="font-family:'oswald' ; font-size: 16 px;" class="mt-2">PRICES</h5>
+              <h5 style="font-family:'oswald' ; font-size: 16 px;" class="mt-2"></h5>
             </div>
           </div>
-
-
         </div>
       </div>
-
     </div>
   </div>
   <div class="container  d-lg-block d-none support content-wrapper" id="Top"
@@ -1319,16 +1371,15 @@ if ($_POST && isset($_POST['submit_comment'])) {
               <div class="d-flex justify-content-end">
                 <div class="d-flex flexiable ">
                   <img src="/imges/download-removebg-preview.png" alt="">
-                  <h5 style="font-family:'oswald' ; font-size: 16px" class="mt-2">
-                  </h5>
+                  <h5 style="font-family:'oswald' ; font-size: 16px; cursor:pointer;" class="mt-2" onclick="document.getElementById('comments').scrollIntoView({behavior:'smooth', block:'start'});">OPINIONS</h5>
                 </div>
                 <div class="d-flex flexiable ">
                   <img src="/imges/download-removebg-preview.png" alt="">
-                  <h5 style="font-family:'oswald' ; font-size: 16px;" class="mt-2"> </h5>
+                  <h5 style="font-family:'oswald' ; font-size: 16px; cursor: pointer;" class="mt-2" onclick="showPicturesModal()">PICTURES</h5>
                 </div>
                 <div class="d-flex flexiable ">
                   <img src="/imges/download-removebg-preview.png" alt="">
-                  <h5 style="font-family:'oswald' ; font-size: 16px;" class="mt-2">COMPARE </h5>
+                  <h5 style="font-family:'oswald' ; font-size: 16px;" class="mt-2" onclick="window.location.href='compare.php?phone1=<?php echo $device['id']; ?>'">COMPARE </h5>
                 </div>
                 <div class="d-flex flexiable ">
                   <img src="/imges/download-removebg-preview.png" alt="">
@@ -1413,7 +1464,9 @@ if ($_POST && isset($_POST['submit_comment'])) {
             correct.</p>
 
           <div class="d-block d-lg-flex"> <button
-              class="pad">COMPARE</button>
+              class="pad" onclick="window.location.href='compare.php?phone1=<?php echo $device['id']; ?>'">COMPARE</button>
+            <button class="pad" onclick="document.getElementById('comments').scrollIntoView({behavior:'smooth', block:'start'});">OPINIONS</button>
+            <button class="pad" onclick="showPicturesModal()">PICTURES</button>
           </div>
 
           <div class="comments" id="comments">
@@ -1570,6 +1623,92 @@ if ($_POST && isset($_POST['submit_comment'])) {
     </div>
   </div>
 
+  <!-- Pictures Modal -->
+  <div class="modal fade" id="picturesModal" tabindex="-1" aria-labelledby="picturesModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg modal-dialog-centered">
+      <div class="modal-content" style="background-color: #EFEBE9; border: 2px solid #8D6E63;">
+        <div class="modal-header" style="border-bottom: 1px solid #8D6E63; background-color: #D7CCC8;">
+          <h5 class="modal-title" id="picturesModalLabel" style="font-family:'oswald'; color: #5D4037;">
+            <i class="fas fa-images me-2"></i><?php echo htmlspecialchars(($device['brand_name'] ?? '') . ' ' . ($device['name'] ?? 'Device')); ?> - Pictures
+          </h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <div class="modal-body p-0">
+          <?php if (!empty($deviceImages)): ?>
+            <!-- Image Carousel -->
+            <div id="picturesCarousel" class="carousel slide" data-bs-ride="false">
+              <!-- Carousel Indicators -->
+              <div class="carousel-indicators">
+                <?php foreach ($deviceImages as $index => $image): ?>
+                  <button type="button" data-bs-target="#picturesCarousel" data-bs-slide-to="<?php echo $index; ?>"
+                    <?php if ($index === 0): ?>class="active" aria-current="true" <?php endif; ?>
+                    aria-label="Slide <?php echo $index + 1; ?>"></button>
+                <?php endforeach; ?>
+              </div>
+
+              <!-- Carousel Images -->
+              <div class="carousel-inner">
+                <?php foreach ($deviceImages as $index => $image): ?>
+                  <div class="carousel-item <?php if ($index === 0): ?>active<?php endif; ?>">
+                    <div class="d-flex justify-content-center" style="background-color: #F5F5F5; min-height: 400px;">
+                      <!-- Debug output -->
+                      <div style="display: none;">Image path: <?php echo htmlspecialchars($image); ?></div>
+
+                      <img src="<?php echo htmlspecialchars($image); ?>"
+                        class="d-block img-fluid"
+                        style="max-height: 500px; max-width: 100%; object-fit: contain; padding: 20px;"
+                        alt="<?php echo htmlspecialchars(($device['brand_name'] ?? '') . ' ' . ($device['name'] ?? 'Device')); ?> - Image <?php echo $index + 1; ?>"
+                        onerror="this.style.display='none';">
+                    </div>
+                    <div class="carousel-caption d-md-block" style="background-color: rgba(0,0,0,0.5); border-radius: 10px; bottom: 20px;">
+                      <p class="mb-0" style="font-size: 14px;">Image <?php echo $index + 1; ?> of <?php echo count($deviceImages); ?></p>
+                    </div>
+                  </div>
+                <?php endforeach; ?>
+              </div>
+
+              <!-- Carousel Controls -->
+              <?php if (count($deviceImages) > 1): ?>
+                <button class="carousel-control-prev" type="button" data-bs-target="#picturesCarousel" data-bs-slide="prev">
+                  <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+                  <span class="visually-hidden">Previous</span>
+                </button>
+                <button class="carousel-control-next" type="button" data-bs-target="#picturesCarousel" data-bs-slide="next">
+                  <span class="carousel-control-next-icon" aria-hidden="true"></span>
+                  <span class="visually-hidden">Next</span>
+                </button>
+              <?php endif; ?>
+            </div>
+
+            <!-- Thumbnail Navigation -->
+            <?php if (count($deviceImages) > 1): ?>
+              <div class="modal-footer" style="border-top: 1px solid #8D6E63; background-color: #D7CCC8; padding: 10px;">
+                <div class="d-flex justify-content-center flex-wrap gap-2" style="max-height: 100px; overflow-y: auto;">
+                  <?php foreach ($deviceImages as $index => $image): ?>
+                    <img src="<?php echo htmlspecialchars($image); ?>"
+                      class="thumbnail-nav border rounded"
+                      style="width: 60px; height: 60px; object-fit: cover; cursor: pointer; opacity: 0.7; transition: opacity 0.3s;"
+                      onclick="showSlide(<?php echo $index; ?>)"
+                      data-slide="<?php echo $index; ?>"
+                      alt="Thumbnail <?php echo $index + 1; ?>"
+                      onerror="this.style.display='none';">
+                  <?php endforeach; ?>
+                </div>
+              </div>
+            <?php endif; ?>
+          <?php else: ?>
+            <!-- No Images Available -->
+            <div class="text-center py-5">
+              <i class="fas fa-image-slash fa-3x text-muted mb-3"></i>
+              <h6 class="text-muted">No pictures available for this device</h6>
+              <p class="text-muted small">Pictures will be added soon</p>
+            </div>
+          <?php endif; ?>
+        </div>
+      </div>
+    </div>
+  </div>
+
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 
@@ -1710,6 +1849,52 @@ if ($_POST && isset($_POST['submit_comment'])) {
   function showAllImages() {
     new bootstrap.Modal(document.getElementById('allImagesModal')).show();
   }
+
+  // Pictures Modal Functions
+  function showPicturesModal() {
+    const modal = new bootstrap.Modal(document.getElementById('picturesModal'));
+    modal.show();
+
+    // Reset carousel to first slide
+    const carousel = bootstrap.Carousel.getInstance(document.getElementById('picturesCarousel'));
+    if (carousel) {
+      carousel.to(0);
+    }
+
+    // Update thumbnail highlighting
+    updateThumbnailHighlight(0);
+  }
+
+  function showSlide(slideIndex) {
+    const carousel = bootstrap.Carousel.getInstance(document.getElementById('picturesCarousel'));
+    if (carousel) {
+      carousel.to(slideIndex);
+    }
+    updateThumbnailHighlight(slideIndex);
+  }
+
+  function updateThumbnailHighlight(activeIndex) {
+    // Remove active class from all thumbnails
+    document.querySelectorAll('.thumbnail-nav').forEach((thumb, index) => {
+      if (index === activeIndex) {
+        thumb.style.opacity = '1';
+        thumb.style.border = '2px solid #5D4037';
+      } else {
+        thumb.style.opacity = '0.7';
+        thumb.style.border = '1px solid #ddd';
+      }
+    });
+  }
+
+  // Listen for carousel slide events to update thumbnails
+  document.addEventListener('DOMContentLoaded', function() {
+    const carousel = document.getElementById('picturesCarousel');
+    if (carousel) {
+      carousel.addEventListener('slid.bs.carousel', function(event) {
+        updateThumbnailHighlight(event.to);
+      });
+    }
+  });
 
   // Smooth scroll to comments section
   document.addEventListener('DOMContentLoaded', function() {
