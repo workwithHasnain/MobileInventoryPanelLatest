@@ -45,18 +45,9 @@ if (session_status() === PHP_SESSION_NONE) {
                         </li>
 
                         <?php if (isset($_SESSION['role']) && $_SESSION['role'] === 'admin'): ?>
-                            <li class="nav-item dropdown">
-                                <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-bs-toggle="dropdown">
-                                    <i class="fas fa-cogs"></i> Manage Data
+                            <li class="nav-item">
+                                <a class="nav-link" href="manage_data_db.php">Manage Data
                                 </a>
-                                <ul class="dropdown-menu">
-                                    <li><a class="dropdown-item" href="manage_data.php">
-                                            <i class="fas fa-file-alt"></i> JSON Files
-                                        </a></li>
-                                    <li><a class="dropdown-item" href="manage_data_db.php">
-                                            <i class="fas fa-database"></i> PostgreSQL Database
-                                        </a></li>
-                                </ul>
                             </li>
                         <?php endif; ?>
                     </ul>
