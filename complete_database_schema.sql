@@ -71,6 +71,7 @@ CREATE TABLE IF NOT EXISTS post_categories (
 -- =====================================================
 
 -- Main devices table (phones & tablets)
+DROP TABLE IF EXISTS phones;
 CREATE TABLE IF NOT EXISTS phones (
     id SERIAL PRIMARY KEY,
     
@@ -78,48 +79,59 @@ CREATE TABLE IF NOT EXISTS phones (
     release_date DATE,
     name VARCHAR(255) NOT NULL,
     brand_id INTEGER REFERENCES brands(id) ON DELETE CASCADE,
+    brand VARCHAR(100), -- For direct brand name storage
     year INTEGER,
     availability VARCHAR(50),
     price DECIMAL(10,2),
     image VARCHAR(255),
+    images TEXT[], -- Array of image paths
     
     -- Network
-    network_2g BOOLEAN DEFAULT FALSE,
-    network_3g BOOLEAN DEFAULT FALSE,
-    network_4g BOOLEAN DEFAULT FALSE,
-    network_5g BOOLEAN DEFAULT FALSE,
+    network_2g TEXT[], -- Array of 2G bands
+    network_3g TEXT[], -- Array of 3G bands
+    network_4g TEXT[], -- Array of 4G bands
+    network_5g TEXT[], -- Array of 5G bands
     dual_sim BOOLEAN DEFAULT FALSE,
     esim BOOLEAN DEFAULT FALSE,
-    sim_size VARCHAR(20),
+    sim_size TEXT[], -- Array of supported SIM sizes
     
-    -- Dimensions & Weight
-    dimensions_length DECIMAL(5,2),
-    dimensions_width DECIMAL(5,2),
-    dimensions_thickness DECIMAL(4,2),
+    -- Body
+    dimensions VARCHAR(100), -- Combined dimensions string
+    form_factor VARCHAR(50),
+    keyboard VARCHAR(50),
+    height DECIMAL(5,2),
+    width DECIMAL(5,2),
+    thickness DECIMAL(4,2),
     weight DECIMAL(5,2),
+    ip_certificate TEXT[], -- Array of IP ratings
+    color VARCHAR(100),
+    back_material VARCHAR(100),
+    frame_material VARCHAR(100),
     
     -- Display
     display_type VARCHAR(50),
     display_size DECIMAL(4,2),
     display_resolution VARCHAR(50),
+    display_density VARCHAR(50), -- Added for PPI
     display_technology VARCHAR(50),
-    display_notch BOOLEAN DEFAULT FALSE,
+    display_notch VARCHAR(50), -- Changed to VARCHAR for different notch types
     refresh_rate INTEGER,
     hdr BOOLEAN DEFAULT FALSE,
     billion_colors BOOLEAN DEFAULT FALSE,
     
     -- Platform
     os VARCHAR(50),
+    os_version VARCHAR(50),
+    chipset VARCHAR(100),
     chipset_id INTEGER REFERENCES chipsets(id) ON DELETE SET NULL,
-    cpu_cores INTEGER,
+    cpu_cores VARCHAR(50),
     cpu_frequency DECIMAL(5,2),
     gpu VARCHAR(100),
     
     -- Memory
-    ram_internal VARCHAR(50),
-    storage_internal VARCHAR(50),
-    card_slot BOOLEAN DEFAULT FALSE,
-    storage_expandable VARCHAR(50),
+    ram VARCHAR(100), -- Changed from ram_internal
+    storage VARCHAR(100), -- Changed from storage_internal
+    card_slot VARCHAR(50), -- Changed to VARCHAR for card sizes
     
     -- Camera
     main_camera_count INTEGER DEFAULT 1,
@@ -129,46 +141,50 @@ CREATE TABLE IF NOT EXISTS phones (
     main_camera_ois BOOLEAN DEFAULT FALSE,
     main_camera_telephoto BOOLEAN DEFAULT FALSE,
     main_camera_ultrawide BOOLEAN DEFAULT FALSE,
-    main_camera_macro BOOLEAN DEFAULT FALSE,
     main_camera_flash BOOLEAN DEFAULT FALSE,
+    main_camera_f_number VARCHAR(50),
     
     selfie_camera_count INTEGER DEFAULT 1,
     selfie_camera_resolution VARCHAR(100),
     selfie_camera_features TEXT[],
     selfie_camera_video VARCHAR(100),
+    selfie_camera_ois BOOLEAN DEFAULT FALSE,
+    selfie_camera_flash BOOLEAN DEFAULT FALSE,
+    popup_camera BOOLEAN DEFAULT FALSE,
+    under_display_camera BOOLEAN DEFAULT FALSE,
     
-    -- Sound
-    loudspeaker BOOLEAN DEFAULT FALSE,
-    audio_jack_35mm BOOLEAN DEFAULT FALSE,
+    -- Audio
+    headphone_jack BOOLEAN DEFAULT FALSE,
+    dual_speakers BOOLEAN DEFAULT FALSE,
     
     -- Communications
-    wifi VARCHAR(100),
-    bluetooth VARCHAR(50),
+    wifi TEXT[], -- Array of WiFi standards
+    bluetooth TEXT[], -- Array of Bluetooth versions
     gps BOOLEAN DEFAULT FALSE,
     nfc BOOLEAN DEFAULT FALSE,
-    infrared_port BOOLEAN DEFAULT FALSE,
-    radio BOOLEAN DEFAULT FALSE,
+    infrared BOOLEAN DEFAULT FALSE,
+    fm_radio BOOLEAN DEFAULT FALSE,
     usb VARCHAR(50),
     
-    -- Features
-    fingerprint BOOLEAN DEFAULT FALSE,
-    face_unlock BOOLEAN DEFAULT FALSE,
-    sensors TEXT[],
+    -- Sensors
+    accelerometer BOOLEAN DEFAULT FALSE,
+    gyro BOOLEAN DEFAULT FALSE,
+    compass BOOLEAN DEFAULT FALSE,
+    proximity BOOLEAN DEFAULT FALSE,
+    barometer BOOLEAN DEFAULT FALSE,
+    heart_rate BOOLEAN DEFAULT FALSE,
+    fingerprint VARCHAR(50), -- Changed to VARCHAR for different types
     
     -- Battery
-    battery_type VARCHAR(50),
     battery_capacity INTEGER,
+    battery_sic BOOLEAN DEFAULT FALSE, -- Silicon battery
     battery_removable BOOLEAN DEFAULT FALSE,
-    charging_wired DECIMAL(5,2),
-    charging_wireless DECIMAL(5,2),
-    charging_reverse DECIMAL(5,2),
+    wired_charging VARCHAR(50),
+    wireless_charging VARCHAR(50),
     
-    -- Colors
+    -- Colors and Additional Fields
     colors TEXT[],
-    
-    -- Additional
-    form_factor VARCHAR(50),
-    keyboard BOOLEAN DEFAULT FALSE,
+   
     
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
@@ -301,43 +317,3 @@ CREATE INDEX IF NOT EXISTS idx_device_views_date ON device_views(view_date);
 CREATE INDEX IF NOT EXISTS idx_device_comparisons_devices ON device_comparisons(device1_id, device2_id);
 CREATE INDEX IF NOT EXISTS idx_content_views_content ON content_views(content_type, content_id);
 
--- =====================================================
--- SAMPLE DATA
--- =====================================================
-
--- Insert sample brands
-INSERT INTO brands (id, name, description) VALUES
-(1, 'Samsung', 'South Korean multinational electronics company'),
-(2, 'Apple', 'American multinational technology company'),
-(3, 'Xiaomi', 'Chinese electronics company'),
-(4, 'OnePlus', 'Chinese smartphone manufacturer'),
-(5, 'Google', 'American multinational technology company'),
-(6, 'Nothing', 'London-based consumer technology company')
-ON CONFLICT (id) DO NOTHING;
-
--- Insert sample chipsets
-INSERT INTO chipsets (id, name, description, manufacturer) VALUES
-(1, 'Snapdragon 8 Gen 3', 'Qualcomm''s latest flagship mobile platform', 'Qualcomm'),
-(2, 'Apple A17 Pro', 'Apple''s most powerful chip for iPhone', 'Apple'),
-(3, 'Dimensity 9300', 'MediaTek''s flagship mobile platform', 'MediaTek'),
-(4, 'Exynos 2400', 'Samsung''s flagship mobile processor', 'Samsung'),
-(5, 'Tensor G3', 'Google''s custom mobile processor', 'Google'),
-(6, 'Helio G99', 'MediaTek''s gaming-focused processor', 'MediaTek'),
-(7, 'Snapdragon 7+ Gen 2', 'Qualcomm''s premium mid-range platform', 'Qualcomm')
-ON CONFLICT (id) DO NOTHING;
-
--- Insert sample posts
-INSERT INTO posts (title, slug, author, publish_date, short_description, content_body, status, is_featured) VALUES
-('Samsung Galaxy S24 Ultra Review', 'samsung-galaxy-s24-ultra-review', 'Tech Reviewer', '2024-01-15', 'Comprehensive review of Samsung''s latest flagship', 'Full review content here...', 'published', TRUE),
-('Best Budget Smartphones of 2024', 'best-budget-smartphones-2024', 'Tech Expert', '2024-01-10', 'Top affordable smartphones worth considering', 'Budget phone recommendations...', 'published', TRUE),
-('5G Revolution: What''s Next?', '5g-revolution-whats-next', 'Network Specialist', '2024-01-05', 'Exploring the future of 5G technology', '5G technology analysis...', 'published', FALSE),
-('Camera Technology Trends', 'camera-technology-trends', 'Photography Expert', '2024-01-01', 'Latest developments in smartphone photography', 'Camera technology overview...', 'published', FALSE)
-ON CONFLICT (slug) DO NOTHING;
-
--- Insert sample phones
-INSERT INTO phones (name, brand_id, chipset_id, release_date, year, availability, price, os, network_5g, network_4g, dual_sim, display_size, display_resolution, battery_capacity) VALUES
-('Galaxy S24 Ultra', 1, 1, '2024-01-17', 2024, 'Available', 1199.99, 'Android', TRUE, TRUE, TRUE, 6.8, '3120 x 1440', 5000),
-('Galaxy S24', 1, 1, '2024-01-17', 2024, 'Available', 799.99, 'Android', TRUE, TRUE, TRUE, 6.2, '2340 x 1080', 4000),
-('iPhone 15 Pro', 2, 2, '2023-09-22', 2023, 'Available', 999.99, 'iOS', TRUE, TRUE, FALSE, 6.1, '2556 x 1179', 3274),
-('Galaxy Tab S9', 1, 4, '2023-08-01', 2023, 'Available', 799.99, 'Android', TRUE, TRUE, TRUE, 11.0, '2560 x 1600', 8400)
-ON CONFLICT DO NOTHING;

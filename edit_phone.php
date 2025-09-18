@@ -3,6 +3,27 @@ require_once 'auth.php';
 require_once 'phone_data.php';
 require_once 'brand_data.php';
 
+// Helper function to get value from phone data
+function getValue($key, $default = '')
+{
+    global $phone;
+    return isset($phone[$key]) ? $phone[$key] : $default;
+}
+
+// Helper function to check if a boolean value is true
+function isChecked($key)
+{
+    global $phone;
+    return isset($phone[$key]) && $phone[$key] ? 'checked' : '';
+}
+
+// Helper function to check if a value is selected
+function isSelected($key, $value)
+{
+    global $phone;
+    return isset($phone[$key]) && $phone[$key] === $value ? 'selected' : '';
+}
+
 // Require login for this page
 requireLogin();
 
@@ -14,16 +35,14 @@ $phone = null;
 $id = isset($_GET['id']) ? (int)$_GET['id'] : -1;
 
 // Get phone data
-$phones = getAllPhones();
+$phone = getPhoneById($id);
 
 // Check if phone exists
-if ($id < 0 || !isset($phones[$id])) {
+if (!$phone) {
     $_SESSION['error_message'] = 'Phone not found!';
     header('Location: dashboard.php');
     exit();
 }
-
-$phone = $phones[$id];
 
 // Handle form submission
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
@@ -116,9 +135,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         }
     }
 
-    // If still no errors after validation, update the device
+    // If still no errors after validation, create the device
     if (empty($errors)) {
-        $updated_phone = [
+        $new_phone = [
             // Launch
             'release_date' => !empty($_POST['release_date']) ? $_POST['release_date'] : null,
 
@@ -225,11 +244,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             'wireless_charging' => $_POST['wireless_charging'] ?? ''
         ];
 
-        $result = updatePhone($id, $updated_phone);
-        if (is_array($result) && isset($result['error'])) {
-            // Set error from updatePhone function
-            $errors['general'] = $result['error'];
-        } else if ($result === true) {
+        $result = updatePhone($id, $new_phone);
+        if ($result === true) {
             // Set success message and redirect to dashboard
             $_SESSION['success_message'] = 'Device updated successfully!';
             header('Location: dashboard.php');
@@ -248,7 +264,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     <div class="row mb-4">
         <div class="col">
             <h1>Edit Device</h1>
-            <p class="text-muted">Update the details of the mobile device</p>
+            <p class="text-muted">Update the details of <?php echo htmlspecialchars($phone['name']); ?></p>
         </div>
         <div class="col-auto">
             <a href="dashboard.php" class="btn btn-secondary">
@@ -282,7 +298,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             <div class="tab-content" id="deviceTypeTabContent">
                 <!-- Phone Form Tab -->
                 <div class="tab-pane fade show active" id="phone-form" role="tabpanel">
-                    <form method="post" action="<?php echo htmlspecialchars($_SERVER['PHP_SELF']) . '?id=' . $id; ?>" enctype="multipart/form-data">
+                    <form method="post" action="<?php echo htmlspecialchars($_SERVER['PHP_SELF'] . '?id=' . $id); ?>" enctype="multipart/form-data">
+                        <input type="hidden" name="id" value="<?php echo $id; ?>">
                         <input type="hidden" name="device_type" value="phone">
 
                         <!-- 1. Launch Section -->
@@ -298,7 +315,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                                         <div class="row">
                                             <div class="col-md-6">
                                                 <label for="release_date" class="form-label">Date of Release</label>
-                                                <input type="date" class="form-control" id="release_date" name="release_date" value="<?php echo htmlspecialchars($phone['release_date'] ?? ''); ?>">
+                                                <input type="date" class="form-control" id="release_date" name="release_date" value="<?php echo getValue('release_date'); ?>">
                                             </div>
                                         </div>
                                     </div>
@@ -318,7 +335,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                                             <div class="col-md-6 mb-3">
                                                 <label for="name" class="form-label">Name *</label>
                                                 <input type="text" class="form-control <?php echo isset($errors['name']) ? 'is-invalid' : ''; ?>"
-                                                    id="name" name="name" value="<?php echo htmlspecialchars($phone['name'] ?? ''); ?>" required>
+                                                    id="name" name="name" value="<?php echo isset($name) ? htmlspecialchars($name) : ''; ?>" required>
                                                 <?php if (isset($errors['name'])): ?>
                                                     <div class="invalid-feedback"><?php echo htmlspecialchars($errors['name']); ?></div>
                                                 <?php endif; ?>
@@ -334,7 +351,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                                                         $brands = getAllBrands();
                                                         if (!empty($brands)) {
                                                             foreach ($brands as $brandItem) {
-                                                                $selected = isset($phone['brand']) && $phone['brand'] === $brandItem['name'] ? 'selected' : '';
+                                                                $selected = isset($brand) && $brand === $brandItem['name'] ? 'selected' : '';
                                                                 echo '<option value="' . htmlspecialchars($brandItem['name']) . '" ' . $selected . '>' .
                                                                     htmlspecialchars($brandItem['name']) . '</option>';
                                                             }
@@ -361,8 +378,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                                             <div class="col-md-4 mb-3">
                                                 <label for="year" class="form-label">Year *</label>
                                                 <input type="number" class="form-control <?php echo isset($errors['year']) ? 'is-invalid' : ''; ?>"
-                                                    id="year" name="year" min="2000" max="<?php echo date('Y') + 2; ?>" value="<?php echo htmlspecialchars($phone['year'] ?? date('Y')); ?>"
-                                                    value="<?php echo htmlspecialchars($phone['year'] ?? date('Y')); ?>" required>
+                                                    id="year" name="year" min="2000" max="<?php echo date('Y') + 2; ?>"
+                                                    value="<?php echo isset($year) ? htmlspecialchars($year) : date('Y'); ?>" required>
                                                 <?php if (isset($errors['year'])): ?>
                                                     <div class="invalid-feedback"><?php echo htmlspecialchars($errors['year']); ?></div>
                                                 <?php endif; ?>
@@ -373,10 +390,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                                                 <select class="form-select <?php echo isset($errors['availability']) ? 'is-invalid' : ''; ?>"
                                                     id="availability" name="availability" required>
                                                     <option value="">Select availability...</option>
-                                                    <option value="Available" <?php echo ($phone['availability'] ?? '') === 'Available' ? 'selected' : ''; ?>>Available</option>
-                                                    <option value="Coming Soon" <?php echo ($phone['availability'] ?? '') === 'Coming Soon' ? 'selected' : ''; ?>>Coming Soon</option>
-                                                    <option value="Discontinued" <?php echo ($phone['availability'] ?? '') === 'Discontinued' ? 'selected' : ''; ?>>Discontinued</option>
-                                                    <option value="Rumored" <?php echo ($phone['availability'] ?? '') === 'Rumored' ? 'selected' : ''; ?>>Rumored</option>
+                                                    <option value="Available" <?php echo isset($availability) && $availability === 'Available' ? 'selected' : ''; ?>>Available</option>
+                                                    <option value="Coming Soon" <?php echo isset($availability) && $availability === 'Coming Soon' ? 'selected' : ''; ?>>Coming Soon</option>
+                                                    <option value="Discontinued" <?php echo isset($availability) && $availability === 'Discontinued' ? 'selected' : ''; ?>>Discontinued</option>
+                                                    <option value="Rumored" <?php echo isset($availability) && $availability === 'Rumored' ? 'selected' : ''; ?>>Rumored</option>
                                                 </select>
                                                 <?php if (isset($errors['availability'])): ?>
                                                     <div class="invalid-feedback"><?php echo htmlspecialchars($errors['availability']); ?></div>
@@ -388,8 +405,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                                                 <div class="input-group">
                                                     <span class="input-group-text">$</span>
                                                     <input type="number" step="0.01" class="form-control <?php echo isset($errors['price']) ? 'is-invalid' : ''; ?>"
-                                                        id="price" name="price" min="0.01" value="<?php echo htmlspecialchars($phone['price'] ?? ''); ?>"
-                                                        value="<?php echo htmlspecialchars($phone['price'] ?? ''); ?>" required>
+                                                        id="price" name="price" min="0.01"
+                                                        value="<?php echo isset($price) ? htmlspecialchars($price) : ''; ?>" required>
                                                     <?php if (isset($errors['price'])): ?>
                                                         <div class="invalid-feedback"><?php echo htmlspecialchars($errors['price']); ?></div>
                                                     <?php endif; ?>
@@ -398,18 +415,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
                                             <div class="col-md-12 mb-3">
                                                 <label class="form-label">Phone Images (up to 5)</label>
-                                                <?php if (!empty($phone['images']) && is_array($phone['images'])): ?>
-                                                    <div class="mb-2">
-                                                        <label class="form-label">Current Images:</label>
-                                                        <div class="row">
-                                                            <?php foreach ($phone['images'] as $imgPath): ?>
-                                                                <div class="col-md-2 mb-2">
-                                                                    <img src="<?php echo htmlspecialchars($imgPath); ?>" alt="Phone Image" class="img-thumbnail" style="max-width:100px; max-height:100px;">
-                                                                </div>
-                                                            <?php endforeach; ?>
-                                                        </div>
-                                                    </div>
-                                                <?php endif; ?>
                                                 <div class="row">
                                                     <div class="col-md-4 mb-2">
                                                         <label for="image1" class="form-label">Image 1 (Main)</label>
@@ -456,7 +461,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                                             <div class="col-md-6 mb-3">
                                                 <label class="form-label">2G</label>
                                                 <div class="form-check">
-                                                    <input class="form-check-input" type="checkbox" name="2g[]" value="GSM 850" id="2g_850" <?php echo in_array('GSM 850', $phone['2g'] ?? []) ? 'checked' : ''; ?>>
+                                                    <input class="form-check-input" type="checkbox" name="2g[]" value="GSM 850" id="2g_850">
                                                     <label class="form-check-label" for="2g_850">GSM 850</label>
                                                 </div>
                                                 <div class="form-check">
@@ -476,7 +481,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                                             <div class="col-md-6 mb-3">
                                                 <label class="form-label">3G</label>
                                                 <div class="form-check">
-                                                    <input class="form-check-input" type="checkbox" name="3g[]" value="HSPA 850" id="3g_850" <?php echo in_array('HSPA 850', $phone['3g'] ?? []) ? 'checked' : ''; ?>>
+                                                    <input class="form-check-input" type="checkbox" name="3g[]" value="HSPA 850" id="3g_850">
                                                     <label class="form-check-label" for="3g_850">HSPA 850</label>
                                                 </div>
                                                 <div class="form-check">
@@ -500,7 +505,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                                             <div class="col-md-6 mb-3">
                                                 <label class="form-label">4G</label>
                                                 <div class="form-check">
-                                                    <input class="form-check-input" type="checkbox" name="4g[]" value="LTE 700" id="4g_700" <?php echo in_array('LTE 700', $phone['4g'] ?? []) ? 'checked' : ''; ?>>
+                                                    <input class="form-check-input" type="checkbox" name="4g[]" value="LTE 700" id="4g_700">
                                                     <label class="form-check-label" for="4g_700">LTE 700</label>
                                                 </div>
                                                 <div class="form-check">
@@ -520,7 +525,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                                             <div class="col-md-6 mb-3">
                                                 <label class="form-label">5G</label>
                                                 <div class="form-check">
-                                                    <input class="form-check-input" type="checkbox" name="5g[]" value="NR 3500" id="5g_3500" <?php echo in_array('NR 3500', $phone['5g'] ?? []) ? 'checked' : ''; ?>>
+                                                    <input class="form-check-input" type="checkbox" name="5g[]" value="NR 3500" id="5g_3500">
                                                     <label class="form-check-label" for="5g_3500">NR 3500</label>
                                                 </div>
                                                 <div class="form-check">
@@ -553,11 +558,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                                         <div class="row">
                                             <div class="col-md-6 mb-3">
                                                 <div class="form-check">
-                                                    <input class="form-check-input" type="checkbox" name="dual_sim" id="dual_sim" <?php echo isset($phone['dual_sim']) && $phone['dual_sim'] ? 'checked' : ''; ?>>
+                                                    <input class="form-check-input" type="checkbox" name="dual_sim" id="dual_sim" <?php echo isChecked('dual_sim'); ?>>
                                                     <label class="form-check-label" for="dual_sim">Dual SIM</label>
                                                 </div>
                                                 <div class="form-check">
-                                                    <input class="form-check-input" type="checkbox" name="esim" id="esim" <?php echo isset($phone['esim']) && $phone['esim'] ? 'checked' : ''; ?>>
+                                                    <input class="form-check-input" type="checkbox" name="esim" id="esim">
                                                     <label class="form-check-label" for="esim">eSIM</label>
                                                 </div>
                                             </div>
@@ -593,13 +598,13 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                                         <div class="row">
                                             <div class="col-md-6 mb-3">
                                                 <label for="dimensions" class="form-label">Dimensions</label>
-                                                <input type="text" class="form-control" id="dimensions" name="dimensions" placeholder="e.g., 159.9 x 75.7 x 8.3 mm" value="<?php echo htmlspecialchars($phone['dimensions'] ?? ''); ?>">
+                                                <input type="text" class="form-control" id="dimensions" name="dimensions" placeholder="e.g., 159.9 x 75.7 x 8.3 mm">
                                             </div>
                                             <div class="col-md-6 mb-3">
                                                 <label for="form_factor" class="form-label">Form Factor</label>
                                                 <select class="form-select" id="form_factor" name="form_factor">
                                                     <option value="">Select form factor...</option>
-                                                    <option value="Bar" <?php echo ($phone['form_factor'] ?? '') === 'Bar' ? 'selected' : ''; ?>>Bar</option>
+                                                    <option value="Bar">Bar</option>
                                                     <option value="Flip Up">Flip Up</option>
                                                     <option value="Flip Down">Flip Down</option>
                                                     <option value="Swivel">Swivel</option>
@@ -616,7 +621,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                                             </div>
                                             <div class="col-md-3 mb-3">
                                                 <label for="height" class="form-label">Height (mm)</label>
-                                                <input type="number" step="0.1" class="form-control" id="height" name="height" value="<?php echo htmlspecialchars($phone['height'] ?? ''); ?>">
+                                                <input type="number" step="0.1" class="form-control" id="height" name="height">
                                             </div>
                                             <div class="col-md-3 mb-3">
                                                 <label for="width" class="form-label">Width (mm)</label>
@@ -661,27 +666,27 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                                             </div>
                                             <div class="col-md-4 mb-3">
                                                 <label for="color" class="form-label">Color</label>
-                                                <input type="text" class="form-control" id="color" name="color" placeholder="e.g., Midnight Black" value="<?php echo htmlspecialchars($phone['color'] ?? ''); ?>">
+                                                <input type="text" class="form-control" id="color" name="color" placeholder="e.g., Midnight Black">
                                             </div>
                                             <div class="col-md-4 mb-3">
                                                 <label for="back_material" class="form-label">Back Material</label>
                                                 <select class="form-select" id="back_material" name="back_material">
                                                     <option value="">Select material...</option>
-                                                    <option value="Plastic" <?php echo ($phone['back_material'] ?? '') === 'Plastic' ? 'selected' : ''; ?>>Plastic</option>
-                                                    <option value="Aluminum" <?php echo ($phone['back_material'] ?? '') === 'Aluminum' ? 'selected' : ''; ?>>Aluminum</option>
-                                                    <option value="Glass" <?php echo ($phone['back_material'] ?? '') === 'Glass' ? 'selected' : ''; ?>>Glass</option>
-                                                    <option value="Ceramic" <?php echo ($phone['back_material'] ?? '') === 'Ceramic' ? 'selected' : ''; ?>>Ceramic</option>
+                                                    <option value="Plastic">Plastic</option>
+                                                    <option value="Aluminum">Aluminum</option>
+                                                    <option value="Glass">Glass</option>
+                                                    <option value="Ceramic">Ceramic</option>
                                                 </select>
                                             </div>
                                             <div class="col-md-4 mb-3">
                                                 <label for="frame_material" class="form-label">Frame Material</label>
                                                 <select class="form-select" id="frame_material" name="frame_material">
                                                     <option value="">Select material...</option>
-                                                    <option value="Plastic" <?php echo ($phone['frame_material'] ?? '') === 'Plastic' ? 'selected' : ''; ?>>Plastic</option>
-                                                    <option value="Aluminum" <?php echo ($phone['frame_material'] ?? '') === 'Aluminum' ? 'selected' : ''; ?>>Aluminum</option>
-                                                    <option value="Stainless Steel" <?php echo ($phone['frame_material'] ?? '') === 'Stainless Steel' ? 'selected' : ''; ?>>Stainless Steel</option>
-                                                    <option value="Ceramic" <?php echo ($phone['frame_material'] ?? '') === 'Ceramic' ? 'selected' : ''; ?>>Ceramic</option>
-                                                    <option value="Titanium" <?php echo ($phone['frame_material'] ?? '') === 'Titanium' ? 'selected' : ''; ?>>Titanium</option>
+                                                    <option value="Plastic">Plastic</option>
+                                                    <option value="Aluminum">Aluminum</option>
+                                                    <option value="Stainless Steel">Stainless Steel</option>
+                                                    <option value="Ceramic">Ceramic</option>
+                                                    <option value="Titanium">Titanium</option>
                                                 </select>
                                             </div>
                                         </div>
@@ -703,20 +708,20 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                                                 <label for="os" class="form-label">OS</label>
                                                 <select class="form-select" id="os" name="os">
                                                     <option value="">Select OS...</option>
-                                                    <option value="Feature phones" <?php echo ($phone['os'] ?? '') === 'Feature phones' ? 'selected' : ''; ?>>Feature phones</option>
-                                                    <option value="Android" <?php echo ($phone['os'] ?? '') === 'Android' ? 'selected' : ''; ?>>Android</option>
-                                                    <option value="iOS" <?php echo ($phone['os'] ?? '') === 'iOS' ? 'selected' : ''; ?>>iOS</option>
-                                                    <option value="KaiOS" <?php echo ($phone['os'] ?? '') === 'KaiOS' ? 'selected' : ''; ?>>KaiOS</option>
-                                                    <option value="Windows Phone" <?php echo ($phone['os'] ?? '') === 'Windows Phone' ? 'selected' : ''; ?>>Windows Phone</option>
-                                                    <option value="Symbian" <?php echo ($phone['os'] ?? '') === 'Symbian' ? 'selected' : ''; ?>>Symbian</option>
-                                                    <option value="RIM" <?php echo ($phone['os'] ?? '') === 'RIM' ? 'selected' : ''; ?>>RIM</option>
-                                                    <option value="Bada" <?php echo ($phone['os'] ?? '') === 'Bada' ? 'selected' : ''; ?>>Bada</option>
-                                                    <option value="Firefox" <?php echo ($phone['os'] ?? '') === 'Firefox' ? 'selected' : ''; ?>>Firefox</option>
+                                                    <option value="Feature phones">Feature phones</option>
+                                                    <option value="Android">Android</option>
+                                                    <option value="iOS">iOS</option>
+                                                    <option value="KaiOS">KaiOS</option>
+                                                    <option value="Windows Phone">Windows Phone</option>
+                                                    <option value="Symbian">Symbian</option>
+                                                    <option value="RIM">RIM</option>
+                                                    <option value="Bada">Bada</option>
+                                                    <option value="Firefox">Firefox</option>
                                                 </select>
                                             </div>
                                             <div class="col-md-6 mb-3">
                                                 <label for="os_version" class="form-label">OS Version</label>
-                                                <input type="text" class="form-control" id="os_version" name="os_version" placeholder="e.g., Android 14" value="<?php echo htmlspecialchars($phone['os_version'] ?? ''); ?>">
+                                                <input type="text" class="form-control" id="os_version" name="os_version" placeholder="e.g., Android 14">
                                             </div>
                                             <div class="col-md-6 mb-3">
                                                 <label for="chipset" class="form-label">Chipset</label>
@@ -748,7 +753,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                                             </div>
                                             <div class="col-md-6 mb-3">
                                                 <label for="cpu_cores" class="form-label">CPU Cores</label>
-                                                <input type="number" class="form-control" id="cpu_cores" name="cpu_cores" min="1" max="16" value="<?php echo htmlspecialchars($phone['cpu_cores'] ?? ''); ?>">
+                                                <input type="number" class="form-control" id="cpu_cores" name="cpu_cores" min="1" max="16">
                                             </div>
                                         </div>
                                     </div>
@@ -767,11 +772,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                                         <div class="row">
                                             <div class="col-md-4 mb-3">
                                                 <label for="ram" class="form-label">RAM (GB)</label>
-                                                <input type="number" step="0.5" class="form-control" id="ram" name="ram" min="0.5" max="64" value="<?php echo htmlspecialchars($phone['ram'] ?? ''); ?>">
+                                                <input type="number" step="0.5" class="form-control" id="ram" name="ram" min="0.5" max="64">
                                             </div>
                                             <div class="col-md-4 mb-3">
                                                 <label for="storage" class="form-label">Storage (GB)</label>
-                                                <input type="number" class="form-control" id="storage" name="storage" min="1" max="2048" value="<?php echo htmlspecialchars($phone['storage'] ?? ''); ?>">
+                                                <input type="number" class="form-control" id="storage" name="storage" min="1" max="2048">
                                             </div>
                                             <div class="col-md-4 mb-3">
                                                 <label for="card_slot" class="form-label">Card Slot</label>
@@ -801,17 +806,17 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                                                 <label for="display_type" class="form-label">Type</label>
                                                 <select class="form-select" id="display_type" name="display_type">
                                                     <option value="">Select type...</option>
-                                                    <option value="AMOLED" <?php echo ($phone['display_type'] ?? '') === 'AMOLED' ? 'selected' : ''; ?>>AMOLED</option>
-                                                    <option value="Super AMOLED" <?php echo ($phone['display_type'] ?? '') === 'Super AMOLED' ? 'selected' : ''; ?>>Super AMOLED</option>
+                                                    <option value="AMOLED">AMOLED</option>
+                                                    <option value="Super AMOLED">Super AMOLED</option>
                                                 </select>
                                             </div>
                                             <div class="col-md-6 mb-3">
                                                 <label for="display_resolution" class="form-label">Resolution</label>
-                                                <input type="text" class="form-control" id="display_resolution" name="display_resolution" placeholder="e.g., 1080 x 2400 pixels" value="<?php echo htmlspecialchars($phone['display_resolution'] ?? ''); ?>">
+                                                <input type="text" class="form-control" id="display_resolution" name="display_resolution" placeholder="e.g., 1080 x 2400 pixels">
                                             </div>
                                             <div class="col-md-4 mb-3">
                                                 <label for="display_size" class="form-label">Size (inches)</label>
-                                                <input type="number" step="0.1" class="form-control" id="display_size" name="display_size" min="2" max="15" value="<?php echo htmlspecialchars($phone['display_size'] ?? ''); ?>">
+                                                <input type="number" step="0.1" class="form-control" id="display_size" name="display_size" min="2" max="15">
                                             </div>
                                             <div class="col-md-4 mb-3">
                                                 <label for="display_density" class="form-label">Density (ppi)</label>
@@ -821,9 +826,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                                                 <label for="display_technology" class="form-label">Technology</label>
                                                 <select class="form-select" id="display_technology" name="display_technology">
                                                     <option value="">Select technology...</option>
-                                                    <option value="IPS" <?php echo ($phone['display_technology'] ?? '') === 'IPS' ? 'selected' : ''; ?>>IPS</option>
-                                                    <option value="Any OLED" <?php echo ($phone['display_technology'] ?? '') === 'Any OLED' ? 'selected' : ''; ?>>Any OLED</option>
-                                                    <option value="LTPO OLED" <?php echo ($phone['display_technology'] ?? '') === 'LTPO OLED' ? 'selected' : ''; ?>>LTPO OLED</option>
+                                                    <option value="IPS">IPS</option>
+                                                    <option value="Any OLED">Any OLED</option>
+                                                    <option value="LTPO OLED">LTPO OLED</option>
                                                 </select>
                                             </div>
                                             <div class="col-md-4 mb-3">
@@ -839,10 +844,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                                                 <label for="refresh_rate" class="form-label">Refresh Rate</label>
                                                 <select class="form-select" id="refresh_rate" name="refresh_rate">
                                                     <option value="">Select rate...</option>
-                                                    <option value="90Hz" <?php echo ($phone['refresh_rate'] ?? '') === '90Hz' ? 'selected' : ''; ?>>90Hz</option>
-                                                    <option value="120Hz" <?php echo ($phone['refresh_rate'] ?? '') === '120Hz' ? 'selected' : ''; ?>>120Hz</option>
-                                                    <option value="144Hz" <?php echo ($phone['refresh_rate'] ?? '') === '144Hz' ? 'selected' : ''; ?>>144Hz</option>
-                                                    <option value="165Hz" <?php echo ($phone['refresh_rate'] ?? '') === '165Hz' ? 'selected' : ''; ?>>165Hz</option>
+                                                    <option value="90Hz">90Hz</option>
+                                                    <option value="120Hz">120Hz</option>
+                                                    <option value="144Hz">144Hz</option>
+                                                    <option value="165Hz">165Hz</option>
                                                 </select>
                                             </div>
                                             <div class="col-md-4 mb-3">
@@ -872,25 +877,25 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                                         <div class="row">
                                             <div class="col-md-6 mb-3">
                                                 <label for="main_camera_resolution" class="form-label">Resolution (MP)</label>
-                                                <input type="number" class="form-control" id="main_camera_resolution" name="main_camera_resolution" min="0.1" max="200" step="0.1" value="<?php echo htmlspecialchars($phone['main_camera_resolution'] ?? ''); ?>">
+                                                <input type="number" class="form-control" id="main_camera_resolution" name="main_camera_resolution" min="0.1" max="200" step="0.1">
                                             </div>
                                             <div class="col-md-6 mb-3">
                                                 <label for="main_camera_count" class="form-label">Cameras</label>
                                                 <select class="form-select" id="main_camera_count" name="main_camera_count">
                                                     <option value="">Select count...</option>
-                                                    <option value="One" <?php echo ($phone['main_camera_count'] ?? '') === 'One' ? 'selected' : ''; ?>>One</option>
-                                                    <option value="Two" <?php echo ($phone['main_camera_count'] ?? '') === 'Two' ? 'selected' : ''; ?>>Two</option>
-                                                    <option value="Three" <?php echo ($phone['main_camera_count'] ?? '') === 'Three' ? 'selected' : ''; ?>>Three</option>
-                                                    <option value="Four or More" <?php echo ($phone['main_camera_count'] ?? '') === 'Four or More' ? 'selected' : ''; ?>>Four or More</option>
+                                                    <option value="One">One</option>
+                                                    <option value="Two">Two</option>
+                                                    <option value="Three">Three</option>
+                                                    <option value="Four or More">Four or More</option>
                                                 </select>
                                             </div>
                                             <div class="col-md-6 mb-3">
                                                 <label for="main_camera_f_number" class="form-label">F-Number</label>
-                                                <input type="number" step="0.1" class="form-control" id="main_camera_f_number" name="main_camera_f_number" min="1" max="10" placeholder="e.g., 1.8" value="<?php echo htmlspecialchars($phone['main_camera_f_number'] ?? ''); ?>">
+                                                <input type="number" step="0.1" class="form-control" id="main_camera_f_number" name="main_camera_f_number" min="1" max="10" placeholder="e.g., 1.8">
                                             </div>
                                             <div class="col-md-6 mb-3">
                                                 <label for="main_camera_video" class="form-label">Video</label>
-                                                <input type="text" class="form-control" id="main_camera_video" name="main_camera_video" placeholder="e.g., 4K@30fps" value="<?php echo htmlspecialchars($phone['main_camera_video'] ?? ''); ?>">
+                                                <input type="text" class="form-control" id="main_camera_video" name="main_camera_video" placeholder="e.g., 4K@30fps">
                                             </div>
                                             <div class="col-md-6 mb-3">
                                                 <label for="main_camera_flash" class="form-label">Flash</label>
@@ -932,7 +937,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                                         <div class="row">
                                             <div class="col-md-6 mb-3">
                                                 <label for="selfie_camera_resolution" class="form-label">Resolution (MP)</label>
-                                                <input type="number" class="form-control" id="selfie_camera_resolution" name="selfie_camera_resolution" min="0.1" max="100" step="0.1" value="<?php echo htmlspecialchars($phone['selfie_camera_resolution'] ?? ''); ?>">
+                                                <input type="number" class="form-control" id="selfie_camera_resolution" name="selfie_camera_resolution" min="0.1" max="100" step="0.1">
                                             </div>
                                             <div class="col-md-6 mb-3">
                                                 <label for="selfie_camera_count" class="form-label">Cameras</label>
@@ -979,13 +984,13 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                                         <div class="row">
                                             <div class="col-md-6 mb-3">
                                                 <div class="form-check">
-                                                    <input class="form-check-input" type="checkbox" name="headphone_jack" id="headphone_jack" <?php echo isset($phone['headphone_jack']) && $phone['headphone_jack'] ? 'checked' : ''; ?>>
+                                                    <input class="form-check-input" type="checkbox" name="headphone_jack" id="headphone_jack">
                                                     <label class="form-check-label" for="headphone_jack">3.5mm Jack</label>
                                                 </div>
                                             </div>
                                             <div class="col-md-6 mb-3">
                                                 <div class="form-check">
-                                                    <input class="form-check-input" type="checkbox" name="dual_speakers" id="dual_speakers" <?php echo isset($phone['dual_speakers']) && $phone['dual_speakers'] ? 'checked' : ''; ?>>
+                                                    <input class="form-check-input" type="checkbox" name="dual_speakers" id="dual_speakers">
                                                     <label class="form-check-label" for="dual_speakers">Dual Speakers</label>
                                                 </div>
                                             </div>
@@ -1006,21 +1011,21 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                                         <div class="row">
                                             <div class="col-md-6 mb-3">
                                                 <div class="form-check">
-                                                    <input class="form-check-input" type="checkbox" name="accelerometer" id="accelerometer" <?php echo isset($phone['accelerometer']) && $phone['accelerometer'] ? 'checked' : ''; ?>>
+                                                    <input class="form-check-input" type="checkbox" name="accelerometer" id="accelerometer">
                                                     <label class="form-check-label" for="accelerometer">Accelerometer</label>
                                                 </div>
                                                 <div class="form-check">
-                                                    <input class="form-check-input" type="checkbox" name="gyro" id="gyro" <?php echo isset($phone['gyro']) && $phone['gyro'] ? 'checked' : ''; ?>>
+                                                    <input class="form-check-input" type="checkbox" name="gyro" id="gyro">
                                                     <label class="form-check-label" for="gyro">Gyro</label>
                                                 </div>
                                                 <div class="form-check">
-                                                    <input class="form-check-input" type="checkbox" name="compass" id="compass" <?php echo isset($phone['compass']) && $phone['compass'] ? 'checked' : ''; ?>>
+                                                    <input class="form-check-input" type="checkbox" name="compass" id="compass">
                                                     <label class="form-check-label" for="compass">Compass</label>
                                                 </div>
                                             </div>
                                             <div class="col-md-6 mb-3">
                                                 <div class="form-check">
-                                                    <input class="form-check-input" type="checkbox" name="proximity" id="proximity" <?php echo isset($phone['proximity']) && $phone['proximity'] ? 'checked' : ''; ?>>
+                                                    <input class="form-check-input" type="checkbox" name="proximity" id="proximity">
                                                     <label class="form-check-label" for="proximity">Proximity</label>
                                                 </div>
                                                 <div class="form-check">
@@ -1160,7 +1165,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                                         <div class="row">
                                             <div class="col-md-6 mb-3">
                                                 <label for="battery_capacity" class="form-label">Capacity (mAh)</label>
-                                                <input type="number" class="form-control" id="battery_capacity" name="battery_capacity" min="500" max="10000" value="<?php echo htmlspecialchars($phone['battery_capacity'] ?? ''); ?>">
+                                                <input type="number" class="form-control" id="battery_capacity" name="battery_capacity" min="500" max="10000">
                                             </div>
                                             <div class="col-md-6 mb-3">
                                                 <div class="form-check mt-4">
@@ -1174,11 +1179,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                                             </div>
                                             <div class="col-md-6 mb-3">
                                                 <label for="wired_charging" class="form-label">Wired Charging (W)</label>
-                                                <input type="number" class="form-control" id="wired_charging" name="wired_charging" min="0" max="300" value="<?php echo htmlspecialchars($phone['wired_charging'] ?? ''); ?>">
+                                                <input type="number" class="form-control" id="wired_charging" name="wired_charging" min="0" max="300">
                                             </div>
                                             <div class="col-md-6 mb-3">
                                                 <label for="wireless_charging" class="form-label">Wireless Charging (W)</label>
-                                                <input type="number" class="form-control" id="wireless_charging" name="wireless_charging" min="0" max="100" value="<?php echo htmlspecialchars($phone['wireless_charging'] ?? ''); ?>">
+                                                <input type="number" class="form-control" id="wireless_charging" name="wireless_charging" min="0" max="100">
                                             </div>
                                         </div>
                                     </div>
@@ -1909,29 +1914,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 </div>
 
 <script>
+    // Handle custom brand selection
     document.addEventListener('DOMContentLoaded', function() {
-        // Initialize Bootstrap components
-        var phoneAccordion = document.getElementById('phoneAccordion');
-        if (phoneAccordion) {
-            var accordionItems = phoneAccordion.querySelectorAll('.accordion-collapse');
-            accordionItems.forEach(function(item) {
-                new bootstrap.Collapse(item, {
-                    toggle: false
-                });
-            });
-        }
-
-        // Initialize tab system
-        var triggerTabList = [].slice.call(document.querySelectorAll('#deviceTypeTabs button'));
-        triggerTabList.forEach(function(triggerEl) {
-            var tabTrigger = new bootstrap.Tab(triggerEl);
-            triggerEl.addEventListener('click', function(event) {
-                event.preventDefault();
-                tabTrigger.show();
-            });
-        });
-
-        // Handle custom brand selection
         const brandSelect = document.getElementById('brand');
         const customBrandContainer = document.getElementById('custom-brand-container');
         const customBrandInput = document.getElementById('custom-brand');

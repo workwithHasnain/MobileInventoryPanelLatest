@@ -9,3 +9,4 @@ compare button in device.php -Done
 photo modal in device.php -Done
 brands.php page
 dashboard json dropdown option remove, only keep db  -Done
+phone-finder.php

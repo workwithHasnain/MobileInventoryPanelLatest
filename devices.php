@@ -13,15 +13,15 @@ $brands = getAllBrands();
 // Add view and comment counts for each device
 foreach ($phones as $index => $phone) {
     $device_id = $phone['id'] ?? $phone['name'];
-    
+
     try {
         $pdo = getConnection();
-        
+
         // Get view count
         $view_stmt = $pdo->prepare("SELECT COUNT(*) as count FROM content_views WHERE content_type = 'device' AND content_id = ?");
         $view_stmt->execute([$device_id]);
         $phones[$index]['view_count'] = $view_stmt->fetch()['count'] ?? 0;
-        
+
         // Get comment count
         $comment_stmt = $pdo->prepare("SELECT COUNT(*) as count FROM device_comments WHERE device_id = ?");
         $comment_stmt->execute([$device_id]);
@@ -44,30 +44,29 @@ $device_type_filter = isset($_GET['device_type']) ? trim($_GET['device_type']) :
 $filtered_phones = $phones;
 
 if (!empty($search)) {
-    $filtered_phones = array_filter($filtered_phones, function($phone) use ($search) {
-        return stripos($phone['name'], $search) !== false || 
-               stripos($phone['brand'], $search) !== false;
+    $filtered_phones = array_filter($filtered_phones, function ($phone) use ($search) {
+        return stripos($phone['name'], $search) !== false ||
+            stripos($phone['brand'], $search) !== false;
     });
 }
 
 if (!empty($brand_filter)) {
-    $filtered_phones = array_filter($filtered_phones, function($phone) use ($brand_filter) {
+    $filtered_phones = array_filter($filtered_phones, function ($phone) use ($brand_filter) {
         return $phone['brand'] === $brand_filter;
     });
 }
 
 if (!empty($availability_filter)) {
-    $filtered_phones = array_filter($filtered_phones, function($phone) use ($availability_filter) {
+    $filtered_phones = array_filter($filtered_phones, function ($phone) use ($availability_filter) {
         return $phone['availability'] === $availability_filter;
     });
 }
 
 if (!empty($device_type_filter)) {
-    $filtered_phones = array_filter($filtered_phones, function($phone) use ($device_type_filter) {
+    $filtered_phones = array_filter($filtered_phones, function ($phone) use ($device_type_filter) {
         // Check if device has tablet-specific indicators or missing phone-specific fields
-        $isTablet = isset($phone['device_type']) ? $phone['device_type'] === 'tablet' : 
-                   (!isset($phone['form_factor']) && !isset($phone['keyboard']));
-        
+        $isTablet = isset($phone['device_type']) ? $phone['device_type'] === 'tablet' : (!isset($phone['form_factor']) && !isset($phone['keyboard']));
+
         if ($device_type_filter === 'phone') {
             return !$isTablet;
         } elseif ($device_type_filter === 'tablet') {
@@ -96,16 +95,16 @@ include 'includes/header.php';
                     <form method="GET" class="row g-3">
                         <div class="col-md-4">
                             <label for="search" class="form-label">Search</label>
-                            <input type="text" class="form-control" id="search" name="search" 
-                                   placeholder="Search by name or brand..." value="<?php echo htmlspecialchars($search); ?>">
+                            <input type="text" class="form-control" id="search" name="search"
+                                placeholder="Search by name or brand..." value="<?php echo htmlspecialchars($search); ?>">
                         </div>
                         <div class="col-md-3">
                             <label for="brand" class="form-label">Brand</label>
                             <select class="form-select" id="brand" name="brand">
                                 <option value="">All Brands</option>
                                 <?php foreach ($brands as $brand): ?>
-                                    <option value="<?php echo htmlspecialchars($brand['name']); ?>" 
-                                            <?php echo $brand_filter === $brand['name'] ? 'selected' : ''; ?>>
+                                    <option value="<?php echo htmlspecialchars($brand['name']); ?>"
+                                        <?php echo $brand_filter === $brand['name'] ? 'selected' : ''; ?>>
                                         <?php echo htmlspecialchars($brand['name']); ?>
                                     </option>
                                 <?php endforeach; ?>
@@ -170,23 +169,22 @@ include 'includes/header.php';
                         <div class="col-lg-4 col-md-6 mb-4">
                             <div class="card h-100 shadow-sm">
                                 <?php if (!empty($phone['image'])): ?>
-                                    <img src="<?php echo htmlspecialchars($phone['image'] ?? ''); ?>" 
-                                         class="card-img-top" alt="<?php echo htmlspecialchars($phone['name'] ?? 'Device'); ?>" 
-                                         style="height: 250px; object-fit: cover;">
+                                    <img src="<?php echo htmlspecialchars($phone['image'] ?? ''); ?>"
+                                        class="card-img-top" alt="<?php echo htmlspecialchars($phone['name'] ?? 'Device'); ?>"
+                                        style="height: 250px; object-fit: cover;">
                                 <?php else: ?>
-                                    <div class="card-img-top d-flex align-items-center justify-content-center bg-light" 
-                                         style="height: 250px;">
+                                    <div class="card-img-top d-flex align-items-center justify-content-center bg-light"
+                                        style="height: 250px;">
                                         <i class="fas fa-mobile-alt fa-3x text-muted"></i>
                                     </div>
                                 <?php endif; ?>
-                                
+
                                 <div class="card-body d-flex flex-column">
                                     <div class="d-flex justify-content-between align-items-start mb-2">
                                         <h5 class="card-title mb-0"><?php echo htmlspecialchars($phone['name'] ?? 'Unknown Device'); ?></h5>
-                                        <?php 
+                                        <?php
                                         // Determine device type
-                                        $isTablet = isset($phone['device_type']) ? $phone['device_type'] === 'tablet' : 
-                                                   (!isset($phone['form_factor']) && !isset($phone['keyboard']));
+                                        $isTablet = isset($phone['device_type']) ? $phone['device_type'] === 'tablet' : (!isset($phone['form_factor']) && !isset($phone['keyboard']));
                                         $deviceTypeLabel = $isTablet ? 'Tablet' : 'Phone';
                                         $deviceTypeClass = $isTablet ? 'bg-info' : 'bg-primary';
                                         ?>
@@ -197,39 +195,48 @@ include 'includes/header.php';
                                         <strong>Year:</strong> <?php echo htmlspecialchars($phone['year'] ?? 'Unknown'); ?><br>
                                         <strong>Price:</strong> $<?php echo number_format($phone['price'], 2); ?>
                                     </p>
-                                    
+
                                     <!-- Availability Badge -->
-                                    <?php 
+                                    <?php
                                     $badge_class = '';
-                                    switch($phone['availability']) {
-                                        case 'Available': $badge_class = 'bg-success'; break;
-                                        case 'Coming Soon': $badge_class = 'bg-warning text-dark'; break;
-                                        case 'Discontinued': $badge_class = 'bg-danger'; break;
-                                        case 'Rumored': $badge_class = 'bg-info text-dark'; break;
-                                        default: $badge_class = 'bg-secondary';
+                                    switch ($phone['availability']) {
+                                        case 'Available':
+                                            $badge_class = 'bg-success';
+                                            break;
+                                        case 'Coming Soon':
+                                            $badge_class = 'bg-warning text-dark';
+                                            break;
+                                        case 'Discontinued':
+                                            $badge_class = 'bg-danger';
+                                            break;
+                                        case 'Rumored':
+                                            $badge_class = 'bg-info text-dark';
+                                            break;
+                                        default:
+                                            $badge_class = 'bg-secondary';
                                     }
                                     ?>
                                     <span class="badge <?php echo $badge_class; ?> mb-3">
                                         <?php echo htmlspecialchars($phone['availability'] ?? 'Unknown'); ?>
                                     </span>
-                                    
+
                                     <!-- Key Specifications -->
                                     <div class="mb-3">
                                         <small class="text-muted">
                                             <?php if (!empty($phone['ram'])): ?>
                                                 <i class="fas fa-memory"></i> <?php echo $phone['ram']; ?>GB RAM
                                             <?php endif; ?>
-                                            
+
                                             <?php if (!empty($phone['storage'])): ?>
                                                 <i class="fas fa-hdd ms-2"></i> <?php echo $phone['storage']; ?>GB
                                             <?php endif; ?>
-                                            
+
                                             <?php if (!empty($phone['display_size'])): ?>
                                                 <i class="fas fa-desktop ms-2"></i> <?php echo $phone['display_size']; ?>"
                                             <?php endif; ?>
                                         </small>
                                     </div>
-                                    
+
                                     <!-- View and Comment Stats -->
                                     <div class="mb-3">
                                         <div class="d-flex justify-content-between">
@@ -241,21 +248,21 @@ include 'includes/header.php';
                                             </small>
                                         </div>
                                     </div>
-                                    
+
                                     <!-- Action Buttons -->
                                     <div class="mt-auto">
                                         <div class="btn-group w-100" role="group">
-                                            <a href="edit_phone.php?id=<?php echo $index; ?>" 
-                                               class="btn btn-outline-primary btn-sm">
+                                            <a href="edit_phone.php?id=<?php echo $phone['id']; ?>"
+                                                class="btn btn-outline-primary btn-sm">
                                                 <i class="fas fa-edit"></i> Edit
                                             </a>
-                                            <button type="button" class="btn btn-outline-info btn-sm" 
-                                                    data-bs-toggle="modal" data-bs-target="#viewModal<?php echo $index; ?>">
+                                            <button type="button" class="btn btn-outline-info btn-sm"
+                                                data-bs-toggle="modal" data-bs-target="#viewModal<?php echo $index; ?>">
                                                 <i class="fas fa-eye"></i> View
                                             </button>
-                                            <a href="delete_phone.php?id=<?php echo $index; ?>" 
-                                               class="btn btn-outline-danger btn-sm"
-                                               onclick="return confirm('Are you sure you want to delete this device?')">
+                                            <a href="delete_phone.php?id=<?php echo $index; ?>"
+                                                class="btn btn-outline-danger btn-sm"
+                                                onclick="return confirm('Are you sure you want to delete this device?')">
                                                 <i class="fas fa-trash"></i> Delete
                                             </a>
                                         </div>
@@ -276,8 +283,8 @@ include 'includes/header.php';
                                         <div class="row">
                                             <div class="col-md-4">
                                                 <?php if (!empty($phone['image'])): ?>
-                                                    <img src="<?php echo htmlspecialchars($phone['image']); ?>" 
-                                                         class="img-fluid rounded" alt="<?php echo htmlspecialchars($phone['name']); ?>">
+                                                    <img src="<?php echo htmlspecialchars($phone['image']); ?>"
+                                                        class="img-fluid rounded" alt="<?php echo htmlspecialchars($phone['name']); ?>">
                                                 <?php else: ?>
                                                     <div class="bg-light rounded d-flex align-items-center justify-content-center" style="height: 250px;">
                                                         <i class="fas fa-mobile-alt fa-3x text-muted"></i>
@@ -286,37 +293,70 @@ include 'includes/header.php';
                                             </div>
                                             <div class="col-md-8">
                                                 <table class="table table-sm">
-                                                    <tr><td><strong>Brand:</strong></td><td><?php echo htmlspecialchars($phone['brand']); ?></td></tr>
-                                                    <tr><td><strong>Year:</strong></td><td><?php echo htmlspecialchars($phone['year']); ?></td></tr>
-                                                    <tr><td><strong>Price:</strong></td><td>$<?php echo number_format($phone['price'], 2); ?></td></tr>
-                                                    <tr><td><strong>Availability:</strong></td><td><?php echo htmlspecialchars($phone['availability']); ?></td></tr>
+                                                    <tr>
+                                                        <td><strong>Brand:</strong></td>
+                                                        <td><?php echo htmlspecialchars($phone['brand']); ?></td>
+                                                    </tr>
+                                                    <tr>
+                                                        <td><strong>Year:</strong></td>
+                                                        <td><?php echo htmlspecialchars($phone['year']); ?></td>
+                                                    </tr>
+                                                    <tr>
+                                                        <td><strong>Price:</strong></td>
+                                                        <td>$<?php echo number_format($phone['price'], 2); ?></td>
+                                                    </tr>
+                                                    <tr>
+                                                        <td><strong>Availability:</strong></td>
+                                                        <td><?php echo htmlspecialchars($phone['availability']); ?></td>
+                                                    </tr>
                                                     <?php if (!empty($phone['os'])): ?>
-                                                        <tr><td><strong>OS:</strong></td><td><?php echo htmlspecialchars($phone['os']); ?></td></tr>
+                                                        <tr>
+                                                            <td><strong>OS:</strong></td>
+                                                            <td><?php echo htmlspecialchars($phone['os']); ?></td>
+                                                        </tr>
                                                     <?php endif; ?>
                                                     <?php if (!empty($phone['chipset'])): ?>
-                                                        <tr><td><strong>Chipset:</strong></td><td><?php echo htmlspecialchars($phone['chipset']); ?></td></tr>
+                                                        <tr>
+                                                            <td><strong>Chipset:</strong></td>
+                                                            <td><?php echo htmlspecialchars($phone['chipset']); ?></td>
+                                                        </tr>
                                                     <?php endif; ?>
                                                     <?php if (!empty($phone['ram'])): ?>
-                                                        <tr><td><strong>RAM:</strong></td><td><?php echo $phone['ram']; ?> GB</td></tr>
+                                                        <tr>
+                                                            <td><strong>RAM:</strong></td>
+                                                            <td><?php echo $phone['ram']; ?> GB</td>
+                                                        </tr>
                                                     <?php endif; ?>
                                                     <?php if (!empty($phone['storage'])): ?>
-                                                        <tr><td><strong>Storage:</strong></td><td><?php echo $phone['storage']; ?> GB</td></tr>
+                                                        <tr>
+                                                            <td><strong>Storage:</strong></td>
+                                                            <td><?php echo $phone['storage']; ?> GB</td>
+                                                        </tr>
                                                     <?php endif; ?>
                                                     <?php if (!empty($phone['display_size'])): ?>
-                                                        <tr><td><strong>Display:</strong></td><td><?php echo $phone['display_size']; ?>" <?php echo $phone['display_resolution'] ?? ''; ?></td></tr>
+                                                        <tr>
+                                                            <td><strong>Display:</strong></td>
+                                                            <td><?php echo $phone['display_size']; ?>" <?php echo $phone['display_resolution'] ?? ''; ?></td>
+                                                        </tr>
                                                     <?php endif; ?>
                                                     <?php if (!empty($phone['main_camera_resolution'])): ?>
-                                                        <tr><td><strong>Main Camera:</strong></td><td><?php echo $phone['main_camera_resolution']; ?> MP</td></tr>
+                                                        <tr>
+                                                            <td><strong>Main Camera:</strong></td>
+                                                            <td><?php echo $phone['main_camera_resolution']; ?> MP</td>
+                                                        </tr>
                                                     <?php endif; ?>
                                                     <?php if (!empty($phone['battery_capacity'])): ?>
-                                                        <tr><td><strong>Battery:</strong></td><td><?php echo $phone['battery_capacity']; ?> mAh</td></tr>
+                                                        <tr>
+                                                            <td><strong>Battery:</strong></td>
+                                                            <td><?php echo $phone['battery_capacity']; ?> mAh</td>
+                                                        </tr>
                                                     <?php endif; ?>
                                                 </table>
                                             </div>
                                         </div>
                                     </div>
                                     <div class="modal-footer">
-                                        <a href="edit_phone.php?id=<?php echo $index; ?>" class="btn btn-primary">Edit Device</a>
+                                        <a href="edit_phone.php?id=<?php echo $phone['id']; ?>" class="btn btn-primary">Edit Device</a>
                                         <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
                                     </div>
                                 </div>
