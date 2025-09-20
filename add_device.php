@@ -175,7 +175,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             'main_camera_telephoto' => !empty($_POST['main_camera_telephoto']),
             'main_camera_ultrawide' => !empty($_POST['main_camera_ultrawide']),
             'main_camera_video' => $_POST['main_camera_video'] ?? '',
-            'main_camera_flash' => $_POST['main_camera_flash'] ?? '',
+            'main_camera_flash' => !empty($_POST['main_camera_flash']),
 
             // Selfie Camera
             'selfie_camera_resolution' => $_POST['selfie_camera_resolution'] ?? '',
@@ -836,10 +836,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                                                 <label for="refresh_rate" class="form-label">Refresh Rate</label>
                                                 <select class="form-select" id="refresh_rate" name="refresh_rate">
                                                     <option value="">Select rate...</option>
-                                                    <option value="90">90Hz</option>
-                                                    <option value="120">120Hz</option>
-                                                    <option value="144">144Hz</option>
-                                                    <option value="165">165Hz</option>
+                                                    <option value="90Hz">90Hz</option>
+                                                    <option value="120Hz">120Hz</option>
+                                                    <option value="144Hz">144Hz</option>
+                                                    <option value="165Hz">165Hz</option>
                                                 </select>
                                             </div>
                                             <div class="col-md-4 mb-3">
@@ -875,10 +875,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                                                 <label for="main_camera_count" class="form-label">Cameras</label>
                                                 <select class="form-select" id="main_camera_count" name="main_camera_count">
                                                     <option value="">Select count...</option>
-                                                    <option value="One">One</option>
-                                                    <option value="Two">Two</option>
-                                                    <option value="Three">Three</option>
-                                                    <option value="Four or More">Four or More</option>
+                                                    <option value="1">One</option>
+                                                    <option value="2">Two</option>
+                                                    <option value="3">Three</option>
+                                                    <option value="4">Four or More</option>
                                                 </select>
                                             </div>
                                             <div class="col-md-6 mb-3">
@@ -890,13 +890,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                                                 <input type="text" class="form-control" id="main_camera_video" name="main_camera_video" placeholder="e.g., 4K@30fps">
                                             </div>
                                             <div class="col-md-6 mb-3">
-                                                <label for="main_camera_flash" class="form-label">Flash</label>
-                                                <select class="form-select" id="main_camera_flash" name="main_camera_flash">
-                                                    <option value="">Select flash...</option>
-                                                    <option value="LED">LED</option>
-                                                    <option value="Dual-LED">Dual-LED</option>
-                                                    <option value="Xenon">Xenon</option>
-                                                </select>
+                                                <div class="form-check mt-4">
+                                                    <input class="form-check-input" type="checkbox" name="main_camera_flash" id="main_camera_flash">
+                                                    <label class="form-check-label" for="main_camera_flash">Flash</label>
+                                                </div>
                                             </div>
                                             <div class="col-md-6 mb-3">
                                                 <div class="form-check mt-4">
@@ -935,10 +932,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                                                 <label for="selfie_camera_count" class="form-label">Cameras</label>
                                                 <select class="form-select" id="selfie_camera_count" name="selfie_camera_count">
                                                     <option value="">Select count...</option>
-                                                    <option value="One">One</option>
-                                                    <option value="Two">Two</option>
-                                                    <option value="Three">Three</option>
-                                                    <option value="Four or More">Four or More</option>
+                                                    <option value="1">One</option>
+                                                    <option value="2">Two</option>
+                                                    <option value="3">Three</option>
+                                                    <option value="4">Four or More</option>
                                                 </select>
                                             </div>
                                             <div class="col-md-12 mb-3">

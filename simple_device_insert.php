@@ -166,7 +166,7 @@ function simpleAddDevice($phone)
             ':display_density' => $toNumber($phone['display_density'] ?? '', 'int'),
             ':display_technology' => trim($phone['display_technology'] ?? ''),
             ':display_notch' => trim($phone['display_notch'] ?? ''),
-            ':refresh_rate' => $toNumber($phone['refresh_rate'] ?? '', 'int'),
+            ':refresh_rate' => trim($phone['refresh_rate'] ?? ''),
             ':hdr' => ($phone['hdr'] ?? false) ? 'true' : 'false',
             ':billion_colors' => ($phone['billion_colors'] ?? false) ? 'true' : 'false',
 
@@ -189,7 +189,7 @@ function simpleAddDevice($phone)
             ':main_camera_ois' => ($phone['main_camera_ois'] ?? false) ? 'true' : 'false',
             ':main_camera_telephoto' => ($phone['main_camera_telephoto'] ?? false) ? 'true' : 'false',
             ':main_camera_ultrawide' => ($phone['main_camera_ultrawide'] ?? false) ? 'true' : 'false',
-            ':main_camera_flash' => trim($phone['main_camera_flash'] ?? ''),
+            ':main_camera_flash' => ($phone['main_camera_flash'] ?? false) ? 'true' : 'false',
             ':main_camera_f_number' => $toNumber($phone['main_camera_f_number'] ?? '', 'float'),
 
             // Selfie Camera
