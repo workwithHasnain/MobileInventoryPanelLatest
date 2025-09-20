@@ -550,19 +550,19 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                                     <div class="col-md-6 mb-3">
                                         <label class="form-label">2G</label>
                                         <div class="form-check">
-                                            <input class="form-check-input" type="checkbox" name="2g[]" value="GSM 850" id="2g_850" <?php echo isInArray('2g', 'GSM 850'); ?>>
+                                            <input class="form-check-input" type="checkbox" name="2g[]" value="GSM 850" id="2g_850" <?php echo isInArray('network_2g', 'GSM 850'); ?>>
                                             <label class="form-check-label" for="2g_850">GSM 850</label>
                                         </div>
                                         <div class="form-check">
-                                            <input class="form-check-input" type="checkbox" name="2g[]" value="GSM 900" id="2g_900" <?php echo isInArray('2g', 'GSM 900'); ?>>
+                                            <input class="form-check-input" type="checkbox" name="2g[]" value="GSM 900" id="2g_900" <?php echo isInArray('network_2g', 'GSM 900'); ?>>
                                             <label class="form-check-label" for="2g_900">GSM 900</label>
                                         </div>
                                         <div class="form-check">
-                                            <input class="form-check-input" type="checkbox" name="2g[]" value="GSM 1800" id="2g_1800" <?php echo isInArray('2g', 'GSM 1800'); ?>>
+                                            <input class="form-check-input" type="checkbox" name="2g[]" value="GSM 1800" id="2g_1800" <?php echo isInArray('network_2g', 'GSM 1800'); ?>>
                                             <label class="form-check-label" for="2g_1800">GSM 1800</label>
                                         </div>
                                         <div class="form-check">
-                                            <input class="form-check-input" type="checkbox" name="2g[]" value="GSM 1900" id="2g_1900" <?php echo isInArray('2g', 'GSM 1900'); ?>>
+                                            <input class="form-check-input" type="checkbox" name="2g[]" value="GSM 1900" id="2g_1900" <?php echo isInArray('network_2g', 'GSM 1900'); ?>>
                                             <label class="form-check-label" for="2g_1900">GSM 1900</label>
                                         </div>
                                     </div>
@@ -570,23 +570,23 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                                     <div class="col-md-6 mb-3">
                                         <label class="form-label">3G</label>
                                         <div class="form-check">
-                                            <input class="form-check-input" type="checkbox" name="3g[]" value="HSPA 850" id="3g_850" <?php echo isInArray('3g', 'HSPA 850'); ?>>
+                                            <input class="form-check-input" type="checkbox" name="3g[]" value="HSPA 850" id="3g_850" <?php echo isInArray('network_3g', 'HSPA 850'); ?>>
                                             <label class="form-check-label" for="3g_850">HSPA 850</label>
                                         </div>
                                         <div class="form-check">
-                                            <input class="form-check-input" type="checkbox" name="3g[]" value="HSPA 900" id="3g_900" <?php echo isInArray('3g', 'HSPA 900'); ?>>
+                                            <input class="form-check-input" type="checkbox" name="3g[]" value="HSPA 900" id="3g_900" <?php echo isInArray('network_3g', 'HSPA 900'); ?>>
                                             <label class="form-check-label" for="3g_900">HSPA 900</label>
                                         </div>
                                         <div class="form-check">
-                                            <input class="form-check-input" type="checkbox" name="3g[]" value="HSPA 1700" id="3g_1700" <?php echo isInArray('3g', 'HSPA 1700'); ?>>
+                                            <input class="form-check-input" type="checkbox" name="3g[]" value="HSPA 1700" id="3g_1700" <?php echo isInArray('network_3g', 'HSPA 1700'); ?>>
                                             <label class="form-check-label" for="3g_1700">HSPA 1700</label>
                                         </div>
                                         <div class="form-check">
-                                            <input class="form-check-input" type="checkbox" name="3g[]" value="HSPA 1900" id="3g_1900" <?php echo isInArray('3g', 'HSPA 1900'); ?>>
+                                            <input class="form-check-input" type="checkbox" name="3g[]" value="HSPA 1900" id="3g_1900" <?php echo isInArray('network_3g', 'HSPA 1900'); ?>>
                                             <label class="form-check-label" for="3g_1900">HSPA 1900</label>
                                         </div>
                                         <div class="form-check">
-                                            <input class="form-check-input" type="checkbox" name="3g[]" value="HSPA 2100" id="3g_2100" <?php echo isInArray('3g', 'HSPA 2100'); ?>>
+                                            <input class="form-check-input" type="checkbox" name="3g[]" value="HSPA 2100" id="3g_2100" <?php echo isInArray('network_3g', 'HSPA 2100'); ?>>
                                             <label class="form-check-label" for="3g_2100">HSPA 2100</label>
                                         </div>
                                     </div>
@@ -594,19 +594,19 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                                     <div class="col-md-6 mb-3">
                                         <label class="form-label">4G</label>
                                         <div class="form-check">
-                                            <input class="form-check-input" type="checkbox" name="4g[]" value="LTE 700" id="4g_700" <?php echo isInArray('4g', 'LTE 700'); ?>>
+                                            <input class="form-check-input" type="checkbox" name="4g[]" value="LTE 700" id="4g_700" <?php echo isInArray('network_4g', 'LTE 700'); ?>>
                                             <label class="form-check-label" for="4g_700">LTE 700</label>
                                         </div>
                                         <div class="form-check">
-                                            <input class="form-check-input" type="checkbox" name="4g[]" value="LTE 850" id="4g_850" <?php echo isInArray('4g', 'LTE 850'); ?>>
+                                            <input class="form-check-input" type="checkbox" name="4g[]" value="LTE 850" id="4g_850" <?php echo isInArray('network_4g', 'LTE 850'); ?>>
                                             <label class="form-check-label" for="4g_850">LTE 850</label>
                                         </div>
                                         <div class="form-check">
-                                            <input class="form-check-input" type="checkbox" name="4g[]" value="LTE 900" id="4g_900" <?php echo isInArray('4g', 'LTE 900'); ?>>
+                                            <input class="form-check-input" type="checkbox" name="4g[]" value="LTE 900" id="4g_900" <?php echo isInArray('network_4g', 'LTE 900'); ?>>
                                             <label class="form-check-label" for="4g_900">LTE 900</label>
                                         </div>
                                         <div class="form-check">
-                                            <input class="form-check-input" type="checkbox" name="4g[]" value="LTE 1800" id="4g_1800" <?php echo isInArray('4g', 'LTE 1800'); ?>>
+                                            <input class="form-check-input" type="checkbox" name="4g[]" value="LTE 1800" id="4g_1800" <?php echo isInArray('network_4g', 'LTE 1800'); ?>>
                                             <label class="form-check-label" for="4g_1800">LTE 1800</label>
                                         </div>
                                     </div>
@@ -614,19 +614,19 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                                     <div class="col-md-6 mb-3">
                                         <label class="form-label">5G</label>
                                         <div class="form-check">
-                                            <input class="form-check-input" type="checkbox" name="5g[]" value="NR 3500" id="5g_3500" <?php echo isInArray('5g', 'NR 3500'); ?>>
+                                            <input class="form-check-input" type="checkbox" name="5g[]" value="NR 3500" id="5g_3500" <?php echo isInArray('network_5g', 'NR 3500'); ?>>
                                             <label class="form-check-label" for="5g_3500">NR 3500</label>
                                         </div>
                                         <div class="form-check">
-                                            <input class="form-check-input" type="checkbox" name="5g[]" value="NR 3600" id="5g_3600" <?php echo isInArray('5g', 'NR 3600'); ?>>
+                                            <input class="form-check-input" type="checkbox" name="5g[]" value="NR 3600" id="5g_3600" <?php echo isInArray('network_5g', 'NR 3600'); ?>>
                                             <label class="form-check-label" for="5g_3600">NR 3600</label>
                                         </div>
                                         <div class="form-check">
-                                            <input class="form-check-input" type="checkbox" name="5g[]" value="NR 3700" id="5g_3700" <?php echo isInArray('5g', 'NR 3700'); ?>>
+                                            <input class="form-check-input" type="checkbox" name="5g[]" value="NR 3700" id="5g_3700" <?php echo isInArray('network_5g', 'NR 3700'); ?>>
                                             <label class="form-check-label" for="5g_3700">NR 3700</label>
                                         </div>
                                         <div class="form-check">
-                                            <input class="form-check-input" type="checkbox" name="5g[]" value="NR 3800" id="5g_3800" <?php echo isInArray('5g', 'NR 3800'); ?>>
+                                            <input class="form-check-input" type="checkbox" name="5g[]" value="NR 3800" id="5g_3800" <?php echo isInArray('network_5g', 'NR 3800'); ?>>
                                             <label class="form-check-label" for="5g_3800">NR 3800</label>
                                         </div>
                                     </div>

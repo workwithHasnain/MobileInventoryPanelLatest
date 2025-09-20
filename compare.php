@@ -596,11 +596,13 @@ function formatCommunications($phone)
     $comms_parts = [];
 
     if (!empty($phone['wifi'])) {
-        $comms_parts[] = 'WiFi: ' . $phone['wifi'];
+        $wifi_value = is_array($phone['wifi']) ? implode(', ', $phone['wifi']) : $phone['wifi'];
+        $comms_parts[] = 'WiFi: ' . $wifi_value;
     }
 
     if (!empty($phone['bluetooth'])) {
-        $comms_parts[] = 'Bluetooth: ' . $phone['bluetooth'];
+        $bluetooth_value = is_array($phone['bluetooth']) ? implode(', ', $phone['bluetooth']) : $phone['bluetooth'];
+        $comms_parts[] = 'Bluetooth: ' . $bluetooth_value;
     }
 
     if (isset($phone['gps'])) {
