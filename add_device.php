@@ -211,7 +211,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             'battery_sic' => !empty($_POST['battery_sic']),
             'battery_removable' => !empty($_POST['battery_removable']),
             'wired_charging' => $_POST['wired_charging'] ?? '',
-            'wireless_charging' => $_POST['wireless_charging'] ?? ''
+            'wireless_charging' => $_POST['wireless_charging'] ?? '',
+
+            // Additional
+            'colors' => $_POST['colors'] ?? []
         ];
 
         $result = addPhone($new_phone);

@@ -135,7 +135,7 @@ function addPhone($phone)
                 display_type, display_size, display_resolution, display_density,
                 display_technology, display_notch, refresh_rate, hdr, billion_colors,
                 -- Platform
-                os, os_version, cpu_cores,
+                os, os_version, chipset, cpu_cores,
                 -- Memory
                 ram, storage, card_slot,
                 -- Camera
@@ -154,7 +154,9 @@ function addPhone($phone)
                 heart_rate, fingerprint,
                 -- Battery
                 battery_capacity, battery_sic, battery_removable,
-                wired_charging, wireless_charging
+                wired_charging, wireless_charging,
+                -- Additional
+                colors
             ) VALUES (
                 /* Basic Info: 10 */
                 ?, ?, ?, ?, ?, ?, ?, ?, ?, ?,
@@ -164,8 +166,8 @@ function addPhone($phone)
                 ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?,
                 /* Display: 9 */
                 ?, ?, ?, ?, ?, ?, ?, ?, ?,
-                /* Platform: 3 */
-                ?, ?, ?,
+                /* Platform: 4 */
+                ?, ?, ?, ?,
                 /* Memory: 3 */
                 ?, ?, ?,
                 /* Camera: 17 */
@@ -177,7 +179,9 @@ function addPhone($phone)
                 /* Sensors: 7 */
                 ?, ?, ?, ?, ?, ?, ?,
                 /* Battery: 5 */
-                ?, ?, ?, ?, ?
+                ?, ?, ?, ?, ?,
+                /* Additional: 1 */
+                ?
             )"
         );
 
@@ -233,42 +237,43 @@ function addPhone($phone)
             trim($phone['frame_material'] ?? ''),    // frame_material
 
             // Display
-            $phone['display_type'] ?? null,           // display_type
+            trim($phone['display_type'] ?? ''),       // display_type
             $toNumber($phone['display_size'] ?? ''),  // display_size
-            $phone['display_resolution'] ?? null,      // display_resolution
-            $phone['display_density'] ?? null,        // display_density
-            $phone['display_technology'] ?? null,     // display_technology
-            $phone['display_notch'] ?? null,          // display_notch
-            $phone['refresh_rate'] ?? null,          // refresh_rate
+            trim($phone['display_resolution'] ?? ''), // display_resolution
+            $toNumber($phone['display_density'] ?? '', 'int'), // display_density
+            trim($phone['display_technology'] ?? ''), // display_technology
+            trim($phone['display_notch'] ?? ''),      // display_notch
+            trim($phone['refresh_rate'] ?? ''),       // refresh_rate
             ($phone['hdr'] === true || $phone['hdr'] === 'true' || $phone['hdr'] === '1') ? 'true' : 'false',                    // hdr
             ($phone['billion_colors'] === true || $phone['billion_colors'] === 'true' || $phone['billion_colors'] === '1') ? 'true' : 'false',         // billion_colors
 
             // Platform
-            $phone['os'] ?? null,                    // os
-            $phone['os_version'] ?? null,            // os_version
-            $phone['cpu_cores'] ?? null,             // cpu_cores
+            trim($phone['os'] ?? ''),                // os
+            trim($phone['os_version'] ?? ''),        // os_version
+            trim($phone['chipset'] ?? ''),           // chipset
+            trim($phone['cpu_cores'] ?? ''),         // cpu_cores
 
             // Memory
-            $phone['ram'] ?? null,                   // ram
-            $phone['storage'] ?? null,               // storage
-            $phone['card_slot'] ?? null,            // card_slot
+            $toNumber($phone['ram'] ?? ''),          // ram
+            $toNumber($phone['storage'] ?? '', 'int'), // storage
+            trim($phone['card_slot'] ?? ''),         // card_slot
 
             // Main Camera
             $toNumber($phone['main_camera_count'] ?? '', 'int'),  // main_camera_count
-            $phone['main_camera_resolution'] ?? null,             // main_camera_resolution
+            $toNumber($phone['main_camera_resolution'] ?? '', 'float'), // main_camera_resolution
             $toPostgresArray($phone['main_camera_features'] ?? []), // main_camera_features array
-            $phone['main_camera_video'] ?? null,                  // main_camera_video
+            trim($phone['main_camera_video'] ?? ''),             // main_camera_video
             ($phone['main_camera_ois'] === true || $phone['main_camera_ois'] === 'true' || $phone['main_camera_ois'] === '1') ? 'true' : 'false',                    // main_camera_ois
             ($phone['main_camera_telephoto'] === true || $phone['main_camera_telephoto'] === 'true' || $phone['main_camera_telephoto'] === '1') ? 'true' : 'false',              // main_camera_telephoto
             ($phone['main_camera_ultrawide'] === true || $phone['main_camera_ultrawide'] === 'true' || $phone['main_camera_ultrawide'] === '1') ? 'true' : 'false',              // main_camera_ultrawide
-            ($phone['main_camera_flash'] === true || $phone['main_camera_flash'] === 'true' || $phone['main_camera_flash'] === '1') ? 'true' : 'false',                  // main_camera_flash
-            $phone['main_camera_f_number'] ?? null,              // main_camera_f_number
+            trim($phone['main_camera_flash'] ?? ''),             // main_camera_flash
+            $toNumber($phone['main_camera_f_number'] ?? '', 'float'), // main_camera_f_number
 
             // Selfie Camera
             $toNumber($phone['selfie_camera_count'] ?? '', 'int'), // selfie_camera_count
-            $phone['selfie_camera_resolution'] ?? null,            // selfie_camera_resolution
+            $toNumber($phone['selfie_camera_resolution'] ?? '', 'float'), // selfie_camera_resolution
             $toPostgresArray($phone['selfie_camera_features'] ?? []), // selfie_camera_features array
-            $phone['selfie_camera_video'] ?? null,                // selfie_camera_video
+            trim($phone['selfie_camera_video'] ?? ''),            // selfie_camera_video
             ($phone['selfie_camera_ois'] === true || $phone['selfie_camera_ois'] === 'true' || $phone['selfie_camera_ois'] === '1') ? 'true' : 'false',                  // selfie_camera_ois
             ($phone['selfie_camera_flash'] === true || $phone['selfie_camera_flash'] === 'true' || $phone['selfie_camera_flash'] === '1') ? 'true' : 'false',                // selfie_camera_flash
             ($phone['popup_camera'] === true || $phone['popup_camera'] === 'true' || $phone['popup_camera'] === '1') ? 'true' : 'false',                       // popup_camera
@@ -285,7 +290,7 @@ function addPhone($phone)
             ($phone['nfc'] === true || $phone['nfc'] === 'true' || $phone['nfc'] === '1') ? 'true' : 'false',                               // nfc
             ($phone['infrared'] === true || $phone['infrared'] === 'true' || $phone['infrared'] === '1') ? 'true' : 'false',                          // infrared
             ($phone['fm_radio'] === true || $phone['fm_radio'] === 'true' || $phone['fm_radio'] === '1') ? 'true' : 'false',                          // fm_radio
-            $phone['usb'] ?? null,                              // usb
+            trim($phone['usb'] ?? ''),                          // usb
 
             // Sensors
             ($phone['accelerometer'] === true || $phone['accelerometer'] === 'true' || $phone['accelerometer'] === '1') ? 'true' : 'false',   // accelerometer
@@ -300,8 +305,11 @@ function addPhone($phone)
             $toNumber($phone['battery_capacity'] ?? '', 'int'), // battery_capacity
             ($phone['battery_sic'] === true || $phone['battery_sic'] === 'true' || $phone['battery_sic'] === '1') ? 'true' : 'false',    // battery_sic
             ($phone['battery_removable'] === true || $phone['battery_removable'] === 'true' || $phone['battery_removable'] === '1') ? 'true' : 'false', // battery_removable
-            trim($phone['wired_charging'] ?? ''),              // wired_charging
-            trim($phone['wireless_charging'] ?? '')            // wireless_charging
+            $toNumber($phone['wired_charging'] ?? '', 'int'),  // wired_charging
+            $toNumber($phone['wireless_charging'] ?? '', 'int'), // wireless_charging
+
+            // Additional
+            $toPostgresArray($phone['colors'] ?? [])           // colors array
         ];
 
         $result = $stmt->execute($values);
@@ -485,7 +493,7 @@ function updatePhone($id, $phone)
             ($phone['nfc'] === true || $phone['nfc'] === 'true' || $phone['nfc'] === '1') ? 'true' : 'false',                               // nfc
             ($phone['infrared'] === true || $phone['infrared'] === 'true' || $phone['infrared'] === '1') ? 'true' : 'false',                          // infrared
             ($phone['fm_radio'] === true || $phone['fm_radio'] === 'true' || $phone['fm_radio'] === '1') ? 'true' : 'false',                          // fm_radio
-            $phone['usb'] ?? null,                              // usb
+            trim($phone['usb'] ?? ''),                          // usb
 
             // Sensors
             ($phone['accelerometer'] === true || $phone['accelerometer'] === 'true' || $phone['accelerometer'] === '1') ? 'true' : 'false',   // accelerometer
