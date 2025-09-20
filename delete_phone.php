@@ -9,15 +9,12 @@ requireAdmin();
 $id = isset($_GET['id']) ? (int)$_GET['id'] : -1;
 
 // Check if phone exists
-$phones = getAllPhones();
-if ($id < 0 || !isset($phones[$id])) {
+$phone = getPhoneById($id);
+if (!$phone) {
     $_SESSION['success_message'] = 'Phone not found!';
-    header('Location: dashboard.php');
+    header('Location: devices.php');
     exit();
 }
-
-// Delete the phone
-$phone = $phones[$id];
 
 // Delete image file if it exists
 if (!empty($phone['image']) && file_exists($phone['image'])) {
@@ -31,7 +28,6 @@ if (deletePhone($id)) {
     $_SESSION['success_message'] = 'Failed to delete phone.';
 }
 
-// Redirect to dashboard
-header('Location: dashboard.php');
+// Redirect to devices page
+header('Location: devices.php');
 exit();
-?>

@@ -206,30 +206,30 @@ function formatDeviceSpecs($device)
 
   // Network specifications
   $network_tech = [];
-  if ($device['network_2g']) $network_tech[] = '2G';
-  if ($device['network_3g']) $network_tech[] = '3G';
-  if ($device['network_4g']) $network_tech[] = '4G';
-  if ($device['network_5g']) $network_tech[] = '5G';
+  if (!empty($device['network_2g'])) $network_tech[] = '2G';
+  if (!empty($device['network_3g'])) $network_tech[] = '3G';
+  if (!empty($device['network_4g'])) $network_tech[] = '4G';
+  if (!empty($device['network_5g'])) $network_tech[] = '5G';
 
   if (!empty($network_tech)) {
     $network_details = '<strong>Technology</strong> ' . implode(' / ', $network_tech);
-    if ($device['dual_sim']) $network_details .= '<br><strong>SIM</strong> Dual SIM';
-    if ($device['esim']) $network_details .= ', eSIM';
-    if ($device['sim_size']) $network_details .= ' (' . $device['sim_size'] . ')';
+    if (!empty($device['dual_sim'])) $network_details .= '<br><strong>SIM</strong> Dual SIM';
+    if (!empty($device['esim'])) $network_details .= ', eSIM';
+    if (!empty($device['sim_size'])) $network_details .= ' (' . $device['sim_size'] . ')';
     $specs['NETWORK'] = $network_details;
   }
 
   // Launch specifications
-  if ($device['release_date'] || $device['availability']) {
+  if (!empty($device['release_date']) || !empty($device['availability'])) {
     $launch_details = '';
-    if ($device['release_date']) {
+    if (!empty($device['release_date'])) {
       $launch_details .= '<strong>Released</strong> ' . date('F j, Y', strtotime($device['release_date']));
     }
-    if ($device['availability']) {
+    if (!empty($device['availability'])) {
       if ($launch_details) $launch_details .= '<br>';
       $launch_details .= '<strong>Status</strong> ' . $device['availability'];
     }
-    if ($device['price']) {
+    if (!empty($device['price'])) {
       $launch_details .= '<br><strong>Price</strong> $' . number_format($device['price'], 2);
     }
     $specs['LAUNCH'] = $launch_details;
@@ -326,11 +326,11 @@ function formatDeviceSpecs($device)
 
     // Camera features
     $features = [];
-    if ($device['main_camera_ois']) $features[] = 'OIS';
-    if ($device['main_camera_telephoto']) $features[] = 'Telephoto';
-    if ($device['main_camera_ultrawide']) $features[] = 'Ultrawide';
-    if ($device['main_camera_macro']) $features[] = 'Macro';
-    if ($device['main_camera_flash']) $features[] = 'Flash';
+    if (!empty($device['main_camera_ois'])) $features[] = 'OIS';
+    if (!empty($device['main_camera_telephoto'])) $features[] = 'Telephoto';
+    if (!empty($device['main_camera_ultrawide'])) $features[] = 'Ultrawide';
+    if (!empty($device['main_camera_macro'])) $features[] = 'Macro';
+    if (!empty($device['main_camera_flash'])) $features[] = 'Flash';
     if ($device['main_camera_features'] && is_array($device['main_camera_features'])) {
       $features = array_merge($features, $device['main_camera_features']);
     } elseif ($device['main_camera_features'] && is_string($device['main_camera_features'])) {
@@ -424,12 +424,12 @@ function formatDeviceSpecs($device)
 
   // Build sensors list from individual sensor fields
   $sensors = [];
-  if ($device['accelerometer']) $sensors[] = 'Accelerometer';
-  if ($device['gyro']) $sensors[] = 'Gyro';
-  if ($device['compass']) $sensors[] = 'Compass';
-  if ($device['proximity']) $sensors[] = 'Proximity';
-  if ($device['barometer']) $sensors[] = 'Barometer';
-  if ($device['heart_rate']) $sensors[] = 'Heart Rate';
+  if (!empty($device['accelerometer'])) $sensors[] = 'Accelerometer';
+  if (!empty($device['gyro'])) $sensors[] = 'Gyro';
+  if (!empty($device['compass'])) $sensors[] = 'Compass';
+  if (!empty($device['proximity'])) $sensors[] = 'Proximity';
+  if (!empty($device['barometer'])) $sensors[] = 'Barometer';
+  if (!empty($device['heart_rate'])) $sensors[] = 'Heart Rate';
 
   if (!empty($sensors)) {
     if ($features_details) $features_details .= '<br>';

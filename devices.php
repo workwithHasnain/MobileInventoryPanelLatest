@@ -260,7 +260,7 @@ include 'includes/header.php';
                                                 data-bs-toggle="modal" data-bs-target="#viewModal<?php echo $index; ?>">
                                                 <i class="fas fa-eye"></i> View
                                             </button>
-                                            <a href="delete_phone.php?id=<?php echo $index; ?>"
+                                            <a href="delete_phone.php?id=<?php echo $phone['id']; ?>"
                                                 class="btn btn-outline-danger btn-sm"
                                                 onclick="return confirm('Are you sure you want to delete this device?')">
                                                 <i class="fas fa-trash"></i> Delete
