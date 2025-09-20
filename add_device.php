@@ -104,6 +104,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
     // If still no errors after validation, create the device
     if (empty($errors)) {
+        // Get device type
+        $device_type = $_POST['device_type'] ?? 'phone';
+
         $new_phone = [
             // Launch
             'release_date' => !empty($_POST['release_date']) ? $_POST['release_date'] : null,
@@ -124,14 +127,14 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             '5g' => $_POST['5g'] ?? [],
 
             // SIM
-            'dual_sim' => isset($_POST['dual_sim']),
-            'esim' => isset($_POST['esim']),
+            'dual_sim' => !empty($_POST['dual_sim']),
+            'esim' => !empty($_POST['esim']),
             'sim_size' => $_POST['sim_size'] ?? [],
 
             // Body
             'dimensions' => $_POST['dimensions'] ?? '',
-            'form_factor' => $_POST['form_factor'] ?? '',
-            'keyboard' => $_POST['keyboard'] ?? '',
+            'form_factor' => ($device_type === 'phone') ? ($_POST['form_factor'] ?? '') : '',
+            'keyboard' => ($device_type === 'phone') ? ($_POST['keyboard'] ?? '') : '',
             'height' => $_POST['height'] ?? '',
             'width' => $_POST['width'] ?? '',
             'thickness' => $_POST['thickness'] ?? '',
@@ -160,53 +163,53 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             'display_technology' => $_POST['display_technology'] ?? '',
             'display_notch' => $_POST['display_notch'] ?? '',
             'refresh_rate' => $_POST['refresh_rate'] ?? '',
-            'hdr' => isset($_POST['hdr']),
-            'billion_colors' => isset($_POST['billion_colors']),
+            'hdr' => !empty($_POST['hdr']),
+            'billion_colors' => !empty($_POST['billion_colors']),
 
             // Main Camera
             'main_camera_resolution' => $_POST['main_camera_resolution'] ?? '',
             'main_camera_count' => $_POST['main_camera_count'] ?? '',
-            'main_camera_ois' => isset($_POST['main_camera_ois']),
+            'main_camera_ois' => !empty($_POST['main_camera_ois']),
             'main_camera_f_number' => $_POST['main_camera_f_number'] ?? '',
-            'main_camera_telephoto' => isset($_POST['main_camera_telephoto']),
-            'main_camera_ultrawide' => isset($_POST['main_camera_ultrawide']),
+            'main_camera_telephoto' => !empty($_POST['main_camera_telephoto']),
+            'main_camera_ultrawide' => !empty($_POST['main_camera_ultrawide']),
             'main_camera_video' => $_POST['main_camera_video'] ?? '',
             'main_camera_flash' => $_POST['main_camera_flash'] ?? '',
 
             // Selfie Camera
             'selfie_camera_resolution' => $_POST['selfie_camera_resolution'] ?? '',
             'selfie_camera_count' => $_POST['selfie_camera_count'] ?? '',
-            'selfie_camera_ois' => isset($_POST['selfie_camera_ois']),
-            'selfie_camera_flash' => isset($_POST['selfie_camera_flash']),
-            'popup_camera' => isset($_POST['popup_camera']),
-            'under_display_camera' => isset($_POST['under_display_camera']),
+            'selfie_camera_ois' => !empty($_POST['selfie_camera_ois']),
+            'selfie_camera_flash' => !empty($_POST['selfie_camera_flash']),
+            'popup_camera' => !empty($_POST['popup_camera']),
+            'under_display_camera' => !empty($_POST['under_display_camera']),
 
             // Audio
-            'headphone_jack' => isset($_POST['headphone_jack']),
-            'dual_speakers' => isset($_POST['dual_speakers']),
+            'headphone_jack' => !empty($_POST['headphone_jack']),
+            'dual_speakers' => !empty($_POST['dual_speakers']),
 
             // Sensors
-            'accelerometer' => isset($_POST['accelerometer']),
-            'gyro' => isset($_POST['gyro']),
-            'compass' => isset($_POST['compass']),
-            'proximity' => isset($_POST['proximity']),
-            'barometer' => isset($_POST['barometer']),
-            'heart_rate' => isset($_POST['heart_rate']),
+            'accelerometer' => !empty($_POST['accelerometer']),
+            'gyro' => !empty($_POST['gyro']),
+            'compass' => !empty($_POST['compass']),
+            'proximity' => !empty($_POST['proximity']),
+            'barometer' => !empty($_POST['barometer']),
+            'heart_rate' => !empty($_POST['heart_rate']),
             'fingerprint' => $_POST['fingerprint'] ?? '',
 
             // Connectivity
             'wifi' => $_POST['wifi'] ?? [],
             'bluetooth' => $_POST['bluetooth'] ?? [],
-            'gps' => isset($_POST['gps']),
-            'nfc' => isset($_POST['nfc']),
-            'infrared' => isset($_POST['infrared']),
-            'fm_radio' => isset($_POST['fm_radio']),
+            'gps' => !empty($_POST['gps']),
+            'nfc' => !empty($_POST['nfc']),
+            'infrared' => !empty($_POST['infrared']),
+            'fm_radio' => !empty($_POST['fm_radio']),
             'usb' => $_POST['usb'] ?? '',
 
             // Battery
             'battery_capacity' => $_POST['battery_capacity'] ?? '',
-            'battery_sic' => isset($_POST['battery_sic']),
-            'battery_removable' => isset($_POST['battery_removable']),
+            'battery_sic' => !empty($_POST['battery_sic']),
+            'battery_removable' => !empty($_POST['battery_removable']),
             'wired_charging' => $_POST['wired_charging'] ?? '',
             'wireless_charging' => $_POST['wireless_charging'] ?? ''
         ];
@@ -255,12 +258,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             <ul class="nav nav-tabs mb-4" id="deviceTypeTabs" role="tablist">
                 <li class="nav-item" role="presentation">
                     <button class="nav-link active" id="phone-tab" data-bs-toggle="tab" data-bs-target="#phone-form" type="button" role="tab">
-                        <i class="fas fa-mobile-alt me-2"></i> Phone
-                    </button>
-                </li>
-                <li class="nav-item" role="presentation">
-                    <button class="nav-link" id="tablet-tab" data-bs-toggle="tab" data-bs-target="#tablet-form" type="button" role="tab">
-                        <i class="fas fa-tablet-alt me-2"></i> Tablet
+                        <i class="fas fa-mobile-alt me-2"></i> Device
                     </button>
                 </li>
             </ul>
@@ -269,7 +267,26 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 <!-- Phone Form Tab -->
                 <div class="tab-pane fade show active" id="phone-form" role="tabpanel">
                     <form method="post" action="<?php echo htmlspecialchars($_SERVER['PHP_SELF']); ?>" enctype="multipart/form-data">
-                        <input type="hidden" name="device_type" value="phone">
+                        <!-- Device Type Selection -->
+                        <div class="row mb-4">
+                            <div class="col-12">
+                                <label class="form-label fw-bold">Device Type *</label>
+                                <div class="d-flex gap-4">
+                                    <div class="form-check">
+                                        <input class="form-check-input" type="radio" name="device_type" id="device_type_phone" value="phone" checked>
+                                        <label class="form-check-label" for="device_type_phone">
+                                            <i class="fas fa-mobile-alt me-2"></i>Phone
+                                        </label>
+                                    </div>
+                                    <div class="form-check">
+                                        <input class="form-check-input" type="radio" name="device_type" id="device_type_tablet" value="tablet">
+                                        <label class="form-check-label" for="device_type_tablet">
+                                            <i class="fas fa-tablet-alt me-2"></i>Tablet
+                                        </label>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
 
                         <!-- 1. Launch Section -->
                         <div class="accordion mb-4" id="phoneAccordion">
@@ -579,6 +596,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                                                     <option value="Swivel">Swivel</option>
                                                     <option value="Slide">Slide</option>
                                                 </select>
+                                                <div class="form-text text-muted">Not applicable for tablets</div>
                                             </div>
                                             <div class="col-md-6 mb-3">
                                                 <label for="keyboard" class="form-label">Keyboard</label>
@@ -587,6 +605,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                                                     <option value="Without QWERTY">Without QWERTY</option>
                                                     <option value="With QWERTY">With QWERTY</option>
                                                 </select>
+                                                <div class="form-text text-muted">Not applicable for tablets</div>
                                             </div>
                                             <div class="col-md-3 mb-3">
                                                 <label for="height" class="form-label">Height (mm)</label>
@@ -1166,717 +1185,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                         </div>
                     </form>
                 </div>
-
-                <!-- Tablet Form Tab -->
-                <div class="tab-pane fade" id="tablet-form" role="tabpanel">
-                    <p class="text-info mb-3"><i class="fas fa-info-circle"></i> Tablet form includes all specifications except Form Factor and Keyboard fields.</p>
-                    <form method="post" action="<?php echo htmlspecialchars($_SERVER['PHP_SELF']); ?>" enctype="multipart/form-data">
-                        <input type="hidden" name="device_type" value="tablet">
-
-                        <!-- Complete tablet form - copied from phone form excluding keyboard and form_factor -->
-                        <div class="accordion mb-4" id="tabletAccordion">
-                            <!-- 1. Launch Section -->
-                            <div class="accordion-item">
-                                <h2 class="accordion-header" id="tabletLaunchHeader">
-                                    <button class="accordion-button" type="button" data-bs-toggle="collapse" data-bs-target="#tabletLaunchCollapse" aria-expanded="true" aria-controls="tabletLaunchCollapse">
-                                        <i class="fas fa-rocket me-2"></i> Launch
-                                    </button>
-                                </h2>
-                                <div id="tabletLaunchCollapse" class="accordion-collapse collapse show" aria-labelledby="tabletLaunchHeader">
-                                    <div class="accordion-body">
-                                        <div class="row">
-                                            <div class="col-md-6">
-                                                <label for="tablet_release_date" class="form-label">Date of Release</label>
-                                                <input type="date" class="form-control" id="tablet_release_date" name="release_date">
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-
-                            <!-- 2. General Section -->
-                            <div class="accordion-item">
-                                <h2 class="accordion-header" id="tabletGeneralHeader">
-                                    <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#tabletGeneralCollapse" aria-expanded="false" aria-controls="tabletGeneralCollapse">
-                                        <i class="fas fa-info-circle me-2"></i> General
-                                    </button>
-                                </h2>
-                                <div id="tabletGeneralCollapse" class="accordion-collapse collapse" aria-labelledby="tabletGeneralHeader">
-                                    <div class="accordion-body">
-                                        <div class="row">
-                                            <div class="col-md-6 mb-3">
-                                                <label for="tablet_name" class="form-label">Name *</label>
-                                                <input type="text" class="form-control" id="tablet_name" name="name" required>
-                                            </div>
-                                            <div class="col-md-6 mb-3">
-                                                <label for="tablet_brand" class="form-label">Brand *</label>
-                                                <div class="input-group">
-                                                    <select class="form-select" id="tablet_brand" name="brand" required>
-                                                        <option value="">Select a brand...</option>
-                                                        <?php
-                                                        if (!empty($brands)) {
-                                                            foreach ($brands as $brandItem) {
-                                                                echo '<option value="' . htmlspecialchars($brandItem['name']) . '">' .
-                                                                    htmlspecialchars($brandItem['name']) . '</option>';
-                                                            }
-                                                        }
-                                                        ?>
-                                                        <option value="other">Other (Custom)</option>
-                                                    </select>
-                                                    <button class="btn btn-outline-secondary" type="button"
-                                                        onclick="window.location.href='manage_data.php';"
-                                                        <?php echo (!isset($_SESSION['role']) || $_SESSION['role'] !== 'admin') ? 'disabled' : ''; ?>>
-                                                        <i class="fas fa-plus"></i>
-                                                    </button>
-                                                </div>
-                                            </div>
-                                            <div class="col-md-4 mb-3">
-                                                <label for="tablet_year" class="form-label">Year *</label>
-                                                <input type="number" class="form-control" id="tablet_year" name="year" min="2000" max="<?php echo date('Y') + 2; ?>" value="<?php echo date('Y'); ?>" required>
-                                            </div>
-                                            <div class="col-md-4 mb-3">
-                                                <label for="tablet_availability" class="form-label">Availability *</label>
-                                                <select class="form-select" id="tablet_availability" name="availability" required>
-                                                    <option value="">Select availability...</option>
-                                                    <option value="Available">Available</option>
-                                                    <option value="Coming Soon">Coming Soon</option>
-                                                    <option value="Discontinued">Discontinued</option>
-                                                    <option value="Rumored">Rumored</option>
-                                                </select>
-                                            </div>
-                                            <div class="col-md-4 mb-3">
-                                                <label for="tablet_price" class="form-label">Price (USD) *</label>
-                                                <div class="input-group">
-                                                    <span class="input-group-text">$</span>
-                                                    <input type="number" step="0.01" class="form-control" id="tablet_price" name="price" min="0.01" required>
-                                                </div>
-                                            </div>
-                                            <div class="col-md-12 mb-3">
-                                                <label class="form-label">Tablet Images (up to 5)</label>
-                                                <div class="row">
-                                                    <div class="col-md-4 mb-2">
-                                                        <label for="tablet_image1" class="form-label">Image 1 (Main)</label>
-                                                        <input type="file" class="form-control" id="tablet_image1" name="images[]" accept="image/jpeg, image/png, image/gif">
-                                                    </div>
-                                                    <div class="col-md-4 mb-2">
-                                                        <label for="tablet_image2" class="form-label">Image 2</label>
-                                                        <input type="file" class="form-control" id="tablet_image2" name="images[]" accept="image/jpeg, image/png, image/gif">
-                                                    </div>
-                                                    <div class="col-md-4 mb-2">
-                                                        <label for="tablet_image3" class="form-label">Image 3</label>
-                                                        <input type="file" class="form-control" id="tablet_image3" name="images[]" accept="image/jpeg, image/png, image/gif">
-                                                    </div>
-                                                    <div class="col-md-4 mb-2">
-                                                        <label for="tablet_image4" class="form-label">Image 4</label>
-                                                        <input type="file" class="form-control" id="tablet_image4" name="images[]" accept="image/jpeg, image/png, image/gif">
-                                                    </div>
-                                                    <div class="col-md-4 mb-2">
-                                                        <label for="tablet_image5" class="form-label">Image 5</label>
-                                                        <input type="file" class="form-control" id="tablet_image5" name="images[]" accept="image/jpeg, image/png, image/gif">
-                                                    </div>
-                                                </div>
-                                                <div class="form-text">Max size per image: 5MB. Formats: JPG, PNG, GIF. First image will be the main display image.</div>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-
-                            <!-- 3. Network Section (all network fields from phone) -->
-                            <div class="accordion-item">
-                                <h2 class="accordion-header" id="tabletNetworkHeader">
-                                    <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#tabletNetworkCollapse" aria-expanded="false" aria-controls="tabletNetworkCollapse">
-                                        <i class="fas fa-signal me-2"></i> Network
-                                    </button>
-                                </h2>
-                                <div id="tabletNetworkCollapse" class="accordion-collapse collapse" aria-labelledby="tabletNetworkHeader">
-                                    <div class="accordion-body">
-                                        <div class="row">
-                                            <div class="col-md-6 mb-3">
-                                                <label class="form-label">2G</label>
-                                                <div class="form-check">
-                                                    <input class="form-check-input" type="checkbox" name="2g[]" value="GSM 850" id="tablet_2g_850">
-                                                    <label class="form-check-label" for="tablet_2g_850">GSM 850</label>
-                                                </div>
-                                                <div class="form-check">
-                                                    <input class="form-check-input" type="checkbox" name="2g[]" value="GSM 900" id="tablet_2g_900">
-                                                    <label class="form-check-label" for="tablet_2g_900">GSM 900</label>
-                                                </div>
-                                                <div class="form-check">
-                                                    <input class="form-check-input" type="checkbox" name="2g[]" value="GSM 1800" id="tablet_2g_1800">
-                                                    <label class="form-check-label" for="tablet_2g_1800">GSM 1800</label>
-                                                </div>
-                                                <div class="form-check">
-                                                    <input class="form-check-input" type="checkbox" name="2g[]" value="GSM 1900" id="tablet_2g_1900">
-                                                    <label class="form-check-label" for="tablet_2g_1900">GSM 1900</label>
-                                                </div>
-                                            </div>
-                                            <div class="col-md-6 mb-3">
-                                                <label class="form-label">3G</label>
-                                                <div class="form-check">
-                                                    <input class="form-check-input" type="checkbox" name="3g[]" value="HSPA 850" id="tablet_3g_850">
-                                                    <label class="form-check-label" for="tablet_3g_850">HSPA 850</label>
-                                                </div>
-                                                <div class="form-check">
-                                                    <input class="form-check-input" type="checkbox" name="3g[]" value="HSPA 900" id="tablet_3g_900">
-                                                    <label class="form-check-label" for="tablet_3g_900">HSPA 900</label>
-                                                </div>
-                                                <div class="form-check">
-                                                    <input class="form-check-input" type="checkbox" name="3g[]" value="HSPA 1700" id="tablet_3g_1700">
-                                                    <label class="form-check-label" for="tablet_3g_1700">HSPA 1700</label>
-                                                </div>
-                                                <div class="form-check">
-                                                    <input class="form-check-input" type="checkbox" name="3g[]" value="HSPA 1900" id="tablet_3g_1900">
-                                                    <label class="form-check-label" for="tablet_3g_1900">HSPA 1900</label>
-                                                </div>
-                                                <div class="form-check">
-                                                    <input class="form-check-input" type="checkbox" name="3g[]" value="HSPA 2100" id="tablet_3g_2100">
-                                                    <label class="form-check-label" for="tablet_3g_2100">HSPA 2100</label>
-                                                </div>
-                                            </div>
-                                            <div class="col-md-6 mb-3">
-                                                <label class="form-label">4G</label>
-                                                <div class="form-check">
-                                                    <input class="form-check-input" type="checkbox" name="4g[]" value="LTE 700" id="tablet_4g_700">
-                                                    <label class="form-check-label" for="tablet_4g_700">LTE 700</label>
-                                                </div>
-                                                <div class="form-check">
-                                                    <input class="form-check-input" type="checkbox" name="4g[]" value="LTE 850" id="tablet_4g_850">
-                                                    <label class="form-check-label" for="tablet_4g_850">LTE 850</label>
-                                                </div>
-                                                <div class="form-check">
-                                                    <input class="form-check-input" type="checkbox" name="4g[]" value="LTE 900" id="tablet_4g_900">
-                                                    <label class="form-check-label" for="tablet_4g_900">LTE 900</label>
-                                                </div>
-                                                <div class="form-check">
-                                                    <input class="form-check-input" type="checkbox" name="4g[]" value="LTE 1800" id="tablet_4g_1800">
-                                                    <label class="form-check-label" for="tablet_4g_1800">LTE 1800</label>
-                                                </div>
-                                            </div>
-                                            <div class="col-md-6 mb-3">
-                                                <label class="form-label">5G</label>
-                                                <div class="form-check">
-                                                    <input class="form-check-input" type="checkbox" name="5g[]" value="NR 3500" id="tablet_5g_3500">
-                                                    <label class="form-check-label" for="tablet_5g_3500">NR 3500</label>
-                                                </div>
-                                                <div class="form-check">
-                                                    <input class="form-check-input" type="checkbox" name="5g[]" value="NR 3600" id="tablet_5g_3600">
-                                                    <label class="form-check-label" for="tablet_5g_3600">NR 3600</label>
-                                                </div>
-                                                <div class="form-check">
-                                                    <input class="form-check-input" type="checkbox" name="5g[]" value="NR 3700" id="tablet_5g_3700">
-                                                    <label class="form-check-label" for="tablet_5g_3700">NR 3700</label>
-                                                </div>
-                                                <div class="form-check">
-                                                    <input class="form-check-input" type="checkbox" name="5g[]" value="NR 3800" id="tablet_5g_3800">
-                                                    <label class="form-check-label" for="tablet_5g_3800">NR 3800</label>
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-
-                            <!-- 4. SIM Section -->
-                            <div class="accordion-item">
-                                <h2 class="accordion-header" id="tabletSimHeader">
-                                    <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#tabletSimCollapse" aria-expanded="false" aria-controls="tabletSimCollapse">
-                                        <i class="fas fa-sim-card me-2"></i> SIM
-                                    </button>
-                                </h2>
-                                <div id="tabletSimCollapse" class="accordion-collapse collapse" aria-labelledby="tabletSimHeader">
-                                    <div class="accordion-body">
-                                        <div class="row">
-                                            <div class="col-md-6 mb-3">
-                                                <div class="form-check">
-                                                    <input class="form-check-input" type="checkbox" name="dual_sim" id="tablet_dual_sim">
-                                                    <label class="form-check-label" for="tablet_dual_sim">Dual SIM</label>
-                                                </div>
-                                                <div class="form-check">
-                                                    <input class="form-check-input" type="checkbox" name="esim" id="tablet_esim">
-                                                    <label class="form-check-label" for="tablet_esim">eSIM</label>
-                                                </div>
-                                            </div>
-                                            <div class="col-md-6 mb-3">
-                                                <label class="form-label">Size</label>
-                                                <div class="form-check">
-                                                    <input class="form-check-input" type="checkbox" name="sim_size[]" value="Mini-SIM" id="tablet_sim_mini">
-                                                    <label class="form-check-label" for="tablet_sim_mini">Mini-SIM</label>
-                                                </div>
-                                                <div class="form-check">
-                                                    <input class="form-check-input" type="checkbox" name="sim_size[]" value="Nano-SIM" id="tablet_sim_nano">
-                                                    <label class="form-check-label" for="tablet_sim_nano">Nano-SIM</label>
-                                                </div>
-                                                <div class="form-check">
-                                                    <input class="form-check-input" type="checkbox" name="sim_size[]" value="Micro-SIM" id="tablet_sim_micro">
-                                                    <label class="form-check-label" for="tablet_sim_micro">Micro-SIM</label>
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-
-                            <!-- 5. Body Section (excluding form_factor and keyboard) -->
-                            <div class="accordion-item">
-                                <h2 class="accordion-header" id="tabletBodyHeader">
-                                    <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#tabletBodyCollapse" aria-expanded="false" aria-controls="tabletBodyCollapse">
-                                        <i class="fas fa-tablet-alt me-2"></i> Body
-                                    </button>
-                                </h2>
-                                <div id="tabletBodyCollapse" class="accordion-collapse collapse" aria-labelledby="tabletBodyHeader">
-                                    <div class="accordion-body">
-                                        <div class="row">
-                                            <div class="col-md-6 mb-3">
-                                                <label for="tablet_dimensions" class="form-label">Dimensions</label>
-                                                <input type="text" class="form-control" id="tablet_dimensions" name="dimensions" placeholder="e.g., 259.1 x 164.3 x 6.4 mm">
-                                            </div>
-                                            <div class="col-md-4 mb-3">
-                                                <label for="tablet_color" class="form-label">Color</label>
-                                                <input type="text" class="form-control" id="tablet_color" name="color" placeholder="e.g., Space Gray">
-                                            </div>
-                                            <div class="col-md-4 mb-3">
-                                                <label for="tablet_back_material" class="form-label">Back Material</label>
-                                                <select class="form-select" id="tablet_back_material" name="back_material">
-                                                    <option value="">Select material...</option>
-                                                    <option value="Plastic">Plastic</option>
-                                                    <option value="Aluminum">Aluminum</option>
-                                                    <option value="Glass">Glass</option>
-                                                    <option value="Ceramic">Ceramic</option>
-                                                </select>
-                                            </div>
-                                            <div class="col-md-4 mb-3">
-                                                <label for="tablet_frame_material" class="form-label">Frame Material</label>
-                                                <select class="form-select" id="tablet_frame_material" name="frame_material">
-                                                    <option value="">Select material...</option>
-                                                    <option value="Plastic">Plastic</option>
-                                                    <option value="Aluminum">Aluminum</option>
-                                                    <option value="Stainless Steel">Stainless Steel</option>
-                                                    <option value="Titanium">Titanium</option>
-                                                </select>
-                                            </div>
-                                            <div class="col-md-4 mb-3">
-                                                <label for="tablet_weight" class="form-label">Weight (g)</label>
-                                                <input type="number" class="form-control" id="tablet_weight" name="weight" min="200" max="2000">
-                                            </div>
-                                            <div class="col-md-4 mb-3">
-                                                <label for="tablet_thickness" class="form-label">Thickness (mm)</label>
-                                                <input type="number" step="0.1" class="form-control" id="tablet_thickness" name="thickness" min="3" max="20">
-                                            </div>
-                                            <div class="col-md-4 mb-3">
-                                                <label for="tablet_height" class="form-label">Height (mm)</label>
-                                                <input type="number" step="0.1" class="form-control" id="tablet_height" name="height" min="100" max="400">
-                                            </div>
-                                            <div class="col-md-4 mb-3">
-                                                <label for="tablet_width" class="form-label">Width (mm)</label>
-                                                <input type="number" step="0.1" class="form-control" id="tablet_width" name="width" min="100" max="300">
-                                            </div>
-                                            <div class="col-md-12 mb-3">
-                                                <label class="form-label">IP Rating</label>
-                                                <div class="row">
-                                                    <div class="col-md-3">
-                                                        <div class="form-check">
-                                                            <input class="form-check-input" type="checkbox" name="ip_rating[]" value="IP54" id="tablet_ip54">
-                                                            <label class="form-check-label" for="tablet_ip54">IP54</label>
-                                                        </div>
-                                                    </div>
-                                                    <div class="col-md-3">
-                                                        <div class="form-check">
-                                                            <input class="form-check-input" type="checkbox" name="ip_rating[]" value="IP67" id="tablet_ip67">
-                                                            <label class="form-check-label" for="tablet_ip67">IP67</label>
-                                                        </div>
-                                                    </div>
-                                                    <div class="col-md-3">
-                                                        <div class="form-check">
-                                                            <input class="form-check-input" type="checkbox" name="ip_rating[]" value="IP68" id="tablet_ip68">
-                                                            <label class="form-check-label" for="tablet_ip68">IP68</label>
-                                                        </div>
-                                                    </div>
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-
-                            <!-- 6. Platform Section -->
-                            <div class="accordion-item">
-                                <h2 class="accordion-header" id="tabletPlatformHeader">
-                                    <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#tabletPlatformCollapse" aria-expanded="false" aria-controls="tabletPlatformCollapse">
-                                        <i class="fas fa-microchip me-2"></i> Platform
-                                    </button>
-                                </h2>
-                                <div id="tabletPlatformCollapse" class="accordion-collapse collapse" aria-labelledby="tabletPlatformHeader">
-                                    <div class="accordion-body">
-                                        <div class="row">
-                                            <div class="col-md-6 mb-3">
-                                                <label for="tablet_os" class="form-label">OS</label>
-                                                <select class="form-select" id="tablet_os" name="os">
-                                                    <option value="">Select OS...</option>
-                                                    <option value="Android">Android</option>
-                                                    <option value="iOS">iOS</option>
-                                                    <option value="iPadOS">iPadOS</option>
-                                                    <option value="Windows">Windows</option>
-                                                </select>
-                                            </div>
-                                            <div class="col-md-6 mb-3">
-                                                <label for="tablet_os_version" class="form-label">OS Version</label>
-                                                <input type="text" class="form-control" id="tablet_os_version" name="os_version" placeholder="e.g., iPadOS 17">
-                                            </div>
-                                            <div class="col-md-6 mb-3">
-                                                <label for="tablet_chipset" class="form-label">Chipset</label>
-                                                <select class="form-select" id="tablet_chipset" name="chipset">
-                                                    <option value="">Select chipset...</option>
-                                                    <?php
-                                                    $chipsets = getAllChipsets();
-                                                    if (!empty($chipsets)) {
-                                                        foreach ($chipsets as $chipsetItem) {
-                                                            echo '<option value="' . htmlspecialchars($chipsetItem['name']) . '">' .
-                                                                htmlspecialchars($chipsetItem['name']) . '</option>';
-                                                        }
-                                                    }
-                                                    ?>
-                                                </select>
-                                            </div>
-                                            <div class="col-md-6 mb-3">
-                                                <label for="tablet_gpu" class="form-label">GPU</label>
-                                                <input type="text" class="form-control" id="tablet_gpu" name="gpu" placeholder="e.g., Apple M2 10-core GPU">
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-
-                            <!-- 7. Memory Section -->
-                            <div class="accordion-item">
-                                <h2 class="accordion-header" id="tabletMemoryHeader">
-                                    <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#tabletMemoryCollapse" aria-expanded="false" aria-controls="tabletMemoryCollapse">
-                                        <i class="fas fa-memory me-2"></i> Memory
-                                    </button>
-                                </h2>
-                                <div id="tabletMemoryCollapse" class="accordion-collapse collapse" aria-labelledby="tabletMemoryHeader">
-                                    <div class="accordion-body">
-                                        <div class="row">
-                                            <div class="col-md-6 mb-3">
-                                                <label for="tablet_ram" class="form-label">RAM (GB)</label>
-                                                <input type="number" class="form-control" id="tablet_ram" name="ram" min="1" max="32">
-                                            </div>
-                                            <div class="col-md-6 mb-3">
-                                                <label for="tablet_storage" class="form-label">Storage (GB)</label>
-                                                <input type="number" class="form-control" id="tablet_storage" name="storage" min="8" max="2048">
-                                            </div>
-                                            <div class="col-md-6 mb-3">
-                                                <div class="form-check mt-4">
-                                                    <input class="form-check-input" type="checkbox" name="expandable_storage" id="tablet_expandable_storage">
-                                                    <label class="form-check-label" for="tablet_expandable_storage">Expandable Storage</label>
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-
-                            <!-- 8. Display Section -->
-                            <div class="accordion-item">
-                                <h2 class="accordion-header" id="tabletDisplayHeader">
-                                    <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#tabletDisplayCollapse" aria-expanded="false" aria-controls="tabletDisplayCollapse">
-                                        <i class="fas fa-desktop me-2"></i> Display
-                                    </button>
-                                </h2>
-                                <div id="tabletDisplayCollapse" class="accordion-collapse collapse" aria-labelledby="tabletDisplayHeader">
-                                    <div class="accordion-body">
-                                        <div class="row">
-                                            <div class="col-md-6 mb-3">
-                                                <label for="tablet_display_type" class="form-label">Type</label>
-                                                <input type="text" class="form-control" id="tablet_display_type" name="display_type" placeholder="e.g., Liquid Retina">
-                                            </div>
-                                            <div class="col-md-6 mb-3">
-                                                <label for="tablet_display_resolution" class="form-label">Resolution</label>
-                                                <input type="text" class="form-control" id="tablet_display_resolution" name="display_resolution" placeholder="e.g., 2048 x 2732 pixels">
-                                            </div>
-                                            <div class="col-md-4 mb-3">
-                                                <label for="tablet_display_size" class="form-label">Size (inches)</label>
-                                                <input type="number" step="0.1" class="form-control" id="tablet_display_size" name="display_size" min="7" max="15">
-                                            </div>
-                                            <div class="col-md-4 mb-3">
-                                                <label for="tablet_display_density" class="form-label">Density (ppi)</label>
-                                                <input type="number" class="form-control" id="tablet_display_density" name="display_density" min="100" max="800">
-                                            </div>
-                                            <div class="col-md-4 mb-3">
-                                                <label for="tablet_display_technology" class="form-label">Technology</label>
-                                                <select class="form-select" id="tablet_display_technology" name="display_technology">
-                                                    <option value="">Select technology...</option>
-                                                    <option value="IPS">IPS</option>
-                                                    <option value="OLED">OLED</option>
-                                                    <option value="LTPO OLED">LTPO OLED</option>
-                                                    <option value="Mini-LED">Mini-LED</option>
-                                                </select>
-                                            </div>
-                                            <div class="col-md-4 mb-3">
-                                                <label for="tablet_refresh_rate" class="form-label">Refresh Rate</label>
-                                                <select class="form-select" id="tablet_refresh_rate" name="refresh_rate">
-                                                    <option value="">Select rate...</option>
-                                                    <option value="60Hz">60Hz</option>
-                                                    <option value="90Hz">90Hz</option>
-                                                    <option value="120Hz">120Hz</option>
-                                                    <option value="ProMotion (up to 120Hz)">ProMotion (up to 120Hz)</option>
-                                                </select>
-                                            </div>
-                                            <div class="col-md-4 mb-3">
-                                                <div class="form-check mt-4">
-                                                    <input class="form-check-input" type="checkbox" name="hdr" id="tablet_hdr">
-                                                    <label class="form-check-label" for="tablet_hdr">HDR</label>
-                                                </div>
-                                                <div class="form-check">
-                                                    <input class="form-check-input" type="checkbox" name="billion_colors" id="tablet_billion_colors">
-                                                    <label class="form-check-label" for="tablet_billion_colors">1B+ Colors</label>
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-
-                            <!-- 9. Main Camera Section -->
-                            <div class="accordion-item">
-                                <h2 class="accordion-header" id="tabletMainCameraHeader">
-                                    <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#tabletMainCameraCollapse" aria-expanded="false" aria-controls="tabletMainCameraCollapse">
-                                        <i class="fas fa-camera me-2"></i> Main Camera
-                                    </button>
-                                </h2>
-                                <div id="tabletMainCameraCollapse" class="accordion-collapse collapse" aria-labelledby="tabletMainCameraHeader">
-                                    <div class="accordion-body">
-                                        <div class="row">
-                                            <div class="col-md-6 mb-3">
-                                                <label for="tablet_main_camera_resolution" class="form-label">Resolution (MP)</label>
-                                                <input type="number" class="form-control" id="tablet_main_camera_resolution" name="main_camera_resolution" min="0.1" max="200" step="0.1">
-                                            </div>
-                                            <div class="col-md-6 mb-3">
-                                                <label for="tablet_main_camera_count" class="form-label">Cameras</label>
-                                                <select class="form-select" id="tablet_main_camera_count" name="main_camera_count">
-                                                    <option value="">Select count...</option>
-                                                    <option value="One">One</option>
-                                                    <option value="Two">Two</option>
-                                                    <option value="Three">Three</option>
-                                                </select>
-                                            </div>
-                                            <div class="col-md-6 mb-3">
-                                                <label for="tablet_main_camera_f_number" class="form-label">F-Number</label>
-                                                <input type="number" step="0.1" class="form-control" id="tablet_main_camera_f_number" name="main_camera_f_number" min="1" max="10" placeholder="e.g., 1.8">
-                                            </div>
-                                            <div class="col-md-6 mb-3">
-                                                <label for="tablet_main_camera_video" class="form-label">Video</label>
-                                                <input type="text" class="form-control" id="tablet_main_camera_video" name="main_camera_video" placeholder="e.g., 4K@30fps">
-                                            </div>
-                                            <div class="col-md-6 mb-3">
-                                                <label for="tablet_main_camera_flash" class="form-label">Flash</label>
-                                                <select class="form-select" id="tablet_main_camera_flash" name="main_camera_flash">
-                                                    <option value="">Select flash...</option>
-                                                    <option value="LED">LED</option>
-                                                    <option value="Dual-LED">Dual-LED</option>
-                                                    <option value="None">None</option>
-                                                </select>
-                                            </div>
-                                            <div class="col-md-6 mb-3">
-                                                <div class="form-check mt-4">
-                                                    <input class="form-check-input" type="checkbox" name="main_camera_ois" id="tablet_main_camera_ois">
-                                                    <label class="form-check-label" for="tablet_main_camera_ois">OIS</label>
-                                                </div>
-                                                <div class="form-check">
-                                                    <input class="form-check-input" type="checkbox" name="main_camera_ultrawide" id="tablet_main_camera_ultrawide">
-                                                    <label class="form-check-label" for="tablet_main_camera_ultrawide">Ultrawide</label>
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-
-                            <!-- 10. Selfie Camera Section -->
-                            <div class="accordion-item">
-                                <h2 class="accordion-header" id="tabletSelfieCameraHeader">
-                                    <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#tabletSelfieCameraCollapse" aria-expanded="false" aria-controls="tabletSelfieCameraCollapse">
-                                        <i class="fas fa-camera-retro me-2"></i> Front Camera
-                                    </button>
-                                </h2>
-                                <div id="tabletSelfieCameraCollapse" class="accordion-collapse collapse" aria-labelledby="tabletSelfieCameraHeader">
-                                    <div class="accordion-body">
-                                        <div class="row">
-                                            <div class="col-md-6 mb-3">
-                                                <label for="tablet_selfie_camera_resolution" class="form-label">Resolution (MP)</label>
-                                                <input type="number" class="form-control" id="tablet_selfie_camera_resolution" name="selfie_camera_resolution" min="0.1" max="100" step="0.1">
-                                            </div>
-                                            <div class="col-md-6 mb-3">
-                                                <label for="tablet_selfie_camera_f_number" class="form-label">F-Number</label>
-                                                <input type="number" step="0.1" class="form-control" id="tablet_selfie_camera_f_number" name="selfie_camera_f_number" min="1" max="10" placeholder="e.g., 2.4">
-                                            </div>
-                                            <div class="col-md-12 mb-3">
-                                                <div class="form-check">
-                                                    <input class="form-check-input" type="checkbox" name="selfie_camera_ois" id="tablet_selfie_camera_ois">
-                                                    <label class="form-check-label" for="tablet_selfie_camera_ois">OIS</label>
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-
-                            <!-- 11. Audio Section -->
-                            <div class="accordion-item">
-                                <h2 class="accordion-header" id="tabletAudioHeader">
-                                    <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#tabletAudioCollapse" aria-expanded="false" aria-controls="tabletAudioCollapse">
-                                        <i class="fas fa-volume-up me-2"></i> Audio
-                                    </button>
-                                </h2>
-                                <div id="tabletAudioCollapse" class="accordion-collapse collapse" aria-labelledby="tabletAudioHeader">
-                                    <div class="accordion-body">
-                                        <div class="row">
-                                            <div class="col-md-6 mb-3">
-                                                <div class="form-check">
-                                                    <input class="form-check-input" type="checkbox" name="speakers" id="tablet_speakers">
-                                                    <label class="form-check-label" for="tablet_speakers">Speakers</label>
-                                                </div>
-                                                <div class="form-check">
-                                                    <input class="form-check-input" type="checkbox" name="headphone_jack" id="tablet_headphone_jack">
-                                                    <label class="form-check-label" for="tablet_headphone_jack">3.5mm Jack</label>
-                                                </div>
-                                            </div>
-                                            <div class="col-md-6 mb-3">
-                                                <label for="tablet_speaker_count" class="form-label">Speaker Count</label>
-                                                <select class="form-select" id="tablet_speaker_count" name="speaker_count">
-                                                    <option value="">Select count...</option>
-                                                    <option value="1">1</option>
-                                                    <option value="2">2</option>
-                                                    <option value="4">4</option>
-                                                </select>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-
-                            <!-- 12. Sensors Section -->
-                            <div class="accordion-item">
-                                <h2 class="accordion-header" id="tabletSensorsHeader">
-                                    <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#tabletSensorsCollapse" aria-expanded="false" aria-controls="tabletSensorsCollapse">
-                                        <i class="fas fa-satellite-dish me-2"></i> Sensors
-                                    </button>
-                                </h2>
-                                <div id="tabletSensorsCollapse" class="accordion-collapse collapse" aria-labelledby="tabletSensorsHeader">
-                                    <div class="accordion-body">
-                                        <div class="row">
-                                            <div class="col-md-6 mb-3">
-                                                <div class="form-check">
-                                                    <input class="form-check-input" type="checkbox" name="fingerprint" id="tablet_fingerprint">
-                                                    <label class="form-check-label" for="tablet_fingerprint">Fingerprint</label>
-                                                </div>
-                                                <div class="form-check">
-                                                    <input class="form-check-input" type="checkbox" name="face_unlock" id="tablet_face_unlock">
-                                                    <label class="form-check-label" for="tablet_face_unlock">Face Unlock</label>
-                                                </div>
-                                                <div class="form-check">
-                                                    <input class="form-check-input" type="checkbox" name="accelerometer" id="tablet_accelerometer">
-                                                    <label class="form-check-label" for="tablet_accelerometer">Accelerometer</label>
-                                                </div>
-                                            </div>
-                                            <div class="col-md-6 mb-3">
-                                                <div class="form-check">
-                                                    <input class="form-check-input" type="checkbox" name="gyroscope" id="tablet_gyroscope">
-                                                    <label class="form-check-label" for="tablet_gyroscope">Gyroscope</label>
-                                                </div>
-                                                <div class="form-check">
-                                                    <input class="form-check-input" type="checkbox" name="compass" id="tablet_compass">
-                                                    <label class="form-check-label" for="tablet_compass">Compass</label>
-                                                </div>
-                                                <div class="form-check">
-                                                    <input class="form-check-input" type="checkbox" name="ambient_light" id="tablet_ambient_light">
-                                                    <label class="form-check-label" for="tablet_ambient_light">Ambient Light</label>
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-
-                            <!-- 13. Connectivity Section -->
-                            <div class="accordion-item">
-                                <h2 class="accordion-header" id="tabletConnectivityHeader">
-                                    <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#tabletConnectivityCollapse" aria-expanded="false" aria-controls="tabletConnectivityCollapse">
-                                        <i class="fas fa-wifi me-2"></i> Connectivity
-                                    </button>
-                                </h2>
-                                <div id="tabletConnectivityCollapse" class="accordion-collapse collapse" aria-labelledby="tabletConnectivityHeader">
-                                    <div class="accordion-body">
-                                        <div class="row">
-                                            <div class="col-md-6 mb-3">
-                                                <div class="form-check">
-                                                    <input class="form-check-input" type="checkbox" name="wifi" id="tablet_wifi">
-                                                    <label class="form-check-label" for="tablet_wifi">Wi-Fi</label>
-                                                </div>
-                                                <div class="form-check">
-                                                    <input class="form-check-input" type="checkbox" name="bluetooth" id="tablet_bluetooth">
-                                                    <label class="form-check-label" for="tablet_bluetooth">Bluetooth</label>
-                                                </div>
-                                                <div class="form-check">
-                                                    <input class="form-check-input" type="checkbox" name="gps" id="tablet_gps">
-                                                    <label class="form-check-label" for="tablet_gps">GPS</label>
-                                                </div>
-                                            </div>
-                                            <div class="col-md-6 mb-3">
-                                                <div class="form-check">
-                                                    <input class="form-check-input" type="checkbox" name="nfc" id="tablet_nfc">
-                                                    <label class="form-check-label" for="tablet_nfc">NFC</label>
-                                                </div>
-                                                <div class="form-check">
-                                                    <input class="form-check-input" type="checkbox" name="usb_c" id="tablet_usb_c">
-                                                    <label class="form-check-label" for="tablet_usb_c">USB-C</label>
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-
-                            <!-- 14. Battery Section -->
-                            <div class="accordion-item">
-                                <h2 class="accordion-header" id="tabletBatteryHeader">
-                                    <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#tabletBatteryCollapse" aria-expanded="false" aria-controls="tabletBatteryCollapse">
-                                        <i class="fas fa-battery-three-quarters me-2"></i> Battery
-                                    </button>
-                                </h2>
-                                <div id="tabletBatteryCollapse" class="accordion-collapse collapse" aria-labelledby="tabletBatteryHeader">
-                                    <div class="accordion-body">
-                                        <div class="row">
-                                            <div class="col-md-6 mb-3">
-                                                <label for="tablet_battery_capacity" class="form-label">Capacity (mAh)</label>
-                                                <input type="number" class="form-control" id="tablet_battery_capacity" name="battery_capacity" min="3000" max="15000">
-                                            </div>
-                                            <div class="col-md-6 mb-3">
-                                                <label for="tablet_wired_charging" class="form-label">Wired Charging (W)</label>
-                                                <input type="number" class="form-control" id="tablet_wired_charging" name="wired_charging" min="0" max="100">
-                                            </div>
-                                            <div class="col-md-6 mb-3">
-                                                <label for="tablet_wireless_charging" class="form-label">Wireless Charging (W)</label>
-                                                <input type="number" class="form-control" id="tablet_wireless_charging" name="wireless_charging" min="0" max="50">
-                                            </div>
-                                            <div class="col-md-6 mb-3">
-                                                <div class="form-check mt-4">
-                                                    <input class="form-check-input" type="checkbox" name="removable_battery" id="tablet_removable_battery">
-                                                    <label class="form-check-label" for="tablet_removable_battery">Removable Battery</label>
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-
-                        <div class="d-flex justify-content-end mt-3">
-                            <a href="dashboard.php" class="btn btn-secondary me-2">Cancel</a>
-                            <button type="submit" class="btn btn-primary">Save Tablet</button>
-                        </div>
-                    </form>
-                </div>
             </div>
         </div>
     </div>
@@ -1912,6 +1220,45 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 }
             });
         }
+
+        // Handle device type selection
+        const deviceTypePhone = document.getElementById('device_type_phone');
+        const deviceTypeTablet = document.getElementById('device_type_tablet');
+        const formFactorField = document.getElementById('form_factor');
+        const keyboardField = document.getElementById('keyboard');
+
+        function togglePhoneSpecificFields() {
+            if (deviceTypeTablet && deviceTypeTablet.checked) {
+                // Tablet selected - disable phone-specific fields
+                if (formFactorField) {
+                    formFactorField.disabled = true;
+                    formFactorField.value = '';
+                }
+                if (keyboardField) {
+                    keyboardField.disabled = true;
+                    keyboardField.value = '';
+                }
+            } else {
+                // Phone selected - enable phone-specific fields
+                if (formFactorField) {
+                    formFactorField.disabled = false;
+                }
+                if (keyboardField) {
+                    keyboardField.disabled = false;
+                }
+            }
+        }
+
+        // Add event listeners for device type radio buttons
+        if (deviceTypePhone) {
+            deviceTypePhone.addEventListener('change', togglePhoneSpecificFields);
+        }
+        if (deviceTypeTablet) {
+            deviceTypeTablet.addEventListener('change', togglePhoneSpecificFields);
+        }
+
+        // Initialize on page load
+        togglePhoneSpecificFields();
     });
 </script>
 

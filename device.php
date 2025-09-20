@@ -236,13 +236,15 @@ function formatDeviceSpecs($device)
   }
 
   // Body specifications
-  if ($device['dimensions_length'] || $device['dimensions_width'] || $device['dimensions_thickness'] || $device['weight']) {
+  if ($device['dimensions'] || $device['height'] || $device['width'] || $device['thickness'] || $device['weight']) {
     $body_details = '';
-    if ($device['dimensions_length'] && $device['dimensions_width'] && $device['dimensions_thickness']) {
+    if ($device['dimensions']) {
+      $body_details .= '<strong>Dimensions</strong> ' . $device['dimensions'];
+    } elseif ($device['height'] && $device['width'] && $device['thickness']) {
       $body_details .= '<strong>Dimensions</strong> ' .
-        $device['dimensions_length'] . ' x ' .
-        $device['dimensions_width'] . ' x ' .
-        $device['dimensions_thickness'] . ' mm';
+        $device['height'] . ' x ' .
+        $device['width'] . ' x ' .
+        $device['thickness'] . ' mm';
     }
     if ($device['weight']) {
       if ($body_details) $body_details .= '<br>';
@@ -296,17 +298,16 @@ function formatDeviceSpecs($device)
   }
 
   // Memory specifications
-  if ($device['ram_internal'] || $device['storage_internal'] || $device['card_slot']) {
+  if ($device['ram'] || $device['storage'] || $device['card_slot']) {
     $memory_details = '';
     if ($device['card_slot'] !== null) {
       $memory_details .= '<strong>Card slot</strong> ' . ($device['card_slot'] ? 'Yes' : 'No');
-      if ($device['storage_expandable']) $memory_details .= ' (' . $device['storage_expandable'] . ')';
     }
-    if ($device['storage_internal'] || $device['ram_internal']) {
+    if ($device['storage'] || $device['ram']) {
       if ($memory_details) $memory_details .= '<br>';
       $memory_details .= '<strong>Internal</strong> ';
-      if ($device['storage_internal']) $memory_details .= $device['storage_internal'];
-      if ($device['ram_internal']) $memory_details .= ' RAM: ' . $device['ram_internal'];
+      if ($device['storage']) $memory_details .= $device['storage'];
+      if ($device['ram']) $memory_details .= ' RAM: ' . $device['ram'];
     }
     $specs['MEMORY'] = $memory_details;
   }
@@ -374,14 +375,14 @@ function formatDeviceSpecs($device)
   }
 
   // Sound specifications
-  if ($device['loudspeaker'] !== null || $device['audio_jack_35mm'] !== null) {
+  if ($device['dual_speakers'] !== null || $device['headphone_jack'] !== null) {
     $sound_details = '';
-    if ($device['loudspeaker'] !== null) {
-      $sound_details .= '<strong>Loudspeaker</strong> ' . ($device['loudspeaker'] ? 'Yes' : 'No');
+    if ($device['dual_speakers'] !== null) {
+      $sound_details .= '<strong>Loudspeaker</strong> ' . ($device['dual_speakers'] ? 'Yes' : 'No');
     }
-    if ($device['audio_jack_35mm'] !== null) {
+    if ($device['headphone_jack'] !== null) {
       if ($sound_details) $sound_details .= '<br>';
-      $sound_details .= '<strong>3.5mm jack</strong> ' . ($device['audio_jack_35mm'] ? 'Yes' : 'No');
+      $sound_details .= '<strong>3.5mm jack</strong> ' . ($device['headphone_jack'] ? 'Yes' : 'No');
     }
     $specs['SOUND'] = $sound_details;
   }
@@ -403,9 +404,9 @@ function formatDeviceSpecs($device)
     if ($comms_details) $comms_details .= '<br>';
     $comms_details .= '<strong>NFC</strong> ' . ($device['nfc'] ? 'Yes' : 'No');
   }
-  if ($device['radio'] !== null) {
+  if ($device['fm_radio'] !== null) {
     if ($comms_details) $comms_details .= '<br>';
-    $comms_details .= '<strong>Radio</strong> ' . ($device['radio'] ? 'Yes' : 'No');
+    $comms_details .= '<strong>Radio</strong> ' . ($device['fm_radio'] ? 'Yes' : 'No');
   }
   if ($device['usb']) {
     if ($comms_details) $comms_details .= '<br>';
@@ -420,32 +421,31 @@ function formatDeviceSpecs($device)
   if ($device['fingerprint'] !== null) {
     $features_details .= '<strong>Fingerprint</strong> ' . ($device['fingerprint'] ? 'Yes' : 'No');
   }
-  if ($device['face_unlock'] !== null) {
+
+  // Build sensors list from individual sensor fields
+  $sensors = [];
+  if ($device['accelerometer']) $sensors[] = 'Accelerometer';
+  if ($device['gyro']) $sensors[] = 'Gyro';
+  if ($device['compass']) $sensors[] = 'Compass';
+  if ($device['proximity']) $sensors[] = 'Proximity';
+  if ($device['barometer']) $sensors[] = 'Barometer';
+  if ($device['heart_rate']) $sensors[] = 'Heart Rate';
+
+  if (!empty($sensors)) {
     if ($features_details) $features_details .= '<br>';
-    $features_details .= '<strong>Face unlock</strong> ' . ($device['face_unlock'] ? 'Yes' : 'No');
+    $features_details .= '<strong>Sensors</strong> ' . implode(', ', $sensors);
   }
-  if ($device['sensors'] && is_array($device['sensors'])) {
-    if ($features_details) $features_details .= '<br>';
-    $features_details .= '<strong>Sensors</strong> ' . implode(', ', $device['sensors']);
-  } elseif ($device['sensors'] && is_string($device['sensors'])) {
-    // Handle PostgreSQL array string format
-    $array_sensors = str_replace(['{', '}'], '', $device['sensors']);
-    $array_sensors = explode(',', $array_sensors);
-    if ($features_details) $features_details .= '<br>';
-    $features_details .= '<strong>Sensors</strong> ' . implode(', ', array_map('trim', $array_sensors));
-  }
+
   if ($features_details) {
     $specs['FEATURES'] = $features_details;
   }
 
   // Battery specifications
-  if ($device['battery_capacity'] || $device['battery_type']) {
+  if ($device['battery_capacity'] || $device['battery_sic']) {
     $battery_details = '';
-    if ($device['battery_type']) {
-      $battery_details .= '<strong>Type</strong> ' . $device['battery_type'];
-      if ($device['battery_capacity']) $battery_details .= ' ' . $device['battery_capacity'] . ' mAh';
-    } else if ($device['battery_capacity']) {
+    if ($device['battery_capacity']) {
       $battery_details .= '<strong>Capacity</strong> ' . $device['battery_capacity'] . ' mAh';
+      if ($device['battery_sic']) $battery_details .= ' (Silicon)';
     }
 
     if ($device['battery_removable'] !== null) {
@@ -454,9 +454,8 @@ function formatDeviceSpecs($device)
 
     // Charging information
     $charging = [];
-    if ($device['charging_wired']) $charging[] = 'Wired: ' . $device['charging_wired'] . 'W';
-    if ($device['charging_wireless']) $charging[] = 'Wireless: ' . $device['charging_wireless'] . 'W';
-    if ($device['charging_reverse']) $charging[] = 'Reverse: ' . $device['charging_reverse'] . 'W';
+    if ($device['wired_charging']) $charging[] = 'Wired: ' . $device['wired_charging'];
+    if ($device['wireless_charging']) $charging[] = 'Wireless: ' . $device['wireless_charging'];
 
     if (!empty($charging)) {
       $battery_details .= '<br><strong>Charging</strong> ' . implode(', ', $charging);
@@ -503,8 +502,8 @@ function generateDeviceHighlights($device)
   if ($device['weight']) {
     $weight_dims[] = $device['weight'] . 'g';
   }
-  if ($device['dimensions_thickness']) {
-    $weight_dims[] = $device['dimensions_thickness'] . 'mm thickness';
+  if ($device['thickness']) {
+    $weight_dims[] = $device['thickness'] . 'mm thickness';
   }
   if (!empty($weight_dims)) {
     $highlights['weight_dims'] = "⚖️ " . implode(', ', $weight_dims);
@@ -517,8 +516,8 @@ function generateDeviceHighlights($device)
 
   // Storage highlight
   $storage_parts = [];
-  if ($device['storage_internal']) {
-    $storage_parts[] = $device['storage_internal'] . ' storage';
+  if ($device['storage']) {
+    $storage_parts[] = $device['storage'] . ' storage';
   }
   if ($device['card_slot'] === false) {
     $storage_parts[] = 'no card slot';
@@ -571,8 +570,8 @@ function generateDeviceStats($device)
   // Performance stats (RAM + Chipset)
   $perf_title = 'N/A';
   $perf_subtitle = 'Unknown';
-  if ($device['ram_internal']) {
-    $perf_title = $device['ram_internal'];
+  if ($device['ram']) {
+    $perf_title = $device['ram'];
   }
   if ($device['chipset_name']) {
     // Simplify chipset name
@@ -598,10 +597,10 @@ function generateDeviceStats($device)
   // Battery stats
   $battery_title = $device['battery_capacity'] ? $device['battery_capacity'] . 'mAh' : 'N/A';
   $battery_subtitle = 'N/A';
-  if ($device['charging_wired']) {
-    $battery_subtitle = $device['charging_wired'] . 'W';
-  } elseif ($device['charging_wireless']) {
-    $battery_subtitle = $device['charging_wireless'] . 'W wireless';
+  if ($device['wired_charging']) {
+    $battery_subtitle = $device['wired_charging'];
+  } elseif ($device['wireless_charging']) {
+    $battery_subtitle = $device['wireless_charging'] . ' wireless';
   }
   $stats['battery'] = [
     'icon' => 'imges/lowtry-removebg-preview.png',
@@ -1586,302 +1585,302 @@ if ($_POST && isset($_POST['submit_comment'])) {
             <?php endif; ?>
           </div>
           <div class="center w-100 " style="margin-top: 12px;">
-                    <h6 style="color: #090E21; text-transform: uppercase; font-weight: 900;" class=" mt-2 ">Latest Devices
-                </h6>
-                <div class="cent">
-                    <?php if (empty($devices)): ?>
-                        <div class="text-center py-5">
-                            <i class="fas fa-mobile-alt fa-3x text-muted mb-3"></i>
-                            <h4 class="text-muted">No Devices Available</h4>
-                            <p class="text-muted">Check back later for new devices!</p>
-                        </div>
-                    <?php else: ?>
-                        <?php $chunks = array_chunk($devices, 3); ?>
-                        <?php foreach ($chunks as $row): ?>
-                            <div class="d-flex">
-                                <?php foreach ($row as $i => $device): ?>
-                                    <div class="device-card canel<?php echo $i == 1 ? ' mx-4' : ($i == 0 ? '' : ''); ?>" data-device-id="<?php echo $device['id']; ?>" style="cursor: pointer;">
-                                        <?php if (isset($device['images']) && !empty($device['images'])): ?>
-                                            <img class="shrink" src="<?php echo htmlspecialchars($device['images'][0]); ?>" alt="">
-                                        <?php elseif (isset($device['image']) && !empty($device['image'])): ?>
-                                            <img class="shrink" src="<?php echo htmlspecialchars($device['image']); ?>" alt="">
-                                        <?php else: ?>
-                                            <img class="shrink" src="" alt="">
-                                        <?php endif; ?>
-                                        <p><?php echo htmlspecialchars($device['name'] ?? ''); ?></p>
-                                    </div>
-                                <?php endforeach; ?>
-                                <?php for ($j = count($row); $j < 3; $j++): ?>
-                                    <div class="canel<?php echo $j == 1 ? ' mx-4' : ($j == 0 ? '' : ''); ?>"></div>
-                                <?php endfor; ?>
-                            </div>
-                        <?php endforeach; ?>
-                    <?php endif; ?>
+            <h6 style="color: #090E21; text-transform: uppercase; font-weight: 900;" class=" mt-2 ">Latest Devices
+            </h6>
+            <div class="cent">
+              <?php if (empty($devices)): ?>
+                <div class="text-center py-5">
+                  <i class="fas fa-mobile-alt fa-3x text-muted mb-3"></i>
+                  <h4 class="text-muted">No Devices Available</h4>
+                  <p class="text-muted">Check back later for new devices!</p>
                 </div>
-
-                <h6 style="border-left: solid 5px grey ; color: #090E21; text-transform: uppercase; font-weight: 900; margin-top: 12px;"
-                    class="px-3">Popular comparisons</h6>
-
-                <div class="sentizer bg-white mt-2 p-3 rounded shadow-sm" style="    text-transform: Uppercase;
-                                            font-size: 13px;
-                                            font-weight: 700;">
-                    <div class="row">
-                        <div class="col-12">
-                            <?php if (empty($topComparisons)): ?>
-                                <p class="mb-2" style=" text-transform: capitalize;">No Comparisons Yet</p>
-                            <?php else: ?>
-                                <?php foreach ($topComparisons as $index => $comparison): ?>
-                                    <!-- if $index is odd -->
-                                    <?php if ((($index + 1) % 2) != 0): ?>
-                                        <p class="mb-2 clickable-comparison" data-device1-id="<?php echo $comparison['device1_id'] ?? ''; ?>"
-                                            data-device2-id="<?php echo $comparison['device2_id'] ?? ''; ?>"
-                                            style="cursor: pointer; background-color: #ffe6f0; color: #090E21; text-transform: capitalize;"><?php echo htmlspecialchars($comparison['device1_name'] ?? $comparison['device1'] ?? 'Unknown'); ?> vs.
-                                            <?php echo htmlspecialchars($comparison['device2_name'] ?? $comparison['device2'] ?? 'Unknown'); ?></p>
-                                    <?php else: ?>
-                                        <!-- else if $index is even -->
-                                        <p class="mb-2 clickable-comparison" data-device1-id="<?php echo $comparison['device1_id'] ?? ''; ?>"
-                                            data-device2-id="<?php echo $comparison['device2_id'] ?? ''; ?>" style="cursor: pointer; text-transform: capitalize;"><?php echo htmlspecialchars($comparison['device1_name'] ?? $comparison['device1'] ?? 'Unknown'); ?> vs. <?php echo htmlspecialchars($comparison['device2_name'] ?? $comparison['device2'] ?? 'Unknown'); ?></p>
-                                    <?php endif; ?>
-                                <?php endforeach; ?>
-                            <?php endif; ?>
-                        </div>
-                    </div>
-                </div>
-                <h6 style="border-left: 7px solid #EFEBE9 ; font-weight: 900; color: #090E21; text-transform: uppercase;"
-                    class=" px-2 mt-2 d-inline mt-4">Top 10
-                    Daily Interest</h6>
-
-                <div class="center">
-                    <table class="table table-sm custom-table">
-                        <thead>
-                            <tr style="background-color: #4c7273; color: white;">
-                                <th style="color: white;">#</th>
-                                <th style="color: white;">Devices</th>
-                                <th style="color: white;">Daily Hits</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            <?php if (empty($topViewedDevices)): ?>
-                                <tr>
-                                    <th scope="row"></th>
-                                    <td class="text-start">Not Enough Data Exists</td>
-                                    <td class="text-end"></td>
-                                </tr>
-                            <?php else: ?>
-                                <?php foreach ($topViewedDevices as $index => $device):
-                                    if (($index + 1) % 2 != 0): ?>
-                                        <tr class="clickable-row" data-device-id="<?php echo $device['id']; ?>" style="cursor: pointer;">
-                                            <th scope="row"><?php echo $index + 1; ?></th>
-                                            <td class="text-start"><?php echo htmlspecialchars($device['brand_name']); ?> <?php echo htmlspecialchars($device['name']); ?></td>
-                                            <td class="text-end"><?php echo $device['view_count']; ?></td>
-                                        </tr>
-                                    <?php else: ?>
-                                        <tr class="highlight clickable-row" data-device-id="<?php echo $device['id']; ?>" style="cursor: pointer;">
-                                            <th scope="row" class="text-white"><?php echo $index + 1; ?></th>
-                                            <td class="text-start"><?php echo htmlspecialchars($device['brand_name']); ?> <?php echo htmlspecialchars($device['name']); ?></td>
-                                            <td class="text-end"><?php echo $device['view_count']; ?></td>
-                                        </tr>
-                            <?php
-                                    endif;
-                                endforeach;
-                            endif; ?>
-                        </tbody>
-                    </table>
-                </div>
-                <h6 style="border-left: 7px solid #EFEBE9 ; font-weight: 900; color: #090E21; text-transform: uppercase;"
-                    class=" px-2 mt-2 d-inline mt-4">Top 10 by
-                    Fans</h6>
-                <div class="center" style="margin-top: 12px;">
-                    <table class="table table-sm custom-table">
-                        <thead>
-                            <tr class="text-white" style="background-color: #14222D;">
-                                <th style="color: white;  font-size: 15px;  ">#</th>
-                                <th style="color: white;  font-size: 15px;">Device</th>
-                                <th style="color: white;  font-size: 15px;">Reviews</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            <?php if (empty($topReviewedDevices)): ?>
-                                <tr>
-                                    <th scope="row"></th>
-                                    <td class="text-start">Not Enough Data Exists</td>
-                                    <td class="text-end"></td>
-                                </tr>
-                            <?php else: ?>
-                                <?php foreach ($topReviewedDevices as $index => $device):
-                                    if (($index + 1) % 2 != 0): ?>
-                                        <tr class="clickable-row" data-device-id="<?php echo $device['id']; ?>" style="cursor: pointer;">
-                                            <th scope="row"><?php echo $index + 1; ?></th>
-                                            <td class="text-start"><?php echo htmlspecialchars($device['brand_name']); ?> <?php echo htmlspecialchars($device['name']); ?></td>
-                                            <td class="text-end"><?php echo $device['review_count']; ?></td>
-                                        </tr>
-                                    <?php else: ?>
-                                        <tr class="highlight-12 clickable-row" data-device-id="<?php echo $device['id']; ?>" style="cursor: pointer;">
-                                            <th scope="row" class="text-white"><?php echo $index + 1; ?></th>
-                                            <td class="text-start"><?php echo htmlspecialchars($device['brand_name']); ?> <?php echo htmlspecialchars($device['name']); ?></td>
-                                            <td class="text-end"><?php echo $device['review_count']; ?></td>
-                                        </tr>
-                            <?php
-                                    endif;
-                                endforeach;
-                            endif; ?>
-                        </tbody>
-                    </table>
-                </div>
-                <h6 style="border-left: 7px solid #EFEBE9 ; font-weight: 900; color: #090E21; text-transform: uppercase;"
-                    class=" px-2 mt-2 d-inline mt-4">In
-                    Stores
-                    Now</h6>
-
-                <div class="cent">
-                    <?php if (empty($latestDevices)): ?>
-                        <div class="text-center py-5">
-                            <i class="fas fa-mobile-alt fa-3x text-muted mb-3"></i>
-                            <h4 class="text-muted">No Devices Available</h4>
-                            <p class="text-muted">Check back later for new devices!</p>
-                        </div>
-                    <?php else: ?>
-                        <?php $chunks = array_chunk($latestDevices, 3); ?>
-                        <?php foreach ($chunks as $row): ?>
-                            <div class="d-flex">
-                                <?php foreach ($row as $i => $device): ?>
-                                    <div class="device-card canel<?php echo $i == 1 ? ' mx-4' : ($i == 0 ? '' : ''); ?>" data-device-id="<?php echo $device['id']; ?>" style="cursor: pointer;">
-                                        <img class="shrink" src="<?php echo htmlspecialchars($device['image'] ?? ''); ?>" alt="">
-                                        <p><?php echo htmlspecialchars($device['name'] ?? ''); ?></p>
-                                    </div>
-                                <?php endforeach; ?>
-                                <?php for ($j = count($row); $j < 3; $j++): ?>
-                                    <div class="canel<?php echo $j == 1 ? ' mx-4' : ($j == 0 ? '' : ''); ?>"></div>
-                                <?php endfor; ?>
-                            </div>
-                        <?php endforeach; ?>
-                    <?php endif; ?>
-                </div>
-        </div>
-      </div>
-
-    </div>
-  </div>
-  <div id="bottom" class="container d-flex mt-3" style="max-width: 1034px;">
-    <div class="row align-items-center">
-      <div class="col-md-2 m-auto col-4 d-flex justify-content-center align-items-center "> <img
-          src="https://fdn2.gsmarena.com/w/css/logo-gsmarena-com.png" alt="">
-      </div>
-      <div class="col-10 nav-wrap m-auto text-center ">
-        <div class="nav-container">
-          <a href="#">Home</a>
-
-          <a href="#">Reviews</a>
-          <a href="#">Compare</a>
-          <a href="#">Coverage</a>
-          <a href="#">Glossary</a>
-          <a href="#">FAQ</a>
-          <a href="#"> <i class="fa-solid fa-wifi fa-sm"></i> RSS</a>
-          <a href="#"> <i class="fa-brands fa-youtube fa-sm"></i> YouTube</a>
-          <a href="#"> <i class="fa-brands fa-instagram fa-sm"></i> Instagram</a>
-          <a href="#"> <i class="fa-brands fa-tiktok fa-sm"></i>TikTok</a>
-          <a href="#"> <i class="fa-brands fa-facebook-f fa-sm"></i> Facebook</a>
-          <a href="#"> <i class="fa-brands fa-twitter fa-sm"></i>Twitter</a>
-          <a href="#">© 2000-2025 GSMArena.com</a>
-          <a href="#">Mobile version</a>
-          <a href="#">Android app</a>
-          <a href="#">Tools</a>
-          <a href="contact.php">Contact us</a>
-          <a href="#">Merch store</a>
-          <a href="#">Privacy</a>
-          <a href="#">Terms of use</a>
-        </div>
-      </div>
-    </div>
-  </div>
-
-  <!-- Pictures Modal -->
-  <div class="modal fade" id="picturesModal" tabindex="-1" aria-labelledby="picturesModalLabel" aria-hidden="true">
-    <div class="modal-dialog modal-lg modal-dialog-centered">
-      <div class="modal-content" style="background-color: #EFEBE9; border: 2px solid #8D6E63;">
-        <div class="modal-header" style="border-bottom: 1px solid #8D6E63; background-color: #D7CCC8;">
-          <h5 class="modal-title" id="picturesModalLabel" style="font-family:'oswald'; color: #5D4037;">
-            <i class="fas fa-images me-2"></i><?php echo htmlspecialchars(($device['brand_name'] ?? '') . ' ' . ($device['name'] ?? 'Device')); ?> - Pictures
-          </h5>
-          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-        </div>
-        <div class="modal-body p-0">
-          <?php if (!empty($deviceImages)): ?>
-            <!-- Image Carousel -->
-            <div id="picturesCarousel" class="carousel slide" data-bs-ride="false">
-              <!-- Carousel Indicators -->
-              <div class="carousel-indicators">
-                <?php foreach ($deviceImages as $index => $image): ?>
-                  <button type="button" data-bs-target="#picturesCarousel" data-bs-slide-to="<?php echo $index; ?>"
-                    <?php if ($index === 0): ?>class="active" aria-current="true" <?php endif; ?>
-                    aria-label="Slide <?php echo $index + 1; ?>"></button>
-                <?php endforeach; ?>
-              </div>
-
-              <!-- Carousel Images -->
-              <div class="carousel-inner">
-                <?php foreach ($deviceImages as $index => $image): ?>
-                  <div class="carousel-item <?php if ($index === 0): ?>active<?php endif; ?>">
-                    <div class="d-flex justify-content-center" style="background-color: #F5F5F5; min-height: 400px;">
-                      <!-- Debug output -->
-                      <div style="display: none;">Image path: <?php echo htmlspecialchars($image); ?></div>
-
-                      <img src="<?php echo htmlspecialchars($image); ?>"
-                        class="d-block img-fluid"
-                        style="max-height: 500px; max-width: 100%; object-fit: contain; padding: 20px;"
-                        alt="<?php echo htmlspecialchars(($device['brand_name'] ?? '') . ' ' . ($device['name'] ?? 'Device')); ?> - Image <?php echo $index + 1; ?>"
-                        onerror="this.style.display='none';">
-                    </div>
-                    <div class="carousel-caption d-md-block" style="background-color: rgba(0,0,0,0.5); border-radius: 10px; bottom: 20px;">
-                      <p class="mb-0" style="font-size: 14px;">Image <?php echo $index + 1; ?> of <?php echo count($deviceImages); ?></p>
-                    </div>
+              <?php else: ?>
+                <?php $chunks = array_chunk($devices, 3); ?>
+                <?php foreach ($chunks as $row): ?>
+                  <div class="d-flex">
+                    <?php foreach ($row as $i => $device): ?>
+                      <div class="device-card canel<?php echo $i == 1 ? ' mx-4' : ($i == 0 ? '' : ''); ?>" data-device-id="<?php echo $device['id']; ?>" style="cursor: pointer;">
+                        <?php if (isset($device['images']) && !empty($device['images'])): ?>
+                          <img class="shrink" src="<?php echo htmlspecialchars($device['images'][0]); ?>" alt="">
+                        <?php elseif (isset($device['image']) && !empty($device['image'])): ?>
+                          <img class="shrink" src="<?php echo htmlspecialchars($device['image']); ?>" alt="">
+                        <?php else: ?>
+                          <img class="shrink" src="" alt="">
+                        <?php endif; ?>
+                        <p><?php echo htmlspecialchars($device['name'] ?? ''); ?></p>
+                      </div>
+                    <?php endforeach; ?>
+                    <?php for ($j = count($row); $j < 3; $j++): ?>
+                      <div class="canel<?php echo $j == 1 ? ' mx-4' : ($j == 0 ? '' : ''); ?>"></div>
+                    <?php endfor; ?>
                   </div>
                 <?php endforeach; ?>
-              </div>
-
-              <!-- Carousel Controls -->
-              <?php if (count($deviceImages) > 1): ?>
-                <button class="carousel-control-prev" type="button" data-bs-target="#picturesCarousel" data-bs-slide="prev">
-                  <span class="carousel-control-prev-icon" aria-hidden="true"></span>
-                  <span class="visually-hidden">Previous</span>
-                </button>
-                <button class="carousel-control-next" type="button" data-bs-target="#picturesCarousel" data-bs-slide="next">
-                  <span class="carousel-control-next-icon" aria-hidden="true"></span>
-                  <span class="visually-hidden">Next</span>
-                </button>
               <?php endif; ?>
             </div>
 
-            <!-- Thumbnail Navigation -->
-            <?php if (count($deviceImages) > 1): ?>
-              <div class="modal-footer" style="border-top: 1px solid #8D6E63; background-color: #D7CCC8; padding: 10px;">
-                <div class="d-flex justify-content-center flex-wrap gap-2" style="max-height: 100px; overflow-y: auto;">
-                  <?php foreach ($deviceImages as $index => $image): ?>
-                    <img src="<?php echo htmlspecialchars($image); ?>"
-                      class="thumbnail-nav border rounded"
-                      style="width: 60px; height: 60px; object-fit: cover; cursor: pointer; opacity: 0.7; transition: opacity 0.3s;"
-                      onclick="showSlide(<?php echo $index; ?>)"
-                      data-slide="<?php echo $index; ?>"
-                      alt="Thumbnail <?php echo $index + 1; ?>"
-                      onerror="this.style.display='none';">
-                  <?php endforeach; ?>
+            <h6 style="border-left: solid 5px grey ; color: #090E21; text-transform: uppercase; font-weight: 900; margin-top: 12px;"
+              class="px-3">Popular comparisons</h6>
+
+            <div class="sentizer bg-white mt-2 p-3 rounded shadow-sm" style="    text-transform: Uppercase;
+                                            font-size: 13px;
+                                            font-weight: 700;">
+              <div class="row">
+                <div class="col-12">
+                  <?php if (empty($topComparisons)): ?>
+                    <p class="mb-2" style=" text-transform: capitalize;">No Comparisons Yet</p>
+                  <?php else: ?>
+                    <?php foreach ($topComparisons as $index => $comparison): ?>
+                      <!-- if $index is odd -->
+                      <?php if ((($index + 1) % 2) != 0): ?>
+                        <p class="mb-2 clickable-comparison" data-device1-id="<?php echo $comparison['device1_id'] ?? ''; ?>"
+                          data-device2-id="<?php echo $comparison['device2_id'] ?? ''; ?>"
+                          style="cursor: pointer; background-color: #ffe6f0; color: #090E21; text-transform: capitalize;"><?php echo htmlspecialchars($comparison['device1_name'] ?? $comparison['device1'] ?? 'Unknown'); ?> vs.
+                          <?php echo htmlspecialchars($comparison['device2_name'] ?? $comparison['device2'] ?? 'Unknown'); ?></p>
+                      <?php else: ?>
+                        <!-- else if $index is even -->
+                        <p class="mb-2 clickable-comparison" data-device1-id="<?php echo $comparison['device1_id'] ?? ''; ?>"
+                          data-device2-id="<?php echo $comparison['device2_id'] ?? ''; ?>" style="cursor: pointer; text-transform: capitalize;"><?php echo htmlspecialchars($comparison['device1_name'] ?? $comparison['device1'] ?? 'Unknown'); ?> vs. <?php echo htmlspecialchars($comparison['device2_name'] ?? $comparison['device2'] ?? 'Unknown'); ?></p>
+                      <?php endif; ?>
+                    <?php endforeach; ?>
+                  <?php endif; ?>
                 </div>
               </div>
-            <?php endif; ?>
-          <?php else: ?>
-            <!-- No Images Available -->
-            <div class="text-center py-5">
-              <i class="fas fa-image-slash fa-3x text-muted mb-3"></i>
-              <h6 class="text-muted">No pictures available for this device</h6>
-              <p class="text-muted small">Pictures will be added soon</p>
             </div>
-          <?php endif; ?>
+            <h6 style="border-left: 7px solid #EFEBE9 ; font-weight: 900; color: #090E21; text-transform: uppercase;"
+              class=" px-2 mt-2 d-inline mt-4">Top 10
+              Daily Interest</h6>
+
+            <div class="center">
+              <table class="table table-sm custom-table">
+                <thead>
+                  <tr style="background-color: #4c7273; color: white;">
+                    <th style="color: white;">#</th>
+                    <th style="color: white;">Devices</th>
+                    <th style="color: white;">Daily Hits</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <?php if (empty($topViewedDevices)): ?>
+                    <tr>
+                      <th scope="row"></th>
+                      <td class="text-start">Not Enough Data Exists</td>
+                      <td class="text-end"></td>
+                    </tr>
+                  <?php else: ?>
+                    <?php foreach ($topViewedDevices as $index => $device):
+                      if (($index + 1) % 2 != 0): ?>
+                        <tr class="clickable-row" data-device-id="<?php echo $device['id']; ?>" style="cursor: pointer;">
+                          <th scope="row"><?php echo $index + 1; ?></th>
+                          <td class="text-start"><?php echo htmlspecialchars($device['brand_name']); ?> <?php echo htmlspecialchars($device['name']); ?></td>
+                          <td class="text-end"><?php echo $device['view_count']; ?></td>
+                        </tr>
+                      <?php else: ?>
+                        <tr class="highlight clickable-row" data-device-id="<?php echo $device['id']; ?>" style="cursor: pointer;">
+                          <th scope="row" class="text-white"><?php echo $index + 1; ?></th>
+                          <td class="text-start"><?php echo htmlspecialchars($device['brand_name']); ?> <?php echo htmlspecialchars($device['name']); ?></td>
+                          <td class="text-end"><?php echo $device['view_count']; ?></td>
+                        </tr>
+                  <?php
+                      endif;
+                    endforeach;
+                  endif; ?>
+                </tbody>
+              </table>
+            </div>
+            <h6 style="border-left: 7px solid #EFEBE9 ; font-weight: 900; color: #090E21; text-transform: uppercase;"
+              class=" px-2 mt-2 d-inline mt-4">Top 10 by
+              Fans</h6>
+            <div class="center" style="margin-top: 12px;">
+              <table class="table table-sm custom-table">
+                <thead>
+                  <tr class="text-white" style="background-color: #14222D;">
+                    <th style="color: white;  font-size: 15px;  ">#</th>
+                    <th style="color: white;  font-size: 15px;">Device</th>
+                    <th style="color: white;  font-size: 15px;">Reviews</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <?php if (empty($topReviewedDevices)): ?>
+                    <tr>
+                      <th scope="row"></th>
+                      <td class="text-start">Not Enough Data Exists</td>
+                      <td class="text-end"></td>
+                    </tr>
+                  <?php else: ?>
+                    <?php foreach ($topReviewedDevices as $index => $device):
+                      if (($index + 1) % 2 != 0): ?>
+                        <tr class="clickable-row" data-device-id="<?php echo $device['id']; ?>" style="cursor: pointer;">
+                          <th scope="row"><?php echo $index + 1; ?></th>
+                          <td class="text-start"><?php echo htmlspecialchars($device['brand_name']); ?> <?php echo htmlspecialchars($device['name']); ?></td>
+                          <td class="text-end"><?php echo $device['review_count']; ?></td>
+                        </tr>
+                      <?php else: ?>
+                        <tr class="highlight-12 clickable-row" data-device-id="<?php echo $device['id']; ?>" style="cursor: pointer;">
+                          <th scope="row" class="text-white"><?php echo $index + 1; ?></th>
+                          <td class="text-start"><?php echo htmlspecialchars($device['brand_name']); ?> <?php echo htmlspecialchars($device['name']); ?></td>
+                          <td class="text-end"><?php echo $device['review_count']; ?></td>
+                        </tr>
+                  <?php
+                      endif;
+                    endforeach;
+                  endif; ?>
+                </tbody>
+              </table>
+            </div>
+            <h6 style="border-left: 7px solid #EFEBE9 ; font-weight: 900; color: #090E21; text-transform: uppercase;"
+              class=" px-2 mt-2 d-inline mt-4">In
+              Stores
+              Now</h6>
+
+            <div class="cent">
+              <?php if (empty($latestDevices)): ?>
+                <div class="text-center py-5">
+                  <i class="fas fa-mobile-alt fa-3x text-muted mb-3"></i>
+                  <h4 class="text-muted">No Devices Available</h4>
+                  <p class="text-muted">Check back later for new devices!</p>
+                </div>
+              <?php else: ?>
+                <?php $chunks = array_chunk($latestDevices, 3); ?>
+                <?php foreach ($chunks as $row): ?>
+                  <div class="d-flex">
+                    <?php foreach ($row as $i => $device): ?>
+                      <div class="device-card canel<?php echo $i == 1 ? ' mx-4' : ($i == 0 ? '' : ''); ?>" data-device-id="<?php echo $device['id']; ?>" style="cursor: pointer;">
+                        <img class="shrink" src="<?php echo htmlspecialchars($device['image'] ?? ''); ?>" alt="">
+                        <p><?php echo htmlspecialchars($device['name'] ?? ''); ?></p>
+                      </div>
+                    <?php endforeach; ?>
+                    <?php for ($j = count($row); $j < 3; $j++): ?>
+                      <div class="canel<?php echo $j == 1 ? ' mx-4' : ($j == 0 ? '' : ''); ?>"></div>
+                    <?php endfor; ?>
+                  </div>
+                <?php endforeach; ?>
+              <?php endif; ?>
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+    <div id="bottom" class="container d-flex mt-3" style="max-width: 1034px;">
+      <div class="row align-items-center">
+        <div class="col-md-2 m-auto col-4 d-flex justify-content-center align-items-center "> <img
+            src="https://fdn2.gsmarena.com/w/css/logo-gsmarena-com.png" alt="">
+        </div>
+        <div class="col-10 nav-wrap m-auto text-center ">
+          <div class="nav-container">
+            <a href="#">Home</a>
+
+            <a href="#">Reviews</a>
+            <a href="#">Compare</a>
+            <a href="#">Coverage</a>
+            <a href="#">Glossary</a>
+            <a href="#">FAQ</a>
+            <a href="#"> <i class="fa-solid fa-wifi fa-sm"></i> RSS</a>
+            <a href="#"> <i class="fa-brands fa-youtube fa-sm"></i> YouTube</a>
+            <a href="#"> <i class="fa-brands fa-instagram fa-sm"></i> Instagram</a>
+            <a href="#"> <i class="fa-brands fa-tiktok fa-sm"></i>TikTok</a>
+            <a href="#"> <i class="fa-brands fa-facebook-f fa-sm"></i> Facebook</a>
+            <a href="#"> <i class="fa-brands fa-twitter fa-sm"></i>Twitter</a>
+            <a href="#">© 2000-2025 GSMArena.com</a>
+            <a href="#">Mobile version</a>
+            <a href="#">Android app</a>
+            <a href="#">Tools</a>
+            <a href="contact.php">Contact us</a>
+            <a href="#">Merch store</a>
+            <a href="#">Privacy</a>
+            <a href="#">Terms of use</a>
+          </div>
         </div>
       </div>
     </div>
-  </div>
 
-  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+    <!-- Pictures Modal -->
+    <div class="modal fade" id="picturesModal" tabindex="-1" aria-labelledby="picturesModalLabel" aria-hidden="true">
+      <div class="modal-dialog modal-lg modal-dialog-centered">
+        <div class="modal-content" style="background-color: #EFEBE9; border: 2px solid #8D6E63;">
+          <div class="modal-header" style="border-bottom: 1px solid #8D6E63; background-color: #D7CCC8;">
+            <h5 class="modal-title" id="picturesModalLabel" style="font-family:'oswald'; color: #5D4037;">
+              <i class="fas fa-images me-2"></i><?php echo htmlspecialchars(($device['brand_name'] ?? '') . ' ' . ($device['name'] ?? 'Device')); ?> - Pictures
+            </h5>
+            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+          </div>
+          <div class="modal-body p-0">
+            <?php if (!empty($deviceImages)): ?>
+              <!-- Image Carousel -->
+              <div id="picturesCarousel" class="carousel slide" data-bs-ride="false">
+                <!-- Carousel Indicators -->
+                <div class="carousel-indicators">
+                  <?php foreach ($deviceImages as $index => $image): ?>
+                    <button type="button" data-bs-target="#picturesCarousel" data-bs-slide-to="<?php echo $index; ?>"
+                      <?php if ($index === 0): ?>class="active" aria-current="true" <?php endif; ?>
+                      aria-label="Slide <?php echo $index + 1; ?>"></button>
+                  <?php endforeach; ?>
+                </div>
+
+                <!-- Carousel Images -->
+                <div class="carousel-inner">
+                  <?php foreach ($deviceImages as $index => $image): ?>
+                    <div class="carousel-item <?php if ($index === 0): ?>active<?php endif; ?>">
+                      <div class="d-flex justify-content-center" style="background-color: #F5F5F5; min-height: 400px;">
+                        <!-- Debug output -->
+                        <div style="display: none;">Image path: <?php echo htmlspecialchars($image); ?></div>
+
+                        <img src="<?php echo htmlspecialchars($image); ?>"
+                          class="d-block img-fluid"
+                          style="max-height: 500px; max-width: 100%; object-fit: contain; padding: 20px;"
+                          alt="<?php echo htmlspecialchars(($device['brand_name'] ?? '') . ' ' . ($device['name'] ?? 'Device')); ?> - Image <?php echo $index + 1; ?>"
+                          onerror="this.style.display='none';">
+                      </div>
+                      <div class="carousel-caption d-md-block" style="background-color: rgba(0,0,0,0.5); border-radius: 10px; bottom: 20px;">
+                        <p class="mb-0" style="font-size: 14px;">Image <?php echo $index + 1; ?> of <?php echo count($deviceImages); ?></p>
+                      </div>
+                    </div>
+                  <?php endforeach; ?>
+                </div>
+
+                <!-- Carousel Controls -->
+                <?php if (count($deviceImages) > 1): ?>
+                  <button class="carousel-control-prev" type="button" data-bs-target="#picturesCarousel" data-bs-slide="prev">
+                    <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+                    <span class="visually-hidden">Previous</span>
+                  </button>
+                  <button class="carousel-control-next" type="button" data-bs-target="#picturesCarousel" data-bs-slide="next">
+                    <span class="carousel-control-next-icon" aria-hidden="true"></span>
+                    <span class="visually-hidden">Next</span>
+                  </button>
+                <?php endif; ?>
+              </div>
+
+              <!-- Thumbnail Navigation -->
+              <?php if (count($deviceImages) > 1): ?>
+                <div class="modal-footer" style="border-top: 1px solid #8D6E63; background-color: #D7CCC8; padding: 10px;">
+                  <div class="d-flex justify-content-center flex-wrap gap-2" style="max-height: 100px; overflow-y: auto;">
+                    <?php foreach ($deviceImages as $index => $image): ?>
+                      <img src="<?php echo htmlspecialchars($image); ?>"
+                        class="thumbnail-nav border rounded"
+                        style="width: 60px; height: 60px; object-fit: cover; cursor: pointer; opacity: 0.7; transition: opacity 0.3s;"
+                        onclick="showSlide(<?php echo $index; ?>)"
+                        data-slide="<?php echo $index; ?>"
+                        alt="Thumbnail <?php echo $index + 1; ?>"
+                        onerror="this.style.display='none';">
+                    <?php endforeach; ?>
+                  </div>
+                </div>
+              <?php endif; ?>
+            <?php else: ?>
+              <!-- No Images Available -->
+              <div class="text-center py-5">
+                <i class="fas fa-image-slash fa-3x text-muted mb-3"></i>
+                <h6 class="text-muted">No pictures available for this device</h6>
+                <p class="text-muted small">Pictures will be added soon</p>
+              </div>
+            <?php endif; ?>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 
 </html>

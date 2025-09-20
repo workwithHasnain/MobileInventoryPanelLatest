@@ -1,4 +1,6 @@
 <?php
+error_reporting(E_ALL);
+ini_set('display_errors', 1);
 require_once 'phone_data.php';
 require_once 'database_functions.php';
 // Get posts and devices for display (case-insensitive status check) with comment counts
@@ -295,8 +297,10 @@ function displayNetworkCapabilities($phone)
 // Helper function to format dimensions
 function formatDimensions($phone)
 {
-    if (isset($phone['dimensions_length']) && isset($phone['dimensions_width']) && isset($phone['dimensions_thickness'])) {
-        return $phone['dimensions_length'] . ' x ' . $phone['dimensions_width'] . ' x ' . $phone['dimensions_thickness'] . ' mm';
+    if (isset($phone['dimensions']) && $phone['dimensions']) {
+        return $phone['dimensions'];
+    } elseif (isset($phone['height']) && isset($phone['width']) && isset($phone['thickness'])) {
+        return $phone['height'] . ' x ' . $phone['width'] . ' x ' . $phone['thickness'] . ' mm';
     }
     return '<span class="text-muted">Not specified</span>';
 }
@@ -374,8 +378,11 @@ function formatBattery($phone)
     if (isset($phone['battery_capacity']) && $phone['battery_capacity']) {
         $battery_parts[] = $phone['battery_capacity'] . ' mAh';
     }
-    if (isset($phone['charging_wired']) && $phone['charging_wired']) {
-        $battery_parts[] = $phone['charging_wired'] . 'W charging';
+    if (isset($phone['wired_charging']) && $phone['wired_charging']) {
+        $battery_parts[] = $phone['wired_charging'] . ' charging';
+    }
+    if (isset($phone['wireless_charging']) && $phone['wireless_charging']) {
+        $battery_parts[] = $phone['wireless_charging'] . ' wireless';
     }
 
     return !empty($battery_parts) ? implode(', ', $battery_parts) : '<span class="text-muted">Not specified</span>';
@@ -385,11 +392,11 @@ function formatBattery($phone)
 function formatPrice($phone)
 {
     $price_parts = [];
-    if (isset($phone['storage_internal']) && $phone['storage_internal']) {
-        $price_parts[] = $phone['storage_internal'];
+    if (isset($phone['storage']) && $phone['storage']) {
+        $price_parts[] = $phone['storage'];
     }
-    if (isset($phone['ram_internal']) && $phone['ram_internal']) {
-        $price_parts[] = $phone['ram_internal'] . ' RAM';
+    if (isset($phone['ram']) && $phone['ram']) {
+        $price_parts[] = $phone['ram'] . ' RAM';
     }
 
     $price_line = !empty($price_parts) ? implode(' ', $price_parts) : 'Standard variant';

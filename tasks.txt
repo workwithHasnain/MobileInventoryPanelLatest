@@ -1,0 +1,8 @@
+test overall and Solve Errors
+Dynamic Fields should match with Phone in Tablet
+Add Display Type Tab in manage_data_db.php
+Chipset timestamp
+admin auth table
+Implement HTML
+Deployment
+Email Newsletter Subscription using EmailJS and DB

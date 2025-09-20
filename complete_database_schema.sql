@@ -112,10 +112,10 @@ CREATE TABLE IF NOT EXISTS phones (
     display_type VARCHAR(50),
     display_size DECIMAL(4,2),
     display_resolution VARCHAR(50),
-    display_density VARCHAR(50), -- Added for PPI
+    display_density INTEGER, -- PPI value
     display_technology VARCHAR(50),
     display_notch VARCHAR(50), -- Changed to VARCHAR for different notch types
-    refresh_rate INTEGER,
+    refresh_rate VARCHAR(50),
     hdr BOOLEAN DEFAULT FALSE,
     billion_colors BOOLEAN DEFAULT FALSE,
     
@@ -129,23 +129,23 @@ CREATE TABLE IF NOT EXISTS phones (
     gpu VARCHAR(100),
     
     -- Memory
-    ram VARCHAR(100), -- Changed from ram_internal
-    storage VARCHAR(100), -- Changed from storage_internal
+    ram DECIMAL(5,1), -- RAM in GB
+    storage INTEGER, -- Storage in GB
     card_slot VARCHAR(50), -- Changed to VARCHAR for card sizes
     
     -- Camera
     main_camera_count INTEGER DEFAULT 1,
-    main_camera_resolution VARCHAR(100),
+    main_camera_resolution DECIMAL(5,1), -- Resolution in MP
     main_camera_features TEXT[],
     main_camera_video VARCHAR(100),
     main_camera_ois BOOLEAN DEFAULT FALSE,
     main_camera_telephoto BOOLEAN DEFAULT FALSE,
     main_camera_ultrawide BOOLEAN DEFAULT FALSE,
-    main_camera_flash BOOLEAN DEFAULT FALSE,
-    main_camera_f_number VARCHAR(50),
+    main_camera_flash VARCHAR(50),
+    main_camera_f_number DECIMAL(3,1), -- F-number like 1.8
     
     selfie_camera_count INTEGER DEFAULT 1,
-    selfie_camera_resolution VARCHAR(100),
+    selfie_camera_resolution DECIMAL(5,1), -- Resolution in MP
     selfie_camera_features TEXT[],
     selfie_camera_video VARCHAR(100),
     selfie_camera_ois BOOLEAN DEFAULT FALSE,
@@ -179,8 +179,8 @@ CREATE TABLE IF NOT EXISTS phones (
     battery_capacity INTEGER,
     battery_sic BOOLEAN DEFAULT FALSE, -- Silicon battery
     battery_removable BOOLEAN DEFAULT FALSE,
-    wired_charging VARCHAR(50),
-    wireless_charging VARCHAR(50),
+    wired_charging INTEGER, -- Charging power in W
+    wireless_charging INTEGER, -- Charging power in W
     
     -- Colors and Additional Fields
     colors TEXT[],
