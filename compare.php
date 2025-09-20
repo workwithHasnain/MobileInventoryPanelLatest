@@ -345,47 +345,121 @@ function formatChipset($phone)
 // Helper function to format main camera
 function formatMainCamera($phone)
 {
+    if (!$phone) return '<span class="text-muted">Not specified</span>';
+
     $camera_parts = [];
-    if (isset($phone['main_camera_resolution']) && $phone['main_camera_resolution']) {
-        $camera_parts[] = $phone['main_camera_resolution'];
-    }
-    if (isset($phone['main_camera_ultrawide']) && $phone['main_camera_ultrawide']) {
-        $camera_parts[] = 'ultrawide';
-    }
-    if (isset($phone['main_camera_telephoto']) && $phone['main_camera_telephoto']) {
-        $camera_parts[] = 'telephoto';
-    }
-    if (isset($phone['main_camera_macro']) && $phone['main_camera_macro']) {
-        $camera_parts[] = 'macro';
+
+    // Camera count
+    if (!empty($phone['main_camera_count']) && $phone['main_camera_count'] > 1) {
+        $camera_parts[] = ucfirst(convertNumberToWord($phone['main_camera_count']));
+    } else {
+        $camera_parts[] = 'Single';
     }
 
-    return !empty($camera_parts) ? implode(' + ', $camera_parts) : '<span class="text-muted">Not specified</span>';
+    // Resolution
+    if (!empty($phone['main_camera_resolution'])) {
+        $camera_parts[] = $phone['main_camera_resolution'] . 'MP';
+    }
+
+    // Features
+    $features = [];
+    if (!empty($phone['main_camera_ois'])) $features[] = 'OIS';
+    if (!empty($phone['main_camera_telephoto'])) $features[] = 'Telephoto';
+    if (!empty($phone['main_camera_ultrawide'])) $features[] = 'Ultrawide';
+    if (!empty($phone['main_camera_macro'])) $features[] = 'Macro';
+    if (!empty($phone['main_camera_flash'])) $features[] = 'Flash';
+
+    if (!empty($features)) {
+        $camera_parts[] = implode(', ', $features);
+    }
+
+    // Video
+    if (!empty($phone['main_camera_video'])) {
+        $camera_parts[] = 'Video: ' . $phone['main_camera_video'];
+    }
+
+    return !empty($camera_parts) ? implode('<br>', $camera_parts) : '<span class="text-muted">Not specified</span>';
+}
+
+// Helper function to convert numbers to words
+function convertNumberToWord($num)
+{
+    $words = ['', 'single', 'dual', 'triple', 'quad', 'penta', 'hexa', 'hepta', 'octa'];
+    return isset($words[$num]) ? $words[$num] : $num;
 }
 
 // Helper function to format selfie camera
 function formatSelfieCamera($phone)
 {
-    if (isset($phone['selfie_camera_resolution']) && $phone['selfie_camera_resolution']) {
-        return htmlspecialchars($phone['selfie_camera_resolution']);
+    if (!$phone) return '<span class="text-muted">Not specified</span>';
+
+    $selfie_parts = [];
+
+    // Camera count
+    if (!empty($phone['selfie_camera_count']) && $phone['selfie_camera_count'] > 1) {
+        $selfie_parts[] = ucfirst(convertNumberToWord($phone['selfie_camera_count']));
+    } else {
+        $selfie_parts[] = 'Single';
     }
-    return '<span class="text-muted">Not specified</span>';
+
+    // Resolution
+    if (!empty($phone['selfie_camera_resolution'])) {
+        $selfie_parts[] = $phone['selfie_camera_resolution'] . 'MP';
+    }
+
+    // Features
+    $features = [];
+    if (!empty($phone['selfie_camera_ois'])) $features[] = 'OIS';
+    if (!empty($phone['selfie_camera_flash'])) $features[] = 'Flash';
+    if (!empty($phone['popup_camera'])) $features[] = 'Popup';
+    if (!empty($phone['under_display_camera'])) $features[] = 'Under Display';
+
+    if (!empty($features)) {
+        $selfie_parts[] = implode(', ', $features);
+    }
+
+    // Video
+    if (!empty($phone['selfie_camera_video'])) {
+        $selfie_parts[] = 'Video: ' . $phone['selfie_camera_video'];
+    }
+
+    return !empty($selfie_parts) ? implode('<br>', $selfie_parts) : '<span class="text-muted">Not specified</span>';
 }
 
 // Helper function to format battery
 function formatBattery($phone)
 {
+    if (!$phone) return '<span class="text-muted">Not specified</span>';
+
     $battery_parts = [];
-    if (isset($phone['battery_capacity']) && $phone['battery_capacity']) {
+
+    // Capacity
+    if (!empty($phone['battery_capacity'])) {
         $battery_parts[] = $phone['battery_capacity'] . ' mAh';
-    }
-    if (isset($phone['wired_charging']) && $phone['wired_charging']) {
-        $battery_parts[] = $phone['wired_charging'] . ' charging';
-    }
-    if (isset($phone['wireless_charging']) && $phone['wireless_charging']) {
-        $battery_parts[] = $phone['wireless_charging'] . ' wireless';
+        if (!empty($phone['battery_sic'])) {
+            $battery_parts[] = '(Silicon)';
+        }
     }
 
-    return !empty($battery_parts) ? implode(', ', $battery_parts) : '<span class="text-muted">Not specified</span>';
+    // Removable
+    if (isset($phone['battery_removable'])) {
+        $battery_parts[] = 'Removable: ' . ($phone['battery_removable'] ? 'Yes' : 'No');
+    }
+
+    // Charging
+    $charging = [];
+    if (!empty($phone['wired_charging'])) {
+        $charging[] = 'Wired: ' . $phone['wired_charging'] . 'W';
+    }
+    if (!empty($phone['wireless_charging'])) {
+        $charging[] = 'Wireless: ' . $phone['wireless_charging'] . 'W';
+    }
+
+    if (!empty($charging)) {
+        $battery_parts[] = implode(', ', $charging);
+    }
+
+    return !empty($battery_parts) ? implode('<br>', $battery_parts) : '<span class="text-muted">Not specified</span>';
 }
 
 // Helper function to format price
@@ -434,6 +508,164 @@ function getPhoneName($phone)
     }
 
     return !empty($name) ? htmlspecialchars($name) : 'Unknown Device';
+}
+
+// Helper function to format display specifications
+function formatDisplay($phone)
+{
+    if (!$phone) return '<span class="text-muted">Not specified</span>';
+
+    $display_parts = [];
+
+    if (!empty($phone['display_type'])) {
+        $display_parts[] = $phone['display_type'];
+        if (!empty($phone['display_technology'])) {
+            $display_parts[] = $phone['display_technology'];
+        }
+        if (!empty($phone['refresh_rate'])) {
+            $display_parts[] = $phone['refresh_rate'] . 'Hz';
+        }
+        if (!empty($phone['hdr'])) {
+            $display_parts[] = 'HDR';
+        }
+        if (!empty($phone['billion_colors'])) {
+            $display_parts[] = '1B colors';
+        }
+    }
+
+    $display_info = !empty($display_parts) ? implode(', ', $display_parts) : '';
+
+    if (!empty($phone['display_size'])) {
+        if ($display_info) $display_info .= '<br>';
+        $display_info .= $phone['display_size'] . '"';
+    }
+
+    if (!empty($phone['display_resolution'])) {
+        if ($display_info) $display_info .= '<br>';
+        $display_info .= $phone['display_resolution'];
+    }
+
+    return !empty($display_info) ? $display_info : '<span class="text-muted">Not specified</span>';
+}
+
+// Helper function to format memory specifications
+function formatMemory($phone)
+{
+    if (!$phone) return '<span class="text-muted">Not specified</span>';
+
+    $memory_parts = [];
+
+    if (!empty($phone['ram'])) {
+        $memory_parts[] = $phone['ram'] . 'GB RAM';
+    }
+
+    if (!empty($phone['storage'])) {
+        $memory_parts[] = $phone['storage'] . 'GB';
+    }
+
+    if (!empty($phone['card_slot'])) {
+        $memory_parts[] = 'Card slot: ' . $phone['card_slot'];
+    }
+
+    return !empty($memory_parts) ? implode(', ', $memory_parts) : '<span class="text-muted">Not specified</span>';
+}
+
+// Helper function to format sound specifications
+function formatSound($phone)
+{
+    if (!$phone) return '<span class="text-muted">Not specified</span>';
+
+    $sound_parts = [];
+
+    if (isset($phone['dual_speakers'])) {
+        $sound_parts[] = 'Loudspeaker: ' . ($phone['dual_speakers'] ? 'Yes' : 'No');
+    }
+
+    if (isset($phone['headphone_jack'])) {
+        $sound_parts[] = '3.5mm jack: ' . ($phone['headphone_jack'] ? 'Yes' : 'No');
+    }
+
+    return !empty($sound_parts) ? implode(', ', $sound_parts) : '<span class="text-muted">Not specified</span>';
+}
+
+// Helper function to format communications specifications
+function formatCommunications($phone)
+{
+    if (!$phone) return '<span class="text-muted">Not specified</span>';
+
+    $comms_parts = [];
+
+    if (!empty($phone['wifi'])) {
+        $comms_parts[] = 'WiFi: ' . $phone['wifi'];
+    }
+
+    if (!empty($phone['bluetooth'])) {
+        $comms_parts[] = 'Bluetooth: ' . $phone['bluetooth'];
+    }
+
+    if (isset($phone['gps'])) {
+        $comms_parts[] = 'GPS: ' . ($phone['gps'] ? 'Yes' : 'No');
+    }
+
+    if (isset($phone['nfc'])) {
+        $comms_parts[] = 'NFC: ' . ($phone['nfc'] ? 'Yes' : 'No');
+    }
+
+    if (isset($phone['fm_radio'])) {
+        $comms_parts[] = 'FM Radio: ' . ($phone['fm_radio'] ? 'Yes' : 'No');
+    }
+
+    if (!empty($phone['usb'])) {
+        $comms_parts[] = 'USB: ' . $phone['usb'];
+    }
+
+    return !empty($comms_parts) ? implode(', ', $comms_parts) : '<span class="text-muted">Not specified</span>';
+}
+
+// Helper function to format features specifications
+function formatFeatures($phone)
+{
+    if (!$phone) return '<span class="text-muted">Not specified</span>';
+
+    $features_parts = [];
+
+    if (isset($phone['fingerprint'])) {
+        $features_parts[] = 'Fingerprint: ' . ($phone['fingerprint'] ? 'Yes' : 'No');
+    }
+
+    // Build sensors list
+    $sensors = [];
+    if (!empty($phone['accelerometer'])) $sensors[] = 'Accelerometer';
+    if (!empty($phone['gyro'])) $sensors[] = 'Gyro';
+    if (!empty($phone['compass'])) $sensors[] = 'Compass';
+    if (!empty($phone['proximity'])) $sensors[] = 'Proximity';
+    if (!empty($phone['barometer'])) $sensors[] = 'Barometer';
+    if (!empty($phone['heart_rate'])) $sensors[] = 'Heart Rate';
+
+    if (!empty($sensors)) {
+        $features_parts[] = 'Sensors: ' . implode(', ', $sensors);
+    }
+
+    return !empty($features_parts) ? implode(', ', $features_parts) : '<span class="text-muted">Not specified</span>';
+}
+
+// Helper function to format colors
+function formatColors($phone)
+{
+    if (!$phone) return '<span class="text-muted">Not specified</span>';
+
+    if (!empty($phone['colors'])) {
+        if (is_array($phone['colors'])) {
+            return implode(', ', $phone['colors']);
+        } elseif (is_string($phone['colors'])) {
+            // Handle PostgreSQL array string format
+            $colors = str_replace(['{', '}'], '', $phone['colors']);
+            $colors = explode(',', $colors);
+            return implode(', ', array_map('trim', $colors));
+        }
+    }
+
+    return '<span class="text-muted">Not specified</span>';
 }
 ?>
 <!DOCTYPE html>
@@ -846,6 +1078,60 @@ function getPhoneName($phone)
                     <td><?php echo $phone1 ? formatBattery($phone1) : 'N/A'; ?></td>
                     <td><?php echo $phone2 ? formatBattery($phone2) : 'N/A'; ?></td>
                     <td><?php echo $phone3 ? formatBattery($phone3) : 'N/A'; ?></td>
+                </tr>
+
+                <tr>
+                    <td colspan="3" style="font-weight: 600; color: #f14d4d; font-size: 16px; background: #f9f9f9;">Display</td>
+                </tr>
+                <tr>
+                    <td><?php echo $phone1 ? formatDisplay($phone1) : 'N/A'; ?></td>
+                    <td><?php echo $phone2 ? formatDisplay($phone2) : 'N/A'; ?></td>
+                    <td><?php echo $phone3 ? formatDisplay($phone3) : 'N/A'; ?></td>
+                </tr>
+
+                <tr>
+                    <td colspan="3" style="font-weight: 600; color: #f14d4d; font-size: 16px; background: #f9f9f9;">Memory</td>
+                </tr>
+                <tr>
+                    <td><?php echo $phone1 ? formatMemory($phone1) : 'N/A'; ?></td>
+                    <td><?php echo $phone2 ? formatMemory($phone2) : 'N/A'; ?></td>
+                    <td><?php echo $phone3 ? formatMemory($phone3) : 'N/A'; ?></td>
+                </tr>
+
+                <tr>
+                    <td colspan="3" style="font-weight: 600; color: #f14d4d; font-size: 16px; background: #f9f9f9;">Sound</td>
+                </tr>
+                <tr>
+                    <td><?php echo $phone1 ? formatSound($phone1) : 'N/A'; ?></td>
+                    <td><?php echo $phone2 ? formatSound($phone2) : 'N/A'; ?></td>
+                    <td><?php echo $phone3 ? formatSound($phone3) : 'N/A'; ?></td>
+                </tr>
+
+                <tr>
+                    <td colspan="3" style="font-weight: 600; color: #f14d4d; font-size: 16px; background: #f9f9f9;">Communications</td>
+                </tr>
+                <tr>
+                    <td><?php echo $phone1 ? formatCommunications($phone1) : 'N/A'; ?></td>
+                    <td><?php echo $phone2 ? formatCommunications($phone2) : 'N/A'; ?></td>
+                    <td><?php echo $phone3 ? formatCommunications($phone3) : 'N/A'; ?></td>
+                </tr>
+
+                <tr>
+                    <td colspan="3" style="font-weight: 600; color: #f14d4d; font-size: 16px; background: #f9f9f9;">Features</td>
+                </tr>
+                <tr>
+                    <td><?php echo $phone1 ? formatFeatures($phone1) : 'N/A'; ?></td>
+                    <td><?php echo $phone2 ? formatFeatures($phone2) : 'N/A'; ?></td>
+                    <td><?php echo $phone3 ? formatFeatures($phone3) : 'N/A'; ?></td>
+                </tr>
+
+                <tr>
+                    <td colspan="3" style="font-weight: 600; color: #f14d4d; font-size: 16px; background: #f9f9f9;">Colors</td>
+                </tr>
+                <tr>
+                    <td><?php echo $phone1 ? formatColors($phone1) : 'N/A'; ?></td>
+                    <td><?php echo $phone2 ? formatColors($phone2) : 'N/A'; ?></td>
+                    <td><?php echo $phone3 ? formatColors($phone3) : 'N/A'; ?></td>
                 </tr>
 
                 <tr>
