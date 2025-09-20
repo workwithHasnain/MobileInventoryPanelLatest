@@ -166,7 +166,7 @@ function simpleAddDevice($phone)
             ':display_density' => $toNumber($phone['display_density'] ?? '', 'int'),
             ':display_technology' => trim($phone['display_technology'] ?? ''),
             ':display_notch' => trim($phone['display_notch'] ?? ''),
-            ':refresh_rate' => trim($phone['refresh_rate'] ?? ''),
+            ':refresh_rate' => $toNumber($phone['refresh_rate'] ?? '', 'int'),
             ':hdr' => ($phone['hdr'] ?? false) ? 'true' : 'false',
             ':billion_colors' => ($phone['billion_colors'] ?? false) ? 'true' : 'false',
 

@@ -836,10 +836,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                                                 <label for="refresh_rate" class="form-label">Refresh Rate</label>
                                                 <select class="form-select" id="refresh_rate" name="refresh_rate">
                                                     <option value="">Select rate...</option>
-                                                    <option value="90Hz">90Hz</option>
-                                                    <option value="120Hz">120Hz</option>
-                                                    <option value="144Hz">144Hz</option>
-                                                    <option value="165Hz">165Hz</option>
+                                                    <option value="90">90Hz</option>
+                                                    <option value="120">120Hz</option>
+                                                    <option value="144">144Hz</option>
+                                                    <option value="165">165Hz</option>
                                                 </select>
                                             </div>
                                             <div class="col-md-4 mb-3">
