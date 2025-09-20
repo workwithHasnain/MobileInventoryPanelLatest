@@ -1,4 +1,5 @@
 <?php
+
 /** Database connection and utility functions for PostgreSQL */
 
 // Load configuration
@@ -208,5 +209,65 @@ function escapeString($string)
     } catch (Exception $e) {
         error_log('String escape error: ' . $e->getMessage());
         return "'" . str_replace("'", "''", $string) . "'";
+    }
+}
+
+/**
+ * Get popular device comparisons from database
+ *
+ * @param int $limit Number of comparisons to return (default: 10)
+ * @return array Array of popular comparisons with device details
+ */
+function getPopularComparisons($limit = 10)
+{
+    try {
+        $pdo = getConnection();
+
+        $query = "
+            SELECT 
+                dc.device1_id,
+                dc.device2_id,
+                COUNT(*) as comparison_count,
+                p1.name as device1_name,
+                p1.image as device1_image,
+                b1.name as device1_brand,
+                p2.name as device2_name,
+                p2.image as device2_image,
+                b2.name as device2_brand
+            FROM device_comparisons dc
+            LEFT JOIN phones p1 ON dc.device1_id = CAST(p1.id AS VARCHAR)
+            LEFT JOIN phones p2 ON dc.device2_id = CAST(p2.id AS VARCHAR)
+            LEFT JOIN brands b1 ON p1.brand_id = b1.id
+            LEFT JOIN brands b2 ON p2.brand_id = b2.id
+            WHERE p1.id IS NOT NULL AND p2.id IS NOT NULL
+            GROUP BY dc.device1_id, dc.device2_id, p1.name, p1.image, b1.name, p2.name, p2.image, b2.name
+            ORDER BY comparison_count DESC
+            LIMIT ?
+        ";
+
+        $stmt = $pdo->prepare($query);
+        $stmt->execute([$limit]);
+        $results = $stmt->fetchAll();
+
+        // Format results to match the expected structure
+        $formattedResults = [];
+        foreach ($results as $row) {
+            $formattedResults[] = [
+                'device1_id' => $row['device1_id'],
+                'device2_id' => $row['device2_id'],
+                'comparison_count' => (int)$row['comparison_count'],
+                'device1_name' => $row['device1_name'],
+                'device2_name' => $row['device2_name'],
+                'device1_image' => $row['device1_image'] ?? '',
+                'device2_image' => $row['device2_image'] ?? '',
+                'device1_brand' => $row['device1_brand'] ?? '',
+                'device2_brand' => $row['device2_brand'] ?? ''
+            ];
+        }
+
+        return $formattedResults;
+    } catch (Exception $e) {
+        error_log('Get popular comparisons error: ' . $e->getMessage());
+        return [];
     }
 }

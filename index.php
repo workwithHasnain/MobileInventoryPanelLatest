@@ -66,36 +66,12 @@ try {
     $topReviewedDevices = [];
 }
 
-// Get top comparisons (simulated for now)
-$topComparisons = [
-    [
-        'device1_id' => 3,
-        'device2_id' => 1,
-        'comparison_count' => 45,
-        'device1_name' => 'iPhone 15 Pro',
-        'device2_name' => 'Galaxy S24',
-        'device1_image' => 'uploads/device_1755632616_68a4d3e8945a8_1.png',
-        'device2_image' => 'uploads/device_1755632662_68a4d416172aa_1.png'
-    ],
-    [
-        'device1_id' => 6,
-        'device2_id' => 5,
-        'comparison_count' => 38,
-        'device1_name' => 'OnePlus 12',
-        'device2_name' => 'Xiaomi 14 Pro',
-        'device1_image' => 'uploads/device_1755632707_68a4d4435da26_1.jpg',
-        'device2_image' => 'uploads/phone_1755633457_68a4d7318f660_1.png'
-    ],
-    [
-        'device1_id' => 7,
-        'device2_id' => 8,
-        'comparison_count' => 32,
-        'device1_name' => 'Google Pixel 8 Pro',
-        'device2_name' => 'Nothing Phone (2)',
-        'device1_image' => '',
-        'device2_image' => ''
-    ],
-];
+// Get top comparisons from database
+try {
+    $topComparisons = getPopularComparisons(10);
+} catch (Exception $e) {
+    $topComparisons = [];
+}
 
 // Get latest 9 devices for the new section
 $latestDevices = getAllPhones();

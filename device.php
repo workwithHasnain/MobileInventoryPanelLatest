@@ -35,6 +35,13 @@ $topViewedDevices = [];
 $topReviewedDevices = [];
 $topComparisons = [];
 
+// Get top comparisons from database
+try {
+  $topComparisons = getPopularComparisons(10);
+} catch (Exception $e) {
+  $topComparisons = [];
+}
+
 // Get top viewed devices
 try {
   $stmt = $pdo->prepare("

@@ -66,36 +66,12 @@ try {
     $topReviewedDevices = [];
 }
 
-// Get top comparisons (simulated for now)
-$topComparisons = [
-    [
-        'device1_id' => 3,
-        'device2_id' => 1,
-        'comparison_count' => 45,
-        'device1_name' => 'iPhone 15 Pro',
-        'device2_name' => 'Galaxy S24',
-        'device1_image' => 'uploads/device_1755632616_68a4d3e8945a8_1.png',
-        'device2_image' => 'uploads/device_1755632662_68a4d416172aa_1.png'
-    ],
-    [
-        'device1_id' => 6,
-        'device2_id' => 5,
-        'comparison_count' => 38,
-        'device1_name' => 'OnePlus 12',
-        'device2_name' => 'Xiaomi 14 Pro',
-        'device1_image' => 'uploads/device_1755632707_68a4d4435da26_1.jpg',
-        'device2_image' => 'uploads/phone_1755633457_68a4d7318f660_1.png'
-    ],
-    [
-        'device1_id' => 7,
-        'device2_id' => 8,
-        'comparison_count' => 32,
-        'device1_name' => 'Google Pixel 8 Pro',
-        'device2_name' => 'Nothing Phone (2)',
-        'device1_image' => '',
-        'device2_image' => ''
-    ],
-];
+// Get top comparisons from database
+try {
+    $topComparisons = getPopularComparisons(10);
+} catch (Exception $e) {
+    $topComparisons = [];
+}
 
 // Get latest 9 devices for the new section
 $latestDevices = getAllPhones();
@@ -726,385 +702,385 @@ if ($_POST && isset($_POST['action'])) {
             <div class="col-lg-4  col-12  bg-white p-3">
                 <div class="center w-100 " style="margin-top: 12px;">
                     <h6 style="color: #090E21; text-transform: uppercase; font-weight: 900;" class=" mt-2 ">Latest Devices
-                </h6>
-                <div class="cent">
-                    <?php if (empty($devices)): ?>
-                        <div class="text-center py-5">
-                            <i class="fas fa-mobile-alt fa-3x text-muted mb-3"></i>
-                            <h4 class="text-muted">No Devices Available</h4>
-                            <p class="text-muted">Check back later for new devices!</p>
-                        </div>
-                    <?php else: ?>
-                        <?php $chunks = array_chunk($devices, 3); ?>
-                        <?php foreach ($chunks as $row): ?>
-                            <div class="d-flex">
-                                <?php foreach ($row as $i => $device): ?>
-                                    <div class="device-card canel<?php echo $i == 1 ? ' mx-4' : ($i == 0 ? '' : ''); ?>" data-device-id="<?php echo $device['id']; ?>" style="cursor: pointer;">
-                                        <?php if (isset($device['images']) && !empty($device['images'])): ?>
-                                            <img class="shrink" src="<?php echo htmlspecialchars($device['images'][0]); ?>" alt="">
-                                        <?php elseif (isset($device['image']) && !empty($device['image'])): ?>
-                                            <img class="shrink" src="<?php echo htmlspecialchars($device['image']); ?>" alt="">
-                                        <?php else: ?>
-                                            <img class="shrink" src="" alt="">
-                                        <?php endif; ?>
-                                        <p><?php echo htmlspecialchars($device['name'] ?? ''); ?></p>
-                                    </div>
-                                <?php endforeach; ?>
-                                <?php for ($j = count($row); $j < 3; $j++): ?>
-                                    <div class="canel<?php echo $j == 1 ? ' mx-4' : ($j == 0 ? '' : ''); ?>"></div>
-                                <?php endfor; ?>
+                    </h6>
+                    <div class="cent">
+                        <?php if (empty($devices)): ?>
+                            <div class="text-center py-5">
+                                <i class="fas fa-mobile-alt fa-3x text-muted mb-3"></i>
+                                <h4 class="text-muted">No Devices Available</h4>
+                                <p class="text-muted">Check back later for new devices!</p>
                             </div>
-                        <?php endforeach; ?>
-                    <?php endif; ?>
-                </div>
+                        <?php else: ?>
+                            <?php $chunks = array_chunk($devices, 3); ?>
+                            <?php foreach ($chunks as $row): ?>
+                                <div class="d-flex">
+                                    <?php foreach ($row as $i => $device): ?>
+                                        <div class="device-card canel<?php echo $i == 1 ? ' mx-4' : ($i == 0 ? '' : ''); ?>" data-device-id="<?php echo $device['id']; ?>" style="cursor: pointer;">
+                                            <?php if (isset($device['images']) && !empty($device['images'])): ?>
+                                                <img class="shrink" src="<?php echo htmlspecialchars($device['images'][0]); ?>" alt="">
+                                            <?php elseif (isset($device['image']) && !empty($device['image'])): ?>
+                                                <img class="shrink" src="<?php echo htmlspecialchars($device['image']); ?>" alt="">
+                                            <?php else: ?>
+                                                <img class="shrink" src="" alt="">
+                                            <?php endif; ?>
+                                            <p><?php echo htmlspecialchars($device['name'] ?? ''); ?></p>
+                                        </div>
+                                    <?php endforeach; ?>
+                                    <?php for ($j = count($row); $j < 3; $j++): ?>
+                                        <div class="canel<?php echo $j == 1 ? ' mx-4' : ($j == 0 ? '' : ''); ?>"></div>
+                                    <?php endfor; ?>
+                                </div>
+                            <?php endforeach; ?>
+                        <?php endif; ?>
+                    </div>
 
-                <h6 style="border-left: solid 5px grey ; color: #090E21; text-transform: uppercase; font-weight: 900; margin-top: 12px;"
-                    class="px-3">Popular comparisons</h6>
+                    <h6 style="border-left: solid 5px grey ; color: #090E21; text-transform: uppercase; font-weight: 900; margin-top: 12px;"
+                        class="px-3">Popular comparisons</h6>
 
-                <div class="sentizer bg-white mt-2 p-3 rounded shadow-sm" style="    text-transform: Uppercase;
+                    <div class="sentizer bg-white mt-2 p-3 rounded shadow-sm" style="    text-transform: Uppercase;
                                             font-size: 13px;
                                             font-weight: 700;">
-                    <div class="row">
-                        <div class="col-12">
-                            <?php if (empty($topComparisons)): ?>
-                                <p class="mb-2" style=" text-transform: capitalize;">No Comparisons Yet</p>
-                            <?php else: ?>
-                                <?php foreach ($topComparisons as $index => $comparison): ?>
-                                    <!-- if $index is odd -->
-                                    <?php if ((($index + 1) % 2) != 0): ?>
-                                        <p class="mb-2 clickable-comparison" data-device1-id="<?php echo $comparison['device1_id'] ?? ''; ?>"
-                                            data-device2-id="<?php echo $comparison['device2_id'] ?? ''; ?>"
-                                            style="cursor: pointer; background-color: #ffe6f0; color: #090E21; text-transform: capitalize;"><?php echo htmlspecialchars($comparison['device1_name'] ?? $comparison['device1'] ?? 'Unknown'); ?> vs.
-                                            <?php echo htmlspecialchars($comparison['device2_name'] ?? $comparison['device2'] ?? 'Unknown'); ?></p>
-                                    <?php else: ?>
-                                        <!-- else if $index is even -->
-                                        <p class="mb-2 clickable-comparison" data-device1-id="<?php echo $comparison['device1_id'] ?? ''; ?>"
-                                            data-device2-id="<?php echo $comparison['device2_id'] ?? ''; ?>" style="cursor: pointer; text-transform: capitalize;"><?php echo htmlspecialchars($comparison['device1_name'] ?? $comparison['device1'] ?? 'Unknown'); ?> vs. <?php echo htmlspecialchars($comparison['device2_name'] ?? $comparison['device2'] ?? 'Unknown'); ?></p>
-                                    <?php endif; ?>
-                                <?php endforeach; ?>
-                            <?php endif; ?>
+                        <div class="row">
+                            <div class="col-12">
+                                <?php if (empty($topComparisons)): ?>
+                                    <p class="mb-2" style=" text-transform: capitalize;">No Comparisons Yet</p>
+                                <?php else: ?>
+                                    <?php foreach ($topComparisons as $index => $comparison): ?>
+                                        <!-- if $index is odd -->
+                                        <?php if ((($index + 1) % 2) != 0): ?>
+                                            <p class="mb-2 clickable-comparison" data-device1-id="<?php echo $comparison['device1_id'] ?? ''; ?>"
+                                                data-device2-id="<?php echo $comparison['device2_id'] ?? ''; ?>"
+                                                style="cursor: pointer; background-color: #ffe6f0; color: #090E21; text-transform: capitalize;"><?php echo htmlspecialchars($comparison['device1_name'] ?? $comparison['device1'] ?? 'Unknown'); ?> vs.
+                                                <?php echo htmlspecialchars($comparison['device2_name'] ?? $comparison['device2'] ?? 'Unknown'); ?></p>
+                                        <?php else: ?>
+                                            <!-- else if $index is even -->
+                                            <p class="mb-2 clickable-comparison" data-device1-id="<?php echo $comparison['device1_id'] ?? ''; ?>"
+                                                data-device2-id="<?php echo $comparison['device2_id'] ?? ''; ?>" style="cursor: pointer; text-transform: capitalize;"><?php echo htmlspecialchars($comparison['device1_name'] ?? $comparison['device1'] ?? 'Unknown'); ?> vs. <?php echo htmlspecialchars($comparison['device2_name'] ?? $comparison['device2'] ?? 'Unknown'); ?></p>
+                                        <?php endif; ?>
+                                    <?php endforeach; ?>
+                                <?php endif; ?>
+                            </div>
                         </div>
                     </div>
-                </div>
-                <h6 style="border-left: 7px solid #EFEBE9 ; font-weight: 900; color: #090E21; text-transform: uppercase;"
-                    class=" px-2 mt-2 d-inline mt-4">Top 10
-                    Daily Interest</h6>
+                    <h6 style="border-left: 7px solid #EFEBE9 ; font-weight: 900; color: #090E21; text-transform: uppercase;"
+                        class=" px-2 mt-2 d-inline mt-4">Top 10
+                        Daily Interest</h6>
 
-                <div class="center">
-                    <table class="table table-sm custom-table">
-                        <thead>
-                            <tr style="background-color: #4c7273; color: white;">
-                                <th style="color: white;">#</th>
-                                <th style="color: white;">Devices</th>
-                                <th style="color: white;">Daily Hits</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            <?php if (empty($topViewedDevices)): ?>
-                                <tr>
-                                    <th scope="row"></th>
-                                    <td class="text-start">Not Enough Data Exists</td>
-                                    <td class="text-end"></td>
+                    <div class="center">
+                        <table class="table table-sm custom-table">
+                            <thead>
+                                <tr style="background-color: #4c7273; color: white;">
+                                    <th style="color: white;">#</th>
+                                    <th style="color: white;">Devices</th>
+                                    <th style="color: white;">Daily Hits</th>
                                 </tr>
-                            <?php else: ?>
-                                <?php foreach ($topViewedDevices as $index => $device):
-                                    if (($index + 1) % 2 != 0): ?>
-                                        <tr class="clickable-row" data-device-id="<?php echo $device['id']; ?>" style="cursor: pointer;">
-                                            <th scope="row"><?php echo $index + 1; ?></th>
-                                            <td class="text-start"><?php echo htmlspecialchars($device['brand_name']); ?> <?php echo htmlspecialchars($device['name']); ?></td>
-                                            <td class="text-end"><?php echo $device['view_count']; ?></td>
-                                        </tr>
-                                    <?php else: ?>
-                                        <tr class="highlight clickable-row" data-device-id="<?php echo $device['id']; ?>" style="cursor: pointer;">
-                                            <th scope="row" class="text-white"><?php echo $index + 1; ?></th>
-                                            <td class="text-start"><?php echo htmlspecialchars($device['brand_name']); ?> <?php echo htmlspecialchars($device['name']); ?></td>
-                                            <td class="text-end"><?php echo $device['view_count']; ?></td>
-                                        </tr>
-                            <?php
-                                    endif;
-                                endforeach;
-                            endif; ?>
-                        </tbody>
-                    </table>
-                </div>
-                <h6 style="border-left: 7px solid #EFEBE9 ; font-weight: 900; color: #090E21; text-transform: uppercase;"
-                    class=" px-2 mt-2 d-inline mt-4">Top 10 by
-                    Fans</h6>
-                <div class="center" style="margin-top: 12px;">
-                    <table class="table table-sm custom-table">
-                        <thead>
-                            <tr class="text-white" style="background-color: #14222D;">
-                                <th style="color: white;  font-size: 15px;  ">#</th>
-                                <th style="color: white;  font-size: 15px;">Device</th>
-                                <th style="color: white;  font-size: 15px;">Reviews</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            <?php if (empty($topReviewedDevices)): ?>
-                                <tr>
-                                    <th scope="row"></th>
-                                    <td class="text-start">Not Enough Data Exists</td>
-                                    <td class="text-end"></td>
+                            </thead>
+                            <tbody>
+                                <?php if (empty($topViewedDevices)): ?>
+                                    <tr>
+                                        <th scope="row"></th>
+                                        <td class="text-start">Not Enough Data Exists</td>
+                                        <td class="text-end"></td>
+                                    </tr>
+                                <?php else: ?>
+                                    <?php foreach ($topViewedDevices as $index => $device):
+                                        if (($index + 1) % 2 != 0): ?>
+                                            <tr class="clickable-row" data-device-id="<?php echo $device['id']; ?>" style="cursor: pointer;">
+                                                <th scope="row"><?php echo $index + 1; ?></th>
+                                                <td class="text-start"><?php echo htmlspecialchars($device['brand_name']); ?> <?php echo htmlspecialchars($device['name']); ?></td>
+                                                <td class="text-end"><?php echo $device['view_count']; ?></td>
+                                            </tr>
+                                        <?php else: ?>
+                                            <tr class="highlight clickable-row" data-device-id="<?php echo $device['id']; ?>" style="cursor: pointer;">
+                                                <th scope="row" class="text-white"><?php echo $index + 1; ?></th>
+                                                <td class="text-start"><?php echo htmlspecialchars($device['brand_name']); ?> <?php echo htmlspecialchars($device['name']); ?></td>
+                                                <td class="text-end"><?php echo $device['view_count']; ?></td>
+                                            </tr>
+                                <?php
+                                        endif;
+                                    endforeach;
+                                endif; ?>
+                            </tbody>
+                        </table>
+                    </div>
+                    <h6 style="border-left: 7px solid #EFEBE9 ; font-weight: 900; color: #090E21; text-transform: uppercase;"
+                        class=" px-2 mt-2 d-inline mt-4">Top 10 by
+                        Fans</h6>
+                    <div class="center" style="margin-top: 12px;">
+                        <table class="table table-sm custom-table">
+                            <thead>
+                                <tr class="text-white" style="background-color: #14222D;">
+                                    <th style="color: white;  font-size: 15px;  ">#</th>
+                                    <th style="color: white;  font-size: 15px;">Device</th>
+                                    <th style="color: white;  font-size: 15px;">Reviews</th>
                                 </tr>
-                            <?php else: ?>
-                                <?php foreach ($topReviewedDevices as $index => $device):
-                                    if (($index + 1) % 2 != 0): ?>
-                                        <tr class="clickable-row" data-device-id="<?php echo $device['id']; ?>" style="cursor: pointer;">
-                                            <th scope="row"><?php echo $index + 1; ?></th>
-                                            <td class="text-start"><?php echo htmlspecialchars($device['brand_name']); ?> <?php echo htmlspecialchars($device['name']); ?></td>
-                                            <td class="text-end"><?php echo $device['review_count']; ?></td>
-                                        </tr>
-                                    <?php else: ?>
-                                        <tr class="highlight-12 clickable-row" data-device-id="<?php echo $device['id']; ?>" style="cursor: pointer;">
-                                            <th scope="row" class="text-white"><?php echo $index + 1; ?></th>
-                                            <td class="text-start"><?php echo htmlspecialchars($device['brand_name']); ?> <?php echo htmlspecialchars($device['name']); ?></td>
-                                            <td class="text-end"><?php echo $device['review_count']; ?></td>
-                                        </tr>
-                            <?php
-                                    endif;
-                                endforeach;
-                            endif; ?>
-                        </tbody>
-                    </table>
-                </div>
-                <h6 style="border-left: 7px solid #EFEBE9 ; font-weight: 900; color: #090E21; text-transform: uppercase;"
-                    class=" px-2 mt-2 d-inline mt-4">In
-                    Stores
-                    Now</h6>
+                            </thead>
+                            <tbody>
+                                <?php if (empty($topReviewedDevices)): ?>
+                                    <tr>
+                                        <th scope="row"></th>
+                                        <td class="text-start">Not Enough Data Exists</td>
+                                        <td class="text-end"></td>
+                                    </tr>
+                                <?php else: ?>
+                                    <?php foreach ($topReviewedDevices as $index => $device):
+                                        if (($index + 1) % 2 != 0): ?>
+                                            <tr class="clickable-row" data-device-id="<?php echo $device['id']; ?>" style="cursor: pointer;">
+                                                <th scope="row"><?php echo $index + 1; ?></th>
+                                                <td class="text-start"><?php echo htmlspecialchars($device['brand_name']); ?> <?php echo htmlspecialchars($device['name']); ?></td>
+                                                <td class="text-end"><?php echo $device['review_count']; ?></td>
+                                            </tr>
+                                        <?php else: ?>
+                                            <tr class="highlight-12 clickable-row" data-device-id="<?php echo $device['id']; ?>" style="cursor: pointer;">
+                                                <th scope="row" class="text-white"><?php echo $index + 1; ?></th>
+                                                <td class="text-start"><?php echo htmlspecialchars($device['brand_name']); ?> <?php echo htmlspecialchars($device['name']); ?></td>
+                                                <td class="text-end"><?php echo $device['review_count']; ?></td>
+                                            </tr>
+                                <?php
+                                        endif;
+                                    endforeach;
+                                endif; ?>
+                            </tbody>
+                        </table>
+                    </div>
+                    <h6 style="border-left: 7px solid #EFEBE9 ; font-weight: 900; color: #090E21; text-transform: uppercase;"
+                        class=" px-2 mt-2 d-inline mt-4">In
+                        Stores
+                        Now</h6>
 
-                <div class="cent">
-                    <?php if (empty($latestDevices)): ?>
-                        <div class="text-center py-5">
-                            <i class="fas fa-mobile-alt fa-3x text-muted mb-3"></i>
-                            <h4 class="text-muted">No Devices Available</h4>
-                            <p class="text-muted">Check back later for new devices!</p>
-                        </div>
-                    <?php else: ?>
-                        <?php $chunks = array_chunk($latestDevices, 3); ?>
-                        <?php foreach ($chunks as $row): ?>
-                            <div class="d-flex">
-                                <?php foreach ($row as $i => $device): ?>
-                                    <div class="device-card canel<?php echo $i == 1 ? ' mx-4' : ($i == 0 ? '' : ''); ?>" data-device-id="<?php echo $device['id']; ?>" style="cursor: pointer;">
-                                        <img class="shrink" src="<?php echo htmlspecialchars($device['image'] ?? ''); ?>" alt="">
-                                        <p><?php echo htmlspecialchars($device['name'] ?? ''); ?></p>
-                                    </div>
-                                <?php endforeach; ?>
-                                <?php for ($j = count($row); $j < 3; $j++): ?>
-                                    <div class="canel<?php echo $j == 1 ? ' mx-4' : ($j == 0 ? '' : ''); ?>"></div>
-                                <?php endfor; ?>
+                    <div class="cent">
+                        <?php if (empty($latestDevices)): ?>
+                            <div class="text-center py-5">
+                                <i class="fas fa-mobile-alt fa-3x text-muted mb-3"></i>
+                                <h4 class="text-muted">No Devices Available</h4>
+                                <p class="text-muted">Check back later for new devices!</p>
                             </div>
-                        <?php endforeach; ?>
-                    <?php endif; ?>
-                </div>
+                        <?php else: ?>
+                            <?php $chunks = array_chunk($latestDevices, 3); ?>
+                            <?php foreach ($chunks as $row): ?>
+                                <div class="d-flex">
+                                    <?php foreach ($row as $i => $device): ?>
+                                        <div class="device-card canel<?php echo $i == 1 ? ' mx-4' : ($i == 0 ? '' : ''); ?>" data-device-id="<?php echo $device['id']; ?>" style="cursor: pointer;">
+                                            <img class="shrink" src="<?php echo htmlspecialchars($device['image'] ?? ''); ?>" alt="">
+                                            <p><?php echo htmlspecialchars($device['name'] ?? ''); ?></p>
+                                        </div>
+                                    <?php endforeach; ?>
+                                    <?php for ($j = count($row); $j < 3; $j++): ?>
+                                        <div class="canel<?php echo $j == 1 ? ' mx-4' : ($j == 0 ? '' : ''); ?>"></div>
+                                    <?php endfor; ?>
+                                </div>
+                            <?php endforeach; ?>
+                        <?php endif; ?>
+                    </div>
 
 
-            </div>
-        </div>
-    </div>
-
-    <div id="bottom" class="container d-flex mt-3" style="max-width: 1034px;">
-        <div class="row align-items-center">
-            <div class="col-md-2 m-auto col-4 d-flex justify-content-center align-items-center "> <img
-                    src="https://fdn2.gsmarena.com/w/css/logo-gsmarena-com.png" alt="">
-            </div>
-            <div class="col-10 nav-wrap m-auto text-center ">
-                <div class="nav-container">
-                    <a href="#">Home</a>
-
-                    <a href="#">Reviews</a>
-                    <a href="#">Compare</a>
-                    <a href="#">Coverage</a>
-                    <a href="#">Glossary</a>
-                    <a href="#">FAQ</a>
-                    <a href="#"> <i class="fa-solid fa-wifi fa-sm"></i> RSS</a>
-                    <a href="#"> <i class="fa-brands fa-youtube fa-sm"></i> YouTube</a>
-                    <a href="#"> <i class="fa-brands fa-instagram fa-sm"></i> Instagram</a>
-                    <a href="#"> <i class="fa-brands fa-tiktok fa-sm"></i>TikTok</a>
-                    <a href="#"> <i class="fa-brands fa-facebook-f fa-sm"></i> Facebook</a>
-                    <a href="#"> <i class="fa-brands fa-twitter fa-sm"></i>Twitter</a>
-                    <a href="#">© 2000-2025 GSMArena.com</a>
-                    <a href="#">Mobile version</a>
-                    <a href="#">Android app</a>
-                    <a href="#">Tools</a>
-                    <a href="contact.php">Contact us</a>
-                    <a href="#">Merch store</a>
-                    <a href="#">Privacy</a>
-                    <a href="#">Terms of use</a>
                 </div>
             </div>
         </div>
-    </div>
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
 
-    <script>
-        document.addEventListener('DOMContentLoaded', function() {
-            const commentForm = document.getElementById('main-comment-form');
-            const originalFormParent = commentForm.parentNode;
-            const parentIdInput = commentForm.querySelector('input[name="parent_id"]');
-            const formTitle = commentForm.querySelector('h5');
-            const submitButton = commentForm.querySelector('button[type="submit"]');
-            const cancelButton = commentForm.querySelector('.cancel-reply');
+        <div id="bottom" class="container d-flex mt-3" style="max-width: 1034px;">
+            <div class="row align-items-center">
+                <div class="col-md-2 m-auto col-4 d-flex justify-content-center align-items-center "> <img
+                        src="https://fdn2.gsmarena.com/w/css/logo-gsmarena-com.png" alt="">
+                </div>
+                <div class="col-10 nav-wrap m-auto text-center ">
+                    <div class="nav-container">
+                        <a href="#">Home</a>
 
-            // Handle reply button clicks
-            document.addEventListener('click', function(e) {
-                if (e.target.classList.contains('reply-btn') || e.target.closest('.reply-btn')) {
+                        <a href="#">Reviews</a>
+                        <a href="#">Compare</a>
+                        <a href="#">Coverage</a>
+                        <a href="#">Glossary</a>
+                        <a href="#">FAQ</a>
+                        <a href="#"> <i class="fa-solid fa-wifi fa-sm"></i> RSS</a>
+                        <a href="#"> <i class="fa-brands fa-youtube fa-sm"></i> YouTube</a>
+                        <a href="#"> <i class="fa-brands fa-instagram fa-sm"></i> Instagram</a>
+                        <a href="#"> <i class="fa-brands fa-tiktok fa-sm"></i>TikTok</a>
+                        <a href="#"> <i class="fa-brands fa-facebook-f fa-sm"></i> Facebook</a>
+                        <a href="#"> <i class="fa-brands fa-twitter fa-sm"></i>Twitter</a>
+                        <a href="#">© 2000-2025 GSMArena.com</a>
+                        <a href="#">Mobile version</a>
+                        <a href="#">Android app</a>
+                        <a href="#">Tools</a>
+                        <a href="contact.php">Contact us</a>
+                        <a href="#">Merch store</a>
+                        <a href="#">Privacy</a>
+                        <a href="#">Terms of use</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
+
+        <script>
+            document.addEventListener('DOMContentLoaded', function() {
+                const commentForm = document.getElementById('main-comment-form');
+                const originalFormParent = commentForm.parentNode;
+                const parentIdInput = commentForm.querySelector('input[name="parent_id"]');
+                const formTitle = commentForm.querySelector('h5');
+                const submitButton = commentForm.querySelector('button[type="submit"]');
+                const cancelButton = commentForm.querySelector('.cancel-reply');
+
+                // Handle reply button clicks
+                document.addEventListener('click', function(e) {
+                    if (e.target.classList.contains('reply-btn') || e.target.closest('.reply-btn')) {
+                        e.preventDefault();
+                        const button = e.target.closest('.reply-btn');
+                        const commentId = button.getAttribute('data-comment-id');
+                        const commentAuthor = button.getAttribute('data-comment-author');
+                        const placeholder = document.querySelector(`.reply-form-placeholder[data-comment-id="${commentId}"]`);
+
+                        // Move form to reply position
+                        placeholder.appendChild(commentForm);
+
+                        // Update form for reply
+                        parentIdInput.value = commentId;
+                        formTitle.textContent = `Reply to ${commentAuthor}`;
+                        submitButton.innerHTML = '<i class="fas fa-paper-plane me-2"></i>Submit Reply';
+                        cancelButton.style.display = 'inline-block';
+
+                        // Clear form fields
+                        commentForm.querySelector('#name').value = '';
+                        commentForm.querySelector('#email').value = '';
+                        commentForm.querySelector('#comment').value = '';
+
+                        // Focus on name field
+                        commentForm.querySelector('#name').focus();
+                    }
+                });
+
+                // Handle cancel reply
+                cancelButton.addEventListener('click', function(e) {
                     e.preventDefault();
-                    const button = e.target.closest('.reply-btn');
-                    const commentId = button.getAttribute('data-comment-id');
-                    const commentAuthor = button.getAttribute('data-comment-author');
-                    const placeholder = document.querySelector(`.reply-form-placeholder[data-comment-id="${commentId}"]`);
 
-                    // Move form to reply position
-                    placeholder.appendChild(commentForm);
+                    // Move form back to original position
+                    originalFormParent.appendChild(commentForm);
 
-                    // Update form for reply
-                    parentIdInput.value = commentId;
-                    formTitle.textContent = `Reply to ${commentAuthor}`;
-                    submitButton.innerHTML = '<i class="fas fa-paper-plane me-2"></i>Submit Reply';
-                    cancelButton.style.display = 'inline-block';
+                    // Reset form
+                    parentIdInput.value = '';
+                    formTitle.textContent = 'Leave a Comment';
+                    submitButton.innerHTML = '<i class="fas fa-paper-plane me-2"></i>Submit Comment';
+                    cancelButton.style.display = 'none';
 
                     // Clear form fields
                     commentForm.querySelector('#name').value = '';
                     commentForm.querySelector('#email').value = '';
                     commentForm.querySelector('#comment').value = '';
-
-                    // Focus on name field
-                    commentForm.querySelector('#name').focus();
-                }
+                });
             });
+            // Handle clickable table rows for devices
+            document.addEventListener('DOMContentLoaded', function() {
+                // Handle device row clicks (for views and reviews tables)
+                document.querySelectorAll('.clickable-row').forEach(function(row) {
+                    row.addEventListener('click', function() {
+                        const deviceId = this.getAttribute('data-device-id');
+                        if (deviceId) {
+                            // Track the view
+                            fetch('track_device_view.php', {
+                                method: 'POST',
+                                headers: {
+                                    'Content-Type': 'application/x-www-form-urlencoded',
+                                },
+                                body: 'device_id=' + encodeURIComponent(deviceId)
+                            });
 
-            // Handle cancel reply
-            cancelButton.addEventListener('click', function(e) {
-                e.preventDefault();
+                            // Show device details modal
+                            showDeviceDetails(deviceId);
+                        }
+                    });
+                });
 
-                // Move form back to original position
-                originalFormParent.appendChild(commentForm);
+                // Handle device card clicks (for latest devices grid)
+                document.querySelectorAll('.device-card').forEach(function(card) {
+                    card.addEventListener('click', function() {
+                        const deviceId = this.getAttribute('data-device-id');
+                        if (deviceId) {
+                            // Track the view
+                            fetch('track_device_view.php', {
+                                method: 'POST',
+                                headers: {
+                                    'Content-Type': 'application/x-www-form-urlencoded',
+                                },
+                                body: 'device_id=' + encodeURIComponent(deviceId)
+                            });
 
-                // Reset form
-                parentIdInput.value = '';
-                formTitle.textContent = 'Leave a Comment';
-                submitButton.innerHTML = '<i class="fas fa-paper-plane me-2"></i>Submit Comment';
-                cancelButton.style.display = 'none';
+                            // Show device details modal
+                            showDeviceDetails(deviceId);
+                        }
+                    });
+                });
 
-                // Clear form fields
-                commentForm.querySelector('#name').value = '';
-                commentForm.querySelector('#email').value = '';
-                commentForm.querySelector('#comment').value = '';
-            });
-        });
-        // Handle clickable table rows for devices
-        document.addEventListener('DOMContentLoaded', function() {
-            // Handle device row clicks (for views and reviews tables)
-            document.querySelectorAll('.clickable-row').forEach(function(row) {
-                row.addEventListener('click', function() {
-                    const deviceId = this.getAttribute('data-device-id');
-                    if (deviceId) {
-                        // Track the view
-                        fetch('track_device_view.php', {
-                            method: 'POST',
-                            headers: {
-                                'Content-Type': 'application/x-www-form-urlencoded',
-                            },
-                            body: 'device_id=' + encodeURIComponent(deviceId)
-                        });
+                // Handle brand cell clicks
+                document.querySelectorAll('.brand-cell').forEach(function(cell) {
+                    cell.addEventListener('click', function() {
+                        const brandId = this.getAttribute('data-brand-id');
+                        if (brandId) {
+                            // Redirect to brands page with specific brand filter
+                            window.location.href = `brands.php?brand=${brandId}`;
+                        }
+                    });
+                });
 
-                        // Show device details modal
-                        showDeviceDetails(deviceId);
-                    }
+                // Handle comparison row clicks
+                document.querySelectorAll('.clickable-comparison').forEach(function(row) {
+                    row.addEventListener('click', function() {
+                        const device1Id = this.getAttribute('data-device1-id');
+                        const device2Id = this.getAttribute('data-device2-id');
+                        if (device1Id && device2Id) {
+                            // Track the comparison
+                            fetch('track_device_comparison.php', {
+                                method: 'POST',
+                                headers: {
+                                    'Content-Type': 'application/x-www-form-urlencoded',
+                                },
+                                body: 'device1_id=' + encodeURIComponent(device1Id) + '&device2_id=' + encodeURIComponent(device2Id)
+                            });
+
+                            // Redirect to comparison page
+                            window.location.href = `compare.php?phone1=${device1Id}&phone2=${device2Id}`;
+                        }
+                    });
                 });
             });
 
-            // Handle device card clicks (for latest devices grid)
-            document.querySelectorAll('.device-card').forEach(function(card) {
-                card.addEventListener('click', function() {
-                    const deviceId = this.getAttribute('data-device-id');
-                    if (deviceId) {
-                        // Track the view
-                        fetch('track_device_view.php', {
-                            method: 'POST',
-                            headers: {
-                                'Content-Type': 'application/x-www-form-urlencoded',
-                            },
-                            body: 'device_id=' + encodeURIComponent(deviceId)
-                        });
+            // Show post details in modal
+            function showPostDetails(postId) {
+                fetch(`get_post_details.php?id=${postId}`)
+                    .then(response => response.text())
+                    .then(data => {
+                        window.location.href = `post.php?id=${postId}`;
+                    })
+                    .catch(error => {
+                        console.error('Error:', error);
+                        alert('Failed to load post details');
+                    });
+            }
 
-                        // Show device details modal
-                        showDeviceDetails(deviceId);
-                    }
+            // Show device details in modal
+            function showDeviceDetails(deviceId) {
+                fetch(`get_device_details.php?id=${deviceId}`)
+                    .then(response => response.text())
+                    .then(data => {
+                        window.location.href = `device.php?id=${deviceId}`;
+                    })
+                    .catch(error => {
+                        console.error('Error:', error);
+                        alert('Failed to load device details');
+                    });
+            }
+
+
+
+            // Auto-dismiss alerts after 5 seconds
+            setTimeout(function() {
+                var alerts = document.querySelectorAll('.alert');
+                alerts.forEach(function(alert) {
+                    var bsAlert = new bootstrap.Alert(alert);
+                    bsAlert.close();
                 });
-            });
-
-            // Handle brand cell clicks
-            document.querySelectorAll('.brand-cell').forEach(function(cell) {
-                cell.addEventListener('click', function() {
-                    const brandId = this.getAttribute('data-brand-id');
-                    if (brandId) {
-                        // Redirect to brands page with specific brand filter
-                        window.location.href = `brands.php?brand=${brandId}`;
-                    }
-                });
-            });
-
-            // Handle comparison row clicks
-            document.querySelectorAll('.clickable-comparison').forEach(function(row) {
-                row.addEventListener('click', function() {
-                    const device1Id = this.getAttribute('data-device1-id');
-                    const device2Id = this.getAttribute('data-device2-id');
-                    if (device1Id && device2Id) {
-                        // Track the comparison
-                        fetch('track_device_comparison.php', {
-                            method: 'POST',
-                            headers: {
-                                'Content-Type': 'application/x-www-form-urlencoded',
-                            },
-                            body: 'device1_id=' + encodeURIComponent(device1Id) + '&device2_id=' + encodeURIComponent(device2Id)
-                        });
-
-                        // Redirect to comparison page
-                        window.location.href = `compare.php?phone1=${device1Id}&phone2=${device2Id}`;
-                    }
-                });
-            });
-        });
-
-        // Show post details in modal
-        function showPostDetails(postId) {
-            fetch(`get_post_details.php?id=${postId}`)
-                .then(response => response.text())
-                .then(data => {
-                    window.location.href = `post.php?id=${postId}`;
-                })
-                .catch(error => {
-                    console.error('Error:', error);
-                    alert('Failed to load post details');
-                });
-        }
-
-        // Show device details in modal
-        function showDeviceDetails(deviceId) {
-            fetch(`get_device_details.php?id=${deviceId}`)
-                .then(response => response.text())
-                .then(data => {
-                    window.location.href = `device.php?id=${deviceId}`;
-                })
-                .catch(error => {
-                    console.error('Error:', error);
-                    alert('Failed to load device details');
-                });
-        }
-
-
-
-        // Auto-dismiss alerts after 5 seconds
-        setTimeout(function() {
-            var alerts = document.querySelectorAll('.alert');
-            alerts.forEach(function(alert) {
-                var bsAlert = new bootstrap.Alert(alert);
-                bsAlert.close();
-            });
-        }, 5000);
-    </script>
-    <script src="script.js"></script>
+            }, 5000);
+        </script>
+        <script src="script.js"></script>
 </body>
 
 </html>

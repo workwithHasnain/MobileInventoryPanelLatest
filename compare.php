@@ -3,6 +3,7 @@ error_reporting(E_ALL);
 ini_set('display_errors', 1);
 require_once 'phone_data.php';
 require_once 'database_functions.php';
+require_once 'includes/database_functions.php';
 // Get posts and devices for display (case-insensitive status check) with comment counts
 $pdo = getConnection();
 $posts_stmt = $pdo->prepare("
@@ -66,36 +67,12 @@ try {
     $topReviewedDevices = [];
 }
 
-// Get top comparisons (simulated for now)
-$topComparisons = [
-    [
-        'device1_id' => 3,
-        'device2_id' => 1,
-        'comparison_count' => 45,
-        'device1_name' => 'iPhone 15 Pro',
-        'device2_name' => 'Galaxy S24',
-        'device1_image' => 'uploads/device_1755632616_68a4d3e8945a8_1.png',
-        'device2_image' => 'uploads/device_1755632662_68a4d416172aa_1.png'
-    ],
-    [
-        'device1_id' => 6,
-        'device2_id' => 5,
-        'comparison_count' => 38,
-        'device1_name' => 'OnePlus 12',
-        'device2_name' => 'Xiaomi 14 Pro',
-        'device1_image' => 'uploads/device_1755632707_68a4d4435da26_1.jpg',
-        'device2_image' => 'uploads/phone_1755633457_68a4d7318f660_1.png'
-    ],
-    [
-        'device1_id' => 7,
-        'device2_id' => 8,
-        'comparison_count' => 32,
-        'device1_name' => 'Google Pixel 8 Pro',
-        'device2_name' => 'Nothing Phone (2)',
-        'device1_image' => '',
-        'device2_image' => ''
-    ],
-];
+// Get top comparisons from database
+try {
+    $topComparisons = getPopularComparisons(10);
+} catch (Exception $e) {
+    $topComparisons = [];
+}
 
 // Get latest 9 devices for the new section
 $latestDevices = getAllPhones();
@@ -258,6 +235,17 @@ function findPhoneById($phones, $phoneId)
 $phone1 = findPhoneById($phones, $phone1_id);
 $phone2 = findPhoneById($phones, $phone2_id);
 $phone3 = findPhoneById($phones, $phone3_id);
+
+// Track device comparison if both phones are selected
+if ($phone1 && $phone2) {
+    try {
+        $ipAddress = $_SERVER['REMOTE_ADDR'] ?? '127.0.0.1';
+        trackDeviceComparison($phone1['id'], $phone2['id'], $ipAddress);
+    } catch (Exception $e) {
+        // Log error but don't break the page
+        error_log('Failed to track device comparison: ' . $e->getMessage());
+    }
+}
 
 // Check if at least one phone is selected
 $has_selection = ($phone1 !== null || $phone2 !== null || $phone3 !== null);
