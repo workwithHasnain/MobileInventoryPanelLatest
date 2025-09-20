@@ -845,7 +845,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                                     </div>
                                     <div class="col-md-6 mb-3">
                                         <label for="cpu_cores" class="form-label">CPU Cores</label>
-                                        <input type="number" class="form-control" id="cpu_cores" name="cpu_cores" min="1" max="16" value="<?php echo getValue('cpu_cores'); ?>">
+                                        <input type="text" class="form-control" id="cpu_cores" name="cpu_cores" placeholder="e.g., 8-core, Octa-core" value="<?php echo getValue('cpu_cores'); ?>">
                                     </div>
                                 </div>
                             </div>
@@ -975,10 +975,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                                         <label for="main_camera_count" class="form-label">Cameras</label>
                                         <select class="form-select" id="main_camera_count" name="main_camera_count">
                                             <option value="">Select count...</option>
-                                            <option value="One" <?php echo isSelected('main_camera_count', 'One'); ?>>One</option>
-                                            <option value="Two" <?php echo isSelected('main_camera_count', 'Two'); ?>>Two</option>
-                                            <option value="Three" <?php echo isSelected('main_camera_count', 'Three'); ?>>Three</option>
-                                            <option value="Four or More" <?php echo isSelected('main_camera_count', 'Four or More'); ?>>Four or More</option>
+                                            <option value="1" <?php echo isSelected('main_camera_count', '1'); ?>>One</option>
+                                            <option value="2" <?php echo isSelected('main_camera_count', '2'); ?>>Two</option>
+                                            <option value="3" <?php echo isSelected('main_camera_count', '3'); ?>>Three</option>
+                                            <option value="4" <?php echo isSelected('main_camera_count', '4'); ?>>Four or More</option>
                                         </select>
                                     </div>
                                     <div class="col-md-6 mb-3">
@@ -1035,10 +1035,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                                         <label for="selfie_camera_count" class="form-label">Cameras</label>
                                         <select class="form-select" id="selfie_camera_count" name="selfie_camera_count">
                                             <option value="">Select count...</option>
-                                            <option value="One" <?php echo isSelected('selfie_camera_count', 'One'); ?>>One</option>
-                                            <option value="Two" <?php echo isSelected('selfie_camera_count', 'Two'); ?>>Two</option>
-                                            <option value="Three" <?php echo isSelected('selfie_camera_count', 'Three'); ?>>Three</option>
-                                            <option value="Four or More" <?php echo isSelected('selfie_camera_count', 'Four or More'); ?>>Four or More</option>
+                                            <option value="1" <?php echo isSelected('selfie_camera_count', '1'); ?>>One</option>
+                                            <option value="2" <?php echo isSelected('selfie_camera_count', '2'); ?>>Two</option>
+                                            <option value="3" <?php echo isSelected('selfie_camera_count', '3'); ?>>Three</option>
+                                            <option value="4" <?php echo isSelected('selfie_camera_count', '4'); ?>>Four or More</option>
                                         </select>
                                     </div>
                                     <div class="col-md-12 mb-3">
