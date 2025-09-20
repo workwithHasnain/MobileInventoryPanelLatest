@@ -2,8 +2,9 @@
 error_reporting(E_ALL);
 ini_set('display_errors', 1);
 require_once 'auth.php';
-require_once 'phone_data.php';
+require_once 'phone_data.php'; // Keep for getAllPhones function
 require_once 'brand_data.php';
+require_once 'simple_device_insert.php'; // Add our new simple insertion script
 
 // Require login for this page
 requireLogin();
@@ -217,9 +218,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             'colors' => $_POST['colors'] ?? []
         ];
 
-        $result = addPhone($new_phone);
+        $result = simpleAddDevice($new_phone);
         if (is_array($result) && isset($result['error'])) {
-            // Set error from addPhone function
+            // Set error from simpleAddDevice function
             $errors['general'] = $result['error'];
         } else if ($result === true) {
             // Set success message and redirect to dashboard
