@@ -22,13 +22,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
         header("Location: dashboard.php");
         exit();
-    } else if ($username === 'emp' && $password === '1234') {
-        $_SESSION['logged_in'] = true;
-        $_SESSION['username'] = 'emp';
-        $_SESSION['role'] = 'employee';
-
-        header("Location: dashboard.php");
-        exit();
     } else {
         $error = 'Invalid username or password';
     }
@@ -76,7 +69,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                     </div>
                     <div class="card-footer text-center">
                         <div><small class="text-muted">Admin credentials: admin / 1234</small></div>
-                        <div><small class="text-muted">Employee credentials: emp / 1234</small></div>
                     </div>
                 </div>
             </div>
