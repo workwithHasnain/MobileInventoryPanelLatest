@@ -1192,20 +1192,8 @@ function formatColors($phone)
             }
 
             function formatPhoneSelection(state) {
-                if (!state.id) {
-                    return state.text;
-                }
-                var $option = $(state.element);
-                var img = $option.data('image');
-                var name = $option.data('name') || state.text;
-                var $container = $(
-                    '<span class="phone-selection">' +
-                    (img ? '<img class="phone-thumb" src="' + img + '" alt="">' : '') +
-                    '<span class="phone-label"></span>' +
-                    '</span>'
-                );
-                $container.find('.phone-label').text(name);
-                return $container;
+                // Show only the text for the selected value to avoid duplication/overlap
+                return state.text || '';
             }
 
             $('.phone-search-select').select2({
