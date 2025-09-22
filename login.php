@@ -68,7 +68,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                         </form>
                     </div>
                     <div class="card-footer text-center">
-                        <div><small class="text-muted">Admin credentials: admin / 1234</small></div>
                     </div>
                 </div>
             </div>
