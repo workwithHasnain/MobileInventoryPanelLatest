@@ -479,7 +479,7 @@ if ($_POST && isset($_POST['action'])) {
                     <div class="article-info">
                         <div class="bg-blur">
                             <?php if (!empty($post['featured_image'])): ?>
-                                <img class="center-img" src="<?php echo htmlspecialchars($post['featured_image']); ?>" alt="<?php echo htmlspecialchars($post['title']); ?>">
+                                <img class="center-img" data-src="<?php echo htmlspecialchars($post['featured_image']); ?>" src="" alt="<?php echo htmlspecialchars($post['title']); ?>" style="visibility: hidden;">
                             <?php endif; ?>
                         </div>
                     </div>
@@ -1080,6 +1080,19 @@ if ($_POST && isset($_POST['action'])) {
                     bsAlert.close();
                 });
             }, 5000);
+
+            // Defer loading the hero featured image until fully loaded
+            window.addEventListener('load', function() {
+                var heroImg = document.querySelector('.comfort-life-23 .bg-blur .center-img[data-src]');
+                if (heroImg && heroImg.getAttribute('data-src')) {
+                    var temp = new Image();
+                    temp.onload = function() {
+                        heroImg.src = heroImg.getAttribute('data-src');
+                        heroImg.style.visibility = 'visible';
+                    };
+                    temp.src = heroImg.getAttribute('data-src');
+                }
+            });
         </script>
         <script src="script.js"></script>
 </body>
