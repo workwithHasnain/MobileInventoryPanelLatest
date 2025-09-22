@@ -49,7 +49,7 @@ $where_clause = !empty($where_conditions) ? "WHERE " . implode(" AND ", $where_c
 
 // Get posts with filters and counts
 $query = "SELECT p.*, 
-    COALESCE((SELECT COUNT(*) FROM content_views cv WHERE cv.content_type = 'post' AND cv.content_id = p.id::varchar), 0) as view_count,
+    COALESCE((SELECT COUNT(*) FROM content_views cv WHERE cv.content_type = 'post' AND cv.content_id = CAST(p.id AS VARCHAR)), 0) as view_count,
     (SELECT COUNT(*) FROM post_comments pc WHERE pc.post_id = p.id) as comment_count
     FROM posts p $where_clause ORDER BY p.created_at DESC";
 $stmt = $pdo->prepare($query);

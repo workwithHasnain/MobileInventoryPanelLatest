@@ -117,11 +117,11 @@ $user_ip = $_SERVER['REMOTE_ADDR'] ?? '127.0.0.1';
 $user_agent = $_SERVER['HTTP_USER_AGENT'] ?? '';
 
 try {
-    $view_stmt = $pdo->prepare("INSERT INTO content_views (content_type, content_id, ip_address, user_agent) VALUES ('post', ?, ?, ?) ON CONFLICT (content_type, content_id, ip_address, DATE(viewed_at)) DO NOTHING");
+    $view_stmt = $pdo->prepare("INSERT INTO content_views (content_type, content_id, ip_address, user_agent) VALUES ('post', CAST(? AS VARCHAR), ?, ?) ON CONFLICT (content_type, content_id, ip_address) DO NOTHING");
     $view_stmt->execute([$post['id'], $user_ip, $user_agent]);
 
     // Update view count in posts table
-    $update_view_stmt = $pdo->prepare("UPDATE posts SET view_count = (SELECT COUNT(*) FROM content_views WHERE content_type = 'post' AND content_id = ?) WHERE id = ?");
+    $update_view_stmt = $pdo->prepare("UPDATE posts SET view_count = (SELECT COUNT(*) FROM content_views WHERE content_type = 'post' AND content_id = CAST(? AS VARCHAR)) WHERE id = ?");
     $update_view_stmt->execute([$post['id'], $post['id']]);
 } catch (Exception $e) {
     // Silently ignore view tracking errors
