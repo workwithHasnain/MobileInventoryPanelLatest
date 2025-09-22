@@ -361,7 +361,7 @@ if ($_POST && isset($_POST['action'])) {
             foreach ($chunks as $colIndex => $colPosts):
             ?>
                 <div class="<?php echo $colIndex === 0 ? 'col-lg-4 col-6 conjection-froud  bobile' : 'col-6 col-lg-4 conjection-froud'; ?>" <?php echo $colIndex === 1 ? ' style="margin-left: 7px;"' : ''; ?>>
-                    <div class="review-column-list-item review-column-list-item-secondary " style="cursor:pointer;" onclick="window.location.href='post.php?slug=<?php echo urlencode($post['slug']); ?>'">
+                    <div class="review-column-list-item review-column-list-item-secondary " style="cursor:pointer;">
                         <?php foreach ($colPosts as $post): ?>
                             <?php if (!empty($post['featured_image'])): ?>
                                 <img class="review-list-item-image" src="<?php echo htmlspecialchars($post['featured_image']); ?>" alt="<?php echo htmlspecialchars($post['title']); ?>" style="cursor:pointer;" onclick="window.location.href='post.php?slug=<?php echo urlencode($post['slug']); ?>'">
