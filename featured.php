@@ -82,6 +82,10 @@ $brands_stmt = $pdo->prepare("
 $brands_stmt->execute();
 $brands = $brands_stmt->fetchAll();
 
+// Get latest 9 devices for the "In Stores Now" section
+$latestDevices = getAllPhones();
+$latestDevices = array_slice(array_reverse($latestDevices), 0, 9);
+
 
 
 ?>

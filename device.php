@@ -555,15 +555,16 @@ function generateDeviceStats($device)
   // Camera stats
   $camera_title = 'N/A';
   $camera_subtitle = 'N/A';
+  $resolutionText = (string)($device['main_camera_resolution'] ?? '');
   if ($device['main_camera_resolution']) {
     // Extract MP from resolution
-    if (preg_match('/(\d+)\s*MP/', $device['main_camera_resolution'], $matches)) {
+    if (preg_match('/(\d+)\s*MP/', $resolutionText, $matches)) {
       $camera_title = $matches[1] . 'MP';
     }
   }
   if ($device['main_camera_video']) {
     $camera_subtitle = $device['main_camera_video'];
-  } elseif (strpos($device['main_camera_resolution'], '4K') !== false) {
+  } elseif ($resolutionText !== '' && strpos($resolutionText, '4K') !== false) {
     $camera_subtitle = '4K';
   } else {
     $camera_subtitle = '1080p';
