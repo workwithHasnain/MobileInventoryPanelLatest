@@ -478,9 +478,9 @@ if ($_POST && isset($_POST['action'])) {
                 <div class="comfort-life-23 position-absolute d-flex justify-content-between  ">
                     <div class="article-info">
                         <div class="bg-blur">
-                        <?php if (!empty($post['featured_image'])): ?>
-                            <img class="center-img" src="<?php echo htmlspecialchars($post['featured_image']); ?>" alt="<?php echo htmlspecialchars($post['title']); ?>">
-                        <?php endif; ?>
+                            <?php if (!empty($post['featured_image'])): ?>
+                                <img class="center-img" src="<?php echo htmlspecialchars($post['featured_image']); ?>" alt="<?php echo htmlspecialchars($post['title']); ?>">
+                            <?php endif; ?>
                         </div>
                     </div>
                     <div style="    display: flex;  flex-direction: column;">
@@ -546,23 +546,26 @@ if ($_POST && isset($_POST['action'])) {
                         </div>
                         <div>
                             <?php
-                            $categories = $post['categories'];
-                            if (!empty($categories)):
-                                // Handle PostgreSQL array format
-                                if (is_string($categories)) {
-                                    // Parse PostgreSQL array string like {Apple,iOS,Rumors}
-                                    $categories = trim($categories, '{}');
-                                    $categories = explode(',', $categories);
+                            $tags = $post['tags'];
+                            if (!empty($tags)):
+                                // Handle both PostgreSQL array format and comma-separated strings
+                                if (is_string($tags)) {
+                                    $tagsString = trim($tags);
+                                    if (strlen($tagsString) > 1 && $tagsString[0] === '{' && substr($tagsString, -1) === '}') {
+                                        // PostgreSQL array string like {Apple,iOS,Rumors}
+                                        $tagsString = trim($tagsString, '{}');
+                                        $tags = explode(',', $tagsString);
+                                    } else {
+                                        // Plain comma-separated string
+                                        $tags = array_map('trim', explode(',', $tagsString));
+                                    }
                                 }
-                                if (is_array($categories)):
+                                if (is_array($tags)):
                             ?>
-                                    <?php foreach ($categories as $category): ?>
-                                        <button class="section-button"><?php echo htmlspecialchars(trim($category)); ?></button>
+                                    <?php foreach ($tags as $tag): ?>
+                                        <button class="section-button"><?php echo htmlspecialchars(trim($tag)); ?></button>
                                     <?php endforeach; ?>
                                 <?php endif; ?>
-                            <?php else: ?>
-                                <button class="section-button">News</button>
-                                <button class="section-button">Tech</button>
                             <?php endif; ?>
                         </div>
                     </div>

@@ -1204,6 +1204,23 @@ table tr:hover {
     overflow: hidden;
 }
 
+/* Ensure the first header block inside the post hero fills the area */
+.comfort-life-23>.article-info:first-child {
+    height: 100%;
+}
+
+.comfort-life-23>.article-info:first-child .bg-blur {
+    height: 100%;
+}
+
+/* Make the featured image cover the blurred section fully */
+.comfort-life-23 .bg-blur .center-img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+}
+
 .bg-blur {
     background-image: none !important;
     height: 100%;
