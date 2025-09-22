@@ -11,7 +11,6 @@ $posts_stmt = $pdo->prepare("
     FROM posts p 
     WHERE p.status ILIKE 'published' 
     ORDER BY p.created_at DESC 
-    LIMIT 6
 ");
 $posts_stmt->execute();
 $posts = $posts_stmt->fetchAll();
@@ -418,7 +417,7 @@ if ($_POST && isset($_POST['action'])) {
     <div class="container mt-0 war ">
         <div class="row">
             <?php
-            $maxPosts = 6;
+            $maxPosts = count($posts);
             $postChunks = array_chunk(array_slice($posts, 0, $maxPosts), ceil($maxPosts / 2));
             foreach ($postChunks as $colIndex => $colPosts):
             ?>
