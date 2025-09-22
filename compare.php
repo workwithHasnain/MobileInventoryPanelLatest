@@ -858,7 +858,7 @@ function formatColors($phone)
                         <select id="phone1-select" name="phone1" class="bg-white w-100 mx-2 text-center-auto border phone-search-select" onchange="updateComparison(1, this.value)">
                             <option value="">Select Phone 1</option>
                             <?php foreach ($phones as $phone): ?>
-                                <option value="<?php echo $phone['id']; ?>" <?php echo ($phone1 && $phone1['id'] == $phone['id']) ? 'selected' : ''; ?>>
+                                <option value="<?php echo $phone['id']; ?>" data-image="<?php echo htmlspecialchars(getPhoneImage($phone)); ?>" data-name="<?php echo htmlspecialchars(getPhoneName($phone)); ?>" <?php echo ($phone1 && $phone1['id'] == $phone['id']) ? 'selected' : ''; ?>>
                                     <?php echo getPhoneName($phone); ?>
                                 </option>
                             <?php endforeach; ?>
@@ -896,7 +896,7 @@ function formatColors($phone)
                         <select id="phone2-select" name="phone2" class="bg-white w-100 mx-2 text-center-auto border phone-search-select" onchange="updateComparison(2, this.value)">
                             <option value="">Select Phone 2</option>
                             <?php foreach ($phones as $phone): ?>
-                                <option value="<?php echo $phone['id']; ?>" <?php echo ($phone2 && $phone2['id'] == $phone['id']) ? 'selected' : ''; ?>>
+                                <option value="<?php echo $phone['id']; ?>" data-image="<?php echo htmlspecialchars(getPhoneImage($phone)); ?>" data-name="<?php echo htmlspecialchars(getPhoneName($phone)); ?>" <?php echo ($phone2 && $phone2['id'] == $phone['id']) ? 'selected' : ''; ?>>
                                     <?php echo getPhoneName($phone); ?>
                                 </option>
                             <?php endforeach; ?>
@@ -936,7 +936,7 @@ function formatColors($phone)
                         <select id="phone3-select" name="phone3" class="bg-white w-100 mx-2 text-center-auto border phone-search-select" onchange="updateComparison(3, this.value)">
                             <option value="">Select Phone 3</option>
                             <?php foreach ($phones as $phone): ?>
-                                <option value="<?php echo $phone['id']; ?>" <?php echo ($phone3 && $phone3['id'] == $phone['id']) ? 'selected' : ''; ?>>
+                                <option value="<?php echo $phone['id']; ?>" data-image="<?php echo htmlspecialchars(getPhoneImage($phone)); ?>" data-name="<?php echo htmlspecialchars(getPhoneName($phone)); ?>" <?php echo ($phone3 && $phone3['id'] == $phone['id']) ? 'selected' : ''; ?>>
                                     <?php echo getPhoneName($phone); ?>
                                 </option>
                             <?php endforeach; ?>
@@ -1174,6 +1174,40 @@ function formatColors($phone)
     <script>
         $(document).ready(function() {
             // Initialize Select2 for searchable dropdowns
+            function formatPhoneOption(state) {
+                if (!state.id) {
+                    return state.text;
+                }
+                var $option = $(state.element);
+                var img = $option.data('image');
+                var name = $option.data('name') || state.text;
+                var $container = $(
+                    '<span class="phone-option">' +
+                    (img ? '<img class="phone-thumb" src="' + img + '" alt="">' : '') +
+                    '<span class="phone-label"></span>' +
+                    '</span>'
+                );
+                $container.find('.phone-label').text(name);
+                return $container;
+            }
+
+            function formatPhoneSelection(state) {
+                if (!state.id) {
+                    return state.text;
+                }
+                var $option = $(state.element);
+                var img = $option.data('image');
+                var name = $option.data('name') || state.text;
+                var $container = $(
+                    '<span class="phone-selection">' +
+                    (img ? '<img class="phone-thumb" src="' + img + '" alt="">' : '') +
+                    '<span class="phone-label"></span>' +
+                    '</span>'
+                );
+                $container.find('.phone-label').text(name);
+                return $container;
+            }
+
             $('.phone-search-select').select2({
                 placeholder: 'Search and select a phone...',
                 allowClear: true,
@@ -1181,7 +1215,12 @@ function formatColors($phone)
                 theme: 'default',
                 dropdownAutoWidth: true,
                 containerCssClass: 'phone-select-container',
-                dropdownCssClass: 'phone-select-dropdown'
+                dropdownCssClass: 'phone-select-dropdown',
+                templateResult: formatPhoneOption,
+                templateSelection: formatPhoneSelection,
+                escapeMarkup: function(markup) {
+                    return markup;
+                }
             });
 
             // Custom onChange handler for Select2
@@ -1236,6 +1275,22 @@ function formatColors($phone)
         .phone-select-dropdown .select2-results__option--highlighted {
             background-color: #007bff;
             color: white;
+        }
+
+        /* Phone image + label layout */
+        .phone-thumb {
+            width: 24px;
+            height: 24px;
+            object-fit: contain;
+            margin-right: 8px;
+            vertical-align: middle;
+        }
+
+        .phone-option,
+        .phone-selection {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
         }
     </style>
 </body>
