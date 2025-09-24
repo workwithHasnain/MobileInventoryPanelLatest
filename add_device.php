@@ -601,19 +601,19 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                                             </div>
                                             <div class="col-md-3 mb-3">
                                                 <label for="height" class="form-label">Height (mm)</label>
-                                                <input type="number" step="0.1" class="form-control" id="height" name="height">
+                                                <input type="number" step="0.01" class="form-control" id="height" name="height">
                                             </div>
                                             <div class="col-md-3 mb-3">
                                                 <label for="width" class="form-label">Width (mm)</label>
-                                                <input type="number" step="0.1" class="form-control" id="width" name="width">
+                                                <input type="number" step="0.01" class="form-control" id="width" name="width">
                                             </div>
                                             <div class="col-md-3 mb-3">
                                                 <label for="thickness" class="form-label">Thickness (mm)</label>
-                                                <input type="number" step="0.1" class="form-control" id="thickness" name="thickness">
+                                                <input type="number" step="0.01" class="form-control" id="thickness" name="thickness">
                                             </div>
                                             <div class="col-md-3 mb-3">
                                                 <label for="weight" class="form-label">Weight (g)</label>
-                                                <input type="number" step="0.1" class="form-control" id="weight" name="weight">
+                                                <input type="number" step="0.01" class="form-control" id="weight" name="weight">
                                             </div>
                                             <div class="col-md-6 mb-3">
                                                 <label class="form-label">IP Certificate</label>
