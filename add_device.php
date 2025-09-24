@@ -21,24 +21,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     }
 
     $brand = isset($_POST['brand']) ? trim($_POST['brand']) : '';
-    if (empty($brand)) {
-        $errors['brand'] = 'Brand is required';
-    }
 
     $year = isset($_POST['year']) ? trim($_POST['year']) : '';
-    if (empty($year) || !is_numeric($year) || $year < 2000 || $year > date('Y') + 2) {
-        $errors['year'] = 'Please enter a valid year between 2000 and ' . (date('Y') + 2);
-    }
 
     $availability = isset($_POST['availability']) ? trim($_POST['availability']) : '';
-    if (empty($availability)) {
-        $errors['availability'] = 'Availability status is required';
-    }
 
     $price = isset($_POST['price']) ? trim($_POST['price']) : '';
-    if (empty($price) || !is_numeric($price) || $price <= 0) {
-        $errors['price'] = 'Please enter a valid price greater than 0';
-    }
 
     // Handle multiple image uploads (up to 5)
     $image_paths = [];
@@ -114,10 +102,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
             // General
             'name' => $name,
-            'brand' => $brand,
-            'year' => $year,
-            'availability' => $availability,
-            'price' => $price,
+            'brand' => ($brand === '') ? null : $brand,
+            'year' => ($year === '') ? null : $year,
+            'availability' => ($availability === '') ? null : $availability,
+            'price' => ($price === '') ? null : $price,
             'image' => $image_path,
             'images' => $image_paths,
 
@@ -133,53 +121,53 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             'sim_size' => $_POST['sim_size'] ?? [],
 
             // Body
-            'dimensions' => $_POST['dimensions'] ?? '',
+            'dimensions' => (isset($_POST['dimensions']) && trim($_POST['dimensions']) !== '') ? $_POST['dimensions'] : null,
             'form_factor' => ($device_type === 'phone') ? ($_POST['form_factor'] ?? '') : '',
             'keyboard' => ($device_type === 'phone') ? ($_POST['keyboard'] ?? '') : '',
-            'height' => $_POST['height'] ?? '',
-            'width' => $_POST['width'] ?? '',
-            'thickness' => $_POST['thickness'] ?? '',
-            'weight' => $_POST['weight'] ?? '',
+            'height' => (isset($_POST['height']) && $_POST['height'] !== '') ? $_POST['height'] : null,
+            'width' => (isset($_POST['width']) && $_POST['width'] !== '') ? $_POST['width'] : null,
+            'thickness' => (isset($_POST['thickness']) && $_POST['thickness'] !== '') ? $_POST['thickness'] : null,
+            'weight' => (isset($_POST['weight']) && $_POST['weight'] !== '') ? $_POST['weight'] : null,
             'ip_certificate' => !empty($_POST['ip_certificate']) ? $_POST['ip_certificate'] : [],
             'color' => !empty($_POST['color']) ? trim($_POST['color']) : null,
             'back_material' => !empty($_POST['back_material']) ? trim($_POST['back_material']) : null,
             'frame_material' => !empty($_POST['frame_material']) ? trim($_POST['frame_material']) : null,
 
             // Platform
-            'os' => $_POST['os'] ?? '',
-            'os_version' => $_POST['os_version'] ?? '',
-            'chipset' => $_POST['chipset'] ?? '',
-            'cpu_cores' => $_POST['cpu_cores'] ?? '',
+            'os' => (isset($_POST['os']) && $_POST['os'] !== '') ? $_POST['os'] : null,
+            'os_version' => (isset($_POST['os_version']) && trim($_POST['os_version']) !== '') ? $_POST['os_version'] : null,
+            'chipset' => (isset($_POST['chipset']) && $_POST['chipset'] !== '') ? $_POST['chipset'] : null,
+            'cpu_cores' => (isset($_POST['cpu_cores']) && trim($_POST['cpu_cores']) !== '') ? $_POST['cpu_cores'] : null,
 
             // Memory
-            'ram' => $_POST['ram'] ?? '',
-            'storage' => $_POST['storage'] ?? '',
-            'card_slot' => $_POST['card_slot'] ?? '',
+            'ram' => (isset($_POST['ram']) && trim($_POST['ram']) !== '') ? $_POST['ram'] : null,
+            'storage' => (isset($_POST['storage']) && trim($_POST['storage']) !== '') ? $_POST['storage'] : null,
+            'card_slot' => (isset($_POST['card_slot']) && $_POST['card_slot'] !== '') ? $_POST['card_slot'] : null,
 
             // Display
-            'display_type' => $_POST['display_type'] ?? '',
-            'display_resolution' => $_POST['display_resolution'] ?? '',
-            'display_size' => $_POST['display_size'] ?? '',
-            'display_density' => $_POST['display_density'] ?? '',
-            'display_technology' => $_POST['display_technology'] ?? '',
-            'display_notch' => $_POST['display_notch'] ?? '',
-            'refresh_rate' => $_POST['refresh_rate'] ?? '',
+            'display_type' => (isset($_POST['display_type']) && $_POST['display_type'] !== '') ? $_POST['display_type'] : null,
+            'display_resolution' => (isset($_POST['display_resolution']) && trim($_POST['display_resolution']) !== '') ? $_POST['display_resolution'] : null,
+            'display_size' => (isset($_POST['display_size']) && $_POST['display_size'] !== '') ? $_POST['display_size'] : null,
+            'display_density' => (isset($_POST['display_density']) && $_POST['display_density'] !== '') ? $_POST['display_density'] : null,
+            'display_technology' => (isset($_POST['display_technology']) && $_POST['display_technology'] !== '') ? $_POST['display_technology'] : null,
+            'display_notch' => (isset($_POST['display_notch']) && $_POST['display_notch'] !== '') ? $_POST['display_notch'] : null,
+            'refresh_rate' => (isset($_POST['refresh_rate']) && $_POST['refresh_rate'] !== '') ? $_POST['refresh_rate'] : null,
             'hdr' => !empty($_POST['hdr']),
             'billion_colors' => !empty($_POST['billion_colors']),
 
             // Main Camera
-            'main_camera_resolution' => $_POST['main_camera_resolution'] ?? '',
-            'main_camera_count' => $_POST['main_camera_count'] ?? '',
+            'main_camera_resolution' => (isset($_POST['main_camera_resolution']) && $_POST['main_camera_resolution'] !== '') ? $_POST['main_camera_resolution'] : null,
+            'main_camera_count' => (isset($_POST['main_camera_count']) && $_POST['main_camera_count'] !== '') ? $_POST['main_camera_count'] : null,
             'main_camera_ois' => !empty($_POST['main_camera_ois']),
-            'main_camera_f_number' => $_POST['main_camera_f_number'] ?? '',
+            'main_camera_f_number' => (isset($_POST['main_camera_f_number']) && $_POST['main_camera_f_number'] !== '') ? $_POST['main_camera_f_number'] : null,
             'main_camera_telephoto' => !empty($_POST['main_camera_telephoto']),
             'main_camera_ultrawide' => !empty($_POST['main_camera_ultrawide']),
-            'main_camera_video' => $_POST['main_camera_video'] ?? '',
+            'main_camera_video' => (isset($_POST['main_camera_video']) && trim($_POST['main_camera_video']) !== '') ? $_POST['main_camera_video'] : null,
             'main_camera_flash' => !empty($_POST['main_camera_flash']),
 
             // Selfie Camera
-            'selfie_camera_resolution' => $_POST['selfie_camera_resolution'] ?? '',
-            'selfie_camera_count' => $_POST['selfie_camera_count'] ?? '',
+            'selfie_camera_resolution' => (isset($_POST['selfie_camera_resolution']) && $_POST['selfie_camera_resolution'] !== '') ? $_POST['selfie_camera_resolution'] : null,
+            'selfie_camera_count' => (isset($_POST['selfie_camera_count']) && $_POST['selfie_camera_count'] !== '') ? $_POST['selfie_camera_count'] : null,
             'selfie_camera_ois' => !empty($_POST['selfie_camera_ois']),
             'selfie_camera_flash' => !empty($_POST['selfie_camera_flash']),
             'popup_camera' => !empty($_POST['popup_camera']),
@@ -205,14 +193,14 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             'nfc' => !empty($_POST['nfc']),
             'infrared' => !empty($_POST['infrared']),
             'fm_radio' => !empty($_POST['fm_radio']),
-            'usb' => $_POST['usb'] ?? '',
+            'usb' => (isset($_POST['usb']) && $_POST['usb'] !== '') ? $_POST['usb'] : null,
 
             // Battery
-            'battery_capacity' => $_POST['battery_capacity'] ?? '',
+            'battery_capacity' => (isset($_POST['battery_capacity']) && $_POST['battery_capacity'] !== '') ? $_POST['battery_capacity'] : null,
             'battery_sic' => !empty($_POST['battery_sic']),
             'battery_removable' => !empty($_POST['battery_removable']),
-            'wired_charging' => $_POST['wired_charging'] ?? '',
-            'wireless_charging' => $_POST['wireless_charging'] ?? '',
+            'wired_charging' => (isset($_POST['wired_charging']) && $_POST['wired_charging'] !== '') ? $_POST['wired_charging'] : null,
+            'wireless_charging' => (isset($_POST['wireless_charging']) && $_POST['wireless_charging'] !== '') ? $_POST['wireless_charging'] : null,
 
             // Additional
             'colors' => $_POST['colors'] ?? []
@@ -335,7 +323,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                                                 <label for="brand" class="form-label">Brand *</label>
                                                 <div class="input-group">
                                                     <select class="form-select <?php echo isset($errors['brand']) ? 'is-invalid' : ''; ?>"
-                                                        id="brand" name="brand" required>
+                                                        id="brand" name="brand">
                                                         <option value="">Select a brand...</option>
                                                         <?php
                                                         $brands = getAllBrands();
@@ -369,7 +357,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                                                 <label for="year" class="form-label">Year *</label>
                                                 <input type="number" class="form-control <?php echo isset($errors['year']) ? 'is-invalid' : ''; ?>"
                                                     id="year" name="year" min="2000" max="<?php echo date('Y') + 2; ?>"
-                                                    value="<?php echo isset($year) ? htmlspecialchars($year) : date('Y'); ?>" required>
+                                                    value="<?php echo isset($year) ? htmlspecialchars($year) : ''; ?>">
                                                 <?php if (isset($errors['year'])): ?>
                                                     <div class="invalid-feedback"><?php echo htmlspecialchars($errors['year']); ?></div>
                                                 <?php endif; ?>
@@ -378,7 +366,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                                             <div class="col-md-4 mb-3">
                                                 <label for="availability" class="form-label">Availability *</label>
                                                 <select class="form-select <?php echo isset($errors['availability']) ? 'is-invalid' : ''; ?>"
-                                                    id="availability" name="availability" required>
+                                                    id="availability" name="availability">
                                                     <option value="">Select availability...</option>
                                                     <option value="Available" <?php echo isset($availability) && $availability === 'Available' ? 'selected' : ''; ?>>Available</option>
                                                     <option value="Coming Soon" <?php echo isset($availability) && $availability === 'Coming Soon' ? 'selected' : ''; ?>>Coming Soon</option>
@@ -396,7 +384,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                                                     <span class="input-group-text">$</span>
                                                     <input type="number" step="0.01" class="form-control <?php echo isset($errors['price']) ? 'is-invalid' : ''; ?>"
                                                         id="price" name="price" min="0.01"
-                                                        value="<?php echo isset($price) ? htmlspecialchars($price) : ''; ?>" required>
+                                                        value="<?php echo isset($price) ? htmlspecialchars($price) : ''; ?>">
                                                     <?php if (isset($errors['price'])): ?>
                                                         <div class="invalid-feedback"><?php echo htmlspecialchars($errors['price']); ?></div>
                                                     <?php endif; ?>
@@ -763,12 +751,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                                     <div class="accordion-body">
                                         <div class="row">
                                             <div class="col-md-4 mb-3">
-                                                <label for="ram" class="form-label">RAM (GB)</label>
-                                                <input type="number" step="0.5" class="form-control" id="ram" name="ram" min="0.5" max="64">
+                                                <label for="ram" class="form-label">RAM</label>
+                                                <input type="text" class="form-control" id="ram" name="ram" placeholder="e.g., 8 GB, 8/12 GB">
                                             </div>
                                             <div class="col-md-4 mb-3">
-                                                <label for="storage" class="form-label">Storage (GB)</label>
-                                                <input type="number" class="form-control" id="storage" name="storage" min="1" max="2048">
+                                                <label for="storage" class="form-label">Storage</label>
+                                                <input type="text" class="form-control" id="storage" name="storage" placeholder="e.g., 128 GB, 128/256 GB">
                                             </div>
                                             <div class="col-md-4 mb-3">
                                                 <label for="card_slot" class="form-label">Card Slot</label>

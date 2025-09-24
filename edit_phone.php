@@ -863,12 +863,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                             <div class="accordion-body">
                                 <div class="row">
                                     <div class="col-md-4 mb-3">
-                                        <label for="ram" class="form-label">RAM (GB)</label>
-                                        <input type="number" step="0.5" class="form-control" id="ram" name="ram" min="0.5" max="64" value="<?php echo getValue('ram'); ?>">
+                                        <label for="ram" class="form-label">RAM</label>
+                                        <input type="text" class="form-control" id="ram" name="ram" placeholder="e.g., 8 GB, 8/12 GB" value="<?php echo getValue('ram'); ?>">
                                     </div>
                                     <div class="col-md-4 mb-3">
-                                        <label for="storage" class="form-label">Storage (GB)</label>
-                                        <input type="number" class="form-control" id="storage" name="storage" min="1" max="2048" value="<?php echo getValue('storage'); ?>">
+                                        <label for="storage" class="form-label">Storage</label>
+                                        <input type="text" class="form-control" id="storage" name="storage" placeholder="e.g., 128 GB, 128/256 GB" value="<?php echo getValue('storage'); ?>">
                                     </div>
                                     <div class="col-md-4 mb-3">
                                         <label for="card_slot" class="form-label">Card Slot</label>

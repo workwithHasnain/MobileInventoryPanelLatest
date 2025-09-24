@@ -254,8 +254,8 @@ function addPhone($phone)
             trim($phone['cpu_cores'] ?? ''),         // cpu_cores
 
             // Memory
-            $toNumber($phone['ram'] ?? ''),          // ram
-            $toNumber($phone['storage'] ?? '', 'int'), // storage
+            trim($phone['ram'] ?? ''),          // ram (store as text)
+            trim($phone['storage'] ?? ''), // storage (store as text)
             trim($phone['card_slot'] ?? ''),         // card_slot
 
             // Main Camera
@@ -460,8 +460,8 @@ function updatePhone($id, $phone)
             $phone['cpu_cores'] ?? null,             // cpu_cores
 
             // Memory
-            $toNumber($phone['ram'] ?? ''),          // ram (DECIMAL(5,1))
-            $toNumber($phone['storage'] ?? '', 'int'), // storage (INTEGER)
+            trim($phone['ram'] ?? ''),          // ram (store as text)
+            trim($phone['storage'] ?? ''), // storage (store as text)
             $phone['card_slot'] ?? null,            // card_slot
 
             // Main Camera

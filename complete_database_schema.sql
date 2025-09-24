@@ -129,8 +129,8 @@ CREATE TABLE IF NOT EXISTS phones (
     gpu VARCHAR(100),
     
     -- Memory
-    ram DECIMAL(5,1), -- RAM in GB
-    storage INTEGER, -- Storage in GB
+    ram VARCHAR(100), -- RAM stored as text (e.g., "8 GB", "8/12 GB")
+    storage VARCHAR(100), -- Storage stored as text (e.g., "128 GB", "128/256 GB")
     card_slot VARCHAR(50), -- Changed to VARCHAR for card sizes
     
     -- Camera
