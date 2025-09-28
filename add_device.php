@@ -580,23 +580,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                                             </div>
                                             <div class="col-md-6 mb-3">
                                                 <label for="form_factor" class="form-label">Form Factor</label>
-                                                <select class="form-select" id="form_factor" name="form_factor">
-                                                    <option value="">Select form factor...</option>
-                                                    <option value="Bar">Bar</option>
-                                                    <option value="Flip Up">Flip Up</option>
-                                                    <option value="Flip Down">Flip Down</option>
-                                                    <option value="Swivel">Swivel</option>
-                                                    <option value="Slide">Slide</option>
-                                                </select>
+                                                <input type="text" class="form-control" id="form_factor" name="form_factor" placeholder="e.g., Bar, Flip, Slide">
                                                 <div class="form-text text-muted">Not applicable for tablets</div>
                                             </div>
                                             <div class="col-md-6 mb-3">
                                                 <label for="keyboard" class="form-label">Keyboard</label>
-                                                <select class="form-select" id="keyboard" name="keyboard">
-                                                    <option value="">Select keyboard type...</option>
-                                                    <option value="Without QWERTY">Without QWERTY</option>
-                                                    <option value="With QWERTY">With QWERTY</option>
-                                                </select>
+                                                <input type="text" class="form-control" id="keyboard" name="keyboard" placeholder="e.g., With QWERTY, Without QWERTY">
                                                 <div class="form-text text-muted">Not applicable for tablets</div>
                                             </div>
                                             <div class="col-md-3 mb-3">
@@ -650,24 +639,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                                             </div>
                                             <div class="col-md-4 mb-3">
                                                 <label for="back_material" class="form-label">Back Material</label>
-                                                <select class="form-select" id="back_material" name="back_material">
-                                                    <option value="">Select material...</option>
-                                                    <option value="Plastic">Plastic</option>
-                                                    <option value="Aluminum">Aluminum</option>
-                                                    <option value="Glass">Glass</option>
-                                                    <option value="Ceramic">Ceramic</option>
-                                                </select>
+                                                <input type="text" class="form-control" id="back_material" name="back_material" placeholder="e.g., Plastic, Glass, Ceramic">
                                             </div>
                                             <div class="col-md-4 mb-3">
                                                 <label for="frame_material" class="form-label">Frame Material</label>
-                                                <select class="form-select" id="frame_material" name="frame_material">
-                                                    <option value="">Select material...</option>
-                                                    <option value="Plastic">Plastic</option>
-                                                    <option value="Aluminum">Aluminum</option>
-                                                    <option value="Stainless Steel">Stainless Steel</option>
-                                                    <option value="Ceramic">Ceramic</option>
-                                                    <option value="Titanium">Titanium</option>
-                                                </select>
+                                                <input type="text" class="form-control" id="frame_material" name="frame_material" placeholder="e.g., Aluminum, Stainless Steel, Titanium">
                                             </div>
                                         </div>
                                     </div>
@@ -686,18 +662,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                                         <div class="row">
                                             <div class="col-md-6 mb-3">
                                                 <label for="os" class="form-label">OS</label>
-                                                <select class="form-select" id="os" name="os">
-                                                    <option value="">Select OS...</option>
-                                                    <option value="Feature phones">Feature phones</option>
-                                                    <option value="Android">Android</option>
-                                                    <option value="iOS">iOS</option>
-                                                    <option value="KaiOS">KaiOS</option>
-                                                    <option value="Windows Phone">Windows Phone</option>
-                                                    <option value="Symbian">Symbian</option>
-                                                    <option value="RIM">RIM</option>
-                                                    <option value="Bada">Bada</option>
-                                                    <option value="Firefox">Firefox</option>
-                                                </select>
+                                                <input type="text" class="form-control" id="os" name="os" placeholder="e.g., Android, iOS, Feature phone">
                                             </div>
                                             <div class="col-md-6 mb-3">
                                                 <label for="os_version" class="form-label">OS Version</label>
@@ -760,12 +725,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                                             </div>
                                             <div class="col-md-4 mb-3">
                                                 <label for="card_slot" class="form-label">Card Slot</label>
-                                                <select class="form-select" id="card_slot" name="card_slot">
-                                                    <option value="">Select option...</option>
-                                                    <option value="Yes (any type)">Yes (any type)</option>
-                                                    <option value="Yes (dedicated)">Yes (dedicated)</option>
-                                                    <option value="No">No</option>
-                                                </select>
+                                                <input type="text" class="form-control" id="card_slot" name="card_slot" placeholder="e.g., Yes (dedicated), No">
                                             </div>
                                         </div>
                                     </div>
@@ -784,11 +744,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                                         <div class="row">
                                             <div class="col-md-6 mb-3">
                                                 <label for="display_type" class="form-label">Type</label>
-                                                <select class="form-select" id="display_type" name="display_type">
-                                                    <option value="">Select type...</option>
-                                                    <option value="AMOLED">AMOLED</option>
-                                                    <option value="Super AMOLED">Super AMOLED</option>
-                                                </select>
+                                                <input type="text" class="form-control" id="display_type" name="display_type" placeholder="e.g., AMOLED, IPS, LTPO OLED">
                                             </div>
                                             <div class="col-md-6 mb-3">
                                                 <label for="display_resolution" class="form-label">Resolution</label>
@@ -804,31 +760,15 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                                             </div>
                                             <div class="col-md-4 mb-3">
                                                 <label for="display_technology" class="form-label">Technology</label>
-                                                <select class="form-select" id="display_technology" name="display_technology">
-                                                    <option value="">Select technology...</option>
-                                                    <option value="IPS">IPS</option>
-                                                    <option value="Any OLED">Any OLED</option>
-                                                    <option value="LTPO OLED">LTPO OLED</option>
-                                                </select>
+                                                <input type="text" class="form-control" id="display_technology" name="display_technology" placeholder="e.g., IPS, Any OLED, LTPO OLED">
                                             </div>
                                             <div class="col-md-4 mb-3">
                                                 <label for="display_notch" class="form-label">Notch</label>
-                                                <select class="form-select" id="display_notch" name="display_notch">
-                                                    <option value="">Select option...</option>
-                                                    <option value="No">No</option>
-                                                    <option value="Yes">Yes</option>
-                                                    <option value="Punch Hole">Punch Hole</option>
-                                                </select>
+                                                <input type="text" class="form-control" id="display_notch" name="display_notch" placeholder="e.g., No, Yes, Punch Hole">
                                             </div>
                                             <div class="col-md-4 mb-3">
                                                 <label for="refresh_rate" class="form-label">Refresh Rate</label>
-                                                <select class="form-select" id="refresh_rate" name="refresh_rate">
-                                                    <option value="">Select rate...</option>
-                                                    <option value="90">90Hz</option>
-                                                    <option value="120">120Hz</option>
-                                                    <option value="144">144Hz</option>
-                                                    <option value="165">165Hz</option>
-                                                </select>
+                                                <input type="text" class="form-control" id="refresh_rate" name="refresh_rate" placeholder="e.g., 90Hz, 120Hz, 144Hz">
                                             </div>
                                             <div class="col-md-4 mb-3">
                                                 <div class="form-check mt-4">
@@ -861,13 +801,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                                             </div>
                                             <div class="col-md-6 mb-3">
                                                 <label for="main_camera_count" class="form-label">Cameras</label>
-                                                <select class="form-select" id="main_camera_count" name="main_camera_count">
-                                                    <option value="">Select count...</option>
-                                                    <option value="1">One</option>
-                                                    <option value="2">Two</option>
-                                                    <option value="3">Three</option>
-                                                    <option value="4">Four or More</option>
-                                                </select>
+                                                <input type="number" class="form-control" id="main_camera_count" name="main_camera_count" min="1" max="10" step="1" placeholder="e.g., 2">
                                             </div>
                                             <div class="col-md-6 mb-3">
                                                 <label for="main_camera_f_number" class="form-label">F-Number</label>
@@ -918,13 +852,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                                             </div>
                                             <div class="col-md-6 mb-3">
                                                 <label for="selfie_camera_count" class="form-label">Cameras</label>
-                                                <select class="form-select" id="selfie_camera_count" name="selfie_camera_count">
-                                                    <option value="">Select count...</option>
-                                                    <option value="1">One</option>
-                                                    <option value="2">Two</option>
-                                                    <option value="3">Three</option>
-                                                    <option value="4">Four or More</option>
-                                                </select>
+                                                <input type="number" class="form-control" id="selfie_camera_count" name="selfie_camera_count" min="1" max="10" step="1" placeholder="e.g., 2">
                                             </div>
                                             <div class="col-md-12 mb-3">
                                                 <div class="form-check">
@@ -1016,15 +944,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                                             </div>
                                             <div class="col-md-12 mb-3">
                                                 <label for="fingerprint" class="form-label">Fingerprint</label>
-                                                <select class="form-select" id="fingerprint" name="fingerprint">
-                                                    <option value="">Select option...</option>
-                                                    <option value="Yes (any type)">Yes (any type)</option>
-                                                    <option value="Front-mounted">Front-mounted</option>
-                                                    <option value="Rear-mounted">Rear-mounted</option>
-                                                    <option value="Side-mounted">Side-mounted</option>
-                                                    <option value="Top-mounted">Top-mounted</option>
-                                                    <option value="Under Display">Under Display</option>
-                                                </select>
+                                                <input type="text" class="form-control" id="fingerprint" name="fingerprint" placeholder="e.g., Rear-mounted, Under Display, Side-mounted">
                                             </div>
                                         </div>
                                     </div>
@@ -1119,11 +1039,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                                             </div>
                                             <div class="col-md-6 mb-3">
                                                 <label for="usb" class="form-label">USB</label>
-                                                <select class="form-select" id="usb" name="usb">
-                                                    <option value="">Select USB type...</option>
-                                                    <option value="USB-C">USB-C</option>
-                                                    <option value="USB-C 3.0 or Higher">USB-C 3.0 or Higher</option>
-                                                </select>
+                                                <input type="text" class="form-control" id="usb" name="usb" placeholder="e.g., USB-C, USB-C 3.0 or Higher">
                                             </div>
                                         </div>
                                     </div>
