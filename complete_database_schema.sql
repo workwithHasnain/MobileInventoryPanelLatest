@@ -71,7 +71,6 @@ CREATE TABLE IF NOT EXISTS post_categories (
 -- =====================================================
 
 -- Main devices table (phones & tablets)
-DROP TABLE IF EXISTS phones;
 CREATE TABLE IF NOT EXISTS phones (
     id SERIAL PRIMARY KEY,
     

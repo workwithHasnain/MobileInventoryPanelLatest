@@ -277,17 +277,11 @@ if ($_POST && isset($_POST['action'])) {
         </div>
         <div class="column">
             <a href="index.php">Home</a>
-
             <a href="reviews.php">Reviews</a>
             <a href="videos.php">Videos</a>
             <a href="featured.php">Featured</a>
             <a href="phonefinder.php">Phone Finder</a>
             <a href="compare.php">Compare</a>
-            <a href="#">Coverage</a>
-            <a href="contact">Contact Us</a>
-            <a href="#">Merch</a>
-            <a href="#">Tip Us</a>
-            <a href="#">Privacy</a>
         </div>
         <div class="brand-grid">
             <?php
@@ -312,7 +306,6 @@ if ($_POST && isset($_POST['action'])) {
                 <a href="compare.php" class="nav-link">Compare</a>
                 <a href="videos.php" class="nav-link">Videos</a>
                 <a href="reviews.php" class="nav-link ">Reviews</a>
-
                 <a href="featured.php" class="nav-link d-lg-block d-none">Featured</a>
                 <a href="phonefinder.php" class="nav-link d-lg-block d-none">Phone Finder</a>
                 <a href="contact.php" class="nav-link d-lg-block d-none">Contact</a>
@@ -418,7 +411,8 @@ if ($_POST && isset($_POST['action'])) {
         <div class="row">
             <?php
             $maxPosts = count($posts);
-            $postChunks = array_chunk(array_slice($posts, 0, $maxPosts), ceil($maxPosts / 2));
+            $chunkSize = max(1, ceil($maxPosts / 2));
+            $postChunks = !empty($posts) ? array_chunk(array_slice($posts, 0, $maxPosts), $chunkSize) : [];
             foreach ($postChunks as $colIndex => $colPosts):
             ?>
                 <div class="col-lg-4 col-md-6 col-12 sentizer-erx" style="background-color: #EEEEEE;">
