@@ -582,6 +582,7 @@ if ($_POST && isset($_POST['action'])) {
                                 <i class="fa-solid fa-chevron-right"></i>
                             </button>
                         </div>
+                        <br>
                         <div class="d-flex">
                             <button class="section-button"><?php echo htmlspecialchars($post['author']); ?></button>
                             <p class="my-2 portion-headline mx-1"><?php echo !empty($post['publish_date']) ? date('j F Y', strtotime($post['publish_date'])) : date('j F Y', strtotime($post['created_at'])); ?></p>
