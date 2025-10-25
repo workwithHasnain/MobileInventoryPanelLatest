@@ -6,6 +6,38 @@
 require_once 'database_functions.php';
 require_once 'phone_data.php';
 
+// Function to convert USD to EUR using free API
+function convertUSDtoEUR($usd_amount)
+{
+  try {
+    // Using exchangerate-api.com free tier (no key required for basic usage)
+    $api_url = "https://open.er-api.com/v6/latest/USD";
+
+    $context = stream_context_create([
+      'http' => [
+        'timeout' => 3 // 3 second timeout
+      ]
+    ]);
+
+    $response = @file_get_contents($api_url, false, $context);
+
+    if ($response === false) {
+      return null; // API call failed
+    }
+
+    $data = json_decode($response, true);
+
+    if (isset($data['rates']['EUR'])) {
+      $eur_rate = $data['rates']['EUR'];
+      return $usd_amount * $eur_rate;
+    }
+
+    return null;
+  } catch (Exception $e) {
+    return null;
+  }
+}
+
 // Get posts and devices for display (case-insensitive status check) with comment counts
 $pdo = getConnection();
 $posts_stmt = $pdo->prepare("
@@ -237,7 +269,14 @@ function formatDeviceSpecs($device)
       $launch_details .= '<strong>Status</strong> ' . $device['availability'];
     }
     if (!empty($device['price'])) {
-      $launch_details .= '<br><strong>Price</strong> $' . number_format($device['price'], 2);
+      $price_usd = number_format($device['price'], 2);
+      $launch_details .= '<br><strong>Price</strong> $' . $price_usd;
+
+      // Add Euro conversion
+      $price_eur = convertUSDtoEUR($device['price']);
+      if ($price_eur !== null) {
+        $launch_details .= ' / €' . number_format($price_eur, 2);
+      }
     }
     $specs['LAUNCH'] = $launch_details;
   }
