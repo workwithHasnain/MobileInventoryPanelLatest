@@ -572,7 +572,7 @@ if ($_POST && isset($_POST['action'])) {
         <div class="row">
             <div class="col-lg-8 py-3" style=" padding-left: 0; padding-right: 0; border: 1px solid #e0e0e0;">
                 <div>
-                    <div class="d-flex align-items-center justify-content-between  gap-portion">
+                    <div class="d-flex align-items-center gap-portion mb-2">
                         <div class="heading-jump d-flex align-items-center">
                             <button id="headingPrev" type="button" class="heading-nav-btn me-2" title="Previous section" aria-label="Previous section" style="display:none;">
                                 <i class="fa-solid fa-chevron-left"></i>
@@ -582,7 +582,8 @@ if ($_POST && isset($_POST['action'])) {
                                 <i class="fa-solid fa-chevron-right"></i>
                             </button>
                         </div>
-                        <br>
+                    </div>
+                    <div class="d-flex align-items-center justify-content-between gap-portion">
                         <div class="d-flex">
                             <button class="section-button"><?php echo htmlspecialchars($post['author']); ?></button>
                             <p class="my-2 portion-headline mx-1"><?php echo !empty($post['publish_date']) ? date('j F Y', strtotime($post['publish_date'])) : date('j F Y', strtotime($post['created_at'])); ?></p>
