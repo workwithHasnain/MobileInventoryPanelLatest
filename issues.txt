@@ -10,3 +10,8 @@ photo modal in device.php -Done
 brands.php page
 dashboard json dropdown option remove, only keep db  -Done
 phone-finder.php
+
+...
+1. form implementation from old clone
+2. indexes in post headings
+3. currency in euro for device pricing

@@ -241,29 +241,29 @@ $brands = $brands_stmt->fetchAll();
                     <button class="btn btn-toggle w-100 text-start mb-3" type="button" data-bs-toggle="collapse"
                         style="border-radius: 1px;" data-bs-target="#networkCollapse" aria-expanded="false"
                         aria-controls="networkCollapse">
-                        Availbility
+                        Availability
                     </button>
                     <div class="collapse" id="networkCollapse">
                         <div class="card card-body py-2 px-3">
                             <div class="form-check">
-                                <input class="form-check-input" type="checkbox" value="Wi-Fi Only" id="networkWifi"
-                                    name="network" />
-                                <label class="form-check-label" for="networkWifi">Available</label>
+                                <input class="form-check-input" type="checkbox" value="Available" id="availabilityAvailable"
+                                    name="availability" />
+                                <label class="form-check-label" for="availabilityAvailable">Available</label>
                             </div>
                             <div class="form-check">
-                                <input class="form-check-input" type="checkbox" value="4G" id="network4G"
-                                    name="network" />
-                                <label class="form-check-label" for="network4G">Coming Soon</label>
+                                <input class="form-check-input" type="checkbox" value="Coming Soon" id="availabilityComingSoon"
+                                    name="availability" />
+                                <label class="form-check-label" for="availabilityComingSoon">Coming Soon</label>
                             </div>
                             <div class="form-check">
-                                <input class="form-check-input" type="checkbox" value="5G" id="network5G"
-                                    name="network" />
-                                <label class="form-check-label" for="network5G">Discontinued</label>
+                                <input class="form-check-input" type="checkbox" value="Discontinued" id="availabilityDiscontinued"
+                                    name="availability" />
+                                <label class="form-check-label" for="availabilityDiscontinued">Discontinued</label>
                             </div>
                             <div class="form-check">
-                                <input class="form-check-input" type="checkbox" value="5G" id="network5G2"
-                                    name="network" />
-                                <label class="form-check-label" for="network5G2">Rumored</label>
+                                <input class="form-check-input" type="checkbox" value="Rumored" id="availabilityRumored"
+                                    name="availability" />
+                                <label class="form-check-label" for="availabilityRumored">Rumored</label>
                             </div>
                         </div>
                     </div>
@@ -342,12 +342,12 @@ $brands = $brands_stmt->fetchAll();
                     <div class="row">
                         <div class="col-lg-6 d-flex align-items-center justify-content-center">
                             <label class="btn w-100 text-start mb-0 fw-bolder" style="border-radius: 1px;">
-                                <input type="checkbox" class="form-check-input me-2 float-end"> DUAL SIM
+                                <input type="checkbox" class="form-check-input me-2 float-end" name="dual_sim" value="1"> DUAL SIM
                             </label>
                         </div>
                         <div class="col-lg-6 d-flex align-items-center justify-content-center">
                             <label class="btn  w-100 text-start mb-0 fw-bolder" style="border-radius: 1px;">
-                                <input type="checkbox" class="form-check-input me-2 float-end"> ESIM
+                                <input type="checkbox" class="form-check-input me-2 float-end" name="esim" value="1"> ESIM
                             </label>
                         </div>
                     </div>
@@ -355,35 +355,35 @@ $brands = $brands_stmt->fetchAll();
                     <button style="border-radius: 1px;" class="btn btn-toggle w-100 text-start" type="button"
                         data-bs-toggle="collapse" data-bs-target="#factorCollapse" aria-expanded="false"
                         aria-controls="factorCollapse">
-                        From Factor
+                        Form Factor
                     </button>
                     <div class="collapse" id="factorCollapse">
                         <div class="card card-body px-3">
                             <div class="form-check">
-                                <input class="form-check-input" type="checkbox" value="Mini-SIM" id="miniSim"
-                                    name="size" />
-                                <label class="form-check-label" for="miniSim">Bar</label>
+                                <input class="form-check-input" type="checkbox" value="Bar" id="formFactorBar"
+                                    name="form_factor" />
+                                <label class="form-check-label" for="formFactorBar">Bar</label>
                             </div>
                             <div class="form-check">
-                                <input class="form-check-input" type="checkbox" value="Nano-SIM" id="nanoSim"
-                                    name="size" />
-                                <label class="form-check-label" for="nanoSim">Flip up</label>
+                                <input class="form-check-input" type="checkbox" value="Flip up" id="formFactorFlipUp"
+                                    name="form_factor" />
+                                <label class="form-check-label" for="formFactorFlipUp">Flip up</label>
                             </div>
                             <div class="form-check">
-                                <input class="form-check-input" type="checkbox" value="Micro-SIM" id="microSim"
-                                    name="size" />
-                                <label class="form-check-label" for="microSim">Flip down</label>
+                                <input class="form-check-input" type="checkbox" value="Flip down" id="formFactorFlipDown"
+                                    name="form_factor" />
+                                <label class="form-check-label" for="formFactorFlipDown">Flip down</label>
                             </div>
 
                             <div class="form-check">
-                                <input class="form-check-input" type="checkbox" value="Micro-SIM" id="microSim"
-                                    name="size" />
-                                <label class="form-check-label" for="microSim">Swivel</label>
+                                <input class="form-check-input" type="checkbox" value="Swivel" id="formFactorSwivel"
+                                    name="form_factor" />
+                                <label class="form-check-label" for="formFactorSwivel">Swivel</label>
                             </div>
                             <div class="form-check">
-                                <input class="form-check-input" type="checkbox" value="Micro-SIM" id="microSim"
-                                    name="size" />
-                                <label class="form-check-label" for="microSim">Slide</label>
+                                <input class="form-check-input" type="checkbox" value="Slide" id="formFactorSlide"
+                                    name="form_factor" />
+                                <label class="form-check-label" for="formFactorSlide">Slide</label>
                             </div>
                         </div>
                     </div>
@@ -396,7 +396,7 @@ $brands = $brands_stmt->fetchAll();
                     </div>
                     <div class="d-flex fw-bolder align-items-center gap-3 mt-2"
                         style="border: 1px solid; padding: 7px; margin-top: 14px;">
-                        Thinkness: <span id="yearValue">min</span>
+                        Thickness: <span id="yearValue">min</span>
                         <input type="range" class="form-range custom-range flex-grow-1" min="2000" max="2025"
                             id="rangeYear">
                         <span class="text-muted">max</span>
@@ -409,25 +409,25 @@ $brands = $brands_stmt->fetchAll();
                     <div class="collapse" id="ipCollapse">
                         <div class="card card-body px-3">
                             <div class="form-check">
-                                <input class="form-check-input" type="checkbox" value="Mini-SIM" id="miniSim"
-                                    name="size" />
-                                <label class="form-check-label" for="miniSim"> MIL-STD-810F</label>
+                                <input class="form-check-input" type="checkbox" value="IP54" id="ip54"
+                                    name="ip_certificate" />
+                                <label class="form-check-label" for="ip54">IP54</label>
                             </div>
                             <div class="form-check">
-                                <input class="form-check-input" type="checkbox" value="Mini-SIM" id="miniSim"
-                                    name="size" />
-                                <label class="form-check-label" for="miniSim">MIL-STD-810D</label>
+                                <input class="form-check-input" type="checkbox" value="IP67" id="ip67"
+                                    name="ip_certificate" />
+                                <label class="form-check-label" for="ip67">IP67</label>
                             </div>
                             <div class="form-check">
-                                <input class="form-check-input" type="checkbox" value="Nano-SIM" id="nanoSim"
-                                    name="size" />
-                                <label class="form-check-label" for="nanoSim">MIL-STD-810H</label>
+                                <input class="form-check-input" type="checkbox" value="IP68" id="ip68"
+                                    name="ip_certificate" />
+                                <label class="form-check-label" for="ip68">IP68</label>
                             </div>
 
                             <div class="form-check">
-                                <input class="form-check-input" type="checkbox" value="Nano-SIM" id="nanoSim"
-                                    name="size" />
-                                <label class="form-check-label" for="nanoSim"> MIL-STD-810G </label>
+                                <input class="form-check-input" type="checkbox" value="IP69K" id="ip69k"
+                                    name="ip_certificate" />
+                                <label class="form-check-label" for="ip69k">IP69K</label>
                             </div>
                         </div>
                     </div>
@@ -540,24 +540,24 @@ $brands = $brands_stmt->fetchAll();
                     <div class="row">
                         <div class="col-lg-6 d-flex align-items-center justify-content-center">
                             <label class="btn  w-100 text-start mb-0 fw-bolder" style="border-radius: 1px;">
-                                <input type="checkbox" class="form-check-input me-2 float-end"> ACCELEROMETER
+                                <input type="checkbox" class="form-check-input me-2 float-end" name="accelerometer" value="1"> ACCELEROMETER
                             </label>
                         </div>
                         <div class="col-lg-6 d-flex align-items-center justify-content-center">
                             <label class="btn  w-100 text-start mb-0 fw-bolder" style="border-radius: 1px;">
-                                <input type="checkbox" class="form-check-input me-2 float-end"> GYRO
+                                <input type="checkbox" class="form-check-input me-2 float-end" name="gyro" value="1"> GYRO
                             </label>
                         </div>
                     </div>
                     <div class="row ">
                         <div class="col-lg-6 d-flex align-items-center mt-2 justify-content-center">
                             <label class="btn  w-100 text-start mb-0 fw-bolder" style="border-radius: 1px;">
-                                <input type="checkbox" class="form-check-input me-2 float-end"> BAROMATER
+                                <input type="checkbox" class="form-check-input me-2 float-end" name="barometer" value="1"> BAROMETER
                             </label>
                         </div>
                         <div class="col-lg-6 d-flex align-items-center mt-2 justify-content-center">
                             <label class="btn  w-100 text-start mb-0 fw-bolder" style="border-radius: 1px;">
-                                <input type="checkbox" class="form-check-input me-2 float-end"> HEART RATE
+                                <input type="checkbox" class="form-check-input me-2 float-end" name="heart_rate" value="1"> HEART RATE
                             </label>
                         </div>
                     </div>
@@ -684,16 +684,16 @@ $brands = $brands_stmt->fetchAll();
                 <div class="collapse" id="sizeCollapse">
                     <div class="card card-body px-3">
                         <div class="form-check">
-                            <input class="form-check-input" type="checkbox" value="Mini-SIM" id="miniSim" name="size" />
+                            <input class="form-check-input" type="checkbox" value="Mini-SIM" id="miniSim" name="sim_size" />
                             <label class="form-check-label" for="miniSim">Mini-SIM (regular size)</label>
                         </div>
                         <div class="form-check">
-                            <input class="form-check-input" type="checkbox" value="Nano-SIM" id="nanoSim" name="size" />
+                            <input class="form-check-input" type="checkbox" value="Nano-SIM" id="nanoSim" name="sim_size" />
                             <label class="form-check-label" for="nanoSim">Nano-SIM</label>
                         </div>
                         <div class="form-check">
                             <input class="form-check-input" type="checkbox" value="Micro-SIM" id="microSim"
-                                name="size" />
+                                name="sim_size" />
                             <label class="form-check-label" for="microSim">Micro-SIM</label>
                         </div>
                     </div>
@@ -806,12 +806,12 @@ $brands = $brands_stmt->fetchAll();
                 <div class="row mt-5">
                     <div class="col-lg-6 d-flex align-items-center mt-3 justify-content-center">
                         <label class="btn  w-100 text-start mb-0 fw-bolder" style="border-radius: 1px;">
-                            <input type="checkbox" class="form-check-input me-2 float-end"> COMPASS
+                            <input type="checkbox" class="form-check-input me-2 float-end" name="compass" value="1"> COMPASS
                         </label>
                     </div>
                     <div class="col-lg-6 d-flex align-items-center mt-3 justify-content-center">
                         <label class="btn  w-100 text-start mb-0 fw-bolder" style="border-radius: 1px;">
-                            <input type="checkbox" class="form-check-input me-2 float-end"> PROXIMTYT
+                            <input type="checkbox" class="form-check-input me-2 float-end" name="proximity" value="1"> PROXIMITY
                         </label>
                     </div>
                 </div>
@@ -923,12 +923,12 @@ $brands = $brands_stmt->fetchAll();
                 <div class="row ">
                     <div class="col-lg-6 d-flex align-items-center justify-content-center mt-2">
                         <label class="btn   w-100 text-start mb-0 fw-bolder" style="border-radius: 1px;">
-                            <input type="checkbox" class="form-check-input me-2 float-end"> FRONT FLASH
+                            <input type="checkbox" class="form-check-input me-2 float-end" name="selfie_camera_flash" value="1"> FRONT FLASH
                         </label>
                     </div>
                     <div class="col-lg-6 d-flex align-items-center justify-content-center mt-2">
                         <label class="btn w-100 text-start mb-0 fw-bolder" style="border-radius: 1px;">
-                            <input type="checkbox" class="form-check-input me-2 float-end"> POP-UP CAMERA
+                            <input type="checkbox" class="form-check-input me-2 float-end" name="popup_camera" value="1"> POP-UP CAMERA
                         </label>
                     </div>
                 </div>
@@ -965,12 +965,12 @@ $brands = $brands_stmt->fetchAll();
                 <div class="row mt-2">
                     <div class="col-lg-6 d-flex align-items-center justify-content-center">
                         <label class="btn  w-100 text-start mb-0 fw-bolder" style="border-radius: 1px;">
-                            <input type="checkbox" class="form-check-input me-2 float-end"> GPS
+                            <input type="checkbox" class="form-check-input me-2 float-end" name="gps" value="1"> GPS
                         </label>
                     </div>
                     <div class="col-lg-6 d-flex align-items-center justify-content-center">
                         <label class="btn w-100 text-start mb-0 fw-bolder" style="border-radius: 1px;">
-                            <input type="checkbox" class="form-check-input me-2 float-end"> NFC
+                            <input type="checkbox" class="form-check-input me-2 float-end" name="nfc" value="1"> NFC
                         </label>
                     </div>
                 </div>
@@ -996,13 +996,13 @@ $brands = $brands_stmt->fetchAll();
                 </div>
                 <div class="filter-header mt-1 mb-2" style="margin-left: -1px;">Battery</div>
                 <div class="filter-box ">
-                    <span class="filter-label ">CAPICITY</span>
+                    <span class="filter-label ">CAPACITY</span>
                     <span id="sizeValue">Any</span>
                     <input type="range" class="form-range custom-range flex-grow-1" min="2000" max="2025"
                         id="rangeSize" />
                 </div>
                 <div class="filter-box mt-1">
-                    <span class="filter-label">WEIRED CHARGING:</span>
+                    <span class="filter-label">WIRED CHARGING:</span>
                     <span id="sizeValue">min</span>
                     <input type="range" class="form-range custom-range flex-grow-1" min="2000" max="2025"
                         id="rangeSize" />
@@ -1027,12 +1027,12 @@ $brands = $brands_stmt->fetchAll();
                 <div class="row ">
                     <div class="col-lg-6 d-flex align-items-center justify-content-center mt-2">
                         <label class="btn   w-100 text-start mb-0 fw-bolder" style="border-radius: 1px;">
-                            <input type="checkbox" class="form-check-input me-2 float-end"> 3.5MM JACK
+                            <input type="checkbox" class="form-check-input me-2 float-end" name="headphone_jack" value="1"> 3.5MM JACK
                         </label>
                     </div>
                     <div class="col-lg-6 d-flex align-items-center justify-content-center mt-2">
                         <label class="btn w-100 text-start mb-0 fw-bolder" style="border-radius: 1px;">
-                            <input type="checkbox" class="form-check-input me-2 float-end"> DUAL SPEAKER
+                            <input type="checkbox" class="form-check-input me-2 float-end" name="dual_speakers" value="1"> DUAL SPEAKER
                         </label>
                     </div>
                 </div>
@@ -1072,12 +1072,12 @@ $brands = $brands_stmt->fetchAll();
                 <div class="row">
                     <div class="col-lg-6 d-flex align-items-center justify-content-center">
                         <label class="btn w-100 text-start mb-0 fw-bolder" style="border-radius: 1px;">
-                            <input type="checkbox" class="form-check-input me-2 float-end"> HDR
+                            <input type="checkbox" class="form-check-input me-2 float-end" name="hdr" value="1"> HDR
                         </label>
                     </div>
                     <div class="col-lg-6 d-flex align-items-center justify-content-center">
                         <label class="btn  w-100 text-start mb-0 fw-bolder" style="border-radius: 1px;">
-                            <input type="checkbox" class="form-check-input me-2 float-end"> 1B+COLORS
+                            <input type="checkbox" class="form-check-input me-2 float-end" name="billion_colors" value="1"> 1B+COLORS
                         </label>
                     </div>
                 </div>
@@ -1096,12 +1096,12 @@ $brands = $brands_stmt->fetchAll();
                 <div class="row ">
                     <div class="col-lg-6 d-flex align-items-center justify-content-center mt-2">
                         <label class="btn  w-100 text-start mb-0 fw-bolder" style="border-radius: 1px;">
-                            <input type="checkbox" class="form-check-input me-2 float-end"> TELEPHOTO
+                            <input type="checkbox" class="form-check-input me-2 float-end" name="main_camera_telephoto" value="1"> TELEPHOTO
                         </label>
                     </div>
                     <div class="col-lg-6 d-flex align-items-center justify-content-center mt-2">
                         <label class="btn w-100 text-start mb-0 fw-bolder" style="border-radius: 1px;">
-                            <input type="checkbox" class="form-check-input me-2 float-end"> ULTRAWIDE
+                            <input type="checkbox" class="form-check-input me-2 float-end" name="main_camera_ultrawide" value="1"> ULTRAWIDE
                         </label>
                     </div>
                 </div>
@@ -1137,18 +1137,18 @@ $brands = $brands_stmt->fetchAll();
                     </div>
                     <div class="col-lg-6 d-flex align-items-center justify-content-center mt-3">
                         <label class="btn w-100 text-start mb-0 fw-bolder" style="border-radius: 1px;">
-                            <input type="checkbox" class="form-check-input me-2 float-end"> OIS
+                            <input type="checkbox" class="form-check-input me-2 float-end" name="main_camera_ois" value="1"> OIS
                         </label>
                     </div>
                 </div>
                 <div class="col-lg-6 d-flex align-items-center justify-content-center mt-2 ">
                     <label class="btn  w-100 text-start mb-0 fw-bolder" style="border-radius: 1px;">
-                        <input type="checkbox" class="form-check-input me-2 float-end"> UNDER DISPLAY CAMERA
+                        <input type="checkbox" class="form-check-input me-2 float-end" name="under_display_camera" value="1"> UNDER DISPLAY CAMERA
                     </label>
                 </div>
                 <button class="btn  btn-toggle w-100  mb-3 mt-5" type="button" data-bs-toggle="collapse"
                     data-bs-target="#bluetoothCollapse" aria-expanded="false" aria-controls="bluetoothCollapse">
-                    BLUETHOOTH
+                    BLUETOOTH
                 </button>
                 <div class="collapse " id="bluetoothCollapse">
                     <div class="card card-body">
@@ -1188,29 +1188,29 @@ $brands = $brands_stmt->fetchAll();
                 <div class="row " style="margin-top: -7px;">
                     <div class="col-lg-6 d-flex align-items-center justify-content-center">
                         <label class="btn w-100 text-start mb-0 fw-bolder" style="border-radius: 1px;">
-                            <input type="checkbox" class="form-check-input me-2 float-end">INFRAED
+                            <input type="checkbox" class="form-check-input me-2 float-end" name="infrared" value="1">INFRARED
                         </label>
                     </div>
                     <div class="col-lg-6 d-flex align-items-center justify-content-center">
                         <label class="btn  w-100 text-start mb-0 fw-bolder" style="border-radius: 1px;">
-                            <input type="checkbox" class="form-check-input me-2 float-end"> FM-RADIO
+                            <input type="checkbox" class="form-check-input me-2 float-end" name="fm_radio" value="1"> FM-RADIO
                         </label>
                     </div>
                 </div>
                 <div class="row styled">
                     <div class="col-lg-6 d-flex align-items-center justify-content-center ">
                         <label class="btn  w-100 text-start mb-0 fw-bolder" style="border-radius: 1px;">
-                            <input type="checkbox" class="form-check-input me-2 float-end"> SI/C
+                            <input type="checkbox" class="form-check-input me-2 float-end" name="battery_sic" value="1"> SI/C
                         </label>
                     </div>
                     <div class="col-lg-6 d-flex align-items-center justify-content-center ">
                         <label class="btn w-100 text-start mb-0 fw-bolder" style="border-radius: 1px;">
-                            <input type="checkbox" class="form-check-input me-2 float-end"> REMOVABLE
+                            <input type="checkbox" class="form-check-input me-2 float-end" name="battery_removable" value="1"> REMOVABLE
                         </label>
                     </div>
                 </div>
                 <div class="filter-box mt-1">
-                    <span class="filter-label">WEIRLESS CHARGING:</span>
+                    <span class="filter-label">WIRELESS CHARGING:</span>
                     <span id="sizeValue">min</span>
                     <input type="range" class="form-range custom-range flex-grow-1" min="2000" max="2025"
                         id="rangeSize" />
