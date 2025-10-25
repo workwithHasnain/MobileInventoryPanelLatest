@@ -545,6 +545,8 @@ if ($_POST && isset($_POST['action'])) {
                             <p class="my-2 portion-headline mx-1"><?php echo !empty($post['publish_date']) ? date('j F Y', strtotime($post['publish_date'])) : date('j F Y', strtotime($post['created_at'])); ?></p>
                         </div>
                         <div>
+                            <!-- Auto-generated headings dropdown (populated after page load) -->
+                            <select id="headingDropdown" class="form-select form-select-sm d-inline-block ms-2" aria-label="Jump to section" style="width:auto; min-width: 220px; display:none;"></select>
                             <?php
                             $tags = $post['tags'];
                             if (!empty($tags)):
@@ -567,18 +569,6 @@ if ($_POST && isset($_POST['action'])) {
                                     <?php endforeach; ?>
                                 <?php endif; ?>
                             <?php endif; ?>
-                        </div>
-                    </div>
-
-                    <!-- Table of Contents Dropdown -->
-                    <div class="gap-portion mt-3">
-                        <div class="dropdown" id="tocDropdownContainer" style="display: none;">
-                            <button class="btn btn-outline-secondary dropdown-toggle w-100" type="button" id="tocDropdown" data-bs-toggle="dropdown" aria-expanded="false">
-                                <i class="fas fa-list-ul me-2"></i>Table of Contents
-                            </button>
-                            <ul class="dropdown-menu w-100" aria-labelledby="tocDropdown" id="tocList">
-                                <!-- Headings will be populated here by JavaScript -->
-                            </ul>
                         </div>
                     </div>
                 </div>
@@ -926,99 +916,80 @@ if ($_POST && isset($_POST['action'])) {
         <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
 
         <script>
-            // Table of Contents Generator
-            document.addEventListener('DOMContentLoaded', function() {
-                const tocList = document.getElementById('tocList');
-                const tocDropdownContainer = document.getElementById('tocDropdownContainer');
-                const contentSection = document.querySelector('.document-section');
+            // Build a dynamic dropdown of all H3 headings and enable jump-to-section behavior
+            window.addEventListener('load', function() {
+                try {
+                    const container = document.querySelector('.document-section');
+                    const dropdown = document.getElementById('headingDropdown');
+                    if (!container || !dropdown) return;
 
-                if (!contentSection) return;
+                    const headings = container.querySelectorAll('h3');
+                    if (!headings.length) return;
 
-                // Find all headings (h1-h6) and elements with font-size > 18px
-                const headings = [];
-                const allElements = contentSection.querySelectorAll('*');
+                    // Prepare dropdown
+                    dropdown.innerHTML = '';
+                    const placeholder = document.createElement('option');
+                    placeholder.value = '';
+                    placeholder.textContent = 'Jump to section…';
+                    placeholder.disabled = true;
+                    placeholder.selected = true;
+                    dropdown.appendChild(placeholder);
 
-                allElements.forEach((element, index) => {
-                    // Check if it's a heading tag
-                    if (['H1', 'H2', 'H3', 'H4', 'H5', 'H6'].includes(element.tagName)) {
-                        headings.push({
-                            element: element,
-                            text: element.textContent.trim(),
-                            level: parseInt(element.tagName.charAt(1))
-                        });
-                    } else {
-                        // Check computed font size
-                        const computedStyle = window.getComputedStyle(element);
-                        const fontSize = parseFloat(computedStyle.fontSize);
+                    const usedIds = new Set();
+                    const makeSlug = (str) => {
+                        return str
+                            .toLowerCase()
+                            .replace(/[^a-z0-9\s-]/g, '')
+                            .replace(/\s+/g, '-')
+                            .replace(/-+/g, '-')
+                            .replace(/^-|-$|/g, '');
+                    };
 
-                        // Only consider elements with text content and font-size > 18px
-                        if (fontSize > 18 && element.textContent.trim().length > 0) {
-                            // Avoid including parent elements if children are already included
-                            let hasHeadingChild = false;
-                            headings.forEach(heading => {
-                                if (element.contains(heading.element)) {
-                                    hasHeadingChild = true;
-                                }
-                            });
+                    headings.forEach((h3, idx) => {
+                        let text = (h3.textContent || '').trim().replace(/\s+/g, ' ');
+                        if (!text) text = `Section ${idx + 1}`;
 
-                            if (!hasHeadingChild && !element.querySelector('h1, h2, h3, h4, h5, h6')) {
-                                headings.push({
-                                    element: element,
-                                    text: element.textContent.trim().substring(0, 100), // Limit text length
-                                    level: 3 // Default level for non-heading elements
-                                });
-                            }
+                        // Ensure heading has a unique id
+                        let slug = h3.id || makeSlug(text) || `section-${idx + 1}`;
+                        let base = slug;
+                        let counter = 2;
+                        while (usedIds.has(slug) || document.getElementById(slug)) {
+                            slug = `${base}-${counter++}`;
                         }
-                    }
-                });
-
-                // If we found headings, populate the dropdown
-                if (headings.length > 0) {
-                    tocDropdownContainer.style.display = 'block';
-
-                    headings.forEach((heading, index) => {
-                        // Add an ID to the heading element for smooth scrolling
-                        if (!heading.element.id) {
-                            heading.element.id = 'heading-' + index;
+                        if (!h3.id) {
+                            h3.id = slug;
                         }
+                        usedIds.add(slug);
 
-                        // Create dropdown item
-                        const li = document.createElement('li');
-                        const a = document.createElement('a');
-                        a.className = 'dropdown-item';
-                        a.href = '#' + heading.element.id;
-                        a.textContent = heading.text;
-
-                        // Add indentation based on heading level
-                        if (heading.level > 2) {
-                            a.style.paddingLeft = (heading.level - 1) * 15 + 'px';
-                            a.style.fontSize = '0.9rem';
-                        }
-
-                        // Smooth scroll on click
-                        a.addEventListener('click', function(e) {
-                            e.preventDefault();
-                            const targetElement = document.getElementById(heading.element.id);
-                            if (targetElement) {
-                                targetElement.scrollIntoView({
-                                    behavior: 'smooth',
-                                    block: 'start'
-                                });
-
-                                // Add a highlight effect
-                                targetElement.style.backgroundColor = '#fff3cd';
-                                setTimeout(() => {
-                                    targetElement.style.backgroundColor = '';
-                                }, 2000);
-                            }
-                        });
-
-                        li.appendChild(a);
-                        tocList.appendChild(li);
+                        // Add option
+                        const opt = document.createElement('option');
+                        opt.value = `#${slug}`;
+                        opt.textContent = text.length > 80 ? text.slice(0, 77) + '…' : text;
+                        dropdown.appendChild(opt);
                     });
+
+                    // Show dropdown now that it has content
+                    dropdown.style.display = 'inline-block';
+
+                    // Smooth-scroll to target with offset for fixed navbar
+                    dropdown.addEventListener('change', function() {
+                        const hash = this.value;
+                        if (!hash) return;
+                        const target = document.querySelector(hash);
+                        if (!target) return;
+                        const fixed = document.querySelector('#navbar');
+                        const offset = (fixed ? fixed.offsetHeight : 0) + 12; // small extra padding
+                        const top = target.getBoundingClientRect().top + window.pageYOffset - offset;
+                        window.scrollTo({
+                            top,
+                            behavior: 'smooth'
+                        });
+                    });
+                } catch (e) {
+                    // Fail silently to avoid breaking the page
+                    console.error('Heading dropdown init failed:', e);
                 }
             });
-
             document.addEventListener('DOMContentLoaded', function() {
                 const commentForm = document.getElementById('main-comment-form');
                 const originalFormParent = commentForm.parentNode;
