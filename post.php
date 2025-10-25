@@ -540,13 +540,13 @@ if ($_POST && isset($_POST['action'])) {
             <div class="col-lg-8 py-3" style=" padding-left: 0; padding-right: 0; border: 1px solid #e0e0e0;">
                 <div>
                     <div class="d-flex align-items-center justify-content-between  gap-portion">
+                        <!-- Auto-generated headings dropdown (populated after page load) -->
+                        <select id="headingDropdown" class="form-select form-select-sm d-inline-block ms-2" aria-label="Jump to section" style="width:auto; min-width: 220px; display:none;"></select>
                         <div class="d-flex">
                             <button class="section-button"><?php echo htmlspecialchars($post['author']); ?></button>
                             <p class="my-2 portion-headline mx-1"><?php echo !empty($post['publish_date']) ? date('j F Y', strtotime($post['publish_date'])) : date('j F Y', strtotime($post['created_at'])); ?></p>
                         </div>
                         <div>
-                            <!-- Auto-generated headings dropdown (populated after page load) -->
-                            <select id="headingDropdown" class="form-select form-select-sm d-inline-block ms-2" aria-label="Jump to section" style="width:auto; min-width: 220px; display:none;"></select>
                             <?php
                             $tags = $post['tags'];
                             if (!empty($tags)):
