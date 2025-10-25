@@ -340,6 +340,9 @@ if ($_POST && isset($_POST['action'])) {
             font-size: 0.95rem;
             border: 1px solid #e0e0e0;
             background-color: #fff;
+            flex: 1 1 auto;
+            min-width: 0;
+            width: 100%;
         }
 
         .heading-nav-btn {
@@ -353,6 +356,7 @@ if ($_POST && isset($_POST['action'])) {
             align-items: center;
             justify-content: center;
             transition: background-color .15s ease, border-color .15s ease;
+            flex: 0 0 auto;
         }
 
         .heading-nav-btn:hover {
@@ -572,13 +576,13 @@ if ($_POST && isset($_POST['action'])) {
         <div class="row">
             <div class="col-lg-8 py-3" style=" padding-left: 0; padding-right: 0; border: 1px solid #e0e0e0;">
                 <div>
-                    <div class="d-flex align-items-center gap-portion mb-2 w-100">
+                    <div class="d-flex align-items-center gap-portion mb-2">
                         <div class="heading-jump d-flex align-items-center w-100">
-                            <button id="headingPrev" type="button" class="heading-nav-btn me-2" title="Previous section" aria-label="Previous section" style="display:none;">
+                            <button id="headingPrev" type="button" class="heading-nav-btn me-2 flex-shrink-0" title="Previous section" aria-label="Previous section" style="display:none;">
                                 <i class="fa-solid fa-chevron-left"></i>
                             </button>
-                            <select id="headingDropdown" class="form-select form-select-sm d-inline-block flex-grow-1" aria-label="Jump to section" style="max-width: 100%; display:none;"></select>
-                            <button id="headingNext" type="button" class="heading-nav-btn ms-2" title="Next section" aria-label="Next section" style="display:none;">
+                            <select id="headingDropdown" class="form-select form-select-sm w-100 flex-grow-1" aria-label="Jump to section" style="width:100%; display:none;"></select>
+                            <button id="headingNext" type="button" class="heading-nav-btn ms-2 flex-shrink-0" title="Next section" aria-label="Next section" style="display:none;">
                                 <i class="fa-solid fa-chevron-right"></i>
                             </button>
                         </div>
