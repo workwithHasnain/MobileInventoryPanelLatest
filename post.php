@@ -569,6 +569,18 @@ if ($_POST && isset($_POST['action'])) {
                             <?php endif; ?>
                         </div>
                     </div>
+
+                    <!-- Table of Contents Dropdown -->
+                    <div class="gap-portion mt-3">
+                        <div class="dropdown" id="tocDropdownContainer" style="display: none;">
+                            <button class="btn btn-outline-secondary dropdown-toggle w-100" type="button" id="tocDropdown" data-bs-toggle="dropdown" aria-expanded="false">
+                                <i class="fas fa-list-ul me-2"></i>Table of Contents
+                            </button>
+                            <ul class="dropdown-menu w-100" aria-labelledby="tocDropdown" id="tocList">
+                                <!-- Headings will be populated here by JavaScript -->
+                            </ul>
+                        </div>
+                    </div>
                 </div>
                 <div class="document-section">
                     <?php if (!empty($post['short_description'])): ?>
@@ -914,6 +926,99 @@ if ($_POST && isset($_POST['action'])) {
         <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
 
         <script>
+            // Table of Contents Generator
+            document.addEventListener('DOMContentLoaded', function() {
+                const tocList = document.getElementById('tocList');
+                const tocDropdownContainer = document.getElementById('tocDropdownContainer');
+                const contentSection = document.querySelector('.document-section');
+
+                if (!contentSection) return;
+
+                // Find all headings (h1-h6) and elements with font-size > 18px
+                const headings = [];
+                const allElements = contentSection.querySelectorAll('*');
+
+                allElements.forEach((element, index) => {
+                    // Check if it's a heading tag
+                    if (['H1', 'H2', 'H3', 'H4', 'H5', 'H6'].includes(element.tagName)) {
+                        headings.push({
+                            element: element,
+                            text: element.textContent.trim(),
+                            level: parseInt(element.tagName.charAt(1))
+                        });
+                    } else {
+                        // Check computed font size
+                        const computedStyle = window.getComputedStyle(element);
+                        const fontSize = parseFloat(computedStyle.fontSize);
+
+                        // Only consider elements with text content and font-size > 18px
+                        if (fontSize > 18 && element.textContent.trim().length > 0) {
+                            // Avoid including parent elements if children are already included
+                            let hasHeadingChild = false;
+                            headings.forEach(heading => {
+                                if (element.contains(heading.element)) {
+                                    hasHeadingChild = true;
+                                }
+                            });
+
+                            if (!hasHeadingChild && !element.querySelector('h1, h2, h3, h4, h5, h6')) {
+                                headings.push({
+                                    element: element,
+                                    text: element.textContent.trim().substring(0, 100), // Limit text length
+                                    level: 3 // Default level for non-heading elements
+                                });
+                            }
+                        }
+                    }
+                });
+
+                // If we found headings, populate the dropdown
+                if (headings.length > 0) {
+                    tocDropdownContainer.style.display = 'block';
+
+                    headings.forEach((heading, index) => {
+                        // Add an ID to the heading element for smooth scrolling
+                        if (!heading.element.id) {
+                            heading.element.id = 'heading-' + index;
+                        }
+
+                        // Create dropdown item
+                        const li = document.createElement('li');
+                        const a = document.createElement('a');
+                        a.className = 'dropdown-item';
+                        a.href = '#' + heading.element.id;
+                        a.textContent = heading.text;
+
+                        // Add indentation based on heading level
+                        if (heading.level > 2) {
+                            a.style.paddingLeft = (heading.level - 1) * 15 + 'px';
+                            a.style.fontSize = '0.9rem';
+                        }
+
+                        // Smooth scroll on click
+                        a.addEventListener('click', function(e) {
+                            e.preventDefault();
+                            const targetElement = document.getElementById(heading.element.id);
+                            if (targetElement) {
+                                targetElement.scrollIntoView({
+                                    behavior: 'smooth',
+                                    block: 'start'
+                                });
+
+                                // Add a highlight effect
+                                targetElement.style.backgroundColor = '#fff3cd';
+                                setTimeout(() => {
+                                    targetElement.style.backgroundColor = '';
+                                }, 2000);
+                            }
+                        });
+
+                        li.appendChild(a);
+                        tocList.appendChild(li);
+                    });
+                }
+            });
+
             document.addEventListener('DOMContentLoaded', function() {
                 const commentForm = document.getElementById('main-comment-form');
                 const originalFormParent = commentForm.parentNode;
