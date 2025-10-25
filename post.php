@@ -331,6 +331,39 @@ if ($_POST && isset($_POST['action'])) {
             background-color: #007bff;
             border-color: #007bff;
         }
+
+        /* Heading jump controls */
+        .heading-jump .form-select {
+            border-radius: 999px;
+            padding: 4px 12px;
+            height: 34px;
+            font-size: 0.95rem;
+            border: 1px solid #e0e0e0;
+            background-color: #fff;
+        }
+
+        .heading-nav-btn {
+            background-color: #f1f3f5;
+            border: 1px solid #e0e0e0;
+            color: #090E21;
+            border-radius: 999px;
+            width: 34px;
+            height: 34px;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            transition: background-color .15s ease, border-color .15s ease;
+        }
+
+        .heading-nav-btn:hover {
+            background-color: #e9ecef;
+            border-color: #d5d5d5;
+        }
+
+        .heading-nav-btn:disabled {
+            opacity: .5;
+            cursor: not-allowed;
+        }
     </style>
 </head>
 
@@ -540,9 +573,14 @@ if ($_POST && isset($_POST['action'])) {
             <div class="col-lg-8 py-3" style=" padding-left: 0; padding-right: 0; border: 1px solid #e0e0e0;">
                 <div>
                     <div class="d-flex align-items-center justify-content-between  gap-portion">
-                        <div>
-                            <!-- Auto-generated headings dropdown (populated after page load) -->
-                            <select id="headingDropdown" class="form-select form-select-sm d-inline-block ms-2" aria-label="Jump to section" style="width:auto; min-width: 220px; display:none;"></select>
+                        <div class="heading-jump d-flex align-items-center">
+                            <button id="headingPrev" type="button" class="heading-nav-btn me-2" title="Previous section" aria-label="Previous section" style="display:none;">
+                                <i class="fa-solid fa-chevron-left"></i>
+                            </button>
+                            <select id="headingDropdown" class="form-select form-select-sm d-inline-block" aria-label="Jump to section" style="width:auto; min-width: 240px; display:none;"></select>
+                            <button id="headingNext" type="button" class="heading-nav-btn ms-2" title="Next section" aria-label="Next section" style="display:none;">
+                                <i class="fa-solid fa-chevron-right"></i>
+                            </button>
                         </div>
                         <div class="d-flex">
                             <button class="section-button"><?php echo htmlspecialchars($post['author']); ?></button>
@@ -944,7 +982,7 @@ if ($_POST && isset($_POST['action'])) {
                             .replace(/[^a-z0-9\s-]/g, '')
                             .replace(/\s+/g, '-')
                             .replace(/-+/g, '-')
-                            .replace(/^-|-$|/g, '');
+                            .replace(/^-+|-+$/g, '');
                     };
 
                     headings.forEach((h3, idx) => {
@@ -970,23 +1008,73 @@ if ($_POST && isset($_POST['action'])) {
                         dropdown.appendChild(opt);
                     });
 
-                    // Show dropdown now that it has content
+                    // Show dropdown and arrow buttons now that they have content
                     dropdown.style.display = 'inline-block';
+                    const prevBtn = document.getElementById('headingPrev');
+                    const nextBtn = document.getElementById('headingNext');
+                    const headingEls = Array.from(headings);
+                    let activeIdx = -1; // 0-based index into headingEls; -1 means none selected yet
+
+                    const fixed = document.querySelector('#navbar');
+                    const getOffsetTop = (el) => {
+                        const offset = (fixed ? fixed.offsetHeight : 0) + 12;
+                        return el.getBoundingClientRect().top + window.pageYOffset - offset;
+                    };
+                    const scrollToEl = (el) => {
+                        window.scrollTo({
+                            top: getOffsetTop(el),
+                            behavior: 'smooth'
+                        });
+                    };
+                    const updateButtons = () => {
+                        if (!prevBtn || !nextBtn) return;
+                        prevBtn.disabled = activeIdx <= 0;
+                        // When nothing selected, allow Next to go to first
+                        nextBtn.disabled = (activeIdx >= headingEls.length - 1) && activeIdx !== -1;
+                    };
+
+                    if (prevBtn && nextBtn && headingEls.length) {
+                        prevBtn.style.display = 'inline-flex';
+                        nextBtn.style.display = 'inline-flex';
+                        updateButtons();
+                    }
+
+                    const setActiveByIndex = (idx) => {
+                        if (idx < 0 || idx >= headingEls.length) return;
+                        activeIdx = idx;
+                        // sync dropdown (account for placeholder at 0)
+                        dropdown.selectedIndex = idx + 1;
+                        updateButtons();
+                        scrollToEl(headingEls[idx]);
+                    };
 
                     // Smooth-scroll to target with offset for fixed navbar
                     dropdown.addEventListener('change', function() {
-                        const hash = this.value;
-                        if (!hash) return;
-                        const target = document.querySelector(hash);
-                        if (!target) return;
-                        const fixed = document.querySelector('#navbar');
-                        const offset = (fixed ? fixed.offsetHeight : 0) + 12; // small extra padding
-                        const top = target.getBoundingClientRect().top + window.pageYOffset - offset;
-                        window.scrollTo({
-                            top,
-                            behavior: 'smooth'
-                        });
+                        const selIndex = dropdown.selectedIndex;
+                        const idx = selIndex - 1; // account for placeholder
+                        if (idx >= 0 && idx < headingEls.length) {
+                            setActiveByIndex(idx);
+                        }
                     });
+
+                    if (prevBtn) {
+                        prevBtn.addEventListener('click', function() {
+                            if (activeIdx === -1) {
+                                setActiveByIndex(0);
+                            } else if (activeIdx > 0) {
+                                setActiveByIndex(activeIdx - 1);
+                            }
+                        });
+                    }
+                    if (nextBtn) {
+                        nextBtn.addEventListener('click', function() {
+                            if (activeIdx === -1) {
+                                setActiveByIndex(0);
+                            } else if (activeIdx < headingEls.length - 1) {
+                                setActiveByIndex(activeIdx + 1);
+                            }
+                        });
+                    }
                 } catch (e) {
                     // Fail silently to avoid breaking the page
                     console.error('Heading dropdown init failed:', e);
