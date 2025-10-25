@@ -572,12 +572,12 @@ if ($_POST && isset($_POST['action'])) {
         <div class="row">
             <div class="col-lg-8 py-3" style=" padding-left: 0; padding-right: 0; border: 1px solid #e0e0e0;">
                 <div>
-                    <div class="d-flex align-items-center gap-portion mb-2">
-                        <div class="heading-jump d-flex align-items-center">
+                    <div class="d-flex align-items-center gap-portion mb-2 w-100">
+                        <div class="heading-jump d-flex align-items-center w-100">
                             <button id="headingPrev" type="button" class="heading-nav-btn me-2" title="Previous section" aria-label="Previous section" style="display:none;">
                                 <i class="fa-solid fa-chevron-left"></i>
                             </button>
-                            <select id="headingDropdown" class="form-select form-select-sm d-inline-block" aria-label="Jump to section" style="width:auto; min-width: 240px; display:none;"></select>
+                            <select id="headingDropdown" class="form-select form-select-sm d-inline-block flex-grow-1" aria-label="Jump to section" style="max-width: 100%; display:none;"></select>
                             <button id="headingNext" type="button" class="heading-nav-btn ms-2" title="Next section" aria-label="Next section" style="display:none;">
                                 <i class="fa-solid fa-chevron-right"></i>
                             </button>
