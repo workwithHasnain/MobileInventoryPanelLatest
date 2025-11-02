@@ -343,9 +343,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                                             <div class="col-md-3 mb-3">
                                                 <label for="card_slot" class="form-label">Memory Card Slot</label>
                                                 <select class="form-select" id="card_slot" name="card_slot">
-                                                    <option value="">Not specified</option>
+                                                    <option value="0">Not specified</option>
                                                     <option value="1" <?php echo (isset($_POST['card_slot']) && $_POST['card_slot'] === '1') ? 'selected' : ''; ?>>Yes (Expandable)</option>
-                                                    <option value="0" <?php echo (isset($_POST['card_slot']) && $_POST['card_slot'] === '0') ? 'selected' : ''; ?>>No</option>
+                                                    <option selected value="0" <?php echo (isset($_POST['card_slot']) && $_POST['card_slot'] === '0') ? 'selected' : ''; ?>>No</option>
                                                 </select>
                                             </div>
 
