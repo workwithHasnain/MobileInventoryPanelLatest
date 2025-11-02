@@ -13,52 +13,31 @@ function getAllPhones()
     try {
         $pdo = getConnection();
         $stmt = $pdo->query("
-            SELECT p.*, b.name as brand_name, c.name as chipset_name 
+            SELECT p.*, b.name as brand_name
             FROM phones p 
             LEFT JOIN brands b ON p.brand_id = b.id 
-            LEFT JOIN chipsets c ON p.chipset_id = c.id 
             ORDER BY p.name
         ");
         $phones = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
         // Format phones to match expected structure
         foreach ($phones as &$phone) {
+            // Normalize expected fields
             $phone['brand'] = $phone['brand_name'];
-            $phone['chipset'] = $phone['chipset_name'];
-
-            // Decode PostgreSQL arrays back to PHP arrays
-            $arrayFields = [
-                'images',
-                'network_2g',
-                'network_3g',
-                'network_4g',
-                'network_5g',
-                'sim_size',
-                'ip_certificate',
-                'wifi',
-                'bluetooth',
-                'main_camera_features',
-                'selfie_camera_features'
-            ];
-
-            foreach ($arrayFields as $field) {
-                if (isset($phone[$field]) && is_string($phone[$field])) {
-                    // Handle PostgreSQL array format: {value1,value2,value3}
-                    if (strpos($phone[$field], '{') === 0 && strpos($phone[$field], '}') === strlen($phone[$field]) - 1) {
-                        $phone[$field] = array_filter(explode(',', trim($phone[$field], '{}')));
-                        // Clean up any empty values
-                        $phone[$field] = array_values(array_filter($phone[$field], function ($v) {
-                            return !empty(trim($v));
-                        }));
-                    }
-                }
+            // chipset_name is now stored directly on phones table
+            if (isset($phone['chipset_name'])) {
+                $phone['chipset'] = $phone['chipset_name'];
             }
 
-            // Map database field names to form field names for compatibility
-            $phone['2g'] = $phone['network_2g'] ?? [];
-            $phone['3g'] = $phone['network_3g'] ?? [];
-            $phone['4g'] = $phone['network_4g'] ?? [];
-            $phone['5g'] = $phone['network_5g'] ?? [];
+            // Decode PostgreSQL images array back to PHP array
+            if (isset($phone['images']) && is_string($phone['images'])) {
+                if (strpos($phone['images'], '{') === 0 && substr($phone['images'], -1) === '}') {
+                    $imgArr = array_filter(explode(',', trim($phone['images'], '{}')));
+                    $phone['images'] = array_values(array_filter($imgArr, function ($v) {
+                        return trim($v) !== '';
+                    }));
+                }
+            }
         }
 
         return $phones;
@@ -559,10 +538,9 @@ function getPhoneById($id)
     try {
         $pdo = getConnection();
         $stmt = $pdo->prepare("
-            SELECT p.*, b.name as brand_name, c.name as chipset_name 
+            SELECT p.*, b.name as brand_name
             FROM phones p 
             LEFT JOIN brands b ON p.brand_id = b.id 
-            LEFT JOIN chipsets c ON p.chipset_id = c.id 
             WHERE p.id = ?
         ");
         $stmt->execute([$id]);
@@ -570,41 +548,19 @@ function getPhoneById($id)
 
         if ($phone) {
             $phone['brand'] = $phone['brand_name'];
-            $phone['chipset'] = $phone['chipset_name'];
-
-            // Decode PostgreSQL arrays back to PHP arrays
-            $arrayFields = [
-                'images',
-                'network_2g',
-                'network_3g',
-                'network_4g',
-                'network_5g',
-                'sim_size',
-                'ip_certificate',
-                'wifi',
-                'bluetooth',
-                'main_camera_features',
-                'selfie_camera_features'
-            ];
-
-            foreach ($arrayFields as $field) {
-                if (isset($phone[$field]) && is_string($phone[$field])) {
-                    // Handle PostgreSQL array format: {value1,value2,value3}
-                    if (strpos($phone[$field], '{') === 0 && strpos($phone[$field], '}') === strlen($phone[$field]) - 1) {
-                        $phone[$field] = array_filter(explode(',', trim($phone[$field], '{}')));
-                        // Clean up any empty values
-                        $phone[$field] = array_values(array_filter($phone[$field], function ($v) {
-                            return !empty(trim($v));
-                        }));
-                    }
-                }
+            if (isset($phone['chipset_name'])) {
+                $phone['chipset'] = $phone['chipset_name'];
             }
 
-            // Map database field names to form field names for compatibility
-            $phone['2g'] = $phone['network_2g'] ?? [];
-            $phone['3g'] = $phone['network_3g'] ?? [];
-            $phone['4g'] = $phone['network_4g'] ?? [];
-            $phone['5g'] = $phone['network_5g'] ?? [];
+            // Decode PostgreSQL images array back to PHP array
+            if (isset($phone['images']) && is_string($phone['images'])) {
+                if (strpos($phone['images'], '{') === 0 && substr($phone['images'], -1) === '}') {
+                    $imgArr = array_filter(explode(',', trim($phone['images'], '{}')));
+                    $phone['images'] = array_values(array_filter($imgArr, function ($v) {
+                        return trim($v) !== '';
+                    }));
+                }
+            }
         }
 
         return $phone ?: null;
