@@ -38,6 +38,36 @@ function convertUSDtoEUR($usd_amount)
   }
 }
 
+// Function to extract price from misc JSON column
+function extractPriceFromMisc($miscJson)
+{
+  if (!isset($miscJson) || $miscJson === '' || $miscJson === null) {
+    return null;
+  }
+
+  $decoded = json_decode($miscJson, true);
+  if (json_last_error() !== JSON_ERROR_NONE || !is_array($decoded)) {
+    return null;
+  }
+
+  // Search for price field in misc data
+  foreach ($decoded as $row) {
+    $field = isset($row['field']) ? trim(strtolower((string)$row['field'])) : '';
+    $desc = isset($row['description']) ? trim((string)$row['description']) : '';
+    
+    if ($field === 'price' && $desc !== '') {
+      // Extract numeric value from description (e.g., "$999" or "999 USD" or "999")
+      $priceStr = preg_replace('/[^0-9.]/', '', $desc);
+      if ($priceStr !== '' && is_numeric($priceStr)) {
+        return (float)$priceStr;
+      }
+    }
+  }
+
+  return null;
+}
+
+
 // Get posts and devices for display (case-insensitive status check) with comment counts
 $pdo = getConnection();
 $posts_stmt = $pdo->prepare("
@@ -243,7 +273,7 @@ function formatDeviceSpecs($device)
   $specs = [];
 
   // Helper: render a section from JSON stored as TEXT in DB
-  $renderJsonSection = function ($jsonValue) {
+  $renderJsonSection = function ($jsonValue, $sectionName = '') {
     if (!isset($jsonValue) || $jsonValue === '' || $jsonValue === null) return null;
     $decoded = json_decode($jsonValue, true);
     if (json_last_error() !== JSON_ERROR_NONE || !is_array($decoded)) {
@@ -257,7 +287,21 @@ function formatDeviceSpecs($device)
       if ($field === '' && $desc === '') continue;
       if ($field !== '') {
         $line = '<strong>' . htmlspecialchars($field) . '</strong>';
-        if ($desc !== '') $line .= ' ' . htmlspecialchars($desc);
+        if ($desc !== '') {
+          $line .= ' ' . htmlspecialchars($desc);
+          
+          // Add EUR conversion for price field in MISC section
+          if ($sectionName === 'MISC' && strtolower($field) === 'price') {
+            $priceStr = preg_replace('/[^0-9.]/', '', $desc);
+            if ($priceStr !== '' && is_numeric($priceStr)) {
+              $priceUsd = (float)$priceStr;
+              $priceEur = convertUSDtoEUR($priceUsd);
+              if ($priceEur !== null) {
+                $line .= ' / €' . number_format($priceEur, 2);
+              }
+            }
+          }
+        }
         $parts[] = $line;
       } else {
         $parts[] = htmlspecialchars($desc);
@@ -284,7 +328,7 @@ function formatDeviceSpecs($device)
   ];
 
   foreach ($jsonSections as $label => $raw) {
-    $html = $renderJsonSection($raw);
+    $html = $renderJsonSection($raw, $label);
     if ($html) {
       $specs[$label] = $html;
     }
