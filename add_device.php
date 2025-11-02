@@ -797,8 +797,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             row.dataset.section = currentSection;
             row.dataset.isFirst = isFirst ? 'true' : 'false';
 
-            // Make cells editable
-            sectionCell.contentEditable = 'true';
+            // Make cells editable (sections should NOT be editable)
+            sectionCell.contentEditable = 'false';
             if (descCell) descCell.contentEditable = 'true';
 
             // For field cell, wrap existing text in a span and make only that editable
@@ -859,7 +859,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
                 const tdSection = document.createElement('td');
                 tdSection.textContent = '';
-                tdSection.contentEditable = 'true';
+                tdSection.contentEditable = 'false';
 
                 const tdField = document.createElement('td');
                 // Create editable span for field text
