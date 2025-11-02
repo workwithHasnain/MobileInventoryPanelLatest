@@ -54,7 +54,7 @@ function extractPriceFromMisc($miscJson)
   foreach ($decoded as $row) {
     $field = isset($row['field']) ? trim(strtolower((string)$row['field'])) : '';
     $desc = isset($row['description']) ? trim((string)$row['description']) : '';
-    
+
     if ($field === 'price' && $desc !== '') {
       // Extract numeric value from description (e.g., "$999" or "999 USD" or "999")
       $priceStr = preg_replace('/[^0-9.]/', '', $desc);
@@ -289,7 +289,7 @@ function formatDeviceSpecs($device)
         $line = '<strong>' . htmlspecialchars($field) . '</strong>';
         if ($desc !== '') {
           $line .= ' ' . htmlspecialchars($desc);
-          
+
           // Add EUR conversion for price field in MISC section
           if ($sectionName === 'MISC' && strtolower($field) === 'price') {
             $priceStr = preg_replace('/[^0-9.]/', '', $desc);
