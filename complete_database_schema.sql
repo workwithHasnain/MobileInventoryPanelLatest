@@ -73,7 +73,6 @@ CREATE TABLE IF NOT EXISTS post_categories (
 -- Main devices table (phones & tablets)
 CREATE TABLE IF NOT EXISTS phones (
     id SERIAL PRIMARY KEY,
-    
     -- Launch Information
     release_date DATE,
     name VARCHAR(255) NOT NULL,
@@ -84,109 +83,35 @@ CREATE TABLE IF NOT EXISTS phones (
     price DECIMAL(10,2),
     image VARCHAR(255),
     images TEXT[], -- Array of image paths
-    
-    -- Network
-    network_2g TEXT[], -- Array of 2G bands
-    network_3g TEXT[], -- Array of 3G bands
-    network_4g TEXT[], -- Array of 4G bands
-    network_5g TEXT[], -- Array of 5G bands
-    dual_sim BOOLEAN DEFAULT FALSE,
-    esim BOOLEAN DEFAULT FALSE,
-    sim_size TEXT[], -- Array of supported SIM sizes
-    
-    -- Body
-    dimensions VARCHAR(100), -- Combined dimensions string
-    form_factor VARCHAR(50),
-    keyboard VARCHAR(50),
-    height DECIMAL(5,2),
-    width DECIMAL(5,2),
-    thickness DECIMAL(4,2),
-    weight DECIMAL(5,2),
-    ip_certificate TEXT[], -- Array of IP ratings
-    color VARCHAR(100),
-    back_material VARCHAR(100),
-    frame_material VARCHAR(100),
-    
-    -- Display
-    display_type VARCHAR(50),
-    display_size DECIMAL(4,2),
-    display_resolution VARCHAR(50),
-    display_density INTEGER, -- PPI value
-    display_technology VARCHAR(50),
-    display_notch VARCHAR(50), -- Changed to VARCHAR for different notch types
-    refresh_rate VARCHAR(50),
-    hdr BOOLEAN DEFAULT FALSE,
-    billion_colors BOOLEAN DEFAULT FALSE,
-    
-    -- Platform
-    os VARCHAR(50),
-    os_version VARCHAR(50),
-    chipset VARCHAR(100),
-    chipset_id INTEGER REFERENCES chipsets(id) ON DELETE SET NULL,
-    cpu_cores VARCHAR(50),
-    cpu_frequency DECIMAL(5,2),
-    gpu VARCHAR(100),
-    
-    -- Memory
-    ram VARCHAR(100), -- RAM stored as text (e.g., "8 GB", "8/12 GB")
-    storage VARCHAR(100), -- Storage stored as text (e.g., "128 GB", "128/256 GB")
-    card_slot VARCHAR(50), -- Changed to VARCHAR for card sizes
-    
-    -- Camera
-    main_camera_count INTEGER DEFAULT 1,
-    main_camera_resolution DECIMAL(5,1), -- Resolution in MP
-    main_camera_features TEXT[],
-    main_camera_video VARCHAR(100),
-    main_camera_ois BOOLEAN DEFAULT FALSE,
-    main_camera_telephoto BOOLEAN DEFAULT FALSE,
-    main_camera_ultrawide BOOLEAN DEFAULT FALSE,
-    main_camera_flash VARCHAR(50),
-    main_camera_f_number DECIMAL(3,1), -- F-number like 1.8
-    
-    selfie_camera_count INTEGER DEFAULT 1,
-    selfie_camera_resolution DECIMAL(5,1), -- Resolution in MP
-    selfie_camera_features TEXT[],
-    selfie_camera_video VARCHAR(100),
-    selfie_camera_ois BOOLEAN DEFAULT FALSE,
-    selfie_camera_flash BOOLEAN DEFAULT FALSE,
-    popup_camera BOOLEAN DEFAULT FALSE,
-    under_display_camera BOOLEAN DEFAULT FALSE,
-    
-    -- Audio
-    headphone_jack BOOLEAN DEFAULT FALSE,
-    dual_speakers BOOLEAN DEFAULT FALSE,
-    
-    -- Communications
-    wifi TEXT[], -- Array of WiFi standards
-    bluetooth TEXT[], -- Array of Bluetooth versions
-    gps BOOLEAN DEFAULT FALSE,
-    nfc BOOLEAN DEFAULT FALSE,
-    infrared BOOLEAN DEFAULT FALSE,
-    fm_radio BOOLEAN DEFAULT FALSE,
-    usb VARCHAR(50),
-    
-    -- Sensors
-    accelerometer BOOLEAN DEFAULT FALSE,
-    gyro BOOLEAN DEFAULT FALSE,
-    compass BOOLEAN DEFAULT FALSE,
-    proximity BOOLEAN DEFAULT FALSE,
-    barometer BOOLEAN DEFAULT FALSE,
-    heart_rate BOOLEAN DEFAULT FALSE,
-    fingerprint VARCHAR(50), -- Changed to VARCHAR for different types
-    
-    -- Battery
-    battery_capacity INTEGER,
-    battery_sic BOOLEAN DEFAULT FALSE, -- Silicon battery
-    battery_removable BOOLEAN DEFAULT FALSE,
-    wired_charging INTEGER, -- Charging power in W
-    wireless_charging INTEGER, -- Charging power in W
-    
-    -- Colors and Additional Fields
-    colors TEXT[],
-   
-    
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    network TEXT,
+    launch TEXT,
+    body TEXT,
+    display TEXT,
+    platform TEXT,
+    memory TEXT,
+    main_camera TEXT,
+    selfie_camera TEXT,
+    sound TEXT,
+    comms TEXT,
+    features TEXT,
+    battery TEXT,
+    misc TEXT,
+    weight VARCHAR(50),
+    thickness VARCHAR(50),
+    os VARCHAR(50),
+    storage VARCHAR(50),
+    card_slot boolean,
+    display_size VARCHAR(50),
+    display_resolution VARCHAR(100),
+    main_camera_resolution VARCHAR(100),
+    main_camera_video VARCHAR(100),
+    ram VARCHAR(50),
+    chipset_name VARCHAR(100),
+    battery_capacity VARCHAR(50),
+    wired_charging VARCHAR(100),
+    wireless_charging VARCHAR(100)
 );
 
 -- =====================================================
@@ -296,12 +221,9 @@ CREATE INDEX IF NOT EXISTS idx_posts_tags ON posts USING GIN(tags);
 
 -- Phones indexes
 CREATE INDEX IF NOT EXISTS idx_phones_brand_id ON phones(brand_id);
-CREATE INDEX IF NOT EXISTS idx_phones_chipset_id ON phones(chipset_id);
 CREATE INDEX IF NOT EXISTS idx_phones_name ON phones(name);
 CREATE INDEX IF NOT EXISTS idx_phones_year ON phones(year);
 CREATE INDEX IF NOT EXISTS idx_phones_price ON phones(price);
-CREATE INDEX IF NOT EXISTS idx_phones_network_5g ON phones(network_5g);
-CREATE INDEX IF NOT EXISTS idx_phones_network_4g ON phones(network_4g);
 CREATE INDEX IF NOT EXISTS idx_phones_os ON phones(os);
 
 -- Comments indexes

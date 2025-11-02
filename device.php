@@ -180,10 +180,9 @@ function getDeviceDetails($pdo, $device_id)
   // Try database first (comprehensive data source)
   try {
     $stmt = $pdo->prepare("
-            SELECT p.*, b.name as brand_name, c.name as chipset_name 
+            SELECT p.*, b.name as brand_name
             FROM phones p 
             LEFT JOIN brands b ON p.brand_id = b.id 
-            LEFT JOIN chipsets c ON p.chipset_id = c.id 
             WHERE p.id = ?
         ");
     $stmt->execute([$device_id]);
@@ -243,23 +242,73 @@ function formatDeviceSpecs($device)
 {
   $specs = [];
 
-  // Network specifications
-  $network_tech = [];
-  if (!empty($device['network_2g'])) $network_tech[] = '2G';
-  if (!empty($device['network_3g'])) $network_tech[] = '3G';
-  if (!empty($device['network_4g'])) $network_tech[] = '4G';
-  if (!empty($device['network_5g'])) $network_tech[] = '5G';
+  // Helper: render a section from JSON stored as TEXT in DB
+  $renderJsonSection = function ($jsonValue) {
+    if (!isset($jsonValue) || $jsonValue === '' || $jsonValue === null) return null;
+    $decoded = json_decode($jsonValue, true);
+    if (json_last_error() !== JSON_ERROR_NONE || !is_array($decoded)) {
+      // If it's not valid JSON but has text, just return as-is (escaped)
+      return htmlspecialchars((string)$jsonValue);
+    }
+    $parts = [];
+    foreach ($decoded as $row) {
+      $field = isset($row['field']) ? trim((string)$row['field']) : '';
+      $desc = isset($row['description']) ? trim((string)$row['description']) : '';
+      if ($field === '' && $desc === '') continue;
+      if ($field !== '') {
+        $line = '<strong>' . htmlspecialchars($field) . '</strong>';
+        if ($desc !== '') $line .= ' ' . htmlspecialchars($desc);
+        $parts[] = $line;
+      } else {
+        $parts[] = htmlspecialchars($desc);
+      }
+    }
+    return implode('<br>', $parts);
+  };
 
-  if (!empty($network_tech)) {
-    $network_details = '<strong>Technology</strong> ' . implode(' / ', $network_tech);
-    if (!empty($device['dual_sim'])) $network_details .= '<br><strong>SIM</strong> Dual SIM';
-    if (!empty($device['esim'])) $network_details .= ', eSIM';
-    if (!empty($device['sim_size'])) $network_details .= ' (' . $device['sim_size'] . ')';
-    $specs['NETWORK'] = $network_details;
+  // Prefer new grouped JSON columns when present; otherwise fall back to legacy fields
+  $jsonSections = [
+    'NETWORK' => $device['network'] ?? null,
+    'LAUNCH' => $device['launch'] ?? null,
+    'BODY' => $device['body'] ?? null,
+    'DISPLAY' => $device['display'] ?? null,
+    'PLATFORM' => $device['platform'] ?? null,
+    'MEMORY' => $device['memory'] ?? null,
+    'MAIN CAMERA' => $device['main_camera'] ?? null,
+    'SELFIE CAMERA' => $device['selfie_camera'] ?? null,
+    'SOUND' => $device['sound'] ?? null,
+    'COMMUNICATIONS' => $device['comms'] ?? null,
+    'FEATURES' => $device['features'] ?? null,
+    'BATTERY' => $device['battery'] ?? null,
+    'MISC' => $device['misc'] ?? null,
+  ];
+
+  foreach ($jsonSections as $label => $raw) {
+    $html = $renderJsonSection($raw);
+    if ($html) {
+      $specs[$label] = $html;
+    }
   }
 
-  // Launch specifications
-  if (!empty($device['release_date']) || !empty($device['availability'])) {
+  // Legacy fallback: Network
+  if (!isset($specs['NETWORK'])) {
+    $network_tech = [];
+    if (!empty($device['network_2g'])) $network_tech[] = '2G';
+    if (!empty($device['network_3g'])) $network_tech[] = '3G';
+    if (!empty($device['network_4g'])) $network_tech[] = '4G';
+    if (!empty($device['network_5g'])) $network_tech[] = '5G';
+
+    if (!empty($network_tech)) {
+      $network_details = '<strong>Technology</strong> ' . implode(' / ', $network_tech);
+      if (!empty($device['dual_sim'])) $network_details .= '<br><strong>SIM</strong> Dual SIM';
+      if (!empty($device['esim'])) $network_details .= ', eSIM';
+      if (!empty($device['sim_size'])) $network_details .= ' (' . $device['sim_size'] . ')';
+      $specs['NETWORK'] = $network_details;
+    }
+  }
+
+  // Legacy fallback: Launch (also add price if JSON not used)
+  if (!isset($specs['LAUNCH']) && (!empty($device['release_date']) || !empty($device['availability']) || !empty($device['price']))) {
     $launch_details = '';
     if (!empty($device['release_date'])) {
       $launch_details .= '<strong>Released</strong> ' . date('F j, Y', strtotime($device['release_date']));
@@ -281,92 +330,92 @@ function formatDeviceSpecs($device)
     $specs['LAUNCH'] = $launch_details;
   }
 
-  // Body specifications
-  if ($device['dimensions'] || $device['height'] || $device['width'] || $device['thickness'] || $device['weight']) {
+  // Legacy fallback: Body
+  if (!isset($specs['BODY']) && (!empty($device['dimensions']) || !empty($device['height']) || !empty($device['width']) || !empty($device['thickness']) || !empty($device['weight']))) {
     $body_details = '';
-    if ($device['dimensions']) {
+    if (!empty($device['dimensions'])) {
       $body_details .= '<strong>Dimensions</strong> ' . $device['dimensions'];
-    } elseif ($device['height'] && $device['width'] && $device['thickness']) {
+    } elseif (!empty($device['height']) && !empty($device['width']) && !empty($device['thickness'])) {
       $body_details .= '<strong>Dimensions</strong> ' .
         $device['height'] . ' x ' .
         $device['width'] . ' x ' .
         $device['thickness'] . ' mm';
     }
-    if ($device['weight']) {
+    if (!empty($device['weight'])) {
       if ($body_details) $body_details .= '<br>';
       $body_details .= '<strong>Weight</strong> ' . $device['weight'] . ' g';
     }
     $specs['BODY'] = $body_details;
   }
 
-  // Display specifications
-  if ($device['display_type'] || $device['display_size'] || $device['display_resolution']) {
+  // Legacy fallback: Display
+  if (!isset($specs['DISPLAY']) && (!empty($device['display_type']) || !empty($device['display_size']) || !empty($device['display_resolution']))) {
     $display_details = '';
-    if ($device['display_type']) {
+    if (!empty($device['display_type'])) {
       $display_details .= '<strong>Type</strong> ' . $device['display_type'];
-      if ($device['display_technology']) $display_details .= ', ' . $device['display_technology'];
-      if ($device['refresh_rate']) $display_details .= ', ' . $device['refresh_rate'] . 'Hz';
-      if ($device['hdr']) $display_details .= ', HDR';
-      if ($device['billion_colors']) $display_details .= ', 1B colors';
+      if (!empty($device['display_technology'])) $display_details .= ', ' . $device['display_technology'];
+      if (!empty($device['refresh_rate'])) $display_details .= ', ' . $device['refresh_rate'] . 'Hz';
+      if (!empty($device['hdr'])) $display_details .= ', HDR';
+      if (!empty($device['billion_colors'])) $display_details .= ', 1B colors';
     }
-    if ($device['display_size']) {
+    if (!empty($device['display_size'])) {
       if ($display_details) $display_details .= '<br>';
       $display_details .= '<strong>Size</strong> ' . $device['display_size'] . ' inches';
     }
-    if ($device['display_resolution']) {
+    if (!empty($device['display_resolution'])) {
       if ($display_details) $display_details .= '<br>';
       $display_details .= '<strong>Resolution</strong> ' . $device['display_resolution'];
     }
     $specs['DISPLAY'] = $display_details;
   }
 
-  // Platform specifications
-  if ($device['os'] || $device['chipset_name'] || $device['cpu_cores'] || $device['gpu']) {
+  // Legacy fallback: Platform
+  if (!isset($specs['PLATFORM']) && (!empty($device['os']) || !empty($device['chipset_name']) || !empty($device['cpu_cores']) || !empty($device['gpu']))) {
     $platform_details = '';
-    if ($device['os']) {
+    if (!empty($device['os'])) {
       $platform_details .= '<strong>OS</strong> ' . $device['os'];
     }
-    if ($device['chipset_name']) {
+    if (!empty($device['chipset_name'])) {
       if ($platform_details) $platform_details .= '<br>';
       $platform_details .= '<strong>Chipset</strong> ' . $device['chipset_name'];
     }
-    if ($device['cpu_cores'] || $device['cpu_frequency']) {
+    if (!empty($device['cpu_cores']) || !empty($device['cpu_frequency'])) {
       if ($platform_details) $platform_details .= '<br>';
       $platform_details .= '<strong>CPU</strong> ';
-      if ($device['cpu_cores']) $platform_details .= $device['cpu_cores'] . '-core';
-      if ($device['cpu_frequency']) $platform_details .= ' (' . $device['cpu_frequency'] . ' GHz)';
+      if (!empty($device['cpu_cores'])) $platform_details .= $device['cpu_cores'] . '-core';
+      if (!empty($device['cpu_frequency'])) $platform_details .= ' (' . $device['cpu_frequency'] . ' GHz)';
     }
-    if ($device['gpu']) {
+    if (!empty($device['gpu'])) {
       if ($platform_details) $platform_details .= '<br>';
       $platform_details .= '<strong>GPU</strong> ' . $device['gpu'];
     }
     $specs['PLATFORM'] = $platform_details;
   }
 
-  // Memory specifications
-  if ($device['ram'] || $device['storage'] || $device['card_slot']) {
+  // Legacy fallback: Memory
+  if (!isset($specs['MEMORY']) && (!empty($device['ram']) || !empty($device['storage']) || isset($device['card_slot']))) {
     $memory_details = '';
-    if ($device['card_slot'] !== null) {
+    if (isset($device['card_slot']) && $device['card_slot'] !== null) {
       $memory_details .= '<strong>Card slot</strong> ' . ($device['card_slot'] ? 'Yes' : 'No');
     }
-    if ($device['storage'] || $device['ram']) {
+    if (!empty($device['storage']) || !empty($device['ram'])) {
       if ($memory_details) $memory_details .= '<br>';
       $memory_details .= '<strong>Internal</strong> ';
-      if ($device['storage']) $memory_details .= $device['storage'];
-      if ($device['ram']) $memory_details .= ' RAM: ' . $device['ram'];
+      if (!empty($device['storage'])) $memory_details .= $device['storage'];
+      if (!empty($device['ram'])) $memory_details .= ' RAM: ' . $device['ram'];
     }
     $specs['MEMORY'] = $memory_details;
   }
 
-  // Main Camera specifications
-  if ($device['main_camera_resolution'] || $device['main_camera_count']) {
+  // Legacy fallback: Main Camera
+  if (!isset($specs['MAIN CAMERA']) && (!empty($device['main_camera_resolution']) || !empty($device['main_camera_count']))) {
     $camera_details = '';
-    if ($device['main_camera_count'] > 1) {
+    if (!empty($device['main_camera_count']) && $device['main_camera_count'] > 1) {
       $camera_details .= '<strong>' . ucfirst(convertNumberToWord($device['main_camera_count'])) . '</strong><br>';
     } else {
       $camera_details .= '<strong>Single</strong><br>';
     }
-    if ($device['main_camera_resolution']) {
+    if (!empty($device['main_camera_resolution'])) {
       $camera_details .= $device['main_camera_resolution'];
     }
 
@@ -377,9 +426,9 @@ function formatDeviceSpecs($device)
     if (!empty($device['main_camera_ultrawide'])) $features[] = 'Ultrawide';
     if (!empty($device['main_camera_macro'])) $features[] = 'Macro';
     if (!empty($device['main_camera_flash'])) $features[] = 'Flash';
-    if ($device['main_camera_features'] && is_array($device['main_camera_features'])) {
+    if (isset($device['main_camera_features']) && is_array($device['main_camera_features'])) {
       $features = array_merge($features, $device['main_camera_features']);
-    } elseif ($device['main_camera_features'] && is_string($device['main_camera_features'])) {
+    } elseif (isset($device['main_camera_features']) && is_string($device['main_camera_features'])) {
       // Handle PostgreSQL array string format
       $array_features = str_replace(['{', '}'], '', $device['main_camera_features']);
       $array_features = explode(',', $array_features);
@@ -389,119 +438,123 @@ function formatDeviceSpecs($device)
     if (!empty($features)) {
       $camera_details .= '<br><strong>Features</strong> ' . implode(', ', $features);
     }
-    if ($device['main_camera_video']) {
+    if (!empty($device['main_camera_video'])) {
       $camera_details .= '<br><strong>Video</strong> ' . $device['main_camera_video'];
     }
     $specs['MAIN CAMERA'] = $camera_details;
   }
 
-  // Selfie Camera specifications
-  if ($device['selfie_camera_resolution'] || $device['selfie_camera_count']) {
+  // Legacy fallback: Selfie Camera
+  if (!isset($specs['SELFIE CAMERA']) && (!empty($device['selfie_camera_resolution']) || !empty($device['selfie_camera_count']))) {
     $selfie_details = '';
-    if ($device['selfie_camera_count'] > 1) {
+    if (!empty($device['selfie_camera_count']) && $device['selfie_camera_count'] > 1) {
       $selfie_details .= '<strong>' . ucfirst(convertNumberToWord($device['selfie_camera_count'])) . '</strong> ';
     } else {
       $selfie_details .= '<strong>Single</strong> ';
     }
-    if ($device['selfie_camera_resolution']) {
+    if (!empty($device['selfie_camera_resolution'])) {
       $selfie_details .= $device['selfie_camera_resolution'];
     }
-    if ($device['selfie_camera_features'] && is_array($device['selfie_camera_features'])) {
+    if (isset($device['selfie_camera_features']) && is_array($device['selfie_camera_features'])) {
       $selfie_details .= '<br><strong>Features</strong> ' . implode(', ', $device['selfie_camera_features']);
-    } elseif ($device['selfie_camera_features'] && is_string($device['selfie_camera_features'])) {
+    } elseif (isset($device['selfie_camera_features']) && is_string($device['selfie_camera_features'])) {
       // Handle PostgreSQL array string format
       $array_features = str_replace(['{', '}'], '', $device['selfie_camera_features']);
       $array_features = explode(',', $array_features);
       $selfie_details .= '<br><strong>Features</strong> ' . implode(', ', array_map('trim', $array_features));
     }
-    if ($device['selfie_camera_video']) {
+    if (!empty($device['selfie_camera_video'])) {
       $selfie_details .= '<br><strong>Video</strong> ' . $device['selfie_camera_video'];
     }
     $specs['SELFIE CAMERA'] = $selfie_details;
   }
 
-  // Sound specifications
-  if ($device['dual_speakers'] !== null || $device['headphone_jack'] !== null) {
+  // Legacy fallback: Sound
+  if (!isset($specs['SOUND']) && (isset($device['dual_speakers']) || isset($device['headphone_jack']))) {
     $sound_details = '';
-    if ($device['dual_speakers'] !== null) {
+    if (isset($device['dual_speakers']) && $device['dual_speakers'] !== null) {
       $sound_details .= '<strong>Loudspeaker</strong> ' . ($device['dual_speakers'] ? 'Yes' : 'No');
     }
-    if ($device['headphone_jack'] !== null) {
+    if (isset($device['headphone_jack']) && $device['headphone_jack'] !== null) {
       if ($sound_details) $sound_details .= '<br>';
       $sound_details .= '<strong>3.5mm jack</strong> ' . ($device['headphone_jack'] ? 'Yes' : 'No');
     }
     $specs['SOUND'] = $sound_details;
   }
 
-  // Communications specifications
-  $comms_details = '';
-  if ($device['wifi']) {
-    $comms_details .= '<strong>WLAN</strong> ' . $device['wifi'];
-  }
-  if ($device['bluetooth']) {
-    if ($comms_details) $comms_details .= '<br>';
-    $comms_details .= '<strong>Bluetooth</strong> ' . $device['bluetooth'];
-  }
-  if ($device['gps'] !== null) {
-    if ($comms_details) $comms_details .= '<br>';
-    $comms_details .= '<strong>Positioning</strong> ' . ($device['gps'] ? 'GPS' : 'No');
-  }
-  if ($device['nfc'] !== null) {
-    if ($comms_details) $comms_details .= '<br>';
-    $comms_details .= '<strong>NFC</strong> ' . ($device['nfc'] ? 'Yes' : 'No');
-  }
-  if ($device['fm_radio'] !== null) {
-    if ($comms_details) $comms_details .= '<br>';
-    $comms_details .= '<strong>Radio</strong> ' . ($device['fm_radio'] ? 'Yes' : 'No');
-  }
-  if ($device['usb']) {
-    if ($comms_details) $comms_details .= '<br>';
-    $comms_details .= '<strong>USB</strong> ' . $device['usb'];
-  }
-  if ($comms_details) {
-    $specs['COMMUNICATIONS'] = $comms_details;
-  }
-
-  // Features specifications
-  $features_details = '';
-  if ($device['fingerprint'] !== null) {
-    $features_details .= '<strong>Fingerprint</strong> ' . ($device['fingerprint'] ? 'Yes' : 'No');
+  // Legacy fallback: Communications
+  if (!isset($specs['COMMUNICATIONS'])) {
+    $comms_details = '';
+    if (!empty($device['wifi'])) {
+      $comms_details .= '<strong>WLAN</strong> ' . $device['wifi'];
+    }
+    if (!empty($device['bluetooth'])) {
+      if ($comms_details) $comms_details .= '<br>';
+      $comms_details .= '<strong>Bluetooth</strong> ' . $device['bluetooth'];
+    }
+    if (isset($device['gps']) && $device['gps'] !== null) {
+      if ($comms_details) $comms_details .= '<br>';
+      $comms_details .= '<strong>Positioning</strong> ' . ($device['gps'] ? 'GPS' : 'No');
+    }
+    if (isset($device['nfc']) && $device['nfc'] !== null) {
+      if ($comms_details) $comms_details .= '<br>';
+      $comms_details .= '<strong>NFC</strong> ' . ($device['nfc'] ? 'Yes' : 'No');
+    }
+    if (isset($device['fm_radio']) && $device['fm_radio'] !== null) {
+      if ($comms_details) $comms_details .= '<br>';
+      $comms_details .= '<strong>Radio</strong> ' . ($device['fm_radio'] ? 'Yes' : 'No');
+    }
+    if (!empty($device['usb'])) {
+      if ($comms_details) $comms_details .= '<br>';
+      $comms_details .= '<strong>USB</strong> ' . $device['usb'];
+    }
+    if ($comms_details) {
+      $specs['COMMUNICATIONS'] = $comms_details;
+    }
   }
 
-  // Build sensors list from individual sensor fields
-  $sensors = [];
-  if (!empty($device['accelerometer'])) $sensors[] = 'Accelerometer';
-  if (!empty($device['gyro'])) $sensors[] = 'Gyro';
-  if (!empty($device['compass'])) $sensors[] = 'Compass';
-  if (!empty($device['proximity'])) $sensors[] = 'Proximity';
-  if (!empty($device['barometer'])) $sensors[] = 'Barometer';
-  if (!empty($device['heart_rate'])) $sensors[] = 'Heart Rate';
-
-  if (!empty($sensors)) {
-    if ($features_details) $features_details .= '<br>';
-    $features_details .= '<strong>Sensors</strong> ' . implode(', ', $sensors);
-  }
-
-  if ($features_details) {
-    $specs['FEATURES'] = $features_details;
-  }
-
-  // Battery specifications
-  if ($device['battery_capacity'] || $device['battery_sic']) {
-    $battery_details = '';
-    if ($device['battery_capacity']) {
-      $battery_details .= '<strong>Capacity</strong> ' . $device['battery_capacity'] . ' mAh';
-      if ($device['battery_sic']) $battery_details .= ' (Silicon)';
+  // Legacy fallback: Features
+  if (!isset($specs['FEATURES'])) {
+    $features_details = '';
+    if (isset($device['fingerprint']) && $device['fingerprint'] !== null) {
+      $features_details .= '<strong>Fingerprint</strong> ' . ($device['fingerprint'] ? 'Yes' : 'No');
     }
 
-    if ($device['battery_removable'] !== null) {
+    // Build sensors list from individual sensor fields
+    $sensors = [];
+    if (!empty($device['accelerometer'])) $sensors[] = 'Accelerometer';
+    if (!empty($device['gyro'])) $sensors[] = 'Gyro';
+    if (!empty($device['compass'])) $sensors[] = 'Compass';
+    if (!empty($device['proximity'])) $sensors[] = 'Proximity';
+    if (!empty($device['barometer'])) $sensors[] = 'Barometer';
+    if (!empty($device['heart_rate'])) $sensors[] = 'Heart Rate';
+
+    if (!empty($sensors)) {
+      if ($features_details) $features_details .= '<br>';
+      $features_details .= '<strong>Sensors</strong> ' . implode(', ', $sensors);
+    }
+
+    if ($features_details) {
+      $specs['FEATURES'] = $features_details;
+    }
+  }
+
+  // Legacy fallback: Battery
+  if (!isset($specs['BATTERY']) && (!empty($device['battery_capacity']) || !empty($device['battery_sic']))) {
+    $battery_details = '';
+    if (!empty($device['battery_capacity'])) {
+      $battery_details .= '<strong>Capacity</strong> ' . $device['battery_capacity'] . ' mAh';
+      if (!empty($device['battery_sic'])) $battery_details .= ' (Silicon)';
+    }
+
+    if (isset($device['battery_removable']) && $device['battery_removable'] !== null) {
       $battery_details .= '<br><strong>Removable</strong> ' . ($device['battery_removable'] ? 'Yes' : 'No');
     }
 
     // Charging information
     $charging = [];
-    if ($device['wired_charging']) $charging[] = 'Wired: ' . $device['wired_charging'];
-    if ($device['wireless_charging']) $charging[] = 'Wireless: ' . $device['wireless_charging'];
+    if (!empty($device['wired_charging'])) $charging[] = 'Wired: ' . $device['wired_charging'];
+    if (!empty($device['wireless_charging'])) $charging[] = 'Wireless: ' . $device['wireless_charging'];
 
     if (!empty($charging)) {
       $battery_details .= '<br><strong>Charging</strong> ' . implode(', ', $charging);
@@ -510,10 +563,10 @@ function formatDeviceSpecs($device)
     $specs['BATTERY'] = $battery_details;
   }
 
-  // Colors
-  if ($device['colors'] && is_array($device['colors'])) {
+  // Colors (legacy field) - keep if present
+  if (isset($device['colors']) && is_array($device['colors'])) {
     $specs['COLORS'] = '<strong>Available</strong> ' . implode(', ', $device['colors']);
-  } elseif ($device['colors'] && is_string($device['colors'])) {
+  } elseif (isset($device['colors']) && is_string($device['colors'])) {
     // Handle PostgreSQL array string format
     $array_colors = str_replace(['{', '}'], '', $device['colors']);
     $array_colors = explode(',', $array_colors);
@@ -536,19 +589,19 @@ function generateDeviceHighlights($device)
   $highlights = [];
 
   // Release date highlight
-  if ($device['release_date']) {
+  if (!empty($device['release_date'])) {
     $release_date = date('F j, Y', strtotime($device['release_date']));
     $highlights['release'] = "📅 Released " . $release_date;
-  } elseif ($device['year']) {
+  } elseif (!empty($device['year'])) {
     $highlights['release'] = "📅 Released " . $device['year'];
   }
 
   // Weight and dimensions highlight
   $weight_dims = [];
-  if ($device['weight']) {
+  if (!empty($device['weight'])) {
     $weight_dims[] = $device['weight'] . 'g';
   }
-  if ($device['thickness']) {
+  if (!empty($device['thickness'])) {
     $weight_dims[] = $device['thickness'] . 'mm thickness';
   }
   if (!empty($weight_dims)) {
@@ -556,18 +609,18 @@ function generateDeviceHighlights($device)
   }
 
   // OS highlight
-  if ($device['os']) {
+  if (!empty($device['os'])) {
     $highlights['os'] = "🆔 " . $device['os'];
   }
 
   // Storage highlight
   $storage_parts = [];
-  if ($device['storage']) {
+  if (!empty($device['storage'])) {
     $storage_parts[] = $device['storage'] . ' storage';
   }
-  if ($device['card_slot'] === false) {
+  if (isset($device['card_slot']) && $device['card_slot'] === false) {
     $storage_parts[] = 'no card slot';
-  } elseif ($device['card_slot'] === true) {
+  } elseif (isset($device['card_slot']) && $device['card_slot'] === true) {
     $storage_parts[] = 'expandable';
   }
   if (!empty($storage_parts)) {
@@ -583,7 +636,7 @@ function generateDeviceStats($device)
   $stats = [];
 
   // Display stats
-  $display_title = $device['display_size'] ? $device['display_size'] . '"' : 'N/A';
+  $display_title = !empty($device['display_size']) ? $device['display_size'] . '"' : 'N/A';
   $display_subtitle = $device['display_resolution'] ?? 'Unknown';
   $stats['display'] = [
     'icon' => 'imges/vrer.png',
@@ -595,13 +648,16 @@ function generateDeviceStats($device)
   $camera_title = 'N/A';
   $camera_subtitle = 'N/A';
   $resolutionText = (string)($device['main_camera_resolution'] ?? '');
-  if ($device['main_camera_resolution']) {
+  if (!empty($device['main_camera_resolution'])) {
     // Extract MP from resolution
     if (preg_match('/(\d+)\s*MP/', $resolutionText, $matches)) {
       $camera_title = $matches[1] . 'MP';
+    } else {
+      // If no MP pattern found, use the raw value
+      $camera_title = $resolutionText;
     }
   }
-  if ($device['main_camera_video']) {
+  if (!empty($device['main_camera_video'])) {
     $camera_subtitle = $device['main_camera_video'];
   } elseif ($resolutionText !== '' && strpos($resolutionText, '4K') !== false) {
     $camera_subtitle = '4K';
@@ -617,10 +673,10 @@ function generateDeviceStats($device)
   // Performance stats (RAM + Chipset)
   $perf_title = 'N/A';
   $perf_subtitle = 'Unknown';
-  if ($device['ram']) {
+  if (!empty($device['ram'])) {
     $perf_title = $device['ram'];
   }
-  if ($device['chipset_name']) {
+  if (!empty($device['chipset_name'])) {
     // Simplify chipset name
     $chipset = $device['chipset_name'];
     if (strpos($chipset, 'Snapdragon') !== false) {
@@ -642,11 +698,11 @@ function generateDeviceStats($device)
   ];
 
   // Battery stats
-  $battery_title = $device['battery_capacity'] ? $device['battery_capacity'] . 'mAh' : 'N/A';
+  $battery_title = !empty($device['battery_capacity']) ? $device['battery_capacity'] . 'mAh' : 'N/A';
   $battery_subtitle = 'N/A';
-  if ($device['wired_charging']) {
+  if (!empty($device['wired_charging'])) {
     $battery_subtitle = $device['wired_charging'];
-  } elseif ($device['wireless_charging']) {
+  } elseif (!empty($device['wireless_charging'])) {
     $battery_subtitle = $device['wireless_charging'] . ' wireless';
   }
   $stats['battery'] = [

@@ -93,9 +93,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
     // If still no errors after validation, create the device
     if (empty($errors)) {
-        // Get device type
-        $device_type = $_POST['device_type'] ?? 'phone';
-
+        // Only keep basic fields now
         $new_phone = [
             // Launch
             'release_date' => !empty($_POST['release_date']) ? $_POST['release_date'] : null,
@@ -109,101 +107,38 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             'image' => $image_path,
             'images' => $image_paths,
 
-            // Network
-            '2g' => $_POST['2g'] ?? [],
-            '3g' => $_POST['3g'] ?? [],
-            '4g' => $_POST['4g'] ?? [],
-            '5g' => $_POST['5g'] ?? [],
+            // Highlight fields
+            'weight' => !empty($_POST['weight']) ? trim($_POST['weight']) : null,
+            'thickness' => !empty($_POST['thickness']) ? trim($_POST['thickness']) : null,
+            'os' => !empty($_POST['os']) ? trim($_POST['os']) : null,
+            'storage' => !empty($_POST['storage']) ? trim($_POST['storage']) : null,
+            'card_slot' => isset($_POST['card_slot']) && $_POST['card_slot'] !== '' ? ($_POST['card_slot'] === '1') : null,
 
-            // SIM
-            'dual_sim' => !empty($_POST['dual_sim']),
-            'esim' => !empty($_POST['esim']),
-            'sim_size' => $_POST['sim_size'] ?? [],
+            // Stats fields
+            'display_size' => !empty($_POST['display_size']) ? trim($_POST['display_size']) : null,
+            'display_resolution' => !empty($_POST['display_resolution']) ? trim($_POST['display_resolution']) : null,
+            'main_camera_resolution' => !empty($_POST['main_camera_resolution']) ? trim($_POST['main_camera_resolution']) : null,
+            'main_camera_video' => !empty($_POST['main_camera_video']) ? trim($_POST['main_camera_video']) : null,
+            'ram' => !empty($_POST['ram']) ? trim($_POST['ram']) : null,
+            'chipset_name' => !empty($_POST['chipset_name']) ? trim($_POST['chipset_name']) : null,
+            'battery_capacity' => !empty($_POST['battery_capacity']) ? trim($_POST['battery_capacity']) : null,
+            'wired_charging' => !empty($_POST['wired_charging']) ? trim($_POST['wired_charging']) : null,
+            'wireless_charging' => !empty($_POST['wireless_charging']) ? trim($_POST['wireless_charging']) : null,
 
-            // Body
-            'dimensions' => (isset($_POST['dimensions']) && trim($_POST['dimensions']) !== '') ? $_POST['dimensions'] : null,
-            'form_factor' => ($device_type === 'phone') ? ($_POST['form_factor'] ?? '') : '',
-            'keyboard' => ($device_type === 'phone') ? ($_POST['keyboard'] ?? '') : '',
-            'height' => (isset($_POST['height']) && $_POST['height'] !== '') ? $_POST['height'] : null,
-            'width' => (isset($_POST['width']) && $_POST['width'] !== '') ? $_POST['width'] : null,
-            'thickness' => (isset($_POST['thickness']) && $_POST['thickness'] !== '') ? $_POST['thickness'] : null,
-            'weight' => (isset($_POST['weight']) && $_POST['weight'] !== '') ? $_POST['weight'] : null,
-            'ip_certificate' => !empty($_POST['ip_certificate']) ? $_POST['ip_certificate'] : [],
-            'color' => !empty($_POST['color']) ? trim($_POST['color']) : null,
-            'back_material' => !empty($_POST['back_material']) ? trim($_POST['back_material']) : null,
-            'frame_material' => !empty($_POST['frame_material']) ? trim($_POST['frame_material']) : null,
-
-            // Platform
-            'os' => (isset($_POST['os']) && $_POST['os'] !== '') ? $_POST['os'] : null,
-            'os_version' => (isset($_POST['os_version']) && trim($_POST['os_version']) !== '') ? $_POST['os_version'] : null,
-            'chipset' => (isset($_POST['chipset']) && $_POST['chipset'] !== '') ? $_POST['chipset'] : null,
-            'cpu_cores' => (isset($_POST['cpu_cores']) && trim($_POST['cpu_cores']) !== '') ? $_POST['cpu_cores'] : null,
-
-            // Memory
-            'ram' => (isset($_POST['ram']) && trim($_POST['ram']) !== '') ? $_POST['ram'] : null,
-            'storage' => (isset($_POST['storage']) && trim($_POST['storage']) !== '') ? $_POST['storage'] : null,
-            'card_slot' => (isset($_POST['card_slot']) && $_POST['card_slot'] !== '') ? $_POST['card_slot'] : null,
-
-            // Display
-            'display_type' => (isset($_POST['display_type']) && $_POST['display_type'] !== '') ? $_POST['display_type'] : null,
-            'display_resolution' => (isset($_POST['display_resolution']) && trim($_POST['display_resolution']) !== '') ? $_POST['display_resolution'] : null,
-            'display_size' => (isset($_POST['display_size']) && $_POST['display_size'] !== '') ? $_POST['display_size'] : null,
-            'display_density' => (isset($_POST['display_density']) && $_POST['display_density'] !== '') ? $_POST['display_density'] : null,
-            'display_technology' => (isset($_POST['display_technology']) && $_POST['display_technology'] !== '') ? $_POST['display_technology'] : null,
-            'display_notch' => (isset($_POST['display_notch']) && $_POST['display_notch'] !== '') ? $_POST['display_notch'] : null,
-            'refresh_rate' => (isset($_POST['refresh_rate']) && $_POST['refresh_rate'] !== '') ? $_POST['refresh_rate'] : null,
-            'hdr' => !empty($_POST['hdr']),
-            'billion_colors' => !empty($_POST['billion_colors']),
-
-            // Main Camera
-            'main_camera_resolution' => (isset($_POST['main_camera_resolution']) && $_POST['main_camera_resolution'] !== '') ? $_POST['main_camera_resolution'] : null,
-            'main_camera_count' => (isset($_POST['main_camera_count']) && $_POST['main_camera_count'] !== '') ? $_POST['main_camera_count'] : null,
-            'main_camera_ois' => !empty($_POST['main_camera_ois']),
-            'main_camera_f_number' => (isset($_POST['main_camera_f_number']) && $_POST['main_camera_f_number'] !== '') ? $_POST['main_camera_f_number'] : null,
-            'main_camera_telephoto' => !empty($_POST['main_camera_telephoto']),
-            'main_camera_ultrawide' => !empty($_POST['main_camera_ultrawide']),
-            'main_camera_video' => (isset($_POST['main_camera_video']) && trim($_POST['main_camera_video']) !== '') ? $_POST['main_camera_video'] : null,
-            'main_camera_flash' => !empty($_POST['main_camera_flash']),
-
-            // Selfie Camera
-            'selfie_camera_resolution' => (isset($_POST['selfie_camera_resolution']) && $_POST['selfie_camera_resolution'] !== '') ? $_POST['selfie_camera_resolution'] : null,
-            'selfie_camera_count' => (isset($_POST['selfie_camera_count']) && $_POST['selfie_camera_count'] !== '') ? $_POST['selfie_camera_count'] : null,
-            'selfie_camera_ois' => !empty($_POST['selfie_camera_ois']),
-            'selfie_camera_flash' => !empty($_POST['selfie_camera_flash']),
-            'popup_camera' => !empty($_POST['popup_camera']),
-            'under_display_camera' => !empty($_POST['under_display_camera']),
-
-            // Audio
-            'headphone_jack' => !empty($_POST['headphone_jack']),
-            'dual_speakers' => !empty($_POST['dual_speakers']),
-
-            // Sensors
-            'accelerometer' => !empty($_POST['accelerometer']),
-            'gyro' => !empty($_POST['gyro']),
-            'compass' => !empty($_POST['compass']),
-            'proximity' => !empty($_POST['proximity']),
-            'barometer' => !empty($_POST['barometer']),
-            'heart_rate' => !empty($_POST['heart_rate']),
-            'fingerprint' => $_POST['fingerprint'] ?? '',
-
-            // Connectivity
-            'wifi' => $_POST['wifi'] ?? [],
-            'bluetooth' => $_POST['bluetooth'] ?? [],
-            'gps' => !empty($_POST['gps']),
-            'nfc' => !empty($_POST['nfc']),
-            'infrared' => !empty($_POST['infrared']),
-            'fm_radio' => !empty($_POST['fm_radio']),
-            'usb' => (isset($_POST['usb']) && $_POST['usb'] !== '') ? $_POST['usb'] : null,
-
-            // Battery
-            'battery_capacity' => (isset($_POST['battery_capacity']) && $_POST['battery_capacity'] !== '') ? $_POST['battery_capacity'] : null,
-            'battery_sic' => !empty($_POST['battery_sic']),
-            'battery_removable' => !empty($_POST['battery_removable']),
-            'wired_charging' => (isset($_POST['wired_charging']) && $_POST['wired_charging'] !== '') ? $_POST['wired_charging'] : null,
-            'wireless_charging' => (isset($_POST['wireless_charging']) && $_POST['wireless_charging'] !== '') ? $_POST['wireless_charging'] : null,
-
-            // Additional
-            'colors' => $_POST['colors'] ?? []
+            // Grouped spec columns (JSON strings from hidden inputs)
+            'network' => isset($_POST['network']) ? $_POST['network'] : null,
+            'launch' => isset($_POST['launch']) ? $_POST['launch'] : null,
+            'body' => isset($_POST['body']) ? $_POST['body'] : null,
+            'display' => isset($_POST['display']) ? $_POST['display'] : null,
+            'platform' => isset($_POST['platform']) ? $_POST['platform'] : null,
+            'memory' => isset($_POST['memory']) ? $_POST['memory'] : null,
+            'main_camera' => isset($_POST['main_camera']) ? $_POST['main_camera'] : null,
+            'selfie_camera' => isset($_POST['selfie_camera']) ? $_POST['selfie_camera'] : null,
+            'sound' => isset($_POST['sound']) ? $_POST['sound'] : null,
+            'comms' => isset($_POST['comms']) ? $_POST['comms'] : null,
+            'features' => isset($_POST['features']) ? $_POST['features'] : null,
+            'battery' => isset($_POST['battery']) ? $_POST['battery'] : null,
+            'misc' => isset($_POST['misc']) ? $_POST['misc'] : null,
         ];
 
         $result = simpleAddDevice($new_phone);
@@ -258,27 +193,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             <div class="tab-content" id="deviceTypeTabContent">
                 <!-- Phone Form Tab -->
                 <div class="tab-pane fade show active" id="phone-form" role="tabpanel">
-                    <form method="post" action="<?php echo htmlspecialchars($_SERVER['PHP_SELF']); ?>" enctype="multipart/form-data">
-                        <!-- Device Type Selection -->
-                        <div class="row mb-4">
-                            <div class="col-12">
-                                <label class="form-label fw-bold">Device Type *</label>
-                                <div class="d-flex gap-4">
-                                    <div class="form-check">
-                                        <input class="form-check-input" type="radio" name="device_type" id="device_type_phone" value="phone" checked>
-                                        <label class="form-check-label" for="device_type_phone">
-                                            <i class="fas fa-mobile-alt me-2"></i>Phone
-                                        </label>
-                                    </div>
-                                    <div class="form-check">
-                                        <input class="form-check-input" type="radio" name="device_type" id="device_type_tablet" value="tablet">
-                                        <label class="form-check-label" for="device_type_tablet">
-                                            <i class="fas fa-tablet-alt me-2"></i>Tablet
-                                        </label>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
+                    <form id="add-device-form" method="post" action="<?php echo htmlspecialchars($_SERVER['PHP_SELF']); ?>" enctype="multipart/form-data">
+
 
                         <!-- 1. Launch Section -->
                         <div class="accordion mb-4" id="phoneAccordion">
@@ -391,6 +307,116 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                                                 </div>
                                             </div>
 
+                                            <!-- Highlight Fields Section -->
+                                            <div class="col-12 mb-3">
+                                                <h6 class="text-muted border-bottom pb-2">Device Highlights (Quick Info)</h6>
+                                            </div>
+
+                                            <div class="col-md-3 mb-3">
+                                                <label for="weight" class="form-label">Weight (g)</label>
+                                                <input type="text" class="form-control" id="weight" name="weight" placeholder="e.g., 195"
+                                                    value="<?php echo isset($_POST['weight']) ? htmlspecialchars($_POST['weight']) : ''; ?>">
+                                                <small class="form-text text-muted">In grams</small>
+                                            </div>
+
+                                            <div class="col-md-3 mb-3">
+                                                <label for="thickness" class="form-label">Thickness (mm)</label>
+                                                <input type="text" class="form-control" id="thickness" name="thickness" placeholder="e.g., 8.5"
+                                                    value="<?php echo isset($_POST['thickness']) ? htmlspecialchars($_POST['thickness']) : ''; ?>">
+                                                <small class="form-text text-muted">In millimeters</small>
+                                            </div>
+
+                                            <div class="col-md-3 mb-3">
+                                                <label for="os" class="form-label">Operating System</label>
+                                                <input type="text" class="form-control" id="os" name="os" placeholder="e.g., Android 14"
+                                                    value="<?php echo isset($_POST['os']) ? htmlspecialchars($_POST['os']) : ''; ?>">
+                                                <small class="form-text text-muted">OS name & version</small>
+                                            </div>
+
+                                            <div class="col-md-3 mb-3">
+                                                <label for="storage" class="form-label">Storage</label>
+                                                <input type="text" class="form-control" id="storage" name="storage" placeholder="e.g., 256GB"
+                                                    value="<?php echo isset($_POST['storage']) ? htmlspecialchars($_POST['storage']) : ''; ?>">
+                                                <small class="form-text text-muted">Storage capacity</small>
+                                            </div>
+
+                                            <div class="col-md-3 mb-3">
+                                                <label for="card_slot" class="form-label">Memory Card Slot</label>
+                                                <select class="form-select" id="card_slot" name="card_slot">
+                                                    <option value="">Not specified</option>
+                                                    <option value="1" <?php echo (isset($_POST['card_slot']) && $_POST['card_slot'] === '1') ? 'selected' : ''; ?>>Yes (Expandable)</option>
+                                                    <option value="0" <?php echo (isset($_POST['card_slot']) && $_POST['card_slot'] === '0') ? 'selected' : ''; ?>>No</option>
+                                                </select>
+                                            </div>
+
+                                            <!-- Device Stats Section -->
+                                            <div class="col-12 mb-3 mt-3">
+                                                <h6 class="text-muted border-bottom pb-2">Device Stats (For Stats Bar)</h6>
+                                            </div>
+
+                                            <div class="col-md-3 mb-3">
+                                                <label for="display_size" class="form-label">Display Size</label>
+                                                <input type="text" class="form-control" id="display_size" name="display_size" placeholder="e.g., 6.1"
+                                                    value="<?php echo isset($_POST['display_size']) ? htmlspecialchars($_POST['display_size']) : ''; ?>">
+                                                <small class="form-text text-muted">In inches (without ")</small>
+                                            </div>
+
+                                            <div class="col-md-3 mb-3">
+                                                <label for="display_resolution" class="form-label">Display Resolution</label>
+                                                <input type="text" class="form-control" id="display_resolution" name="display_resolution" placeholder="e.g., 1080 x 2340"
+                                                    value="<?php echo isset($_POST['display_resolution']) ? htmlspecialchars($_POST['display_resolution']) : ''; ?>">
+                                                <small class="form-text text-muted">Width x Height</small>
+                                            </div>
+
+                                            <div class="col-md-3 mb-3">
+                                                <label for="main_camera_resolution" class="form-label">Main Camera</label>
+                                                <input type="text" class="form-control" id="main_camera_resolution" name="main_camera_resolution" placeholder="e.g., 50 MP"
+                                                    value="<?php echo isset($_POST['main_camera_resolution']) ? htmlspecialchars($_POST['main_camera_resolution']) : ''; ?>">
+                                                <small class="form-text text-muted">Megapixels</small>
+                                            </div>
+
+                                            <div class="col-md-3 mb-3">
+                                                <label for="main_camera_video" class="form-label">Camera Video</label>
+                                                <input type="text" class="form-control" id="main_camera_video" name="main_camera_video" placeholder="e.g., 4K@60fps"
+                                                    value="<?php echo isset($_POST['main_camera_video']) ? htmlspecialchars($_POST['main_camera_video']) : ''; ?>">
+                                                <small class="form-text text-muted">Video capability</small>
+                                            </div>
+
+                                            <div class="col-md-3 mb-3">
+                                                <label for="ram" class="form-label">RAM</label>
+                                                <input type="text" class="form-control" id="ram" name="ram" placeholder="e.g., 8GB"
+                                                    value="<?php echo isset($_POST['ram']) ? htmlspecialchars($_POST['ram']) : ''; ?>">
+                                                <small class="form-text text-muted">Memory size</small>
+                                            </div>
+
+                                            <div class="col-md-3 mb-3">
+                                                <label for="chipset_name" class="form-label">Chipset</label>
+                                                <input type="text" class="form-control" id="chipset_name" name="chipset_name" placeholder="e.g., Snapdragon 8 Gen 2"
+                                                    value="<?php echo isset($_POST['chipset_name']) ? htmlspecialchars($_POST['chipset_name']) : ''; ?>">
+                                                <small class="form-text text-muted">Processor name</small>
+                                            </div>
+
+                                            <div class="col-md-2 mb-3">
+                                                <label for="battery_capacity" class="form-label">Battery</label>
+                                                <input type="text" class="form-control" id="battery_capacity" name="battery_capacity" placeholder="e.g., 5000"
+                                                    value="<?php echo isset($_POST['battery_capacity']) ? htmlspecialchars($_POST['battery_capacity']) : ''; ?>">
+                                                <small class="form-text text-muted">mAh (without unit)</small>
+                                            </div>
+
+                                            <div class="col-md-2 mb-3">
+                                                <label for="wired_charging" class="form-label">Wired Charging</label>
+                                                <input type="text" class="form-control" id="wired_charging" name="wired_charging" placeholder="e.g., 65W"
+                                                    value="<?php echo isset($_POST['wired_charging']) ? htmlspecialchars($_POST['wired_charging']) : ''; ?>">
+                                                <small class="form-text text-muted">Charging speed</small>
+                                            </div>
+
+                                            <div class="col-md-2 mb-3">
+                                                <label for="wireless_charging" class="form-label">Wireless Charging</label>
+                                                <input type="text" class="form-control" id="wireless_charging" name="wireless_charging" placeholder="e.g., 15W"
+                                                    value="<?php echo isset($_POST['wireless_charging']) ? htmlspecialchars($_POST['wireless_charging']) : ''; ?>">
+                                                <small class="form-text text-muted">Wireless speed</small>
+                                            </div>
+
                                             <div class="col-md-12 mb-3">
                                                 <label class="form-label">Phone Images (up to 5)</label>
                                                 <div class="row">
@@ -426,662 +452,277 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                                 </div>
                             </div>
 
-                            <!-- 3. Network Section -->
-                            <div class="accordion-item">
-                                <h2 class="accordion-header" id="networkHeader">
-                                    <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#networkCollapse" aria-expanded="false" aria-controls="networkCollapse">
-                                        <i class="fas fa-signal me-2"></i> Network
-                                    </button>
-                                </h2>
-                                <div id="networkCollapse" class="accordion-collapse collapse" aria-labelledby="networkHeader">
-                                    <div class="accordion-body">
-                                        <div class="row">
-                                            <div class="col-md-6 mb-3">
-                                                <label class="form-label">2G</label>
-                                                <div class="form-check">
-                                                    <input class="form-check-input" type="checkbox" name="2g[]" value="GSM 850" id="2g_850">
-                                                    <label class="form-check-label" for="2g_850">GSM 850</label>
-                                                </div>
-                                                <div class="form-check">
-                                                    <input class="form-check-input" type="checkbox" name="2g[]" value="GSM 900" id="2g_900">
-                                                    <label class="form-check-label" for="2g_900">GSM 900</label>
-                                                </div>
-                                                <div class="form-check">
-                                                    <input class="form-check-input" type="checkbox" name="2g[]" value="GSM 1800" id="2g_1800">
-                                                    <label class="form-check-label" for="2g_1800">GSM 1800</label>
-                                                </div>
-                                                <div class="form-check">
-                                                    <input class="form-check-input" type="checkbox" name="2g[]" value="GSM 1900" id="2g_1900">
-                                                    <label class="form-check-label" for="2g_1900">GSM 1900</label>
-                                                </div>
-                                            </div>
 
-                                            <div class="col-md-6 mb-3">
-                                                <label class="form-label">3G</label>
-                                                <div class="form-check">
-                                                    <input class="form-check-input" type="checkbox" name="3g[]" value="HSPA 850" id="3g_850">
-                                                    <label class="form-check-label" for="3g_850">HSPA 850</label>
-                                                </div>
-                                                <div class="form-check">
-                                                    <input class="form-check-input" type="checkbox" name="3g[]" value="HSPA 900" id="3g_900">
-                                                    <label class="form-check-label" for="3g_900">HSPA 900</label>
-                                                </div>
-                                                <div class="form-check">
-                                                    <input class="form-check-input" type="checkbox" name="3g[]" value="HSPA 1700" id="3g_1700">
-                                                    <label class="form-check-label" for="3g_1700">HSPA 1700</label>
-                                                </div>
-                                                <div class="form-check">
-                                                    <input class="form-check-input" type="checkbox" name="3g[]" value="HSPA 1900" id="3g_1900">
-                                                    <label class="form-check-label" for="3g_1900">HSPA 1900</label>
-                                                </div>
-                                                <div class="form-check">
-                                                    <input class="form-check-input" type="checkbox" name="3g[]" value="HSPA 2100" id="3g_2100">
-                                                    <label class="form-check-label" for="3g_2100">HSPA 2100</label>
-                                                </div>
-                                            </div>
+                        </div>
 
-                                            <div class="col-md-6 mb-3">
-                                                <label class="form-label">4G</label>
-                                                <div class="form-check">
-                                                    <input class="form-check-input" type="checkbox" name="4g[]" value="LTE 700" id="4g_700">
-                                                    <label class="form-check-label" for="4g_700">LTE 700</label>
-                                                </div>
-                                                <div class="form-check">
-                                                    <input class="form-check-input" type="checkbox" name="4g[]" value="LTE 850" id="4g_850">
-                                                    <label class="form-check-label" for="4g_850">LTE 850</label>
-                                                </div>
-                                                <div class="form-check">
-                                                    <input class="form-check-input" type="checkbox" name="4g[]" value="LTE 900" id="4g_900">
-                                                    <label class="form-check-label" for="4g_900">LTE 900</label>
-                                                </div>
-                                                <div class="form-check">
-                                                    <input class="form-check-input" type="checkbox" name="4g[]" value="LTE 1800" id="4g_1800">
-                                                    <label class="form-check-label" for="4g_1800">LTE 1800</label>
-                                                </div>
-                                            </div>
+                        <!-- Specs Template Table (titles and subtitles only, descriptions intentionally blank) -->
+                        <div class="card mt-4">
+                            <div class="card-header">
+                                <strong>Specifications Template</strong>
+                                <span class="text-muted" style="font-size: 0.9rem;">(Descriptions removed intentionally)</span>
+                            </div>
+                            <div class="card-body p-0">
+                                <div class="table-responsive">
+                                    <table id="specs-template-table" class="table table-striped mb-0 align-middle">
+                                        <thead class="table-light">
+                                            <tr>
+                                                <th style="width: 18%">Section</th>
+                                                <th style="width: 22%">Field</th>
+                                                <th>Description</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            <!-- Network -->
+                                            <tr>
+                                                <td>Network</td>
+                                                <td>Technology</td>
+                                                <td></td>
+                                            </tr>
 
-                                            <div class="col-md-6 mb-3">
-                                                <label class="form-label">5G</label>
-                                                <div class="form-check">
-                                                    <input class="form-check-input" type="checkbox" name="5g[]" value="NR 3500" id="5g_3500">
-                                                    <label class="form-check-label" for="5g_3500">NR 3500</label>
-                                                </div>
-                                                <div class="form-check">
-                                                    <input class="form-check-input" type="checkbox" name="5g[]" value="NR 3600" id="5g_3600">
-                                                    <label class="form-check-label" for="5g_3600">NR 3600</label>
-                                                </div>
-                                                <div class="form-check">
-                                                    <input class="form-check-input" type="checkbox" name="5g[]" value="NR 3700" id="5g_3700">
-                                                    <label class="form-check-label" for="5g_3700">NR 3700</label>
-                                                </div>
-                                                <div class="form-check">
-                                                    <input class="form-check-input" type="checkbox" name="5g[]" value="NR 3800" id="5g_3800">
-                                                    <label class="form-check-label" for="5g_3800">NR 3800</label>
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </div>
+                                            <!-- Launch -->
+                                            <tr>
+                                                <td>Launch</td>
+                                                <td>Announced</td>
+                                                <td></td>
+                                            </tr>
+                                            <tr>
+                                                <td></td>
+                                                <td>Status</td>
+                                                <td></td>
+                                            </tr>
+
+                                            <!-- Body -->
+                                            <tr>
+                                                <td>Body</td>
+                                                <td>Dimensions</td>
+                                                <td></td>
+                                            </tr>
+                                            <tr>
+                                                <td></td>
+                                                <td>Weight</td>
+                                                <td></td>
+                                            </tr>
+                                            <tr>
+                                                <td></td>
+                                                <td>Build</td>
+                                                <td></td>
+                                            </tr>
+                                            <tr>
+                                                <td></td>
+                                                <td>SIM</td>
+                                                <td></td>
+                                            </tr>
+                                            <tr>
+                                                <td></td>
+                                                <td></td>
+                                                <td></td>
+                                            </tr>
+
+                                            <!-- Display -->
+                                            <tr>
+                                                <td>Display</td>
+                                                <td>Type</td>
+                                                <td></td>
+                                            </tr>
+                                            <tr>
+                                                <td></td>
+                                                <td>Size</td>
+                                                <td></td>
+                                            </tr>
+                                            <tr>
+                                                <td></td>
+                                                <td>Resolution</td>
+                                                <td></td>
+                                            </tr>
+                                            <tr>
+                                                <td></td>
+                                                <td>Protection</td>
+                                                <td></td>
+                                            </tr>
+                                            <tr>
+                                                <td></td>
+                                                <td></td>
+                                                <td></td>
+                                            </tr>
+
+                                            <!-- Platform -->
+                                            <tr>
+                                                <td>Platform</td>
+                                                <td>OS</td>
+                                                <td></td>
+                                            </tr>
+                                            <tr>
+                                                <td></td>
+                                                <td>Chipset</td>
+                                                <td></td>
+                                            </tr>
+                                            <tr>
+                                                <td></td>
+                                                <td>CPU</td>
+                                                <td></td>
+                                            </tr>
+                                            <tr>
+                                                <td></td>
+                                                <td>GPU</td>
+                                                <td></td>
+                                            </tr>
+
+                                            <!-- Memory -->
+                                            <tr>
+                                                <td>Memory</td>
+                                                <td>Card slot</td>
+                                                <td></td>
+                                            </tr>
+                                            <tr>
+                                                <td></td>
+                                                <td>Internal</td>
+                                                <td></td>
+                                            </tr>
+                                            <tr>
+                                                <td></td>
+                                                <td></td>
+                                                <td></td>
+                                            </tr>
+
+                                            <!-- Main Camera -->
+                                            <tr>
+                                                <td>Main Camera</td>
+                                                <td>Dual</td>
+                                                <td></td>
+                                            </tr>
+                                            <tr>
+                                                <td></td>
+                                                <td>Features</td>
+                                                <td></td>
+                                            </tr>
+                                            <tr>
+                                                <td></td>
+                                                <td>Video</td>
+                                                <td></td>
+                                            </tr>
+
+                                            <!-- Selfie camera -->
+                                            <tr>
+                                                <td>Selfie camera</td>
+                                                <td>Single</td>
+                                                <td></td>
+                                            </tr>
+                                            <tr>
+                                                <td></td>
+                                                <td>Video</td>
+                                                <td></td>
+                                            </tr>
+
+                                            <!-- Sound -->
+                                            <tr>
+                                                <td>Sound</td>
+                                                <td>Loudspeaker</td>
+                                                <td></td>
+                                            </tr>
+                                            <tr>
+                                                <td></td>
+                                                <td>3.5mm jack</td>
+                                                <td></td>
+                                            </tr>
+
+                                            <!-- Comms -->
+                                            <tr>
+                                                <td>Comms</td>
+                                                <td>WLAN</td>
+                                                <td></td>
+                                            </tr>
+                                            <tr>
+                                                <td></td>
+                                                <td>Bluetooth</td>
+                                                <td></td>
+                                            </tr>
+                                            <tr>
+                                                <td></td>
+                                                <td>Positioning</td>
+                                                <td></td>
+                                            </tr>
+                                            <tr>
+                                                <td></td>
+                                                <td>NFC</td>
+                                                <td></td>
+                                            </tr>
+                                            <tr>
+                                                <td></td>
+                                                <td>Infrared port</td>
+                                                <td></td>
+                                            </tr>
+                                            <tr>
+                                                <td></td>
+                                                <td>Radio</td>
+                                                <td></td>
+                                            </tr>
+                                            <tr>
+                                                <td></td>
+                                                <td>USB</td>
+                                                <td></td>
+                                            </tr>
+
+                                            <!-- Features -->
+                                            <tr>
+                                                <td>Features</td>
+                                                <td>Sensors</td>
+                                                <td></td>
+                                            </tr>
+
+                                            <!-- Battery -->
+                                            <tr>
+                                                <td>Battery</td>
+                                                <td>Type</td>
+                                                <td></td>
+                                            </tr>
+                                            <tr>
+                                                <td></td>
+                                                <td>Charging</td>
+                                                <td></td>
+                                            </tr>
+                                            <tr>
+                                                <td></td>
+                                                <td>Reverse wired</td>
+                                                <td></td>
+                                            </tr>
+
+                                            <!-- Misc -->
+                                            <tr>
+                                                <td>Misc</td>
+                                                <td>Colors</td>
+                                                <td></td>
+                                            </tr>
+                                            <tr>
+                                                <td></td>
+                                                <td>Models</td>
+                                                <td></td>
+                                            </tr>
+                                            <tr>
+                                                <td></td>
+                                                <td>Price</td>
+                                                <td></td>
+                                            </tr>
+                                        </tbody>
+                                    </table>
                                 </div>
                             </div>
+                        </div>
 
-                            <!-- 4. SIM Section -->
-                            <div class="accordion-item">
-                                <h2 class="accordion-header" id="simHeader">
-                                    <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#simCollapse" aria-expanded="false" aria-controls="simCollapse">
-                                        <i class="fas fa-sim-card me-2"></i> SIM
-                                    </button>
-                                </h2>
-                                <div id="simCollapse" class="accordion-collapse collapse" aria-labelledby="simHeader">
-                                    <div class="accordion-body">
-                                        <div class="row">
-                                            <div class="col-md-6 mb-3">
-                                                <div class="form-check">
-                                                    <input class="form-check-input" type="checkbox" name="dual_sim" id="dual_sim">
-                                                    <label class="form-check-label" for="dual_sim">Dual SIM</label>
-                                                </div>
-                                                <div class="form-check">
-                                                    <input class="form-check-input" type="checkbox" name="esim" id="esim">
-                                                    <label class="form-check-label" for="esim">eSIM</label>
-                                                </div>
-                                            </div>
-                                            <div class="col-md-6 mb-3">
-                                                <label class="form-label">Size</label>
-                                                <div class="form-check">
-                                                    <input class="form-check-input" type="checkbox" name="sim_size[]" value="Mini-SIM" id="sim_mini">
-                                                    <label class="form-check-label" for="sim_mini">Mini-SIM</label>
-                                                </div>
-                                                <div class="form-check">
-                                                    <input class="form-check-input" type="checkbox" name="sim_size[]" value="Nano-SIM" id="sim_nano">
-                                                    <label class="form-check-label" for="sim_nano">Nano-SIM</label>
-                                                </div>
-                                                <div class="form-check">
-                                                    <input class="form-check-input" type="checkbox" name="sim_size[]" value="Micro-SIM" id="sim_micro">
-                                                    <label class="form-check-label" for="sim_micro">Micro-SIM</label>
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-
-                            <!-- 5. Body Section -->
-                            <div class="accordion-item">
-                                <h2 class="accordion-header" id="bodyHeader">
-                                    <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#bodyCollapse" aria-expanded="false" aria-controls="bodyCollapse">
-                                        <i class="fas fa-mobile-alt me-2"></i> Body
-                                    </button>
-                                </h2>
-                                <div id="bodyCollapse" class="accordion-collapse collapse" aria-labelledby="bodyHeader">
-                                    <div class="accordion-body">
-                                        <div class="row">
-                                            <div class="col-md-6 mb-3">
-                                                <label for="dimensions" class="form-label">Dimensions</label>
-                                                <input type="text" class="form-control" id="dimensions" name="dimensions" placeholder="e.g., 159.9 x 75.7 x 8.3 mm">
-                                            </div>
-                                            <div class="col-md-6 mb-3">
-                                                <label for="form_factor" class="form-label">Form Factor</label>
-                                                <input type="text" class="form-control" id="form_factor" name="form_factor" placeholder="e.g., Bar, Flip, Slide">
-                                                <div class="form-text text-muted">Not applicable for tablets</div>
-                                            </div>
-                                            <div class="col-md-6 mb-3">
-                                                <label for="keyboard" class="form-label">Keyboard</label>
-                                                <input type="text" class="form-control" id="keyboard" name="keyboard" placeholder="e.g., With QWERTY, Without QWERTY">
-                                                <div class="form-text text-muted">Not applicable for tablets</div>
-                                            </div>
-                                            <div class="col-md-3 mb-3">
-                                                <label for="height" class="form-label">Height (mm)</label>
-                                                <input type="number" step="0.01" class="form-control" id="height" name="height">
-                                            </div>
-                                            <div class="col-md-3 mb-3">
-                                                <label for="width" class="form-label">Width (mm)</label>
-                                                <input type="number" step="0.01" class="form-control" id="width" name="width">
-                                            </div>
-                                            <div class="col-md-3 mb-3">
-                                                <label for="thickness" class="form-label">Thickness (mm)</label>
-                                                <input type="number" step="0.01" class="form-control" id="thickness" name="thickness">
-                                            </div>
-                                            <div class="col-md-3 mb-3">
-                                                <label for="weight" class="form-label">Weight (g)</label>
-                                                <input type="number" step="0.01" class="form-control" id="weight" name="weight">
-                                            </div>
-                                            <div class="col-md-6 mb-3">
-                                                <label class="form-label">IP Certificate</label>
-                                                <div class="d-flex flex-wrap gap-2">
-                                                    <div class="form-check">
-                                                        <input class="form-check-input" type="checkbox" name="ip_certificate[]" value="IP5x" id="ip5x">
-                                                        <label class="form-check-label" for="ip5x">IP5x</label>
-                                                    </div>
-                                                    <div class="form-check">
-                                                        <input class="form-check-input" type="checkbox" name="ip_certificate[]" value="IP6x" id="ip6x">
-                                                        <label class="form-check-label" for="ip6x">IP6x</label>
-                                                    </div>
-                                                    <div class="form-check">
-                                                        <input class="form-check-input" type="checkbox" name="ip_certificate[]" value="IPx5" id="ipx5">
-                                                        <label class="form-check-label" for="ipx5">IPx5</label>
-                                                    </div>
-                                                    <div class="form-check">
-                                                        <input class="form-check-input" type="checkbox" name="ip_certificate[]" value="IPx6" id="ipx6">
-                                                        <label class="form-check-label" for="ipx6">IPx6</label>
-                                                    </div>
-                                                    <div class="form-check">
-                                                        <input class="form-check-input" type="checkbox" name="ip_certificate[]" value="IPx7" id="ipx7">
-                                                        <label class="form-check-label" for="ipx7">IPx7</label>
-                                                    </div>
-                                                    <div class="form-check">
-                                                        <input class="form-check-input" type="checkbox" name="ip_certificate[]" value="IPx8" id="ipx8">
-                                                        <label class="form-check-label" for="ipx8">IPx8</label>
-                                                    </div>
-                                                </div>
-                                            </div>
-                                            <div class="col-md-4 mb-3">
-                                                <label for="color" class="form-label">Color</label>
-                                                <input type="text" class="form-control" id="color" name="color" placeholder="e.g., Midnight Black">
-                                            </div>
-                                            <div class="col-md-4 mb-3">
-                                                <label for="back_material" class="form-label">Back Material</label>
-                                                <input type="text" class="form-control" id="back_material" name="back_material" placeholder="e.g., Plastic, Glass, Ceramic">
-                                            </div>
-                                            <div class="col-md-4 mb-3">
-                                                <label for="frame_material" class="form-label">Frame Material</label>
-                                                <input type="text" class="form-control" id="frame_material" name="frame_material" placeholder="e.g., Aluminum, Stainless Steel, Titanium">
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-
-                            <!-- 6. Platform Section -->
-                            <div class="accordion-item">
-                                <h2 class="accordion-header" id="platformHeader">
-                                    <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#platformCollapse" aria-expanded="false" aria-controls="platformCollapse">
-                                        <i class="fas fa-microchip me-2"></i> Platform
-                                    </button>
-                                </h2>
-                                <div id="platformCollapse" class="accordion-collapse collapse" aria-labelledby="platformHeader">
-                                    <div class="accordion-body">
-                                        <div class="row">
-                                            <div class="col-md-6 mb-3">
-                                                <label for="os" class="form-label">OS</label>
-                                                <input type="text" class="form-control" id="os" name="os" placeholder="e.g., Android, iOS, Feature phone">
-                                            </div>
-                                            <div class="col-md-6 mb-3">
-                                                <label for="os_version" class="form-label">OS Version</label>
-                                                <input type="text" class="form-control" id="os_version" name="os_version" placeholder="e.g., Android 14">
-                                            </div>
-                                            <div class="col-md-6 mb-3">
-                                                <label for="chipset" class="form-label">Chipset</label>
-                                                <div class="input-group">
-                                                    <select class="form-select" id="chipset" name="chipset">
-                                                        <option value="">Select chipset...</option>
-                                                        <?php
-                                                        $chipsets = getAllChipsets();
-                                                        if (!empty($chipsets)) {
-                                                            foreach ($chipsets as $chipsetItem) {
-                                                                echo '<option value="' . htmlspecialchars($chipsetItem['name']) . '">' .
-                                                                    htmlspecialchars($chipsetItem['name']) . '</option>';
-                                                            }
-                                                        }
-                                                        ?>
-                                                        <option value="other">Other (Custom)</option>
-                                                    </select>
-                                                    <button class="btn btn-outline-secondary" type="button"
-                                                        onclick="window.location.href='manage_data.php';"
-                                                        <?php echo (!isset($_SESSION['role']) || $_SESSION['role'] !== 'admin') ? 'disabled' : ''; ?>
-                                                        title="<?php echo (!isset($_SESSION['role']) || $_SESSION['role'] !== 'admin') ? 'Only admin can manage chipsets' : 'Manage Chipsets'; ?>">
-                                                        <i class="fas fa-plus"></i>
-                                                    </button>
-                                                </div>
-                                                <div id="custom-chipset-container" class="mt-2 d-none">
-                                                    <input type="text" class="form-control" id="custom-chipset"
-                                                        placeholder="Enter custom chipset name">
-                                                </div>
-                                            </div>
-                                            <div class="col-md-6 mb-3">
-                                                <label for="cpu_cores" class="form-label">CPU Cores</label>
-                                                <input type="number" class="form-control" id="cpu_cores" name="cpu_cores" min="1" max="16">
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-
-                            <!-- 7. Memory Section -->
-                            <div class="accordion-item">
-                                <h2 class="accordion-header" id="memoryHeader">
-                                    <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#memoryCollapse" aria-expanded="false" aria-controls="memoryCollapse">
-                                        <i class="fas fa-memory me-2"></i> Memory
-                                    </button>
-                                </h2>
-                                <div id="memoryCollapse" class="accordion-collapse collapse" aria-labelledby="memoryHeader">
-                                    <div class="accordion-body">
-                                        <div class="row">
-                                            <div class="col-md-4 mb-3">
-                                                <label for="ram" class="form-label">RAM</label>
-                                                <input type="text" class="form-control" id="ram" name="ram" placeholder="e.g., 8 GB, 8/12 GB">
-                                            </div>
-                                            <div class="col-md-4 mb-3">
-                                                <label for="storage" class="form-label">Storage</label>
-                                                <input type="text" class="form-control" id="storage" name="storage" placeholder="e.g., 128 GB, 128/256 GB">
-                                            </div>
-                                            <div class="col-md-4 mb-3">
-                                                <label for="card_slot" class="form-label">Card Slot</label>
-                                                <input type="text" class="form-control" id="card_slot" name="card_slot" placeholder="e.g., Yes (dedicated), No">
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-
-                            <!-- 8. Display Section -->
-                            <div class="accordion-item">
-                                <h2 class="accordion-header" id="displayHeader">
-                                    <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#displayCollapse" aria-expanded="false" aria-controls="displayCollapse">
-                                        <i class="fas fa-tv me-2"></i> Display
-                                    </button>
-                                </h2>
-                                <div id="displayCollapse" class="accordion-collapse collapse" aria-labelledby="displayHeader">
-                                    <div class="accordion-body">
-                                        <div class="row">
-                                            <div class="col-md-6 mb-3">
-                                                <label for="display_type" class="form-label">Type</label>
-                                                <input type="text" class="form-control" id="display_type" name="display_type" placeholder="e.g., AMOLED, IPS, LTPO OLED">
-                                            </div>
-                                            <div class="col-md-6 mb-3">
-                                                <label for="display_resolution" class="form-label">Resolution</label>
-                                                <input type="text" class="form-control" id="display_resolution" name="display_resolution" placeholder="e.g., 1080 x 2400 pixels">
-                                            </div>
-                                            <div class="col-md-4 mb-3">
-                                                <label for="display_size" class="form-label">Size (inches)</label>
-                                                <input type="number" step="0.1" class="form-control" id="display_size" name="display_size" min="2" max="15">
-                                            </div>
-                                            <div class="col-md-4 mb-3">
-                                                <label for="display_density" class="form-label">Density (ppi)</label>
-                                                <input type="number" class="form-control" id="display_density" name="display_density" min="50" max="1000">
-                                            </div>
-                                            <div class="col-md-4 mb-3">
-                                                <label for="display_technology" class="form-label">Technology</label>
-                                                <input type="text" class="form-control" id="display_technology" name="display_technology" placeholder="e.g., IPS, Any OLED, LTPO OLED">
-                                            </div>
-                                            <div class="col-md-4 mb-3">
-                                                <label for="display_notch" class="form-label">Notch</label>
-                                                <input type="text" class="form-control" id="display_notch" name="display_notch" placeholder="e.g., No, Yes, Punch Hole">
-                                            </div>
-                                            <div class="col-md-4 mb-3">
-                                                <label for="refresh_rate" class="form-label">Refresh Rate</label>
-                                                <input type="text" class="form-control" id="refresh_rate" name="refresh_rate" placeholder="e.g., 90Hz, 120Hz, 144Hz">
-                                            </div>
-                                            <div class="col-md-4 mb-3">
-                                                <div class="form-check mt-4">
-                                                    <input class="form-check-input" type="checkbox" name="hdr" id="hdr">
-                                                    <label class="form-check-label" for="hdr">HDR</label>
-                                                </div>
-                                                <div class="form-check">
-                                                    <input class="form-check-input" type="checkbox" name="billion_colors" id="billion_colors">
-                                                    <label class="form-check-label" for="billion_colors">1B+ Colors</label>
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-
-                            <!-- 9. Main Camera Section -->
-                            <div class="accordion-item">
-                                <h2 class="accordion-header" id="mainCameraHeader">
-                                    <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#mainCameraCollapse" aria-expanded="false" aria-controls="mainCameraCollapse">
-                                        <i class="fas fa-camera me-2"></i> Main Camera
-                                    </button>
-                                </h2>
-                                <div id="mainCameraCollapse" class="accordion-collapse collapse" aria-labelledby="mainCameraHeader">
-                                    <div class="accordion-body">
-                                        <div class="row">
-                                            <div class="col-md-6 mb-3">
-                                                <label for="main_camera_resolution" class="form-label">Resolution (MP)</label>
-                                                <input type="number" class="form-control" id="main_camera_resolution" name="main_camera_resolution" min="0.1" max="200" step="0.1">
-                                            </div>
-                                            <div class="col-md-6 mb-3">
-                                                <label for="main_camera_count" class="form-label">Cameras</label>
-                                                <input type="number" class="form-control" id="main_camera_count" name="main_camera_count" min="1" max="10" step="1" placeholder="e.g., 2">
-                                            </div>
-                                            <div class="col-md-6 mb-3">
-                                                <label for="main_camera_f_number" class="form-label">F-Number</label>
-                                                <input type="number" step="0.1" class="form-control" id="main_camera_f_number" name="main_camera_f_number" min="1" max="10" placeholder="e.g., 1.8">
-                                            </div>
-                                            <div class="col-md-6 mb-3">
-                                                <label for="main_camera_video" class="form-label">Video</label>
-                                                <input type="text" class="form-control" id="main_camera_video" name="main_camera_video" placeholder="e.g., 4K@30fps">
-                                            </div>
-                                            <div class="col-md-6 mb-3">
-                                                <div class="form-check mt-4">
-                                                    <input class="form-check-input" type="checkbox" name="main_camera_flash" id="main_camera_flash">
-                                                    <label class="form-check-label" for="main_camera_flash">Flash</label>
-                                                </div>
-                                            </div>
-                                            <div class="col-md-6 mb-3">
-                                                <div class="form-check mt-4">
-                                                    <input class="form-check-input" type="checkbox" name="main_camera_ois" id="main_camera_ois">
-                                                    <label class="form-check-label" for="main_camera_ois">OIS</label>
-                                                </div>
-                                                <div class="form-check">
-                                                    <input class="form-check-input" type="checkbox" name="main_camera_telephoto" id="main_camera_telephoto">
-                                                    <label class="form-check-label" for="main_camera_telephoto">Telephoto</label>
-                                                </div>
-                                                <div class="form-check">
-                                                    <input class="form-check-input" type="checkbox" name="main_camera_ultrawide" id="main_camera_ultrawide">
-                                                    <label class="form-check-label" for="main_camera_ultrawide">Ultrawide</label>
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-
-                            <!-- 10. Selfie Camera Section -->
-                            <div class="accordion-item">
-                                <h2 class="accordion-header" id="selfieCameraHeader">
-                                    <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#selfieCameraCollapse" aria-expanded="false" aria-controls="selfieCameraCollapse">
-                                        <i class="fas fa-camera-retro me-2"></i> Selfie Camera
-                                    </button>
-                                </h2>
-                                <div id="selfieCameraCollapse" class="accordion-collapse collapse" aria-labelledby="selfieCameraHeader">
-                                    <div class="accordion-body">
-                                        <div class="row">
-                                            <div class="col-md-6 mb-3">
-                                                <label for="selfie_camera_resolution" class="form-label">Resolution (MP)</label>
-                                                <input type="number" class="form-control" id="selfie_camera_resolution" name="selfie_camera_resolution" min="0.1" max="100" step="0.1">
-                                            </div>
-                                            <div class="col-md-6 mb-3">
-                                                <label for="selfie_camera_count" class="form-label">Cameras</label>
-                                                <input type="number" class="form-control" id="selfie_camera_count" name="selfie_camera_count" min="1" max="10" step="1" placeholder="e.g., 2">
-                                            </div>
-                                            <div class="col-md-12 mb-3">
-                                                <div class="form-check">
-                                                    <input class="form-check-input" type="checkbox" name="selfie_camera_ois" id="selfie_camera_ois">
-                                                    <label class="form-check-label" for="selfie_camera_ois">OIS</label>
-                                                </div>
-                                                <div class="form-check">
-                                                    <input class="form-check-input" type="checkbox" name="selfie_camera_flash" id="selfie_camera_flash">
-                                                    <label class="form-check-label" for="selfie_camera_flash">Front Flash</label>
-                                                </div>
-                                                <div class="form-check">
-                                                    <input class="form-check-input" type="checkbox" name="popup_camera" id="popup_camera">
-                                                    <label class="form-check-label" for="popup_camera">Pop-up Camera</label>
-                                                </div>
-                                                <div class="form-check">
-                                                    <input class="form-check-input" type="checkbox" name="under_display_camera" id="under_display_camera">
-                                                    <label class="form-check-label" for="under_display_camera">Under Display Camera</label>
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-
-                            <!-- 11. Audio Section -->
-                            <div class="accordion-item">
-                                <h2 class="accordion-header" id="audioHeader">
-                                    <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#audioCollapse" aria-expanded="false" aria-controls="audioCollapse">
-                                        <i class="fas fa-volume-up me-2"></i> Audio
-                                    </button>
-                                </h2>
-                                <div id="audioCollapse" class="accordion-collapse collapse" aria-labelledby="audioHeader">
-                                    <div class="accordion-body">
-                                        <div class="row">
-                                            <div class="col-md-6 mb-3">
-                                                <div class="form-check">
-                                                    <input class="form-check-input" type="checkbox" name="headphone_jack" id="headphone_jack">
-                                                    <label class="form-check-label" for="headphone_jack">3.5mm Jack</label>
-                                                </div>
-                                            </div>
-                                            <div class="col-md-6 mb-3">
-                                                <div class="form-check">
-                                                    <input class="form-check-input" type="checkbox" name="dual_speakers" id="dual_speakers">
-                                                    <label class="form-check-label" for="dual_speakers">Dual Speakers</label>
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-
-                            <!-- 12. Sensors Section -->
-                            <div class="accordion-item">
-                                <h2 class="accordion-header" id="sensorsHeader">
-                                    <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#sensorsCollapse" aria-expanded="false" aria-controls="sensorsCollapse">
-                                        <i class="fas fa-satellite-dish me-2"></i> Sensors
-                                    </button>
-                                </h2>
-                                <div id="sensorsCollapse" class="accordion-collapse collapse" aria-labelledby="sensorsHeader">
-                                    <div class="accordion-body">
-                                        <div class="row">
-                                            <div class="col-md-6 mb-3">
-                                                <div class="form-check">
-                                                    <input class="form-check-input" type="checkbox" name="accelerometer" id="accelerometer">
-                                                    <label class="form-check-label" for="accelerometer">Accelerometer</label>
-                                                </div>
-                                                <div class="form-check">
-                                                    <input class="form-check-input" type="checkbox" name="gyro" id="gyro">
-                                                    <label class="form-check-label" for="gyro">Gyro</label>
-                                                </div>
-                                                <div class="form-check">
-                                                    <input class="form-check-input" type="checkbox" name="compass" id="compass">
-                                                    <label class="form-check-label" for="compass">Compass</label>
-                                                </div>
-                                            </div>
-                                            <div class="col-md-6 mb-3">
-                                                <div class="form-check">
-                                                    <input class="form-check-input" type="checkbox" name="proximity" id="proximity">
-                                                    <label class="form-check-label" for="proximity">Proximity</label>
-                                                </div>
-                                                <div class="form-check">
-                                                    <input class="form-check-input" type="checkbox" name="barometer" id="barometer">
-                                                    <label class="form-check-label" for="barometer">Barometer</label>
-                                                </div>
-                                                <div class="form-check">
-                                                    <input class="form-check-input" type="checkbox" name="heart_rate" id="heart_rate">
-                                                    <label class="form-check-label" for="heart_rate">Heart Rate</label>
-                                                </div>
-                                            </div>
-                                            <div class="col-md-12 mb-3">
-                                                <label for="fingerprint" class="form-label">Fingerprint</label>
-                                                <input type="text" class="form-control" id="fingerprint" name="fingerprint" placeholder="e.g., Rear-mounted, Under Display, Side-mounted">
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-
-                            <!-- 13. Connectivity Section -->
-                            <div class="accordion-item">
-                                <h2 class="accordion-header" id="connectivityHeader">
-                                    <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#connectivityCollapse" aria-expanded="false" aria-controls="connectivityCollapse">
-                                        <i class="fas fa-wifi me-2"></i> Connectivity
-                                    </button>
-                                </h2>
-                                <div id="connectivityCollapse" class="accordion-collapse collapse" aria-labelledby="connectivityHeader">
-                                    <div class="accordion-body">
-                                        <div class="row">
-                                            <div class="col-md-6 mb-3">
-                                                <label class="form-label">WLAN (Wi-Fi)</label>
-                                                <div class="form-check">
-                                                    <input class="form-check-input" type="checkbox" name="wifi[]" value="Wi-Fi 4 (802.11n)" id="wifi4">
-                                                    <label class="form-check-label" for="wifi4">Wi-Fi 4 (802.11n)</label>
-                                                </div>
-                                                <div class="form-check">
-                                                    <input class="form-check-input" type="checkbox" name="wifi[]" value="Wi-Fi 5 (802.11ac)" id="wifi5">
-                                                    <label class="form-check-label" for="wifi5">Wi-Fi 5 (802.11ac)</label>
-                                                </div>
-                                                <div class="form-check">
-                                                    <input class="form-check-input" type="checkbox" name="wifi[]" value="Wi-Fi 6 (802.11ax)" id="wifi6">
-                                                    <label class="form-check-label" for="wifi6">Wi-Fi 6 (802.11ax)</label>
-                                                </div>
-                                                <div class="form-check">
-                                                    <input class="form-check-input" type="checkbox" name="wifi[]" value="Wi-Fi 7 (802.11be)" id="wifi7">
-                                                    <label class="form-check-label" for="wifi7">Wi-Fi 7 (802.11be)</label>
-                                                </div>
-                                            </div>
-                                            <div class="col-md-6 mb-3">
-                                                <label class="form-label">Bluetooth</label>
-                                                <div class="form-check">
-                                                    <input class="form-check-input" type="checkbox" name="bluetooth[]" value="Bluetooth 4.0" id="bt40">
-                                                    <label class="form-check-label" for="bt40">Bluetooth 4.0</label>
-                                                </div>
-                                                <div class="form-check">
-                                                    <input class="form-check-input" type="checkbox" name="bluetooth[]" value="Bluetooth 4.1" id="bt41">
-                                                    <label class="form-check-label" for="bt41">Bluetooth 4.1</label>
-                                                </div>
-                                                <div class="form-check">
-                                                    <input class="form-check-input" type="checkbox" name="bluetooth[]" value="Bluetooth 4.2" id="bt42">
-                                                    <label class="form-check-label" for="bt42">Bluetooth 4.2</label>
-                                                </div>
-                                                <div class="form-check">
-                                                    <input class="form-check-input" type="checkbox" name="bluetooth[]" value="Bluetooth 5.0" id="bt50">
-                                                    <label class="form-check-label" for="bt50">Bluetooth 5.0</label>
-                                                </div>
-                                                <div class="form-check">
-                                                    <input class="form-check-input" type="checkbox" name="bluetooth[]" value="Bluetooth 5.1" id="bt51">
-                                                    <label class="form-check-label" for="bt51">Bluetooth 5.1</label>
-                                                </div>
-                                                <div class="form-check">
-                                                    <input class="form-check-input" type="checkbox" name="bluetooth[]" value="Bluetooth 5.2" id="bt52">
-                                                    <label class="form-check-label" for="bt52">Bluetooth 5.2</label>
-                                                </div>
-                                                <div class="form-check">
-                                                    <input class="form-check-input" type="checkbox" name="bluetooth[]" value="Bluetooth 5.3" id="bt53">
-                                                    <label class="form-check-label" for="bt53">Bluetooth 5.3</label>
-                                                </div>
-                                                <div class="form-check">
-                                                    <input class="form-check-input" type="checkbox" name="bluetooth[]" value="Bluetooth 5.4" id="bt54">
-                                                    <label class="form-check-label" for="bt54">Bluetooth 5.4</label>
-                                                </div>
-                                                <div class="form-check">
-                                                    <input class="form-check-input" type="checkbox" name="bluetooth[]" value="Bluetooth 6.0" id="bt60">
-                                                    <label class="form-check-label" for="bt60">Bluetooth 6.0</label>
-                                                </div>
-                                            </div>
-                                            <div class="col-md-6 mb-3">
-                                                <div class="form-check">
-                                                    <input class="form-check-input" type="checkbox" name="gps" id="gps">
-                                                    <label class="form-check-label" for="gps">GPS</label>
-                                                </div>
-                                                <div class="form-check">
-                                                    <input class="form-check-input" type="checkbox" name="nfc" id="nfc">
-                                                    <label class="form-check-label" for="nfc">NFC</label>
-                                                </div>
-                                                <div class="form-check">
-                                                    <input class="form-check-input" type="checkbox" name="infrared" id="infrared">
-                                                    <label class="form-check-label" for="infrared">Infrared</label>
-                                                </div>
-                                                <div class="form-check">
-                                                    <input class="form-check-input" type="checkbox" name="fm_radio" id="fm_radio">
-                                                    <label class="form-check-label" for="fm_radio">FM Radio</label>
-                                                </div>
-                                            </div>
-                                            <div class="col-md-6 mb-3">
-                                                <label for="usb" class="form-label">USB</label>
-                                                <input type="text" class="form-control" id="usb" name="usb" placeholder="e.g., USB-C, USB-C 3.0 or Higher">
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-
-                            <!-- 14. Battery Section -->
-                            <div class="accordion-item">
-                                <h2 class="accordion-header" id="batteryHeader">
-                                    <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#batteryCollapse" aria-expanded="false" aria-controls="batteryCollapse">
-                                        <i class="fas fa-battery-three-quarters me-2"></i> Battery
-                                    </button>
-                                </h2>
-                                <div id="batteryCollapse" class="accordion-collapse collapse" aria-labelledby="batteryHeader">
-                                    <div class="accordion-body">
-                                        <div class="row">
-                                            <div class="col-md-6 mb-3">
-                                                <label for="battery_capacity" class="form-label">Capacity (mAh)</label>
-                                                <input type="number" class="form-control" id="battery_capacity" name="battery_capacity" min="500" max="10000">
-                                            </div>
-                                            <div class="col-md-6 mb-3">
-                                                <div class="form-check mt-4">
-                                                    <input class="form-check-input" type="checkbox" name="battery_sic" id="battery_sic">
-                                                    <label class="form-check-label" for="battery_sic">SI/C</label>
-                                                </div>
-                                                <div class="form-check">
-                                                    <input class="form-check-input" type="checkbox" name="battery_removable" id="battery_removable">
-                                                    <label class="form-check-label" for="battery_removable">Removable</label>
-                                                </div>
-                                            </div>
-                                            <div class="col-md-6 mb-3">
-                                                <label for="wired_charging" class="form-label">Wired Charging (W)</label>
-                                                <input type="number" class="form-control" id="wired_charging" name="wired_charging" min="0" max="300">
-                                            </div>
-                                            <div class="col-md-6 mb-3">
-                                                <label for="wireless_charging" class="form-label">Wireless Charging (W)</label>
-                                                <input type="number" class="form-control" id="wireless_charging" name="wireless_charging" min="0" max="100">
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
+                        <!-- Hidden inputs to carry serialized specs JSON for 13 grouped columns -->
+                        <div id="specs-hidden-inputs">
+                            <input type="hidden" name="network" id="spec_network" />
+                            <input type="hidden" name="launch" id="spec_launch" />
+                            <input type="hidden" name="body" id="spec_body" />
+                            <input type="hidden" name="display" id="spec_display" />
+                            <input type="hidden" name="platform" id="spec_platform" />
+                            <input type="hidden" name="memory" id="spec_memory" />
+                            <input type="hidden" name="main_camera" id="spec_main_camera" />
+                            <input type="hidden" name="selfie_camera" id="spec_selfie_camera" />
+                            <input type="hidden" name="sound" id="spec_sound" />
+                            <input type="hidden" name="comms" id="spec_comms" />
+                            <input type="hidden" name="features" id="spec_features" />
+                            <input type="hidden" name="battery" id="spec_battery" />
+                            <input type="hidden" name="misc" id="spec_misc" />
                         </div>
 
                         <div class="d-flex justify-content-end mt-3">
@@ -1126,48 +767,215 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             });
         }
 
-        // Handle device type selection
-        const deviceTypePhone = document.getElementById('device_type_phone');
-        const deviceTypeTablet = document.getElementById('device_type_tablet');
-        const formFactorField = document.getElementById('form_factor');
-        const keyboardField = document.getElementById('keyboard');
-
-        function togglePhoneSpecificFields() {
-            if (deviceTypeTablet && deviceTypeTablet.checked) {
-                // Tablet selected - disable phone-specific fields
-                if (formFactorField) {
-                    formFactorField.disabled = true;
-                    formFactorField.value = '';
-                }
-                if (keyboardField) {
-                    keyboardField.disabled = true;
-                    keyboardField.value = '';
-                }
-            } else {
-                // Phone selected - enable phone-specific fields
-                if (formFactorField) {
-                    formFactorField.disabled = false;
-                }
-                if (keyboardField) {
-                    keyboardField.disabled = false;
-                }
-            }
-        }
-
-        // Add event listeners for device type radio buttons
-        if (deviceTypePhone) {
-            deviceTypePhone.addEventListener('change', togglePhoneSpecificFields);
-        }
-        if (deviceTypeTablet) {
-            deviceTypeTablet.addEventListener('change', togglePhoneSpecificFields);
-        }
-
-        // Initialize on page load
-        togglePhoneSpecificFields();
+        // Device type removed; no toggling needed
     });
 </script>
 
 <!-- Form validation script -->
 <script src="js/form-validation.js"></script>
+
+<script>
+    // Specs Template dynamic add/remove of fields per section
+    document.addEventListener('DOMContentLoaded', function() {
+        const table = document.getElementById('specs-template-table');
+        if (!table) return;
+
+        const tbody = table.querySelector('tbody');
+        if (!tbody) return;
+
+        // Annotate rows with section grouping and inject action buttons
+        let currentSection = '';
+        [...tbody.rows].forEach((row) => {
+            const sectionCell = row.cells[0];
+            const fieldCell = row.cells[1];
+            const descCell = row.cells[2];
+            if (!sectionCell || !fieldCell) return;
+
+            const sectionText = sectionCell.textContent.trim();
+            const isFirst = sectionText !== '';
+            if (isFirst) currentSection = sectionText;
+            row.dataset.section = currentSection;
+            row.dataset.isFirst = isFirst ? 'true' : 'false';
+
+            // Make cells editable
+            sectionCell.contentEditable = 'true';
+            if (descCell) descCell.contentEditable = 'true';
+
+            // For field cell, wrap existing text in a span and make only that editable
+            const fieldText = fieldCell.textContent;
+            fieldCell.textContent = ''; // Clear the cell
+            const fieldSpan = document.createElement('span');
+            fieldSpan.contentEditable = 'true';
+            fieldSpan.textContent = fieldText;
+            fieldSpan.style.display = 'inline-block';
+            fieldSpan.style.minWidth = '60%';
+            fieldCell.appendChild(fieldSpan);
+
+            // Create actions container on the right side of Field cell
+            const actions = document.createElement('span');
+            actions.className = 'float-end';
+            actions.contentEditable = 'false';
+
+            if (isFirst) {
+                // Add button for the first row of each section
+                const addBtn = document.createElement('button');
+                addBtn.type = 'button';
+                addBtn.className = 'btn btn-sm btn-outline-primary btn-add-field';
+                addBtn.title = 'Add field';
+                addBtn.dataset.section = currentSection;
+                addBtn.innerHTML = '<i class="fas fa-plus"></i>';
+                actions.appendChild(addBtn);
+            } else {
+                // Remove button for subsequent rows
+                const removeBtn = document.createElement('button');
+                removeBtn.type = 'button';
+                removeBtn.className = 'btn btn-sm btn-outline-danger btn-remove-field';
+                removeBtn.title = 'Remove field';
+                removeBtn.innerHTML = '<i class="fas fa-minus"></i>';
+                actions.appendChild(removeBtn);
+            }
+
+            // Ensure action buttons are visible even when Field is empty
+            fieldCell.appendChild(actions);
+        });
+
+        // Event delegation for add/remove
+        tbody.addEventListener('click', function(e) {
+            const addBtn = e.target.closest('.btn-add-field');
+            const removeBtn = e.target.closest('.btn-remove-field');
+
+            if (addBtn) {
+                const section = addBtn.dataset.section || '';
+                if (!section) return;
+
+                // Find last row in this section
+                const rows = [...tbody.rows].filter(r => r.dataset.section === section);
+                const lastRow = rows[rows.length - 1];
+
+                // Create a new row with blank Field/Description and a remove button
+                const newRow = document.createElement('tr');
+                newRow.dataset.section = section;
+                newRow.dataset.isFirst = 'false';
+
+                const tdSection = document.createElement('td');
+                tdSection.textContent = '';
+                tdSection.contentEditable = 'true';
+
+                const tdField = document.createElement('td');
+                // Create editable span for field text
+                const fieldText = document.createElement('span');
+                fieldText.contentEditable = 'true';
+                fieldText.style.display = 'inline-block';
+                fieldText.style.minWidth = '60%';
+                // Actions
+                const actions = document.createElement('span');
+                actions.className = 'float-end';
+                actions.contentEditable = 'false';
+                const removeBtn2 = document.createElement('button');
+                removeBtn2.type = 'button';
+                removeBtn2.className = 'btn btn-sm btn-outline-danger btn-remove-field';
+                removeBtn2.title = 'Remove field';
+                removeBtn2.innerHTML = '<i class="fas fa-minus"></i>';
+                actions.appendChild(removeBtn2);
+                tdField.appendChild(fieldText);
+                tdField.appendChild(actions);
+
+                const tdDesc = document.createElement('td');
+                tdDesc.textContent = '';
+                tdDesc.contentEditable = 'true';
+
+                newRow.appendChild(tdSection);
+                newRow.appendChild(tdField);
+                newRow.appendChild(tdDesc);
+
+                // Insert after last row of the section
+                if (lastRow && lastRow.nextSibling) {
+                    tbody.insertBefore(newRow, lastRow.nextSibling);
+                } else {
+                    tbody.appendChild(newRow);
+                }
+
+                return;
+            }
+
+            if (removeBtn) {
+                const tr = removeBtn.closest('tr');
+                if (!tr) return;
+                // Do not remove first row of section (no remove button there anyway)
+                tbody.removeChild(tr);
+                return;
+            }
+        });
+
+        // On form submit, serialize the table into per-section JSON arrays and fill hidden inputs
+        const form = document.getElementById('add-device-form');
+        if (form) {
+            form.addEventListener('submit', function() {
+                const sectionKeyMap = {
+                    'Network': 'network',
+                    'Launch': 'launch',
+                    'Body': 'body',
+                    'Display': 'display',
+                    'Platform': 'platform',
+                    'Memory': 'memory',
+                    'Main Camera': 'main_camera',
+                    'Selfie camera': 'selfie_camera',
+                    'Sound': 'sound',
+                    'Comms': 'comms',
+                    'Features': 'features',
+                    'Battery': 'battery',
+                    'Misc': 'misc'
+                };
+
+                // Initialize containers
+                const dataByKey = {};
+                Object.values(sectionKeyMap).forEach(k => dataByKey[k] = []);
+
+                // Collect rows per original section (dataset.section)
+                const rows = [...tbody.rows];
+                rows.forEach((row) => {
+                    const section = row.dataset.section || '';
+                    const key = sectionKeyMap[section];
+                    if (!key) return; // skip unknown sections
+
+                    // Get field text from the editable span inside cell[1], not the entire cell
+                    const fieldCell = row.cells[1];
+                    const fieldSpan = fieldCell?.querySelector('span[contenteditable="true"]');
+                    const field = (fieldSpan?.innerText || '').trim();
+
+                    const desc = (row.cells[2]?.innerText || '').trim();
+
+                    // Only push if something is present
+                    if (field !== '' || desc !== '') {
+                        dataByKey[key].push({
+                            field,
+                            description: desc
+                        });
+                    }
+                });
+
+                // Fill hidden inputs with JSON strings (or empty if none)
+                const setVal = (id, val) => {
+                    const el = document.getElementById(id);
+                    if (el) el.value = val && val.length ? JSON.stringify(val) : '';
+                };
+
+                setVal('spec_network', dataByKey['network']);
+                setVal('spec_launch', dataByKey['launch']);
+                setVal('spec_body', dataByKey['body']);
+                setVal('spec_display', dataByKey['display']);
+                setVal('spec_platform', dataByKey['platform']);
+                setVal('spec_memory', dataByKey['memory']);
+                setVal('spec_main_camera', dataByKey['main_camera']);
+                setVal('spec_selfie_camera', dataByKey['selfie_camera']);
+                setVal('spec_sound', dataByKey['sound']);
+                setVal('spec_comms', dataByKey['comms']);
+                setVal('spec_features', dataByKey['features']);
+                setVal('spec_battery', dataByKey['battery']);
+                setVal('spec_misc', dataByKey['misc']);
+            });
+        }
+    });
+</script>
 
 <?php include 'includes/footer.php'; ?>
