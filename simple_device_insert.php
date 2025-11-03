@@ -112,7 +112,7 @@ function simpleAddDevice($phone)
             ':thickness' => $nullIfEmpty($phone['thickness'] ?? null),
             ':os' => $nullIfEmpty($phone['os'] ?? null),
             ':storage' => $nullIfEmpty($phone['storage'] ?? null),
-            ':card_slot' => $phone['card_slot'] ?? false,
+            ':card_slot' => $nullIfEmpty($phone['card_slot'] ?? null),
 
             // Stats fields
             ':display_size' => $nullIfEmpty($phone['display_size'] ?? null),
@@ -133,6 +133,7 @@ function simpleAddDevice($phone)
         } else {
             $errorInfo = $stmt->errorInfo();
             error_log('Database error when adding device: ' . json_encode($errorInfo));
+            error_log('All params: ' . json_encode($params));
             return ['error' => 'Database error: ' . $errorInfo[2]];
         }
     } catch (Exception $e) {

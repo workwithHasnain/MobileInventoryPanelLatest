@@ -112,7 +112,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             'thickness' => !empty($_POST['thickness']) ? trim($_POST['thickness']) : null,
             'os' => !empty($_POST['os']) ? trim($_POST['os']) : null,
             'storage' => !empty($_POST['storage']) ? trim($_POST['storage']) : null,
-            'card_slot' => isset($_POST['card_slot']) && $_POST['card_slot'] !== '' ? ($_POST['card_slot'] === '1') : null,
+            'card_slot' => !empty($_POST['card_slot']) ? trim($_POST['card_slot']) : null,
 
             // Stats fields
             'display_size' => !empty($_POST['display_size']) ? trim($_POST['display_size']) : null,
@@ -343,8 +343,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                                             <div class="col-md-3 mb-3">
                                                 <label for="card_slot" class="form-label">Memory Card Slot</label>
                                                 <select class="form-select" id="card_slot" name="card_slot">
-                                                    <option value="true">Yes (Expandable)</option>
-                                                    <option selected value="false">No</option>
+                                                    <option value="">Select...</option>
+                                                    <option value="Yes">Yes (Expandable)</option>
+                                                    <option value="No">No</option>
                                                 </select>
                                             </div>
 

@@ -437,10 +437,10 @@ function formatDeviceSpecs($device)
   }
 
   // Legacy fallback: Memory
-  if (!isset($specs['MEMORY']) && (!empty($device['ram']) || !empty($device['storage']) || isset($device['card_slot']))) {
+  if (!isset($specs['MEMORY']) && (!empty($device['ram']) || !empty($device['storage']) || !empty($device['card_slot']))) {
     $memory_details = '';
-    if (isset($device['card_slot']) && $device['card_slot'] !== null) {
-      $memory_details .= '<strong>Card slot</strong> ' . ($device['card_slot'] ? 'Yes' : 'No');
+    if (!empty($device['card_slot'])) {
+      $memory_details .= '<strong>Card slot</strong> ' . htmlspecialchars($device['card_slot']);
     }
     if (!empty($device['storage']) || !empty($device['ram'])) {
       if ($memory_details) $memory_details .= '<br>';
@@ -662,10 +662,12 @@ function generateDeviceHighlights($device)
   if (!empty($device['storage'])) {
     $storage_parts[] = $device['storage'] . ' storage';
   }
-  if (isset($device['card_slot']) && $device['card_slot'] === false) {
-    $storage_parts[] = 'no card slot';
-  } elseif (isset($device['card_slot']) && $device['card_slot'] === true) {
-    $storage_parts[] = 'expandable';
+  if (!empty($device['card_slot'])) {
+    if (strtolower($device['card_slot']) === 'no') {
+      $storage_parts[] = 'no card slot';
+    } elseif (strtolower($device['card_slot']) === 'yes') {
+      $storage_parts[] = 'expandable';
+    }
   }
   if (!empty($storage_parts)) {
     $highlights['storage'] = "💾 " . implode(', ', $storage_parts);
