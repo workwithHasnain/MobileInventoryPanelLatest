@@ -587,7 +587,7 @@ function formatDeviceSpecs($device)
   if (!isset($specs['BATTERY']) && (!empty($device['battery_capacity']) || !empty($device['battery_sic']))) {
     $battery_details = '';
     if (!empty($device['battery_capacity'])) {
-      $battery_details .= '<strong>Capacity</strong> ' . $device['battery_capacity'] . ' mAh';
+      $battery_details .= '<strong>Capacity</strong> ' . $device['battery_capacity'];
       if (!empty($device['battery_sic'])) $battery_details .= ' (Silicon)';
     }
 
@@ -744,7 +744,7 @@ function generateDeviceStats($device)
   ];
 
   // Battery stats
-  $battery_title = !empty($device['battery_capacity']) ? $device['battery_capacity'] . 'mAh' : 'N/A';
+  $battery_title = !empty($device['battery_capacity']) ? $device['battery_capacity'] : 'N/A';
   $battery_subtitle = 'N/A';
   if (!empty($device['wired_charging'])) {
     $battery_subtitle = $device['wired_charging'];
