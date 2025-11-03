@@ -53,24 +53,22 @@ function simpleAddDevice($phone)
             return '{' . implode(',', array_map('trim', $arr)) . '}';
         };
 
-        // Build the insert query including grouped spec columns as JSON (TEXT)
+        // Build the insert query matching exact schema column order
         $sql = "
             INSERT INTO phones (
-                name, brand_id, brand, availability, price, year,
-                release_date, image, images,
+                release_date, name, brand_id, brand, year, availability, price, image, images,
+                network, launch, body, display, platform, memory,
+                main_camera, selfie_camera, sound, comms, features, battery, misc,
                 weight, thickness, os, storage, card_slot,
                 display_size, display_resolution, main_camera_resolution, main_camera_video,
-                ram, chipset_name, battery_capacity, wired_charging, wireless_charging,
-                network, launch, body, display, platform, memory,
-                main_camera, selfie_camera, sound, comms, features, battery, misc
+                ram, chipset_name, battery_capacity, wired_charging, wireless_charging
             ) VALUES (
-                :name, :brand_id, :brand, :availability, :price, :year,
-                :release_date, :image, :images,
+                :release_date, :name, :brand_id, :brand, :year, :availability, :price, :image, :images,
+                :network, :launch, :body, :display, :platform, :memory,
+                :main_camera, :selfie_camera, :sound, :comms, :features, :battery, :misc,
                 :weight, :thickness, :os, :storage, :card_slot,
                 :display_size, :display_resolution, :main_camera_resolution, :main_camera_video,
-                :ram, :chipset_name, :battery_capacity, :wired_charging, :wireless_charging,
-                :network, :launch, :body, :display, :platform, :memory,
-                :main_camera, :selfie_camera, :sound, :comms, :features, :battery, :misc
+                :ram, :chipset_name, :battery_capacity, :wired_charging, :wireless_charging
             )
         ";
 
@@ -84,15 +82,30 @@ function simpleAddDevice($phone)
         };
 
         $params = [
+            ':release_date' => $nullIfEmpty($phone['release_date'] ?? null),
             ':name' => trim($phone['name'] ?? ''),
             ':brand_id' => $brand_id,
             ':brand' => $nullIfEmpty($phone['brand'] ?? null),
+            ':year' => $nullIfEmpty($phone['year'] ?? null),
             ':availability' => $nullIfEmpty($phone['availability'] ?? null),
             ':price' => $nullIfEmpty($phone['price'] ?? null),
-            ':year' => $nullIfEmpty($phone['year'] ?? null),
-            ':release_date' => $nullIfEmpty($phone['release_date'] ?? null),
             ':image' => $nullIfEmpty($phone['image'] ?? null),
             ':images' => $toPostgresArray($phone['images'] ?? []),
+
+            // Grouped spec columns (JSON strings stored as TEXT)
+            ':network' => $nullIfEmpty($phone['network'] ?? null),
+            ':launch' => $nullIfEmpty($phone['launch'] ?? null),
+            ':body' => $nullIfEmpty($phone['body'] ?? null),
+            ':display' => $nullIfEmpty($phone['display'] ?? null),
+            ':platform' => $nullIfEmpty($phone['platform'] ?? null),
+            ':memory' => $nullIfEmpty($phone['memory'] ?? null),
+            ':main_camera' => $nullIfEmpty($phone['main_camera'] ?? null),
+            ':selfie_camera' => $nullIfEmpty($phone['selfie_camera'] ?? null),
+            ':sound' => $nullIfEmpty($phone['sound'] ?? null),
+            ':comms' => $nullIfEmpty($phone['comms'] ?? null),
+            ':features' => $nullIfEmpty($phone['features'] ?? null),
+            ':battery' => $nullIfEmpty($phone['battery'] ?? null),
+            ':misc' => $nullIfEmpty($phone['misc'] ?? null),
 
             // Highlight fields
             ':weight' => $nullIfEmpty($phone['weight'] ?? null),
@@ -111,21 +124,6 @@ function simpleAddDevice($phone)
             ':battery_capacity' => $nullIfEmpty($phone['battery_capacity'] ?? null),
             ':wired_charging' => $nullIfEmpty($phone['wired_charging'] ?? null),
             ':wireless_charging' => $nullIfEmpty($phone['wireless_charging'] ?? null),
-
-            // Grouped spec columns (JSON strings stored as TEXT)
-            ':network' => $nullIfEmpty($phone['network'] ?? null),
-            ':launch' => $nullIfEmpty($phone['launch'] ?? null),
-            ':body' => $nullIfEmpty($phone['body'] ?? null),
-            ':display' => $nullIfEmpty($phone['display'] ?? null),
-            ':platform' => $nullIfEmpty($phone['platform'] ?? null),
-            ':memory' => $nullIfEmpty($phone['memory'] ?? null),
-            ':main_camera' => $nullIfEmpty($phone['main_camera'] ?? null),
-            ':selfie_camera' => $nullIfEmpty($phone['selfie_camera'] ?? null),
-            ':sound' => $nullIfEmpty($phone['sound'] ?? null),
-            ':comms' => $nullIfEmpty($phone['comms'] ?? null),
-            ':features' => $nullIfEmpty($phone['features'] ?? null),
-            ':battery' => $nullIfEmpty($phone['battery'] ?? null),
-            ':misc' => $nullIfEmpty($phone['misc'] ?? null),
         ];
 
         $result = $stmt->execute($params);
