@@ -99,7 +99,7 @@ function simpleAddDevice($phone)
             ':thickness' => $nullIfEmpty($phone['thickness'] ?? null),
             ':os' => $nullIfEmpty($phone['os'] ?? null),
             ':storage' => $nullIfEmpty($phone['storage'] ?? null),
-            ':card_slot' => isset($phone['card_slot']) ? ($phone['card_slot'] === true || $phone['card_slot'] === 1 || $phone['card_slot'] === '1' ? true : ($phone['card_slot'] === false || $phone['card_slot'] === 0 || $phone['card_slot'] === '0' ? false : null)) : null,
+            ':card_slot' => $phone['card_slot'] ?? false,
 
             // Stats fields
             ':display_size' => $nullIfEmpty($phone['display_size'] ?? null),
