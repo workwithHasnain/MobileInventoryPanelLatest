@@ -343,7 +343,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                                             <div class="col-md-3 mb-3">
                                                 <label for="card_slot" class="form-label">Memory Card Slot</label>
                                                 <select class="form-select" id="card_slot" name="card_slot">
-                                                    <option value="">Select...</option>
+                                                    <option value="No">Select...</option>
                                                     <option value="Yes">Yes (Expandable)</option>
                                                     <option value="No">No</option>
                                                 </select>
@@ -400,7 +400,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                                                 <label for="battery_capacity" class="form-label">Battery</label>
                                                 <input type="text" class="form-control" id="battery_capacity" name="battery_capacity" placeholder="e.g., 5000"
                                                     value="<?php echo isset($_POST['battery_capacity']) ? htmlspecialchars($_POST['battery_capacity']) : ''; ?>">
-                                                <small class="form-text text-muted">mAh (without unit)</small>
+                                                <small class="form-text text-muted">5000mAh</small>
                                             </div>
 
                                             <div class="col-md-2 mb-3">
