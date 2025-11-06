@@ -179,9 +179,41 @@ function getDeviceImages($device)
     }
   }
 
-  // Add images from 'images' array if available (from JSON)
-  if (!empty($device['images']) && is_array($device['images'])) {
-    foreach ($device['images'] as $image) {
+  // Add images from 'images' array if available (from database or JSON)
+  if (!empty($device['images'])) {
+    $imageArray = [];
+
+    if (is_array($device['images'])) {
+      // Already an array
+      $imageArray = $device['images'];
+    } elseif (is_string($device['images'])) {
+      // Parse PostgreSQL TEXT[] format: {path1,path2,path3}
+      $text = trim($device['images']);
+      if ($text !== '' && $text !== '{}') {
+        if ($text[0] === '{' && substr($text, -1) === '}') {
+          $inner = substr($text, 1, -1);
+          if ($inner !== '') {
+            $parts = explode(',', $inner);
+            foreach ($parts as $part) {
+              $cleaned = trim($part);
+              // Remove quotes if present
+              if ((strlen($cleaned) >= 2) &&
+                (($cleaned[0] === '"' && substr($cleaned, -1) === '"') ||
+                  ($cleaned[0] === "'" && substr($cleaned, -1) === "'"))
+              ) {
+                $cleaned = substr($cleaned, 1, -1);
+              }
+              if ($cleaned !== '' && $cleaned !== 'NULL') {
+                $imageArray[] = $cleaned;
+              }
+            }
+          }
+        }
+      }
+    }
+
+    // Add parsed images
+    foreach ($imageArray as $image) {
       if (!empty($image) && !in_array($image, $images)) { // Avoid duplicates
         $images[] = $image;
       }
@@ -2175,21 +2207,31 @@ if ($_POST && isset($_POST['submit_comment'])) {
     const modal = new bootstrap.Modal(document.getElementById('picturesModal'));
     modal.show();
 
-    // Reset carousel to first slide
-    const carousel = bootstrap.Carousel.getInstance(document.getElementById('picturesCarousel'));
-    if (carousel) {
+    // Initialize carousel after modal is shown
+    const carouselEl = document.getElementById('picturesCarousel');
+    setTimeout(() => {
+      let carousel = bootstrap.Carousel.getInstance(carouselEl);
+      if (!carousel) {
+        carousel = new bootstrap.Carousel(carouselEl, {
+          interval: false, // Don't auto-advance
+          wrap: true
+        });
+      }
       carousel.to(0);
-    }
-
-    // Update thumbnail highlighting
-    updateThumbnailHighlight(0);
+      updateThumbnailHighlight(0);
+    }, 100);
   }
 
   function showSlide(slideIndex) {
-    const carousel = bootstrap.Carousel.getInstance(document.getElementById('picturesCarousel'));
-    if (carousel) {
-      carousel.to(slideIndex);
+    const carouselEl = document.getElementById('picturesCarousel');
+    let carousel = bootstrap.Carousel.getInstance(carouselEl);
+    if (!carousel) {
+      carousel = new bootstrap.Carousel(carouselEl, {
+        interval: false,
+        wrap: true
+      });
     }
+    carousel.to(slideIndex);
     updateThumbnailHighlight(slideIndex);
   }
 

@@ -102,7 +102,7 @@ CREATE TABLE IF NOT EXISTS phones (
     thickness VARCHAR(50),
     os VARCHAR(50),
     storage VARCHAR(50),
-    card_slot boolean,
+    card_slot VARCHAR(50),
     display_size VARCHAR(50),
     display_resolution VARCHAR(100),
     main_camera_resolution VARCHAR(100),

@@ -272,7 +272,7 @@ include 'includes/header.php';
                                     <!-- Action Buttons -->
                                     <div class="mt-auto">
                                         <div class="btn-group w-100" role="group">
-                                            <a href="edit_phone.php?id=<?php echo $phone['id']; ?>"
+                                            <a href="edit_device.php?id=<?php echo $phone['id']; ?>"
                                                 class="btn btn-outline-primary btn-sm">
                                                 <i class="fas fa-edit"></i> Edit
                                             </a>
@@ -386,7 +386,7 @@ include 'includes/header.php';
                                         </div>
                                     </div>
                                     <div class="modal-footer">
-                                        <a href="edit_phone.php?id=<?php echo $phone['id']; ?>" class="btn btn-primary">Edit Device</a>
+                                        <a href="edit_device.php?id=<?php echo $phone['id']; ?>" class="btn btn-primary">Edit Device</a>
                                         <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
                                     </div>
                                 </div>
