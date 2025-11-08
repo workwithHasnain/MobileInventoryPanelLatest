@@ -472,6 +472,52 @@ function formatPrice($phone)
     return $price_line;
 }
 
+// ---- Pricing helpers (copied to align with device.php behavior) ----
+// Convert USD to EUR using a public exchange rate API
+function convertUSDtoEUR($usd_amount)
+{
+    try {
+        if ($usd_amount === null || $usd_amount === '' || !is_numeric($usd_amount)) return null;
+        $api_url = "https://open.er-api.com/v6/latest/USD";
+        $context = stream_context_create([]);
+        $response = @file_get_contents($api_url, false, $context);
+        if ($response === false) return null;
+        $data = json_decode($response, true);
+        if (isset($data['rates']['EUR']) && is_numeric($data['rates']['EUR'])) {
+            $rate = (float)$data['rates']['EUR'];
+            return $usd_amount * $rate;
+        }
+        return null;
+    } catch (Exception $e) {
+        return null;
+    }
+}
+
+// Extract numeric USD price from misc JSON (rows with field: 'Price')
+function extractPriceFromMisc($miscJson)
+{
+    if (!isset($miscJson) || $miscJson === '' || $miscJson === null) return null;
+    $decoded = json_decode($miscJson, true);
+    if (json_last_error() !== JSON_ERROR_NONE || !is_array($decoded)) return null;
+
+    foreach ($decoded as $row) {
+        $field = isset($row['field']) ? strtolower(trim((string)$row['field'])) : '';
+        $desc = isset($row['description']) ? trim((string)$row['description']) : '';
+        if ($field === 'price' && $desc !== '') {
+            // Try to extract a USD amount like $999 or 999.99
+            // First, look for an explicit $ amount
+            if (preg_match('/\$\s*([0-9]+(?:\.[0-9]{1,2})?)/', $desc, $m)) {
+                return (float)$m[1];
+            }
+            // Otherwise, fallback to the first number in the string
+            if (preg_match('/([0-9]+(?:\.[0-9]{1,2})?)/', $desc, $m)) {
+                return (float)$m[1];
+            }
+        }
+    }
+    return null;
+}
+
 // Helper function to get phone image
 function getPhoneImage($phone)
 {
@@ -656,6 +702,76 @@ function formatColors($phone)
     }
 
     return '<span class="text-muted">Not specified</span>';
+}
+
+// ---- New JSON specs rendering (align with device.php) ----
+// Helper: render a section from JSON stored as TEXT in DB
+function renderJsonSection($jsonValue, $sectionName = '')
+{
+    if (!isset($jsonValue) || $jsonValue === '' || $jsonValue === null) return null;
+    $decoded = json_decode($jsonValue, true);
+    if (json_last_error() !== JSON_ERROR_NONE || !is_array($decoded)) {
+        // If it's not valid JSON but has text, just return as-is (escaped)
+        return htmlspecialchars((string)$jsonValue);
+    }
+    $parts = [];
+    foreach ($decoded as $row) {
+        $field = isset($row['field']) ? trim((string)$row['field']) : '';
+        $desc = isset($row['description']) ? trim((string)$row['description']) : '';
+        if ($field === '' && $desc === '') continue;
+        if ($field !== '') {
+            $line = '<strong>' . htmlspecialchars($field) . '</strong>';
+            if ($desc !== '') {
+                $line .= ' ' . htmlspecialchars($desc);
+
+                // If this is the MISC -> Price row, append EUR conversion like device.php
+                if ($sectionName === 'MISC' && strtolower($field) === 'price') {
+                    // Extract numeric USD amount from description
+                    $priceStr = preg_replace('/[^0-9.]/', '', $desc);
+                    if ($priceStr !== '' && is_numeric($priceStr)) {
+                        $usd = (float)$priceStr;
+                        $eur = convertUSDtoEUR($usd);
+                        if ($eur !== null) {
+                            $line .= ' / €' . number_format($eur, 2);
+                        }
+                    }
+                }
+            }
+            $parts[] = $line;
+        } else {
+            $parts[] = htmlspecialchars($desc);
+        }
+    }
+    return implode('<br>', $parts);
+}
+
+// Build specs array from grouped JSON columns
+function formatDeviceSpecsJson($device)
+{
+    $specs = [];
+    $jsonSections = [
+        'NETWORK' => $device['network'] ?? null,
+        'LAUNCH' => $device['launch'] ?? null,
+        'BODY' => $device['body'] ?? null,
+        'DISPLAY' => $device['display'] ?? null,
+        'PLATFORM' => $device['platform'] ?? null,
+        'MEMORY' => $device['memory'] ?? null,
+        'MAIN CAMERA' => $device['main_camera'] ?? null,
+        'SELFIE CAMERA' => $device['selfie_camera'] ?? null,
+        'SOUND' => $device['sound'] ?? null,
+        'COMMUNICATIONS' => $device['comms'] ?? null,
+        'FEATURES' => $device['features'] ?? null,
+        'BATTERY' => $device['battery'] ?? null,
+        'MISC' => $device['misc'] ?? null,
+    ];
+
+    foreach ($jsonSections as $label => $raw) {
+        $html = renderJsonSection($raw, $label);
+        if ($html && trim($html) !== '') {
+            $specs[$label] = $html;
+        }
+    }
+    return $specs;
 }
 ?>
 <!DOCTYPE html>
@@ -980,158 +1096,112 @@ function formatColors($phone)
                 </tr>
             </thead>
             <tbody>
-                <tr>
-                    <td colspan="3" style="color: #f14d4d; font-size: 16px; background: #f9f9f9; font-weight: 600;">Network Technology</td>
-                </tr>
-                <tr>
-                    <td><?php echo $phone1 ? displayNetworkCapabilities($phone1) : 'N/A'; ?></td>
-                    <td><?php echo $phone2 ? displayNetworkCapabilities($phone2) : 'N/A'; ?></td>
-                    <td><?php echo $phone3 ? displayNetworkCapabilities($phone3) : 'N/A'; ?></td>
-                </tr>
+                <?php
+                // Build spec arrays from JSON for each phone (if phone selected)
+                $specs1 = $phone1 ? formatDeviceSpecsJson($phone1) : [];
+                $specs2 = $phone2 ? formatDeviceSpecsJson($phone2) : [];
+                $specs3 = $phone3 ? formatDeviceSpecsJson($phone3) : [];
 
-                <tr>
-                    <td colspan="3" style="color: #f14d4d; font-size: 16px; background: #f9f9f9; font-weight: 600;">Announcement Date</td>
-                </tr>
-                <tr>
-                    <td><?php echo $phone1 ? formatAnnouncementDate($phone1) : 'N/A'; ?></td>
-                    <td><?php echo $phone2 ? formatAnnouncementDate($phone2) : 'N/A'; ?></td>
-                    <td><?php echo $phone3 ? formatAnnouncementDate($phone3) : 'N/A'; ?></td>
-                </tr>
+                // Ordered sections (match device page logical order)
+                $orderedSections = [
+                    'NETWORK',
+                    'LAUNCH',
+                    'BODY',
+                    'DISPLAY',
+                    'PLATFORM',
+                    'MEMORY',
+                    'MAIN CAMERA',
+                    'SELFIE CAMERA',
+                    'SOUND',
+                    'COMMUNICATIONS',
+                    'FEATURES',
+                    'BATTERY',
+                    'MISC'
+                ];
 
-                <tr>
-                    <td colspan="3" style="font-weight: 600; color: #f14d4d; font-size: 16px; background: #f9f9f9;">Availability / Status</td>
-                </tr>
-                <tr>
-                    <td><?php echo $phone1 ? displayAvailability($phone1) : 'N/A'; ?></td>
-                    <td><?php echo $phone2 ? displayAvailability($phone2) : 'N/A'; ?></td>
-                    <td><?php echo $phone3 ? displayAvailability($phone3) : 'N/A'; ?></td>
-                </tr>
+                // Fallback legacy mapping for key sections if JSON absent
+                $legacyFallback = function ($label, $phone) {
+                    if (!$phone) return 'N/A';
+                    switch ($label) {
+                        case 'NETWORK':
+                            return displayNetworkCapabilities($phone);
+                        case 'LAUNCH':
+                            // combine announcement + availability + price if present
+                            $parts = [];
+                            if (!empty($phone['release_date'])) {
+                                $parts[] = formatAnnouncementDate($phone);
+                            }
+                            if (!empty($phone['availability'])) {
+                                $parts[] = 'Status: ' . htmlspecialchars($phone['availability']);
+                            }
+                            // Prefer extracting price from misc JSON if available
+                            $usdPrice = null;
+                            if (!empty($phone['misc'])) {
+                                $usdPrice = extractPriceFromMisc($phone['misc']);
+                            }
+                            if ($usdPrice === null && !empty($phone['price']) && is_numeric($phone['price'])) {
+                                $usdPrice = (float)$phone['price'];
+                            }
+                            if ($usdPrice !== null) {
+                                $priceLine = 'Price: $' . number_format($usdPrice, 2);
+                                $eur = convertUSDtoEUR($usdPrice);
+                                if ($eur !== null) {
+                                    $priceLine .= ' / €' . number_format($eur, 2);
+                                }
+                                $parts[] = $priceLine;
+                            }
+                            return !empty($parts) ? implode('<br>', $parts) : 'N/A';
+                        case 'BODY':
+                            $body = [];
+                            $dims = formatDimensions($phone);
+                            if ($dims && strpos($dims, 'Not specified') === false) $body[] = '<strong>Dimensions</strong> ' . $dims;
+                            if (!empty($phone['weight'])) $body[] = '<strong>Weight</strong> ' . htmlspecialchars($phone['weight']) . ' g';
+                            return !empty($body) ? implode('<br>', $body) : 'N/A';
+                        case 'DISPLAY':
+                            return formatDisplay($phone);
+                        case 'PLATFORM':
+                            $plat = [];
+                            if (!empty($phone['os'])) $plat[] = '<strong>OS</strong> ' . htmlspecialchars($phone['os']);
+                            if (!empty($phone['chipset_name'])) $plat[] = '<strong>Chipset</strong> ' . htmlspecialchars($phone['chipset_name']);
+                            return !empty($plat) ? implode('<br>', $plat) : 'N/A';
+                        case 'MEMORY':
+                            return formatMemory($phone);
+                        case 'MAIN CAMERA':
+                            return formatMainCamera($phone);
+                        case 'SELFIE CAMERA':
+                            return formatSelfieCamera($phone);
+                        case 'SOUND':
+                            return formatSound($phone);
+                        case 'COMMUNICATIONS':
+                            return formatCommunications($phone);
+                        case 'FEATURES':
+                            return formatFeatures($phone);
+                        case 'BATTERY':
+                            return formatBattery($phone);
+                        case 'MISC':
+                            // Price & colors if available
+                            $miscParts = [];
+                            $colors = formatColors($phone);
+                            if ($colors && strpos($colors, 'Not specified') === false) $miscParts[] = '<strong>Colors</strong> ' . $colors;
+                            // Remove direct price display here to avoid duplication (now shown in LAUNCH)
+                            return !empty($miscParts) ? implode('<br>', $miscParts) : 'N/A';
+                        default:
+                            return 'N/A';
+                    }
+                };
 
-                <tr>
-                    <td colspan="3" style="font-weight: 600; color: #f14d4d; font-size: 16px; background: #f9f9f9;">Dimensions</td>
-                </tr>
-                <tr>
-                    <td><?php echo $phone1 ? formatDimensions($phone1) : 'N/A'; ?></td>
-                    <td><?php echo $phone2 ? formatDimensions($phone2) : 'N/A'; ?></td>
-                    <td><?php echo $phone3 ? formatDimensions($phone3) : 'N/A'; ?></td>
-                </tr>
-
-                <tr>
-                    <td colspan="3" style="font-weight: 600; color: #f14d4d; font-size: 16px; background: #f9f9f9;">Weight</td>
-                </tr>
-                <tr>
-                    <td><?php echo $phone1 ? formatWeight($phone1) : 'N/A'; ?></td>
-                    <td><?php echo $phone2 ? formatWeight($phone2) : 'N/A'; ?></td>
-                    <td><?php echo $phone3 ? formatWeight($phone3) : 'N/A'; ?></td>
-                </tr>
-
-                <tr>
-                    <td colspan="3" style="font-weight: 600; color: #f14d4d; font-size: 16px; background: #f9f9f9;">Operating System (OS)</td>
-                </tr>
-                <tr>
-                    <td><?php echo $phone1 ? formatOS($phone1) : 'N/A'; ?></td>
-                    <td><?php echo $phone2 ? formatOS($phone2) : 'N/A'; ?></td>
-                    <td><?php echo $phone3 ? formatOS($phone3) : 'N/A'; ?></td>
-                </tr>
-
-                <tr>
-                    <td colspan="3" style="font-weight: 600; color: #f14d4d; font-size: 16px; background: #f9f9f9;">Chipset</td>
-                </tr>
-                <tr>
-                    <td><?php echo $phone1 ? formatChipset($phone1) : 'N/A'; ?></td>
-                    <td><?php echo $phone2 ? formatChipset($phone2) : 'N/A'; ?></td>
-                    <td><?php echo $phone3 ? formatChipset($phone3) : 'N/A'; ?></td>
-                </tr>
-
-                <tr>
-                    <td colspan="3" style="font-weight: 600; color: #f14d4d; font-size: 16px; background: #f9f9f9;">Main Camera</td>
-                </tr>
-                <tr>
-                    <td><?php echo $phone1 ? formatMainCamera($phone1) : 'N/A'; ?></td>
-                    <td><?php echo $phone2 ? formatMainCamera($phone2) : 'N/A'; ?></td>
-                    <td><?php echo $phone3 ? formatMainCamera($phone3) : 'N/A'; ?></td>
-                </tr>
-
-                <tr>
-                    <td colspan="3" style="font-weight: 600; color: #f14d4d; font-size: 16px; background: #f9f9f9;">Selfie Camera</td>
-                </tr>
-                <tr>
-                    <td><?php echo $phone1 ? formatSelfieCamera($phone1) : 'N/A'; ?></td>
-                    <td><?php echo $phone2 ? formatSelfieCamera($phone2) : 'N/A'; ?></td>
-                    <td><?php echo $phone3 ? formatSelfieCamera($phone3) : 'N/A'; ?></td>
-                </tr>
-
-                <tr>
-                    <td colspan="3" style="font-weight: 600; color: #f14d4d; font-size: 16px; background: #f9f9f9;">Battery</td>
-                </tr>
-                <tr>
-                    <td><?php echo $phone1 ? formatBattery($phone1) : 'N/A'; ?></td>
-                    <td><?php echo $phone2 ? formatBattery($phone2) : 'N/A'; ?></td>
-                    <td><?php echo $phone3 ? formatBattery($phone3) : 'N/A'; ?></td>
-                </tr>
-
-                <tr>
-                    <td colspan="3" style="font-weight: 600; color: #f14d4d; font-size: 16px; background: #f9f9f9;">Display</td>
-                </tr>
-                <tr>
-                    <td><?php echo $phone1 ? formatDisplay($phone1) : 'N/A'; ?></td>
-                    <td><?php echo $phone2 ? formatDisplay($phone2) : 'N/A'; ?></td>
-                    <td><?php echo $phone3 ? formatDisplay($phone3) : 'N/A'; ?></td>
-                </tr>
-
-                <tr>
-                    <td colspan="3" style="font-weight: 600; color: #f14d4d; font-size: 16px; background: #f9f9f9;">Memory</td>
-                </tr>
-                <tr>
-                    <td><?php echo $phone1 ? formatMemory($phone1) : 'N/A'; ?></td>
-                    <td><?php echo $phone2 ? formatMemory($phone2) : 'N/A'; ?></td>
-                    <td><?php echo $phone3 ? formatMemory($phone3) : 'N/A'; ?></td>
-                </tr>
-
-                <tr>
-                    <td colspan="3" style="font-weight: 600; color: #f14d4d; font-size: 16px; background: #f9f9f9;">Sound</td>
-                </tr>
-                <tr>
-                    <td><?php echo $phone1 ? formatSound($phone1) : 'N/A'; ?></td>
-                    <td><?php echo $phone2 ? formatSound($phone2) : 'N/A'; ?></td>
-                    <td><?php echo $phone3 ? formatSound($phone3) : 'N/A'; ?></td>
-                </tr>
-
-                <tr>
-                    <td colspan="3" style="font-weight: 600; color: #f14d4d; font-size: 16px; background: #f9f9f9;">Communications</td>
-                </tr>
-                <tr>
-                    <td><?php echo $phone1 ? formatCommunications($phone1) : 'N/A'; ?></td>
-                    <td><?php echo $phone2 ? formatCommunications($phone2) : 'N/A'; ?></td>
-                    <td><?php echo $phone3 ? formatCommunications($phone3) : 'N/A'; ?></td>
-                </tr>
-
-                <tr>
-                    <td colspan="3" style="font-weight: 600; color: #f14d4d; font-size: 16px; background: #f9f9f9;">Features</td>
-                </tr>
-                <tr>
-                    <td><?php echo $phone1 ? formatFeatures($phone1) : 'N/A'; ?></td>
-                    <td><?php echo $phone2 ? formatFeatures($phone2) : 'N/A'; ?></td>
-                    <td><?php echo $phone3 ? formatFeatures($phone3) : 'N/A'; ?></td>
-                </tr>
-
-                <tr>
-                    <td colspan="3" style="font-weight: 600; color: #f14d4d; font-size: 16px; background: #f9f9f9;">Colors</td>
-                </tr>
-                <tr>
-                    <td><?php echo $phone1 ? formatColors($phone1) : 'N/A'; ?></td>
-                    <td><?php echo $phone2 ? formatColors($phone2) : 'N/A'; ?></td>
-                    <td><?php echo $phone3 ? formatColors($phone3) : 'N/A'; ?></td>
-                </tr>
-
-                <tr>
-                    <td colspan="3" style="font-weight: 600; color: #f14d4d; font-size: 16px; background: #f9f9f9;">Price</td>
-                </tr>
-                <tr>
-                    <td><?php echo $phone1 ? formatPrice($phone1) : 'N/A'; ?></td>
-                    <td><?php echo $phone2 ? formatPrice($phone2) : 'N/A'; ?></td>
-                    <td><?php echo $phone3 ? formatPrice($phone3) : 'N/A'; ?></td>
-                </tr>
+                foreach ($orderedSections as $section) {
+                    $val1 = isset($specs1[$section]) ? $specs1[$section] : $legacyFallback($section, $phone1);
+                    $val2 = isset($specs2[$section]) ? $specs2[$section] : $legacyFallback($section, $phone2);
+                    $val3 = isset($specs3[$section]) ? $specs3[$section] : $legacyFallback($section, $phone3);
+                    echo '<tr><td colspan="3" style="color:#f14d4d;font-size:16px;background:#f9f9f9;font-weight:600;">' . htmlspecialchars($section) . '</td></tr>';
+                    echo '<tr>';
+                    echo '<td>' . ($val1 !== '' ? $val1 : 'N/A') . '</td>';
+                    echo '<td>' . ($val2 !== '' ? $val2 : 'N/A') . '</td>';
+                    echo '<td>' . ($val3 !== '' ? $val3 : 'N/A') . '</td>';
+                    echo '</tr>';
+                }
+                ?>
             </tbody>
         </table>
 
