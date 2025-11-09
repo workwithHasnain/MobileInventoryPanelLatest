@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Database Export Script
  * Exports all data from database tables into an SQL file and downloads it
@@ -14,48 +15,48 @@ ini_set('memory_limit', '256M');
 try {
     // Get database connection
     $pdo = getConnection();
-    
+
     // Get database name
     $dbname = getenv('PGDATABASE') ?: 'mobile_tech_hub';
-    
+
     // Start building SQL content
     $sqlContent = "-- Database Export\n";
     $sqlContent .= "-- Generated: " . date('Y-m-d H:i:s') . "\n";
     $sqlContent .= "-- Database: {$dbname}\n\n";
     $sqlContent .= "SET client_encoding = 'UTF8';\n";
     $sqlContent .= "SET standard_conforming_strings = on;\n\n";
-    
+
     // Get all tables from the database
     $query = "SELECT table_name 
               FROM information_schema.tables 
               WHERE table_schema = 'public' 
               AND table_type = 'BASE TABLE'
               ORDER BY table_name";
-    
+
     $stmt = $pdo->query($query);
     $tables = $stmt->fetchAll(PDO::FETCH_COLUMN);
-    
+
     if (empty($tables)) {
         throw new Exception("No tables found in the database.");
     }
-    
+
     // Loop through each table and export data
     foreach ($tables as $table) {
         $sqlContent .= "\n-- --------------------------------------------------------\n";
         $sqlContent .= "-- Table: {$table}\n";
         $sqlContent .= "-- --------------------------------------------------------\n\n";
-        
+
         // Get table structure (for reference in comments)
         $columnsQuery = "SELECT column_name, data_type, is_nullable, column_default
                          FROM information_schema.columns
                          WHERE table_name = :table
                          AND table_schema = 'public'
                          ORDER BY ordinal_position";
-        
+
         $columnsStmt = $pdo->prepare($columnsQuery);
         $columnsStmt->execute([':table' => $table]);
         $columns = $columnsStmt->fetchAll();
-        
+
         // Add column information as comments
         $sqlContent .= "-- Columns:\n";
         foreach ($columns as $column) {
@@ -64,29 +65,29 @@ try {
             $sqlContent .= "-- - {$column['column_name']} ({$column['data_type']}) {$nullable}{$default}\n";
         }
         $sqlContent .= "\n";
-        
+
         // Get row count
         $countStmt = $pdo->query("SELECT COUNT(*) FROM \"{$table}\"");
         $rowCount = $countStmt->fetchColumn();
-        
+
         if ($rowCount > 0) {
             // Get all data from the table
             $dataStmt = $pdo->query("SELECT * FROM \"{$table}\"");
             $rows = $dataStmt->fetchAll(PDO::FETCH_ASSOC);
-            
+
             // Get column names
             $columnNames = array_keys($rows[0]);
-            $escapedColumns = array_map(function($col) {
+            $escapedColumns = array_map(function ($col) {
                 return '"' . $col . '"';
             }, $columnNames);
-            
+
             $sqlContent .= "-- Dumping data for table {$table}\n";
             $sqlContent .= "-- {$rowCount} rows\n\n";
-            
+
             // Generate INSERT statements
             foreach ($rows as $row) {
                 $values = [];
-                
+
                 foreach ($row as $value) {
                     if ($value === null) {
                         $values[] = 'NULL';
@@ -104,42 +105,41 @@ try {
                         $values[] = "'" . $escapedValue . "'";
                     }
                 }
-                
+
                 $sqlContent .= "INSERT INTO \"{$table}\" (" . implode(', ', $escapedColumns) . ") VALUES (";
                 $sqlContent .= implode(', ', $values);
                 $sqlContent .= ");\n";
             }
-            
+
             $sqlContent .= "\n";
         } else {
             $sqlContent .= "-- No data in table {$table}\n\n";
         }
     }
-    
+
     // Add footer
     $sqlContent .= "\n-- Export completed successfully\n";
     $sqlContent .= "-- Total tables exported: " . count($tables) . "\n";
-    
+
     // Generate filename with timestamp
     $filename = $dbname . '_export_' . date('Y-m-d_His') . '.sql';
-    
+
     // Set headers for download
     header('Content-Type: application/sql');
     header('Content-Disposition: attachment; filename="' . $filename . '"');
     header('Content-Length: ' . strlen($sqlContent));
     header('Cache-Control: no-cache, must-revalidate');
     header('Expires: Sat, 26 Jul 1997 05:00:00 GMT'); // Past date
-    
+
     // Output the SQL content
     echo $sqlContent;
-    
+
     // Exit to prevent any additional output
     exit;
-    
 } catch (Exception $e) {
     // Log error
     error_log('Database export error: ' . $e->getMessage());
-    
+
     // Display error to user
     header('Content-Type: text/html; charset=utf-8');
     echo "<!DOCTYPE html>\n";
