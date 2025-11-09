@@ -465,31 +465,26 @@ $brands = $brands_stmt->fetchAll();
                         OS: </button>
                     <div class="collapse" id="osCollapse">
                         <div class="card card-body px-3">
-                            <div class="form-check">
-                                <input class="form-check-input" type="checkbox" value="Mini-SIM" id="miniSim"
-                                    name="size" />
-                                <label class="form-check-label" for="miniSim"> Feature phones</label>
-                            </div>
-                            <div class="form-check">
-                                <input class="form-check-input" type="checkbox" value="Mini-SIM" id="miniSim"
-                                    name="size" />
-                                <label class="form-check-label" for="miniSim">Android</label>
-                            </div>
-                            <div class="form-check">
-                                <input class="form-check-input" type="checkbox" value="Nano-SIM" id="nanoSim"
-                                    name="size" />
-                                <label class="form-check-label" for="nanoSim">Windows Phone</label>
-                            </div>
-
-                            <div class="form-check">
-                                <input class="form-check-input" type="checkbox" value="Nano-SIM" id="nanoSim"
-                                    name="size" />
-                                <label class="form-check-label" for="nanoSim">Symbian</label>
-                            </div>
-                            <div class="form-check">
-                                <input class="form-check-input" type="checkbox" value="Nano-SIM" id="nanoSim"
-                                    name="size" />
-                                <label class="form-check-label" for="nanoSim">RIM Bada</label>
+                            <div class="row g-2">
+                                <div class="col-12">Select OS family</div>
+                                <div class="col-6">
+                                    <div class="form-check">
+                                        <input class="form-check-input" type="checkbox" value="android" id="osAndroid" name="os_family" />
+                                        <label class="form-check-label" for="osAndroid">Android</label>
+                                    </div>
+                                </div>
+                                <div class="col-6">
+                                    <div class="form-check">
+                                        <input class="form-check-input" type="checkbox" value="ios" id="osIOS" name="os_family" />
+                                        <label class="form-check-label" for="osIOS">iOS</label>
+                                    </div>
+                                </div>
+                                <div class="col-12">
+                                    <div class="form-check">
+                                        <input class="form-check-input" type="checkbox" value="other" id="osOther" name="os_family" />
+                                        <label class="form-check-label" for="osOther">Other (not Android/iOS)</label>
+                                    </div>
+                                </div>
                             </div>
                         </div>
                     </div>
@@ -499,37 +494,8 @@ $brands = $brands_stmt->fetchAll();
                         CHIPSET: </button>
                     <div class="collapse" id="chipsCollapse">
                         <div class="card card-body px-3">
-                            <div class="form-check">
-                                <input class="form-check-input" type="checkbox" value="Mini-SIM" id="miniSim"
-                                    name="size" />
-                                <label class="form-check-label" for="miniSim">Any Dimensity </label>
-                            </div>
-                            <div class="form-check">
-                                <input class="form-check-input" type="checkbox" value="Mini-SIM" id="miniSim"
-                                    name="size" />
-                                <label class="form-check-label" for="miniSim">Snapdragon 8 Gen 3</label>
-                            </div>
-                            <div class="form-check">
-                                <input class="form-check-input" type="checkbox" value="Mini-SIM" id="miniSim"
-                                    name="size" />
-                                <label class="form-check-label" for="miniSim">Any Helio</label>
-                            </div>
-                            <div class="form-check">
-                                <input class="form-check-input" type="checkbox" value="Nano-SIM" id="nanoSim"
-                                    name="size" />
-                                <label class="form-check-label" for="nanoSim">Any Kirin</label>
-                            </div>
-
-                            <div class="form-check">
-                                <input class="form-check-input" type="checkbox" value="Nano-SIM" id="nanoSim"
-                                    name="size" />
-                                <label class="form-check-label" for="nanoSim">Snapdragon 8 Elite</label>
-                            </div>
-                            <div class="form-check">
-                                <input class="form-check-input" type="checkbox" value="Nano-SIM" id="nanoSim"
-                                    name="size" />
-                                <label class="form-check-label" for="nanoSim">Snapdragon 8 Gen 1</label>
-                            </div>
+                            <label for="chipsetQuery" class="form-label">Chipset contains</label>
+                            <input type="text" id="chipsetQuery" class="form-control" placeholder="e.g. Snapdragon 8 Gen, A18, Dimensity 9300" />
                         </div>
                     </div>
 
@@ -559,11 +525,13 @@ $brands = $brands_stmt->fetchAll();
                         </div>
                     </div>
                     <div class="filter-header mx-1 mb-2">Memory</div>
+                    <!-- RAM filter (Min GB) -->
                     <div class="d-flex fw-bolder align-items-center gap-3 mt-3"
                         style="border: 1px solid; padding: 7px; margin-top: 14px;">
-                        RAM: <span id="yearValue">Any</span>
-                        <input type="range" class="form-range custom-range flex-grow-1" min="2000" max="2025"
-                            id="rangeYear">
+                        Min RAM: <span id="ramMinValue">Any</span>
+                        <input type="range" class="form-range custom-range flex-grow-1" min="0" max="32" step="1"
+                            id="ramMin" value="0">
+                        <span class="text-muted">GB</span>
                     </div>
                     <button style="border-radius: 1px;" class=" btn btn-toggle w-100 mt-2 text-start" type="button"
                         data-bs-toggle="collapse" data-bs-target="#cardCollapse" aria-expanded="false"
@@ -572,21 +540,9 @@ $brands = $brands_stmt->fetchAll();
                     <div class="collapse" id="cardCollapse">
                         <div class="card card-body px-3">
                             <div class="form-check">
-                                <input class="form-check-input" type="checkbox" value="Mini-SIM" id="miniSim"
-                                    name="size" />
-                                <label class="form-check-label" for="miniSim">Yes (any type) </label>
+                                <input class="form-check-input" type="checkbox" id="cardSlotRequired" />
+                                <label class="form-check-label" for="cardSlotRequired">Require card slot</label>
                             </div>
-                            <div class="form-check">
-                                <input class="form-check-input" type="checkbox" value="Mini-SIM" id="miniSim"
-                                    name="size" />
-                                <label class="form-check-label" for="miniSim">Yes (dedicated)</label>
-                            </div>
-                            <div class="form-check">
-                                <input class="form-check-input" type="checkbox" value="Mini-SIM" id="miniSim"
-                                    name="size" />
-                                <label class="form-check-label" for="miniSim">No</label>
-                            </div>
-
                         </div>
                     </div>
 
@@ -594,12 +550,16 @@ $brands = $brands_stmt->fetchAll();
             </div>
 
             <div class="col-lg-6 col-12 pt-3">
+                <!-- Year filter (Min-Max) -->
                 <div class="d-flex fw-bolder align-items-center gap-3 mt-4"
                     style="border: 1px solid; padding: 7px; margin-top: 14px;">
-                    Year: <span id="yearValue">Min</span>
-                    <input type="range" class="form-range custom-range flex-grow-1" min="2000" max="2025"
-                        id="rangeYear">
-                    <span class="text-muted">Max</span>
+                    Year: <span id="yearMinValue">2000</span>
+                    <input type="range" class="form-range custom-range flex-grow-1" min="2000" max="2026"
+                        id="yearMin" value="2000">
+                    <span class="mx-2">-</span>
+                    <input type="range" class="form-range custom-range flex-grow-1" min="2000" max="2026"
+                        id="yearMax" value="2026">
+                    <span id="yearMaxValue">2026</span>
                 </div>
                 <!-- Price filter (Max price) -->
                 <div class="d-flex fw-bolder align-items-center gap-3 mt-4"
@@ -786,10 +746,10 @@ $brands = $brands_stmt->fetchAll();
                     MIN OS VERSION: </button>
                 <div class="collapse" id="iosCollapse">
                     <div class="card card-body px-3">
-                        <div class="form-check">
-                            <input class="form-check-input" type="checkbox" value="Mini-SIM" id="miniSim" name="size"
-                                checked />
-                            <label class="form-check-label" for="miniSim">Select an OS First</label>
+                        <div class="d-flex fw-bolder align-items-center gap-3">
+                            Min OS Version: <span id="osVersionMinValue">Any</span>
+                            <input type="range" class="form-range custom-range flex-grow-1" min="0" max="20" step="1"
+                                id="osVersionMin" value="0">
                         </div>
                     </div>
                 </div>
@@ -839,11 +799,13 @@ $brands = $brands_stmt->fetchAll();
                         </div>
                     </div>
                 </div>
+                <!-- Storage filter (Min GB) -->
                 <div class="d-flex fw-bolder align-items-center gap-3 mt-5"
                     style="border: 1px solid; padding: 7px; margin-top: 14px;">
-                    Storage: <span id="yearValue">Any</span>
-                    <input type="range" class="form-range custom-range flex-grow-1 " min="2000" max="2025"
-                        id="rangeYear">
+                    Min Storage: <span id="storageMinValue">Any</span>
+                    <input type="range" class="form-range custom-range flex-grow-1" min="0" max="2048" step="16"
+                        id="storageMin" value="0">
+                    <span class="text-muted">GB</span>
                 </div>
             </div>
             <div class="filter-header">Display</div>
@@ -855,12 +817,17 @@ $brands = $brands_stmt->fetchAll();
         </div>
         <div class="row gx-4 gy-3 crs">
             <div class="col-lg-6 mt-3 py-3">
+                <!-- Display Size filter (Min-Max inches) -->
                 <div class="filter-box ">
                     <span class="filter-label">Size:</span>
-                    <span id="sizeValue">min</span>
-                    <input type="range" class="form-range custom-range flex-grow-1" min="2000" max="2025"
-                        id="rangeSize" />
-                    <span class="text-muted">max</span>
+                    <span id="displaySizeMinValue">3.0</span>
+                    <input type="range" class="form-range custom-range flex-grow-1" min="3.0" max="8.0" step="0.1"
+                        id="displaySizeMin" value="3.0" />
+                    <span class="mx-2">-</span>
+                    <input type="range" class="form-range custom-range flex-grow-1" min="3.0" max="8.0" step="0.1"
+                        id="displaySizeMax" value="8.0" />
+                    <span id="displaySizeMaxValue">8.0</span>
+                    <span class="text-muted">"</span>
                 </div>
                 <button class="btn  btn-toggle w-100  mb-3 mt-2" type="button" data-bs-toggle="collapse"
                     data-bs-target="#techCollapse" aria-expanded="false" aria-controls="techCollapse">
@@ -895,9 +862,10 @@ $brands = $brands_stmt->fetchAll();
                 <div class="filter-header mt-4 mb-3" style="margin-left: -1px;">Main Camera</div>
                 <div class="filter-box  ">
                     <span class="filter-label ">Resolution</span>
-                    <span id="sizeValue">Any</span>
-                    <input type="range" class="form-range custom-range flex-grow-1" min="2000" max="2025"
-                        id="rangeSize" />
+                    <span id="mainCamMpMinValue">Any</span>
+                    <input type="range" class="form-range custom-range flex-grow-1" min="0" max="200" step="1"
+                        id="mainCamMpMin" />
+                    <span class="text-muted">MP</span>
                 </div>
                 <div class="filter-box mt-1 ">
                     <span class="filter-label ">F-NUMBER</span>
@@ -907,9 +875,20 @@ $brands = $brands_stmt->fetchAll();
                 </div>
                 <div class="filter-box mt-1">
                     <span class="filter-label ">VIDEO</span>
-                    <span id="sizeValue">Any</span>
-                    <input type="range" class="form-range custom-range flex-grow-1" min="2000" max="2025"
-                        id="rangeSize" />
+                    <div class="row">
+                        <div class="col-6">
+                            <div class="form-check">
+                                <input class="form-check-input" type="checkbox" id="video4k" />
+                                <label class="form-check-label" for="video4k">4K</label>
+                            </div>
+                        </div>
+                        <div class="col-6">
+                            <div class="form-check">
+                                <input class="form-check-input" type="checkbox" id="video8k" />
+                                <label class="form-check-label" for="video8k">8K</label>
+                            </div>
+                        </div>
+                    </div>
                 </div>
                 <div class="filter-header my-3" style="margin-left: -1px;">Selfie Camera</div>
                 <div class="filter-box ">
@@ -994,17 +973,18 @@ $brands = $brands_stmt->fetchAll();
                 </div>
                 <div class="filter-header mt-1 mb-2" style="margin-left: -1px;">Battery</div>
                 <div class="filter-box ">
-                    <span class="filter-label ">CAPACITY</span>
-                    <span id="sizeValue">Any</span>
-                    <input type="range" class="form-range custom-range flex-grow-1" min="2000" max="2025"
-                        id="rangeSize" />
+                    <span class="filter-label ">Capacity</span>
+                    <span id="batteryCapacityMinValue">Any</span>
+                    <input type="range" class="form-range custom-range flex-grow-1" min="0" max="10000" step="100"
+                        id="batteryCapacityMin" />
+                    <span class="text-muted">mAh</span>
                 </div>
                 <div class="filter-box mt-1">
-                    <span class="filter-label">WIRED CHARGING:</span>
-                    <span id="sizeValue">min</span>
-                    <input type="range" class="form-range custom-range flex-grow-1" min="2000" max="2025"
-                        id="rangeSize" />
-                    <span class="text-muted">max</span>
+                    <span class="filter-label">Wired Charging:</span>
+                    <span id="wiredChargeMinValue">Any</span>
+                    <input type="range" class="form-range custom-range flex-grow-1" min="0" max="300" step="5"
+                        id="wiredChargeMin" />
+                    <span class="text-muted">W</span>
                 </div>
 
                 <div class="filter-header mt-3 mb-3" style="margin-left: -1px;">Misc</div>
@@ -1208,11 +1188,21 @@ $brands = $brands_stmt->fetchAll();
                     </div>
                 </div>
                 <div class="filter-box mt-1">
-                    <span class="filter-label">WIRELESS CHARGING:</span>
-                    <span id="sizeValue">min</span>
-                    <input type="range" class="form-range custom-range flex-grow-1" min="2000" max="2025"
-                        id="rangeSize" />
-                    <span class="text-muted">max</span>
+                    <span class="filter-label">Wireless Charging:</span>
+                    <div class="row g-2 align-items-center">
+                        <div class="col-12">
+                            <div class="form-check">
+                                <input class="form-check-input" type="checkbox" id="wirelessRequired" />
+                                <label class="form-check-label" for="wirelessRequired">Require wireless charging</label>
+                            </div>
+                        </div>
+                        <div class="col-12 d-flex fw-bolder align-items-center gap-3">
+                            Min: <span id="wirelessChargeMinValue">Any</span>
+                            <input type="range" class="form-range custom-range flex-grow-1" min="0" max="100" step="5"
+                                id="wirelessChargeMin" />
+                            <span class="text-muted">W</span>
+                        </div>
+                    </div>
                 </div>
                 <button class="btn  btn-toggle w-100  mb-3 mt-5" type="button" data-bs-toggle="collapse"
                     data-bs-target="#popularCollapse" aria-expanded="false" aria-controls="popularCollapse">
@@ -1285,10 +1275,50 @@ $brands = $brands_stmt->fetchAll();
             const resultsSection = document.getElementById('resultsSection');
             const resultsContainer = document.getElementById('resultsContainer');
             const resultsCount = document.getElementById('resultsCount');
+
             // Price slider elements
             const priceMaxInput = document.getElementById('priceMax');
             const priceMaxValue = document.getElementById('priceMaxValue');
 
+            // Year slider elements
+            const yearMinInput = document.getElementById('yearMin');
+            const yearMinValue = document.getElementById('yearMinValue');
+            const yearMaxInput = document.getElementById('yearMax');
+            const yearMaxValue = document.getElementById('yearMaxValue');
+
+            // RAM slider elements
+            const ramMinInput = document.getElementById('ramMin');
+            const ramMinValue = document.getElementById('ramMinValue');
+
+            // Storage slider elements
+            const storageMinInput = document.getElementById('storageMin');
+            const storageMinValue = document.getElementById('storageMinValue');
+
+            // Display size slider elements
+            const displaySizeMinInput = document.getElementById('displaySizeMin');
+            const displaySizeMinValue = document.getElementById('displaySizeMinValue');
+            const displaySizeMaxInput = document.getElementById('displaySizeMax');
+            const displaySizeMaxValue = document.getElementById('displaySizeMaxValue');
+
+            // B1 new controls
+            const osVersionMinInput = document.getElementById('osVersionMin');
+            const osVersionMinValue = document.getElementById('osVersionMinValue');
+            const chipsetQueryInput = document.getElementById('chipsetQuery');
+            const cardSlotRequiredInput = document.getElementById('cardSlotRequired');
+            const mainCamMpMinInput = document.getElementById('mainCamMpMin');
+            const mainCamMpMinValue = document.getElementById('mainCamMpMinValue');
+            const video4kInput = document.getElementById('video4k');
+            const video8kInput = document.getElementById('video8k');
+            const batteryCapacityMinInput = document.getElementById('batteryCapacityMin');
+            const batteryCapacityMinValue = document.getElementById('batteryCapacityMinValue');
+            const wiredChargeMinInput = document.getElementById('wiredChargeMin');
+            const wiredChargeMinValue = document.getElementById('wiredChargeMinValue');
+            const wirelessRequiredInput = document.getElementById('wirelessRequired');
+            const wirelessChargeMinInput = document.getElementById('wirelessChargeMin');
+            const wirelessChargeMinValue = document.getElementById('wirelessChargeMinValue');
+            const osFamilyInputs = document.querySelectorAll('input[name="os_family"]');
+
+            // Price slider handler
             if (priceMaxInput && priceMaxValue) {
                 const maxPrice = parseInt(priceMaxInput.max, 10);
                 const formatUsd = (v) => {
@@ -1296,12 +1326,170 @@ $brands = $brands_stmt->fetchAll();
                     if (isNaN(num) || num <= 0 || num >= maxPrice) return 'Any';
                     return '$' + num.toLocaleString();
                 };
-                // Initialize display
                 priceMaxValue.textContent = formatUsd(priceMaxInput.value);
-                // Update on input
                 priceMaxInput.addEventListener('input', function() {
                     priceMaxValue.textContent = formatUsd(this.value);
                 });
+            }
+
+            // Year slider handlers
+            if (yearMinInput && yearMinValue) {
+                yearMinValue.textContent = yearMinInput.value;
+                yearMinInput.addEventListener('input', function() {
+                    yearMinValue.textContent = this.value;
+                    // Ensure min <= max
+                    if (parseInt(this.value) > parseInt(yearMaxInput.value)) {
+                        yearMaxInput.value = this.value;
+                        yearMaxValue.textContent = this.value;
+                    }
+                });
+            }
+            if (yearMaxInput && yearMaxValue) {
+                yearMaxValue.textContent = yearMaxInput.value;
+                yearMaxInput.addEventListener('input', function() {
+                    yearMaxValue.textContent = this.value;
+                    // Ensure max >= min
+                    if (parseInt(this.value) < parseInt(yearMinInput.value)) {
+                        yearMinInput.value = this.value;
+                        yearMinValue.textContent = this.value;
+                    }
+                });
+            }
+
+            // RAM slider handler
+            if (ramMinInput && ramMinValue) {
+                ramMinValue.textContent = ramMinInput.value == 0 ? 'Any' : ramMinInput.value + ' GB';
+                ramMinInput.addEventListener('input', function() {
+                    ramMinValue.textContent = this.value == 0 ? 'Any' : this.value + ' GB';
+                });
+            }
+
+            // Storage slider handler
+            if (storageMinInput && storageMinValue) {
+                storageMinValue.textContent = storageMinInput.value == 0 ? 'Any' : storageMinInput.value + ' GB';
+                storageMinInput.addEventListener('input', function() {
+                    const val = parseInt(this.value);
+                    if (val == 0) {
+                        storageMinValue.textContent = 'Any';
+                    } else if (val >= 1024) {
+                        storageMinValue.textContent = (val / 1024) + ' TB';
+                    } else {
+                        storageMinValue.textContent = val + ' GB';
+                    }
+                });
+            }
+
+            // Display size slider handlers
+            if (displaySizeMinInput && displaySizeMinValue) {
+                displaySizeMinValue.textContent = parseFloat(displaySizeMinInput.value).toFixed(1);
+                displaySizeMinInput.addEventListener('input', function() {
+                    displaySizeMinValue.textContent = parseFloat(this.value).toFixed(1);
+                    // Ensure min <= max
+                    if (parseFloat(this.value) > parseFloat(displaySizeMaxInput.value)) {
+                        displaySizeMaxInput.value = this.value;
+                        displaySizeMaxValue.textContent = parseFloat(this.value).toFixed(1);
+                    }
+                });
+            }
+            if (displaySizeMaxInput && displaySizeMaxValue) {
+                displaySizeMaxValue.textContent = parseFloat(displaySizeMaxInput.value).toFixed(1);
+                displaySizeMaxInput.addEventListener('input', function() {
+                    displaySizeMaxValue.textContent = parseFloat(this.value).toFixed(1);
+                    // Ensure max >= min
+                    if (parseFloat(this.value) < parseFloat(displaySizeMinInput.value)) {
+                        displaySizeMinInput.value = this.value;
+                        displaySizeMinValue.textContent = parseFloat(this.value).toFixed(1);
+                    }
+                });
+            }
+
+            // OS Version slider handler
+            if (osVersionMinInput && osVersionMinValue) {
+                const updateOsVer = (v) => v == 0 ? 'Any' : '≥ ' + v;
+                osVersionMinValue.textContent = updateOsVer(osVersionMinInput.value);
+                osVersionMinInput.addEventListener('input', function() {
+                    osVersionMinValue.textContent = updateOsVer(this.value);
+                });
+            }
+
+            // Main camera MP handler
+            if (mainCamMpMinInput && mainCamMpMinValue) {
+                const upd = (v) => v == 0 ? 'Any' : '≥ ' + v + 'MP';
+                mainCamMpMinValue.textContent = upd(mainCamMpMinInput.value);
+                mainCamMpMinInput.addEventListener('input', function() {
+                    mainCamMpMinValue.textContent = upd(this.value);
+                });
+            }
+
+            // Battery capacity handler
+            if (batteryCapacityMinInput && batteryCapacityMinValue) {
+                const upd = (v) => v == 0 ? 'Any' : '≥ ' + v + ' mAh';
+                batteryCapacityMinValue.textContent = upd(batteryCapacityMinInput.value);
+                batteryCapacityMinInput.addEventListener('input', function() {
+                    batteryCapacityMinValue.textContent = upd(this.value);
+                });
+            }
+
+            // Wired charging handler
+            if (wiredChargeMinInput && wiredChargeMinValue) {
+                const upd = (v) => v == 0 ? 'Any' : '≥ ' + v + ' W';
+                wiredChargeMinValue.textContent = upd(wiredChargeMinInput.value);
+                wiredChargeMinInput.addEventListener('input', function() {
+                    wiredChargeMinValue.textContent = upd(this.value);
+                });
+            }
+
+            // Wireless charging handler
+            if (wirelessChargeMinInput && wirelessChargeMinValue) {
+                const upd = (v) => v == 0 ? 'Any' : '≥ ' + v + ' W';
+                wirelessChargeMinValue.textContent = upd(wirelessChargeMinInput.value);
+                wirelessChargeMinInput.addEventListener('input', function() {
+                    wirelessChargeMinValue.textContent = upd(this.value);
+                });
+            }
+
+            // Utility: reset all filters to default (no filter)
+            function resetAllFilters() {
+                // Uncheck all checkboxes
+                document.querySelectorAll('input[type="checkbox"]').forEach(cb => {
+                    cb.checked = false;
+                });
+                // Reset all sliders to min/default
+                if (priceMaxInput) priceMaxInput.value = priceMaxInput.min;
+                if (yearMinInput) yearMinInput.value = yearMinInput.min;
+                if (yearMaxInput) yearMaxInput.value = yearMaxInput.max;
+                if (ramMinInput) ramMinInput.value = ramMinInput.min;
+                if (storageMinInput) storageMinInput.value = storageMinInput.min;
+                if (displaySizeMinInput) displaySizeMinInput.value = displaySizeMinInput.min;
+                if (displaySizeMaxInput) displaySizeMaxInput.value = displaySizeMaxInput.max;
+                if (osVersionMinInput) osVersionMinInput.value = osVersionMinInput.min;
+                if (mainCamMpMinInput) mainCamMpMinInput.value = mainCamMpMinInput.min;
+                if (batteryCapacityMinInput) batteryCapacityMinInput.value = batteryCapacityMinInput.min;
+                if (wiredChargeMinInput) wiredChargeMinInput.value = wiredChargeMinInput.min;
+                if (wirelessChargeMinInput) wirelessChargeMinInput.value = wirelessChargeMinInput.min;
+                if (chipsetQueryInput) chipsetQueryInput.value = '';
+                // Trigger UI updates for labels
+                if (typeof Event === 'function') {
+                    [priceMaxInput, yearMinInput, yearMaxInput, ramMinInput, storageMinInput, displaySizeMinInput, displaySizeMaxInput, osVersionMinInput, mainCamMpMinInput, batteryCapacityMinInput, wiredChargeMinInput, wirelessChargeMinInput].forEach(inp => {
+                        if (inp) inp.dispatchEvent(new Event('input'));
+                    });
+                }
+            }
+
+            // On page load, reset all filters
+            resetAllFilters();
+
+            // Optionally, add a Reset Filters button
+            if (!document.getElementById('resetFiltersBtn')) {
+                const btn = document.createElement('button');
+                btn.id = 'resetFiltersBtn';
+                btn.className = 'btn btn-secondary w-100 my-2';
+                btn.innerHTML = '<i class="fa fa-undo me-2"></i>Reset Filters';
+                btn.onclick = function(e) {
+                    e.preventDefault();
+                    resetAllFilters();
+                };
+                findBtn.parentNode.insertBefore(btn, findBtn);
             }
 
             findBtn.addEventListener('click', function() {
@@ -1329,6 +1517,7 @@ $brands = $brands_stmt->fetchAll();
                 selectedAvailability.forEach(function(status) {
                     formData.append('availability[]', status);
                 });
+
                 // Append price max if provided (> 0 and < max)
                 if (priceMaxInput) {
                     const val = parseInt(priceMaxInput.value, 10);
@@ -1336,6 +1525,78 @@ $brands = $brands_stmt->fetchAll();
                     if (!isNaN(val) && val > 0 && val < maxPrice) {
                         formData.append('price_max', val);
                     }
+                }
+
+                // Append year range if not default
+                if (yearMinInput && yearMaxInput) {
+                    const minYear = parseInt(yearMinInput.value);
+                    const maxYear = parseInt(yearMaxInput.value);
+                    if (minYear > 2000) formData.append('year_min', minYear);
+                    if (maxYear < 2026) formData.append('year_max', maxYear);
+                }
+
+                // Append RAM min if > 0
+                if (ramMinInput) {
+                    const ramMin = parseInt(ramMinInput.value);
+                    if (ramMin > 0) formData.append('ram_min', ramMin);
+                }
+
+                // Append Storage min if > 0
+                if (storageMinInput) {
+                    const storageMin = parseInt(storageMinInput.value);
+                    if (storageMin > 0) formData.append('storage_min', storageMin);
+                }
+
+                // Append Display Size range if not default
+                if (displaySizeMinInput && displaySizeMaxInput) {
+                    const minSize = parseFloat(displaySizeMinInput.value);
+                    const maxSize = parseFloat(displaySizeMaxInput.value);
+                    if (minSize > 3.0) formData.append('display_size_min', minSize);
+                    if (maxSize < 8.0) formData.append('display_size_max', maxSize);
+                }
+
+                // OS families (multi)
+                if (osFamilyInputs) {
+                    osFamilyInputs.forEach(cb => {
+                        if (cb.checked) formData.append('os_family[]', cb.value);
+                    });
+                }
+                // Min OS version
+                if (osVersionMinInput) {
+                    const v = parseInt(osVersionMinInput.value);
+                    if (v > 0) formData.append('os_version_min', v);
+                }
+                // Chipset contains
+                if (chipsetQueryInput && chipsetQueryInput.value.trim() !== '') {
+                    formData.append('chipset_query', chipsetQueryInput.value.trim());
+                }
+                // Require card slot
+                if (cardSlotRequiredInput && cardSlotRequiredInput.checked) {
+                    formData.append('card_slot_required', '1');
+                }
+                // Main camera min MP
+                if (mainCamMpMinInput) {
+                    const mp = parseInt(mainCamMpMinInput.value);
+                    if (mp > 0) formData.append('main_camera_mp_min', mp);
+                }
+                // Video capabilities
+                if (video4kInput && video4kInput.checked) formData.append('video_4k', '1');
+                if (video8kInput && video8kInput.checked) formData.append('video_8k', '1');
+                // Battery capacity min
+                if (batteryCapacityMinInput) {
+                    const bc = parseInt(batteryCapacityMinInput.value);
+                    if (bc > 0) formData.append('battery_capacity_min', bc);
+                }
+                // Wired charging min
+                if (wiredChargeMinInput) {
+                    const wc = parseInt(wiredChargeMinInput.value);
+                    if (wc > 0) formData.append('wired_charge_min', wc);
+                }
+                // Wireless required + min
+                if (wirelessRequiredInput && wirelessRequiredInput.checked) formData.append('wireless_required', '1');
+                if (wirelessChargeMinInput) {
+                    const wlc = parseInt(wirelessChargeMinInput.value);
+                    if (wlc > 0) formData.append('wireless_charge_min', wlc);
                 }
 
                 // Send AJAX request

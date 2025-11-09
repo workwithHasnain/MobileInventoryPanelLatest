@@ -1,6 +1,6 @@
 test and fix all fields of post with and without required fields in add and edit.
-test and fix all fields of device with and without required fields in add and edit.
-edit_device issue (urgent)
+test and fix all fields of device with and without required fields in add and edit. DONE
+edit_device issue (urgent) DONE
 edit post issue (urgent)
 sidebar tables in all pages -Done
 compare button in device.php -Done
@@ -12,6 +12,6 @@ dashboard json dropdown option remove, only keep db  -Done
 phone-finder.php
 
 ...
-1. form implementation from old clone
-2. indexes in post headings
-3. currency in euro for device pricing
+1. form implementation from old clone DONE
+2. indexes in post headings DONE
+3. currency in euro for device pricing DONE

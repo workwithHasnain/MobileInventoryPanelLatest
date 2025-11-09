@@ -1,5 +1,7 @@
 <?php
 // Handler for phonefinder AJAX requests
+
+// (debug POST logging removed for production)
 header('Content-Type: application/json');
 
 require_once 'database_functions.php';
@@ -18,6 +20,33 @@ try {
 
     // Max price (optional)
     $priceMax = isset($_POST['price_max']) ? $_POST['price_max'] : null;
+
+    // Year range (optional)
+    $yearMin = isset($_POST['year_min']) ? $_POST['year_min'] : null;
+    $yearMax = isset($_POST['year_max']) ? $_POST['year_max'] : null;
+
+    // RAM min (optional)
+    $ramMin = isset($_POST['ram_min']) ? $_POST['ram_min'] : null;
+
+    // Storage min (optional)
+    $storageMin = isset($_POST['storage_min']) ? $_POST['storage_min'] : null;
+
+    // Display size range (optional)
+    $displaySizeMin = isset($_POST['display_size_min']) ? $_POST['display_size_min'] : null;
+    $displaySizeMax = isset($_POST['display_size_max']) ? $_POST['display_size_max'] : null;
+
+    // B1 new filters
+    $osFamilies = isset($_POST['os_family']) ? (array)$_POST['os_family'] : [];
+    $osVersionMin = isset($_POST['os_version_min']) ? $_POST['os_version_min'] : null;
+    $chipsetQuery = isset($_POST['chipset_query']) ? trim($_POST['chipset_query']) : '';
+    $cardSlotRequired = isset($_POST['card_slot_required']) ? true : false;
+    $mainCameraMpMin = isset($_POST['main_camera_mp_min']) ? $_POST['main_camera_mp_min'] : null;
+    $video4k = isset($_POST['video_4k']);
+    $video8k = isset($_POST['video_8k']);
+    $batteryCapacityMin = isset($_POST['battery_capacity_min']) ? $_POST['battery_capacity_min'] : null;
+    $wiredChargeMin = isset($_POST['wired_charge_min']) ? $_POST['wired_charge_min'] : null;
+    $wirelessRequired = isset($_POST['wireless_required']);
+    $wirelessChargeMin = isset($_POST['wireless_charge_min']) ? $_POST['wireless_charge_min'] : null;
 
     // Build the query
     $query = "SELECT p.*, b.name as brand_name 
@@ -48,6 +77,139 @@ try {
             $query .= " AND p.price IS NOT NULL AND p.price <= ?";
             $params[] = $priceMax;
         }
+    }
+
+    // Filter by year range
+    if ($yearMin !== null && $yearMin !== '') {
+        $yearMin = intval($yearMin);
+        $query .= " AND p.year >= ?";
+        $params[] = $yearMin;
+    }
+    if ($yearMax !== null && $yearMax !== '') {
+        $yearMax = intval($yearMax);
+        $query .= " AND p.year <= ?";
+        $params[] = $yearMax;
+    }
+
+    // Filter by RAM (extract FIRST number only to handle "12/16GB RAM")
+    if ($ramMin !== null && $ramMin !== '') {
+        $ramMin = intval($ramMin);
+        if ($ramMin > 0) {
+            // Extract first number from ram column (handles "12/16GB RAM" → 12, "8GB" → 8)
+            $query .= " AND CAST(substring(COALESCE(p.ram, '0') FROM '([0-9]+)') AS INTEGER) >= ?";
+            $params[] = $ramMin;
+        }
+    }
+
+    // Filter by Storage (extract FIRST number only, handle TB conversion)
+    if ($storageMin !== null && $storageMin !== '') {
+        $storageMin = intval($storageMin);
+        if ($storageMin > 0) {
+            // Extract first number and check if first segment has TB (handles "256GB/512GB/1TB" → 256)
+            $query .= " AND (
+                CASE
+                    WHEN substring(p.storage FROM '^([^/]+)') ILIKE '%TB%' THEN
+                        CAST(substring(p.storage FROM '([0-9]+)') AS INTEGER) * 1024
+                    ELSE
+                        CAST(substring(COALESCE(p.storage, '0') FROM '([0-9]+)') AS INTEGER)
+                END
+            ) >= ?";
+            $params[] = $storageMin;
+        }
+    }
+
+    // Filter by Display Size (parse DECIMAL from VARCHAR like "6.1" or "6.9 inches")
+    if ($displaySizeMin !== null && $displaySizeMin !== '') {
+        $displaySizeMin = floatval($displaySizeMin);
+        $query .= " AND CAST(substring(COALESCE(p.display_size, '0') FROM '([0-9.]+)') AS DECIMAL) >= ?";
+        $params[] = $displaySizeMin;
+    }
+    if ($displaySizeMax !== null && $displaySizeMax !== '') {
+        $displaySizeMax = floatval($displaySizeMax);
+        $query .= " AND CAST(substring(COALESCE(p.display_size, '0') FROM '([0-9.]+)') AS DECIMAL) <= ?";
+        $params[] = $displaySizeMax;
+    }
+
+    // OS family filtering (Android/iOS/Other)
+    if (!empty($osFamilies)) {
+        // Search across direct OS column and platform text as fallback
+        $osExpr = "COALESCE(p.os, '') || ' ' || COALESCE(p.platform, '')";
+        $conditions = [];
+        $onlyOther = (count($osFamilies) === 1 && strtolower($osFamilies[0]) === 'other');
+        foreach ($osFamilies as $fam) {
+            $famLower = strtolower($fam);
+            if ($famLower === 'android') {
+                $conditions[] = "(($osExpr) ILIKE '%android%')";
+            } elseif ($famLower === 'ios') {
+                $conditions[] = "(($osExpr) ILIKE '%ios%' OR ($osExpr) ILIKE '%iphone%')";
+            } elseif ($famLower === 'other') {
+                // other by exclusion if selected alone
+                if ($onlyOther) {
+                    $conditions[] = "( ($osExpr) NOT ILIKE '%android%' AND ($osExpr) NOT ILIKE '%ios%' AND ($osExpr) NOT ILIKE '%iphone%')";
+                }
+            }
+        }
+        if (!empty($conditions)) {
+            $query .= " AND (" . implode(' OR ', $conditions) . ")";
+        }
+    }
+
+    // Min OS version (extract first number) only applied if provided
+    if ($osVersionMin !== null && $osVersionMin !== '' && intval($osVersionMin) > 0) {
+        $osVersionMin = intval($osVersionMin);
+        // Extract from os; if null, try platform text
+        $query .= " AND CAST(substring(COALESCE(p.os, p.platform, '0') FROM '([0-9]+)') AS INTEGER) >= ?";
+        $params[] = $osVersionMin;
+    }
+
+    // Chipset contains
+    if (!empty($chipsetQuery)) {
+        $query .= " AND p.chipset_name ILIKE ?";
+        $params[] = '%' . $chipsetQuery . '%';
+    }
+
+    // Card slot required
+    if ($cardSlotRequired) {
+        $query .= " AND p.card_slot IS NOT NULL AND p.card_slot NOT ILIKE '%No%'";
+    }
+
+    // Main camera MP (parse number from main_camera_resolution)
+    if ($mainCameraMpMin !== null && $mainCameraMpMin !== '' && intval($mainCameraMpMin) > 0) {
+        $mainCameraMpMin = intval($mainCameraMpMin);
+        $query .= " AND CAST(substring(COALESCE(p.main_camera_resolution, '0') FROM '([0-9]+)') AS INTEGER) >= ?";
+        $params[] = $mainCameraMpMin;
+    }
+
+    // Video capability filters
+    if ($video4k) {
+        $query .= " AND p.main_camera_video ILIKE '%4K%'";
+    }
+    if ($video8k) {
+        $query .= " AND p.main_camera_video ILIKE '%8K%'";
+    }
+
+    // Battery capacity minimum
+    if ($batteryCapacityMin !== null && $batteryCapacityMin !== '' && intval($batteryCapacityMin) > 0) {
+        $batteryCapacityMin = intval($batteryCapacityMin);
+        $query .= " AND CAST(substring(COALESCE(p.battery_capacity, '0') FROM '([0-9]+)') AS INTEGER) >= ?";
+        $params[] = $batteryCapacityMin;
+    }
+
+    // Wired charging minimum
+    if ($wiredChargeMin !== null && $wiredChargeMin !== '' && intval($wiredChargeMin) > 0) {
+        $wiredChargeMin = intval($wiredChargeMin);
+        $query .= " AND CAST(substring(COALESCE(p.wired_charging, '0') FROM '([0-9]+)') AS INTEGER) >= ?";
+        $params[] = $wiredChargeMin;
+    }
+
+    // Wireless charging required and minimum wattage
+    if ($wirelessRequired) {
+        $query .= " AND p.wireless_charging IS NOT NULL AND p.wireless_charging NOT ILIKE '%No%'";
+    }
+    if ($wirelessChargeMin !== null && $wirelessChargeMin !== '' && intval($wirelessChargeMin) > 0) {
+        $wirelessChargeMin = intval($wirelessChargeMin);
+        $query .= " AND CAST(substring(COALESCE(p.wireless_charging, '0') FROM '([0-9]+)') AS INTEGER) >= ?";
+        $params[] = $wirelessChargeMin;
     }
 
     // Order by newest first
