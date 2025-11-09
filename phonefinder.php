@@ -216,26 +216,23 @@ $brands = $brands_stmt->fetchAll();
                     </button>
                     <div class="collapse" id="brandCollapse">
                         <div class="card card-body py-2 px-3">
-                            <div class="form-check">
-                                <input class="form-check-input" type="checkbox" value="Apple" id="brandApple"
-                                    name="brand" />
-                                <label class="form-check-label" for="brandApple">Apple</label>
-                            </div>
-                            <div class="form-check">
-                                <input class="form-check-input" type="checkbox" value="Samsung" id="brandSamsung"
-                                    name="brand" />
-                                <label class="form-check-label" for="brandSamsung">Samsung</label>
-                            </div>
-                            <div class="form-check">
-                                <input class="form-check-input" type="checkbox" value="Xiaomi" id="brandXiaomi"
-                                    name="brand" />
-                                <label class="form-check-label" for="brandXiaomi">Xiaomi</label>
-                            </div>
-                            <div class="form-check">
-                                <input class="form-check-input" type="checkbox" value="Lenovo" id="brandLenovo"
-                                    name="brand" />
-                                <label class="form-check-label" for="brandLenovo">Lenovo</label>
-                            </div>
+                            <?php
+                            if (!empty($brands)) {
+                                foreach ($brands as $brand) {
+                                    $brandCheckboxId = 'brand' . $brand['id'];
+                                    $brandName = htmlspecialchars($brand['name']);
+                            ?>
+                                    <div class="form-check">
+                                        <input class="form-check-input" type="checkbox" value="<?php echo $brand['id']; ?>"
+                                            id="<?php echo $brandCheckboxId; ?>" name="brand[]" />
+                                        <label class="form-check-label" for="<?php echo $brandCheckboxId; ?>"><?php echo $brandName; ?></label>
+                                    </div>
+                            <?php
+                                }
+                            } else {
+                                echo '<p class="text-muted mb-0">No brands available</p>';
+                            }
+                            ?>
                         </div>
                     </div>
                     <button class="btn btn-toggle w-100 text-start mb-3" type="button" data-bs-toggle="collapse"
@@ -604,12 +601,13 @@ $brands = $brands_stmt->fetchAll();
                         id="rangeYear">
                     <span class="text-muted">Max</span>
                 </div>
+                <!-- Price filter (Max price) -->
                 <div class="d-flex fw-bolder align-items-center gap-3 mt-4"
                     style="border: 1px solid; padding: 7px; margin-top: 14px;">
-                    Price: <span id="yearValue">Min</span>
-                    <input type="range" class="form-range custom-range flex-grow-1" min="2000" max="2025"
-                        id="rangeYear">
-                    <span class="text-muted">Max</span>
+                    Max Price: <span id="priceMaxValue">Any</span>
+                    <input type="range" class="form-range custom-range flex-grow-1" min="0" max="3000" step="10"
+                        id="priceMax">
+                    <span class="text-muted">USD</span>
                 </div>
                 <div class="row g-2 mt-5">
                     <div class="col-6 mt-3">
@@ -1254,11 +1252,159 @@ $brands = $brands_stmt->fetchAll();
                 "reverse wireless", "Gorilla Glass 5", "GALILEO", "aptX" and so on. In some cases it can be very useful,
                 but the results
                 are less reliable.</p>
-            <h1 class="text-center mt-4 mb-5 fs-4 wascot">NEED SIMILAR SEARCH FOR ELECTRIC VEHICLES? WE HAVE IT.</h1>
             <img class="volunteer text-center m-auto d-flex align-items-center justify-content-between "
                 src="https://fdn.gsmarena.com/imgroot/static/banners/self/nordvpn-728x90-25.gif" alt="">
         </div>
+        <!-- Find button row inserted -->
+        <div class="row mt-4">
+            <div class="col-12">
+                <button type="button" id="findDevicesBtn" class="btn btn-danger w-100 py-3 fw-bold">
+                    <i class="fa fa-search me-2"></i> Find Devices
+                </button>
+            </div>
+        </div>
+
+        <!-- Results section -->
+        <div class="row mt-4" id="resultsSection" style="display: none;">
+            <div class="col-12">
+                <div class="alert alert-info">
+                    <strong id="resultsCount">0</strong> devices found
+                </div>
+            </div>
+        </div>
+
+        <div class="row" id="resultsContainer">
+            <!-- Results will be dynamically inserted here -->
+        </div>
     </div>
+
+    <!-- Phonefinder AJAX Script -->
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const findBtn = document.getElementById('findDevicesBtn');
+            const resultsSection = document.getElementById('resultsSection');
+            const resultsContainer = document.getElementById('resultsContainer');
+            const resultsCount = document.getElementById('resultsCount');
+            // Price slider elements
+            const priceMaxInput = document.getElementById('priceMax');
+            const priceMaxValue = document.getElementById('priceMaxValue');
+
+            if (priceMaxInput && priceMaxValue) {
+                const maxPrice = parseInt(priceMaxInput.max, 10);
+                const formatUsd = (v) => {
+                    const num = parseInt(v, 10);
+                    if (isNaN(num) || num <= 0 || num >= maxPrice) return 'Any';
+                    return '$' + num.toLocaleString();
+                };
+                // Initialize display
+                priceMaxValue.textContent = formatUsd(priceMaxInput.value);
+                // Update on input
+                priceMaxInput.addEventListener('input', function() {
+                    priceMaxValue.textContent = formatUsd(this.value);
+                });
+            }
+
+            findBtn.addEventListener('click', function() {
+                // Show loading state
+                findBtn.disabled = true;
+                findBtn.innerHTML = '<i class="fa fa-spinner fa-spin me-2"></i> Searching...';
+
+                // Gather selected brands
+                const selectedBrands = [];
+                document.querySelectorAll('input[name="brand[]"]:checked').forEach(function(checkbox) {
+                    selectedBrands.push(checkbox.value);
+                });
+
+                // Gather selected availability statuses
+                const selectedAvailability = [];
+                document.querySelectorAll('input[name="availability"]:checked').forEach(function(checkbox) {
+                    selectedAvailability.push(checkbox.value);
+                });
+
+                // Prepare form data
+                const formData = new FormData();
+                selectedBrands.forEach(function(brandId) {
+                    formData.append('brands[]', brandId);
+                });
+                selectedAvailability.forEach(function(status) {
+                    formData.append('availability[]', status);
+                });
+                // Append price max if provided (> 0 and < max)
+                if (priceMaxInput) {
+                    const val = parseInt(priceMaxInput.value, 10);
+                    const maxPrice = parseInt(priceMaxInput.max, 10);
+                    if (!isNaN(val) && val > 0 && val < maxPrice) {
+                        formData.append('price_max', val);
+                    }
+                }
+
+                // Send AJAX request
+                fetch('phonefinder_handler.php', {
+                        method: 'POST',
+                        body: formData
+                    })
+                    .then(response => response.json())
+                    .then(data => {
+                        if (data.success) {
+                            // Update results count
+                            resultsCount.textContent = data.count;
+                            resultsSection.style.display = data.count > 0 ? 'block' : 'none';
+
+                            // Clear previous results
+                            resultsContainer.innerHTML = '';
+
+                            // Display devices
+                            if (data.devices.length > 0) {
+                                data.devices.forEach(function(device) {
+                                    const deviceCard = createDeviceCard(device);
+                                    resultsContainer.innerHTML += deviceCard;
+                                });
+
+                                // Scroll to results
+                                resultsSection.scrollIntoView({
+                                    behavior: 'smooth',
+                                    block: 'start'
+                                });
+                            } else {
+                                resultsContainer.innerHTML = '<div class="col-12"><div class="alert alert-warning">No devices found matching your criteria.</div></div>';
+                            }
+                        } else {
+                            alert('Error: ' + (data.error || 'Failed to fetch results'));
+                        }
+                    })
+                    .catch(error => {
+                        console.error('Error:', error);
+                        alert('An error occurred while searching. Please try again.');
+                    })
+                    .finally(() => {
+                        // Reset button state
+                        findBtn.disabled = false;
+                        findBtn.innerHTML = '<i class="fa fa-search me-2"></i> Find Devices';
+                    });
+            });
+
+            function createDeviceCard(device) {
+                return `
+                <div class="col-lg-3 col-md-4 col-sm-6 mb-4">
+                    <div class="card h-100 shadow-sm">
+                        <a href="device.php?id=${device.id}" class="text-decoration-none">
+                            <img src="${device.thumbnail}" class="card-img-top" alt="${device.name}" style="height: 200px; object-fit: contain; padding: 10px;">
+                            <div class="card-body">
+                                <h6 class="card-title text-dark fw-bold">${device.name}</h6>
+                                <p class="text-muted small mb-1"><i class="fa fa-building me-1"></i>${device.brand || 'Unknown'}</p>
+                                ${device.announced ? `<p class="text-muted small mb-1"><i class="fa fa-calendar me-1"></i>${device.announced}</p>` : ''}
+                                ${device.display_size ? `<p class="text-muted small mb-1"><i class="fa fa-mobile me-1"></i>${device.display_size}</p>` : ''}
+                                ${device.ram ? `<p class="text-muted small mb-1"><i class="fa fa-microchip me-1"></i>${device.ram}</p>` : ''}
+                                ${device.battery ? `<p class="text-muted small mb-0"><i class="fa fa-battery-full me-1"></i>${device.battery}</p>` : ''}
+                            </div>
+                        </a>
+                    </div>
+                </div>
+            `;
+            }
+        });
+    </script>
+
     <div id="bottom" class="container d-flex" style="max-width: 1034px;">
         <div class="row align-items-center">
             <div class="col-md-2 m-auto col-4 d-flex justify-content-center align-items-center "> <img
