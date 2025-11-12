@@ -275,23 +275,23 @@ $brands = $brands_stmt->fetchAll();
                             <div class="collapse" id="simCollapse">
                                 <div class="card card-body px-3">
                                     <div class="form-check">
-                                        <input class="form-check-input" type="checkbox" value="GSM 850" id="gsm850"
-                                            name="networkBand" />
+                                        <input class="form-check-input network-2g-band" type="checkbox" value="850" id="gsm850"
+                                            name="network_2g_bands[]" />
                                         <label class="form-check-label" for="gsm850">GSM 850</label>
                                     </div>
                                     <div class="form-check">
-                                        <input class="form-check-input" type="checkbox" value="GSM 900" id="gsm900"
-                                            name="networkBand" />
+                                        <input class="form-check-input network-2g-band" type="checkbox" value="900" id="gsm900"
+                                            name="network_2g_bands[]" />
                                         <label class="form-check-label" for="gsm900">GSM 900</label>
                                     </div>
                                     <div class="form-check">
-                                        <input class="form-check-input" type="checkbox" value="GSM 1800" id="gsm1800"
-                                            name="networkBand" />
+                                        <input class="form-check-input network-2g-band" type="checkbox" value="1800" id="gsm1800"
+                                            name="network_2g_bands[]" />
                                         <label class="form-check-label" for="gsm1800">GSM 1800</label>
                                     </div>
                                     <div class="form-check">
-                                        <input class="form-check-input" type="checkbox" value="GSM 1900" id="gsm1900"
-                                            name="networkBand" />
+                                        <input class="form-check-input network-2g-band" type="checkbox" value="1900" id="gsm1900"
+                                            name="network_2g_bands[]" />
                                         <label class="form-check-label" for="gsm1900">GSM 1900</label>
                                     </div>
                                 </div>
@@ -307,28 +307,28 @@ $brands = $brands_stmt->fetchAll();
                             <div class="collapse" id="simwasCollapse">
                                 <div class="card card-body py-2 px-3">
                                     <div class="form-check">
-                                        <input class="form-check-input" type="checkbox" value="HSPA 850" id="hspa850"
-                                            name="networkBand" />
+                                        <input class="form-check-input network-3g-band" type="checkbox" value="850" id="hspa850"
+                                            name="network_3g_bands[]" />
                                         <label class="form-check-label" for="hspa850">HSPA 850</label>
                                     </div>
                                     <div class="form-check">
-                                        <input class="form-check-input" type="checkbox" value="HSPA 900" id="hspa900"
-                                            name="networkBand" />
+                                        <input class="form-check-input network-3g-band" type="checkbox" value="900" id="hspa900"
+                                            name="network_3g_bands[]" />
                                         <label class="form-check-label" for="hspa900">HSPA 900</label>
                                     </div>
                                     <div class="form-check">
-                                        <input class="form-check-input" type="checkbox" value="HSPA 1700" id="hspa1700"
-                                            name="networkBand" />
+                                        <input class="form-check-input network-3g-band" type="checkbox" value="1700" id="hspa1700"
+                                            name="network_3g_bands[]" />
                                         <label class="form-check-label" for="hspa1700">HSPA 1700</label>
                                     </div>
                                     <div class="form-check">
-                                        <input class="form-check-input" type="checkbox" value="HSPA 1900" id="hspa1900"
-                                            name="networkBand" />
+                                        <input class="form-check-input network-3g-band" type="checkbox" value="1900" id="hspa1900"
+                                            name="network_3g_bands[]" />
                                         <label class="form-check-label" for="hspa1900">HSPA 1900</label>
                                     </div>
                                     <div class="form-check">
-                                        <input class="form-check-input" type="checkbox" value="HSPA 2100" id="hspa2100"
-                                            name="networkBand" />
+                                        <input class="form-check-input network-3g-band" type="checkbox" value="2100" id="hspa2100"
+                                            name="network_3g_bands[]" />
                                         <label class="form-check-label" for="hspa2100">HSPA 2100</label>
                                     </div>
 
@@ -339,12 +339,12 @@ $brands = $brands_stmt->fetchAll();
                     <div class="row">
                         <div class="col-lg-6 d-flex align-items-center justify-content-center">
                             <label class="btn w-100 text-start mb-0 fw-bolder" style="border-radius: 1px;">
-                                <input type="checkbox" class="form-check-input me-2 float-end" name="dual_sim" value="1"> DUAL SIM
+                                <input type="checkbox" class="form-check-input me-2 float-end" id="dualSim" name="dual_sim" value="1"> DUAL SIM
                             </label>
                         </div>
                         <div class="col-lg-6 d-flex align-items-center justify-content-center">
                             <label class="btn  w-100 text-start mb-0 fw-bolder" style="border-radius: 1px;">
-                                <input type="checkbox" class="form-check-input me-2 float-end" name="esim" value="1"> ESIM
+                                <input type="checkbox" class="form-check-input me-2 float-end" id="esimSupport" name="esim" value="1"> ESIM
                             </label>
                         </div>
                     </div>
@@ -358,45 +358,45 @@ $brands = $brands_stmt->fetchAll();
                         <div class="card card-body px-3">
                             <div class="form-check">
                                 <input class="form-check-input" type="checkbox" value="Bar" id="formFactorBar"
-                                    name="form_factor" />
+                                    name="form_factor[]" />
                                 <label class="form-check-label" for="formFactorBar">Bar</label>
                             </div>
                             <div class="form-check">
                                 <input class="form-check-input" type="checkbox" value="Flip up" id="formFactorFlipUp"
-                                    name="form_factor" />
+                                    name="form_factor[]" />
                                 <label class="form-check-label" for="formFactorFlipUp">Flip up</label>
                             </div>
                             <div class="form-check">
                                 <input class="form-check-input" type="checkbox" value="Flip down" id="formFactorFlipDown"
-                                    name="form_factor" />
+                                    name="form_factor[]" />
                                 <label class="form-check-label" for="formFactorFlipDown">Flip down</label>
                             </div>
 
                             <div class="form-check">
                                 <input class="form-check-input" type="checkbox" value="Swivel" id="formFactorSwivel"
-                                    name="form_factor" />
+                                    name="form_factor[]" />
                                 <label class="form-check-label" for="formFactorSwivel">Swivel</label>
                             </div>
                             <div class="form-check">
                                 <input class="form-check-input" type="checkbox" value="Slide" id="formFactorSlide"
-                                    name="form_factor" />
+                                    name="form_factor[]" />
                                 <label class="form-check-label" for="formFactorSlide">Slide</label>
                             </div>
                         </div>
                     </div>
                     <div class="d-flex fw-bolder align-items-center gap-3 mt-2"
                         style="border: 1px solid; padding: 7px; margin-top: 14px;">
-                        Height: <span id="yearValue">min</span>
-                        <input type="range" class="form-range custom-range flex-grow-1" min="2000" max="2025"
-                            id="rangeYear">
-                        <span class="text-muted">max</span>
+                        Height: <span id="heightMinValue">Any</span>
+                        <input type="range" class="form-range custom-range flex-grow-1" min="0" max="220" step="1"
+                            id="heightMin" value="0">
+                        <span class="text-muted">mm</span>
                     </div>
                     <div class="d-flex fw-bolder align-items-center gap-3 mt-2"
                         style="border: 1px solid; padding: 7px; margin-top: 14px;">
-                        Thickness: <span id="yearValue">min</span>
-                        <input type="range" class="form-range custom-range flex-grow-1" min="2000" max="2025"
-                            id="rangeYear">
-                        <span class="text-muted">max</span>
+                        Thickness: <span id="thicknessMaxValue">Any</span>
+                        <input type="range" class="form-range custom-range flex-grow-1" min="0" max="15" step="0.1"
+                            id="thicknessMax" value="0">
+                        <span class="text-muted">mm</span>
                     </div>
                     <button style="border-radius: 1px;" class=" btn btn-toggle w-100 mt-2 text-start" type="button"
                         data-bs-toggle="collapse" data-bs-target="#ipCollapse" aria-expanded="false"
@@ -407,23 +407,23 @@ $brands = $brands_stmt->fetchAll();
                         <div class="card card-body px-3">
                             <div class="form-check">
                                 <input class="form-check-input" type="checkbox" value="IP54" id="ip54"
-                                    name="ip_certificate" />
+                                    name="ip_certificate[]" />
                                 <label class="form-check-label" for="ip54">IP54</label>
                             </div>
                             <div class="form-check">
                                 <input class="form-check-input" type="checkbox" value="IP67" id="ip67"
-                                    name="ip_certificate" />
+                                    name="ip_certificate[]" />
                                 <label class="form-check-label" for="ip67">IP67</label>
                             </div>
                             <div class="form-check">
                                 <input class="form-check-input" type="checkbox" value="IP68" id="ip68"
-                                    name="ip_certificate" />
+                                    name="ip_certificate[]" />
                                 <label class="form-check-label" for="ip68">IP68</label>
                             </div>
 
                             <div class="form-check">
                                 <input class="form-check-input" type="checkbox" value="IP69K" id="ip69k"
-                                    name="ip_certificate" />
+                                    name="ip_certificate[]" />
                                 <label class="form-check-label" for="ip69k">IP69K</label>
                             </div>
                         </div>
@@ -436,25 +436,25 @@ $brands = $brands_stmt->fetchAll();
                     <div class="collapse" id="backCollapse">
                         <div class="card card-body px-3">
                             <div class="form-check">
-                                <input class="form-check-input" type="checkbox" value="Mini-SIM" id="miniSim"
-                                    name="size" />
-                                <label class="form-check-label" for="miniSim"> Plastic</label>
+                                <input class="form-check-input" type="checkbox" value="Plastic" id="backPlastic"
+                                    name="back_material[]" />
+                                <label class="form-check-label" for="backPlastic"> Plastic</label>
                             </div>
                             <div class="form-check">
-                                <input class="form-check-input" type="checkbox" value="Mini-SIM" id="miniSim"
-                                    name="size" />
-                                <label class="form-check-label" for="miniSim">Aluminum</label>
+                                <input class="form-check-input" type="checkbox" value="Aluminum" id="backAluminum"
+                                    name="back_material[]" />
+                                <label class="form-check-label" for="backAluminum">Aluminum</label>
                             </div>
                             <div class="form-check">
-                                <input class="form-check-input" type="checkbox" value="Nano-SIM" id="nanoSim"
-                                    name="size" />
-                                <label class="form-check-label" for="nanoSim">Glass</label>
+                                <input class="form-check-input" type="checkbox" value="Glass" id="backGlass"
+                                    name="back_material[]" />
+                                <label class="form-check-label" for="backGlass">Glass</label>
                             </div>
 
                             <div class="form-check">
-                                <input class="form-check-input" type="checkbox" value="Nano-SIM" id="nanoSim"
-                                    name="size" />
-                                <label class="form-check-label" for="nanoSim">Ceramic</label>
+                                <input class="form-check-input" type="checkbox" value="Ceramic" id="backCeramic"
+                                    name="back_material[]" />
+                                <label class="form-check-label" for="backCeramic">Ceramic</label>
                             </div>
                         </div>
                     </div>
@@ -579,24 +579,29 @@ $brands = $brands_stmt->fetchAll();
                         <div class="collapse" id="fourGCollapse">
                             <div class="card card-body px-3">
                                 <div class="form-check">
-                                    <input class="form-check-input" type="checkbox" value="LTE 700" id="lte700"
-                                        name="networkBand" />
+                                    <input class="form-check-input network-4g-band" type="checkbox" value="700" id="lte700"
+                                        name="network_4g_bands[]" />
                                     <label class="form-check-label" for="lte700">LTE 700</label>
                                 </div>
                                 <div class="form-check">
-                                    <input class="form-check-input" type="checkbox" value="LTE 850" id="lte850"
-                                        name="networkBand" />
+                                    <input class="form-check-input network-4g-band" type="checkbox" value="850" id="lte850"
+                                        name="network_4g_bands[]" />
                                     <label class="form-check-label" for="lte850">LTE 850</label>
                                 </div>
                                 <div class="form-check">
-                                    <input class="form-check-input" type="checkbox" value="LTE 900" id="lte900"
-                                        name="networkBand" />
+                                    <input class="form-check-input network-4g-band" type="checkbox" value="900" id="lte900"
+                                        name="network_4g_bands[]" />
                                     <label class="form-check-label" for="lte900">LTE 900</label>
                                 </div>
                                 <div class="form-check">
-                                    <input class="form-check-input" type="checkbox" value="LTE 1800" id="lte1800"
-                                        name="networkBand" />
+                                    <input class="form-check-input network-4g-band" type="checkbox" value="1800" id="lte1800"
+                                        name="network_4g_bands[]" />
                                     <label class="form-check-label" for="lte1800">LTE 1800</label>
+                                </div>
+                                <div class="form-check">
+                                    <input class="form-check-input network-4g-band" type="checkbox" value="2600" id="lte2600"
+                                        name="network_4g_bands[]" />
+                                    <label class="form-check-label" for="lte2600">LTE 2600</label>
                                 </div>
                             </div>
                         </div>
@@ -611,24 +616,29 @@ $brands = $brands_stmt->fetchAll();
                         <div class="collapse" id="fiveGCollapse">
                             <div class="card card-body px-3">
                                 <div class="form-check">
-                                    <input class="form-check-input" type="checkbox" value="NR 3500" id="nr3500"
-                                        name="networkBand" />
+                                    <input class="form-check-input network-5g-band" type="checkbox" value="3500" id="nr3500"
+                                        name="network_5g_bands[]" />
                                     <label class="form-check-label" for="nr3500">NR 3500</label>
                                 </div>
                                 <div class="form-check">
-                                    <input class="form-check-input" type="checkbox" value="NR 3600" id="nr3600"
-                                        name="networkBand" />
+                                    <input class="form-check-input network-5g-band" type="checkbox" value="3600" id="nr3600"
+                                        name="network_5g_bands[]" />
                                     <label class="form-check-label" for="nr3600">NR 3600</label>
                                 </div>
                                 <div class="form-check">
-                                    <input class="form-check-input" type="checkbox" value="NR 3700" id="nr3700"
-                                        name="networkBand" />
+                                    <input class="form-check-input network-5g-band" type="checkbox" value="3700" id="nr3700"
+                                        name="network_5g_bands[]" />
                                     <label class="form-check-label" for="nr3700">NR 3700</label>
                                 </div>
                                 <div class="form-check">
-                                    <input class="form-check-input" type="checkbox" value="NR 3800" id="nr3800"
-                                        name="networkBand" />
+                                    <input class="form-check-input network-5g-band" type="checkbox" value="3800" id="nr3800"
+                                        name="network_5g_bands[]" />
                                     <label class="form-check-label" for="nr3800">NR 3800</label>
+                                </div>
+                                <div class="form-check">
+                                    <input class="form-check-input network-5g-band" type="checkbox" value="mmWave" id="nr5gmmwave"
+                                        name="network_5g_bands[]" />
+                                    <label class="form-check-label" for="nr5gmmwave">mmWave (24-40 GHz)</label>
                                 </div>
                             </div>
                         </div>
@@ -637,56 +647,38 @@ $brands = $brands_stmt->fetchAll();
                 <button style="border-radius: 1px;" class=" btn btn-toggle mt-3 w-100 text-start" type="button"
                     data-bs-toggle="collapse" data-bs-target="#sizeCollapse" aria-expanded="false"
                     aria-controls="sizeCollapse">
-                    SIZE
+                    SIM SIZE
                 </button>
                 <div class="collapse" id="sizeCollapse">
                     <div class="card card-body px-3">
                         <div class="form-check">
-                            <input class="form-check-input" type="checkbox" value="Mini-SIM" id="miniSim" name="sim_size" />
+                            <input class="form-check-input" type="checkbox" value="Mini-SIM" id="miniSim" name="sim_sizes[]" />
                             <label class="form-check-label" for="miniSim">Mini-SIM (regular size)</label>
                         </div>
                         <div class="form-check">
-                            <input class="form-check-input" type="checkbox" value="Nano-SIM" id="nanoSim" name="sim_size" />
+                            <input class="form-check-input" type="checkbox" value="Nano-SIM" id="nanoSim" name="sim_sizes[]" />
                             <label class="form-check-label" for="nanoSim">Nano-SIM</label>
                         </div>
                         <div class="form-check">
                             <input class="form-check-input" type="checkbox" value="Micro-SIM" id="microSim"
-                                name="sim_size" />
+                                name="sim_sizes[]" />
                             <label class="form-check-label" for="microSim">Micro-SIM</label>
                         </div>
                     </div>
                 </div>
-                <button style="border-radius: 1px;" class=" btn btn-toggle w-100 mt-5 text-start" type="button"
-                    data-bs-toggle="collapse" data-bs-target="#KeyWordsCollapse" aria-expanded="false"
-                    aria-controls="KeyWordsCollapse">
-                    KeyWords
-                </button>
-                <div class="collapse" id="KeyWordsCollapse">
-                    <div class="card card-body px-3">
-                        <div class="form-check">
-                            <input class="form-check-input" type="checkbox" value="Mini-SIM" id="miniSim" name="size" />
-                            <label class="form-check-label" for="miniSim"> Without QWERTY</label>
-                        </div>
-                        <div class="form-check">
-                            <input class="form-check-input" type="checkbox" value="Nano-SIM" id="nanoSim" name="size" />
-                            <label class="form-check-label" for="nanoSim">With QWERTY</label>
-                        </div>
-
-                    </div>
+                <div class="d-flex align-items-center fw-bolder gap-3 mt-2"
+                    style="border: 1px solid; padding: 7px; margin-top: 14px;">
+                    Width: <span id="widthMinValue">Any</span>
+                    <input type="range" class="form-range custom-range flex-grow-1" min="0" max="100" step="1"
+                        id="widthMin" value="0">
+                    <span class="text-muted">mm</span>
                 </div>
                 <div class="d-flex align-items-center fw-bolder gap-3 mt-2"
                     style="border: 1px solid; padding: 7px; margin-top: 14px;">
-                    Width: <span id="yearValue">min</span>
-                    <input type="range" class="form-range custom-range flex-grow-1" min="2000" max="2025"
-                        id="rangeYear">
-                    <span class="text-muted">max</span>
-                </div>
-                <div class="d-flex align-items-center fw-bolder gap-3 mt-2"
-                    style="border: 1px solid; padding: 7px; margin-top: 14px;">
-                    Weight: <span id="yearValue">min</span>
-                    <input type="range" class="form-range custom-range flex-grow-1" min="2000" max="2025"
-                        id="rangeYear">
-                    <span class="text-muted">max</span>
+                    Weight: <span id="weightMaxValue">Any</span>
+                    <input type="range" class="form-range custom-range flex-grow-1" min="0" max="400" step="5"
+                        id="weightMax" value="0">
+                    <span class="text-muted">g</span>
                 </div>
                 <button style="border-radius: 1px;" class="btn btn-toggle w-100 mt-2 text-start" type="button"
                     data-bs-toggle="collapse" data-bs-target="#colorCollapse" aria-expanded="false"
@@ -696,21 +688,21 @@ $brands = $brands_stmt->fetchAll();
                 <div class="collapse" id="colorCollapse">
                     <div class="card card-body px-3">
                         <div class="form-check">
-                            <input class="form-check-input" type="checkbox" value="Mini-SIM" id="miniSim" name="size" />
-                            <label class="form-check-label" for="miniSim"> RED</label>
+                            <input class="form-check-input" type="checkbox" value="Red" id="colorRed" name="color[]" />
+                            <label class="form-check-label" for="colorRed"> RED</label>
                         </div>
                         <div class="form-check">
-                            <input class="form-check-input" type="checkbox" value="Mini-SIM" id="miniSim" name="size" />
-                            <label class="form-check-label" for="miniSim">WHITE</label>
+                            <input class="form-check-input" type="checkbox" value="White" id="colorWhite" name="color[]" />
+                            <label class="form-check-label" for="colorWhite">WHITE</label>
                         </div>
                         <div class="form-check">
-                            <input class="form-check-input" type="checkbox" value="Nano-SIM" id="nanoSim" name="size" />
-                            <label class="form-check-label" for="nanoSim">BLACK</label>
+                            <input class="form-check-input" type="checkbox" value="Black" id="colorBlack" name="color[]" />
+                            <label class="form-check-label" for="colorBlack">BLACK</label>
                         </div>
 
                         <div class="form-check">
-                            <input class="form-check-input" type="checkbox" value="Nano-SIM" id="nanoSim" name="size" />
-                            <label class="form-check-label" for="nanoSim">BLUE</label>
+                            <input class="form-check-input" type="checkbox" value="Blue" id="colorBlue" name="color[]" />
+                            <label class="form-check-label" for="colorBlue">BLUE</label>
                         </div>
                     </div>
                 </div>
@@ -722,21 +714,21 @@ $brands = $brands_stmt->fetchAll();
                 <div class="collapse" id="frontCollapse">
                     <div class="card card-body px-3">
                         <div class="form-check">
-                            <input class="form-check-input" type="checkbox" value="Mini-SIM" id="miniSim" name="size" />
-                            <label class="form-check-label" for="miniSim"> Plastic</label>
+                            <input class="form-check-input" type="checkbox" value="Plastic" id="framePlastic" name="frame_material[]" />
+                            <label class="form-check-label" for="framePlastic"> Plastic</label>
                         </div>
                         <div class="form-check">
-                            <input class="form-check-input" type="checkbox" value="Mini-SIM" id="miniSim" name="size" />
-                            <label class="form-check-label" for="miniSim">Aluminum</label>
+                            <input class="form-check-input" type="checkbox" value="Aluminum" id="frameAluminum" name="frame_material[]" />
+                            <label class="form-check-label" for="frameAluminum">Aluminum</label>
                         </div>
                         <div class="form-check">
-                            <input class="form-check-input" type="checkbox" value="Nano-SIM" id="nanoSim" name="size" />
-                            <label class="form-check-label" for="nanoSim">Stainless steel</label>
+                            <input class="form-check-input" type="checkbox" value="Stainless steel" id="frameSteel" name="frame_material[]" />
+                            <label class="form-check-label" for="frameSteel">Stainless steel</label>
                         </div>
 
                         <div class="form-check">
-                            <input class="form-check-input" type="checkbox" value="Nano-SIM" id="nanoSim" name="size" />
-                            <label class="form-check-label" for="nanoSim">Ceramic Titanium</label>
+                            <input class="form-check-input" type="checkbox" value="Ceramic Titanium" id="frameCeramicTitanium" name="frame_material[]" />
+                            <label class="form-check-label" for="frameCeramicTitanium">Ceramic Titanium</label>
                         </div>
                     </div>
                 </div>
@@ -810,9 +802,11 @@ $brands = $brands_stmt->fetchAll();
             </div>
             <div class="filter-header">Display</div>
             <div class="d-flex secondary fw-bolder align-items-center gap-3 mt-2">
-                Resolution: <span id="yearValue">min</span>
-                <input type="range" class="form-range custom-range flex-grow-1" min="2000" max="2025" id="rangeYear">
-                <span class="text-muted">max</span>
+                Resolution: <span id="displayResMinValue">min</span>
+                <input type="range" class="form-range custom-range flex-grow-1" min="480" max="4320" step="1" id="displayResMin" value="480">
+                <span class="mx-2">-</span>
+                <input type="range" class="form-range custom-range flex-grow-1" min="480" max="4320" step="1" id="displayResMax" value="4320">
+                <span id="displayResMaxValue">max</span>
             </div>
         </div>
         <div class="row gx-4 gy-3 crs">
@@ -836,42 +830,43 @@ $brands = $brands_stmt->fetchAll();
                 <div class="collapse" id="techCollapse">
                     <div class="card card-body">
                         <div class="form-check">
-                            <input class="form-check-input" type="checkbox" value="Apple" id="brandApple"
-                                name="brand" />
-                            <label class="form-check-label" for="brandApple">IPS</label>
+                            <input class="form-check-input" type="checkbox" value="IPS" id="techIPS"
+                                name="display_tech[]" />
+                            <label class="form-check-label" for="techIPS">IPS</label>
                         </div>
                         <div class="form-check">
-                            <input class="form-check-input" type="checkbox" value="Samsung" id="brandSamsung"
-                                name="brand" />
-                            <label class="form-check-label" for="brandSamsung">OLED</label>
+                            <input class="form-check-input" type="checkbox" value="OLED" id="techOLED"
+                                name="display_tech[]" />
+                            <label class="form-check-label" for="techOLED">OLED</label>
                         </div>
                         <div class="form-check">
-                            <input class="form-check-input" type="checkbox" value="Xiaomi" id="brandXiaomi"
-                                name="brand" />
-                            <label class="form-check-label" for="brandXiaomi">LTPO OLED</label>
+                            <input class="form-check-input" type="checkbox" value="LTPO" id="techLTPO"
+                                name="display_tech[]" />
+                            <label class="form-check-label" for="techLTPO">LTPO OLED</label>
                         </div>
 
                     </div>
                 </div>
                 <div class="filter-box">
                     <span class="filter-label">Refresh Rate:</span>
-                    <span id="sizeValue">Any</span>
-                    <input type="range" class="form-range custom-range flex-grow-1" min="2000" max="2025"
-                        id="rangeSize" />
+                    <span id="refreshRateMinValue">Any</span>
+                    <input type="range" class="form-range custom-range flex-grow-1" min="0" max="240" step="30"
+                        id="refreshRateMin" value="0" />
+                    <span class="text-muted">Hz</span>
                 </div>
                 <div class="filter-header mt-4 mb-3" style="margin-left: -1px;">Main Camera</div>
                 <div class="filter-box  ">
                     <span class="filter-label ">Resolution</span>
-                    <span id="mainCamMpMinValue">Any</span>
-                    <input type="range" class="form-range custom-range flex-grow-1" min="0" max="200" step="1"
-                        id="mainCamMpMin" />
+                    <span id="fNumberMaxValue">Any</span>
+                    <input type="range" class="form-range custom-range flex-grow-1" min="0" max="4.0" step="0.1"
+                        id="fNumberMax" value="0" />
                     <span class="text-muted">MP</span>
                 </div>
                 <div class="filter-box mt-1 ">
-                    <span class="filter-label ">F-NUMBER</span>
-                    <span id="sizeValue">Any</span>
-                    <input type="range" class="form-range custom-range flex-grow-1" min="2000" max="2025"
-                        id="rangeSize" />
+                    CPU: <span id="cpuClockMinValue">Any</span>
+                    <input type="range" class="form-range custom-range flex-grow-1" min="0" max="4.0" step="0.1"
+                        id="cpuClockMin" value="0">
+                    id="rangeSize" />
                 </div>
                 <div class="filter-box mt-1">
                     <span class="filter-label ">VIDEO</span>
@@ -917,24 +912,24 @@ $brands = $brands_stmt->fetchAll();
                 <div class="collapse" id="wlanCollapse">
                     <div class="card card-body">
                         <div class="form-check">
-                            <input class="form-check-input" type="checkbox" value="Apple" id="brandApple"
-                                name="brand" />
-                            <label class="form-check-label" for="brandApple">Wi-Fi 4 (802.11n)</label>
+                            <input class="form-check-input wifi-version" type="checkbox" value="802.11n" id="wifi4"
+                                name="wifi_versions[]" />
+                            <label class="form-check-label" for="wifi4">Wi-Fi 4 (802.11n)</label>
                         </div>
                         <div class="form-check">
-                            <input class="form-check-input" type="checkbox" value="Samsung" id="brandSamsung"
-                                name="brand" />
-                            <label class="form-check-label" for="brandSamsung">Wi-Fi 5 (802.11ac)</label>
+                            <input class="form-check-input wifi-version" type="checkbox" value="802.11ac" id="wifi5"
+                                name="wifi_versions[]" />
+                            <label class="form-check-label" for="wifi5">Wi-Fi 5 (802.11ac)</label>
                         </div>
                         <div class="form-check">
-                            <input class="form-check-input" type="checkbox" value="Xiaomi" id="brandXiaomi"
-                                name="brand" />
-                            <label class="form-check-label" for="brandXiaomi">Wi-Fi 6 (802.11ax)</label>
+                            <input class="form-check-input wifi-version" type="checkbox" value="802.11ax" id="wifi6"
+                                name="wifi_versions[]" />
+                            <label class="form-check-label" for="wifi6">Wi-Fi 6 (802.11ax)</label>
                         </div>
                         <div class="form-check">
-                            <input class="form-check-input" type="checkbox" value="Xiaomi" id="brandXiaomi"
-                                name="brand" />
-                            <label class="form-check-label" for="brandXiaomi">Wi-Fi 7 (802.11be)</label>
+                            <input class="form-check-input wifi-version" type="checkbox" value="802.11be" id="wifi7"
+                                name="wifi_versions[]" />
+                            <label class="form-check-label" for="wifi7">Wi-Fi 7 (802.11be)</label>
                         </div>
 
                     </div>
@@ -942,12 +937,12 @@ $brands = $brands_stmt->fetchAll();
                 <div class="row mt-2">
                     <div class="col-lg-6 d-flex align-items-center justify-content-center">
                         <label class="btn  w-100 text-start mb-0 fw-bolder" style="border-radius: 1px;">
-                            <input type="checkbox" class="form-check-input me-2 float-end" name="gps" value="1"> GPS
+                            <input type="checkbox" class="form-check-input me-2 float-end" id="gpsRequired" name="gps" value="1"> GPS
                         </label>
                     </div>
                     <div class="col-lg-6 d-flex align-items-center justify-content-center">
                         <label class="btn w-100 text-start mb-0 fw-bolder" style="border-radius: 1px;">
-                            <input type="checkbox" class="form-check-input me-2 float-end" name="nfc" value="1"> NFC
+                            <input type="checkbox" class="form-check-input me-2 float-end" id="nfcRequired" name="nfc" value="1"> NFC
                         </label>
                     </div>
                 </div>
@@ -959,14 +954,19 @@ $brands = $brands_stmt->fetchAll();
                     <div class="card card-body">
 
                         <div class="form-check">
-                            <input class="form-check-input" type="checkbox" value="Xiaomi" id="brandXiaomi"
-                                name="brand" />
-                            <label class="form-check-label" for="brandXiaomi">Any USB-C </label>
+                            <input class="form-check-input usb-type" type="checkbox" value="USB-C" id="usbTypeC"
+                                name="usb_types[]" />
+                            <label class="form-check-label" for="usbTypeC">Any USB-C</label>
                         </div>
                         <div class="form-check">
-                            <input class="form-check-input" type="checkbox" value="Xiaomi" id="brandXiaomi"
-                                name="brand" />
-                            <label class="form-check-label" for="brandXiaomi">USB-C 3.0 and higher</label>
+                            <input class="form-check-input usb-type" type="checkbox" value="USB 3" id="usb3"
+                                name="usb_types[]" />
+                            <label class="form-check-label" for="usb3">USB-C 3.0 and higher</label>
+                        </div>
+                        <div class="form-check">
+                            <input class="form-check-input usb-type" type="checkbox" value="micro USB" id="microUsb"
+                                name="usb_types[]" />
+                            <label class="form-check-label" for="microUsb">Micro USB</label>
                         </div>
 
                     </div>
@@ -994,35 +994,8 @@ $brands = $brands_stmt->fetchAll();
                     <input type="text" class=" flex-grow-1 life" />
 
                 </div>
-
-                <div class="col-lg-6 d-flex align-items-center justify-content-center mt-2 mx-1 ">
-                    <label class="btn w-100 text-start mb-0 fw-bolder" style="border-radius: 1px;">
-                        <input type="checkbox" class="form-check-input me-2 float-end"> Rewiew Only
-                    </label>
-                </div>
-
-                <div class="filter-header mT-3 mb-2" style="margin-left: -1px;">Audio</div>
-                <div class="row ">
-                    <div class="col-lg-6 d-flex align-items-center justify-content-center mt-2">
-                        <label class="btn   w-100 text-start mb-0 fw-bolder" style="border-radius: 1px;">
-                            <input type="checkbox" class="form-check-input me-2 float-end" name="headphone_jack" value="1"> 3.5MM JACK
-                        </label>
-                    </div>
-                    <div class="col-lg-6 d-flex align-items-center justify-content-center mt-2">
-                        <label class="btn w-100 text-start mb-0 fw-bolder" style="border-radius: 1px;">
-                            <input type="checkbox" class="form-check-input me-2 float-end" name="dual_speakers" value="1"> DUAL SPEAKER
-                        </label>
-                    </div>
-                </div>
             </div>
             <div class="col-lg-6 mt-3 py-3">
-                <div class="filter-box ">
-                    <span class="filter-label">Size:</span>
-                    <span id="sizeValue">min</span>
-                    <input type="range" class="form-range custom-range flex-grow-1" min="2000" max="2025"
-                        id="rangeSize" />
-                    <span class="text-muted">max</span>
-                </div>
                 <button class="btn  w-100 btn-toggle  mb-3 mt-2" type="button" data-bs-toggle="collapse"
                     data-bs-target="#notchCollapse" aria-expanded="false" aria-controls="notchCollapse">
                     Notch
@@ -1030,19 +1003,19 @@ $brands = $brands_stmt->fetchAll();
                 <div class="collapse" id="notchCollapse">
                     <div class="card card-body">
                         <div class="form-check">
-                            <input class="form-check-input" type="checkbox" value="Apple" id="brandApple"
-                                name="brand" />
-                            <label class="form-check-label" for="brandApple">No</label>
+                            <input class="form-check-input" type="checkbox" value="No notch" id="notchNo"
+                                name="display_notch[]" />
+                            <label class="form-check-label" for="notchNo">No</label>
                         </div>
                         <div class="form-check">
-                            <input class="form-check-input" type="checkbox" value="Samsung" id="brandSamsung"
-                                name="brand" />
-                            <label class="form-check-label" for="brandSamsung">Yes</label>
+                            <input class="form-check-input" type="checkbox" value="Notch" id="notchYes"
+                                name="display_notch[]" />
+                            <label class="form-check-label" for="notchYes">Yes</label>
                         </div>
                         <div class="form-check">
-                            <input class="form-check-input" type="checkbox" value="Xiaomi" id="brandXiaomi"
-                                name="brand" />
-                            <label class="form-check-label" for="brandXiaomi">Punch hole</label>
+                            <input class="form-check-input" type="checkbox" value="Punch hole" id="notchPunch"
+                                name="display_notch[]" />
+                            <label class="form-check-label" for="notchPunch">Punch hole</label>
                         </div>
 
                     </div>
@@ -1131,34 +1104,44 @@ $brands = $brands_stmt->fetchAll();
                 <div class="collapse " id="bluetoothCollapse">
                     <div class="card card-body">
                         <div class="form-check">
-                            <input class="form-check-input" type="checkbox" value="Apple" id="brandApple"
-                                name="brand" />
-                            <label class="form-check-label" for="brandApple">Any Bluetooth</label>
+                            <input class="form-check-input bluetooth-version" type="checkbox" value="4.0" id="bt40"
+                                name="bluetooth_versions[]" />
+                            <label class="form-check-label" for="bt40">Bluetooth 4.0</label>
                         </div>
                         <div class="form-check">
-                            <input class="form-check-input" type="checkbox" value="Samsung" id="brandSamsung"
-                                name="brand" />
-                            <label class="form-check-label" for="brandSamsung">Bluetooth 4.0</label>
+                            <input class="form-check-input bluetooth-version" type="checkbox" value="4.1" id="bt41"
+                                name="bluetooth_versions[]" />
+                            <label class="form-check-label" for="bt41">Bluetooth 4.1</label>
                         </div>
                         <div class="form-check">
-                            <input class="form-check-input" type="checkbox" value="Xiaomi" id="brandXiaomi"
-                                name="brand" />
-                            <label class="form-check-label" for="brandXiaomi">Bluetooth 4.1</label>
+                            <input class="form-check-input bluetooth-version" type="checkbox" value="4.2" id="bt42"
+                                name="bluetooth_versions[]" />
+                            <label class="form-check-label" for="bt42">Bluetooth 4.2</label>
                         </div>
                         <div class="form-check">
-                            <input class="form-check-input" type="checkbox" value="Xiaomi" id="brandXiaomi"
-                                name="brand" />
-                            <label class="form-check-label" for="brandXiaomi">Bluetooth 4.2</label>
+                            <input class="form-check-input bluetooth-version" type="checkbox" value="5.0" id="bt50"
+                                name="bluetooth_versions[]" />
+                            <label class="form-check-label" for="bt50">Bluetooth 5.0</label>
                         </div>
                         <div class="form-check">
-                            <input class="form-check-input" type="checkbox" value="Xiaomi" id="brandXiaomi"
-                                name="brand" />
-                            <label class="form-check-label" for="brandXiaomi">Bluetooth 5.1</label>
+                            <input class="form-check-input bluetooth-version" type="checkbox" value="5.1" id="bt51"
+                                name="bluetooth_versions[]" />
+                            <label class="form-check-label" for="bt51">Bluetooth 5.1</label>
                         </div>
                         <div class="form-check">
-                            <input class="form-check-input" type="checkbox" value="Xiaomi" id="brandXiaomi"
-                                name="brand" />
-                            <label class="form-check-label" for="brandXiaomi">Bluetooth 5.2</label>
+                            <input class="form-check-input bluetooth-version" type="checkbox" value="5.2" id="bt52"
+                                name="bluetooth_versions[]" />
+                            <label class="form-check-label" for="bt52">Bluetooth 5.2</label>
+                        </div>
+                        <div class="form-check">
+                            <input class="form-check-input bluetooth-version" type="checkbox" value="5.3" id="bt53"
+                                name="bluetooth_versions[]" />
+                            <label class="form-check-label" for="bt53">Bluetooth 5.3</label>
+                        </div>
+                        <div class="form-check">
+                            <input class="form-check-input bluetooth-version" type="checkbox" value="5.4" id="bt54"
+                                name="bluetooth_versions[]" />
+                            <label class="form-check-label" for="bt54">Bluetooth 5.4</label>
                         </div>
 
                     </div>
@@ -1166,12 +1149,12 @@ $brands = $brands_stmt->fetchAll();
                 <div class="row " style="margin-top: -7px;">
                     <div class="col-lg-6 d-flex align-items-center justify-content-center">
                         <label class="btn w-100 text-start mb-0 fw-bolder" style="border-radius: 1px;">
-                            <input type="checkbox" class="form-check-input me-2 float-end" name="infrared" value="1">INFRARED
+                            <input type="checkbox" class="form-check-input me-2 float-end" id="infraredRequired" name="infrared" value="1">INFRARED
                         </label>
                     </div>
                     <div class="col-lg-6 d-flex align-items-center justify-content-center">
                         <label class="btn  w-100 text-start mb-0 fw-bolder" style="border-radius: 1px;">
-                            <input type="checkbox" class="form-check-input me-2 float-end" name="fm_radio" value="1"> FM-RADIO
+                            <input type="checkbox" class="form-check-input me-2 float-end" id="fmRadioRequired" name="fm_radio" value="1"> FM-RADIO
                         </label>
                     </div>
                 </div>
@@ -1300,6 +1283,34 @@ $brands = $brands_stmt->fetchAll();
             const displaySizeMaxInput = document.getElementById('displaySizeMax');
             const displaySizeMaxValue = document.getElementById('displaySizeMaxValue');
 
+            // Display resolution slider elements
+            const displayResMinInput = document.getElementById('displayResMin');
+            const displayResMinValue = document.getElementById('displayResMinValue');
+            const displayResMaxInput = document.getElementById('displayResMax');
+            const displayResMaxValue = document.getElementById('displayResMaxValue');
+
+            // Refresh rate slider
+            const refreshRateMinInput = document.getElementById('refreshRateMin');
+            const refreshRateMinValue = document.getElementById('refreshRateMinValue');
+
+            // F-number (aperture) max slider
+            const fNumberMaxInput = document.getElementById('fNumberMax');
+            const fNumberMaxValue = document.getElementById('fNumberMaxValue');
+
+            // CPU clock min slider (GHz)
+            const cpuClockMinInput = document.getElementById('cpuClockMin');
+            const cpuClockMinValue = document.getElementById('cpuClockMinValue');
+
+            // Body sliders
+            const heightMinInput = document.getElementById('heightMin');
+            const heightMinValue = document.getElementById('heightMinValue');
+            const thicknessMaxInput = document.getElementById('thicknessMax');
+            const thicknessMaxValue = document.getElementById('thicknessMaxValue');
+            const widthMinInput = document.getElementById('widthMin');
+            const widthMinValue = document.getElementById('widthMinValue');
+            const weightMaxInput = document.getElementById('weightMax');
+            const weightMaxValue = document.getElementById('weightMaxValue');
+
             // B1 new controls
             const osVersionMinInput = document.getElementById('osVersionMin');
             const osVersionMinValue = document.getElementById('osVersionMinValue');
@@ -1403,6 +1414,39 @@ $brands = $brands_stmt->fetchAll();
                 });
             }
 
+            // Display resolution slider handlers
+            if (displayResMinInput && displayResMinValue) {
+                const formatRes = (v) => v == 480 ? 'min' : v + 'p';
+                displayResMinValue.textContent = formatRes(displayResMinInput.value);
+                displayResMinInput.addEventListener('input', function() {
+                    displayResMinValue.textContent = formatRes(this.value);
+                    if (parseInt(this.value) > parseInt(displayResMaxInput.value)) {
+                        displayResMaxInput.value = this.value;
+                        displayResMaxValue.textContent = formatRes(this.value);
+                    }
+                });
+            }
+            if (displayResMaxInput && displayResMaxValue) {
+                const formatRes = (v) => v == 4320 ? 'max' : v + 'p';
+                displayResMaxValue.textContent = formatRes(displayResMaxInput.value);
+                displayResMaxInput.addEventListener('input', function() {
+                    displayResMaxValue.textContent = formatRes(this.value);
+                    if (parseInt(this.value) < parseInt(displayResMinInput.value)) {
+                        displayResMinInput.value = this.value;
+                        displayResMinValue.textContent = formatRes(this.value);
+                    }
+                });
+            }
+
+            // Refresh rate handler
+            if (refreshRateMinInput && refreshRateMinValue) {
+                const formatHz = (v) => v == 0 ? 'Any' : '≥ ' + v + 'Hz';
+                refreshRateMinValue.textContent = formatHz(refreshRateMinInput.value);
+                refreshRateMinInput.addEventListener('input', function() {
+                    refreshRateMinValue.textContent = formatHz(this.value);
+                });
+            }
+
             // OS Version slider handler
             if (osVersionMinInput && osVersionMinValue) {
                 const updateOsVer = (v) => v == 0 ? 'Any' : '≥ ' + v;
@@ -1448,6 +1492,57 @@ $brands = $brands_stmt->fetchAll();
                 });
             }
 
+            // F-number handler (max threshold, smaller is better)
+            if (fNumberMaxInput && fNumberMaxValue) {
+                const fmt = (v) => parseFloat(v) == 0 ? 'Any' : '≤ f/' + parseFloat(v).toFixed(1);
+                fNumberMaxValue.textContent = fmt(fNumberMaxInput.value);
+                fNumberMaxInput.addEventListener('input', function() {
+                    fNumberMaxValue.textContent = fmt(this.value);
+                });
+            }
+
+            // CPU clock handler (min GHz)
+            if (cpuClockMinInput && cpuClockMinValue) {
+                const fmt = (v) => parseFloat(v) == 0 ? 'Any' : '≥ ' + parseFloat(v).toFixed(1) + ' GHz';
+                cpuClockMinValue.textContent = fmt(cpuClockMinInput.value);
+                cpuClockMinInput.addEventListener('input', function() {
+                    cpuClockMinValue.textContent = fmt(this.value);
+                });
+            }
+
+            // Height (min)
+            if (heightMinInput && heightMinValue) {
+                const fmt = (v) => parseInt(v) == 0 ? 'Any' : '≥ ' + parseInt(v) + ' mm';
+                heightMinValue.textContent = fmt(heightMinInput.value);
+                heightMinInput.addEventListener('input', function() {
+                    heightMinValue.textContent = fmt(this.value);
+                });
+            }
+            // Thickness (max)
+            if (thicknessMaxInput && thicknessMaxValue) {
+                const fmt = (v) => parseFloat(v) == 0 ? 'Any' : '≤ ' + parseFloat(v).toFixed(1) + ' mm';
+                thicknessMaxValue.textContent = fmt(thicknessMaxInput.value);
+                thicknessMaxInput.addEventListener('input', function() {
+                    thicknessMaxValue.textContent = fmt(this.value);
+                });
+            }
+            // Width (min)
+            if (widthMinInput && widthMinValue) {
+                const fmt = (v) => parseInt(v) == 0 ? 'Any' : '≥ ' + parseInt(v) + ' mm';
+                widthMinValue.textContent = fmt(widthMinInput.value);
+                widthMinInput.addEventListener('input', function() {
+                    widthMinValue.textContent = fmt(this.value);
+                });
+            }
+            // Weight (max)
+            if (weightMaxInput && weightMaxValue) {
+                const fmt = (v) => parseInt(v) == 0 ? 'Any' : '≤ ' + parseInt(v) + ' g';
+                weightMaxValue.textContent = fmt(weightMaxInput.value);
+                weightMaxInput.addEventListener('input', function() {
+                    weightMaxValue.textContent = fmt(this.value);
+                });
+            }
+
             // Utility: reset all filters to default (no filter)
             function resetAllFilters() {
                 // Uncheck all checkboxes
@@ -1462,15 +1557,24 @@ $brands = $brands_stmt->fetchAll();
                 if (storageMinInput) storageMinInput.value = storageMinInput.min;
                 if (displaySizeMinInput) displaySizeMinInput.value = displaySizeMinInput.min;
                 if (displaySizeMaxInput) displaySizeMaxInput.value = displaySizeMaxInput.max;
+                if (displayResMinInput) displayResMinInput.value = displayResMinInput.min;
+                if (displayResMaxInput) displayResMaxInput.value = displayResMaxInput.max;
+                if (refreshRateMinInput) refreshRateMinInput.value = refreshRateMinInput.min;
                 if (osVersionMinInput) osVersionMinInput.value = osVersionMinInput.min;
                 if (mainCamMpMinInput) mainCamMpMinInput.value = mainCamMpMinInput.min;
                 if (batteryCapacityMinInput) batteryCapacityMinInput.value = batteryCapacityMinInput.min;
                 if (wiredChargeMinInput) wiredChargeMinInput.value = wiredChargeMinInput.min;
                 if (wirelessChargeMinInput) wirelessChargeMinInput.value = wirelessChargeMinInput.min;
+                if (fNumberMaxInput) fNumberMaxInput.value = fNumberMaxInput.min;
+                if (cpuClockMinInput) cpuClockMinInput.value = cpuClockMinInput.min;
+                if (heightMinInput) heightMinInput.value = heightMinInput.min;
+                if (thicknessMaxInput) thicknessMaxInput.value = thicknessMaxInput.min;
+                if (widthMinInput) widthMinInput.value = widthMinInput.min;
+                if (weightMaxInput) weightMaxInput.value = weightMaxInput.min;
                 if (chipsetQueryInput) chipsetQueryInput.value = '';
                 // Trigger UI updates for labels
                 if (typeof Event === 'function') {
-                    [priceMaxInput, yearMinInput, yearMaxInput, ramMinInput, storageMinInput, displaySizeMinInput, displaySizeMaxInput, osVersionMinInput, mainCamMpMinInput, batteryCapacityMinInput, wiredChargeMinInput, wirelessChargeMinInput].forEach(inp => {
+                    [priceMaxInput, yearMinInput, yearMaxInput, ramMinInput, storageMinInput, displaySizeMinInput, displaySizeMaxInput, displayResMinInput, displayResMaxInput, refreshRateMinInput, osVersionMinInput, mainCamMpMinInput, batteryCapacityMinInput, wiredChargeMinInput, wirelessChargeMinInput, fNumberMaxInput, cpuClockMinInput, heightMinInput, thicknessMaxInput, widthMinInput, weightMaxInput].forEach(inp => {
                         if (inp) inp.dispatchEvent(new Event('input'));
                     });
                 }
@@ -1555,6 +1659,38 @@ $brands = $brands_stmt->fetchAll();
                     if (maxSize < 8.0) formData.append('display_size_max', maxSize);
                 }
 
+                // Display Resolution range if not default
+                if (displayResMinInput && displayResMaxInput) {
+                    const minRes = parseInt(displayResMinInput.value);
+                    const maxRes = parseInt(displayResMaxInput.value);
+                    if (minRes > 480) formData.append('display_res_min', minRes);
+                    if (maxRes < 4320) formData.append('display_res_max', maxRes);
+                }
+
+                // Display Technology checkboxes
+                document.querySelectorAll('input[name="display_tech[]"]:checked').forEach(cb => {
+                    formData.append('display_tech[]', cb.value);
+                });
+
+                // Display Notch checkboxes
+                document.querySelectorAll('input[name="display_notch[]"]:checked').forEach(cb => {
+                    formData.append('display_notch[]', cb.value);
+                });
+
+                // Refresh Rate min if > 0
+                if (refreshRateMinInput) {
+                    const rr = parseInt(refreshRateMinInput.value);
+                    if (rr > 0) formData.append('refresh_rate_min', rr);
+                }
+
+                // HDR
+                const hdrCb = document.querySelector('input[name="hdr"]');
+                if (hdrCb && hdrCb.checked) formData.append('hdr', '1');
+
+                // Billion colors
+                const billionColorsCb = document.querySelector('input[name="billion_colors"]');
+                if (billionColorsCb && billionColorsCb.checked) formData.append('billion_colors', '1');
+
                 // OS families (multi)
                 if (osFamilyInputs) {
                     osFamilyInputs.forEach(cb => {
@@ -1579,6 +1715,11 @@ $brands = $brands_stmt->fetchAll();
                     const mp = parseInt(mainCamMpMinInput.value);
                     if (mp > 0) formData.append('main_camera_mp_min', mp);
                 }
+                // F-number max (aperture)
+                if (fNumberMaxInput) {
+                    const fmax = parseFloat(fNumberMaxInput.value);
+                    if (!isNaN(fmax) && fmax > 0) formData.append('f_number_max', fmax.toFixed(1));
+                }
                 // Video capabilities
                 if (video4kInput && video4kInput.checked) formData.append('video_4k', '1');
                 if (video8kInput && video8kInput.checked) formData.append('video_8k', '1');
@@ -1598,6 +1739,195 @@ $brands = $brands_stmt->fetchAll();
                     const wlc = parseInt(wirelessChargeMinInput.value);
                     if (wlc > 0) formData.append('wireless_charge_min', wlc);
                 }
+
+                // CPU min GHz
+                if (cpuClockMinInput) {
+                    const cpuMin = parseFloat(cpuClockMinInput.value);
+                    if (!isNaN(cpuMin) && cpuMin > 0) formData.append('cpu_clock_min', cpuMin.toFixed(1));
+                }
+
+                // Body dimensions/weight
+                if (heightMinInput) {
+                    const h = parseInt(heightMinInput.value);
+                    if (!isNaN(h) && h > 0) formData.append('height_min', h);
+                }
+                if (thicknessMaxInput) {
+                    const t = parseFloat(thicknessMaxInput.value);
+                    if (!isNaN(t) && t > 0) formData.append('thickness_max', t.toFixed(1));
+                }
+                if (widthMinInput) {
+                    const w = parseInt(widthMinInput.value);
+                    if (!isNaN(w) && w > 0) formData.append('width_min', w);
+                }
+                if (weightMaxInput) {
+                    const wg = parseInt(weightMaxInput.value);
+                    if (!isNaN(wg) && wg > 0) formData.append('weight_max', wg);
+                }
+
+                // Materials & colors
+                document.querySelectorAll('input[name="color[]"]:checked').forEach(cb => {
+                    formData.append('color[]', cb.value);
+                });
+                document.querySelectorAll('input[name="frame_material[]"]:checked').forEach(cb => {
+                    formData.append('frame_material[]', cb.value);
+                });
+                document.querySelectorAll('input[name="back_material[]"]:checked').forEach(cb => {
+                    formData.append('back_material[]', cb.value);
+                });
+
+                // Network filters (SIM/Network bands)
+                // 2G bands
+                document.querySelectorAll('input.network-2g-band:checked').forEach(cb => {
+                    formData.append('network_2g_bands[]', cb.value);
+                });
+                // 3G bands
+                document.querySelectorAll('input.network-3g-band:checked').forEach(cb => {
+                    formData.append('network_3g_bands[]', cb.value);
+                });
+                // 4G bands
+                document.querySelectorAll('input.network-4g-band:checked').forEach(cb => {
+                    formData.append('network_4g_bands[]', cb.value);
+                });
+                // 5G bands
+                document.querySelectorAll('input.network-5g-band:checked').forEach(cb => {
+                    formData.append('network_5g_bands[]', cb.value);
+                });
+                // Dual SIM
+                const dualSimInput = document.getElementById('dualSim');
+                if (dualSimInput && dualSimInput.checked) {
+                    formData.append('dual_sim', '1');
+                }
+                // eSIM
+                const esimSupportInput = document.getElementById('esimSupport');
+                if (esimSupportInput && esimSupportInput.checked) {
+                    formData.append('esim', '1');
+                }
+                // SIM sizes
+                document.querySelectorAll('input[name="sim_sizes[]"]:checked').forEach(cb => {
+                    formData.append('sim_sizes[]', cb.value);
+                });
+
+                // WiFi/WLAN versions
+                document.querySelectorAll('input.wifi-version:checked').forEach(cb => {
+                    formData.append('wifi_versions[]', cb.value);
+                });
+                // Bluetooth versions
+                document.querySelectorAll('input.bluetooth-version:checked').forEach(cb => {
+                    formData.append('bluetooth_versions[]', cb.value);
+                });
+                // USB types
+                document.querySelectorAll('input.usb-type:checked').forEach(cb => {
+                    formData.append('usb_types[]', cb.value);
+                });
+                // GPS required
+                const gpsInput = document.getElementById('gpsRequired');
+                if (gpsInput && gpsInput.checked) {
+                    formData.append('gps_required', '1');
+                }
+                // NFC required
+                const nfcInput = document.getElementById('nfcRequired');
+                if (nfcInput && nfcInput.checked) {
+                    formData.append('nfc_required', '1');
+                }
+                // Infrared required
+                const infraredInput = document.getElementById('infraredRequired');
+                if (infraredInput && infraredInput.checked) {
+                    formData.append('infrared_required', '1');
+                }
+                // FM Radio required
+                const fmRadioInput = document.getElementById('fmRadioRequired');
+                if (fmRadioInput && fmRadioInput.checked) {
+                    formData.append('fm_radio_required', '1');
+                }
+
+                // Sensors (existing UI checkboxes)
+                const accelCb = document.querySelector('input[name="accelerometer"]');
+                if (accelCb && accelCb.checked) formData.append('accelerometer', '1');
+                const gyroCb = document.querySelector('input[name="gyro"]');
+                if (gyroCb && gyroCb.checked) formData.append('gyro', '1');
+                const barometerCb = document.querySelector('input[name="barometer"]');
+                if (barometerCb && barometerCb.checked) formData.append('barometer', '1');
+                const heartRateCb = document.querySelector('input[name="heart_rate"]');
+                if (heartRateCb && heartRateCb.checked) formData.append('heart_rate', '1');
+                const compassCb = document.querySelector('input[name="compass"]');
+                if (compassCb && compassCb.checked) formData.append('compass', '1');
+                const proximityCb = document.querySelector('input[name="proximity"]');
+                if (proximityCb && proximityCb.checked) formData.append('proximity', '1');
+
+                // Audio (existing UI checkboxes)
+                const hpJackCb = document.querySelector('input[name="headphone_jack"]');
+                if (hpJackCb && hpJackCb.checked) formData.append('headphone_jack', '1');
+                const dualSpkCb = document.querySelector('input[name="dual_speakers"]');
+                if (dualSpkCb && dualSpkCb.checked) formData.append('dual_speakers', '1');
+
+                // Main Camera features (existing UI checkboxes)
+                const telephotoCheckbox = document.querySelector('input[name="main_camera_telephoto"]');
+                if (telephotoCheckbox && telephotoCheckbox.checked) formData.append('main_camera_telephoto', '1');
+                const ultrawideCheckbox = document.querySelector('input[name="main_camera_ultrawide"]');
+                if (ultrawideCheckbox && ultrawideCheckbox.checked) formData.append('main_camera_ultrawide', '1');
+                const oisCheckbox = document.querySelector('input[name="main_camera_ois"]');
+                if (oisCheckbox && oisCheckbox.checked) formData.append('main_camera_ois', '1');
+
+                // Selfie Camera features (existing UI checkboxes)
+                const selfieFlashCheckbox = document.querySelector('input[name="selfie_camera_flash"]');
+                if (selfieFlashCheckbox && selfieFlashCheckbox.checked) formData.append('selfie_camera_flash', '1');
+                const popupCameraCheckbox = document.querySelector('input[name="popup_camera"]');
+                if (popupCameraCheckbox && popupCameraCheckbox.checked) formData.append('popup_camera', '1');
+                const underDisplayCameraCheckbox = document.querySelector('input[name="under_display_camera"]');
+                if (underDisplayCameraCheckbox && underDisplayCameraCheckbox.checked) formData.append('under_display_camera', '1');
+
+                // Battery extras (existing UI checkboxes)
+                const batterySiCCheckbox = document.querySelector('input[name="battery_sic"]');
+                if (batterySiCCheckbox && batterySiCCheckbox.checked) formData.append('battery_sic', '1');
+                const batteryRemovableCheckbox = document.querySelector('input[name="battery_removable"]');
+                if (batteryRemovableCheckbox && batteryRemovableCheckbox.checked) formData.append('battery_removable', '1');
+
+                // IP certificate (multi-select)
+                document.querySelectorAll('input[name="ip_certificate[]"]:checked').forEach(cb => {
+                    formData.append('ip_certificate[]', cb.value);
+                });
+
+                // Form factor (multi-select)
+                document.querySelectorAll('input[name="form_factor[]"]:checked').forEach(cb => {
+                    formData.append('form_factor[]', cb.value);
+                });
+
+                // Free Text (Misc)
+                const freeTextInput = document.querySelector('input.life');
+                if (freeTextInput && freeTextInput.value.trim() !== '') {
+                    formData.append('free_text', freeTextInput.value.trim());
+                }
+
+                // Orders (sorting options) - pick the first checked option
+                let orderValue = null;
+                document.querySelectorAll('#popularCollapse .form-check').forEach(fc => {
+                    if (orderValue) return; // already chosen one
+                    const inp = fc.querySelector('input');
+                    const lbl = fc.querySelector('label');
+                    if (inp && inp.checked && lbl) {
+                        const t = lbl.textContent.trim().toLowerCase();
+                        if (t.startsWith('price')) orderValue = 'price';
+                        else if (t.startsWith('camera')) orderValue = 'camera_battery';
+                        else if (t.startsWith('popularity')) orderValue = 'popularity';
+                    }
+                });
+                if (orderValue) formData.append('order', orderValue);
+
+                // Fingerprint (from Fingerprint collapse by label text)
+                const fpConds = [];
+                document.querySelectorAll('#fingerCollapse .form-check').forEach(fc => {
+                    const inp = fc.querySelector('input');
+                    const lbl = fc.querySelector('label');
+                    if (inp && inp.checked && lbl) {
+                        const t = lbl.textContent.trim().toLowerCase();
+                        if (t.includes('any')) fpConds.push('any');
+                        else if (t.includes('rear')) fpConds.push('rear');
+                        else if (t.includes('side')) fpConds.push('side');
+                        else if (t.includes('under display') || t.includes('under-display') || t.includes('in-display')) fpConds.push('under_display');
+                    }
+                });
+                // Deduplicate and append
+                [...new Set(fpConds)].forEach(v => formData.append('fingerprint[]', v));
 
                 // Send AJAX request
                 fetch('phonefinder_handler.php', {
