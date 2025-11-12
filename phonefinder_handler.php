@@ -77,10 +77,6 @@ try {
     $sensorCompass = isset($_POST['compass']);
     $sensorProximity = isset($_POST['proximity']);
 
-    // Audio
-    $audioHeadphoneJack = isset($_POST['headphone_jack']);
-    $audioDualSpeakers = isset($_POST['dual_speakers']);
-
     // Main Camera features
     $mainCameraTelephoto = isset($_POST['main_camera_telephoto']);
     $mainCameraUltrawide = isset($_POST['main_camera_ultrawide']);
