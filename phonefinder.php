@@ -866,7 +866,6 @@ $brands = $brands_stmt->fetchAll();
                     CPU: <span id="cpuClockMinValue">Any</span>
                     <input type="range" class="form-range custom-range flex-grow-1" min="0" max="4.0" step="0.1"
                         id="cpuClockMin" value="0">
-                    id="rangeSize" />
                 </div>
                 <div class="filter-box mt-1">
                     <span class="filter-label ">VIDEO</span>
@@ -1228,10 +1227,16 @@ $brands = $brands_stmt->fetchAll();
             <img class="volunteer text-center m-auto d-flex align-items-center justify-content-between "
                 src="https://fdn.gsmarena.com/imgroot/static/banners/self/nordvpn-728x90-25.gif" alt="">
         </div>
-        <!-- Find button row inserted -->
-        <div class="row mt-4">
-            <div class="col-12">
-                <button type="button" id="findDevicesBtn" class="btn btn-danger w-100 py-3 fw-bold">
+
+        <!-- Action buttons -->
+        <div class="row mt-4 mb-3">
+            <div class="col-md-6 mb-2">
+                <button type="button" id="resetFiltersBtn" class="w-100 py-3 fw-bold" style="background-color: #6c757d; color: white; border: none; cursor: pointer;">
+                    <i class="fa fa-undo me-2"></i> Reset Filters
+                </button>
+            </div>
+            <div class="col-md-6 mb-2">
+                <button type="button" id="findDevicesBtn" class="w-100 py-3 fw-bold" style="background-color: #d50000; color: white; border: none; cursor: pointer;">
                     <i class="fa fa-search me-2"></i> Find Devices
                 </button>
             </div>
@@ -1583,17 +1588,13 @@ $brands = $brands_stmt->fetchAll();
             // On page load, reset all filters
             resetAllFilters();
 
-            // Optionally, add a Reset Filters button
-            if (!document.getElementById('resetFiltersBtn')) {
-                const btn = document.createElement('button');
-                btn.id = 'resetFiltersBtn';
-                btn.className = 'btn btn-secondary w-100 my-2';
-                btn.innerHTML = '<i class="fa fa-undo me-2"></i>Reset Filters';
-                btn.onclick = function(e) {
+            // Reset button handler
+            const resetBtn = document.getElementById('resetFiltersBtn');
+            if (resetBtn) {
+                resetBtn.addEventListener('click', function(e) {
                     e.preventDefault();
                     resetAllFilters();
-                };
-                findBtn.parentNode.insertBefore(btn, findBtn);
+                });
             }
 
             findBtn.addEventListener('click', function() {
@@ -1934,8 +1935,22 @@ $brands = $brands_stmt->fetchAll();
                         method: 'POST',
                         body: formData
                     })
-                    .then(response => response.json())
-                    .then(data => {
+                    .then(response => {
+                        if (!response.ok) {
+                            throw new Error('HTTP error! status: ' + response.status);
+                        }
+                        return response.text();
+                    })
+                    .then(text => {
+                        let data;
+                        try {
+                            data = JSON.parse(text);
+                        } catch (e) {
+                            console.error('JSON parse error:', e);
+                            console.error('Response text:', text);
+                            throw new Error('Invalid JSON response from server');
+                        }
+
                         if (data.success) {
                             // Update results count
                             resultsCount.textContent = data.count;
@@ -1964,8 +1979,8 @@ $brands = $brands_stmt->fetchAll();
                         }
                     })
                     .catch(error => {
-                        console.error('Error:', error);
-                        alert('An error occurred while searching. Please try again.');
+                        console.error('Full error details:', error);
+                        alert('An error occurred while searching: ' + error.message + '\n\nPlease check the browser console for details.');
                     })
                     .finally(() => {
                         // Reset button state

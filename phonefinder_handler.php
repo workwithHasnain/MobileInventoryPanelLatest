@@ -445,18 +445,6 @@ try {
         $query .= " AND (p.comms ILIKE '%Radio%' OR p.comms ILIKE '%FM radio%')";
     }
 
-    // Audio filters
-    if ($audioHeadphoneJack) {
-        // Require presence of a headphone jack; avoid matches that explicitly say no jack
-        $query .= " AND ((p.sound ILIKE '%3.5mm%' OR p.sound ILIKE '%headphone jack%' OR p.body ILIKE '%3.5mm jack%') ";
-        $query .= " AND (p.sound NOT ILIKE '%no 3.5mm%' AND p.sound NOT ILIKE '%without 3.5mm%'))";
-    }
-    if ($audioDualSpeakers) {
-        // Stereo/dual speakers
-        $query .= " AND ((p.sound ILIKE '%stereo%' OR p.sound ILIKE '%dual speakers%') ";
-        $query .= " AND (p.sound NOT ILIKE '%no stereo%'))";
-    }
-
     // Sensor filters (match in FEATURES/body text)
     if ($sensorAccelerometer) {
         $query .= " AND (p.features ILIKE '%Accelerometer%' OR p.body ILIKE '%Accelerometer%')";
