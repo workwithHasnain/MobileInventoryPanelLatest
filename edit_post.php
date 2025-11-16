@@ -168,9 +168,9 @@ if ($_POST) {
             {
                 if (empty($set)) return '{}';
                 foreach ($set as &$v) {
-                    $v = '"' . str_replace('"', '\"', $v) . '"';
+                    $v = '"' . str_replace('"', '""', $v) . '"';
                 }
-                return '{' . implode(",", $set) . '}';
+                return '{' . implode(',', $set) . '}';
             }
 
             $pg_media_gallery = to_pg_array($media_gallery);
@@ -229,6 +229,7 @@ function pg_array_parse($pgArray)
 // Decode PostgreSQL array fields for form display
 $post_categories = pg_array_parse($post['categories']);
 $post_media_gallery = pg_array_parse($post['media_gallery']);
+$post_tags = pg_array_parse($post['tags']); // Ensure tags are parsed properly
 
 $page_title = "Edit Post";
 include 'includes/header.php';
@@ -433,7 +434,7 @@ include 'includes/header.php';
                                 <div class="mb-3">
                                     <label for="tags" class="form-label">Tags/Keywords</label>
                                     <input type="text" class="form-control" id="tags" name="tags"
-                                        value="<?php echo htmlspecialchars($_POST['tags'] ?? $post['tags']); ?>"
+                                        value="<?php echo htmlspecialchars(isset($_POST['tags']) ? $_POST['tags'] : implode(', ', $post_tags)); ?>"
                                         placeholder="mobile, smartphone, review, tech">
                                     <div class="form-text">Separate tags with commas</div>
                                 </div>
