@@ -5,17 +5,44 @@ require_once 'phone_data.php';
 
 // Get posts and devices for display (case-insensitive status check) with comment counts
 $pdo = getConnection();
-$posts_stmt = $pdo->prepare("
-    SELECT p.*, 
-    (SELECT COUNT(*) FROM post_comments pc WHERE pc.post_id = p.id AND pc.status = 'approved') as comment_count
-    FROM posts p 
-    WHERE p.status ILIKE 'published'
-    AND p.is_featured = TRUE 
-    ORDER BY p.created_at DESC 
-    LIMIT 6
-");
-$posts_stmt->execute();
-$posts = $posts_stmt->fetchAll();
+
+// Read search query (hero search bar)
+$q = trim($_GET['q'] ?? '');
+$isSearching = ($q !== '');
+
+// Build posts list: default is featured + published; if searching, filter by title/tags
+if ($isSearching) {
+    $term = '%' . $q . '%';
+    $posts_stmt = $pdo->prepare("
+        SELECT p.*, 
+        (SELECT COUNT(*) FROM post_comments pc WHERE pc.post_id = p.id AND pc.status = 'approved') as comment_count
+        FROM posts p 
+        WHERE p.status ILIKE 'published'
+          AND (
+              p.title ILIKE ?
+              OR EXISTS (
+                  SELECT 1 FROM unnest(COALESCE(p.tags, ARRAY[]::varchar[])) t
+                  WHERE t ILIKE ?
+              )
+          )
+        ORDER BY p.created_at DESC
+        LIMIT 24
+    ");
+    $posts_stmt->execute([$term, $term]);
+    $posts = $posts_stmt->fetchAll();
+} else {
+    $posts_stmt = $pdo->prepare("
+        SELECT p.*, 
+        (SELECT COUNT(*) FROM post_comments pc WHERE pc.post_id = p.id AND pc.status = 'approved') as comment_count
+        FROM posts p 
+        WHERE p.status ILIKE 'published'
+        AND p.is_featured = TRUE 
+        ORDER BY p.created_at DESC 
+        LIMIT 6
+    ");
+    $posts_stmt->execute();
+    $posts = $posts_stmt->fetchAll();
+}
 
 // Get devices from database
 $devices = getAllPhones();
@@ -259,11 +286,11 @@ $latestDevices = array_slice(array_reverse($latestDevices), 0, 9);
                         <button class="mobiles-button">Motorola</button>
                     </div>
 
-                    <div class="comon">
-                        <label for="" class="text-white whitening ">Search For</label>
-                        <input type="text" class="bg-white">
-                        <button class="mobiles-button bg-grey">Search</button>
-                    </div>
+                    <form method="get" action="featured.php" class="comon">
+                        <label for="hero-search" class="text-white whitening ">Search For</label>
+                        <input id="hero-search" name="q" type="text" class="bg-white" placeholder="Search posts..." value="<?php echo htmlspecialchars($q ?? ''); ?>">
+                        <button type="submit" class="mobiles-button bg-grey">Search</button>
+                    </form>
                 </div>
 
             </div>
@@ -302,9 +329,24 @@ $latestDevices = array_slice(array_reverse($latestDevices), 0, 9);
     <div class="container mt-0  ">
         <div class="row">
             <?php
-            $maxPosts = 6;
-            $postChunks = array_chunk(array_slice($posts, 0, $maxPosts), ceil($maxPosts / 2));
-            foreach ($postChunks as $colIndex => $colPosts):
+            if (empty($posts)):
+            ?>
+                <div class="col-12">
+                    <div class="alert alert-light border" role="alert">
+                        <?php if ($isSearching): ?>
+                            No posts found for "<?php echo htmlspecialchars($q); ?>".
+                        <?php else: ?>
+                            No posts to show.
+                        <?php endif; ?>
+                    </div>
+                </div>
+            <?php
+            else:
+                $maxPosts = $isSearching ? count($posts) : 6;
+                $displayPosts = array_slice($posts, 0, $maxPosts);
+                $columns = max(1, ceil($maxPosts / 2));
+                $postChunks = array_chunk($displayPosts, $columns);
+                foreach ($postChunks as $colIndex => $colPosts):
             ?>
                 <div class="col-lg-4 col-md-6 col-12 sentizer-erx" style="background-color: #EEEEEE;">
                     <?php foreach ($colPosts as $post): ?>
@@ -324,7 +366,7 @@ $latestDevices = array_slice(array_reverse($latestDevices), 0, 9);
                         </a>
                     <?php endforeach; ?>
                 </div>
-            <?php endforeach; ?>
+            <?php endforeach; endif; ?>
 
             <div class="col-lg-4  col-12  bg-white p-3">
 
