@@ -595,26 +595,28 @@ if ($_POST && isset($_POST['action'])) {
                         <div>
                             <?php
                             $tags = $post['tags'];
-                            if (!empty($tags)):
+                            if (!empty($tags)) {
                                 // Handle both PostgreSQL array format and comma-separated strings
                                 if (is_string($tags)) {
                                     $tagsString = trim($tags);
                                     if (strlen($tagsString) > 1 && $tagsString[0] === '{' && substr($tagsString, -1) === '}') {
-                                        // PostgreSQL array string like {Apple,iOS,Rumors}
+                                        // PostgreSQL array string like {"Apple","iOS","Rumors"}
                                         $tagsString = trim($tagsString, '{}');
-                                        $tags = explode(',', $tagsString);
+                                        $tags = array_map(function ($tag) {
+                                            return trim($tag, '"'); // Remove double quotes around tags
+                                        }, explode(',', $tagsString));
                                     } else {
                                         // Plain comma-separated string
                                         $tags = array_map('trim', explode(',', $tagsString));
                                     }
                                 }
-                                if (is_array($tags)):
+                                if (is_array($tags)) {
+                                    foreach ($tags as $tag) {
+                                        echo '<button class="section-button">' . htmlspecialchars($tag) . '</button>';
+                                    }
+                                }
+                            }
                             ?>
-                                    <?php foreach ($tags as $tag): ?>
-                                        <button class="section-button"><?php echo htmlspecialchars(trim($tag)); ?></button>
-                                    <?php endforeach; ?>
-                                <?php endif; ?>
-                            <?php endif; ?>
                         </div>
                     </div>
                 </div>
