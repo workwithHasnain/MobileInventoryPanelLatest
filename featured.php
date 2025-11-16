@@ -340,33 +340,34 @@ $latestDevices = array_slice(array_reverse($latestDevices), 0, 9);
                         <?php endif; ?>
                     </div>
                 </div>
-            <?php
+                <?php
             else:
                 $maxPosts = $isSearching ? count($posts) : 6;
                 $displayPosts = array_slice($posts, 0, $maxPosts);
                 $columns = max(1, ceil($maxPosts / 2));
                 $postChunks = array_chunk($displayPosts, $columns);
                 foreach ($postChunks as $colIndex => $colPosts):
-            ?>
-                <div class="col-lg-4 col-md-6 col-12 sentizer-erx" style="background-color: #EEEEEE;">
-                    <?php foreach ($colPosts as $post): ?>
-                        <a href="post.php?slug=<?php echo urlencode($post['slug']); ?>">
-                            <div class="review-card" style="cursor:pointer;" onclick="window.location.href='post.php?slug=<?php echo urlencode($post['slug']); ?>'">
-                                <?php if (isset($post['featured_image']) && !empty($post['featured_image'])): ?>
-                                    <img style="cursor:pointer;" onclick="window.location.href='post.php?slug=<?php echo urlencode($post['slug']); ?>'" src="<?php echo htmlspecialchars($post['featured_image']); ?>" alt="<?php echo htmlspecialchars($post['title']); ?>">
-                                <?php endif; ?>
-                                <div class="review-card-body">
-                                    <div style="cursor:pointer;" onclick="window.location.href='post.php?slug=<?php echo urlencode($post['slug']); ?>'" class="review-card-title"><?php echo htmlspecialchars($post['title']); ?></div>
-                                    <div class="review-card-meta">
-                                        <span><?php echo date('M j, Y', strtotime($post['created_at'])); ?></span>
-                                        <span><i class="bi bi-chat-dots-fill"></i><?php echo $post['comment_count']; ?> comments</span>
+                ?>
+                    <div class="col-lg-4 col-md-6 col-12 sentizer-erx" style="background-color: #EEEEEE;">
+                        <?php foreach ($colPosts as $post): ?>
+                            <a href="post.php?slug=<?php echo urlencode($post['slug']); ?>">
+                                <div class="review-card" style="cursor:pointer;" onclick="window.location.href='post.php?slug=<?php echo urlencode($post['slug']); ?>'">
+                                    <?php if (isset($post['featured_image']) && !empty($post['featured_image'])): ?>
+                                        <img style="cursor:pointer;" onclick="window.location.href='post.php?slug=<?php echo urlencode($post['slug']); ?>'" src="<?php echo htmlspecialchars($post['featured_image']); ?>" alt="<?php echo htmlspecialchars($post['title']); ?>">
+                                    <?php endif; ?>
+                                    <div class="review-card-body">
+                                        <div style="cursor:pointer;" onclick="window.location.href='post.php?slug=<?php echo urlencode($post['slug']); ?>'" class="review-card-title"><?php echo htmlspecialchars($post['title']); ?></div>
+                                        <div class="review-card-meta">
+                                            <span><?php echo date('M j, Y', strtotime($post['created_at'])); ?></span>
+                                            <span><i class="bi bi-chat-dots-fill"></i><?php echo $post['comment_count']; ?> comments</span>
+                                        </div>
                                     </div>
                                 </div>
-                            </div>
-                        </a>
-                    <?php endforeach; ?>
-                </div>
-            <?php endforeach; endif; ?>
+                            </a>
+                        <?php endforeach; ?>
+                    </div>
+            <?php endforeach;
+            endif; ?>
 
             <div class="col-lg-4  col-12  bg-white p-3">
 
