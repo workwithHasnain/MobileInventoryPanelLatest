@@ -262,7 +262,7 @@ $latestDevices = array_slice(array_reverse($latestDevices), 0, 9);
                     <div class="comon">
                         <label for="" class="text-white whitening ">Search For</label>
                         <input type="text" class="bg-white">
-                        <button class="mobiles-button bg-white">Android</button>
+                        <button class="mobiles-button bg-grey">Search</button>
                     </div>
                 </div>
 
