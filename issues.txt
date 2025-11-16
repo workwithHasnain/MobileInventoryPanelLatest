@@ -1,4 +1,4 @@
-test and fix all fields of post with and without required fields in add and edit.
+test and fix all fields of post with and without required fields in add and edit. -Done
 test and fix all fields of device with and without required fields in add and edit. -Done
 edit_device issue (urgent) -Done
 edit post issue (urgent)
