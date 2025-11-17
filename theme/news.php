@@ -101,13 +101,13 @@
             <i class="fas fa-share-alt"></i>
         </div>
         <div class="column">
-            <a href="index.html">Home</a>
-            <a href="news.html">News</a>
-            <a href="rewies.html">Reviews</a>
-            <a href="videos.html">Videos</a>
-            <a href="featured.html">Featured</a>
-            <a href="phonefinder.html">Phone Finder</a>
-            <a href="compare.html">Compare</a>
+            <a href="index.php">Home</a>
+            <a href="news.php">News</a>
+            <a href="rewies.php">Reviews</a>
+            <a href="videos.php">Videos</a>
+            <a href="featured.php">Featured</a>
+            <a href="phonefinder.php">Phone Finder</a>
+            <a href="compare.php">Compare</a>
             <a href="#">Coverage</a>
             <a href="contact">Contact Us</a>
             <a href="#">Merch</a>
@@ -137,14 +137,14 @@
     <div id="leftMenu" class="container show">
         <div class="row">
             <div class="col-12 d-flex align-items-center   colums-gap">
-                <a href="index.html" class="nav-link">Home</a>
-                <a href="compare.html" class="nav-link">Compare</a>
-                <a href="videos.html" class="nav-link">Videos</a>
-                <a href="rewies.html" class="nav-link ">Reviews</a>
-                <a href="news.html" class="nav-link d-lg-block d-none">News</a>
-                <a href="featured.html" class="nav-link d-lg-block d-none">Featured</a>
-                <a href="phonefinder.html" class="nav-link d-lg-block d-none">Phone Finder</a>
-                <a href="contact.html" class="nav-link d-lg-block d-none">Contact</a>
+                <a href="index.php" class="nav-link">Home</a>
+                <a href="compare.php" class="nav-link">Compare</a>
+                <a href="videos.php" class="nav-link">Videos</a>
+                <a href="rewies.php" class="nav-link ">Reviews</a>
+                <a href="news.php" class="nav-link d-lg-block d-none">News</a>
+                <a href="featured.php" class="nav-link d-lg-block d-none">Featured</a>
+                <a href="phonefinder.php" class="nav-link d-lg-block d-none">Phone Finder</a>
+                <a href="contact.php" class="nav-link d-lg-block d-none">Contact</a>
                 <div style="background-color: #d50000; border-radius: 7px;" class="d-lg-none py-2"><svg
                         xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" height="16" width="16" class="mx-3">
                         <path fill="#ffffff"
@@ -673,7 +673,7 @@
                     <a href="#">Mobile version</a>
                     <a href="#">Android app</a>
                     <a href="#">Tools</a>
-                    <a href="contact.html">Contact us</a>
+                    <a href="contact.php">Contact us</a>
                     <a href="#">Merch store</a>
                     <a href="#">Privacy</a>
                     <a href="#">Terms of use</a>
