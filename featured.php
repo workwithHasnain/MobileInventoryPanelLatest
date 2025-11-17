@@ -8,10 +8,26 @@ $pdo = getConnection();
 
 // Read search query (hero search bar)
 $q = trim($_GET['q'] ?? '');
+$tag = trim($_GET['tag'] ?? '');
 $isSearching = ($q !== '');
+$isTagFiltering = ($tag !== '');
 
 // Build posts list: default is featured + published; if searching, filter by title/tags
-if ($isSearching) {
+if ($isTagFiltering) {
+    $posts_stmt = $pdo->prepare("
+        SELECT p.*, 
+        (SELECT COUNT(*) FROM post_comments pc WHERE pc.post_id = p.id AND pc.status = 'approved') as comment_count
+        FROM posts p 
+        WHERE p.status ILIKE 'published'
+          AND EXISTS (
+              SELECT 1 FROM unnest(COALESCE(p.tags, ARRAY[]::varchar[])) t
+              WHERE t ILIKE ?
+          )
+        ORDER BY p.created_at DESC
+    ");
+    $posts_stmt->execute([$tag]);
+    $posts = $posts_stmt->fetchAll();
+} else if ($isSearching) {
     $term = '%' . $q . '%';
     $posts_stmt = $pdo->prepare("
         SELECT p.*, 
@@ -26,7 +42,6 @@ if ($isSearching) {
               )
           )
         ORDER BY p.created_at DESC
-        LIMIT 24
     ");
     $posts_stmt->execute([$term, $term]);
     $posts = $posts_stmt->fetchAll();
@@ -37,8 +52,7 @@ if ($isSearching) {
         FROM posts p 
         WHERE p.status ILIKE 'published'
         AND p.is_featured = TRUE 
-        ORDER BY p.created_at DESC 
-        LIMIT 6
+        ORDER BY p.created_at DESC
     ");
     $posts_stmt->execute();
     $posts = $posts_stmt->fetchAll();
@@ -276,14 +290,14 @@ $latestDevices = array_slice(array_reverse($latestDevices), 0, 9);
                         style="background-repeat: no-repeat; background-size: cover;" alt="">
                     <div class="position-absolute d-flex mt-1">
                         <label class="text-white whitening ">Popular Tags</label>
-                        <button class="mobiles-button">Featured</button>
-                        <button class="mobiles-button">Android</button>
-                        <button class="mobiles-button">Samsung</button>
-                        <button class="mobiles-button">Nokia</button>
-                        <button class="mobiles-button">Sony</button>
-                        <button class="mobiles-button">Rumors</button>
-                        <button class="mobiles-button">Apple</button>
-                        <button class="mobiles-button">Motorola</button>
+                        <a href="featured.php?tag=Featured"><button class="mobiles-button">Featured</button></a>
+                        <a href="featured.php?tag=Android"><button class="mobiles-button">Android</button></a>
+                        <a href="featured.php?tag=Samsung"><button class="mobiles-button">Samsung</button></a>
+                        <a href="featured.php?tag=Nokia"><button class="mobiles-button">Nokia</button></a>
+                        <a href="featured.php?tag=Sony"><button class="mobiles-button">Sony</button></a>
+                        <a href="featured.php?tag=Rumors"><button class="mobiles-button">Rumors</button></a>
+                        <a href="featured.php?tag=Apple"><button class="mobiles-button">Apple</button></a>
+                        <a href="featured.php?tag=Motorola"><button class="mobiles-button">Motorola</button></a>
                     </div>
 
                     <form method="get" action="featured.php" class="comon">
@@ -333,7 +347,9 @@ $latestDevices = array_slice(array_reverse($latestDevices), 0, 9);
             ?>
                 <div class="col-12">
                     <div class="alert alert-light border" role="alert">
-                        <?php if ($isSearching): ?>
+                        <?php if ($isTagFiltering): ?>
+                            No posts found with tag "<?php echo htmlspecialchars($tag); ?>".
+                        <?php elseif ($isSearching): ?>
                             No posts found for "<?php echo htmlspecialchars($q); ?>".
                         <?php else: ?>
                             No posts to show.
@@ -342,7 +358,7 @@ $latestDevices = array_slice(array_reverse($latestDevices), 0, 9);
                 </div>
                 <?php
             else:
-                $maxPosts = $isSearching ? count($posts) : 6;
+                $maxPosts = count($posts);
                 $displayPosts = array_slice($posts, 0, $maxPosts);
                 $columns = max(1, ceil($maxPosts / 2));
                 $postChunks = array_chunk($displayPosts, $columns);
