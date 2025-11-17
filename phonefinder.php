@@ -34,6 +34,11 @@ $brands = $brands_stmt->fetchAll();
 
 
     <link rel="stylesheet" href="style.css">
+    <style>
+        .filter-header{
+            font-weight: bold;
+        }
+    </style>
 </head>
 
 <body style="background-color: #EFEBE9;">
@@ -1231,13 +1236,13 @@ $brands = $brands_stmt->fetchAll();
         <!-- Action buttons -->
         <div class="row mt-4 mb-3">
             <div class="col-md-6 mb-2">
-                <button type="button" id="resetFiltersBtn" class="w-100 py-3 fw-bold" style="background-color: #6c757d; color: white; border: none; cursor: pointer;">
-                    <i class="fa fa-undo me-2"></i> Reset Filters
+                <button type="button" id="resetFiltersBtn" class="w-100 py-3 fw-bold" style="background-color: #6c757d; color: white; border: none; cursor: pointer; border-radius: 4px;">
+                    <i class="fa fa-undo me-2" style="pointer-events: none;"></i><span style="pointer-events: none;">Reset Filters</span>
                 </button>
             </div>
             <div class="col-md-6 mb-2">
-                <button type="button" id="findDevicesBtn" class="w-100 py-3 fw-bold" style="background-color: #d50000; color: white; border: none; cursor: pointer;">
-                    <i class="fa fa-search me-2"></i> Find Devices
+                <button type="button" id="findDevicesBtn" class="w-100 py-3 fw-bold" style="background-color: #d50000; color: white; border: none; cursor: pointer; border-radius: 4px;">
+                    <i class="fa fa-search me-2" style="pointer-events: none;"></i><span style="pointer-events: none;">Find Devices</span>
                 </button>
             </div>
         </div>
@@ -1598,10 +1603,6 @@ $brands = $brands_stmt->fetchAll();
             }
 
             findBtn.addEventListener('click', function() {
-                // Show loading state
-                findBtn.disabled = true;
-                findBtn.innerHTML = '<i class="fa fa-spinner fa-spin me-2"></i> Searching...';
-
                 // Gather selected brands
                 const selectedBrands = [];
                 document.querySelectorAll('input[name="brand[]"]:checked').forEach(function(checkbox) {
@@ -1613,6 +1614,132 @@ $brands = $brands_stmt->fetchAll();
                 document.querySelectorAll('input[name="availability"]:checked').forEach(function(checkbox) {
                     selectedAvailability.push(checkbox.value);
                 });
+
+                // Check if at least one filter is applied
+                let hasFilter = false;
+
+                // Check brands and availability
+                if (selectedBrands.length > 0 || selectedAvailability.length > 0) {
+                    hasFilter = true;
+                }
+
+                // Check price max
+                if (priceMaxInput) {
+                    const val = parseInt(priceMaxInput.value, 10);
+                    const maxPrice = parseInt(priceMaxInput.max, 10);
+                    if (!isNaN(val) && val > 0 && val < maxPrice) {
+                        hasFilter = true;
+                    }
+                }
+
+                // Check year range
+                if (yearMinInput && yearMaxInput) {
+                    const minYear = parseInt(yearMinInput.value);
+                    const maxYear = parseInt(yearMaxInput.value);
+                    if (minYear > 2000 || maxYear < 2026) {
+                        hasFilter = true;
+                    }
+                }
+
+                // Check RAM
+                if (ramMinInput && parseInt(ramMinInput.value) > 0) {
+                    hasFilter = true;
+                }
+
+                // Check Storage
+                if (storageMinInput && parseInt(storageMinInput.value) > 0) {
+                    hasFilter = true;
+                }
+
+                // Check Display Size
+                if (displaySizeMinInput && displaySizeMaxInput) {
+                    const minSize = parseFloat(displaySizeMinInput.value);
+                    const maxSize = parseFloat(displaySizeMaxInput.value);
+                    if (minSize > 3.0 || maxSize < 8.0) {
+                        hasFilter = true;
+                    }
+                }
+
+                // Check Display Resolution
+                if (displayResMinInput && displayResMaxInput) {
+                    const minRes = parseInt(displayResMinInput.value);
+                    const maxRes = parseInt(displayResMaxInput.value);
+                    if (minRes > 480 || maxRes < 4320) {
+                        hasFilter = true;
+                    }
+                }
+
+                // Check various checkboxes and inputs
+                if (document.querySelectorAll('input[name="display_tech[]"]:checked').length > 0 ||
+                    document.querySelectorAll('input[name="display_notch[]"]:checked').length > 0 ||
+                    (refreshRateMinInput && parseInt(refreshRateMinInput.value) > 0) ||
+                    document.querySelector('input[name="hdr"]:checked') ||
+                    document.querySelector('input[name="billion_colors"]:checked') ||
+                    document.querySelectorAll('input[name="os_family"]:checked').length > 0 ||
+                    (osVersionMinInput && parseInt(osVersionMinInput.value) > 0) ||
+                    (chipsetQueryInput && chipsetQueryInput.value.trim() !== '') ||
+                    document.querySelector('input[name="card_slot_required"]:checked') ||
+                    (mainCamMpMinInput && parseInt(mainCamMpMinInput.value) > 0) ||
+                    (fNumberMaxInput && parseFloat(fNumberMaxInput.value) > 0) ||
+                    document.querySelector('input[name="video_4k"]:checked') ||
+                    document.querySelector('input[name="video_8k"]:checked') ||
+                    (batteryCapacityMinInput && parseInt(batteryCapacityMinInput.value) > 0) ||
+                    (wiredChargeMinInput && parseInt(wiredChargeMinInput.value) > 0) ||
+                    document.querySelector('input[name="wireless_required"]:checked') ||
+                    (wirelessChargeMinInput && parseInt(wirelessChargeMinInput.value) > 0) ||
+                    (cpuClockMinInput && parseFloat(cpuClockMinInput.value) > 0) ||
+                    (heightMinInput && parseInt(heightMinInput.value) > 0) ||
+                    (thicknessMaxInput && parseFloat(thicknessMaxInput.value) > 0) ||
+                    (widthMinInput && parseInt(widthMinInput.value) > 0) ||
+                    (weightMaxInput && parseInt(weightMaxInput.value) > 0) ||
+                    document.querySelectorAll('input[name="color[]"]:checked').length > 0 ||
+                    document.querySelectorAll('input[name="frame_material[]"]:checked').length > 0 ||
+                    document.querySelectorAll('input[name="back_material[]"]:checked').length > 0 ||
+                    document.querySelectorAll('input.network-2g-band:checked').length > 0 ||
+                    document.querySelectorAll('input.network-3g-band:checked').length > 0 ||
+                    document.querySelectorAll('input.network-4g-band:checked').length > 0 ||
+                    document.querySelectorAll('input.network-5g-band:checked').length > 0 ||
+                    document.getElementById('dualSim')?.checked ||
+                    document.getElementById('esimSupport')?.checked ||
+                    document.querySelectorAll('input[name="sim_sizes[]"]:checked').length > 0 ||
+                    document.querySelectorAll('input.wifi-version:checked').length > 0 ||
+                    document.querySelectorAll('input.bluetooth-version:checked').length > 0 ||
+                    document.querySelectorAll('input.usb-type:checked').length > 0 ||
+                    document.getElementById('gpsRequired')?.checked ||
+                    document.getElementById('nfcRequired')?.checked ||
+                    document.getElementById('infraredRequired')?.checked ||
+                    document.getElementById('fmRadioRequired')?.checked ||
+                    document.querySelector('input[name="accelerometer"]:checked') ||
+                    document.querySelector('input[name="gyro"]:checked') ||
+                    document.querySelector('input[name="barometer"]:checked') ||
+                    document.querySelector('input[name="heart_rate"]:checked') ||
+                    document.querySelector('input[name="compass"]:checked') ||
+                    document.querySelector('input[name="proximity"]:checked') ||
+                    document.querySelector('input[name="headphone_jack"]:checked') ||
+                    document.querySelector('input[name="dual_speakers"]:checked') ||
+                    document.querySelector('input[name="main_camera_telephoto"]:checked') ||
+                    document.querySelector('input[name="main_camera_ultrawide"]:checked') ||
+                    document.querySelector('input[name="main_camera_ois"]:checked') ||
+                    document.querySelector('input[name="selfie_camera_flash"]:checked') ||
+                    document.querySelector('input[name="popup_camera"]:checked') ||
+                    document.querySelector('input[name="under_display_camera"]:checked') ||
+                    document.querySelector('input[name="battery_sic"]:checked') ||
+                    document.querySelector('input[name="battery_removable"]:checked') ||
+                    document.querySelectorAll('input[name="ip_certificate[]"]:checked').length > 0 ||
+                    document.querySelectorAll('input[name="form_factor[]"]:checked').length > 0 ||
+                    (document.querySelector('input.life')?.value.trim() !== '')) {
+                    hasFilter = true;
+                }
+
+                // If no filters selected, show alert and stop
+                if (!hasFilter) {
+                    alert('Please select at least one filter to search for devices. This helps improve performance and provides more relevant results.');
+                    return;
+                }
+
+                // Show loading state
+                findBtn.disabled = true;
+                findBtn.innerHTML = '<i class="fa fa-spinner fa-spin me-2" style="pointer-events: none;"></i><span style="pointer-events: none;">Searching...</span>';
 
                 // Prepare form data
                 const formData = new FormData();
@@ -1985,7 +2112,7 @@ $brands = $brands_stmt->fetchAll();
                     .finally(() => {
                         // Reset button state
                         findBtn.disabled = false;
-                        findBtn.innerHTML = '<i class="fa fa-search me-2"></i> Find Devices';
+                        findBtn.innerHTML = '<i class="fa fa-search me-2" style="pointer-events: none;"></i><span style="pointer-events: none;">Find Devices</span>';
                     });
             });
 
