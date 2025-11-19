@@ -145,7 +145,7 @@ try {
     echo "<!DOCTYPE html>\n";
     echo "<html>\n<head>\n";
     echo "<title>Database Export Error</title>\n";
-    echo "<style>body { font-family: Arial, sans-serif; padding: 20px; }\n";
+    echo "<style>body { font-family: system ui, sans-serif; padding: 20px; }\n";
     echo ".error { background: #ffebee; color: #c62828; padding: 15px; border-radius: 5px; border-left: 4px solid #c62828; }\n";
     echo "h1 { color: #c62828; }\n";
     echo "</style>\n</head>\n<body>\n";

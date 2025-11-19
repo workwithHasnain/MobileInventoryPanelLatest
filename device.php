@@ -1086,7 +1086,7 @@ if ($_POST && isset($_POST['submit_comment'])) {
   </div>
   <style>
     span {
-      font-family: 'oswald';
+      font-family: 'system ui';
       color: black;
       font-size: 12px;
       font-weight: 300;
@@ -1127,7 +1127,7 @@ if ($_POST && isset($_POST['submit_comment'])) {
 
     .spec-title {
       font-weight: 400;
-      font-family: 'oswald';
+      font-family: 'system ui';
       font-size: 1.5rem;
       color: black;
     }
@@ -1153,7 +1153,7 @@ if ($_POST && isset($_POST['submit_comment'])) {
     }
 
     .stat-item :nth-child(2) {
-      font-family: 'oswald';
+      font-family: 'system ui';
       text-shadow: 1px 1px 1px rgba(0, 0, 0, .4);
     }
 
@@ -1182,7 +1182,7 @@ if ($_POST && isset($_POST['submit_comment'])) {
 
 
     .spec-subtitle {
-      font-family: 'oswald';
+      font-family: 'system ui';
       font-weight: 100;
       font-size: 14px;
       color: black;
@@ -1216,7 +1216,7 @@ if ($_POST && isset($_POST['submit_comment'])) {
     .vr-hide {
       float: left;
       padding-left: 10px;
-      font: 300 28px / 47px Google-Oswald, Arial, sans-serif;
+      font: 300 28px / 47px Google-system ui, system ui, sans-serif;
       text-shadow: none;
       color: #fff;
       margin-bottom: 0px;
@@ -1252,7 +1252,7 @@ if ($_POST && isset($_POST['submit_comment'])) {
     table th {
       vertical-align: top;
       padding: 8px 12px;
-      font-family: Arial, sans-serif;
+      font-family: system ui, sans-serif;
       font-size: 14px;
       line-height: 1.5;
     }
@@ -1362,7 +1362,7 @@ if ($_POST && isset($_POST['submit_comment'])) {
       <div class="article-info">
         <div class="bg-blur">
           <p class="vr-hide"
-            style=" font-family: 'oswald'; text-transform: capitalize; text-shadow: 1px 1px 2px rgba(0, 0, 0, .4);">
+            style=" font-family: 'system ui'; text-transform: capitalize; text-shadow: 1px 1px 2px rgba(0, 0, 0, .4);">
             <?php echo htmlspecialchars(($device['brand_name'] ?? '') . ' ' . ($device['name'] ?? 'Device')); ?>
           </p>
           <svg class="float-end mx-3 mt-1" xmlns="http://www.w3.org/2000/svg" height="34" width="34"
@@ -1428,15 +1428,15 @@ if ($_POST && isset($_POST['submit_comment'])) {
           <div class="d-lg-none d-block justify-content-end">
             <div class="d-flex flexiable mt-2">
               <img src="/imges/download-removebg-preview.png" alt="">
-              <h5 style="font-family:'oswald' ; font-size: 16px;" class="mt-2" onclick="document.getElementById('comments').scrollIntoView({behavior:'smooth', block:'start'});">OPINIONS </h5>
+              <h5 style="font-family:'system ui' ; font-size: 16px;" class="mt-2" onclick="document.getElementById('comments').scrollIntoView({behavior:'smooth', block:'start'});">OPINIONS </h5>
             </div>
             <div class="d-flex flexiable mt-2">
               <img src="/imges/download-removebg-preview.png" alt="">
-              <h5 style="font-family:'oswald' ; font-size: 16px;" class="mt-2" onclick="window.location.href='compare.php?phone1=<?php echo $device['id']; ?>'">COMPARE </h5>
+              <h5 style="font-family:'system ui' ; font-size: 16px;" class="mt-2" onclick="window.location.href='compare.php?phone1=<?php echo $device['id']; ?>'">COMPARE </h5>
             </div>
             <div class="d-flex flexiable mt-2">
               <img src="/imges/download-removebg-preview.png" alt="">
-              <h5 style="font-family:'oswald' ; font-size: 16px; cursor: pointer;" class="mt-2" onclick="showPicturesModal()">PICTURES </h5>
+              <h5 style="font-family:'system ui' ; font-size: 16px; cursor: pointer;" class="mt-2" onclick="showPicturesModal()">PICTURES </h5>
             </div>
           </div>
 
@@ -1453,23 +1453,23 @@ if ($_POST && isset($_POST['submit_comment'])) {
           <div class="d-flex justify-content-end">
             <div class="d-flex flexiable ">
               <img src="/imges/download-removebg-preview.png" alt="">
-              <h5 style="font-family:'oswald' ; font-size: 16px; cursor:pointer;" class="mt-2" onclick="document.getElementById('comments').scrollIntoView({behavior:'smooth', block:'start'});">OPINIONS</h5>
+              <h5 style="font-family:'system ui' ; font-size: 16px; cursor:pointer;" class="mt-2" onclick="document.getElementById('comments').scrollIntoView({behavior:'smooth', block:'start'});">OPINIONS</h5>
             </div>
             <div class="d-flex flexiable ">
               <img src="/imges/download-removebg-preview.png" alt="">
-              <h5 style="font-family:'oswald' ; font-size: 16px; cursor: pointer;" class="mt-2" onclick="showPicturesModal()">PICTURES</h5>
+              <h5 style="font-family:'system ui' ; font-size: 16px; cursor: pointer;" class="mt-2" onclick="showPicturesModal()">PICTURES</h5>
             </div>
             <div class="d-flex flexiable ">
               <img src="/imges/download-removebg-preview.png" alt="">
-              <h5 style="font-family:'oswald' ; font-size: 16px;" class="mt-2" onclick="window.location.href='compare.php?phone1=<?php echo $device['id']; ?>'">COMPARE </h5>
+              <h5 style="font-family:'system ui' ; font-size: 16px;" class="mt-2" onclick="window.location.href='compare.php?phone1=<?php echo $device['id']; ?>'">COMPARE </h5>
             </div>
             <div class="d-flex flexiable ">
               <img src="/imges/download-removebg-preview.png" alt="">
-              <h5 style="font-family:'oswald' ; font-size: 16px;" class="mt-2"> </h5>
+              <h5 style="font-family:'system ui' ; font-size: 16px;" class="mt-2"> </h5>
             </div>
             <div class="d-flex flexiable ">
               <img src="/imges/download-removebg-preview.png" alt="">
-              <h5 style="font-family:'oswald' ; font-size: 16 px;" class="mt-2"></h5>
+              <h5 style="font-family:'system ui' ; font-size: 16 px;" class="mt-2"></h5>
             </div>
           </div>
         </div>
@@ -1485,7 +1485,7 @@ if ($_POST && isset($_POST['submit_comment'])) {
           <div class="article-info">
             <div class="bg-blur">
               <p class="vr-hide"
-                style=" font-family: 'oswald'; text-transform: capitalize; text-shadow: 1px 1px 2px rgba(0, 0, 0, .4);">
+                style=" font-family: 'system ui'; text-transform: capitalize; text-shadow: 1px 1px 2px rgba(0, 0, 0, .4);">
                 <?php echo htmlspecialchars(($device['brand_name'] ?? '') . ' ' . ($device['name'] ?? 'Device')); ?>
               </p>
               <svg class="float-end mx-3 mt-1" xmlns="http://www.w3.org/2000/svg" height="34" width="34"
@@ -1551,23 +1551,23 @@ if ($_POST && isset($_POST['submit_comment'])) {
               <div class="d-flex justify-content-end">
                 <div class="d-flex flexiable ">
                   <img src="/imges/download-removebg-preview.png" alt="">
-                  <h5 style="font-family:'oswald' ; font-size: 16px; cursor:pointer;" class="mt-2" onclick="document.getElementById('comments').scrollIntoView({behavior:'smooth', block:'start'});">OPINIONS</h5>
+                  <h5 style="font-family:'system ui' ; font-size: 16px; cursor:pointer;" class="mt-2" onclick="document.getElementById('comments').scrollIntoView({behavior:'smooth', block:'start'});">OPINIONS</h5>
                 </div>
                 <div class="d-flex flexiable ">
                   <img src="/imges/download-removebg-preview.png" alt="">
-                  <h5 style="font-family:'oswald' ; font-size: 16px; cursor: pointer;" class="mt-2" onclick="showPicturesModal()">PICTURES</h5>
+                  <h5 style="font-family:'system ui' ; font-size: 16px; cursor: pointer;" class="mt-2" onclick="showPicturesModal()">PICTURES</h5>
                 </div>
                 <div class="d-flex flexiable ">
                   <img src="/imges/download-removebg-preview.png" alt="">
-                  <h5 style="font-family:'oswald' ; font-size: 16px;" class="mt-2" onclick="window.location.href='compare.php?phone1=<?php echo $device['id']; ?>'">COMPARE </h5>
+                  <h5 style="font-family:'system ui' ; font-size: 16px;" class="mt-2" onclick="window.location.href='compare.php?phone1=<?php echo $device['id']; ?>'">COMPARE </h5>
                 </div>
                 <div class="d-flex flexiable ">
                   <img src="/imges/download-removebg-preview.png" alt="">
-                  <h5 style="font-family:'oswald' ; font-size: 16px;" class="mt-2"> </h5>
+                  <h5 style="font-family:'system ui' ; font-size: 16px;" class="mt-2"> </h5>
                 </div>
                 <div class="d-flex flexiable ">
                   <img src="/imges/download-removebg-preview.png" alt="">
-                  <h5 style="font-family:'oswald' ; font-size: 16 px;" class="mt-2"></h5>
+                  <h5 style="font-family:'system ui' ; font-size: 16 px;" class="mt-2"></h5>
                 </div>
               </div>
             </div>
@@ -1980,7 +1980,7 @@ if ($_POST && isset($_POST['submit_comment'])) {
       <div class="modal-dialog modal-lg modal-dialog-centered">
         <div class="modal-content" style="background-color: #EFEBE9; border: 2px solid #8D6E63;">
           <div class="modal-header" style="border-bottom: 1px solid #8D6E63; background-color: #D7CCC8;">
-            <h5 class="modal-title" id="picturesModalLabel" style="font-family:'oswald'; color: #5D4037;">
+            <h5 class="modal-title" id="picturesModalLabel" style="font-family:'system ui'; color: #5D4037;">
               <i class="fas fa-images me-2"></i><?php echo htmlspecialchars(($device['brand_name'] ?? '') . ' ' . ($device['name'] ?? 'Device')); ?> - Pictures
             </h5>
             <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>

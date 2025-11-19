@@ -1,10 +1,10 @@
-@import url('https://fonts.googleapis.com/css2?family=Arimo:ital,wght@0,400..700;1,400..700&family=Caveat:wght@400..700&family=Roboto:ital,wght@0,100..900;1,100..900&display=swap');
-@import url('https://fonts.googleapis.com/css2?family=Arimo:ital,wght@0,400..700;1,400..700&family=Caveat:wght@400..700&family=Oswald:wght@200..700&family=Roboto:ital,wght@0,100..900;1,100..900&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=system ui:ital,wght@0,400..700;1,400..700&family=Caveat:wght@400..700&family=Roboto:ital,wght@0,100..900;1,100..900&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=system ui:ital,wght@0,400..700;1,400..700&family=Caveat:wght@400..700&family=system ui:wght@200..700&family=Roboto:ital,wght@0,100..900;1,100..900&display=swap');
 
 * {
     padding: 0;
     margin: 0;
-    /* font-family: Arimo, sans-serif; */
+    /* font-family: system ui, sans-serif; */
     box-sizing: border-box;
 }
 
@@ -14,7 +14,7 @@ body {
     line-height: 150%;
     font-optical-sizing: auto;
     font-weight: weight;
-    font-family: "Arimo", sans-serif;
+    font-family: "system ui", sans-serif;
     font-style: normal;
     font-variation-settings:
         "wdth" 100;
@@ -96,7 +96,7 @@ span {
 
 
 .nav-link {
-    font-family: "Oswald", sans-serif;
+    font-family: "system ui", sans-serif;
     position: relative;
     display: block;
     font-weight: 400;
@@ -213,7 +213,7 @@ input:focus {
     letter-spacing: -0.19px;
     text-transform: uppercase;
     text-align: center;
-    font-family: "Oswald", sans-serif;
+    font-family: "system ui", sans-serif;
     color: #828383;
 }
 
@@ -609,7 +609,7 @@ input:focus {
     margin-left: -12px;
     color: white;
     box-sizing: border-box;
-    font-family: Arial, sans-serif;
+    font-family: system ui, sans-serif;
 }
 
 .comfort-life-23 {
@@ -626,7 +626,7 @@ input:focus {
     margin-left: -12px;
     color: white;
     box-sizing: border-box;
-    font-family: Arial, sans-serif;
+    font-family: system ui, sans-serif;
 }
 
 .comfort-life-zone img {
@@ -638,7 +638,7 @@ input:focus {
     /* border-radius: 10px; */
     color: white;
     box-sizing: border-box;
-    font-family: Arial, sans-serif;
+    font-family: system ui, sans-serif;
 }
 
 .mobiles-button {
@@ -731,7 +731,7 @@ input:focus {
 
 .filter-header {
     margin-left: 17PX;
-    font: 299 20px Google-Oswald, sans-serif;
+    font: 299 20px Google-system ui, sans-serif;
     margin-top: 12px;
     color: #fb3a43;
 }
@@ -836,7 +836,7 @@ input:focus {
     position: relative;
     background: #fff;
     padding: 0px 10px 0;
-    font-family: Arimo, Arial;
+    font-family: system ui, system ui;
     float: none;
 
     border: 1px solid #ddd;
@@ -951,7 +951,7 @@ input:hover {
 }
 
 .wascot {
-    font-family: Arimo, sans-serif;
+    font-family: system ui, sans-serif;
     color: #777777;
     padding: 12px;
     border-bottom: 10px solid #76b1d0;
@@ -1065,7 +1065,7 @@ input:hover {
 table {
     width: 100%;
     border-collapse: collapse;
-    font-family: Arial, sans-serif;
+    font-family: system ui, sans-serif;
     font-size: 13px;
     color: #222;
     margin-top: 15px;
@@ -1115,7 +1115,7 @@ table tr:hover {
     font-size: 14px;
     font-weight: 600;
     height: 12px;
-    font-family: "Arimo", Arial, sans-serif;
+    font-family: "system ui", system ui, sans-serif;
     max-width: 600px;
 }
 
@@ -1184,7 +1184,7 @@ table tr:hover {
 .article-info-name {
     position: relative;
     color: #fff;
-    font-family: "Oswald", sans-serif;
+    font-family: "system ui", sans-serif;
     padding: 0 5px;
     font-weight: 500;
     margin-left: 12px;
@@ -1236,7 +1236,7 @@ table tr:hover {
     display: block;
     align-items: center;
     min-width: 139px;
-    font: 400 14px Google-Oswald, Arial, sans-serif;
+    font: 400 14px Google-system ui, system ui, sans-serif;
     text-transform: uppercase;
     color: #fff;
     text-shadow: 1px 1px 1px rgba(0, 0, 0, .8)
@@ -1248,7 +1248,7 @@ table tr:hover {
 }
 
 .classy {
-    font-family: "Arimo", sans-serif;
+    font-family: "system ui", sans-serif;
     font-size: 15px;
     font-weight: 500;
     text-transform: capitalize;
@@ -1283,7 +1283,7 @@ table tr:hover {
     padding: 5px 10px;
     margin-bottom: 0;
     width: 100%;
-    font: 600 17px Google-Oswald, Arial Narrow, Arial, sans-serif;
+    font: 600 17px Google-system ui, system ui Narrow, system ui, sans-serif;
     color: #777;
     background: 0 0;
     text-transform: uppercase;
@@ -1317,7 +1317,7 @@ table tr:hover {
 }
 
 .reader {
-    font-family: 'oswald';
+    font-family: 'system ui';
     color: #555;
     font-weight: 400;
 
@@ -1425,7 +1425,7 @@ table tr:hover {
 }
 
 .button-links {
-    font: 700 14px Arimo, Arial, sans-serif;
+    font: 700 14px system ui, system ui, sans-serif;
     padding: 5px 9px;
     background: #f9f9f9;
     text-transform: uppercase;
@@ -1676,7 +1676,7 @@ table tr:hover {
     color: #d60a0a;
     font-weight: 500;
     font-size: 1.3rem;
-    font-family: 'oswald';
+    font-family: 'system ui';
 }
 
 b,
@@ -1714,7 +1714,7 @@ strong {
     font-weight: 400;
     float: right;
     font-size: 17px;
-    font-family: 'Oswald';
+    font-family: 'system ui';
 }
 
 .read-review-btn {
@@ -1731,8 +1731,8 @@ strong {
 /* Target elements with red text color */
 .red-text {
     color: red;
-    font-family: 'Oswald', sans-serif;
-    /* Ensure Oswald font is imported */
+    font-family: 'system ui', sans-serif;
+    /* Ensure system ui font is imported */
 }
 
 /* Add bottom border to each td */
@@ -1761,7 +1761,7 @@ td {
 .new-heading {
     margin-left: 5px;
     -webkit-line-clamp: 3;
-    font: 700 13px / 18px Arimo, Arial, sans-serif;
+    font: 700 13px / 18px system ui, system ui, sans-serif;
     color: #444;
 }
 
@@ -1792,7 +1792,7 @@ td {
     padding: 0;
     font-weight: 300;
     text-transform: capitalize;
-    font-family: 'oswald';
+    font-family: 'system ui';
     font-size: 31px;
     color: inherit;
     text-shadow: 1px 1px 2px rgba(0, 0, 0, .4);
@@ -1833,7 +1833,7 @@ td {
 
 .vivo-div strong {
     color: #333;
-    font: 600 18px / 1.4 Google-Oswald, Arimo, Arial, sans-serif;
+    font: 600 18px / 1.4 Google-system ui, system ui, system ui, sans-serif;
     display: block;
     text-transform: uppercase;
     text-shadow: 1px 1px 2px #fff;
