@@ -15,3 +15,22 @@ phone-finder.php -Done
 1. form implementation from old clone -Done
 2. indexes in post headings -Done
 3. currency in euro for device pricing -Done
+
+
+...
+
+System ui fonts in all pages -Done
+
+Css/ styles images, post body minor issues -> live
+
+Add color field for phones background
+
+Brands modal
+
+Navbar (remove news and unwanted text) specially in mobile view
+
+Json for phone finder
+
+Login auth
+
+Subscribe Newsletter

@@ -501,7 +501,7 @@ if ($_POST && isset($_POST['action'])) {
 
     <div class=" mt-4 d-lg-none d-block bg-white">
         <h3 style="font-size: 23px;
-        font-weight: 600; font-family: 'system ui';" class="mx-3 my-5"><?php echo htmlspecialchars($post['title']); ?></h3>
+        font-weight: 600; font-family: 'system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif';" class="mx-3 my-5"><?php echo htmlspecialchars($post['title']); ?></h3>
         <?php if (!empty($post['featured_image'])): ?>
             <img style="height: 100%; width: -webkit-fill-available;" src="<?php echo htmlspecialchars($post['featured_image']); ?>" alt="<?php echo htmlspecialchars($post['title']); ?>">
         <?php else: ?>
@@ -527,12 +527,12 @@ if ($_POST && isset($_POST['action'])) {
                                 <div class="d-flex justify-content-end">
                                     <div class="d-flex flexiable ">
                                         <img src="/imges/download-removebg-preview.png" alt="">
-                                        <h5 style="font-family:'system ui' ; font-size: 17px" class="mt-2">COMMENTS (<?php echo $postCommentCount; ?>)
+                                        <h5 style="font-family:'system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif' ; font-size: 17px" class="mt-2">COMMENTS (<?php echo $postCommentCount; ?>)
                                         </h5>
                                     </div>
                                     <div class="d-flex flexiable " onclick="document.querySelector('.comment-form').scrollIntoView()">
                                         <img src="/imges/download-removebg-preview.png" alt="">
-                                        <h5 style="font-family:'system ui' ; font-size: 17px;" class="mt-2">POST YOUR
+                                        <h5 style="font-family:'system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif' ; font-size: 17px;" class="mt-2">POST YOUR
                                             COMMENT </h5>
                                     </div>
                                 </div>
