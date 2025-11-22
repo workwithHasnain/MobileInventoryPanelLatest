@@ -2,6 +2,7 @@
 require_once 'auth.php';
 require_once 'phone_data.php';
 require_once 'brand_data.php';
+require_once 'filter_config.php';
 
 // Require login for this page
 requireLogin();
@@ -39,7 +40,7 @@ foreach ($phones as $phone) {
 ksort($yearStats);
 
 // Price statistics
-$prices = array_filter(array_map(function($phone) {
+$prices = array_filter(array_map(function ($phone) {
     return !empty($phone['price']) && is_numeric($phone['price']) ? (float)$phone['price'] : null;
 }, $phones));
 
@@ -70,14 +71,17 @@ if (isset($_SESSION['success_message'])) {
             <a href="add_device.php" class="btn btn-success ms-2">
                 <i class="fas fa-plus"></i> Add New Device
             </a>
+            <button type="button" class="btn btn-secondary ms-2" data-bs-toggle="modal" data-bs-target="#filterSettingsModal">
+                <i class="fas fa-sliders-h"></i> Filter Settings
+            </button>
         </div>
     </div>
 
     <?php if ($success_message): ?>
-    <div class="alert alert-success alert-dismissible fade show" role="alert">
-        <?php echo htmlspecialchars($success_message); ?>
-        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-    </div>
+        <div class="alert alert-success alert-dismissible fade show" role="alert">
+            <?php echo htmlspecialchars($success_message); ?>
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
     <?php endif; ?>
 
     <!-- Key Statistics Cards -->
@@ -102,7 +106,7 @@ if (isset($_SESSION['success_message'])) {
                 </div>
             </div>
         </div>
-        
+
         <div class="col-lg-3 col-md-6 mb-3">
             <div class="card text-white bg-info h-100">
                 <div class="card-body">
@@ -123,7 +127,7 @@ if (isset($_SESSION['success_message'])) {
                 </div>
             </div>
         </div>
-        
+
         <div class="col-lg-3 col-md-6 mb-3">
             <div class="card text-white bg-success h-100">
                 <div class="card-body">
@@ -142,7 +146,7 @@ if (isset($_SESSION['success_message'])) {
                 </div>
             </div>
         </div>
-        
+
         <div class="col-lg-3 col-md-6 mb-3">
             <div class="card text-white bg-warning h-100">
                 <div class="card-body">
@@ -164,155 +168,256 @@ if (isset($_SESSION['success_message'])) {
     </div>
 
     <?php if (empty($phones)): ?>
-    <div class="row">
-        <div class="col-12">
-            <div class="alert alert-info text-center">
-                <i class="fas fa-info-circle fa-2x mb-3"></i>
-                <h4>Welcome to your Device Management Dashboard!</h4>
-                <p>No devices have been added yet. Get started by adding your first device.</p>
-                <a href="add_device.php" class="btn btn-primary btn-lg">
-                    <i class="fas fa-plus me-2"></i>Add Your First Device
-                </a>
+        <div class="row">
+            <div class="col-12">
+                <div class="alert alert-info text-center">
+                    <i class="fas fa-info-circle fa-2x mb-3"></i>
+                    <h4>Welcome to your Device Management Dashboard!</h4>
+                    <p>No devices have been added yet. Get started by adding your first device.</p>
+                    <a href="add_device.php" class="btn btn-primary btn-lg">
+                        <i class="fas fa-plus me-2"></i>Add Your First Device
+                    </a>
+                </div>
             </div>
         </div>
-    </div>
     <?php else: ?>
-    <div class="row">
-        <!-- Availability Status Chart -->
-        <div class="col-lg-6 mb-4">
-            <div class="card h-100">
-                <div class="card-header">
-                    <h5 class="card-title mb-0"><i class="fas fa-chart-pie me-2"></i>Device Availability Status</h5>
-                </div>
-                <div class="card-body">
-                    <?php if (!empty($availabilityStats)): ?>
-                    <div class="table-responsive">
-                        <table class="table table-sm">
-                            <thead>
-                                <tr>
-                                    <th>Status</th>
-                                    <th>Count</th>
-                                    <th>Percentage</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                <?php foreach ($availabilityStats as $status => $count): ?>
-                                <tr>
-                                    <td>
-                                        <?php 
-                                        $badge_class = '';
-                                        switch($status) {
-                                            case 'Available': $badge_class = 'bg-success'; break;
-                                            case 'Coming Soon': $badge_class = 'bg-warning text-dark'; break;
-                                            case 'Discontinued': $badge_class = 'bg-danger'; break;
-                                            case 'Rumored': $badge_class = 'bg-info text-dark'; break;
-                                            default: $badge_class = 'bg-secondary';
-                                        }
-                                        ?>
-                                        <span class="badge <?php echo $badge_class; ?>"><?php echo htmlspecialchars($status); ?></span>
-                                    </td>
-                                    <td><?php echo $count; ?></td>
-                                    <td>
-                                        <div class="progress" style="height: 20px;">
-                                            <div class="progress-bar" role="progressbar" 
-                                                 style="width: <?php echo ($count / $totalDevices) * 100; ?>%">
-                                                <?php echo round(($count / $totalDevices) * 100, 1); ?>%
-                                            </div>
-                                        </div>
-                                    </td>
-                                </tr>
-                                <?php endforeach; ?>
-                            </tbody>
-                        </table>
+        <div class="row">
+            <!-- Availability Status Chart -->
+            <div class="col-lg-6 mb-4">
+                <div class="card h-100">
+                    <div class="card-header">
+                        <h5 class="card-title mb-0"><i class="fas fa-chart-pie me-2"></i>Device Availability Status</h5>
                     </div>
-                    <?php else: ?>
-                    <div class="text-center text-muted py-4">
-                        <i class="fas fa-chart-pie fa-3x mb-3"></i>
-                        <p>No data available</p>
-                    </div>
-                    <?php endif; ?>
-                </div>
-            </div>
-        </div>
-
-        <!-- Top Brands Chart -->
-        <div class="col-lg-6 mb-4">
-            <div class="card h-100">
-                <div class="card-header">
-                    <h5 class="card-title mb-0"><i class="fas fa-chart-bar me-2"></i>Top 5 Brands</h5>
-                </div>
-                <div class="card-body">
-                    <?php if (!empty($topBrands)): ?>
-                    <div class="table-responsive">
-                        <table class="table table-sm">
-                            <thead>
-                                <tr>
-                                    <th>Brand</th>
-                                    <th>Devices</th>
-                                    <th>Market Share</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                <?php foreach ($topBrands as $brand => $count): ?>
-                                <tr>
-                                    <td><strong><?php echo htmlspecialchars($brand); ?></strong></td>
-                                    <td><?php echo $count; ?></td>
-                                    <td>
-                                        <div class="progress" style="height: 20px;">
-                                            <div class="progress-bar bg-info" role="progressbar" 
-                                                 style="width: <?php echo ($count / $totalDevices) * 100; ?>%">
-                                                <?php echo round(($count / $totalDevices) * 100, 1); ?>%
-                                            </div>
-                                        </div>
-                                    </td>
-                                </tr>
-                                <?php endforeach; ?>
-                            </tbody>
-                        </table>
-                    </div>
-                    <?php else: ?>
-                    <div class="text-center text-muted py-4">
-                        <i class="fas fa-chart-bar fa-3x mb-3"></i>
-                        <p>No data available</p>
-                    </div>
-                    <?php endif; ?>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <!-- Year Distribution -->
-    <div class="row">
-        <div class="col-12">
-            <div class="card">
-                <div class="card-header">
-                    <h5 class="card-title mb-0"><i class="fas fa-calendar-alt me-2"></i>Devices by Release Year</h5>
-                </div>
-                <div class="card-body">
-                    <?php if (!empty($yearStats)): ?>
-                    <div class="row">
-                        <?php foreach ($yearStats as $year => $count): ?>
-                        <div class="col-lg-2 col-md-3 col-sm-4 col-6 mb-3">
-                            <div class="text-center">
-                                <div class="bg-light rounded p-3">
-                                    <h4 class="mb-1 text-primary"><?php echo $count; ?></h4>
-                                    <small class="text-muted"><?php echo htmlspecialchars($year); ?></small>
-                                </div>
+                    <div class="card-body">
+                        <?php if (!empty($availabilityStats)): ?>
+                            <div class="table-responsive">
+                                <table class="table table-sm">
+                                    <thead>
+                                        <tr>
+                                            <th>Status</th>
+                                            <th>Count</th>
+                                            <th>Percentage</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <?php foreach ($availabilityStats as $status => $count): ?>
+                                            <tr>
+                                                <td>
+                                                    <?php
+                                                    $badge_class = '';
+                                                    switch ($status) {
+                                                        case 'Available':
+                                                            $badge_class = 'bg-success';
+                                                            break;
+                                                        case 'Coming Soon':
+                                                            $badge_class = 'bg-warning text-dark';
+                                                            break;
+                                                        case 'Discontinued':
+                                                            $badge_class = 'bg-danger';
+                                                            break;
+                                                        case 'Rumored':
+                                                            $badge_class = 'bg-info text-dark';
+                                                            break;
+                                                        default:
+                                                            $badge_class = 'bg-secondary';
+                                                    }
+                                                    ?>
+                                                    <span class="badge <?php echo $badge_class; ?>"><?php echo htmlspecialchars($status); ?></span>
+                                                </td>
+                                                <td><?php echo $count; ?></td>
+                                                <td>
+                                                    <div class="progress" style="height: 20px;">
+                                                        <div class="progress-bar" role="progressbar"
+                                                            style="width: <?php echo ($count / $totalDevices) * 100; ?>%">
+                                                            <?php echo round(($count / $totalDevices) * 100, 1); ?>%
+                                                        </div>
+                                                    </div>
+                                                </td>
+                                            </tr>
+                                        <?php endforeach; ?>
+                                    </tbody>
+                                </table>
                             </div>
-                        </div>
-                        <?php endforeach; ?>
+                        <?php else: ?>
+                            <div class="text-center text-muted py-4">
+                                <i class="fas fa-chart-pie fa-3x mb-3"></i>
+                                <p>No data available</p>
+                            </div>
+                        <?php endif; ?>
                     </div>
-                    <?php else: ?>
-                    <div class="text-center text-muted py-4">
-                        <i class="fas fa-calendar-alt fa-3x mb-3"></i>
-                        <p>No data available</p>
+                </div>
+            </div>
+
+            <!-- Top Brands Chart -->
+            <div class="col-lg-6 mb-4">
+                <div class="card h-100">
+                    <div class="card-header">
+                        <h5 class="card-title mb-0"><i class="fas fa-chart-bar me-2"></i>Top 5 Brands</h5>
                     </div>
-                    <?php endif; ?>
+                    <div class="card-body">
+                        <?php if (!empty($topBrands)): ?>
+                            <div class="table-responsive">
+                                <table class="table table-sm">
+                                    <thead>
+                                        <tr>
+                                            <th>Brand</th>
+                                            <th>Devices</th>
+                                            <th>Market Share</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <?php foreach ($topBrands as $brand => $count): ?>
+                                            <tr>
+                                                <td><strong><?php echo htmlspecialchars($brand); ?></strong></td>
+                                                <td><?php echo $count; ?></td>
+                                                <td>
+                                                    <div class="progress" style="height: 20px;">
+                                                        <div class="progress-bar bg-info" role="progressbar"
+                                                            style="width: <?php echo ($count / $totalDevices) * 100; ?>%">
+                                                            <?php echo round(($count / $totalDevices) * 100, 1); ?>%
+                                                        </div>
+                                                    </div>
+                                                </td>
+                                            </tr>
+                                        <?php endforeach; ?>
+                                    </tbody>
+                                </table>
+                            </div>
+                        <?php else: ?>
+                            <div class="text-center text-muted py-4">
+                                <i class="fas fa-chart-bar fa-3x mb-3"></i>
+                                <p>No data available</p>
+                            </div>
+                        <?php endif; ?>
+                    </div>
                 </div>
             </div>
         </div>
-    </div>
+
+        <!-- Year Distribution -->
+        <div class="row">
+            <div class="col-12">
+                <div class="card">
+                    <div class="card-header">
+                        <h5 class="card-title mb-0"><i class="fas fa-calendar-alt me-2"></i>Devices by Release Year</h5>
+                    </div>
+                    <div class="card-body">
+                        <?php if (!empty($yearStats)): ?>
+                            <div class="row">
+                                <?php foreach ($yearStats as $year => $count): ?>
+                                    <div class="col-lg-2 col-md-3 col-sm-4 col-6 mb-3">
+                                        <div class="text-center">
+                                            <div class="bg-light rounded p-3">
+                                                <h4 class="mb-1 text-primary"><?php echo $count; ?></h4>
+                                                <small class="text-muted"><?php echo htmlspecialchars($year); ?></small>
+                                            </div>
+                                        </div>
+                                    </div>
+                                <?php endforeach; ?>
+                            </div>
+                        <?php else: ?>
+                            <div class="text-center text-muted py-4">
+                                <i class="fas fa-calendar-alt fa-3x mb-3"></i>
+                                <p>No data available</p>
+                            </div>
+                        <?php endif; ?>
+                    </div>
+                </div>
+            </div>
+        </div>
     <?php endif; ?>
+</div>
+
+<!-- Filter Settings Modal -->
+<div class="modal fade" id="filterSettingsModal" tabindex="-1" aria-labelledby="filterSettingsLabel" aria-hidden="true">
+    <div class="modal-dialog modal-xl modal-dialog-scrollable">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="filterSettingsLabel">
+                    <i class="fas fa-sliders-h me-2"></i>Phone Finder Filter Settings
+                </h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <div id="filterSettingsContent" class="container-fluid">
+                    <div class="text-center">
+                        <div class="spinner-border" role="status">
+                            <span class="visually-hidden">Loading...</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                <button type="button" class="btn btn-primary" id="saveFilterSettingsBtn">
+                    <i class="fas fa-save me-2"></i>Update Settings
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const filterModal = document.getElementById('filterSettingsModal');
+        const filterContent = document.getElementById('filterSettingsContent');
+        const saveBtn = document.getElementById('saveFilterSettingsBtn');
+
+        // Load filter settings when modal opens
+        filterModal.addEventListener('show.bs.modal', function() {
+            loadFilterSettings();
+        });
+
+        // Save filter settings
+        saveBtn.addEventListener('click', saveFilterSettings);
+    });
+
+    function loadFilterSettings() {
+        const filterContent = document.getElementById('filterSettingsContent');
+
+        // Load the filter settings form via AJAX
+        fetch('manage_filter_settings.php?action=load')
+            .then(response => response.text())
+            .then(html => {
+                filterContent.innerHTML = html;
+            })
+            .catch(error => {
+                filterContent.innerHTML = '<div class="alert alert-danger">Error loading filter settings: ' + error + '</div>';
+            });
+    }
+
+    function saveFilterSettings() {
+        const formData = new FormData();
+        formData.append('action', 'save');
+
+        // Collect all form data
+        const form = document.querySelector('form', document.getElementById('filterSettingsContent'));
+        if (form) {
+            const formEntries = new FormData(form);
+            for (let [key, value] of formEntries) {
+                formData.append(key, value);
+            }
+        }
+
+        fetch('manage_filter_settings.php', {
+                method: 'POST',
+                body: formData
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    alert('Filter settings updated successfully!');
+                    bootstrap.Modal.getInstance(document.getElementById('filterSettingsModal')).hide();
+                    location.reload();
+                } else {
+                    alert('Error: ' + (data.message || 'Failed to update settings'));
+                }
+            })
+            .catch(error => {
+                alert('Error saving settings: ' + error);
+            });
+    }
+</script>
 </div>
 
 <?php include 'includes/footer.php'; ?>

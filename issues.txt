@@ -28,7 +28,7 @@ Brands modal -Done
 
 Navbar (remove news and unwanted text) specially in mobile view -Done
 
-Json for phone finder
+Json for phone finder -Done
 
 Login auth
 
@@ -37,3 +37,5 @@ Subscribe Newsletter -NOT ON GSM ARENA
 dynamic popular tags in featured.php and reviews.php -Done
 
 device highlights text issue in device page -Done
+
+column fields name update for devices

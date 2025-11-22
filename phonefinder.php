@@ -11,6 +11,12 @@ $brands_stmt = $pdo->prepare("
 $brands_stmt->execute();
 $brands = $brands_stmt->fetchAll();
 
+// Load filter configuration from JSON
+$filterConfig = json_decode(file_get_contents('filter_config.json'), true);
+if (!$filterConfig) {
+    die('Error loading filter configuration');
+}
+
 ?>
 
 <!DOCTYPE html>
@@ -38,71 +44,72 @@ $brands = $brands_stmt->fetchAll();
         .filter-header {
             font-weight: bold;
         }
+
         /* Brand Modal Styling */
-    .brand-cell-modal {
-      background-color: #fff;
-      border: 1px solid #c5b6b0;
-      color: #5D4037;
-      font-weight: 500;
-      transition: all 0.3s ease;
-      cursor: pointer;
-      font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue';
-    }
+        .brand-cell-modal {
+            background-color: #fff;
+            border: 1px solid #c5b6b0;
+            color: #5D4037;
+            font-weight: 500;
+            transition: all 0.3s ease;
+            cursor: pointer;
+            font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue';
+        }
 
-    .brand-cell-modal:hover {
-      background-color: #D7CCC8 !important;
-      border-color: #8D6E63;
-      transform: translateY(-2px);
-      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
-      color: #3E2723;
-    }
+        .brand-cell-modal:hover {
+            background-color: #D7CCC8 !important;
+            border-color: #8D6E63;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
+            color: #3E2723;
+        }
 
-    .brand-cell-modal:active {
-      transform: translateY(0);
-      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-    }
+        .brand-cell-modal:active {
+            transform: translateY(0);
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
 
-    .brand-cell-modal:focus {
-      outline: none;
-      box-shadow: 0 0 0 3px rgba(141, 110, 99, 0.25);
-    }
+        .brand-cell-modal:focus {
+            outline: none;
+            box-shadow: 0 0 0 3px rgba(141, 110, 99, 0.25);
+        }
 
-    #brandsModal .modal-dialog-scrollable {
-      max-height: 80vh;
-    }
+        #brandsModal .modal-dialog-scrollable {
+            max-height: 80vh;
+        }
 
-    /* Device Cell Modal Styling */
-    .device-cell-modal {
-      background-color: #fff;
-      border: 1px solid #c5b6b0;
-      color: #5D4037;
-      font-weight: 500;
-      transition: all 0.3s ease;
-      cursor: pointer;
-      font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue';
-    }
+        /* Device Cell Modal Styling */
+        .device-cell-modal {
+            background-color: #fff;
+            border: 1px solid #c5b6b0;
+            color: #5D4037;
+            font-weight: 500;
+            transition: all 0.3s ease;
+            cursor: pointer;
+            font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue';
+        }
 
-    .device-cell-modal:hover {
-      background-color: #D7CCC8 !important;
-      border-color: #8D6E63;
-      transform: translateY(-2px);
-      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
-      color: #3E2723;
-    }
+        .device-cell-modal:hover {
+            background-color: #D7CCC8 !important;
+            border-color: #8D6E63;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
+            color: #3E2723;
+        }
 
-    .device-cell-modal:active {
-      transform: translateY(0);
-      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-    }
+        .device-cell-modal:active {
+            transform: translateY(0);
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
 
-    .device-cell-modal:focus {
-      outline: none;
-      box-shadow: 0 0 0 3px rgba(141, 110, 99, 0.25);
-    }
+        .device-cell-modal:focus {
+            outline: none;
+            box-shadow: 0 0 0 3px rgba(141, 110, 99, 0.25);
+        }
 
-    #devicesModal .modal-dialog-scrollable {
-      max-height: 80vh;
-    }
+        #devicesModal .modal-dialog-scrollable {
+            max-height: 80vh;
+        }
     </style>
 </head>
 
@@ -338,26 +345,15 @@ $brands = $brands_stmt->fetchAll();
                             </button>
                             <div class="collapse" id="simCollapse">
                                 <div class="card card-body px-3">
-                                    <div class="form-check">
-                                        <input class="form-check-input network-2g-band" type="checkbox" value="850" id="gsm850"
-                                            name="network_2g_bands[]" />
-                                        <label class="form-check-label" for="gsm850">GSM 850</label>
-                                    </div>
-                                    <div class="form-check">
-                                        <input class="form-check-input network-2g-band" type="checkbox" value="900" id="gsm900"
-                                            name="network_2g_bands[]" />
-                                        <label class="form-check-label" for="gsm900">GSM 900</label>
-                                    </div>
-                                    <div class="form-check">
-                                        <input class="form-check-input network-2g-band" type="checkbox" value="1800" id="gsm1800"
-                                            name="network_2g_bands[]" />
-                                        <label class="form-check-label" for="gsm1800">GSM 1800</label>
-                                    </div>
-                                    <div class="form-check">
-                                        <input class="form-check-input network-2g-band" type="checkbox" value="1900" id="gsm1900"
-                                            name="network_2g_bands[]" />
-                                        <label class="form-check-label" for="gsm1900">GSM 1900</label>
-                                    </div>
+                                    <?php if (isset($filterConfig['network_2g_bands']) && is_array($filterConfig['network_2g_bands'])): ?>
+                                        <?php foreach ($filterConfig['network_2g_bands'] as $index => $band): ?>
+                                            <div class="form-check">
+                                                <input class="form-check-input network-2g-band" type="checkbox" value="<?php echo htmlspecialchars($band['value']); ?>" id="gsm<?php echo $index; ?>"
+                                                    name="network_2g_bands[]" />
+                                                <label class="form-check-label" for="gsm<?php echo $index; ?>"><?php echo htmlspecialchars($band['label']); ?></label>
+                                            </div>
+                                        <?php endforeach; ?>
+                                    <?php endif; ?>
                                 </div>
                             </div>
                         </div>
@@ -370,32 +366,15 @@ $brands = $brands_stmt->fetchAll();
                             </button>
                             <div class="collapse" id="simwasCollapse">
                                 <div class="card card-body py-2 px-3">
-                                    <div class="form-check">
-                                        <input class="form-check-input network-3g-band" type="checkbox" value="850" id="hspa850"
-                                            name="network_3g_bands[]" />
-                                        <label class="form-check-label" for="hspa850">HSPA 850</label>
-                                    </div>
-                                    <div class="form-check">
-                                        <input class="form-check-input network-3g-band" type="checkbox" value="900" id="hspa900"
-                                            name="network_3g_bands[]" />
-                                        <label class="form-check-label" for="hspa900">HSPA 900</label>
-                                    </div>
-                                    <div class="form-check">
-                                        <input class="form-check-input network-3g-band" type="checkbox" value="1700" id="hspa1700"
-                                            name="network_3g_bands[]" />
-                                        <label class="form-check-label" for="hspa1700">HSPA 1700</label>
-                                    </div>
-                                    <div class="form-check">
-                                        <input class="form-check-input network-3g-band" type="checkbox" value="1900" id="hspa1900"
-                                            name="network_3g_bands[]" />
-                                        <label class="form-check-label" for="hspa1900">HSPA 1900</label>
-                                    </div>
-                                    <div class="form-check">
-                                        <input class="form-check-input network-3g-band" type="checkbox" value="2100" id="hspa2100"
-                                            name="network_3g_bands[]" />
-                                        <label class="form-check-label" for="hspa2100">HSPA 2100</label>
-                                    </div>
-
+                                    <?php if (isset($filterConfig['network_3g_bands']) && is_array($filterConfig['network_3g_bands'])): ?>
+                                        <?php foreach ($filterConfig['network_3g_bands'] as $index => $band): ?>
+                                            <div class="form-check">
+                                                <input class="form-check-input network-3g-band" type="checkbox" value="<?php echo htmlspecialchars($band['value']); ?>" id="hspa<?php echo $index; ?>"
+                                                    name="network_3g_bands[]" />
+                                                <label class="form-check-label" for="hspa<?php echo $index; ?>"><?php echo htmlspecialchars($band['label']); ?></label>
+                                            </div>
+                                        <?php endforeach; ?>
+                                    <?php endif; ?>
                                 </div>
                             </div>
                         </div>
@@ -420,46 +399,28 @@ $brands = $brands_stmt->fetchAll();
                     </button>
                     <div class="collapse" id="factorCollapse">
                         <div class="card card-body px-3">
-                            <div class="form-check">
-                                <input class="form-check-input" type="checkbox" value="Bar" id="formFactorBar"
-                                    name="form_factor[]" />
-                                <label class="form-check-label" for="formFactorBar">Bar</label>
-                            </div>
-                            <div class="form-check">
-                                <input class="form-check-input" type="checkbox" value="Flip up" id="formFactorFlipUp"
-                                    name="form_factor[]" />
-                                <label class="form-check-label" for="formFactorFlipUp">Flip up</label>
-                            </div>
-                            <div class="form-check">
-                                <input class="form-check-input" type="checkbox" value="Flip down" id="formFactorFlipDown"
-                                    name="form_factor[]" />
-                                <label class="form-check-label" for="formFactorFlipDown">Flip down</label>
-                            </div>
-
-                            <div class="form-check">
-                                <input class="form-check-input" type="checkbox" value="Swivel" id="formFactorSwivel"
-                                    name="form_factor[]" />
-                                <label class="form-check-label" for="formFactorSwivel">Swivel</label>
-                            </div>
-                            <div class="form-check">
-                                <input class="form-check-input" type="checkbox" value="Slide" id="formFactorSlide"
-                                    name="form_factor[]" />
-                                <label class="form-check-label" for="formFactorSlide">Slide</label>
-                            </div>
+                            <?php if (isset($filterConfig['form_factors']) && is_array($filterConfig['form_factors'])): ?>
+                                <?php foreach ($filterConfig['form_factors'] as $index => $factor): ?>
+                                    <div class="form-check">
+                                        <input class="form-check-input" type="checkbox" value="<?php echo htmlspecialchars($factor); ?>" id="formFactor<?php echo $index; ?>" name="form_factor[]" />
+                                        <label class="form-check-label" for="formFactor<?php echo $index; ?>"><?php echo htmlspecialchars($factor); ?></label>
+                                    </div>
+                                <?php endforeach; ?>
+                            <?php endif; ?>
                         </div>
                     </div>
                     <div class="d-flex fw-bolder align-items-center gap-3 mt-2"
                         style="border: 1px solid; padding: 7px; margin-top: 14px;">
                         Height: <span id="heightMinValue">Any</span>
-                        <input type="range" class="form-range custom-range flex-grow-1" min="0" max="220" step="1"
-                            id="heightMin" value="0">
+                        <input type="range" class="form-range custom-range flex-grow-1" min="<?php echo $filterConfig['dimensions']['height_min']; ?>" max="<?php echo $filterConfig['dimensions']['height_max']; ?>" step="<?php echo $filterConfig['dimensions']['height_step']; ?>"
+                            id="heightMin" value="<?php echo $filterConfig['dimensions']['height_min']; ?>">
                         <span class="text-muted">mm</span>
                     </div>
                     <div class="d-flex fw-bolder align-items-center gap-3 mt-2"
                         style="border: 1px solid; padding: 7px; margin-top: 14px;">
                         Thickness: <span id="thicknessMaxValue">Any</span>
-                        <input type="range" class="form-range custom-range flex-grow-1" min="0" max="15" step="0.1"
-                            id="thicknessMax" value="0">
+                        <input type="range" class="form-range custom-range flex-grow-1" min="<?php echo $filterConfig['dimensions']['thickness_min']; ?>" max="<?php echo $filterConfig['dimensions']['thickness_max']; ?>" step="<?php echo $filterConfig['dimensions']['thickness_step']; ?>"
+                            id="thicknessMax" value="<?php echo $filterConfig['dimensions']['thickness_min']; ?>">
                         <span class="text-muted">mm</span>
                     </div>
                     <button style="border-radius: 1px;" class=" btn btn-toggle w-100 mt-2 text-start" type="button"
@@ -469,27 +430,14 @@ $brands = $brands_stmt->fetchAll();
                     </button>
                     <div class="collapse" id="ipCollapse">
                         <div class="card card-body px-3">
-                            <div class="form-check">
-                                <input class="form-check-input" type="checkbox" value="IP54" id="ip54"
-                                    name="ip_certificate[]" />
-                                <label class="form-check-label" for="ip54">IP54</label>
-                            </div>
-                            <div class="form-check">
-                                <input class="form-check-input" type="checkbox" value="IP67" id="ip67"
-                                    name="ip_certificate[]" />
-                                <label class="form-check-label" for="ip67">IP67</label>
-                            </div>
-                            <div class="form-check">
-                                <input class="form-check-input" type="checkbox" value="IP68" id="ip68"
-                                    name="ip_certificate[]" />
-                                <label class="form-check-label" for="ip68">IP68</label>
-                            </div>
-
-                            <div class="form-check">
-                                <input class="form-check-input" type="checkbox" value="IP69K" id="ip69k"
-                                    name="ip_certificate[]" />
-                                <label class="form-check-label" for="ip69k">IP69K</label>
-                            </div>
+                            <?php if (isset($filterConfig['ip_certificates']) && is_array($filterConfig['ip_certificates'])): ?>
+                                <?php foreach ($filterConfig['ip_certificates'] as $index => $ipCert): ?>
+                                    <div class="form-check">
+                                        <input class="form-check-input" type="checkbox" value="<?php echo htmlspecialchars($ipCert); ?>" id="ip<?php echo $index; ?>" name="ip_certificate[]" />
+                                        <label class="form-check-label" for="ip<?php echo $index; ?>"><?php echo htmlspecialchars($ipCert); ?></label>
+                                    </div>
+                                <?php endforeach; ?>
+                            <?php endif; ?>
                         </div>
                     </div>
                     <button style="border-radius: 1px;" class=" btn btn-toggle w-100 mt-2 text-start" type="button"
@@ -499,27 +447,14 @@ $brands = $brands_stmt->fetchAll();
                     </button>
                     <div class="collapse" id="backCollapse">
                         <div class="card card-body px-3">
-                            <div class="form-check">
-                                <input class="form-check-input" type="checkbox" value="Plastic" id="backPlastic"
-                                    name="back_material[]" />
-                                <label class="form-check-label" for="backPlastic"> Plastic</label>
-                            </div>
-                            <div class="form-check">
-                                <input class="form-check-input" type="checkbox" value="Aluminum" id="backAluminum"
-                                    name="back_material[]" />
-                                <label class="form-check-label" for="backAluminum">Aluminum</label>
-                            </div>
-                            <div class="form-check">
-                                <input class="form-check-input" type="checkbox" value="Glass" id="backGlass"
-                                    name="back_material[]" />
-                                <label class="form-check-label" for="backGlass">Glass</label>
-                            </div>
-
-                            <div class="form-check">
-                                <input class="form-check-input" type="checkbox" value="Ceramic" id="backCeramic"
-                                    name="back_material[]" />
-                                <label class="form-check-label" for="backCeramic">Ceramic</label>
-                            </div>
+                            <?php if (isset($filterConfig['back_materials']) && is_array($filterConfig['back_materials'])): ?>
+                                <?php foreach ($filterConfig['back_materials'] as $index => $material): ?>
+                                    <div class="form-check">
+                                        <input class="form-check-input" type="checkbox" value="<?php echo htmlspecialchars($material); ?>" id="backMaterial<?php echo $index; ?>" name="back_material[]" />
+                                        <label class="form-check-label" for="backMaterial<?php echo $index; ?>"> <?php echo htmlspecialchars($material); ?></label>
+                                    </div>
+                                <?php endforeach; ?>
+                            <?php endif; ?>
                         </div>
                     </div>
                     <div class="filter-header mx-1 mb-2">Platforms</div>
@@ -531,24 +466,16 @@ $brands = $brands_stmt->fetchAll();
                         <div class="card card-body px-3">
                             <div class="row g-2">
                                 <div class="col-12">Select OS family</div>
-                                <div class="col-6">
-                                    <div class="form-check">
-                                        <input class="form-check-input" type="checkbox" value="android" id="osAndroid" name="os_family" />
-                                        <label class="form-check-label" for="osAndroid">Android</label>
-                                    </div>
-                                </div>
-                                <div class="col-6">
-                                    <div class="form-check">
-                                        <input class="form-check-input" type="checkbox" value="ios" id="osIOS" name="os_family" />
-                                        <label class="form-check-label" for="osIOS">iOS</label>
-                                    </div>
-                                </div>
-                                <div class="col-12">
-                                    <div class="form-check">
-                                        <input class="form-check-input" type="checkbox" value="other" id="osOther" name="os_family" />
-                                        <label class="form-check-label" for="osOther">Other (not Android/iOS)</label>
-                                    </div>
-                                </div>
+                                <?php if (isset($filterConfig['os_families']) && is_array($filterConfig['os_families'])): ?>
+                                    <?php foreach ($filterConfig['os_families'] as $index => $os): ?>
+                                        <div class="col-<?php echo count($filterConfig['os_families']) > 3 ? '12' : '6'; ?>">
+                                            <div class="form-check">
+                                                <input class="form-check-input" type="checkbox" value="<?php echo strtolower(htmlspecialchars($os)); ?>" id="os<?php echo $index; ?>" name="os_family" />
+                                                <label class="form-check-label" for="os<?php echo $index; ?>"><?php echo htmlspecialchars($os); ?></label>
+                                            </div>
+                                        </div>
+                                    <?php endforeach; ?>
+                                <?php endif; ?>
                             </div>
                         </div>
                     </div>
@@ -593,8 +520,8 @@ $brands = $brands_stmt->fetchAll();
                     <div class="d-flex fw-bolder align-items-center gap-3 mt-3"
                         style="border: 1px solid; padding: 7px; margin-top: 14px;">
                         Min RAM: <span id="ramMinValue">Any</span>
-                        <input type="range" class="form-range custom-range flex-grow-1" min="0" max="32" step="1"
-                            id="ramMin" value="0">
+                        <input type="range" class="form-range custom-range flex-grow-1" min="<?php echo $filterConfig['ram']['min']; ?>" max="<?php echo $filterConfig['ram']['max']; ?>" step="<?php echo $filterConfig['ram']['step']; ?>"
+                            id="ramMin" value="<?php echo $filterConfig['ram']['default']; ?>">
                         <span class="text-muted">GB</span>
                     </div>
                     <button style="border-radius: 1px;" class=" btn btn-toggle w-100 mt-2 text-start" type="button"
@@ -617,19 +544,19 @@ $brands = $brands_stmt->fetchAll();
                 <!-- Year filter (Min-Max) -->
                 <div class="d-flex fw-bolder align-items-center gap-3 mt-4"
                     style="border: 1px solid; padding: 7px; margin-top: 14px;">
-                    Year: <span id="yearMinValue">2000</span>
-                    <input type="range" class="form-range custom-range flex-grow-1" min="2000" max="2026"
-                        id="yearMin" value="2000">
+                    Year: <span id="yearMinValue"><?php echo $filterConfig['year']['default_min']; ?></span>
+                    <input type="range" class="form-range custom-range flex-grow-1" min="<?php echo $filterConfig['year']['min']; ?>" max="<?php echo $filterConfig['year']['max']; ?>"
+                        id="yearMin" value="<?php echo $filterConfig['year']['default_min']; ?>">
                     <span class="mx-2">-</span>
-                    <input type="range" class="form-range custom-range flex-grow-1" min="2000" max="2026"
-                        id="yearMax" value="2026">
-                    <span id="yearMaxValue">2026</span>
+                    <input type="range" class="form-range custom-range flex-grow-1" min="<?php echo $filterConfig['year']['min']; ?>" max="<?php echo $filterConfig['year']['max']; ?>"
+                        id="yearMax" value="<?php echo $filterConfig['year']['default_max']; ?>">
+                    <span id="yearMaxValue"><?php echo $filterConfig['year']['default_max']; ?></span>
                 </div>
                 <!-- Price filter (Max price) -->
                 <div class="d-flex fw-bolder align-items-center gap-3 mt-4"
                     style="border: 1px solid; padding: 7px; margin-top: 14px;">
                     Max Price: <span id="priceMaxValue">Any</span>
-                    <input type="range" class="form-range custom-range flex-grow-1" min="0" max="3000" step="10"
+                    <input type="range" class="form-range custom-range flex-grow-1" min="<?php echo $filterConfig['price']['min']; ?>" max="<?php echo $filterConfig['price']['max']; ?>" step="<?php echo $filterConfig['price']['step']; ?>"
                         id="priceMax">
                     <span class="text-muted">USD</span>
                 </div>
@@ -642,31 +569,15 @@ $brands = $brands_stmt->fetchAll();
                         </button>
                         <div class="collapse" id="fourGCollapse">
                             <div class="card card-body px-3">
-                                <div class="form-check">
-                                    <input class="form-check-input network-4g-band" type="checkbox" value="700" id="lte700"
-                                        name="network_4g_bands[]" />
-                                    <label class="form-check-label" for="lte700">LTE 700</label>
-                                </div>
-                                <div class="form-check">
-                                    <input class="form-check-input network-4g-band" type="checkbox" value="850" id="lte850"
-                                        name="network_4g_bands[]" />
-                                    <label class="form-check-label" for="lte850">LTE 850</label>
-                                </div>
-                                <div class="form-check">
-                                    <input class="form-check-input network-4g-band" type="checkbox" value="900" id="lte900"
-                                        name="network_4g_bands[]" />
-                                    <label class="form-check-label" for="lte900">LTE 900</label>
-                                </div>
-                                <div class="form-check">
-                                    <input class="form-check-input network-4g-band" type="checkbox" value="1800" id="lte1800"
-                                        name="network_4g_bands[]" />
-                                    <label class="form-check-label" for="lte1800">LTE 1800</label>
-                                </div>
-                                <div class="form-check">
-                                    <input class="form-check-input network-4g-band" type="checkbox" value="2600" id="lte2600"
-                                        name="network_4g_bands[]" />
-                                    <label class="form-check-label" for="lte2600">LTE 2600</label>
-                                </div>
+                                <?php if (isset($filterConfig['network_4g_bands']) && is_array($filterConfig['network_4g_bands'])): ?>
+                                    <?php foreach ($filterConfig['network_4g_bands'] as $index => $band): ?>
+                                        <div class="form-check">
+                                            <input class="form-check-input network-4g-band" type="checkbox" value="<?php echo htmlspecialchars($band['value']); ?>" id="lte<?php echo $index; ?>"
+                                                name="network_4g_bands[]" />
+                                            <label class="form-check-label" for="lte<?php echo $index; ?>"><?php echo htmlspecialchars($band['label']); ?></label>
+                                        </div>
+                                    <?php endforeach; ?>
+                                <?php endif; ?>
                             </div>
                         </div>
                     </div>
@@ -679,31 +590,15 @@ $brands = $brands_stmt->fetchAll();
                         </button>
                         <div class="collapse" id="fiveGCollapse">
                             <div class="card card-body px-3">
-                                <div class="form-check">
-                                    <input class="form-check-input network-5g-band" type="checkbox" value="3500" id="nr3500"
-                                        name="network_5g_bands[]" />
-                                    <label class="form-check-label" for="nr3500">NR 3500</label>
-                                </div>
-                                <div class="form-check">
-                                    <input class="form-check-input network-5g-band" type="checkbox" value="3600" id="nr3600"
-                                        name="network_5g_bands[]" />
-                                    <label class="form-check-label" for="nr3600">NR 3600</label>
-                                </div>
-                                <div class="form-check">
-                                    <input class="form-check-input network-5g-band" type="checkbox" value="3700" id="nr3700"
-                                        name="network_5g_bands[]" />
-                                    <label class="form-check-label" for="nr3700">NR 3700</label>
-                                </div>
-                                <div class="form-check">
-                                    <input class="form-check-input network-5g-band" type="checkbox" value="3800" id="nr3800"
-                                        name="network_5g_bands[]" />
-                                    <label class="form-check-label" for="nr3800">NR 3800</label>
-                                </div>
-                                <div class="form-check">
-                                    <input class="form-check-input network-5g-band" type="checkbox" value="mmWave" id="nr5gmmwave"
-                                        name="network_5g_bands[]" />
-                                    <label class="form-check-label" for="nr5gmmwave">mmWave (24-40 GHz)</label>
-                                </div>
+                                <?php if (isset($filterConfig['network_5g_bands']) && is_array($filterConfig['network_5g_bands'])): ?>
+                                    <?php foreach ($filterConfig['network_5g_bands'] as $index => $band): ?>
+                                        <div class="form-check">
+                                            <input class="form-check-input network-5g-band" type="checkbox" value="<?php echo htmlspecialchars($band['value']); ?>" id="nr5g<?php echo $index; ?>"
+                                                name="network_5g_bands[]" />
+                                            <label class="form-check-label" for="nr5g<?php echo $index; ?>"><?php echo htmlspecialchars($band['label']); ?></label>
+                                        </div>
+                                    <?php endforeach; ?>
+                                <?php endif; ?>
                             </div>
                         </div>
                     </div>
@@ -715,33 +610,28 @@ $brands = $brands_stmt->fetchAll();
                 </button>
                 <div class="collapse" id="sizeCollapse">
                     <div class="card card-body px-3">
-                        <div class="form-check">
-                            <input class="form-check-input" type="checkbox" value="Mini-SIM" id="miniSim" name="sim_sizes[]" />
-                            <label class="form-check-label" for="miniSim">Mini-SIM (regular size)</label>
-                        </div>
-                        <div class="form-check">
-                            <input class="form-check-input" type="checkbox" value="Nano-SIM" id="nanoSim" name="sim_sizes[]" />
-                            <label class="form-check-label" for="nanoSim">Nano-SIM</label>
-                        </div>
-                        <div class="form-check">
-                            <input class="form-check-input" type="checkbox" value="Micro-SIM" id="microSim"
-                                name="sim_sizes[]" />
-                            <label class="form-check-label" for="microSim">Micro-SIM</label>
-                        </div>
+                        <?php if (isset($filterConfig['sim_types']) && is_array($filterConfig['sim_types'])): ?>
+                            <?php foreach ($filterConfig['sim_types'] as $index => $simType): ?>
+                                <div class="form-check">
+                                    <input class="form-check-input" type="checkbox" value="<?php echo htmlspecialchars($simType); ?>" id="simType<?php echo $index; ?>" name="sim_sizes[]" />
+                                    <label class="form-check-label" for="simType<?php echo $index; ?>"><?php echo htmlspecialchars($simType); ?></label>
+                                </div>
+                            <?php endforeach; ?>
+                        <?php endif; ?>
                     </div>
                 </div>
                 <div class="d-flex align-items-center fw-bolder gap-3 mt-2"
                     style="border: 1px solid; padding: 7px; margin-top: 14px;">
                     Width: <span id="widthMinValue">Any</span>
-                    <input type="range" class="form-range custom-range flex-grow-1" min="0" max="100" step="1"
-                        id="widthMin" value="0">
+                    <input type="range" class="form-range custom-range flex-grow-1" min="<?php echo $filterConfig['dimensions']['width_min']; ?>" max="<?php echo $filterConfig['dimensions']['width_max']; ?>" step="<?php echo $filterConfig['dimensions']['width_step']; ?>"
+                        id="widthMin" value="<?php echo $filterConfig['dimensions']['width_min']; ?>">
                     <span class="text-muted">mm</span>
                 </div>
                 <div class="d-flex align-items-center fw-bolder gap-3 mt-2"
                     style="border: 1px solid; padding: 7px; margin-top: 14px;">
                     Weight: <span id="weightMaxValue">Any</span>
-                    <input type="range" class="form-range custom-range flex-grow-1" min="0" max="400" step="5"
-                        id="weightMax" value="0">
+                    <input type="range" class="form-range custom-range flex-grow-1" min="<?php echo $filterConfig['dimensions']['weight_min']; ?>" max="<?php echo $filterConfig['dimensions']['weight_max']; ?>" step="<?php echo $filterConfig['dimensions']['weight_step']; ?>"
+                        id="weightMax" value="<?php echo $filterConfig['dimensions']['weight_min']; ?>">
                     <span class="text-muted">g</span>
                 </div>
                 <button style="border-radius: 1px;" class="btn btn-toggle w-100 mt-2 text-start" type="button"
@@ -751,23 +641,14 @@ $brands = $brands_stmt->fetchAll();
                 </button>
                 <div class="collapse" id="colorCollapse">
                     <div class="card card-body px-3">
-                        <div class="form-check">
-                            <input class="form-check-input" type="checkbox" value="Red" id="colorRed" name="color[]" />
-                            <label class="form-check-label" for="colorRed"> RED</label>
-                        </div>
-                        <div class="form-check">
-                            <input class="form-check-input" type="checkbox" value="White" id="colorWhite" name="color[]" />
-                            <label class="form-check-label" for="colorWhite">WHITE</label>
-                        </div>
-                        <div class="form-check">
-                            <input class="form-check-input" type="checkbox" value="Black" id="colorBlack" name="color[]" />
-                            <label class="form-check-label" for="colorBlack">BLACK</label>
-                        </div>
-
-                        <div class="form-check">
-                            <input class="form-check-input" type="checkbox" value="Blue" id="colorBlue" name="color[]" />
-                            <label class="form-check-label" for="colorBlue">BLUE</label>
-                        </div>
+                        <?php if (isset($filterConfig['colors']) && is_array($filterConfig['colors'])): ?>
+                            <?php foreach ($filterConfig['colors'] as $index => $color): ?>
+                                <div class="form-check">
+                                    <input class="form-check-input" type="checkbox" value="<?php echo htmlspecialchars($color); ?>" id="color<?php echo $index; ?>" name="color[]" />
+                                    <label class="form-check-label" for="color<?php echo $index; ?>"> <?php echo strtoupper(htmlspecialchars($color)); ?></label>
+                                </div>
+                            <?php endforeach; ?>
+                        <?php endif; ?>
                     </div>
                 </div>
                 <button style="border-radius: 1px;" class="btn btn-toggle w-100 mt-2 text-start" type="button"
@@ -777,23 +658,14 @@ $brands = $brands_stmt->fetchAll();
                 </button>
                 <div class="collapse" id="frontCollapse">
                     <div class="card card-body px-3">
-                        <div class="form-check">
-                            <input class="form-check-input" type="checkbox" value="Plastic" id="framePlastic" name="frame_material[]" />
-                            <label class="form-check-label" for="framePlastic"> Plastic</label>
-                        </div>
-                        <div class="form-check">
-                            <input class="form-check-input" type="checkbox" value="Aluminum" id="frameAluminum" name="frame_material[]" />
-                            <label class="form-check-label" for="frameAluminum">Aluminum</label>
-                        </div>
-                        <div class="form-check">
-                            <input class="form-check-input" type="checkbox" value="Stainless steel" id="frameSteel" name="frame_material[]" />
-                            <label class="form-check-label" for="frameSteel">Stainless steel</label>
-                        </div>
-
-                        <div class="form-check">
-                            <input class="form-check-input" type="checkbox" value="Ceramic Titanium" id="frameCeramicTitanium" name="frame_material[]" />
-                            <label class="form-check-label" for="frameCeramicTitanium">Ceramic Titanium</label>
-                        </div>
+                        <?php if (isset($filterConfig['frame_materials']) && is_array($filterConfig['frame_materials'])): ?>
+                            <?php foreach ($filterConfig['frame_materials'] as $index => $material): ?>
+                                <div class="form-check">
+                                    <input class="form-check-input" type="checkbox" value="<?php echo htmlspecialchars($material); ?>" id="frameMaterial<?php echo $index; ?>" name="frame_material[]" />
+                                    <label class="form-check-label" for="frameMaterial<?php echo $index; ?>"> <?php echo htmlspecialchars($material); ?></label>
+                                </div>
+                            <?php endforeach; ?>
+                        <?php endif; ?>
                     </div>
                 </div>
                 <button style="border-radius: 1px;" class=" btn btn-toggle w-100 mt-5 text-start" type="button"
@@ -804,17 +676,17 @@ $brands = $brands_stmt->fetchAll();
                     <div class="card card-body px-3">
                         <div class="d-flex fw-bolder align-items-center gap-3">
                             Min OS Version: <span id="osVersionMinValue">Any</span>
-                            <input type="range" class="form-range custom-range flex-grow-1" min="0" max="20" step="1"
-                                id="osVersionMin" value="0">
+                            <input type="range" class="form-range custom-range flex-grow-1" min="<?php echo $filterConfig['os_version']['min']; ?>" max="<?php echo $filterConfig['os_version']['max']; ?>" step="<?php echo $filterConfig['os_version']['step']; ?>"
+                                id="osVersionMin" value="<?php echo $filterConfig['os_version']['default']; ?>">
                         </div>
                     </div>
                 </div>
                 <div class="d-flex align-items-center fw-bolder gap-3 mt-2"
                     style="border: 1px solid; padding: 7px; margin-top: 14px;">
-                    CPU: <span id="yearValue">min</span>
-                    <input type="range" class="form-range custom-range flex-grow-1" min="2000" max="2025"
-                        id="rangeYear">
-                    <span class="text-muted">max</span>
+                    CPU: <span id="cpuClockValue"><?php echo $filterConfig['cpu_clock']['min']; ?></span>
+                    <input type="range" class="form-range custom-range flex-grow-1" min="<?php echo $filterConfig['cpu_clock']['min']; ?>" max="<?php echo $filterConfig['cpu_clock']['max']; ?>" step="<?php echo $filterConfig['cpu_clock']['step']; ?>"
+                        id="cpuClock" value="<?php echo $filterConfig['cpu_clock']['default']; ?>">
+                    <span class="text-muted">GHz</span>
                 </div>
 
                 <div class="row mt-5">
@@ -836,40 +708,31 @@ $brands = $brands_stmt->fetchAll();
                 </button>
                 <div class="collapse" id="fingerCollapse">
                     <div class="card card-body px-3">
-                        <div class="form-check">
-                            <input class="form-check-input" type="checkbox" value="Mini-SIM" id="miniSim" name="size" />
-                            <label class="form-check-label" for="miniSim"> Yes (any type) </label>
-                        </div>
-                        <div class="form-check">
-                            <input class="form-check-input" type="checkbox" value="Mini-SIM" id="miniSim" name="size" />
-                            <label class="form-check-label" for="miniSim">Rear-mounted</label>
-                        </div>
-                        <div class="form-check">
-                            <input class="form-check-input" type="checkbox" value="Nano-SIM" id="nanoSim" name="size" />
-                            <label class="form-check-label" for="nanoSim">Side-mounted</label>
-                        </div>
-
-                        <div class="form-check">
-                            <input class="form-check-input" type="checkbox" value="Nano-SIM" id="nanoSim" name="size" />
-                            <label class="form-check-label" for="nanoSim">Top-mounted Under display</label>
-                        </div>
+                        <?php if (isset($filterConfig['fingerprint_types']) && is_array($filterConfig['fingerprint_types'])): ?>
+                            <?php foreach ($filterConfig['fingerprint_types'] as $index => $fpType): ?>
+                                <div class="form-check">
+                                    <input class="form-check-input" type="checkbox" value="<?php echo htmlspecialchars($fpType); ?>" id="fp<?php echo $index; ?>" name="fingerprint[]" />
+                                    <label class="form-check-label" for="fp<?php echo $index; ?>"><?php echo htmlspecialchars($fpType); ?></label>
+                                </div>
+                            <?php endforeach; ?>
+                        <?php endif; ?>
                     </div>
                 </div>
                 <!-- Storage filter (Min GB) -->
                 <div class="d-flex fw-bolder align-items-center gap-3 mt-5"
                     style="border: 1px solid; padding: 7px; margin-top: 14px;">
                     Min Storage: <span id="storageMinValue">Any</span>
-                    <input type="range" class="form-range custom-range flex-grow-1" min="0" max="2048" step="16"
-                        id="storageMin" value="0">
+                    <input type="range" class="form-range custom-range flex-grow-1" min="<?php echo $filterConfig['storage']['min']; ?>" max="<?php echo $filterConfig['storage']['max']; ?>" step="<?php echo $filterConfig['storage']['step']; ?>"
+                        id="storageMin" value="<?php echo $filterConfig['storage']['default']; ?>">
                     <span class="text-muted">GB</span>
                 </div>
             </div>
             <div class="filter-header">Display</div>
             <div class="d-flex secondary fw-bolder align-items-center gap-3 mt-2">
                 Resolution: <span id="displayResMinValue">min</span>
-                <input type="range" class="form-range custom-range flex-grow-1" min="480" max="4320" step="1" id="displayResMin" value="480">
+                <input type="range" class="form-range custom-range flex-grow-1" min="<?php echo $filterConfig['display_resolution']['min']; ?>" max="<?php echo $filterConfig['display_resolution']['max']; ?>" step="<?php echo $filterConfig['display_resolution']['step']; ?>" id="displayResMin" value="<?php echo $filterConfig['display_resolution']['default_min']; ?>">
                 <span class="mx-2">-</span>
-                <input type="range" class="form-range custom-range flex-grow-1" min="480" max="4320" step="1" id="displayResMax" value="4320">
+                <input type="range" class="form-range custom-range flex-grow-1" min="<?php echo $filterConfig['display_resolution']['min']; ?>" max="<?php echo $filterConfig['display_resolution']['max']; ?>" step="<?php echo $filterConfig['display_resolution']['step']; ?>" id="displayResMax" value="<?php echo $filterConfig['display_resolution']['default_max']; ?>">
                 <span id="displayResMaxValue">max</span>
             </div>
         </div>
@@ -878,13 +741,13 @@ $brands = $brands_stmt->fetchAll();
                 <!-- Display Size filter (Min-Max inches) -->
                 <div class="filter-box ">
                     <span class="filter-label">Size:</span>
-                    <span id="displaySizeMinValue">3.0</span>
-                    <input type="range" class="form-range custom-range flex-grow-1" min="3.0" max="8.0" step="0.1"
-                        id="displaySizeMin" value="3.0" />
+                    <span id="displaySizeMinValue"><?php echo $filterConfig['display_size']['default_min']; ?></span>
+                    <input type="range" class="form-range custom-range flex-grow-1" min="<?php echo $filterConfig['display_size']['min']; ?>" max="<?php echo $filterConfig['display_size']['max']; ?>" step="<?php echo $filterConfig['display_size']['step']; ?>"
+                        id="displaySizeMin" value="<?php echo $filterConfig['display_size']['default_min']; ?>" />
                     <span class="mx-2">-</span>
-                    <input type="range" class="form-range custom-range flex-grow-1" min="3.0" max="8.0" step="0.1"
-                        id="displaySizeMax" value="8.0" />
-                    <span id="displaySizeMaxValue">8.0</span>
+                    <input type="range" class="form-range custom-range flex-grow-1" min="<?php echo $filterConfig['display_size']['min']; ?>" max="<?php echo $filterConfig['display_size']['max']; ?>" step="<?php echo $filterConfig['display_size']['step']; ?>"
+                        id="displaySizeMax" value="<?php echo $filterConfig['display_size']['default_max']; ?>" />
+                    <span id="displaySizeMaxValue"><?php echo $filterConfig['display_size']['default_max']; ?></span>
                     <span class="text-muted">"</span>
                 </div>
                 <button class="btn  btn-toggle w-100  mb-3 mt-2" type="button" data-bs-toggle="collapse"
@@ -893,42 +756,35 @@ $brands = $brands_stmt->fetchAll();
                 </button>
                 <div class="collapse" id="techCollapse">
                     <div class="card card-body">
-                        <div class="form-check">
-                            <input class="form-check-input" type="checkbox" value="IPS" id="techIPS"
-                                name="display_tech[]" />
-                            <label class="form-check-label" for="techIPS">IPS</label>
-                        </div>
-                        <div class="form-check">
-                            <input class="form-check-input" type="checkbox" value="OLED" id="techOLED"
-                                name="display_tech[]" />
-                            <label class="form-check-label" for="techOLED">OLED</label>
-                        </div>
-                        <div class="form-check">
-                            <input class="form-check-input" type="checkbox" value="LTPO" id="techLTPO"
-                                name="display_tech[]" />
-                            <label class="form-check-label" for="techLTPO">LTPO OLED</label>
-                        </div>
-
+                        <?php if (isset($filterConfig['display_technologies']) && is_array($filterConfig['display_technologies'])): ?>
+                            <?php foreach ($filterConfig['display_technologies'] as $index => $tech): ?>
+                                <div class="form-check">
+                                    <input class="form-check-input" type="checkbox" value="<?php echo htmlspecialchars($tech); ?>" id="tech<?php echo $index; ?>"
+                                        name="display_tech[]" />
+                                    <label class="form-check-label" for="tech<?php echo $index; ?>"><?php echo htmlspecialchars($tech); ?></label>
+                                </div>
+                            <?php endforeach; ?>
+                        <?php endif; ?>
                     </div>
                 </div>
                 <div class="filter-box">
                     <span class="filter-label">Refresh Rate:</span>
                     <span id="refreshRateMinValue">Any</span>
-                    <input type="range" class="form-range custom-range flex-grow-1" min="0" max="240" step="30"
-                        id="refreshRateMin" value="0" />
+                    <input type="range" class="form-range custom-range flex-grow-1" min="<?php echo $filterConfig['refresh_rate']['min']; ?>" max="<?php echo $filterConfig['refresh_rate']['max']; ?>" step="<?php echo $filterConfig['refresh_rate']['step']; ?>"
+                        id="refreshRateMin" value="<?php echo $filterConfig['refresh_rate']['default']; ?>" />
                     <span class="text-muted">Hz</span>
                 </div>
                 <div class="filter-header mt-4 mb-3" style="margin-left: -1px;">Main Camera</div>
                 <div class="filter-box  ">
                     <span class="filter-label ">Resolution</span>
                     <span id="fNumberMaxValue">Any</span>
-                    <input type="range" class="form-range custom-range flex-grow-1" min="0" max="4.0" step="0.1"
-                        id="fNumberMax" value="0" />
+                    <input type="range" class="form-range custom-range flex-grow-1" min="<?php echo $filterConfig['f_number']['min']; ?>" max="<?php echo $filterConfig['f_number']['max']; ?>" step="<?php echo $filterConfig['f_number']['step']; ?>"
+                        id="fNumberMax" value="<?php echo $filterConfig['f_number']['default']; ?>" />
                     <span class="text-muted">MP</span>
                 </div>
                 <div class="filter-box mt-1 ">
                     CPU: <span id="cpuClockMinValue">Any</span>
-                    <input type="range" class="form-range custom-range flex-grow-1" min="0" max="4.0" step="0.1"
+                    <input type="range" class="form-range custom-range flex-grow-1" min="<?php echo $filterConfig['cpu_clock']['min']; ?>" max="<?php echo $filterConfig['cpu_clock']['max']; ?>" step="<?php echo $filterConfig['cpu_clock']['step']; ?>"
                         id="cpuClockMin" value="0">
                 </div>
                 <div class="filter-box mt-1">
@@ -1038,14 +894,14 @@ $brands = $brands_stmt->fetchAll();
                 <div class="filter-box ">
                     <span class="filter-label ">Capacity</span>
                     <span id="batteryCapacityMinValue">Any</span>
-                    <input type="range" class="form-range custom-range flex-grow-1" min="0" max="10000" step="100"
+                    <input type="range" class="form-range custom-range flex-grow-1" min="<?php echo $filterConfig['battery_capacity']['min']; ?>" max="<?php echo $filterConfig['battery_capacity']['max']; ?>" step="<?php echo $filterConfig['battery_capacity']['step']; ?>"
                         id="batteryCapacityMin" />
                     <span class="text-muted">mAh</span>
                 </div>
                 <div class="filter-box mt-1">
                     <span class="filter-label">Wired Charging:</span>
                     <span id="wiredChargeMinValue">Any</span>
-                    <input type="range" class="form-range custom-range flex-grow-1" min="0" max="300" step="5"
+                    <input type="range" class="form-range custom-range flex-grow-1" min="<?php echo $filterConfig['wired_charging']['min']; ?>" max="<?php echo $filterConfig['wired_charging']['max']; ?>" step="<?php echo $filterConfig['wired_charging']['step']; ?>"
                         id="wiredChargeMin" />
                     <span class="text-muted">W</span>
                 </div>
@@ -1244,7 +1100,7 @@ $brands = $brands_stmt->fetchAll();
                         </div>
                         <div class="col-12 d-flex fw-bolder align-items-center gap-3">
                             Min: <span id="wirelessChargeMinValue">Any</span>
-                            <input type="range" class="form-range custom-range flex-grow-1" min="0" max="100" step="5"
+                            <input type="range" class="form-range custom-range flex-grow-1" min="<?php echo $filterConfig['wireless_charging']['min']; ?>" max="<?php echo $filterConfig['wireless_charging']['max']; ?>" step="<?php echo $filterConfig['wireless_charging']['step']; ?>"
                                 id="wirelessChargeMin" />
                             <span class="text-muted">W</span>
                         </div>
@@ -1321,6 +1177,10 @@ $brands = $brands_stmt->fetchAll();
     </div>
 
     <!-- Phonefinder AJAX Script -->
+    <script>
+        // Make filter configuration available globally
+        const filterConfigData = <?php echo json_encode($filterConfig); ?>;
+    </script>
     <script>
         document.addEventListener('DOMContentLoaded', function() {
             const findBtn = document.getElementById('findDevicesBtn');
@@ -2196,47 +2056,47 @@ $brands = $brands_stmt->fetchAll();
             }
         });
         // Show brands modal
-  function showBrandsModal() {
-    const modal = new bootstrap.Modal(document.getElementById('brandsModal'));
-    modal.show();
-  }
+        function showBrandsModal() {
+            const modal = new bootstrap.Modal(document.getElementById('brandsModal'));
+            modal.show();
+        }
 
-  // Handle brand selection from modal
-  function selectBrandFromModal(brandId) {
-    // Close the brands modal
-    const brandsModal = bootstrap.Modal.getInstance(document.getElementById('brandsModal'));
-    if (brandsModal) {
-      brandsModal.hide();
-    }
+        // Handle brand selection from modal
+        function selectBrandFromModal(brandId) {
+            // Close the brands modal
+            const brandsModal = bootstrap.Modal.getInstance(document.getElementById('brandsModal'));
+            if (brandsModal) {
+                brandsModal.hide();
+            }
 
-    // Fetch phones for this brand
-    fetch(`get_phones_by_brand.php?brand_id=${brandId}`)
-      .then(response => response.json())
-      .then(data => {
-        // Populate the devices modal with phones
-        displayPhonesModal(data, brandId);
-      })
-      .catch(error => {
-        console.error('Error fetching phones:', error);
-        alert('Failed to load phones');
-      });
-  }
+            // Fetch phones for this brand
+            fetch(`get_phones_by_brand.php?brand_id=${brandId}`)
+                .then(response => response.json())
+                .then(data => {
+                    // Populate the devices modal with phones
+                    displayPhonesModal(data, brandId);
+                })
+                .catch(error => {
+                    console.error('Error fetching phones:', error);
+                    alert('Failed to load phones');
+                });
+        }
 
-  // Display phones in modal
-  function displayPhonesModal(phones, brandId) {
-    const container = document.getElementById('deviceModalBody');
-    const titleElement = document.getElementById('deviceModalTitle');
+        // Display phones in modal
+        function displayPhonesModal(phones, brandId) {
+            const container = document.getElementById('deviceModalBody');
+            const titleElement = document.getElementById('deviceModalTitle');
 
-    // Update title with brand name
-    const brandButton = document.querySelector(`[data-brand-id="${brandId}"]`);
-    const brandName = brandButton ? brandButton.textContent.trim() : 'Brand';
-    titleElement.innerHTML = `<i class="fas fa-mobile-alt me-2"></i>${brandName} - Devices`;
+            // Update title with brand name
+            const brandButton = document.querySelector(`[data-brand-id="${brandId}"]`);
+            const brandName = brandButton ? brandButton.textContent.trim() : 'Brand';
+            titleElement.innerHTML = `<i class="fas fa-mobile-alt me-2"></i>${brandName} - Devices`;
 
-    if (phones && phones.length > 0) {
-      let html = '<div class="row">';
-      phones.forEach(phone => {
-        const phoneImage = phone.image ? `<img src="${phone.image}" alt="${phone.name}" style="width: 100%; height: 120px; object-fit: contain; margin-bottom: 8px;" onerror="this.style.display='none';">` : '';
-        html += `
+            if (phones && phones.length > 0) {
+                let html = '<div class="row">';
+                phones.forEach(phone => {
+                    const phoneImage = phone.image ? `<img src="${phone.image}" alt="${phone.name}" style="width: 100%; height: 120px; object-fit: contain; margin-bottom: 8px;" onerror="this.style.display='none';">` : '';
+                    html += `
           <div class="col-lg-4 col-md-6 col-sm-6 mb-3">
             <button class="device-cell-modal btn w-100 p-0" style="background-color: #fff; border: 1px solid #c5b6b0; color: #5D4037; font-weight: 500; transition: all 0.3s ease; cursor: pointer; display: flex; flex-direction: column; align-items: center; overflow: hidden;" onclick="goToDevice(${phone.id})">
               ${phoneImage}
@@ -2244,27 +2104,27 @@ $brands = $brands_stmt->fetchAll();
             </button>
           </div>
         `;
-      });
-      html += '</div>';
-      container.innerHTML = html;
-    } else {
-      container.innerHTML = `
+                });
+                html += '</div>';
+                container.innerHTML = html;
+            } else {
+                container.innerHTML = `
         <div class="text-center py-5">
           <i class="fas fa-mobile-alt fa-3x text-muted mb-3"></i>
           <h6 class="text-muted">No devices available for this brand</h6>
         </div>
       `;
-    }
+            }
 
-    // Show devices modal
-    const devicesModal = new bootstrap.Modal(document.getElementById('devicesModal'));
-    devicesModal.show();
-  }
+            // Show devices modal
+            const devicesModal = new bootstrap.Modal(document.getElementById('devicesModal'));
+            devicesModal.show();
+        }
 
-  // Navigate to device page
-  function goToDevice(deviceId) {
-    window.location.href = `device.php?id=${deviceId}`;
-  }
+        // Navigate to device page
+        function goToDevice(deviceId) {
+            window.location.href = `device.php?id=${deviceId}`;
+        }
     </script>
 
     <div id="bottom" class="container d-flex" style="max-width: 1034px;">
@@ -2290,55 +2150,55 @@ $brands = $brands_stmt->fetchAll();
     </div>
     <!-- Brands Modal -->
     <div class="modal fade" id="brandsModal" tabindex="-1" aria-labelledby="brandsModalLabel" aria-hidden="true">
-      <div class="modal-dialog modal-lg modal-dialog-centered modal-dialog-scrollable">
-        <div class="modal-content" style="background-color: #EFEBE9; border: 2px solid #8D6E63;">
-          <div class="modal-header" style="border-bottom: 1px solid #8D6E63; background-color: #D7CCC8;">
-            <h5 class="modal-title" id="brandsModalLabel" style="font-family:system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue'; color: #5D4037;">
-              <i class="fas fa-industry me-2"></i>All Brands
-            </h5>
-            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-          </div>
-          <div class="modal-body">
-            <div class="row">
-              <?php if (!empty($brands)): ?>
-                <?php foreach ($brands as $brand): ?>
-                  <div class="col-lg-4 col-md-6 col-sm-6 mb-3">
-                    <button class="brand-cell-modal btn w-100 py-2 px-3" style="background-color: #fff; border: 1px solid #c5b6b0; color: #5D4037; font-weight: 500; transition: all 0.3s ease; cursor: pointer;" data-brand-id="<?php echo $brand['id']; ?>" onclick="selectBrandFromModal(<?php echo $brand['id']; ?>)">
-                      <?php echo htmlspecialchars($brand['name']); ?>
-                    </button>
-                  </div>
-                <?php endforeach; ?>
-              <?php else: ?>
-                <div class="col-12">
-                  <div class="text-center py-5">
-                    <i class="fas fa-industry fa-3x text-muted mb-3"></i>
-                    <h6 class="text-muted">No brands available</h6>
-                  </div>
+        <div class="modal-dialog modal-lg modal-dialog-centered modal-dialog-scrollable">
+            <div class="modal-content" style="background-color: #EFEBE9; border: 2px solid #8D6E63;">
+                <div class="modal-header" style="border-bottom: 1px solid #8D6E63; background-color: #D7CCC8;">
+                    <h5 class="modal-title" id="brandsModalLabel" style="font-family:system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue'; color: #5D4037;">
+                        <i class="fas fa-industry me-2"></i>All Brands
+                    </h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
-              <?php endif; ?>
+                <div class="modal-body">
+                    <div class="row">
+                        <?php if (!empty($brands)): ?>
+                            <?php foreach ($brands as $brand): ?>
+                                <div class="col-lg-4 col-md-6 col-sm-6 mb-3">
+                                    <button class="brand-cell-modal btn w-100 py-2 px-3" style="background-color: #fff; border: 1px solid #c5b6b0; color: #5D4037; font-weight: 500; transition: all 0.3s ease; cursor: pointer;" data-brand-id="<?php echo $brand['id']; ?>" onclick="selectBrandFromModal(<?php echo $brand['id']; ?>)">
+                                        <?php echo htmlspecialchars($brand['name']); ?>
+                                    </button>
+                                </div>
+                            <?php endforeach; ?>
+                        <?php else: ?>
+                            <div class="col-12">
+                                <div class="text-center py-5">
+                                    <i class="fas fa-industry fa-3x text-muted mb-3"></i>
+                                    <h6 class="text-muted">No brands available</h6>
+                                </div>
+                            </div>
+                        <?php endif; ?>
+                    </div>
+                </div>
             </div>
-          </div>
         </div>
-      </div>
     </div>
 
     <!-- Devices Modal (Phones by Brand) -->
     <div class="modal fade" id="devicesModal" tabindex="-1" aria-labelledby="deviceModalLabel" aria-hidden="true">
-      <div class="modal-dialog modal-lg modal-dialog-centered modal-dialog-scrollable">
-        <div class="modal-content" style="background-color: #EFEBE9; border: 2px solid #8D6E63;">
-          <div class="modal-header" style="border-bottom: 1px solid #8D6E63; background-color: #D7CCC8;">
-            <h5 class="modal-title" id="deviceModalTitle" style="font-family:system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue'; color: #5D4037;">
-              Devices
-            </h5>
-            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-          </div>
-          <div class="modal-body" id="deviceModalBody">
-            <div class="text-center py-5">
-              <i class="fas fa-spinner fa-spin fa-2x text-muted"></i>
+        <div class="modal-dialog modal-lg modal-dialog-centered modal-dialog-scrollable">
+            <div class="modal-content" style="background-color: #EFEBE9; border: 2px solid #8D6E63;">
+                <div class="modal-header" style="border-bottom: 1px solid #8D6E63; background-color: #D7CCC8;">
+                    <h5 class="modal-title" id="deviceModalTitle" style="font-family:system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue'; color: #5D4037;">
+                        Devices
+                    </h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body" id="deviceModalBody">
+                    <div class="text-center py-5">
+                        <i class="fas fa-spinner fa-spin fa-2x text-muted"></i>
+                    </div>
+                </div>
             </div>
-          </div>
         </div>
-      </div>
     </div>
     <script src="script.js"></script>
 </body>
