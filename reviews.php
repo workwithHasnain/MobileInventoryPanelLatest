@@ -5,16 +5,58 @@ require_once 'phone_data.php';
 
 // Get posts and devices for display (case-insensitive status check) with comment counts
 $pdo = getConnection();
-$posts_stmt = $pdo->prepare("
-    SELECT p.*, 
-    (SELECT COUNT(*) FROM post_comments pc WHERE pc.post_id = p.id AND pc.status = 'approved') as comment_count
-    FROM posts p 
-    WHERE p.status ILIKE 'published'
-    ORDER BY p.created_at DESC 
-    LIMIT 6
-");
-$posts_stmt->execute();
-$posts = $posts_stmt->fetchAll();
+
+// Read search query (hero search bar)
+$q = trim($_GET['q'] ?? '');
+$tag = trim($_GET['tag'] ?? '');
+$isSearching = ($q !== '');
+$isTagFiltering = ($tag !== '');
+
+// Build posts list: default is published; if searching, filter by title/tags
+if ($isTagFiltering) {
+    $posts_stmt = $pdo->prepare("
+        SELECT p.*, 
+        (SELECT COUNT(*) FROM post_comments pc WHERE pc.post_id = p.id AND pc.status = 'approved') as comment_count
+        FROM posts p 
+        WHERE p.status ILIKE 'published'
+          AND EXISTS (
+              SELECT 1 FROM unnest(COALESCE(p.tags, ARRAY[]::varchar[])) t
+              WHERE t ILIKE ?
+          )
+        ORDER BY p.created_at DESC
+    ");
+    $posts_stmt->execute([$tag]);
+    $posts = $posts_stmt->fetchAll();
+} else if ($isSearching) {
+    $term = '%' . $q . '%';
+    $posts_stmt = $pdo->prepare("
+        SELECT p.*, 
+        (SELECT COUNT(*) FROM post_comments pc WHERE pc.post_id = p.id AND pc.status = 'approved') as comment_count
+        FROM posts p 
+        WHERE p.status ILIKE 'published'
+          AND (
+              p.title ILIKE ?
+              OR EXISTS (
+                  SELECT 1 FROM unnest(COALESCE(p.tags, ARRAY[]::varchar[])) t
+                  WHERE t ILIKE ?
+              )
+          )
+        ORDER BY p.created_at DESC
+    ");
+    $posts_stmt->execute([$term, $term]);
+    $posts = $posts_stmt->fetchAll();
+} else {
+    $posts_stmt = $pdo->prepare("
+        SELECT p.*, 
+        (SELECT COUNT(*) FROM post_comments pc WHERE pc.post_id = p.id AND pc.status = 'approved') as comment_count
+        FROM posts p 
+        WHERE p.status ILIKE 'published'
+        ORDER BY p.created_at DESC 
+        LIMIT 6
+    ");
+    $posts_stmt->execute();
+    $posts = $posts_stmt->fetchAll();
+}
 
 // Get devices from database
 $devices = getAllPhones();
@@ -25,6 +67,33 @@ foreach ($devices as $index => $device) {
     $comment_stmt = $pdo->prepare("SELECT COUNT(*) as count FROM device_comments WHERE device_id = CAST(? AS VARCHAR) AND status = 'approved'");
     $comment_stmt->execute([$device['id']]);
     $devices[$index]['comment_count'] = $comment_stmt->fetch()['count'] ?? 0;
+}
+
+// Get popular tags (top 8 most appearing in published posts)
+// Using PostgreSQL unnest() for efficient array handling
+$popularTags = [];
+try {
+    $stmt = $pdo->prepare("
+        SELECT tag, COUNT(*) as count
+        FROM (
+            SELECT DISTINCT unnest(tags) as tag
+            FROM posts 
+            WHERE status ILIKE 'published'
+            AND tags IS NOT NULL 
+            AND array_length(tags, 1) > 0
+        ) tag_list
+        GROUP BY tag
+        ORDER BY count DESC
+        LIMIT 8
+    ");
+    $stmt->execute();
+    $tagResults = $stmt->fetchAll(PDO::FETCH_ASSOC);
+
+    foreach ($tagResults as $row) {
+        $popularTags[$row['tag']] = $row['count'];
+    }
+} catch (Exception $e) {
+    $popularTags = [];
 }
 
 // Get data for the three tables
@@ -302,21 +371,20 @@ $brands = $brands_stmt->fetchAll();
                     <img src="imges/Screenshot (160).png" alt="">
                     <div class="position-absolute d-flex mt-1" style="top: 0;">
                         <label class="text-white whitening ">Popular Tags</label>
-                        <button class="mobiles-button">Featured</button>
-                        <button class="mobiles-button">Android</button>
-                        <button class="mobiles-button">Samsung</button>
-                        <button class="mobiles-button">Nokia</button>
-                        <button class="mobiles-button">Sony</button>
-                        <button class="mobiles-button">Rumors</button>
-                        <button class="mobiles-button">Apple</button>
-                        <button class="mobiles-button">Motorola</button>
+                        <?php if (!empty($popularTags)): ?>
+                            <?php foreach ($popularTags as $tag => $count): ?>
+                                <a href="reviews.php?tag=<?php echo urlencode($tag); ?>"><button class="mobiles-button"><?php echo htmlspecialchars($tag); ?></button></a>
+                            <?php endforeach; ?>
+                        <?php else: ?>
+                            <span class="text-white">No tags available</span>
+                        <?php endif; ?>
                     </div>
 
-                    <div class="comon">
-                        <label for="" class="text-white whitening ">Search For</label>
-                        <input type="text" class="bg-white">
-                        <button class="mobiles-button bg-white">Android</button>
-                    </div>
+                    <form method="get" action="reviews.php" class="comon">
+                        <label for="hero-search-reviews" class="text-white whitening ">Search For</label>
+                        <input id="hero-search-reviews" name="q" type="text" class="bg-white" placeholder="Search posts..." value="<?php echo htmlspecialchars($q ?? ''); ?>">
+                        <button type="submit" class="mobiles-button bg-grey">Search</button>
+                    </form>
                 </div>
 
             </div>
@@ -353,29 +421,47 @@ $brands = $brands_stmt->fetchAll();
     <div class="container mt-0  ">
         <div class="row">
             <?php
-            $maxPosts = 6;
-            $postChunks = array_chunk(array_slice($posts, 0, $maxPosts), ceil($maxPosts / 2));
-            foreach ($postChunks as $colIndex => $colPosts):
+            if (empty($posts)):
             ?>
-                <div class="col-lg-4 col-md-6 col-12 sentizer-erx" style="background-color: #EEEEEE;">
-                    <?php foreach ($colPosts as $post): ?>
-                        <a href="post.php?slug=<?php echo urlencode($post['slug']); ?>">
-                            <div class="review-card mb-4" style="cursor:pointer;" onclick="window.location.href='post.php?slug=<?php echo urlencode($post['slug']); ?>'">
-                                <?php if (isset($post['featured_image']) && !empty($post['featured_image'])): ?>
-                                    <img style="cursor:pointer;" onclick="window.location.href='post.php?slug=<?php echo urlencode($post['slug']); ?>'" src="<?php echo htmlspecialchars($post['featured_image']); ?>" alt="<?php echo htmlspecialchars($post['title']); ?>">
-                                <?php endif; ?>
-                                <div class="review-card-body">
-                                    <div style="cursor:pointer;" onclick="window.location.href='post.php?slug=<?php echo urlencode($post['slug']); ?>'" class="review-card-title"><?php echo htmlspecialchars($post['title']); ?></div>
-                                    <div class="review-card-meta">
-                                        <span><?php echo date('M j, Y', strtotime($post['created_at'])); ?></span>
-                                        <span><i class="bi bi-chat-dots-fill"></i><?php echo $post['comment_count']; ?> comments</span>
+                <div class="col-12">
+                    <div class="alert alert-light border" role="alert">
+                        <?php if ($isTagFiltering): ?>
+                            No posts found with tag "<?php echo htmlspecialchars($tag); ?>".
+                        <?php elseif ($isSearching): ?>
+                            No posts found for "<?php echo htmlspecialchars($q); ?>".
+                        <?php else: ?>
+                            No posts to show.
+                        <?php endif; ?>
+                    </div>
+                </div>
+                <?php
+            else:
+                $maxPosts = count($posts);
+                $displayPosts = array_slice($posts, 0, $maxPosts);
+                $columns = max(1, ceil($maxPosts / 2));
+                $postChunks = array_chunk($displayPosts, $columns);
+                foreach ($postChunks as $colIndex => $colPosts):
+                ?>
+                    <div class="col-lg-4 col-md-6 col-12 sentizer-erx" style="background-color: #EEEEEE;">
+                        <?php foreach ($colPosts as $post): ?>
+                            <a href="post.php?slug=<?php echo urlencode($post['slug']); ?>">
+                                <div class="review-card mb-4" style="cursor:pointer;" onclick="window.location.href='post.php?slug=<?php echo urlencode($post['slug']); ?>'">
+                                    <?php if (isset($post['featured_image']) && !empty($post['featured_image'])): ?>
+                                        <img style="cursor:pointer;" onclick="window.location.href='post.php?slug=<?php echo urlencode($post['slug']); ?>'" src="<?php echo htmlspecialchars($post['featured_image']); ?>" alt="<?php echo htmlspecialchars($post['title']); ?>">
+                                    <?php endif; ?>
+                                    <div class="review-card-body">
+                                        <div style="cursor:pointer;" onclick="window.location.href='post.php?slug=<?php echo urlencode($post['slug']); ?>'" class="review-card-title"><?php echo htmlspecialchars($post['title']); ?></div>
+                                        <div class="review-card-meta">
+                                            <span><?php echo date('M j, Y', strtotime($post['created_at'])); ?></span>
+                                            <span><i class="bi bi-chat-dots-fill"></i><?php echo $post['comment_count']; ?> comments</span>
+                                        </div>
                                     </div>
                                 </div>
-                            </div>
-                        </a>
-                    <?php endforeach; ?>
-                </div>
-            <?php endforeach; ?>
+                            </a>
+                        <?php endforeach; ?>
+                    </div>
+            <?php endforeach;
+            endif; ?>
 
             <div class="col-lg-4  col-12  bg-white p-3">
 

@@ -69,6 +69,33 @@ foreach ($devices as $index => $device) {
     $devices[$index]['comment_count'] = $comment_stmt->fetch()['count'] ?? 0;
 }
 
+// Get popular tags (top 8 most appearing in published posts)
+// Using PostgreSQL unnest() for efficient array handling
+$popularTags = [];
+try {
+    $stmt = $pdo->prepare("
+        SELECT tag, COUNT(*) as count
+        FROM (
+            SELECT DISTINCT unnest(tags) as tag
+            FROM posts 
+            WHERE status ILIKE 'published'
+            AND tags IS NOT NULL 
+            AND array_length(tags, 1) > 0
+        ) tag_list
+        GROUP BY tag
+        ORDER BY count DESC
+        LIMIT 8
+    ");
+    $stmt->execute();
+    $tagResults = $stmt->fetchAll(PDO::FETCH_ASSOC);
+
+    foreach ($tagResults as $row) {
+        $popularTags[$row['tag']] = $row['count'];
+    }
+} catch (Exception $e) {
+    $popularTags = [];
+}
+
 // Get data for the three tables
 $topViewedDevices = [];
 $topReviewedDevices = [];
@@ -153,70 +180,70 @@ $latestDevices = array_slice(array_reverse($latestDevices), 0, 9);
     <link rel="stylesheet" href="style.css">
     <style>
         /* Brand Modal Styling */
-    .brand-cell-modal {
-      background-color: #fff;
-      border: 1px solid #c5b6b0;
-      color: #5D4037;
-      font-weight: 500;
-      transition: all 0.3s ease;
-      cursor: pointer;
-      font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue';
-    }
+        .brand-cell-modal {
+            background-color: #fff;
+            border: 1px solid #c5b6b0;
+            color: #5D4037;
+            font-weight: 500;
+            transition: all 0.3s ease;
+            cursor: pointer;
+            font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue';
+        }
 
-    .brand-cell-modal:hover {
-      background-color: #D7CCC8 !important;
-      border-color: #8D6E63;
-      transform: translateY(-2px);
-      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
-      color: #3E2723;
-    }
+        .brand-cell-modal:hover {
+            background-color: #D7CCC8 !important;
+            border-color: #8D6E63;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
+            color: #3E2723;
+        }
 
-    .brand-cell-modal:active {
-      transform: translateY(0);
-      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-    }
+        .brand-cell-modal:active {
+            transform: translateY(0);
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
 
-    .brand-cell-modal:focus {
-      outline: none;
-      box-shadow: 0 0 0 3px rgba(141, 110, 99, 0.25);
-    }
+        .brand-cell-modal:focus {
+            outline: none;
+            box-shadow: 0 0 0 3px rgba(141, 110, 99, 0.25);
+        }
 
-    #brandsModal .modal-dialog-scrollable {
-      max-height: 80vh;
-    }
+        #brandsModal .modal-dialog-scrollable {
+            max-height: 80vh;
+        }
 
-    /* Device Cell Modal Styling */
-    .device-cell-modal {
-      background-color: #fff;
-      border: 1px solid #c5b6b0;
-      color: #5D4037;
-      font-weight: 500;
-      transition: all 0.3s ease;
-      cursor: pointer;
-      font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue';
-    }
+        /* Device Cell Modal Styling */
+        .device-cell-modal {
+            background-color: #fff;
+            border: 1px solid #c5b6b0;
+            color: #5D4037;
+            font-weight: 500;
+            transition: all 0.3s ease;
+            cursor: pointer;
+            font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue';
+        }
 
-    .device-cell-modal:hover {
-      background-color: #D7CCC8 !important;
-      border-color: #8D6E63;
-      transform: translateY(-2px);
-      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
-      color: #3E2723;
-    }
+        .device-cell-modal:hover {
+            background-color: #D7CCC8 !important;
+            border-color: #8D6E63;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
+            color: #3E2723;
+        }
 
-    .device-cell-modal:active {
-      transform: translateY(0);
-      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-    }
+        .device-cell-modal:active {
+            transform: translateY(0);
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
 
-    .device-cell-modal:focus {
-      outline: none;
-      box-shadow: 0 0 0 3px rgba(141, 110, 99, 0.25);
-    }
+        .device-cell-modal:focus {
+            outline: none;
+            box-shadow: 0 0 0 3px rgba(141, 110, 99, 0.25);
+        }
 
-    #devicesModal .modal-dialog-scrollable {
-      max-height: 80vh;
-    }
+        #devicesModal .modal-dialog-scrollable {
+            max-height: 80vh;
+        }
     </style>
 </head>
 
@@ -351,14 +378,13 @@ $latestDevices = array_slice(array_reverse($latestDevices), 0, 9);
                         style="background-repeat: no-repeat; background-size: cover;" alt="">
                     <div class="position-absolute d-flex mt-1">
                         <label class="text-white whitening ">Popular Tags</label>
-                        <a href="featured.php?tag=Featured"><button class="mobiles-button">Featured</button></a>
-                        <a href="featured.php?tag=Android"><button class="mobiles-button">Android</button></a>
-                        <a href="featured.php?tag=Samsung"><button class="mobiles-button">Samsung</button></a>
-                        <a href="featured.php?tag=Nokia"><button class="mobiles-button">Nokia</button></a>
-                        <a href="featured.php?tag=Sony"><button class="mobiles-button">Sony</button></a>
-                        <a href="featured.php?tag=Rumors"><button class="mobiles-button">Rumors</button></a>
-                        <a href="featured.php?tag=Apple"><button class="mobiles-button">Apple</button></a>
-                        <a href="featured.php?tag=Motorola"><button class="mobiles-button">Motorola</button></a>
+                        <?php if (!empty($popularTags)): ?>
+                            <?php foreach ($popularTags as $tag => $count): ?>
+                                <a href="featured.php?tag=<?php echo urlencode($tag); ?>"><button class="mobiles-button"><?php echo htmlspecialchars($tag); ?></button></a>
+                            <?php endforeach; ?>
+                        <?php else: ?>
+                            <span class="text-white">No tags available</span>
+                        <?php endif; ?>
                     </div>
 
                     <form method="get" action="featured.php" class="comon">
@@ -646,57 +672,57 @@ $latestDevices = array_slice(array_reverse($latestDevices), 0, 9);
             </div>
         </div>
         <!-- Brands Modal -->
-    <div class="modal fade" id="brandsModal" tabindex="-1" aria-labelledby="brandsModalLabel" aria-hidden="true">
-      <div class="modal-dialog modal-lg modal-dialog-centered modal-dialog-scrollable">
-        <div class="modal-content" style="background-color: #EFEBE9; border: 2px solid #8D6E63;">
-          <div class="modal-header" style="border-bottom: 1px solid #8D6E63; background-color: #D7CCC8;">
-            <h5 class="modal-title" id="brandsModalLabel" style="font-family:system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue'; color: #5D4037;">
-              <i class="fas fa-industry me-2"></i>All Brands
-            </h5>
-            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-          </div>
-          <div class="modal-body">
-            <div class="row">
-              <?php if (!empty($brands)): ?>
-                <?php foreach ($brands as $brand): ?>
-                  <div class="col-lg-4 col-md-6 col-sm-6 mb-3">
-                    <button class="brand-cell-modal btn w-100 py-2 px-3" style="background-color: #fff; border: 1px solid #c5b6b0; color: #5D4037; font-weight: 500; transition: all 0.3s ease; cursor: pointer;" data-brand-id="<?php echo $brand['id']; ?>" onclick="selectBrandFromModal(<?php echo $brand['id']; ?>)">
-                      <?php echo htmlspecialchars($brand['name']); ?>
-                    </button>
-                  </div>
-                <?php endforeach; ?>
-              <?php else: ?>
-                <div class="col-12">
-                  <div class="text-center py-5">
-                    <i class="fas fa-industry fa-3x text-muted mb-3"></i>
-                    <h6 class="text-muted">No brands available</h6>
-                  </div>
+        <div class="modal fade" id="brandsModal" tabindex="-1" aria-labelledby="brandsModalLabel" aria-hidden="true">
+            <div class="modal-dialog modal-lg modal-dialog-centered modal-dialog-scrollable">
+                <div class="modal-content" style="background-color: #EFEBE9; border: 2px solid #8D6E63;">
+                    <div class="modal-header" style="border-bottom: 1px solid #8D6E63; background-color: #D7CCC8;">
+                        <h5 class="modal-title" id="brandsModalLabel" style="font-family:system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue'; color: #5D4037;">
+                            <i class="fas fa-industry me-2"></i>All Brands
+                        </h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body">
+                        <div class="row">
+                            <?php if (!empty($brands)): ?>
+                                <?php foreach ($brands as $brand): ?>
+                                    <div class="col-lg-4 col-md-6 col-sm-6 mb-3">
+                                        <button class="brand-cell-modal btn w-100 py-2 px-3" style="background-color: #fff; border: 1px solid #c5b6b0; color: #5D4037; font-weight: 500; transition: all 0.3s ease; cursor: pointer;" data-brand-id="<?php echo $brand['id']; ?>" onclick="selectBrandFromModal(<?php echo $brand['id']; ?>)">
+                                            <?php echo htmlspecialchars($brand['name']); ?>
+                                        </button>
+                                    </div>
+                                <?php endforeach; ?>
+                            <?php else: ?>
+                                <div class="col-12">
+                                    <div class="text-center py-5">
+                                        <i class="fas fa-industry fa-3x text-muted mb-3"></i>
+                                        <h6 class="text-muted">No brands available</h6>
+                                    </div>
+                                </div>
+                            <?php endif; ?>
+                        </div>
+                    </div>
                 </div>
-              <?php endif; ?>
             </div>
-          </div>
         </div>
-      </div>
-    </div>
 
-    <!-- Devices Modal (Phones by Brand) -->
-    <div class="modal fade" id="devicesModal" tabindex="-1" aria-labelledby="deviceModalLabel" aria-hidden="true">
-      <div class="modal-dialog modal-lg modal-dialog-centered modal-dialog-scrollable">
-        <div class="modal-content" style="background-color: #EFEBE9; border: 2px solid #8D6E63;">
-          <div class="modal-header" style="border-bottom: 1px solid #8D6E63; background-color: #D7CCC8;">
-            <h5 class="modal-title" id="deviceModalTitle" style="font-family:system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue'; color: #5D4037;">
-              Devices
-            </h5>
-            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-          </div>
-          <div class="modal-body" id="deviceModalBody">
-            <div class="text-center py-5">
-              <i class="fas fa-spinner fa-spin fa-2x text-muted"></i>
+        <!-- Devices Modal (Phones by Brand) -->
+        <div class="modal fade" id="devicesModal" tabindex="-1" aria-labelledby="deviceModalLabel" aria-hidden="true">
+            <div class="modal-dialog modal-lg modal-dialog-centered modal-dialog-scrollable">
+                <div class="modal-content" style="background-color: #EFEBE9; border: 2px solid #8D6E63;">
+                    <div class="modal-header" style="border-bottom: 1px solid #8D6E63; background-color: #D7CCC8;">
+                        <h5 class="modal-title" id="deviceModalTitle" style="font-family:system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue'; color: #5D4037;">
+                            Devices
+                        </h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body" id="deviceModalBody">
+                        <div class="text-center py-5">
+                            <i class="fas fa-spinner fa-spin fa-2x text-muted"></i>
+                        </div>
+                    </div>
+                </div>
             </div>
-          </div>
         </div>
-      </div>
-    </div>
         <script>
             // Handle clickable table rows for devices
             document.addEventListener('DOMContentLoaded', function() {
@@ -789,47 +815,47 @@ $latestDevices = array_slice(array_reverse($latestDevices), 0, 9);
                 });
             }, 5000);
             // Show brands modal
-  function showBrandsModal() {
-    const modal = new bootstrap.Modal(document.getElementById('brandsModal'));
-    modal.show();
-  }
+            function showBrandsModal() {
+                const modal = new bootstrap.Modal(document.getElementById('brandsModal'));
+                modal.show();
+            }
 
-  // Handle brand selection from modal
-  function selectBrandFromModal(brandId) {
-    // Close the brands modal
-    const brandsModal = bootstrap.Modal.getInstance(document.getElementById('brandsModal'));
-    if (brandsModal) {
-      brandsModal.hide();
-    }
+            // Handle brand selection from modal
+            function selectBrandFromModal(brandId) {
+                // Close the brands modal
+                const brandsModal = bootstrap.Modal.getInstance(document.getElementById('brandsModal'));
+                if (brandsModal) {
+                    brandsModal.hide();
+                }
 
-    // Fetch phones for this brand
-    fetch(`get_phones_by_brand.php?brand_id=${brandId}`)
-      .then(response => response.json())
-      .then(data => {
-        // Populate the devices modal with phones
-        displayPhonesModal(data, brandId);
-      })
-      .catch(error => {
-        console.error('Error fetching phones:', error);
-        alert('Failed to load phones');
-      });
-  }
+                // Fetch phones for this brand
+                fetch(`get_phones_by_brand.php?brand_id=${brandId}`)
+                    .then(response => response.json())
+                    .then(data => {
+                        // Populate the devices modal with phones
+                        displayPhonesModal(data, brandId);
+                    })
+                    .catch(error => {
+                        console.error('Error fetching phones:', error);
+                        alert('Failed to load phones');
+                    });
+            }
 
-  // Display phones in modal
-  function displayPhonesModal(phones, brandId) {
-    const container = document.getElementById('deviceModalBody');
-    const titleElement = document.getElementById('deviceModalTitle');
+            // Display phones in modal
+            function displayPhonesModal(phones, brandId) {
+                const container = document.getElementById('deviceModalBody');
+                const titleElement = document.getElementById('deviceModalTitle');
 
-    // Update title with brand name
-    const brandButton = document.querySelector(`[data-brand-id="${brandId}"]`);
-    const brandName = brandButton ? brandButton.textContent.trim() : 'Brand';
-    titleElement.innerHTML = `<i class="fas fa-mobile-alt me-2"></i>${brandName} - Devices`;
+                // Update title with brand name
+                const brandButton = document.querySelector(`[data-brand-id="${brandId}"]`);
+                const brandName = brandButton ? brandButton.textContent.trim() : 'Brand';
+                titleElement.innerHTML = `<i class="fas fa-mobile-alt me-2"></i>${brandName} - Devices`;
 
-    if (phones && phones.length > 0) {
-      let html = '<div class="row">';
-      phones.forEach(phone => {
-        const phoneImage = phone.image ? `<img src="${phone.image}" alt="${phone.name}" style="width: 100%; height: 120px; object-fit: contain; margin-bottom: 8px;" onerror="this.style.display='none';">` : '';
-        html += `
+                if (phones && phones.length > 0) {
+                    let html = '<div class="row">';
+                    phones.forEach(phone => {
+                        const phoneImage = phone.image ? `<img src="${phone.image}" alt="${phone.name}" style="width: 100%; height: 120px; object-fit: contain; margin-bottom: 8px;" onerror="this.style.display='none';">` : '';
+                        html += `
           <div class="col-lg-4 col-md-6 col-sm-6 mb-3">
             <button class="device-cell-modal btn w-100 p-0" style="background-color: #fff; border: 1px solid #c5b6b0; color: #5D4037; font-weight: 500; transition: all 0.3s ease; cursor: pointer; display: flex; flex-direction: column; align-items: center; overflow: hidden;" onclick="goToDevice(${phone.id})">
               ${phoneImage}
@@ -837,27 +863,27 @@ $latestDevices = array_slice(array_reverse($latestDevices), 0, 9);
             </button>
           </div>
         `;
-      });
-      html += '</div>';
-      container.innerHTML = html;
-    } else {
-      container.innerHTML = `
+                    });
+                    html += '</div>';
+                    container.innerHTML = html;
+                } else {
+                    container.innerHTML = `
         <div class="text-center py-5">
           <i class="fas fa-mobile-alt fa-3x text-muted mb-3"></i>
           <h6 class="text-muted">No devices available for this brand</h6>
         </div>
       `;
-    }
+                }
 
-    // Show devices modal
-    const devicesModal = new bootstrap.Modal(document.getElementById('devicesModal'));
-    devicesModal.show();
-  }
+                // Show devices modal
+                const devicesModal = new bootstrap.Modal(document.getElementById('devicesModal'));
+                devicesModal.show();
+            }
 
-  // Navigate to device page
-  function goToDevice(deviceId) {
-    window.location.href = `device.php?id=${deviceId}`;
-  }
+            // Navigate to device page
+            function goToDevice(deviceId) {
+                window.location.href = `device.php?id=${deviceId}`;
+            }
         </script>
         <script src="script.js"></script>
 </body>
