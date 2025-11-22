@@ -1180,6 +1180,10 @@ if ($_POST && isset($_POST['submit_comment'])) {
       font-weight: 100;
       font-size: 14px;
       color: black;
+      word-wrap: break-word;
+      overflow-wrap: break-word;
+      word-break: break-word;
+      max-width: 100%;
     }
 
 
