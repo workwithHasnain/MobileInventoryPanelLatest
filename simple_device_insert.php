@@ -56,14 +56,14 @@ function simpleAddDevice($phone)
         // Build the insert query matching exact schema column order
         $sql = "
             INSERT INTO phones (
-                release_date, name, brand_id, brand, year, availability, price, image, images,
+                release_date, name, brand_id, brand, year, availability, price, device_page_color, image, images,
                 network, launch, body, display, platform, memory,
                 main_camera, selfie_camera, sound, comms, features, battery, misc,
                 weight, thickness, os, storage, card_slot,
                 display_size, display_resolution, main_camera_resolution, main_camera_video,
                 ram, chipset_name, battery_capacity, wired_charging, wireless_charging
             ) VALUES (
-                :release_date, :name, :brand_id, :brand, :year, :availability, :price, :image, :images,
+                :release_date, :name, :brand_id, :brand, :year, :availability, :price, :device_page_color, :image, :images,
                 :network, :launch, :body, :display, :platform, :memory,
                 :main_camera, :selfie_camera, :sound, :comms, :features, :battery, :misc,
                 :weight, :thickness, :os, :storage, :card_slot,
@@ -89,6 +89,7 @@ function simpleAddDevice($phone)
             ':year' => $nullIfEmpty($phone['year'] ?? null),
             ':availability' => $nullIfEmpty($phone['availability'] ?? null),
             ':price' => $nullIfEmpty($phone['price'] ?? null),
+            ':device_page_color' => $nullIfEmpty($phone['device_page_color'] ?? null),
             ':image' => $nullIfEmpty($phone['image'] ?? null),
             ':images' => $toPostgresArray($phone['images'] ?? []),
 

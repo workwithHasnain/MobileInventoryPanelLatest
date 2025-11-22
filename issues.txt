@@ -22,7 +22,7 @@ System ui fonts in all pages -Done
 
 Css/ styles images, post body minor issues -> live
 
-Add color field for phones background
+Add color field for phones background -Done
 
 Brands modal -Done
 

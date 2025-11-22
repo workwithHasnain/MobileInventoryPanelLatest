@@ -66,6 +66,7 @@ function simpleUpdateDevice($id, $phone)
                 year = :year,
                 availability = :availability,
                 price = :price,
+                device_page_color = :device_page_color,
                 image = :image,
                 images = :images,
                 network = :network,
@@ -121,6 +122,7 @@ function simpleUpdateDevice($id, $phone)
             ':year' => $nullIfEmpty($phone['year'] ?? $existing['year'] ?? null),
             ':availability' => $nullIfEmpty($phone['availability'] ?? $existing['availability'] ?? null),
             ':price' => $nullIfEmpty($phone['price'] ?? $existing['price'] ?? null),
+            ':device_page_color' => $nullIfEmpty($phone['device_page_color'] ?? $existing['device_page_color'] ?? null),
             ':image' => $nullIfEmpty($imageVal),
             ':images' => $toPostgresArray($imagesVal ?? []),
 

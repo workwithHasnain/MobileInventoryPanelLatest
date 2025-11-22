@@ -162,6 +162,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             'year' => ($year === '') ? null : $year,
             'availability' => ($availability === '') ? null : $availability,
             'price' => ($price === '') ? null : $price,
+            'device_page_color' => !empty($_POST['device_page_color']) ? trim($_POST['device_page_color']) : null,
 
             // Highlight fields
             'weight' => !empty($_POST['weight']) ? trim($_POST['weight']) : null,
@@ -220,6 +221,7 @@ $brand = $device['brand'] ?? '';
 $year = $device['year'] ?? '';
 $availability = $device['availability'] ?? '';
 $price = $device['price'] ?? '';
+$device_page_color = $device['device_page_color'] ?? '#ffffff';
 
 // Highlights
 $pref_weight = $device['weight'] ?? '';
@@ -388,6 +390,14 @@ $pref_wireless_charging = $device['wireless_charging'] ?? '';
                                                         <div class="invalid-feedback"><?php echo htmlspecialchars($errors['price']); ?></div>
                                                     <?php endif; ?>
                                                 </div>
+                                            </div>
+
+                                            <div class="col-md-4 mb-3">
+                                                <label for="device_page_color" class="form-label">Device Page Color</label>
+                                                <input type="color" class="form-control form-control-color" id="device_page_color" name="device_page_color"
+                                                    value="<?php echo isset($_POST['device_page_color']) ? htmlspecialchars($_POST['device_page_color']) : htmlspecialchars($device_page_color); ?>"
+                                                    title="Choose a color for the device page theme">
+                                                <small class="form-text text-muted">Color theme for device page</small>
                                             </div>
 
                                             <!-- Highlight Fields Section -->

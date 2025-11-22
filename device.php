@@ -1421,7 +1421,12 @@ if ($_POST && isset($_POST['submit_comment'])) {
 
 
   <div class="d-lg-none d-block">
-    <div class="card" role="region" aria-label="<?php echo htmlspecialchars(($device['brand_name'] ?? '') . ' ' . ($device['name'] ?? 'Device')); ?> Phone Info">
+    <div class="card" role="region" aria-label="<?php echo htmlspecialchars(($device['brand_name'] ?? '') . ' ' . ($device['name'] ?? 'Device')); ?> Phone Info" style="<?php
+                                                                                                                                                                        if (!empty($device['device_page_color'])) {
+                                                                                                                                                                          $color = htmlspecialchars($device['device_page_color']);
+                                                                                                                                                                          echo "background: " . $color . " !important;";
+                                                                                                                                                                        }
+                                                                                                                                                                        ?>">
 
       <div class="article-info">
         <div class="bg-blur">
@@ -1544,7 +1549,12 @@ if ($_POST && isset($_POST['submit_comment'])) {
     style=" margin-top: 2rem; padding-left: 0;">
     <div class="row">
       <div class="col-md-8 ">
-        <div class="card" role="region" aria-label="<?php echo htmlspecialchars(($device['brand_name'] ?? '') . ' ' . ($device['name'] ?? 'Device')); ?> Phone Info">
+        <div class="card" role="region" aria-label="<?php echo htmlspecialchars(($device['brand_name'] ?? '') . ' ' . ($device['name'] ?? 'Device')); ?> Phone Info" style="<?php
+                                                                                                                                                                            if (!empty($device['device_page_color'])) {
+                                                                                                                                                                              $color = htmlspecialchars($device['device_page_color']);
+                                                                                                                                                                              echo "background: " . $color . " !important;";
+                                                                                                                                                                            }
+                                                                                                                                                                            ?>">
 
           <div class="article-info">
             <div class="bg-blur">

@@ -81,6 +81,7 @@ CREATE TABLE IF NOT EXISTS phones (
     year INTEGER,
     availability VARCHAR(50),
     price DECIMAL(10,2),
+    device_page_color VARCHAR(7), -- Hex color code (e.g., #ffffff)
     image VARCHAR(255),
     images TEXT[], -- Array of image paths
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,

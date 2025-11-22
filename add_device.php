@@ -104,6 +104,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             'year' => ($year === '') ? null : $year,
             'availability' => ($availability === '') ? null : $availability,
             'price' => ($price === '') ? null : $price,
+            'device_page_color' => !empty($_POST['device_page_color']) ? trim($_POST['device_page_color']) : null,
             'image' => $image_path,
             'images' => $image_paths,
 
@@ -305,6 +306,14 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                                                         <div class="invalid-feedback"><?php echo htmlspecialchars($errors['price']); ?></div>
                                                     <?php endif; ?>
                                                 </div>
+                                            </div>
+
+                                            <div class="col-md-4 mb-3">
+                                                <label for="device_page_color" class="form-label">Device Page Color</label>
+                                                <input type="color" class="form-control form-control-color" id="device_page_color" name="device_page_color"
+                                                    value="<?php echo isset($_POST['device_page_color']) ? htmlspecialchars($_POST['device_page_color']) : '#ffffff'; ?>"
+                                                    title="Choose a color for the device page theme">
+                                                <small class="form-text text-muted">Color theme for device page</small>
                                             </div>
 
                                             <!-- Highlight Fields Section -->
