@@ -24,9 +24,9 @@ Css/ styles images, post body minor issues -> live
 
 Add color field for phones background
 
-Brands modal
+Brands modal -Done
 
-Navbar (remove news and unwanted text) specially in mobile view
+Navbar (remove news and unwanted text) specially in mobile view -Done
 
 Json for phone finder
 
@@ -34,4 +34,6 @@ Login auth
 
 Subscribe Newsletter
 
-dynamic popular tags in featured.php
+dynamic popular tags in featured.php and reviews.php
+
+device highlights text issue in device page

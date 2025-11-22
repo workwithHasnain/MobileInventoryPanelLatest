@@ -368,6 +368,71 @@ if ($_POST && isset($_POST['action'])) {
             opacity: .5;
             cursor: not-allowed;
         }
+        /* Brand Modal Styling */
+        .brand-cell-modal {
+        background-color: #fff;
+        border: 1px solid #c5b6b0;
+        color: #5D4037;
+        font-weight: 500;
+        transition: all 0.3s ease;
+        cursor: pointer;
+        font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue';
+        }
+
+        .brand-cell-modal:hover {
+        background-color: #D7CCC8 !important;
+        border-color: #8D6E63;
+        transform: translateY(-2px);
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
+        color: #3E2723;
+        }
+
+        .brand-cell-modal:active {
+        transform: translateY(0);
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+
+        .brand-cell-modal:focus {
+        outline: none;
+        box-shadow: 0 0 0 3px rgba(141, 110, 99, 0.25);
+        }
+
+        #brandsModal .modal-dialog-scrollable {
+        max-height: 80vh;
+        }
+
+        /* Device Cell Modal Styling */
+        .device-cell-modal {
+        background-color: #fff;
+        border: 1px solid #c5b6b0;
+        color: #5D4037;
+        font-weight: 500;
+        transition: all 0.3s ease;
+        cursor: pointer;
+        font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue';
+        }
+
+        .device-cell-modal:hover {
+        background-color: #D7CCC8 !important;
+        border-color: #8D6E63;
+        transform: translateY(-2px);
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
+        color: #3E2723;
+        }
+
+        .device-cell-modal:active {
+        transform: translateY(0);
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+
+        .device-cell-modal:focus {
+        outline: none;
+        box-shadow: 0 0 0 3px rgba(141, 110, 99, 0.25);
+        }
+
+        #devicesModal .modal-dialog-scrollable {
+        max-height: 80vh;
+        }
     </style>
 </head>
 
@@ -454,15 +519,11 @@ if ($_POST && isset($_POST['action'])) {
         <div class="column">
             <a href="index.php">Home</a>
             <a href="reviews.php">Reviews</a>
-            <a href="videos.php">Videos</a>
+            <a href="#">Videos</a>
             <a href="featured.php">Featured</a>
             <a href="phonefinder.php">Phone Finder</a>
             <a href="compare.php">Compare</a>
-            <a href="#">Coverage</a>
-            <a href="contact">Contact Us</a>
-            <a href="#">Merch</a>
-            <a href="#">Tip Us</a>
-            <a href="#">Privacy</a>
+            <a href="#">Contact Us</a>
         </div>
         <div class="brand-grid">
             <?php
@@ -472,7 +533,7 @@ if ($_POST && isset($_POST['action'])) {
                     <a href="#" class="brand-cell" data-brand-id="<?php echo $brand['id']; ?>"><?php echo htmlspecialchars($brand['name']); ?></a>
             <?php endforeach;
             endforeach; ?>
-            <a href="brands.php">[...]</a>
+            <a href="#" onclick="showBrandsModal(); return false;" style="cursor: pointer;">[...]</a>
         </div>
         <div class="menu-buttons d-flex justify-content-center ">
             <button class="btn btn-danger w-50">📱 Phone Finder</button>
@@ -485,11 +546,11 @@ if ($_POST && isset($_POST['action'])) {
             <div class="col-12 d-flex align-items-center   colums-gap">
                 <a href="index.php" class="nav-link">Home</a>
                 <a href="compare.php" class="nav-link">Compare</a>
-                <a href="videos.php" class="nav-link">Videos</a>
+                <a href="#" class="nav-link">Videos</a>
                 <a href="reviews.php" class="nav-link ">Reviews</a>
                 <a href="featured.php" class="nav-link d-lg-block d-none">Featured</a>
                 <a href="phonefinder.php" class="nav-link d-lg-block d-none">Phone Finder</a>
-                <a href="contact.php" class="nav-link d-lg-block d-none">Contact</a>
+                <a href="#" class="nav-link d-lg-block d-none">Contact</a>
                 <div style="background-color: #d50000; border-radius: 7px;" class="d-lg-none py-2"><svg
                         xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" height="16" width="16" class="mx-3">
                         <path fill="#ffffff"
@@ -562,7 +623,7 @@ if ($_POST && isset($_POST['action'])) {
                     endif;
                     ?>
                 </div>
-                <button class="solid w-50 py-2">
+                <button class="solid w-50 py-2" onclick="showBrandsModal()">
                     <i class="fa-solid fa-bars fa-sm mx-2"></i>
                     All Brands</button>
                 <button class="solid py-2" style="    width: 177px;">
@@ -937,12 +998,8 @@ if ($_POST && isset($_POST['action'])) {
                 <div class="col-10 nav-wrap m-auto text-center ">
                     <div class="nav-container">
                         <a href="#">Home</a>
-
-                        <a href="#">Reviews</a>
-                        <a href="#">Compare</a>
-                        <a href="#">Coverage</a>
-                        <a href="#">Glossary</a>
-                        <a href="#">FAQ</a>
+                        <a href="reviews.php">Reviews</a>
+                        <a href="compare.php">Compare</a>
                         <a href="#"> <i class="fa-solid fa-wifi fa-sm"></i> RSS</a>
                         <a href="#"> <i class="fa-brands fa-youtube fa-sm"></i> YouTube</a>
                         <a href="#"> <i class="fa-brands fa-instagram fa-sm"></i> Instagram</a>
@@ -950,17 +1007,62 @@ if ($_POST && isset($_POST['action'])) {
                         <a href="#"> <i class="fa-brands fa-facebook-f fa-sm"></i> Facebook</a>
                         <a href="#"> <i class="fa-brands fa-twitter fa-sm"></i>Twitter</a>
                         <a href="#">© 2000-2025 GSMArena.com</a>
-                        <a href="#">Mobile version</a>
-                        <a href="#">Android app</a>
-                        <a href="#">Tools</a>
-                        <a href="contact.php">Contact us</a>
-                        <a href="#">Merch store</a>
-                        <a href="#">Privacy</a>
-                        <a href="#">Terms of use</a>
                     </div>
                 </div>
             </div>
         </div>
+        <!-- Brands Modal -->
+    <div class="modal fade" id="brandsModal" tabindex="-1" aria-labelledby="brandsModalLabel" aria-hidden="true">
+      <div class="modal-dialog modal-lg modal-dialog-centered modal-dialog-scrollable">
+        <div class="modal-content" style="background-color: #EFEBE9; border: 2px solid #8D6E63;">
+          <div class="modal-header" style="border-bottom: 1px solid #8D6E63; background-color: #D7CCC8;">
+            <h5 class="modal-title" id="brandsModalLabel" style="font-family:system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue'; color: #5D4037;">
+              <i class="fas fa-industry me-2"></i>All Brands
+            </h5>
+            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+          </div>
+          <div class="modal-body">
+            <div class="row">
+              <?php if (!empty($brands)): ?>
+                <?php foreach ($brands as $brand): ?>
+                  <div class="col-lg-4 col-md-6 col-sm-6 mb-3">
+                    <button class="brand-cell-modal btn w-100 py-2 px-3" style="background-color: #fff; border: 1px solid #c5b6b0; color: #5D4037; font-weight: 500; transition: all 0.3s ease; cursor: pointer;" data-brand-id="<?php echo $brand['id']; ?>" onclick="selectBrandFromModal(<?php echo $brand['id']; ?>)">
+                      <?php echo htmlspecialchars($brand['name']); ?>
+                    </button>
+                  </div>
+                <?php endforeach; ?>
+              <?php else: ?>
+                <div class="col-12">
+                  <div class="text-center py-5">
+                    <i class="fas fa-industry fa-3x text-muted mb-3"></i>
+                    <h6 class="text-muted">No brands available</h6>
+                  </div>
+                </div>
+              <?php endif; ?>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Devices Modal (Phones by Brand) -->
+    <div class="modal fade" id="devicesModal" tabindex="-1" aria-labelledby="deviceModalLabel" aria-hidden="true">
+      <div class="modal-dialog modal-lg modal-dialog-centered modal-dialog-scrollable">
+        <div class="modal-content" style="background-color: #EFEBE9; border: 2px solid #8D6E63;">
+          <div class="modal-header" style="border-bottom: 1px solid #8D6E63; background-color: #D7CCC8;">
+            <h5 class="modal-title" id="deviceModalTitle" style="font-family:system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue'; color: #5D4037;">
+              Devices
+            </h5>
+            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+          </div>
+          <div class="modal-body" id="deviceModalBody">
+            <div class="text-center py-5">
+              <i class="fas fa-spinner fa-spin fa-2x text-muted"></i>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
         <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
 
         <script>
@@ -1185,15 +1287,16 @@ if ($_POST && isset($_POST['action'])) {
                     });
                 });
 
-                // Handle brand cell clicks
+                // Handle brand cell clicks (from sidebar and mobile menu - open devices modal directly)
                 document.querySelectorAll('.brand-cell').forEach(function(cell) {
-                    cell.addEventListener('click', function() {
-                        const brandId = this.getAttribute('data-brand-id');
-                        if (brandId) {
-                            // Redirect to brands page with specific brand filter
-                            window.location.href = `brands.php?brand=${brandId}`;
-                        }
-                    });
+                cell.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    const brandId = this.getAttribute('data-brand-id');
+                    if (brandId) {
+                    // Directly open devices modal for this brand
+                    selectBrandFromModal(brandId);
+                    }
+                });
                 });
 
                 // Handle comparison row clicks
@@ -1267,6 +1370,76 @@ if ($_POST && isset($_POST['action'])) {
                     temp.src = heroImg.getAttribute('data-src');
                 }
             });
+            // Show brands modal
+  function showBrandsModal() {
+    const modal = new bootstrap.Modal(document.getElementById('brandsModal'));
+    modal.show();
+  }
+
+  // Handle brand selection from modal
+  function selectBrandFromModal(brandId) {
+    // Close the brands modal
+    const brandsModal = bootstrap.Modal.getInstance(document.getElementById('brandsModal'));
+    if (brandsModal) {
+      brandsModal.hide();
+    }
+
+    // Fetch phones for this brand
+    fetch(`get_phones_by_brand.php?brand_id=${brandId}`)
+      .then(response => response.json())
+      .then(data => {
+        // Populate the devices modal with phones
+        displayPhonesModal(data, brandId);
+      })
+      .catch(error => {
+        console.error('Error fetching phones:', error);
+        alert('Failed to load phones');
+      });
+  }
+
+  // Display phones in modal
+  function displayPhonesModal(phones, brandId) {
+    const container = document.getElementById('deviceModalBody');
+    const titleElement = document.getElementById('deviceModalTitle');
+
+    // Update title with brand name
+    const brandButton = document.querySelector(`[data-brand-id="${brandId}"]`);
+    const brandName = brandButton ? brandButton.textContent.trim() : 'Brand';
+    titleElement.innerHTML = `<i class="fas fa-mobile-alt me-2"></i>${brandName} - Devices`;
+
+    if (phones && phones.length > 0) {
+      let html = '<div class="row">';
+      phones.forEach(phone => {
+        const phoneImage = phone.image ? `<img src="${phone.image}" alt="${phone.name}" style="width: 100%; height: 120px; object-fit: contain; margin-bottom: 8px;" onerror="this.style.display='none';">` : '';
+        html += `
+          <div class="col-lg-4 col-md-6 col-sm-6 mb-3">
+            <button class="device-cell-modal btn w-100 p-0" style="background-color: #fff; border: 1px solid #c5b6b0; color: #5D4037; font-weight: 500; transition: all 0.3s ease; cursor: pointer; display: flex; flex-direction: column; align-items: center; overflow: hidden;" onclick="goToDevice(${phone.id})">
+              ${phoneImage}
+              <span style="padding: 8px 10px; width: 100%; text-align: center; font-size: 0.95rem;">${phone.name}</span>
+            </button>
+          </div>
+        `;
+      });
+      html += '</div>';
+      container.innerHTML = html;
+    } else {
+      container.innerHTML = `
+        <div class="text-center py-5">
+          <i class="fas fa-mobile-alt fa-3x text-muted mb-3"></i>
+          <h6 class="text-muted">No devices available for this brand</h6>
+        </div>
+      `;
+    }
+
+    // Show devices modal
+    const devicesModal = new bootstrap.Modal(document.getElementById('devicesModal'));
+    devicesModal.show();
+  }
+
+  // Navigate to device page
+  function goToDevice(deviceId) {
+    window.location.href = `device.php?id=${deviceId}`;
+  }
         </script>
         <script src="script.js"></script>
 </body>
