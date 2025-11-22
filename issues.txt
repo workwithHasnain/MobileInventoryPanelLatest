@@ -32,7 +32,7 @@ Json for phone finder
 
 Login auth
 
-Subscribe Newsletter
+Subscribe Newsletter -NOT ON GSM ARENA
 
 dynamic popular tags in featured.php and reviews.php -Done
 
