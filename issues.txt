@@ -34,3 +34,5 @@ Json for phone finder
 Login auth
 
 Subscribe Newsletter
+
+dynamic popular tags in featured.php
