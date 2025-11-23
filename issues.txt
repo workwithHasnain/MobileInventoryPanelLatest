@@ -21,10 +21,16 @@ phone-finder.php -Done
 System ui fonts in all pages -Done
 
 Css/ styles images, post body minor issues -> live
+    scrollbars in sidebar: latest devices
+    featured image css issue
+    featured posts in mobile view
+    search bar overfloating issue in mobile view
+    image size on device.php
+    reviews.php image updated with featured.php
 
 Add color field for phones background -Done
 
-Brands modal -Done
+Brands modal -test failed on homepage, rest is ok. while direct click on brand item. all brands is ok on all pages.
 
 Navbar (remove news and unwanted text) specially in mobile view -Done
 
@@ -32,7 +38,7 @@ Json for phone finder -Done
 
 Login auth
 
-Subscribe Newsletter -NOT ON GSM ARENA
+Subscribe Newsletter -Done
 
 dynamic popular tags in featured.php and reviews.php -Done
 

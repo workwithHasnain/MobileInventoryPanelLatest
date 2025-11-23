@@ -676,6 +676,27 @@ if ($_POST && isset($_POST['action'])) {
 
         </div>
     </div>
+    <!-- Newsletter Section -->
+    <div class="container mt-4 mb-4" style="max-width: 1034px;">
+      <div class="row">
+        <div class="col-12">
+          <div id="newsletter_message_container"></div>
+          <form id="newsletter_form" method="POST" action="" style="background-color: #EFEBE9; padding: 20px; border-radius: 4px; text-align: center;">
+            <p style="margin-bottom: 12px; color: #5D4037; font-weight: 500;">Subscribe to our newsletter</p>
+            <div style="display: flex; gap: 8px; justify-content: center; flex-wrap: wrap;">
+              <input type="email" id="newsletter_email" name="newsletter_email" placeholder="Enter your email" required style="padding: 10px 12px; border: 1px solid #8D6E63; border-radius: 4px; font-size: 14px; flex: 1; min-width: 200px; max-width: 300px; background-color: white;">
+              <style>
+                input::placeholder {
+                  color: #8D6E63;
+                  opacity: 0.7;
+                }
+              </style>
+              <button type="submit" id="newsletter_btn" style="padding: 10px 24px; background-color: #D50000; color: white; border: none; border-radius: 4px; cursor: pointer; font-size: 14px; white-space: nowrap; font-weight: 500;">Subscribe</button>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
     <div id="bottom" class="container d-flex py-3" style="max-width: 1034px;">
         <div class="row align-items-center">
             <div class="col-md-2 m-auto col-4 d-flex justify-content-center align-items-center "> <img
@@ -931,6 +952,74 @@ if ($_POST && isset($_POST['action'])) {
   function goToDevice(deviceId) {
     window.location.href = `device.php?id=${deviceId}`;
   }
+  
+  // Newsletter form AJAX handler
+  document.addEventListener('DOMContentLoaded', function() {
+    const form = document.getElementById('newsletter_form');
+    const messageContainer = document.getElementById('newsletter_message_container');
+    const emailInput = document.getElementById('newsletter_email');
+    const submitBtn = document.getElementById('newsletter_btn');
+
+    if (form) {
+      form.addEventListener('submit', function(e) {
+        e.preventDefault();
+
+        const email = emailInput.value.trim();
+        const originalBtnText = submitBtn.textContent;
+
+        if (!email) {
+          showMessage('Please enter an email address.', 'error');
+          return;
+        }
+
+        // Disable button and show loading state
+        submitBtn.disabled = true;
+        submitBtn.textContent = 'Subscribing...';
+
+        // Send AJAX request
+        fetch('handle_newsletter.php', {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/x-www-form-urlencoded'
+            },
+            body: 'newsletter_email=' + encodeURIComponent(email)
+          })
+          .then(response => response.json())
+          .then(data => {
+            if (data.success) {
+              showMessage(data.message, 'success');
+              emailInput.value = '';
+              // Auto-clear message after 5 seconds
+              setTimeout(() => {
+                messageContainer.innerHTML = '';
+              }, 5000);
+            } else {
+              showMessage(data.message, 'error');
+            }
+            submitBtn.disabled = false;
+            submitBtn.textContent = originalBtnText;
+          })
+          .catch(error => {
+            showMessage('An error occurred. Please try again.', 'error');
+            submitBtn.disabled = false;
+            submitBtn.textContent = originalBtnText;
+          });
+      });
+
+      function showMessage(message, type) {
+        const bgColor = type === 'success' ? '#4CAF50' : '#f44336';
+        messageContainer.innerHTML = '<div style="background-color: ' + bgColor + '; color: white; padding: 12px; border-radius: 4px; margin-bottom: 12px; text-align: center; animation: slideIn 0.3s ease-in-out;">' + message + '</div>';
+
+        // Add animation style
+        if (!document.querySelector('style[data-newsletter]')) {
+          const style = document.createElement('style');
+          style.setAttribute('data-newsletter', 'true');
+          style.textContent = '@keyframes slideIn { from { opacity: 0; transform: translateY(-10px); } to { opacity: 1; transform: translateY(0); } }';
+          document.head.appendChild(style);
+        }
+      }
+    }
+  });
     </script>
     <script src="script.js"></script>
 
