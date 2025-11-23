@@ -69,6 +69,31 @@ try {
             $response['success'] = true;
             $response['message'] = 'Status updated successfully!';
         }
+    } elseif ($action === 'export') {
+        // Export subscribers based on status
+        $status = $_POST['status'] ?? 'all';
+
+        if ($status === 'all') {
+            $stmt = $pdo->prepare("SELECT email FROM newsletter_subscribers ORDER BY subscribed_at DESC");
+            $stmt->execute();
+        } else if (in_array($status, ['active', 'inactive'])) {
+            $stmt = $pdo->prepare("SELECT email FROM newsletter_subscribers WHERE status = ? ORDER BY subscribed_at DESC");
+            $stmt->execute([$status]);
+        } else {
+            $response['message'] = 'Invalid status parameter.';
+            echo json_encode($response);
+            exit;
+        }
+
+        $subscribers = $stmt->fetchAll(PDO::FETCH_ASSOC);
+        $emails = array_map(function ($subscriber) {
+            return $subscriber['email'];
+        }, $subscribers);
+
+        // Return as plain text (comma-separated)
+        header('Content-Type: text/plain; charset=utf-8');
+        echo implode(', ', $emails);
+        exit;
     } else {
         $response['message'] = 'Invalid action.';
     }

@@ -349,8 +349,11 @@ if (isset($_SESSION['success_message'])) {
 
                 <!-- Add Subscriber Form -->
                 <div class="card mb-4">
-                    <div class="card-header">
+                    <div class="card-header d-flex justify-content-between align-items-center">
                         <h6 class="card-title mb-0"><i class="fas fa-plus me-2"></i>Add New Subscriber</h6>
+                        <button class="btn btn-sm btn-success" type="button" id="export_subscribers_btn" data-bs-toggle="modal" data-bs-target="#exportSubscribersModal">
+                            <i class="fas fa-download me-1"></i>Export
+                        </button>
                     </div>
                     <div class="card-body">
                         <div class="input-group">
@@ -369,6 +372,34 @@ if (isset($_SESSION['success_message'])) {
                             <span class="visually-hidden">Loading...</span>
                         </div>
                     </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Export Subscribers Modal -->
+<div class="modal fade" id="exportSubscribersModal" tabindex="-1" aria-labelledby="exportSubscribersLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="exportSubscribersLabel">
+                    <i class="fas fa-download me-2"></i>Export Newsletter Subscribers
+                </h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <p>Choose which subscribers to export:</p>
+                <div class="d-grid gap-3">
+                    <button type="button" class="btn btn-outline-success btn-lg" id="export_active_btn">
+                        <i class="fas fa-check-circle me-2"></i>Export Active Subscribers
+                    </button>
+                    <button type="button" class="btn btn-outline-secondary btn-lg" id="export_inactive_btn">
+                        <i class="fas fa-times-circle me-2"></i>Export Inactive Subscribers
+                    </button>
+                    <button type="button" class="btn btn-outline-primary btn-lg" id="export_all_btn">
+                        <i class="fas fa-list me-2"></i>Export All Subscribers
+                    </button>
                 </div>
             </div>
         </div>
@@ -574,6 +605,9 @@ if (isset($_SESSION['success_message'])) {
                     <td>${statusBadge}</td>
                     <td><small class="text-muted">${subscribedDate}</small></td>
                     <td>
+                        <button class="btn btn-sm btn-${subscriber.status === 'active' ? 'warning' : 'success'}" onclick="toggleSubscriberStatus(${subscriber.id}, '${subscriber.status}')">
+                            <i class="fas fa-${subscriber.status === 'active' ? 'pause' : 'play'}"></i> ${subscriber.status === 'active' ? 'Deactivate' : 'Activate'}
+                        </button>
                         <button class="btn btn-sm btn-danger" onclick="removeSubscriber(${subscriber.id})">
                             <i class="fas fa-trash"></i> Remove
                         </button>
@@ -657,6 +691,30 @@ if (isset($_SESSION['success_message'])) {
             });
     }
 
+    function toggleSubscriberStatus(id, currentStatus) {
+        const newStatus = currentStatus === 'active' ? 'inactive' : 'active';
+
+        fetch('manage_newsletter_subscribers.php', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/x-www-form-urlencoded'
+                },
+                body: 'action=status&id=' + id + '&status=' + newStatus
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    showNewsletterMessage(data.message, 'success');
+                    loadNewsletterSubscribers();
+                } else {
+                    showNewsletterMessage(data.message, 'danger');
+                }
+            })
+            .catch(error => {
+                showNewsletterMessage('Error: ' + error, 'danger');
+            });
+    }
+
     function showNewsletterMessage(message, type) {
         const messageDiv = document.getElementById('newsletter_message');
         messageDiv.className = 'alert alert-' + type + ' alert-dismissible fade show';
@@ -680,9 +738,85 @@ if (isset($_SESSION['success_message'])) {
         return text.replace(/[&<>"']/g, m => map[m]);
     }
 
+    // ===== Newsletter Export =====
+    const exportActiveBtn = document.getElementById('export_active_btn');
+    const exportInactiveBtn = document.getElementById('export_inactive_btn');
+    const exportAllBtn = document.getElementById('export_all_btn');
+
+    if (exportActiveBtn) {
+        exportActiveBtn.addEventListener('click', function() {
+            exportSubscribers('active');
+        });
+    }
+
+    if (exportInactiveBtn) {
+        exportInactiveBtn.addEventListener('click', function() {
+            exportSubscribers('inactive');
+        });
+    }
+
+    if (exportAllBtn) {
+        exportAllBtn.addEventListener('click', function() {
+            exportSubscribers('all');
+        });
+    }
+
+    function exportSubscribers(status) {
+        // Show loading state
+        const activeBtn = document.getElementById('export_active_btn');
+        const inactiveBtn = document.getElementById('export_inactive_btn');
+        const allBtn = document.getElementById('export_all_btn');
+
+        // Disable all buttons temporarily
+        activeBtn.disabled = true;
+        inactiveBtn.disabled = true;
+        allBtn.disabled = true;
+
+        fetch('manage_newsletter_subscribers.php', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/x-www-form-urlencoded'
+                },
+                body: 'action=export&status=' + encodeURIComponent(status)
+            })
+            .then(response => response.text())
+            .then(data => {
+                // Create a blob and download
+                const blob = new Blob([data], {
+                    type: 'text/plain'
+                });
+                const url = window.URL.createObjectURL(blob);
+                const a = document.createElement('a');
+                a.href = url;
+                const today = new Date().toISOString().split('T')[0];
+                const filename = status === 'all' ? `all_subscribers_${today}.txt` : `${status}_subscribers_${today}.txt`;
+                a.download = filename;
+                document.body.appendChild(a);
+                a.click();
+                window.URL.revokeObjectURL(url);
+                document.body.removeChild(a);
+
+                // Close modal and show success message
+                const exportModal = bootstrap.Modal.getInstance(document.getElementById('exportSubscribersModal'));
+                if (exportModal) {
+                    exportModal.hide();
+                }
+                showNewsletterMessage('Subscribers exported successfully!', 'success');
+            })
+            .catch(error => {
+                showNewsletterMessage('Error exporting subscribers: ' + error, 'danger');
+            })
+            .finally(() => {
+                // Re-enable buttons
+                activeBtn.disabled = false;
+                inactiveBtn.disabled = false;
+                allBtn.disabled = false;
+            });
+    }
+
     // ===== Authentication Management =====
     const authModal = document.getElementById('authModal');
-    
+
     if (authModal) {
         authModal.addEventListener('show.bs.modal', function() {
             loadAuthUsers();
@@ -693,20 +827,22 @@ if (isset($_SESSION['success_message'])) {
 
     function loadAuthUsers() {
         const container = document.getElementById('auth_users_container');
-        
+
         fetch('auth_management_handler.php', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/x-www-form-urlencoded',
-            },
-            body: new URLSearchParams({ action: 'list' })
-        })
-        .then(response => response.json())
-        .then(data => {
-            if (data.success && data.users) {
-                let html = '';
-                data.users.forEach(user => {
-                    html += `
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/x-www-form-urlencoded',
+                },
+                body: new URLSearchParams({
+                    action: 'list'
+                })
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success && data.users) {
+                    let html = '';
+                    data.users.forEach(user => {
+                        html += `
                         <div class="card mb-2">
                             <div class="card-body">
                                 <div class="row align-items-center">
@@ -733,15 +869,15 @@ if (isset($_SESSION['success_message'])) {
                             </div>
                         </div>
                     `;
-                });
-                container.innerHTML = html;
-            } else {
-                container.innerHTML = '<div class="alert alert-danger">Failed to load users</div>';
-            }
-        })
-        .catch(error => {
-            container.innerHTML = '<div class="alert alert-danger">Error loading users: ' + error + '</div>';
-        });
+                    });
+                    container.innerHTML = html;
+                } else {
+                    container.innerHTML = '<div class="alert alert-danger">Failed to load users</div>';
+                }
+            })
+            .catch(error => {
+                container.innerHTML = '<div class="alert alert-danger">Error loading users: ' + error + '</div>';
+            });
     }
 
     function addAuthUser() {
@@ -768,43 +904,43 @@ if (isset($_SESSION['success_message'])) {
         btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Adding...';
 
         fetch('auth_management_handler.php', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/x-www-form-urlencoded',
-            },
-            body: new URLSearchParams({
-                action: 'add',
-                username: username,
-                password: password
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/x-www-form-urlencoded',
+                },
+                body: new URLSearchParams({
+                    action: 'add',
+                    username: username,
+                    password: password
+                })
             })
-        })
-        .then(response => response.json())
-        .then(data => {
-            if (data.success) {
-                showAuthMessage(data.message, 'success');
-                document.getElementById('new_username').value = '';
-                document.getElementById('new_password').value = '';
-                loadAuthUsers();
-                setTimeout(() => {
-                    document.getElementById('auth_message').style.display = 'none';
-                }, 3000);
-            } else {
-                showAuthMessage(data.message, 'danger');
-            }
-            btn.disabled = false;
-            btn.innerHTML = '<i class="fas fa-plus me-1"></i>Add User';
-        })
-        .catch(error => {
-            showAuthMessage('Error: ' + error, 'danger');
-            btn.disabled = false;
-            btn.innerHTML = '<i class="fas fa-plus me-1"></i>Add User';
-        });
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    showAuthMessage(data.message, 'success');
+                    document.getElementById('new_username').value = '';
+                    document.getElementById('new_password').value = '';
+                    loadAuthUsers();
+                    setTimeout(() => {
+                        document.getElementById('auth_message').style.display = 'none';
+                    }, 3000);
+                } else {
+                    showAuthMessage(data.message, 'danger');
+                }
+                btn.disabled = false;
+                btn.innerHTML = '<i class="fas fa-plus me-1"></i>Add User';
+            })
+            .catch(error => {
+                showAuthMessage('Error: ' + error, 'danger');
+                btn.disabled = false;
+                btn.innerHTML = '<i class="fas fa-plus me-1"></i>Add User';
+            });
     }
 
     function updateAuthUser(id) {
         const usernameInput = document.querySelector(`.username-input[data-user-id="${id}"]`);
         const passwordInput = document.querySelector(`.password-input[data-user-id="${id}"]`);
-        
+
         const username = usernameInput.value.trim();
         const password = passwordInput.value.trim();
 
@@ -824,33 +960,33 @@ if (isset($_SESSION['success_message'])) {
         }
 
         fetch('auth_management_handler.php', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/x-www-form-urlencoded',
-            },
-            body: new URLSearchParams({
-                action: 'update',
-                id: id,
-                username: username,
-                password: password
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/x-www-form-urlencoded',
+                },
+                body: new URLSearchParams({
+                    action: 'update',
+                    id: id,
+                    username: username,
+                    password: password
+                })
             })
-        })
-        .then(response => response.json())
-        .then(data => {
-            if (data.success) {
-                showAuthMessage(data.message, 'success');
-                passwordInput.value = '';
-                loadAuthUsers();
-                setTimeout(() => {
-                    document.getElementById('auth_message').style.display = 'none';
-                }, 3000);
-            } else {
-                showAuthMessage(data.message, 'danger');
-            }
-        })
-        .catch(error => {
-            showAuthMessage('Error: ' + error, 'danger');
-        });
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    showAuthMessage(data.message, 'success');
+                    passwordInput.value = '';
+                    loadAuthUsers();
+                    setTimeout(() => {
+                        document.getElementById('auth_message').style.display = 'none';
+                    }, 3000);
+                } else {
+                    showAuthMessage(data.message, 'danger');
+                }
+            })
+            .catch(error => {
+                showAuthMessage('Error: ' + error, 'danger');
+            });
     }
 
     function deleteAuthUser(id) {
@@ -859,30 +995,30 @@ if (isset($_SESSION['success_message'])) {
         }
 
         fetch('auth_management_handler.php', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/x-www-form-urlencoded',
-            },
-            body: new URLSearchParams({
-                action: 'delete',
-                id: id
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/x-www-form-urlencoded',
+                },
+                body: new URLSearchParams({
+                    action: 'delete',
+                    id: id
+                })
             })
-        })
-        .then(response => response.json())
-        .then(data => {
-            if (data.success) {
-                showAuthMessage(data.message, 'success');
-                loadAuthUsers();
-                setTimeout(() => {
-                    document.getElementById('auth_message').style.display = 'none';
-                }, 3000);
-            } else {
-                showAuthMessage(data.message, 'danger');
-            }
-        })
-        .catch(error => {
-            showAuthMessage('Error: ' + error, 'danger');
-        });
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    showAuthMessage(data.message, 'success');
+                    loadAuthUsers();
+                    setTimeout(() => {
+                        document.getElementById('auth_message').style.display = 'none';
+                    }, 3000);
+                } else {
+                    showAuthMessage(data.message, 'danger');
+                }
+            })
+            .catch(error => {
+                showAuthMessage('Error: ' + error, 'danger');
+            });
     }
 
     function showAuthMessage(message, type) {
