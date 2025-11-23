@@ -348,15 +348,15 @@ function formatDeviceSpecs($device)
     'LAUNCH' => $device['launch'] ?? null,
     'BODY' => $device['body'] ?? null,
     'DISPLAY' => $device['display'] ?? null,
-    'HARDWARE' => $device['platform'] ?? null,
+    'HARDWARE' => $device['hardware'] ?? null,
     'MEMORY' => $device['memory'] ?? null,
     'MAIN CAMERA' => $device['main_camera'] ?? null,
     'SELFIE CAMERA' => $device['selfie_camera'] ?? null,
-    'MULTIMEDIA' => $device['sound'] ?? null,
-    'CONNECTIVITY' => $device['comms'] ?? null,
+    'MULTIMEDIA' => $device['multimedia'] ?? null,
+    'CONNECTIVITY' => $device['connectivity'] ?? null,
     'FEATURES' => $device['features'] ?? null,
     'BATTERY' => $device['battery'] ?? null,
-    'GENERAL INFO' => $device['misc'] ?? null,
+    'GENERAL INFO' => $device['general_info'] ?? null,
   ];
 
   foreach ($jsonSections as $label => $raw) {

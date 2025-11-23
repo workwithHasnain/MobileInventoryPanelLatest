@@ -187,15 +187,15 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             'launch' => isset($_POST['launch']) ? $_POST['launch'] : null,
             'body' => isset($_POST['body']) ? $_POST['body'] : null,
             'display' => isset($_POST['display']) ? $_POST['display'] : null,
-            'platform' => isset($_POST['platform']) ? $_POST['platform'] : null,
+            'hardware' => isset($_POST['hardware']) ? $_POST['hardware'] : null,
             'memory' => isset($_POST['memory']) ? $_POST['memory'] : null,
             'main_camera' => isset($_POST['main_camera']) ? $_POST['main_camera'] : null,
             'selfie_camera' => isset($_POST['selfie_camera']) ? $_POST['selfie_camera'] : null,
-            'sound' => isset($_POST['sound']) ? $_POST['sound'] : null,
-            'comms' => isset($_POST['comms']) ? $_POST['comms'] : null,
+            'multimedia' => isset($_POST['multimedia']) ? $_POST['multimedia'] : null,
+            'connectivity' => isset($_POST['connectivity']) ? $_POST['connectivity'] : null,
             'features' => isset($_POST['features']) ? $_POST['features'] : null,
             'battery' => isset($_POST['battery']) ? $_POST['battery'] : null,
-            'misc' => isset($_POST['misc']) ? $_POST['misc'] : null,
+            'general_info' => isset($_POST['general_info']) ? $_POST['general_info'] : null,
         ];
 
         // ALWAYS include merged images in the update (finalImages has existing + new uploads merged)
@@ -825,15 +825,15 @@ $pref_wireless_charging = $device['wireless_charging'] ?? '';
                             <input type="hidden" name="launch" id="spec_launch" value="<?php echo htmlspecialchars($device['launch'] ?? ''); ?>" />
                             <input type="hidden" name="body" id="spec_body" value="<?php echo htmlspecialchars($device['body'] ?? ''); ?>" />
                             <input type="hidden" name="display" id="spec_display" value="<?php echo htmlspecialchars($device['display'] ?? ''); ?>" />
-                            <input type="hidden" name="platform" id="spec_platform" value="<?php echo htmlspecialchars($device['platform'] ?? ''); ?>" />
+                            <input type="hidden" name="hardware" id="spec_hardware" value="<?php echo htmlspecialchars($device['hardware'] ?? ''); ?>" />
                             <input type="hidden" name="memory" id="spec_memory" value="<?php echo htmlspecialchars($device['memory'] ?? ''); ?>" />
                             <input type="hidden" name="main_camera" id="spec_main_camera" value="<?php echo htmlspecialchars($device['main_camera'] ?? ''); ?>" />
                             <input type="hidden" name="selfie_camera" id="spec_selfie_camera" value="<?php echo htmlspecialchars($device['selfie_camera'] ?? ''); ?>" />
-                            <input type="hidden" name="sound" id="spec_sound" value="<?php echo htmlspecialchars($device['sound'] ?? ''); ?>" />
-                            <input type="hidden" name="comms" id="spec_comms" value="<?php echo htmlspecialchars($device['comms'] ?? ''); ?>" />
+                            <input type="hidden" name="multimedia" id="spec_multimedia" value="<?php echo htmlspecialchars($device['multimedia'] ?? ''); ?>" />
+                            <input type="hidden" name="connectivity" id="spec_connectivity" value="<?php echo htmlspecialchars($device['connectivity'] ?? ''); ?>" />
                             <input type="hidden" name="features" id="spec_features" value="<?php echo htmlspecialchars($device['features'] ?? ''); ?>" />
                             <input type="hidden" name="battery" id="spec_battery" value="<?php echo htmlspecialchars($device['battery'] ?? ''); ?>" />
-                            <input type="hidden" name="misc" id="spec_misc" value="<?php echo htmlspecialchars($device['misc'] ?? ''); ?>" />
+                            <input type="hidden" name="general_info" id="spec_general_info" value="<?php echo htmlspecialchars($device['general_info'] ?? ''); ?>" />
                         </div>
 
                         <div class="d-flex justify-content-end mt-3">
@@ -957,15 +957,15 @@ $pref_wireless_charging = $device['wireless_charging'] ?? '';
                 'Launch': 'launch',
                 'Body': 'body',
                 'Display': 'display',
-                'Hardware': 'platform',
+                'Hardware': 'hardware',
                 'Memory': 'memory',
                 'Main Camera': 'main_camera',
                 'Selfie camera': 'selfie_camera',
-                'Multimedia': 'sound',
-                'Connectivity': 'comms',
+                'Multimedia': 'multimedia',
+                'Connectivity': 'connectivity',
                 'Features': 'features',
                 'Battery': 'battery',
-                'General Info': 'misc'
+                'General Info': 'general_info'
             };
 
             const getJsonArray = (key) => {
@@ -1145,15 +1145,15 @@ $pref_wireless_charging = $device['wireless_charging'] ?? '';
                     'Launch': 'launch',
                     'Body': 'body',
                     'Display': 'display',
-                    'Hardware': 'platform',
+                    'Hardware': 'hardware',
                     'Memory': 'memory',
                     'Main Camera': 'main_camera',
                     'Selfie camera': 'selfie_camera',
-                    'Multimedia': 'sound',
-                    'Connectivity': 'comms',
+                    'Multimedia': 'multimedia',
+                    'Connectivity': 'connectivity',
                     'Features': 'features',
                     'Battery': 'battery',
-                    'General Info': 'misc'
+                    'General Info': 'general_info'
                 };
 
                 // Initialize containers
@@ -1193,15 +1193,15 @@ $pref_wireless_charging = $device['wireless_charging'] ?? '';
                 setVal('spec_launch', dataByKey['launch']);
                 setVal('spec_body', dataByKey['body']);
                 setVal('spec_display', dataByKey['display']);
-                setVal('spec_platform', dataByKey['platform']);
+                setVal('spec_hardware', dataByKey['hardware']);
                 setVal('spec_memory', dataByKey['memory']);
                 setVal('spec_main_camera', dataByKey['main_camera']);
                 setVal('spec_selfie_camera', dataByKey['selfie_camera']);
-                setVal('spec_sound', dataByKey['sound']);
-                setVal('spec_comms', dataByKey['comms']);
+                setVal('spec_multimedia', dataByKey['multimedia']);
+                setVal('spec_connectivity', dataByKey['connectivity']);
                 setVal('spec_features', dataByKey['features']);
                 setVal('spec_battery', dataByKey['battery']);
-                setVal('spec_misc', dataByKey['misc']);
+                setVal('spec_general_info', dataByKey['general_info']);
             });
         }
     });

@@ -57,15 +57,15 @@ function simpleAddDevice($phone)
         $sql = "
             INSERT INTO phones (
                 release_date, name, brand_id, brand, year, availability, price, device_page_color, image, images,
-                network, launch, body, display, platform, memory,
-                main_camera, selfie_camera, sound, comms, features, battery, misc,
+                network, launch, body, display, hardware, memory,
+                main_camera, selfie_camera, multimedia, connectivity, features, battery, general_info,
                 weight, thickness, os, storage, card_slot,
                 display_size, display_resolution, main_camera_resolution, main_camera_video,
                 ram, chipset_name, battery_capacity, wired_charging, wireless_charging
             ) VALUES (
                 :release_date, :name, :brand_id, :brand, :year, :availability, :price, :device_page_color, :image, :images,
-                :network, :launch, :body, :display, :platform, :memory,
-                :main_camera, :selfie_camera, :sound, :comms, :features, :battery, :misc,
+                :network, :launch, :body, :display, :hardware, :memory,
+                :main_camera, :selfie_camera, :multimedia, :connectivity, :features, :battery, :general_info,
                 :weight, :thickness, :os, :storage, :card_slot,
                 :display_size, :display_resolution, :main_camera_resolution, :main_camera_video,
                 :ram, :chipset_name, :battery_capacity, :wired_charging, :wireless_charging
@@ -98,15 +98,15 @@ function simpleAddDevice($phone)
             ':launch' => $nullIfEmpty($phone['launch'] ?? null),
             ':body' => $nullIfEmpty($phone['body'] ?? null),
             ':display' => $nullIfEmpty($phone['display'] ?? null),
-            ':platform' => $nullIfEmpty($phone['platform'] ?? null),
+            ':hardware' => $nullIfEmpty($phone['hardware'] ?? null),
             ':memory' => $nullIfEmpty($phone['memory'] ?? null),
             ':main_camera' => $nullIfEmpty($phone['main_camera'] ?? null),
             ':selfie_camera' => $nullIfEmpty($phone['selfie_camera'] ?? null),
-            ':sound' => $nullIfEmpty($phone['sound'] ?? null),
-            ':comms' => $nullIfEmpty($phone['comms'] ?? null),
+            ':multimedia' => $nullIfEmpty($phone['multimedia'] ?? null),
+            ':connectivity' => $nullIfEmpty($phone['connectivity'] ?? null),
             ':features' => $nullIfEmpty($phone['features'] ?? null),
             ':battery' => $nullIfEmpty($phone['battery'] ?? null),
-            ':misc' => $nullIfEmpty($phone['misc'] ?? null),
+            ':general_info' => $nullIfEmpty($phone['general_info'] ?? null),
 
             // Highlight fields
             ':weight' => $nullIfEmpty($phone['weight'] ?? null),

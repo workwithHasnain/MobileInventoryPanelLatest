@@ -204,8 +204,8 @@ try {
 
     // OS family filtering (Android/iOS/Other)
     if (!empty($osFamilies)) {
-        // Search across direct OS column and platform text as fallback
-        $osExpr = "COALESCE(p.os, '') || ' ' || COALESCE(p.platform, '')";
+        // Search across direct OS column and hardware text as fallback
+        $osExpr = "COALESCE(p.os, '') || ' ' || COALESCE(p.hardware, '')";
         $conditions = [];
         $onlyOther = (count($osFamilies) === 1 && strtolower($osFamilies[0]) === 'other');
         foreach ($osFamilies as $fam) {
@@ -229,8 +229,8 @@ try {
     // Min OS version (extract first number) only applied if provided
     if ($osVersionMin !== null && $osVersionMin !== '' && intval($osVersionMin) > 0) {
         $osVersionMin = intval($osVersionMin);
-        // Extract from os; if null, try platform text
-        $query .= " AND CAST(substring(COALESCE(p.os, p.platform, '0') FROM '([0-9]+)') AS INTEGER) >= ?";
+        // Extract from os; if null, try hardware text
+        $query .= " AND CAST(substring(COALESCE(p.os, p.hardware, '0') FROM '([0-9]+)') AS INTEGER) >= ?";
         $params[] = $osVersionMin;
     }
 
@@ -240,16 +240,16 @@ try {
         $params[] = '%' . $chipsetQuery . '%';
     }
 
-    // CPU min GHz (parse from platform text: e.g., "3.2 GHz" or "3200 MHz").
+    // CPU min GHz (parse from hardware text: e.g., "3.2 GHz" or "3200 MHz").
     if ($cpuClockMin !== null && $cpuClockMin !== '' && floatval($cpuClockMin) > 0) {
         $cpuClockMin = floatval($cpuClockMin);
         $query .= " AND COALESCE((
             SELECT MAX(freq_ghz) FROM (
                 SELECT CAST((r)[1] AS DECIMAL) AS freq_ghz
-                FROM regexp_matches(COALESCE(p.platform, ''), '([0-9]+\\.?[0-9]*)\\s*GHz', 'g') AS r
+                FROM regexp_matches(COALESCE(p.hardware, ''), '([0-9]+\\.?[0-9]*)\\s*GHz', 'g') AS r
                 UNION ALL
                 SELECT CAST((r2)[1] AS DECIMAL) / 1000.0 AS freq_ghz
-                FROM regexp_matches(COALESCE(p.platform, ''), '([0-9]+\\.?[0-9]*)\\s*MHz', 'g') AS r2
+                FROM regexp_matches(COALESCE(p.hardware, ''), '([0-9]+\\.?[0-9]*)\\s*MHz', 'g') AS r2
             ) t
         ), 0) >= ?";
         $params[] = $cpuClockMin;
@@ -309,7 +309,7 @@ try {
         $params[] = $wirelessChargeMin;
     }
 
-    // Network/SIM filters - parse JSON from network, body, or comms columns
+    // Network/SIM filters - parse JSON from network, body, or connectivity columns
     // These filters require checking JSON data stored in TEXT columns
 
     // Helper to check if network JSON contains specific bands
@@ -368,12 +368,12 @@ try {
 
     // Dual SIM filter - check body or network JSON for dual SIM mention
     if ($dualSimRequired) {
-        $query .= " AND (p.body ILIKE '%Dual SIM%' OR p.network ILIKE '%Dual SIM%' OR p.comms ILIKE '%Dual SIM%')";
+        $query .= " AND (p.body ILIKE '%Dual SIM%' OR p.network ILIKE '%Dual SIM%' OR p.connectivity ILIKE '%Dual SIM%')";
     }
 
     // eSIM filter - check body or network JSON for eSIM mention
     if ($esimRequired) {
-        $query .= " AND (p.body ILIKE '%eSIM%' OR p.network ILIKE '%eSIM%' OR p.comms ILIKE '%eSIM%')";
+        $query .= " AND (p.body ILIKE '%eSIM%' OR p.network ILIKE '%eSIM%' OR p.connectivity ILIKE '%eSIM%')";
     }
 
     // SIM size filters
@@ -393,7 +393,7 @@ try {
         $wifiConditions = [];
         foreach ($wifiVersions as $version) {
             $version = trim($version); // e.g., "802.11n", "802.11ac", "802.11ax", "802.11be"
-            $wifiConditions[] = "p.comms ILIKE '%" . $version . "%'";
+            $wifiConditions[] = "p.connectivity ILIKE '%" . $version . "%'";
         }
         if (!empty($wifiConditions)) {
             $query .= " AND (" . implode(' OR ', $wifiConditions) . ")";
@@ -405,8 +405,8 @@ try {
         $btConditions = [];
         foreach ($bluetoothVersions as $version) {
             $version = trim($version); // e.g., "4.0", "5.0", "5.2"
-            // Match both "Bluetooth 5.0" and just "5.0" in the comms data
-            $btConditions[] = "(p.comms ILIKE '%Bluetooth " . $version . "%' OR p.comms ILIKE '%" . $version . "%')";
+            // Match both "Bluetooth 5.0" and just "5.0" in the connectivity data
+            $btConditions[] = "(p.connectivity ILIKE '%Bluetooth " . $version . "%' OR p.connectivity ILIKE '%" . $version . "%')";
         }
         if (!empty($btConditions)) {
             $query .= " AND (" . implode(' OR ', $btConditions) . ")";
@@ -418,31 +418,31 @@ try {
         $usbConditions = [];
         foreach ($usbTypes as $type) {
             $type = trim($type); // e.g., "USB-C", "USB 3", "micro USB"
-            $usbConditions[] = "p.comms ILIKE '%" . $type . "%'";
+            $usbConditions[] = "p.connectivity ILIKE '%" . $type . "%'";
         }
         if (!empty($usbConditions)) {
             $query .= " AND (" . implode(' OR ', $usbConditions) . ")";
         }
     }
 
-    // GPS filter - check comms or features JSON for GPS/positioning
+    // GPS filter - check connectivity or features JSON for GPS/positioning
     if ($gpsRequired) {
-        $query .= " AND (p.comms ILIKE '%GPS%' OR p.comms ILIKE '%A-GPS%' OR p.comms ILIKE '%GLONASS%' OR p.comms ILIKE '%positioning%')";
+        $query .= " AND (p.connectivity ILIKE '%GPS%' OR p.connectivity ILIKE '%A-GPS%' OR p.connectivity ILIKE '%GLONASS%' OR p.connectivity ILIKE '%positioning%')";
     }
 
-    // NFC filter - check comms JSON for NFC
+    // NFC filter - check connectivity JSON for NFC
     if ($nfcRequired) {
-        $query .= " AND p.comms ILIKE '%NFC%'";
+        $query .= " AND p.connectivity ILIKE '%NFC%'";
     }
 
-    // Infrared filter - check comms JSON for infrared/IR
+    // Infrared filter - check connectivity JSON for infrared/IR
     if ($infraredRequired) {
-        $query .= " AND (p.comms ILIKE '%Infrared%' OR p.comms ILIKE '%IR port%' OR p.comms ILIKE '%IR blaster%')";
+        $query .= " AND (p.connectivity ILIKE '%Infrared%' OR p.connectivity ILIKE '%IR port%' OR p.connectivity ILIKE '%IR blaster%')";
     }
 
-    // FM Radio filter - check comms JSON for radio
+    // FM Radio filter - check connectivity JSON for radio
     if ($fmRadioRequired) {
-        $query .= " AND (p.comms ILIKE '%Radio%' OR p.comms ILIKE '%FM radio%')";
+        $query .= " AND (p.connectivity ILIKE '%Radio%' OR p.connectivity ILIKE '%FM radio%')";
     }
 
     // Sensor filters (match in FEATURES/body text)
@@ -533,7 +533,7 @@ try {
     // Free Text across multiple columns
     if (!empty($freeText)) {
         $like = '%' . $freeText . '%';
-        $query .= " AND (p.display ILIKE ? OR p.features ILIKE ? OR p.platform ILIKE ? OR p.body ILIKE ? OR p.network ILIKE ? OR p.comms ILIKE ? OR p.main_camera ILIKE ? OR p.selfie_camera ILIKE ? OR p.sound ILIKE ? OR p.battery ILIKE ?)";
+        $query .= " AND (p.display ILIKE ? OR p.features ILIKE ? OR p.hardware ILIKE ? OR p.body ILIKE ? OR p.network ILIKE ? OR p.connectivity ILIKE ? OR p.main_camera ILIKE ? OR p.selfie_camera ILIKE ? OR p.multimedia ILIKE ? OR p.battery ILIKE ?)";
         for ($i = 0; $i < 10; $i++) {
             $params[] = $like;
         }
@@ -582,7 +582,7 @@ try {
             $safe = preg_replace('/[^a-zA-Z0-9\s\-]/', '', $c);
             if ($safe !== '') {
                 $like = '%' . $safe . '%';
-                $colorConds[] = '(p.body ILIKE ? OR p.misc ILIKE ?)';
+                $colorConds[] = '(p.body ILIKE ? OR p.general_info ILIKE ?)';
                 $params[] = $like;
                 $params[] = $like;
             }

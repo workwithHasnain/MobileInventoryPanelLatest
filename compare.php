@@ -724,8 +724,8 @@ function renderJsonSection($jsonValue, $sectionName = '')
             if ($desc !== '') {
                 $line .= ' ' . htmlspecialchars($desc);
 
-                // If this is the MISC -> Price row, append EUR conversion like device.php
-                if ($sectionName === 'MISC' && strtolower($field) === 'price') {
+                // If this is the GENERAL INFO -> Price row, append EUR conversion like device.php
+                if ($sectionName === 'GENERAL INFO' && strtolower($field) === 'price') {
                     // Extract numeric USD amount from description
                     $priceStr = preg_replace('/[^0-9.]/', '', $desc);
                     if ($priceStr !== '' && is_numeric($priceStr)) {
@@ -754,15 +754,15 @@ function formatDeviceSpecsJson($device)
         'LAUNCH' => $device['launch'] ?? null,
         'BODY' => $device['body'] ?? null,
         'DISPLAY' => $device['display'] ?? null,
-        'PLATFORM' => $device['platform'] ?? null,
+        'HARDWARE' => $device['hardware'] ?? null,
         'MEMORY' => $device['memory'] ?? null,
         'MAIN CAMERA' => $device['main_camera'] ?? null,
         'SELFIE CAMERA' => $device['selfie_camera'] ?? null,
-        'SOUND' => $device['sound'] ?? null,
-        'COMMUNICATIONS' => $device['comms'] ?? null,
+        'MULTIMEDIA' => $device['multimedia'] ?? null,
+        'CONNECTIVITY' => $device['connectivity'] ?? null,
         'FEATURES' => $device['features'] ?? null,
         'BATTERY' => $device['battery'] ?? null,
-        'MISC' => $device['misc'] ?? null,
+        'GENERAL INFO' => $device['general_info'] ?? null,
     ];
 
     foreach ($jsonSections as $label => $raw) {
@@ -1196,10 +1196,10 @@ function formatDeviceSpecsJson($device)
                             if (!empty($phone['availability'])) {
                                 $parts[] = 'Status: ' . htmlspecialchars($phone['availability']);
                             }
-                            // Prefer extracting price from misc JSON if available
+                            // Prefer extracting price from general_info JSON if available
                             $usdPrice = null;
-                            if (!empty($phone['misc'])) {
-                                $usdPrice = extractPriceFromMisc($phone['misc']);
+                            if (!empty($phone['general_info'])) {
+                                $usdPrice = extractPriceFromMisc($phone['general_info']);
                             }
                             if ($usdPrice === null && !empty($phone['price']) && is_numeric($phone['price'])) {
                                 $usdPrice = (float)$phone['price'];
