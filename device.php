@@ -376,7 +376,7 @@ function formatDeviceSpecs($device)
 
     if (!empty($network_tech)) {
       $network_details = '<strong>Technology</strong> ' . implode(' / ', $network_tech);
-      if (!empty($device['dual_sim'])) $network_details .= '<br><strong>SIM</strong> Dual SIM';
+      if (!empty($device['dual_sim'])) $network_details .= '<br><strong>Connectivity Slot</strong> Dual SIM';
       if (!empty($device['esim'])) $network_details .= ', eSIM';
       if (!empty($device['sim_size'])) $network_details .= ' (' . $device['sim_size'] . ')';
       $specs['NETWORK'] = $network_details;
@@ -391,7 +391,7 @@ function formatDeviceSpecs($device)
     }
     if (!empty($device['availability'])) {
       if ($launch_details) $launch_details .= '<br>';
-      $launch_details .= '<strong>Status</strong> ' . $device['availability'];
+      $launch_details .= '<strong>Availability</strong> ' . $device['availability'];
     }
     if (!empty($device['price'])) {
       $price_usd = number_format($device['price'], 2);
@@ -453,11 +453,11 @@ function formatDeviceSpecs($device)
     }
     if (!empty($device['chipset_name'])) {
       if ($platform_details) $platform_details .= '<br>';
-      $platform_details .= '<strong>Chipset</strong> ' . $device['chipset_name'];
+      $platform_details .= '<strong>System Chip</strong> ' . $device['chipset_name'];
     }
     if (!empty($device['cpu_cores']) || !empty($device['cpu_frequency'])) {
       if ($platform_details) $platform_details .= '<br>';
-      $platform_details .= '<strong>CPU</strong> ';
+      $platform_details .= '<strong>Processor</strong> ';
       if (!empty($device['cpu_cores'])) $platform_details .= $device['cpu_cores'] . '-core';
       if (!empty($device['cpu_frequency'])) $platform_details .= ' (' . $device['cpu_frequency'] . ' GHz)';
     }
@@ -468,15 +468,15 @@ function formatDeviceSpecs($device)
     $specs['PLATFORM'] = $platform_details;
   }
 
-  // Legacy fallback: Memory
+  // Legacy fallback: System Memory
   if (!isset($specs['MEMORY']) && (!empty($device['ram']) || !empty($device['storage']) || !empty($device['card_slot']))) {
     $memory_details = '';
     if (!empty($device['card_slot'])) {
-      $memory_details .= '<strong>Card slot</strong> ' . htmlspecialchars($device['card_slot']);
+      $memory_details .= '<strong>Expansion Slot</strong> ' . htmlspecialchars($device['card_slot']);
     }
     if (!empty($device['storage']) || !empty($device['ram'])) {
       if ($memory_details) $memory_details .= '<br>';
-      $memory_details .= '<strong>Internal</strong> ';
+      $memory_details .= '<strong>Storage</strong> ';
       if (!empty($device['storage'])) $memory_details .= $device['storage'];
       if (!empty($device['ram'])) $memory_details .= ' RAM: ' . $device['ram'];
     }
@@ -515,7 +515,7 @@ function formatDeviceSpecs($device)
       $camera_details .= '<br><strong>Features</strong> ' . implode(', ', $features);
     }
     if (!empty($device['main_camera_video'])) {
-      $camera_details .= '<br><strong>Video</strong> ' . $device['main_camera_video'];
+      $camera_details .= '<br><strong>Video Recording</strong> ' . $device['main_camera_video'];
     }
     $specs['MAIN CAMERA'] = $camera_details;
   }
@@ -540,7 +540,7 @@ function formatDeviceSpecs($device)
       $selfie_details .= '<br><strong>Features</strong> ' . implode(', ', array_map('trim', $array_features));
     }
     if (!empty($device['selfie_camera_video'])) {
-      $selfie_details .= '<br><strong>Video</strong> ' . $device['selfie_camera_video'];
+      $selfie_details .= '<br><strong>Video Recording</strong> ' . $device['selfie_camera_video'];
     }
     $specs['SELFIE CAMERA'] = $selfie_details;
   }
@@ -549,7 +549,7 @@ function formatDeviceSpecs($device)
   if (!isset($specs['SOUND']) && (isset($device['dual_speakers']) || isset($device['headphone_jack']))) {
     $sound_details = '';
     if (isset($device['dual_speakers']) && $device['dual_speakers'] !== null) {
-      $sound_details .= '<strong>Loudspeaker</strong> ' . ($device['dual_speakers'] ? 'Yes' : 'No');
+      $sound_details .= '<strong>Audio Output</strong> ' . ($device['dual_speakers'] ? 'Yes' : 'No');
     }
     if (isset($device['headphone_jack']) && $device['headphone_jack'] !== null) {
       if ($sound_details) $sound_details .= '<br>';
@@ -570,11 +570,11 @@ function formatDeviceSpecs($device)
     }
     if (isset($device['gps']) && $device['gps'] !== null) {
       if ($comms_details) $comms_details .= '<br>';
-      $comms_details .= '<strong>Positioning</strong> ' . ($device['gps'] ? 'GPS' : 'No');
+      $comms_details .= '<strong>Location</strong> ' . ($device['gps'] ? 'GPS' : 'No');
     }
     if (isset($device['nfc']) && $device['nfc'] !== null) {
       if ($comms_details) $comms_details .= '<br>';
-      $comms_details .= '<strong>NFC</strong> ' . ($device['nfc'] ? 'Yes' : 'No');
+      $comms_details .= '<strong>Proximity</strong> ' . ($device['nfc'] ? 'Yes' : 'No');
     }
     if (isset($device['fm_radio']) && $device['fm_radio'] !== null) {
       if ($comms_details) $comms_details .= '<br>';

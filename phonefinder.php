@@ -335,7 +335,7 @@ if (!$filterConfig) {
                             </div>
                         </div>
                     </div>
-                    <div class="filter-header mx-1 mb-2">Sim</div>
+                    <div class="filter-header mx-1 mb-2">Connectivity Slot</div>
                     <div class="row g-2">
                         <div class="col-6">
                             <button class=" btn btn-toggle w-100 text-start" type="button" data-bs-toggle="collapse"
@@ -515,7 +515,7 @@ if (!$filterConfig) {
                             </label>
                         </div>
                     </div>
-                    <div class="filter-header mx-1 mb-2">Memory</div>
+                    <div class="filter-header mx-1 mb-2">System Memory</div>
                     <!-- RAM filter (Min GB) -->
                     <div class="d-flex fw-bolder align-items-center gap-3 mt-3"
                         style="border: 1px solid; padding: 7px; margin-top: 14px;">
@@ -527,11 +527,11 @@ if (!$filterConfig) {
                     <button style="border-radius: 1px;" class=" btn btn-toggle w-100 mt-2 text-start" type="button"
                         data-bs-toggle="collapse" data-bs-target="#cardCollapse" aria-expanded="false"
                         aria-controls="cardCollapse">
-                        Card Slot: </button>
+                        Expansion Slot: </button>
                     <div class="collapse" id="cardCollapse">
                         <div class="card card-body px-3">
                             <div class="form-check">
-                                <input class="form-check-input" type="checkbox" id="cardSlotRequired" />
+                                <input class="form-check-input" type="checkbox" id="cardSlotRequired" name="card_slot_required" />
                                 <label class="form-check-label" for="cardSlotRequired">Require card slot</label>
                             </div>
                         </div>
@@ -683,7 +683,7 @@ if (!$filterConfig) {
                 </div>
                 <div class="d-flex align-items-center fw-bolder gap-3 mt-2"
                     style="border: 1px solid; padding: 7px; margin-top: 14px;">
-                    CPU: <span id="cpuClockValue"><?php echo $filterConfig['cpu_clock']['min']; ?></span>
+                    Processor: <span id="cpuClockValue"><?php echo $filterConfig['cpu_clock']['min']; ?></span>
                     <input type="range" class="form-range custom-range flex-grow-1" min="<?php echo $filterConfig['cpu_clock']['min']; ?>" max="<?php echo $filterConfig['cpu_clock']['max']; ?>" step="<?php echo $filterConfig['cpu_clock']['step']; ?>"
                         id="cpuClock" value="<?php echo $filterConfig['cpu_clock']['default']; ?>">
                     <span class="text-muted">GHz</span>
@@ -783,7 +783,7 @@ if (!$filterConfig) {
                     <span class="text-muted">MP</span>
                 </div>
                 <div class="filter-box mt-1 ">
-                    CPU: <span id="cpuClockMinValue">Any</span>
+                    Processor: <span id="cpuClockMinValue">Any</span>
                     <input type="range" class="form-range custom-range flex-grow-1" min="<?php echo $filterConfig['cpu_clock']['min']; ?>" max="<?php echo $filterConfig['cpu_clock']['max']; ?>" step="<?php echo $filterConfig['cpu_clock']['step']; ?>"
                         id="cpuClockMin" value="0">
                 </div>

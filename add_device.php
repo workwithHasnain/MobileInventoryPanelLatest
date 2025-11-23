@@ -496,7 +496,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                                             </tr>
                                             <tr>
                                                 <td></td>
-                                                <td>Status</td>
+                                                <td>Availability</td>
                                                 <td></td>
                                             </tr>
 
@@ -513,12 +513,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                                             </tr>
                                             <tr>
                                                 <td></td>
-                                                <td>Build</td>
+                                                <td>Materials</td>
                                                 <td></td>
                                             </tr>
                                             <tr>
                                                 <td></td>
-                                                <td>SIM</td>
+                                                <td>Connectivity Slot</td>
                                                 <td></td>
                                             </tr>
                                             <tr>
@@ -562,12 +562,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                                             </tr>
                                             <tr>
                                                 <td></td>
-                                                <td>Chipset</td>
+                                                <td>System Chip</td>
                                                 <td></td>
                                             </tr>
                                             <tr>
                                                 <td></td>
-                                                <td>CPU</td>
+                                                <td>Processor</td>
                                                 <td></td>
                                             </tr>
                                             <tr>
@@ -578,13 +578,13 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
                                             <!-- Memory -->
                                             <tr>
-                                                <td>Memory</td>
-                                                <td>Card slot</td>
+                                                <td>System Memory</td>
+                                                <td>Expansion Slot</td>
                                                 <td></td>
                                             </tr>
                                             <tr>
                                                 <td></td>
-                                                <td>Internal</td>
+                                                <td>Storage</td>
                                                 <td></td>
                                             </tr>
                                             <tr>
@@ -606,7 +606,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                                             </tr>
                                             <tr>
                                                 <td></td>
-                                                <td>Video</td>
+                                                <td>Video Recording</td>
                                                 <td></td>
                                             </tr>
 
@@ -618,14 +618,14 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                                             </tr>
                                             <tr>
                                                 <td></td>
-                                                <td>Video</td>
+                                                <td>Video Recording</td>
                                                 <td></td>
                                             </tr>
 
                                             <!-- Sound -->
                                             <tr>
                                                 <td>Sound</td>
-                                                <td>Loudspeaker</td>
+                                                <td>Audio Output</td>
                                                 <td></td>
                                             </tr>
                                             <tr>
@@ -647,12 +647,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                                             </tr>
                                             <tr>
                                                 <td></td>
-                                                <td>Positioning</td>
+                                                <td>Location</td>
                                                 <td></td>
                                             </tr>
                                             <tr>
                                                 <td></td>
-                                                <td>NFC</td>
+                                                <td>Proximity</td>
                                                 <td></td>
                                             </tr>
                                             <tr>
@@ -703,7 +703,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                                             </tr>
                                             <tr>
                                                 <td></td>
-                                                <td>Models</td>
+                                                <td>Versions</td>
                                                 <td></td>
                                             </tr>
                                             <tr>
