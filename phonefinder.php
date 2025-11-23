@@ -457,7 +457,7 @@ if (!$filterConfig) {
                             <?php endif; ?>
                         </div>
                     </div>
-                    <div class="filter-header mx-1 mb-2">Platforms</div>
+                    <div class="filter-header mx-1 mb-2">Hardware</div>
                     <button style="border-radius: 1px;" class="btn btn-toggle w-100 mt-2 text-start" type="button"
                         data-bs-toggle="collapse" data-bs-target="#osCollapse" aria-expanded="false"
                         aria-controls="osCollapse">
@@ -906,7 +906,7 @@ if (!$filterConfig) {
                     <span class="text-muted">W</span>
                 </div>
 
-                <div class="filter-header mt-3 mb-3" style="margin-left: -1px;">Misc</div>
+                <div class="filter-header mt-3 mb-3" style="margin-left: -1px;">General Info</div>
                 <div class="filter-box">
                     <span class="filter-label">Free TExt</span>
 

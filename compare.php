@@ -1221,7 +1221,7 @@ function formatDeviceSpecsJson($device)
                             return !empty($body) ? implode('<br>', $body) : 'N/A';
                         case 'DISPLAY':
                             return formatDisplay($phone);
-                        case 'PLATFORM':
+                        case 'HARDWARE':
                             $plat = [];
                             if (!empty($phone['os'])) $plat[] = '<strong>OS</strong> ' . htmlspecialchars($phone['os']);
                             if (!empty($phone['chipset_name'])) $plat[] = '<strong>System Chip</strong> ' . htmlspecialchars($phone['chipset_name']);
@@ -1232,15 +1232,15 @@ function formatDeviceSpecsJson($device)
                             return formatMainCamera($phone);
                         case 'SELFIE CAMERA':
                             return formatSelfieCamera($phone);
-                        case 'SOUND':
+                        case 'MULTIMEDIA':
                             return formatSound($phone);
-                        case 'COMMUNICATIONS':
+                        case 'CONNECTIVITY':
                             return formatCommunications($phone);
                         case 'FEATURES':
                             return formatFeatures($phone);
                         case 'BATTERY':
                             return formatBattery($phone);
-                        case 'MISC':
+                        case 'GENERAL INFO':
                             // Price & colors if available
                             $miscParts = [];
                             $colors = formatColors($phone);

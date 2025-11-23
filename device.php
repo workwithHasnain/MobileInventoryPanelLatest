@@ -348,15 +348,15 @@ function formatDeviceSpecs($device)
     'LAUNCH' => $device['launch'] ?? null,
     'BODY' => $device['body'] ?? null,
     'DISPLAY' => $device['display'] ?? null,
-    'PLATFORM' => $device['platform'] ?? null,
+    'HARDWARE' => $device['platform'] ?? null,
     'MEMORY' => $device['memory'] ?? null,
     'MAIN CAMERA' => $device['main_camera'] ?? null,
     'SELFIE CAMERA' => $device['selfie_camera'] ?? null,
-    'SOUND' => $device['sound'] ?? null,
-    'COMMUNICATIONS' => $device['comms'] ?? null,
+    'MULTIMEDIA' => $device['sound'] ?? null,
+    'CONNECTIVITY' => $device['comms'] ?? null,
     'FEATURES' => $device['features'] ?? null,
     'BATTERY' => $device['battery'] ?? null,
-    'MISC' => $device['misc'] ?? null,
+    'GENERAL INFO' => $device['misc'] ?? null,
   ];
 
   foreach ($jsonSections as $label => $raw) {
@@ -445,8 +445,8 @@ function formatDeviceSpecs($device)
     $specs['DISPLAY'] = $display_details;
   }
 
-  // Legacy fallback: Platform
-  if (!isset($specs['PLATFORM']) && (!empty($device['os']) || !empty($device['chipset_name']) || !empty($device['cpu_cores']) || !empty($device['gpu']))) {
+  // Legacy fallback: Hardware
+  if (!isset($specs['HARDWARE']) && (!empty($device['os']) || !empty($device['chipset_name']) || !empty($device['cpu_cores']) || !empty($device['gpu']))) {
     $platform_details = '';
     if (!empty($device['os'])) {
       $platform_details .= '<strong>OS</strong> ' . $device['os'];
@@ -465,7 +465,7 @@ function formatDeviceSpecs($device)
       if ($platform_details) $platform_details .= '<br>';
       $platform_details .= '<strong>GPU</strong> ' . $device['gpu'];
     }
-    $specs['PLATFORM'] = $platform_details;
+    $specs['HARDWARE'] = $platform_details;
   }
 
   // Legacy fallback: System Memory
@@ -545,8 +545,8 @@ function formatDeviceSpecs($device)
     $specs['SELFIE CAMERA'] = $selfie_details;
   }
 
-  // Legacy fallback: Sound
-  if (!isset($specs['SOUND']) && (isset($device['dual_speakers']) || isset($device['headphone_jack']))) {
+  // Legacy fallback: Multimedia
+  if (!isset($specs['MULTIMEDIA']) && (isset($device['dual_speakers']) || isset($device['headphone_jack']))) {
     $sound_details = '';
     if (isset($device['dual_speakers']) && $device['dual_speakers'] !== null) {
       $sound_details .= '<strong>Audio Output</strong> ' . ($device['dual_speakers'] ? 'Yes' : 'No');
@@ -555,11 +555,11 @@ function formatDeviceSpecs($device)
       if ($sound_details) $sound_details .= '<br>';
       $sound_details .= '<strong>3.5mm jack</strong> ' . ($device['headphone_jack'] ? 'Yes' : 'No');
     }
-    $specs['SOUND'] = $sound_details;
+    $specs['MULTIMEDIA'] = $sound_details;
   }
 
-  // Legacy fallback: Communications
-  if (!isset($specs['COMMUNICATIONS'])) {
+  // Legacy fallback: Connectivity
+  if (!isset($specs['CONNECTIVITY'])) {
     $comms_details = '';
     if (!empty($device['wifi'])) {
       $comms_details .= '<strong>WLAN</strong> ' . $device['wifi'];
@@ -585,7 +585,7 @@ function formatDeviceSpecs($device)
       $comms_details .= '<strong>USB</strong> ' . $device['usb'];
     }
     if ($comms_details) {
-      $specs['COMMUNICATIONS'] = $comms_details;
+      $specs['CONNECTIVITY'] = $comms_details;
     }
   }
 

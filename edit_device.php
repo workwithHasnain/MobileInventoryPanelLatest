@@ -656,9 +656,9 @@ $pref_wireless_charging = $device['wireless_charging'] ?? '';
                                                 <td></td>
                                             </tr>
 
-                                            <!-- Platform -->
+                                            <!-- Hardware -->
                                             <tr>
-                                                <td>Platform</td>
+                                                <td>Hardware</td>
                                                 <td>OS</td>
                                                 <td></td>
                                             </tr>
@@ -724,9 +724,9 @@ $pref_wireless_charging = $device['wireless_charging'] ?? '';
                                                 <td></td>
                                             </tr>
 
-                                            <!-- Sound -->
+                                            <!-- Multimedia -->
                                             <tr>
-                                                <td>Sound</td>
+                                                <td>Multimedia</td>
                                                 <td>Audio Output</td>
                                                 <td></td>
                                             </tr>
@@ -736,9 +736,9 @@ $pref_wireless_charging = $device['wireless_charging'] ?? '';
                                                 <td></td>
                                             </tr>
 
-                                            <!-- Comms -->
+                                            <!-- Connectivity -->
                                             <tr>
-                                                <td>Comms</td>
+                                                <td>Connectivity</td>
                                                 <td>WLAN</td>
                                                 <td></td>
                                             </tr>
@@ -797,9 +797,9 @@ $pref_wireless_charging = $device['wireless_charging'] ?? '';
                                                 <td></td>
                                             </tr>
 
-                                            <!-- Misc -->
+                                            <!-- General Info -->
                                             <tr>
-                                                <td>Misc</td>
+                                                <td>General Info</td>
                                                 <td>Colors</td>
                                                 <td></td>
                                             </tr>

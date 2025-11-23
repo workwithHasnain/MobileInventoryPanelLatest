@@ -554,9 +554,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                                                 <td></td>
                                             </tr>
 
-                                            <!-- Platform -->
+                                            <!-- Hardware -->
                                             <tr>
-                                                <td>Platform</td>
+                                                <td>Hardware</td>
                                                 <td>OS</td>
                                                 <td></td>
                                             </tr>
@@ -622,9 +622,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                                                 <td></td>
                                             </tr>
 
-                                            <!-- Sound -->
+                                            <!-- Multimedia -->
                                             <tr>
-                                                <td>Sound</td>
+                                                <td>Multimedia</td>
                                                 <td>Audio Output</td>
                                                 <td></td>
                                             </tr>
@@ -634,9 +634,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                                                 <td></td>
                                             </tr>
 
-                                            <!-- Comms -->
+                                            <!-- Connectivity -->
                                             <tr>
-                                                <td>Comms</td>
+                                                <td>Connectivity</td>
                                                 <td>WLAN</td>
                                                 <td></td>
                                             </tr>
@@ -695,9 +695,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                                                 <td></td>
                                             </tr>
 
-                                            <!-- Misc -->
+                                            <!-- General Info -->
                                             <tr>
-                                                <td>Misc</td>
+                                                <td>General Info</td>
                                                 <td>Colors</td>
                                                 <td></td>
                                             </tr>
