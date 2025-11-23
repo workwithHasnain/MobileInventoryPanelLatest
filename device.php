@@ -322,8 +322,8 @@ function formatDeviceSpecs($device)
         if ($desc !== '') {
           $line .= ' ' . htmlspecialchars($desc);
 
-          // Add EUR conversion for price field in MISC section
-          if ($sectionName === 'MISC' && strtolower($field) === 'price') {
+          // Add EUR conversion for price field in GENERAL INFO section
+          if ($sectionName === 'GENERAL INFO' && strtolower($field) === 'price') {
             $priceStr = preg_replace('/[^0-9.]/', '', $desc);
             if ($priceStr !== '' && is_numeric($priceStr)) {
               $priceUsd = (float)$priceStr;

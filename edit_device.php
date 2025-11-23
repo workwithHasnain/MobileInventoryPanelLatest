@@ -957,15 +957,15 @@ $pref_wireless_charging = $device['wireless_charging'] ?? '';
                 'Launch': 'launch',
                 'Body': 'body',
                 'Display': 'display',
-                'Platform': 'platform',
+                'Hardware': 'platform',
                 'Memory': 'memory',
                 'Main Camera': 'main_camera',
                 'Selfie camera': 'selfie_camera',
-                'Sound': 'sound',
-                'Comms': 'comms',
+                'Multimedia': 'sound',
+                'Connectivity': 'comms',
                 'Features': 'features',
                 'Battery': 'battery',
-                'Misc': 'misc'
+                'General Info': 'misc'
             };
 
             const getJsonArray = (key) => {
@@ -1145,15 +1145,15 @@ $pref_wireless_charging = $device['wireless_charging'] ?? '';
                     'Launch': 'launch',
                     'Body': 'body',
                     'Display': 'display',
-                    'Platform': 'platform',
+                    'Hardware': 'platform',
                     'Memory': 'memory',
                     'Main Camera': 'main_camera',
                     'Selfie camera': 'selfie_camera',
-                    'Sound': 'sound',
-                    'Comms': 'comms',
+                    'Multimedia': 'sound',
+                    'Connectivity': 'comms',
                     'Features': 'features',
                     'Battery': 'battery',
-                    'Misc': 'misc'
+                    'General Info': 'misc'
                 };
 
                 // Initialize containers

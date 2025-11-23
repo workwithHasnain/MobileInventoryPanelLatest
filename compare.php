@@ -1170,15 +1170,15 @@ function formatDeviceSpecsJson($device)
                     'LAUNCH',
                     'BODY',
                     'DISPLAY',
-                    'PLATFORM',
+                    'HARDWARE',
                     'MEMORY',
                     'MAIN CAMERA',
                     'SELFIE CAMERA',
-                    'SOUND',
-                    'COMMUNICATIONS',
+                    'MULTIMEDIA',
+                    'CONNECTIVITY',
                     'FEATURES',
                     'BATTERY',
-                    'MISC'
+                    'GENERAL INFO'
                 ];
 
                 // Fallback legacy mapping for key sections if JSON absent
