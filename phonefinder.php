@@ -1183,6 +1183,18 @@ if (!$filterConfig) {
     </script>
     <script>
         document.addEventListener('DOMContentLoaded', function() {
+            // Handle brand cell clicks (from sidebar and mobile menu - open devices modal directly)
+            document.querySelectorAll('.brand-cell').forEach(function(cell) {
+                cell.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    const brandId = this.getAttribute('data-brand-id');
+                    if (brandId) {
+                        // Directly open devices modal for this brand
+                        selectBrandFromModal(brandId);
+                    }
+                });
+            });
+
             const findBtn = document.getElementById('findDevicesBtn');
             const resultsSection = document.getElementById('resultsSection');
             const resultsContainer = document.getElementById('resultsContainer');

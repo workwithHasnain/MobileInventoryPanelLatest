@@ -343,7 +343,7 @@ if (isset($_SESSION['success_message'])) {
             </div>
             <div class="modal-body">
                 <div id="newsletter_message" style="display: none;"></div>
-                
+
                 <!-- Add Subscriber Form -->
                 <div class="card mb-4">
                     <div class="card-header">
@@ -480,41 +480,43 @@ if (isset($_SESSION['success_message'])) {
 
     function loadNewsletterSubscribers() {
         const container = document.getElementById('subscribers_list_container');
-        
+
         fetch('manage_newsletter_subscribers.php', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-            body: 'action=list'
-        })
-        .then(response => response.json())
-        .then(data => {
-            if (data.success) {
-                renderSubscribersList(data.subscribers);
-            } else {
-                container.innerHTML = '<div class="alert alert-danger">Error loading subscribers</div>';
-            }
-        })
-        .catch(error => {
-            container.innerHTML = '<div class="alert alert-danger">Error: ' + error + '</div>';
-        });
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/x-www-form-urlencoded'
+                },
+                body: 'action=list'
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    renderSubscribersList(data.subscribers);
+                } else {
+                    container.innerHTML = '<div class="alert alert-danger">Error loading subscribers</div>';
+                }
+            })
+            .catch(error => {
+                container.innerHTML = '<div class="alert alert-danger">Error: ' + error + '</div>';
+            });
     }
 
     function renderSubscribersList(subscribers) {
         const container = document.getElementById('subscribers_list_container');
-        
+
         if (subscribers.length === 0) {
             container.innerHTML = '<div class="alert alert-info text-center">No subscribers yet</div>';
             return;
         }
 
         let html = '<div class="table-responsive"><table class="table table-hover"><thead><tr><th>Email</th><th>Status</th><th>Subscribed</th><th>Action</th></tr></thead><tbody>';
-        
+
         subscribers.forEach(subscriber => {
             const subscribedDate = new Date(subscriber.subscribed_at).toLocaleDateString();
-            const statusBadge = subscriber.status === 'active' ? 
-                '<span class="badge bg-success">Active</span>' : 
+            const statusBadge = subscriber.status === 'active' ?
+                '<span class="badge bg-success">Active</span>' :
                 '<span class="badge bg-secondary">Inactive</span>';
-            
+
             html += `
                 <tr>
                     <td>${escapeHtml(subscriber.email)}</td>
@@ -528,19 +530,19 @@ if (isset($_SESSION['success_message'])) {
                 </tr>
             `;
         });
-        
+
         html += '</tbody></table></div>';
         container.innerHTML = html;
     }
 
     function addSubscriber() {
         const email = newSubscriberEmail.value.trim();
-        
+
         if (!email) {
             showNewsletterMessage('Please enter an email address', 'danger');
             return;
         }
-        
+
         if (!validateEmail(email)) {
             showNewsletterMessage('Please enter a valid email address', 'danger');
             return;
@@ -550,30 +552,32 @@ if (isset($_SESSION['success_message'])) {
         addSubscriberBtn.innerHTML = '<i class="fas fa-spinner fa-spin me-1"></i>Adding...';
 
         fetch('manage_newsletter_subscribers.php', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-            body: 'action=add&email=' + encodeURIComponent(email)
-        })
-        .then(response => response.json())
-        .then(data => {
-            if (data.success) {
-                showNewsletterMessage(data.message, 'success');
-                newSubscriberEmail.value = '';
-                loadNewsletterSubscribers();
-                setTimeout(() => {
-                    document.getElementById('newsletter_message').style.display = 'none';
-                }, 3000);
-            } else {
-                showNewsletterMessage(data.message, 'danger');
-            }
-            addSubscriberBtn.disabled = false;
-            addSubscriberBtn.innerHTML = '<i class="fas fa-plus me-1"></i>Add';
-        })
-        .catch(error => {
-            showNewsletterMessage('Error: ' + error, 'danger');
-            addSubscriberBtn.disabled = false;
-            addSubscriberBtn.innerHTML = '<i class="fas fa-plus me-1"></i>Add';
-        });
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/x-www-form-urlencoded'
+                },
+                body: 'action=add&email=' + encodeURIComponent(email)
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    showNewsletterMessage(data.message, 'success');
+                    newSubscriberEmail.value = '';
+                    loadNewsletterSubscribers();
+                    setTimeout(() => {
+                        document.getElementById('newsletter_message').style.display = 'none';
+                    }, 3000);
+                } else {
+                    showNewsletterMessage(data.message, 'danger');
+                }
+                addSubscriberBtn.disabled = false;
+                addSubscriberBtn.innerHTML = '<i class="fas fa-plus me-1"></i>Add';
+            })
+            .catch(error => {
+                showNewsletterMessage('Error: ' + error, 'danger');
+                addSubscriberBtn.disabled = false;
+                addSubscriberBtn.innerHTML = '<i class="fas fa-plus me-1"></i>Add';
+            });
     }
 
     function removeSubscriber(id) {
@@ -582,22 +586,24 @@ if (isset($_SESSION['success_message'])) {
         }
 
         fetch('manage_newsletter_subscribers.php', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-            body: 'action=remove&id=' + id
-        })
-        .then(response => response.json())
-        .then(data => {
-            if (data.success) {
-                showNewsletterMessage(data.message, 'success');
-                loadNewsletterSubscribers();
-            } else {
-                showNewsletterMessage(data.message, 'danger');
-            }
-        })
-        .catch(error => {
-            showNewsletterMessage('Error: ' + error, 'danger');
-        });
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/x-www-form-urlencoded'
+                },
+                body: 'action=remove&id=' + id
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    showNewsletterMessage(data.message, 'success');
+                    loadNewsletterSubscribers();
+                } else {
+                    showNewsletterMessage(data.message, 'danger');
+                }
+            })
+            .catch(error => {
+                showNewsletterMessage('Error: ' + error, 'danger');
+            });
     }
 
     function showNewsletterMessage(message, type) {

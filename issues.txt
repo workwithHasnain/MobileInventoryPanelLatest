@@ -30,7 +30,7 @@ Css/ styles images, post body minor issues -> live
 
 Add color field for phones background -Done
 
-Brands modal -test failed on homepage, rest is ok. while direct click on brand item. all brands is ok on all pages.
+Brands modal -Done
 
 Navbar (remove news and unwanted text) specially in mobile view -Done
 

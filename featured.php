@@ -787,13 +787,14 @@ $latestDevices = array_slice(array_reverse($latestDevices), 0, 9);
                     });
                 });
 
-                // Handle brand cell clicks
+                // Handle brand cell clicks (from sidebar and mobile menu - open devices modal directly)
                 document.querySelectorAll('.brand-cell').forEach(function(cell) {
-                    cell.addEventListener('click', function() {
+                    cell.addEventListener('click', function(e) {
+                        e.preventDefault();
                         const brandId = this.getAttribute('data-brand-id');
                         if (brandId) {
-                            // Redirect to brands page with specific brand filter
-                            window.location.href = `brands.php?brand=${brandId}`;
+                            // Directly open devices modal for this brand
+                            selectBrandFromModal(brandId);
                         }
                     });
                 });
