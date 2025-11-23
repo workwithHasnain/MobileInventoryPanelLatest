@@ -13,6 +13,15 @@
 -- CORE TABLES
 -- =====================================================
 
+-- Admin/Users authentication table
+CREATE TABLE IF NOT EXISTS admin_users (
+    id SERIAL PRIMARY KEY,
+    username VARCHAR(100) NOT NULL UNIQUE,
+    password VARCHAR(255) NOT NULL,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
 -- Brands table - Device manufacturers
 CREATE TABLE IF NOT EXISTS brands (
     id SERIAL PRIMARY KEY,
@@ -203,6 +212,9 @@ CREATE TABLE IF NOT EXISTS content_views (
 -- =====================================================
 -- INDEXES FOR PERFORMANCE
 -- =====================================================
+
+-- Admin users indexes
+CREATE INDEX IF NOT EXISTS idx_admin_users_username ON admin_users(username);
 
 -- Brands indexes
 CREATE INDEX IF NOT EXISTS idx_brands_name ON brands(name);

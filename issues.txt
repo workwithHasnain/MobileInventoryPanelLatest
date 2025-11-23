@@ -36,7 +36,7 @@ Navbar (remove news and unwanted text) specially in mobile view -Done
 
 Json for phone finder -Done
 
-Login auth
+Login auth -Done
 
 Subscribe Newsletter -Done
 

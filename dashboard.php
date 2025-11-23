@@ -74,6 +74,9 @@ if (isset($_SESSION['success_message'])) {
             <button type="button" class="btn btn-info ms-2" data-bs-toggle="modal" data-bs-target="#newsletterModal">
                 <i class="fas fa-envelope"></i> Newsletter Subscribers
             </button>
+            <button type="button" class="btn btn-warning ms-2" data-bs-toggle="modal" data-bs-target="#authModal">
+                <i class="fas fa-lock"></i> Authentication
+            </button>
             <button type="button" class="btn btn-secondary ms-2" data-bs-toggle="modal" data-bs-target="#filterSettingsModal">
                 <i class="fas fa-sliders-h"></i> Filter Settings
             </button>
@@ -401,6 +404,54 @@ if (isset($_SESSION['success_message'])) {
     </div>
 </div>
 
+<!-- Authentication Users Modal -->
+<div class="modal fade" id="authModal" tabindex="-1" aria-labelledby="authLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg modal-dialog-scrollable">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="authLabel">
+                    <i class="fas fa-lock me-2"></i>Authentication Users
+                </h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <div id="auth_message" style="display: none;"></div>
+
+                <!-- Add User Form -->
+                <div class="card mb-4">
+                    <div class="card-header">
+                        <h6 class="card-title mb-0"><i class="fas fa-plus me-2"></i>Add New User</h6>
+                    </div>
+                    <div class="card-body">
+                        <div class="row g-2">
+                            <div class="col-md-4">
+                                <input type="text" id="new_username" class="form-control" placeholder="Username" minlength="3">
+                            </div>
+                            <div class="col-md-4">
+                                <input type="password" id="new_password" class="form-control" placeholder="Password" minlength="4">
+                            </div>
+                            <div class="col-md-4">
+                                <button class="btn btn-primary w-100" type="button" id="add_auth_user_btn">
+                                    <i class="fas fa-plus me-1"></i>Add User
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Users List -->
+                <div id="auth_users_container">
+                    <div class="text-center py-4">
+                        <div class="spinner-border" role="status">
+                            <span class="visually-hidden">Loading...</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
 <script>
     document.addEventListener('DOMContentLoaded', function() {
         const filterModal = document.getElementById('filterSettingsModal');
@@ -627,6 +678,218 @@ if (isset($_SESSION['success_message'])) {
             "'": '&#039;'
         };
         return text.replace(/[&<>"']/g, m => map[m]);
+    }
+
+    // ===== Authentication Management =====
+    const authModal = document.getElementById('authModal');
+    
+    if (authModal) {
+        authModal.addEventListener('show.bs.modal', function() {
+            loadAuthUsers();
+        });
+
+        document.getElementById('add_auth_user_btn').addEventListener('click', addAuthUser);
+    }
+
+    function loadAuthUsers() {
+        const container = document.getElementById('auth_users_container');
+        
+        fetch('auth_management_handler.php', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/x-www-form-urlencoded',
+            },
+            body: new URLSearchParams({ action: 'list' })
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success && data.users) {
+                let html = '';
+                data.users.forEach(user => {
+                    html += `
+                        <div class="card mb-2">
+                            <div class="card-body">
+                                <div class="row align-items-center">
+                                    <div class="col-md-3">
+                                        <strong>Username:</strong>
+                                        <input type="text" class="form-control form-control-sm mt-1 username-input" value="${escapeHtml(user.username)}" data-user-id="${user.id}">
+                                    </div>
+                                    <div class="col-md-3">
+                                        <strong>Password:</strong>
+                                        <input type="password" class="form-control form-control-sm mt-1 password-input" placeholder="Leave blank to keep current" data-user-id="${user.id}">
+                                    </div>
+                                    <div class="col-md-3">
+                                        <small class="text-muted">Created: ${new Date(user.created_at).toLocaleDateString()}</small>
+                                    </div>
+                                    <div class="col-md-3 text-end">
+                                        <button class="btn btn-sm btn-success me-2" onclick="updateAuthUser(${user.id})">
+                                            <i class="fas fa-save"></i> Save
+                                        </button>
+                                        <button class="btn btn-sm btn-danger" onclick="deleteAuthUser(${user.id})">
+                                            <i class="fas fa-trash"></i> Delete
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    `;
+                });
+                container.innerHTML = html;
+            } else {
+                container.innerHTML = '<div class="alert alert-danger">Failed to load users</div>';
+            }
+        })
+        .catch(error => {
+            container.innerHTML = '<div class="alert alert-danger">Error loading users: ' + error + '</div>';
+        });
+    }
+
+    function addAuthUser() {
+        const username = document.getElementById('new_username').value.trim();
+        const password = document.getElementById('new_password').value.trim();
+        const btn = document.getElementById('add_auth_user_btn');
+
+        if (!username || !password) {
+            showAuthMessage('Username and password are required', 'warning');
+            return;
+        }
+
+        if (username.length < 3) {
+            showAuthMessage('Username must be at least 3 characters', 'warning');
+            return;
+        }
+
+        if (password.length < 4) {
+            showAuthMessage('Password must be at least 4 characters', 'warning');
+            return;
+        }
+
+        btn.disabled = true;
+        btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Adding...';
+
+        fetch('auth_management_handler.php', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/x-www-form-urlencoded',
+            },
+            body: new URLSearchParams({
+                action: 'add',
+                username: username,
+                password: password
+            })
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                showAuthMessage(data.message, 'success');
+                document.getElementById('new_username').value = '';
+                document.getElementById('new_password').value = '';
+                loadAuthUsers();
+                setTimeout(() => {
+                    document.getElementById('auth_message').style.display = 'none';
+                }, 3000);
+            } else {
+                showAuthMessage(data.message, 'danger');
+            }
+            btn.disabled = false;
+            btn.innerHTML = '<i class="fas fa-plus me-1"></i>Add User';
+        })
+        .catch(error => {
+            showAuthMessage('Error: ' + error, 'danger');
+            btn.disabled = false;
+            btn.innerHTML = '<i class="fas fa-plus me-1"></i>Add User';
+        });
+    }
+
+    function updateAuthUser(id) {
+        const usernameInput = document.querySelector(`.username-input[data-user-id="${id}"]`);
+        const passwordInput = document.querySelector(`.password-input[data-user-id="${id}"]`);
+        
+        const username = usernameInput.value.trim();
+        const password = passwordInput.value.trim();
+
+        if (!username) {
+            showAuthMessage('Username is required', 'warning');
+            return;
+        }
+
+        if (username.length < 3) {
+            showAuthMessage('Username must be at least 3 characters', 'warning');
+            return;
+        }
+
+        if (password && password.length < 4) {
+            showAuthMessage('Password must be at least 4 characters', 'warning');
+            return;
+        }
+
+        fetch('auth_management_handler.php', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/x-www-form-urlencoded',
+            },
+            body: new URLSearchParams({
+                action: 'update',
+                id: id,
+                username: username,
+                password: password
+            })
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                showAuthMessage(data.message, 'success');
+                passwordInput.value = '';
+                loadAuthUsers();
+                setTimeout(() => {
+                    document.getElementById('auth_message').style.display = 'none';
+                }, 3000);
+            } else {
+                showAuthMessage(data.message, 'danger');
+            }
+        })
+        .catch(error => {
+            showAuthMessage('Error: ' + error, 'danger');
+        });
+    }
+
+    function deleteAuthUser(id) {
+        if (!confirm('Are you sure you want to delete this user?')) {
+            return;
+        }
+
+        fetch('auth_management_handler.php', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/x-www-form-urlencoded',
+            },
+            body: new URLSearchParams({
+                action: 'delete',
+                id: id
+            })
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                showAuthMessage(data.message, 'success');
+                loadAuthUsers();
+                setTimeout(() => {
+                    document.getElementById('auth_message').style.display = 'none';
+                }, 3000);
+            } else {
+                showAuthMessage(data.message, 'danger');
+            }
+        })
+        .catch(error => {
+            showAuthMessage('Error: ' + error, 'danger');
+        });
+    }
+
+    function showAuthMessage(message, type) {
+        const messageDiv = document.getElementById('auth_message');
+        messageDiv.className = 'alert alert-' + type + ' alert-dismissible fade show';
+        messageDiv.innerHTML = message + '<button type="button" class="btn-close" data-bs-dismiss="alert"></button>';
+        messageDiv.style.display = 'block';
     }
 </script>
 </div>
