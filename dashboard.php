@@ -71,6 +71,9 @@ if (isset($_SESSION['success_message'])) {
             <a href="add_device.php" class="btn btn-success ms-2">
                 <i class="fas fa-plus"></i> Add New Device
             </a>
+            <button type="button" class="btn btn-info ms-2" data-bs-toggle="modal" data-bs-target="#newsletterModal">
+                <i class="fas fa-envelope"></i> Newsletter Subscribers
+            </button>
             <button type="button" class="btn btn-secondary ms-2" data-bs-toggle="modal" data-bs-target="#filterSettingsModal">
                 <i class="fas fa-sliders-h"></i> Filter Settings
             </button>
@@ -328,6 +331,47 @@ if (isset($_SESSION['success_message'])) {
     <?php endif; ?>
 </div>
 
+<!-- Newsletter Subscribers Modal -->
+<div class="modal fade" id="newsletterModal" tabindex="-1" aria-labelledby="newsletterLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg modal-dialog-scrollable">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="newsletterLabel">
+                    <i class="fas fa-envelope me-2"></i>Newsletter Subscribers
+                </h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <div id="newsletter_message" style="display: none;"></div>
+                
+                <!-- Add Subscriber Form -->
+                <div class="card mb-4">
+                    <div class="card-header">
+                        <h6 class="card-title mb-0"><i class="fas fa-plus me-2"></i>Add New Subscriber</h6>
+                    </div>
+                    <div class="card-body">
+                        <div class="input-group">
+                            <input type="email" id="new_subscriber_email" class="form-control" placeholder="Enter email address">
+                            <button class="btn btn-primary" type="button" id="add_subscriber_btn">
+                                <i class="fas fa-plus me-1"></i>Add
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Subscribers List -->
+                <div id="subscribers_list_container">
+                    <div class="text-center py-4">
+                        <div class="spinner-border" role="status">
+                            <span class="visually-hidden">Loading...</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
 <!-- Filter Settings Modal -->
 <div class="modal fade" id="filterSettingsModal" tabindex="-1" aria-labelledby="filterSettingsLabel" aria-hidden="true">
     <div class="modal-dialog modal-xl modal-dialog-scrollable">
@@ -416,6 +460,167 @@ if (isset($_SESSION['success_message'])) {
             .catch(error => {
                 alert('Error saving settings: ' + error);
             });
+    }
+
+    // Newsletter Subscribers Management
+    const newsletterModal = document.getElementById('newsletterModal');
+    const addSubscriberBtn = document.getElementById('add_subscriber_btn');
+    const newSubscriberEmail = document.getElementById('new_subscriber_email');
+
+    newsletterModal.addEventListener('show.bs.modal', function() {
+        loadNewsletterSubscribers();
+    });
+
+    addSubscriberBtn.addEventListener('click', addSubscriber);
+    newSubscriberEmail.addEventListener('keypress', function(e) {
+        if (e.key === 'Enter') {
+            addSubscriber();
+        }
+    });
+
+    function loadNewsletterSubscribers() {
+        const container = document.getElementById('subscribers_list_container');
+        
+        fetch('manage_newsletter_subscribers.php', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+            body: 'action=list'
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                renderSubscribersList(data.subscribers);
+            } else {
+                container.innerHTML = '<div class="alert alert-danger">Error loading subscribers</div>';
+            }
+        })
+        .catch(error => {
+            container.innerHTML = '<div class="alert alert-danger">Error: ' + error + '</div>';
+        });
+    }
+
+    function renderSubscribersList(subscribers) {
+        const container = document.getElementById('subscribers_list_container');
+        
+        if (subscribers.length === 0) {
+            container.innerHTML = '<div class="alert alert-info text-center">No subscribers yet</div>';
+            return;
+        }
+
+        let html = '<div class="table-responsive"><table class="table table-hover"><thead><tr><th>Email</th><th>Status</th><th>Subscribed</th><th>Action</th></tr></thead><tbody>';
+        
+        subscribers.forEach(subscriber => {
+            const subscribedDate = new Date(subscriber.subscribed_at).toLocaleDateString();
+            const statusBadge = subscriber.status === 'active' ? 
+                '<span class="badge bg-success">Active</span>' : 
+                '<span class="badge bg-secondary">Inactive</span>';
+            
+            html += `
+                <tr>
+                    <td>${escapeHtml(subscriber.email)}</td>
+                    <td>${statusBadge}</td>
+                    <td><small class="text-muted">${subscribedDate}</small></td>
+                    <td>
+                        <button class="btn btn-sm btn-danger" onclick="removeSubscriber(${subscriber.id})">
+                            <i class="fas fa-trash"></i> Remove
+                        </button>
+                    </td>
+                </tr>
+            `;
+        });
+        
+        html += '</tbody></table></div>';
+        container.innerHTML = html;
+    }
+
+    function addSubscriber() {
+        const email = newSubscriberEmail.value.trim();
+        
+        if (!email) {
+            showNewsletterMessage('Please enter an email address', 'danger');
+            return;
+        }
+        
+        if (!validateEmail(email)) {
+            showNewsletterMessage('Please enter a valid email address', 'danger');
+            return;
+        }
+
+        addSubscriberBtn.disabled = true;
+        addSubscriberBtn.innerHTML = '<i class="fas fa-spinner fa-spin me-1"></i>Adding...';
+
+        fetch('manage_newsletter_subscribers.php', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+            body: 'action=add&email=' + encodeURIComponent(email)
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                showNewsletterMessage(data.message, 'success');
+                newSubscriberEmail.value = '';
+                loadNewsletterSubscribers();
+                setTimeout(() => {
+                    document.getElementById('newsletter_message').style.display = 'none';
+                }, 3000);
+            } else {
+                showNewsletterMessage(data.message, 'danger');
+            }
+            addSubscriberBtn.disabled = false;
+            addSubscriberBtn.innerHTML = '<i class="fas fa-plus me-1"></i>Add';
+        })
+        .catch(error => {
+            showNewsletterMessage('Error: ' + error, 'danger');
+            addSubscriberBtn.disabled = false;
+            addSubscriberBtn.innerHTML = '<i class="fas fa-plus me-1"></i>Add';
+        });
+    }
+
+    function removeSubscriber(id) {
+        if (!confirm('Are you sure you want to remove this subscriber?')) {
+            return;
+        }
+
+        fetch('manage_newsletter_subscribers.php', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+            body: 'action=remove&id=' + id
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                showNewsletterMessage(data.message, 'success');
+                loadNewsletterSubscribers();
+            } else {
+                showNewsletterMessage(data.message, 'danger');
+            }
+        })
+        .catch(error => {
+            showNewsletterMessage('Error: ' + error, 'danger');
+        });
+    }
+
+    function showNewsletterMessage(message, type) {
+        const messageDiv = document.getElementById('newsletter_message');
+        messageDiv.className = 'alert alert-' + type + ' alert-dismissible fade show';
+        messageDiv.innerHTML = message + '<button type="button" class="btn-close" data-bs-dismiss="alert"></button>';
+        messageDiv.style.display = 'block';
+    }
+
+    function validateEmail(email) {
+        const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+        return emailRegex.test(email);
+    }
+
+    function escapeHtml(text) {
+        const map = {
+            '&': '&amp;',
+            '<': '&lt;',
+            '>': '&gt;',
+            '"': '&quot;',
+            "'": '&#039;'
+        };
+        return text.replace(/[&<>"']/g, m => map[m]);
     }
 </script>
 </div>
