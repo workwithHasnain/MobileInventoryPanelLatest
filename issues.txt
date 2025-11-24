@@ -49,3 +49,7 @@ column fields name update for devices -Done
 Newsletter subscriber exporter -Done
 
 Newsletter status update -Done
+
+...
+
+dynamic hero section images
