@@ -516,13 +516,18 @@ if (isset($_SESSION['success_message'])) {
         const formData = new FormData();
         formData.append('action', 'save');
 
-        // Collect all form data
-        const form = document.querySelector('form', document.getElementById('filterSettingsContent'));
+        // Collect all form data from the filter settings modal
+        const filterContent = document.getElementById('filterSettingsContent');
+        const form = filterContent.querySelector('form');
+        
         if (form) {
             const formEntries = new FormData(form);
             for (let [key, value] of formEntries) {
                 formData.append(key, value);
             }
+        } else {
+            alert('Error: Filter form not found');
+            return;
         }
 
         fetch('manage_filter_settings.php', {

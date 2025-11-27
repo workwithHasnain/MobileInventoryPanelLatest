@@ -476,72 +476,78 @@ function saveFilterSettings()
         // Get current config
         $filterConfig = FilterConfig::get();
 
+        // Helper function to safely get POST value
+        function getPost($key, $default = 0) {
+            return $_POST[$key] ?? $default;
+        }
+
         // Update numerical values
-        $filterConfig['price']['min'] = (int)$_POST['price_min'];
-        $filterConfig['price']['max'] = (int)$_POST['price_max'];
-        $filterConfig['price']['step'] = (int)$_POST['price_step'];
+        $filterConfig['price']['min'] = (int)getPost('price_min');
+        $filterConfig['price']['max'] = (int)getPost('price_max');
+        $filterConfig['price']['step'] = (int)getPost('price_step');
 
-        $filterConfig['year']['min'] = (int)$_POST['year_min'];
-        $filterConfig['year']['max'] = (int)$_POST['year_max'];
+        $filterConfig['year']['min'] = (int)getPost('year_min');
+        $filterConfig['year']['max'] = (int)getPost('year_max');
 
-        $filterConfig['ram']['min'] = (int)$_POST['ram_min'];
-        $filterConfig['ram']['max'] = (int)$_POST['ram_max'];
-        $filterConfig['ram']['step'] = (int)$_POST['ram_step'];
+        $filterConfig['ram']['min'] = (int)getPost('ram_min');
+        $filterConfig['ram']['max'] = (int)getPost('ram_max');
+        $filterConfig['ram']['step'] = (int)getPost('ram_step');
 
-        $filterConfig['storage']['min'] = (int)$_POST['storage_min'];
-        $filterConfig['storage']['max'] = (int)$_POST['storage_max'];
-        $filterConfig['storage']['step'] = (int)$_POST['storage_step'];
+        $filterConfig['storage']['min'] = (int)getPost('storage_min');
+        $filterConfig['storage']['max'] = (int)getPost('storage_max');
+        $filterConfig['storage']['step'] = (int)getPost('storage_step');
 
-        $filterConfig['display_size']['min'] = (float)$_POST['display_size_min'];
-        $filterConfig['display_size']['max'] = (float)$_POST['display_size_max'];
-        $filterConfig['display_size']['step'] = (float)$_POST['display_size_step'];
+        $filterConfig['display_size']['min'] = (float)getPost('display_size_min');
+        $filterConfig['display_size']['max'] = (float)getPost('display_size_max');
+        $filterConfig['display_size']['step'] = (float)getPost('display_size_step');
 
-        $filterConfig['display_resolution']['min'] = (int)$_POST['display_res_min'];
-        $filterConfig['display_resolution']['max'] = (int)$_POST['display_res_max'];
+        // display_resolution uses display_res_min/max from form
+        $filterConfig['display_resolution']['min'] = (int)getPost('display_res_min');
+        $filterConfig['display_resolution']['max'] = (int)getPost('display_res_max');
 
-        $filterConfig['refresh_rate']['min'] = (int)$_POST['refresh_rate_min'];
-        $filterConfig['refresh_rate']['max'] = (int)$_POST['refresh_rate_max'];
-        $filterConfig['refresh_rate']['step'] = (int)$_POST['refresh_rate_step'];
+        $filterConfig['refresh_rate']['min'] = (int)getPost('refresh_rate_min');
+        $filterConfig['refresh_rate']['max'] = (int)getPost('refresh_rate_max');
+        $filterConfig['refresh_rate']['step'] = (int)getPost('refresh_rate_step');
 
-        $filterConfig['cpu_clock']['min'] = (float)$_POST['cpu_clock_min'];
-        $filterConfig['cpu_clock']['max'] = (float)$_POST['cpu_clock_max'];
+        $filterConfig['cpu_clock']['min'] = (float)getPost('cpu_clock_min');
+        $filterConfig['cpu_clock']['max'] = (float)getPost('cpu_clock_max');
 
-        $filterConfig['os_version']['min'] = (float)$_POST['os_version_min'];
-        $filterConfig['os_version']['max'] = (float)$_POST['os_version_max'];
+        $filterConfig['os_version']['min'] = (float)getPost('os_version_min');
+        $filterConfig['os_version']['max'] = (float)getPost('os_version_max');
 
-        $filterConfig['main_camera_mp']['min'] = (int)$_POST['main_camera_min'];
-        $filterConfig['main_camera_mp']['max'] = (int)$_POST['main_camera_max'];
+        $filterConfig['main_camera_mp']['min'] = (int)getPost('main_camera_min');
+        $filterConfig['main_camera_mp']['max'] = (int)getPost('main_camera_max');
 
-        $filterConfig['f_number']['min'] = (float)$_POST['f_number_min'];
-        $filterConfig['f_number']['max'] = (float)$_POST['f_number_max'];
+        $filterConfig['f_number']['min'] = (float)getPost('f_number_min');
+        $filterConfig['f_number']['max'] = (float)getPost('f_number_max');
 
-        $filterConfig['battery_capacity']['min'] = (int)$_POST['battery_cap_min'];
-        $filterConfig['battery_capacity']['max'] = (int)$_POST['battery_cap_max'];
+        $filterConfig['battery_capacity']['min'] = (int)getPost('battery_cap_min');
+        $filterConfig['battery_capacity']['max'] = (int)getPost('battery_cap_max');
 
-        $filterConfig['wired_charging']['min'] = (int)$_POST['wired_charge_min'];
-        $filterConfig['wired_charging']['max'] = (int)$_POST['wired_charge_max'];
+        $filterConfig['wired_charging']['min'] = (int)getPost('wired_charge_min');
+        $filterConfig['wired_charging']['max'] = (int)getPost('wired_charge_max');
 
-        $filterConfig['wireless_charging']['min'] = (int)$_POST['wireless_charge_min'];
-        $filterConfig['wireless_charging']['max'] = (int)$_POST['wireless_charge_max'];
+        $filterConfig['wireless_charging']['min'] = (int)getPost('wireless_charge_min');
+        $filterConfig['wireless_charging']['max'] = (int)getPost('wireless_charge_max');
 
         // Update dimensions
-        $filterConfig['dimensions']['height_min'] = (int)$_POST['height_min'];
-        $filterConfig['dimensions']['height_max'] = (int)$_POST['height_max'];
-        $filterConfig['dimensions']['width_min'] = (int)$_POST['width_min'];
-        $filterConfig['dimensions']['width_max'] = (int)$_POST['width_max'];
-        $filterConfig['dimensions']['thickness_min'] = (float)$_POST['thickness_min'];
-        $filterConfig['dimensions']['thickness_max'] = (float)$_POST['thickness_max'];
-        $filterConfig['dimensions']['weight_min'] = (int)$_POST['weight_min'];
-        $filterConfig['dimensions']['weight_max'] = (int)$_POST['weight_max'];
+        $filterConfig['dimensions']['height_min'] = (int)getPost('height_min');
+        $filterConfig['dimensions']['height_max'] = (int)getPost('height_max');
+        $filterConfig['dimensions']['width_min'] = (int)getPost('width_min');
+        $filterConfig['dimensions']['width_max'] = (int)getPost('width_max');
+        $filterConfig['dimensions']['thickness_min'] = (float)getPost('thickness_min');
+        $filterConfig['dimensions']['thickness_max'] = (float)getPost('thickness_max');
+        $filterConfig['dimensions']['weight_min'] = (int)getPost('weight_min');
+        $filterConfig['dimensions']['weight_max'] = (int)getPost('weight_max');
 
         // Update text options (textarea input, one per line)
-        $filterConfig['colors'] = array_filter(array_map('trim', explode("\n", $_POST['colors'])));
-        $filterConfig['frame_materials'] = array_filter(array_map('trim', explode("\n", $_POST['frame_materials'])));
-        $filterConfig['back_materials'] = array_filter(array_map('trim', explode("\n", $_POST['back_materials'])));
-        $filterConfig['display_technologies'] = array_filter(array_map('trim', explode("\n", $_POST['display_techs'])));
-        $filterConfig['wifi_versions'] = array_filter(array_map('trim', explode("\n", $_POST['wifi_versions'])));
-        $filterConfig['bluetooth_versions'] = array_filter(array_map('trim', explode("\n", $_POST['bluetooth_versions'])));
-        $filterConfig['os_families'] = array_filter(array_map('trim', explode("\n", $_POST['os_families'])));
+        $filterConfig['colors'] = array_filter(array_map('trim', explode("\n", getPost('colors', ''))));
+        $filterConfig['frame_materials'] = array_filter(array_map('trim', explode("\n", getPost('frame_materials', ''))));
+        $filterConfig['back_materials'] = array_filter(array_map('trim', explode("\n", getPost('back_materials', ''))));
+        $filterConfig['display_technologies'] = array_filter(array_map('trim', explode("\n", getPost('display_techs', ''))));
+        $filterConfig['wifi_versions'] = array_filter(array_map('trim', explode("\n", getPost('wifi_versions', ''))));
+        $filterConfig['bluetooth_versions'] = array_filter(array_map('trim', explode("\n", getPost('bluetooth_versions', ''))));
+        $filterConfig['os_families'] = array_filter(array_map('trim', explode("\n", getPost('os_families', ''))));
 
         // Re-index arrays to make them proper JSON arrays
         $filterConfig['colors'] = array_values($filterConfig['colors']);

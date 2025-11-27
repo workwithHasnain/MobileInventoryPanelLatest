@@ -93,7 +93,7 @@
     "colors": [
         "Black",
         "White",
-        "Silver",
+        "Silverr",
         "Red",
         "Gold",
         "Red",
@@ -111,7 +111,8 @@
         "Plastic",
         "TESTER",
         "Carbon Fiber",
-        "Titanium"
+        "Titanium",
+        "Deep blue"
     ],
     "back_materials": [
         "Glass",
@@ -214,31 +215,88 @@
         "USB 2.0"
     ],
     "network_2g_bands": [
-        {"value": "850", "label": "GSM 850"},
-        {"value": "900", "label": "GSM 900"},
-        {"value": "1800", "label": "GSM 1800"},
-        {"value": "1900", "label": "GSM 1900"}
+        {
+            "value": "850",
+            "label": "GSM 850"
+        },
+        {
+            "value": "900",
+            "label": "GSM 900"
+        },
+        {
+            "value": "1800",
+            "label": "GSM 1800"
+        },
+        {
+            "value": "1900",
+            "label": "GSM 1900"
+        }
     ],
     "network_3g_bands": [
-        {"value": "850", "label": "HSPA 850"},
-        {"value": "900", "label": "HSPA 900"},
-        {"value": "1700", "label": "HSPA 1700"},
-        {"value": "1900", "label": "HSPA 1900"},
-        {"value": "2100", "label": "HSPA 2100"}
+        {
+            "value": "850",
+            "label": "HSPA 850"
+        },
+        {
+            "value": "900",
+            "label": "HSPA 900"
+        },
+        {
+            "value": "1700",
+            "label": "HSPA 1700"
+        },
+        {
+            "value": "1900",
+            "label": "HSPA 1900"
+        },
+        {
+            "value": "2100",
+            "label": "HSPA 2100"
+        }
     ],
     "network_4g_bands": [
-        {"value": "700", "label": "LTE 700"},
-        {"value": "850", "label": "LTE 850"},
-        {"value": "900", "label": "LTE 900"},
-        {"value": "1800", "label": "LTE 1800"},
-        {"value": "2600", "label": "LTE 2600"}
+        {
+            "value": "700",
+            "label": "LTE 700"
+        },
+        {
+            "value": "850",
+            "label": "LTE 850"
+        },
+        {
+            "value": "900",
+            "label": "LTE 900"
+        },
+        {
+            "value": "1800",
+            "label": "LTE 1800"
+        },
+        {
+            "value": "2600",
+            "label": "LTE 2600"
+        }
     ],
     "network_5g_bands": [
-        {"value": "3500", "label": "NR 3500"},
-        {"value": "3600", "label": "NR 3600"},
-        {"value": "3700", "label": "NR 3700"},
-        {"value": "3800", "label": "NR 3800"},
-        {"value": "mmWave", "label": "mmWave (24-40 GHz)"}
+        {
+            "value": "3500",
+            "label": "NR 3500"
+        },
+        {
+            "value": "3600",
+            "label": "NR 3600"
+        },
+        {
+            "value": "3700",
+            "label": "NR 3700"
+        },
+        {
+            "value": "3800",
+            "label": "NR 3800"
+        },
+        {
+            "value": "mmWave",
+            "label": "mmWave (24-40 GHz)"
+        }
     ],
     "sort_options": [
         "newest",
