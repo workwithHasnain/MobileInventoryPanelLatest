@@ -22,8 +22,8 @@ System ui fonts in all pages -Done
 
 Css/ styles images, post body minor issues -> live
     scrollbars in sidebar: latest devices
-    featured image css issue
-    featured posts in mobile view
+    featured.php header image css issue 720x370
+    featured posts in mobile view on homepage
     search bar overfloating issue in mobile view
     image size on device.php
     reviews.php image updated with featured.php
