@@ -21,12 +21,12 @@ phone-finder.php -Done
 System ui fonts in all pages -Done
 
 Css/ styles images, post body minor issues -> live
-    scrollbars in sidebar: latest devices
-    featured.php header image css issue 720x370
-    featured posts in mobile view on homepage
-    search bar overfloating issue in mobile view
+    scrollbars in sidebar: latest devices -Solved
+    featured.php header image css issue 720x370 -Okay
+    featured posts in mobile view on homepage -Done
+    search bar overfloating issue in mobile view -Done
     image size on device.php
-    reviews.php image updated with featured.php
+    reviews.php image updated with featured.php -Auto Solve when Dynamic Image will be implemented
     homepage scrolled data fetch
 
 Add color field for phones background -Done
