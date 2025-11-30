@@ -18,7 +18,12 @@ body {
     font-variation-settings:
         "wdth" 100;
 }
-
+.brand-item-bold {
+    font-weight: 600 !important;
+}
+.navbar-bold {
+    font-weight: 700 !important;
+}
 h1,
 h2,
 h3,

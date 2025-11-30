@@ -343,7 +343,7 @@ if ($_POST && isset($_POST['action'])) {
             $brandChunks = array_chunk($brands, 1); // Create chunks of 1 brand per row
             foreach ($brandChunks as $brandRow):
                 foreach ($brandRow as $brand): ?>
-                    <a href="#" style="font-weight: 500;" class="brand-cell" data-brand-id="<?php echo $brand['id']; ?>"><?php echo htmlspecialchars($brand['name']); ?></a>
+                    <a href="#" class="brand-cell brand-item-bold" data-brand-id="<?php echo $brand['id']; ?>"><?php echo htmlspecialchars($brand['name']); ?></a>
             <?php endforeach;
             endforeach; ?>
             <a href="#" onclick="showBrandsModal(); return false;" style="cursor: pointer;">[...]</a>
@@ -357,13 +357,13 @@ if ($_POST && isset($_POST['action'])) {
     <div id="leftMenu" class="container show">
         <div class="row">
             <div class="col-12 d-flex align-items-center   colums-gap">
-                <a href="index.php" class="nav-link" style="font-weight: 700;">Home</a>
-                <a href="compare.php" class="nav-link" style="font-weight: 700;">Compare</a>
-                <a href="#" class="nav-link" style="font-weight: 700;">Videos</a>
-                <a href="reviews.php" class="nav-link" style="font-weight: 700;">Reviews</a>
-                <a href="featured.php" class="nav-link d-lg-block d-none" style="font-weight: 700;">Featured</a>
-                <a href="phonefinder.php" class="nav-link d-lg-block d-none" style="font-weight: 700;">Phone Finder</a>
-                <a href="#" class="nav-link d-lg-block d-none" style="font-weight: 700;">Contact</a>
+                <a href="index.php" class="nav-link navbar-bold">Home</a>
+                <a href="compare.php" class="nav-link navbar-bold">Compare</a>
+                <a href="#" class="nav-link navbar-bold">Videos</a>
+                <a href="reviews.php" class="nav-link navbar-bold">Reviews</a>
+                <a href="featured.php" class="nav-link d-lg-block d-none navbar-bold">Featured</a>
+                <a href="phonefinder.php" class="nav-link d-lg-block d-none navbar-bold">Phone Finder</a>
+                <a href="#" class="nav-link d-lg-block d-none navbar-bold">Contact</a>
                 <div style="background-color: #d50000; border-radius: 7px;" class="d-lg-none py-2"><svg
                         xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" height="16" width="16" class="mx-3">
                         <path fill="#ffffff"
@@ -413,7 +413,7 @@ if ($_POST && isset($_POST['action'])) {
                     </div>
                 </div>
             <?php endforeach; ?>
-            <div class="col-md-4 col-5 d-none d-lg-block" style="position: relative; left: 40px;">
+            <div class="col-md-4 col-5 d-none d-lg-block" style="position: relative; left: 20px;">
                 <button class="solid w-100 py-2">
                     <i class="fa-solid fa-mobile fa-sm mx-2" style="color: white;"></i>
                     Phone Finder</button>
@@ -426,7 +426,7 @@ if ($_POST && isset($_POST['action'])) {
                         foreach ($brandChunks as $brandRow):
                             foreach ($brandRow as $brand):
                         ?>
-                                <button class="brand-cell" style="cursor: pointer; font-weight: 500;" data-brand-id="<?php echo $brand['id']; ?>"><?php echo htmlspecialchars($brand['name']); ?></button>
+                                <button class="brand-cell brand-item-bold" style="cursor: pointer;" data-brand-id="<?php echo $brand['id']; ?>"><?php echo htmlspecialchars($brand['name']); ?></button>
                     <?php
                             endforeach;
                         endforeach;
@@ -504,7 +504,7 @@ if ($_POST && isset($_POST['action'])) {
                                                 <?php else: ?>
                                                     <img class="shrink" src="" alt="">
                                                 <?php endif; ?>
-                                                <p style="font-weight: 500;"><?php echo htmlspecialchars($device['name'] ?? ''); ?></p>
+                                                <p class="brand-item-bold"><?php echo htmlspecialchars($device['name'] ?? ''); ?></p>
                                             </div>
                                         <?php endforeach; ?>
                                         <?php for ($j = count($row); $j < 3; $j++): ?>
@@ -643,7 +643,7 @@ if ($_POST && isset($_POST['action'])) {
                                         <?php foreach ($row as $i => $device): ?>
                                             <div class="device-card canel<?php echo $i == 1 ? ' mx-4' : ($i == 0 ? '' : ''); ?>" data-device-id="<?php echo $device['id']; ?>" style="cursor: pointer;">
                                                 <img class="shrink" src="<?php echo htmlspecialchars($device['image'] ?? ''); ?>" alt="">
-                                                <p style="font-weight: 500;"><?php echo htmlspecialchars($device['name'] ?? ''); ?></p>
+                                                <p class="brand-item-bold"><?php echo htmlspecialchars($device['name'] ?? ''); ?></p>
                                             </div>
                                         <?php endforeach; ?>
                                         <?php for ($j = count($row); $j < 3; $j++): ?>
