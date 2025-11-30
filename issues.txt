@@ -27,6 +27,7 @@ Css/ styles images, post body minor issues -> live
     search bar overfloating issue in mobile view
     image size on device.php
     reviews.php image updated with featured.php
+    homepage scrolled data fetch
 
 Add color field for phones background -Done
 

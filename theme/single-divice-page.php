@@ -50,7 +50,17 @@
               <img src="iccons/instagram-color-svgrepo-com.svg" alt="Instagram" width="22px">
             </button>
 
+            <button type="button" class="btn" data-bs-toggle="tooltip" data-bs-placement="left" title="WiFi">
+              <i class="fa-solid fa-wifi fa-lg" style="color: #ffffff;"></i>
+            </button>
 
+            <button type="button" class="btn" data-bs-toggle="tooltip" data-bs-placement="left" title="Car">
+              <i class="fa-solid fa-car fa-lg" style="color: #ffffff;"></i>
+            </button>
+
+            <button type="button" class="btn" data-bs-toggle="tooltip" data-bs-placement="left" title="Cart">
+              <i class="fa-solid fa-cart-shopping fa-lg" style="color: #ffffff;"></i>
+            </button>
           </div>
         </div>
 
@@ -63,7 +73,13 @@
         </form>
 
         <div>
+          <button type="button" class="btn mb-2" data-bs-toggle="tooltip" data-bs-placement="left" title="Login">
+            <i class="fa-solid fa-right-to-bracket fa-lg" style="color: #ffffff;"></i>
+          </button>
 
+          <button type="button" class="btn mb-2" data-bs-toggle="tooltip" data-bs-placement="left" title="Register">
+            <i class="fa-solid fa-user-plus fa-lg" style="color: #ffffff;"></i>
+          </button>
         </div>
       </div>
 
@@ -101,13 +117,13 @@
       <i class="fas fa-share-alt"></i>
     </div>
     <div class="column">
-      <a href="index.php">Home</a>
-
-      <a href="reviews.php">Reviews</a>
-      <a href="videos.php">Videos</a>
-      <a href="featured.php">Featured</a>
-      <a href="phonefinder.php">Phone Finder</a>
-      <a href="compare.php">Compare</a>
+      <a href="index.html">Home</a>
+      <a href="news.html">News</a>
+      <a href="rewies.html">Reviews</a>
+      <a href="videos.html">Videos</a>
+      <a href="featured.html">Featured</a>
+      <a href="phonefinder.html">Phone Finder</a>
+      <a href="compare.html">Compare</a>
       <a href="#">Coverage</a>
       <a href="contact">Contact Us</a>
       <a href="#">Merch</a>
@@ -137,14 +153,14 @@
   <div id="leftMenu" class="container show">
     <div class="row">
       <div class="col-12 d-flex align-items-center   colums-gap">
-        <a href="index.php" class="nav-link">Home</a>
-        <a href="compare.php" class="nav-link">Compare</a>
-        <a href="videos.php" class="nav-link">Videos</a>
-        <a href="reviews.php" class="nav-link ">Reviews</a>
-
-        <a href="featured.php" class="nav-link d-lg-block d-none">Featured</a>
-        <a href="phonefinder.php" class="nav-link d-lg-block d-none">Phone Finder</a>
-        <a href="contact.php" class="nav-link d-lg-block d-none">Contact</a>
+        <a href="index.html" class="nav-link">Home</a>
+        <a href="compare.html" class="nav-link">Compare</a>
+        <a href="videos.html" class="nav-link">Videos</a>
+        <a href="rewies.html" class="nav-link ">Reviews</a>
+        <a href="news.html" class="nav-link d-lg-block d-none">News</a>
+        <a href="featured.html" class="nav-link d-lg-block d-none">Featured</a>
+        <a href="phonefinder.html" class="nav-link d-lg-block d-none">Phone Finder</a>
+        <a href="contact.html" class="nav-link d-lg-block d-none">Contact</a>
         <div style="background-color: #d50000; border-radius: 7px;" class="d-lg-none py-2"><svg
             xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" height="16" width="16" class="mx-3">
             <path fill="#ffffff"
@@ -207,7 +223,7 @@
     }
 
     .spec-item {
-      padding: 20px;
+      padding: 12px 20px;
       display: flex;
       row-gap: 8px;
       flex-direction: column;
@@ -302,15 +318,21 @@
       background: linear-gradient(90deg, #fff 0%, #fcfeff 2%, rgba(125, 185, 232, 0));
       z-index: 1;
     }
-
+    
     .phone-image {
-      display: block;
-      height: -webkit-fill-available;
-      width: 165px;
-      position: relative;
-      z-index: 2;
-      background: #fff;
-    }
+     margin-left: 5px;
+    display: block;
+    height: -webkit-fill-available;
+    width: 165px;
+    position: relative;
+    z-index: 2;
+    background: url("https://fdn2.gsmarena.com/vv/bigpic/samsung-galaxy-s24-ultra-5g-sm-s928-stylus.jpg");
+    /* background: #fff; */
+    background-position: right;
+    background-color: #fff;
+    background-size: contain;
+    background-repeat: no-repeat;
+}
 
     tr {
       background-color: white;
@@ -370,11 +392,15 @@
       <div class="d-lg-flex  d-block" style="align-items: flex-start; ">
 
         <!-- Left: Phone Image -->
-        <div class="phone-image me-3 pt-2 px-2">
-          <img style="    height: -webkit-fill-available;
-    width: 100%;
-    padding: 12px;" src="https://fdn2.gsmarena.com/vv/bigpic/vivo-v60.jpg" alt="vivo V60 phone image" />
-        </div>
+         <div style=" 
+         height: 200px;
+    height: -webkit-fill-available;
+    background: white;
+   padding-top: 5px;    
+">
+            <!-- Left: Phone Image -->
+            <div class="phone-image me-3 pt-2 px-2" style="height: 200px;"></div>
+</div>
 
         <!-- Right: Details + Stats + Specs -->
         <div class="flex-grow-1 position-relative" style="z-index: 100;">
@@ -402,32 +428,32 @@
           </div>
 
           <!-- Specs Row (aligned with image) -->
-          <div class="row text-center d-block g-0  pt-2 specs-bar">
-            <div class="col-3 spec-item">
-              <img src="imges/vrer.png" style="width: 25px;" alt="">
+           <div class="row text-center d-block g-0  pt-2 specs-bar">
+                <div class="col-3 spec-item">
+                  <img src="imges/vrer.png" style="width: 25px;" alt="">
 
-              <div class="spec-title"> 6.77"</div>
-              <div class="spec-subtitle">1080x2392 px</div>
-            </div>
-            <div class="col-3 spec-item border-start">
-              <img src="imges/bett-removebg-preview.png" style="width: 35px;" alt="">
+                  <div class="spec-title"> 6.77"</div>
+                  <div class="spec-subtitle">1080x2392 px</div>
+                </div>
+                <div class="col-3 spec-item border-start">
+                  <img src="imges/bett-removebg-preview.png" style="width: 35px;" alt="">
 
-              <div class="spec-title">50MP</div>
-              <div class="spec-subtitle">2160p</div>
-            </div>
-            <div class="col-3 spec-item border-start">
-              <img src="imges/encypt-removebg-preview.png" style="width: 38px;" alt="">
+                  <div class="spec-title">50MP</div>
+                  <div class="spec-subtitle">2160p</div>
+                </div>
+                <div class="col-3 spec-item border-start">
+                  <img src="imges/encypt-removebg-preview.png" style="width: 38px;" alt="">
 
-              <div class="spec-title">8-16GB</div>
-              <div class="spec-subtitle">Snapdragon 7</div>
-            </div>
-            <div class="col-3 spec-item border-start">
-              <img src="imges/lowtry-removebg-preview.png" style="width: 35px;" alt="">
+                  <div class="spec-title">8-16GB</div>
+                  <div class="spec-subtitle">Snapdragon 7</div>
+                </div>
+                <div class="col-3 spec-item border-start">
+                  <img src="imges/lowtry-removebg-preview.png" style="width: 35px;" alt="">
 
-              <div class="spec-title">6500mAh</div>
-              <div class="spec-subtitle">90W</div>
-            </div>
-          </div>
+                  <div class="spec-title">6500mAh</div>
+                  <div class="spec-subtitle">90W</div>
+                </div>
+              </div>
 
         </div>
       </div>
@@ -463,11 +489,11 @@
 
     </div>
   </div>
-  <div class="container d-lg-block d-none">
+  <div class="container d-md-block d-none">
     <div class="row">
       <div class="article-info">
         <div class="bg-blur">
-          <div class="d-block justify-content-end">
+          <div class="d-block d-md-none justify-content-end">
             <div class="d-flex flexiable ">
               <img src="/imges/download-removebg-preview.png" alt="">
               <h5 style="font-family:'oswald' ; font-size: 16px" class="mt-2">Review (17)
@@ -519,18 +545,19 @@
           <div class="d-flex" style="align-items: flex-start;">
 
             <!-- Left: Phone Image -->
-            <div class="phone-image me-3 pt-2 px-2">
-              <img style="    height: -webkit-fill-available;
-    width: 100%;
-    padding: 12px;" src="https://fdn2.gsmarena.com/vv/bigpic/vivo-v60.jpg" alt="vivo V60 phone image" />
-            </div>
-
+             <div style="
+    height: -webkit-fill-available;
+    background: white;
+">
+            <!-- Left: Phone Image -->
+            <div class="phone-image me-3 pt-2 px-2"></div>
+</div>
+          
             <!-- Right: Details + Stats + Specs -->
             <div class="flex-grow-1 position-relative" style="z-index: 100;">
 
               <!-- Phone Details + Stats -->
-              <div class="d-flex justify-content-between mb-3">
-
+              <div class="d-flex justify-content-between">
                 <ul class="phone-details list-unstyled mb-0 d-lg-block d-none">
                   <li><span>📅 Released 2025, August 19</span></li>
                   <li><span>⚖️ 192g or 201g, 7.5mm thickness</span></li>
@@ -614,55 +641,59 @@
 
 
       </div>
-      <div class="col-md-4 col-5 d-none d-lg-block" style="position: relative; left: 25px;">
-        <button class="solid w-100 py-2">
-          <i class="fa-solid fa-mobile fa-sm mx-2" style="color: white;"></i>
-          Phone Finder</button>
-        <div class="devor">
-          <button class="px-3 py-1 ">Sumsung</button>
-          <button class="px-3 py-1 ">Xiaomi</button>
-          <button class="px-3 py-1 ">Asus</button>
-          <button class="px-3 py-1 ">Infinix</button>
-          <button class="px-3 py-1 ">Apple</button>
-          <button class="px-3 py-1 ">Google</button>
-          <button class="px-3 py-1 ">AlCatel</button>
-          <button class="px-3 py-1 ">Ulefone</button>
-          <button class="px-3 py-1 ">Huawei</button>
-          <button class="px-3 py-1 ">Honor</button>
-          <button class="px-3 py-1 ">Zte</button>
-          <button class="px-3 py-1 ">Tecno</button>
-          <button class="px-3 py-1 ">Nokia</button>
-          <button class="px-3 py-1 ">Oppo</button>
-          <button class="px-3 py-1 ">Microsoft </button>
-          <button class="px-3 py-1 ">Dooge</button>
-          <button class="px-3 py-1 ">Sony</button>
-          <button class="px-3 py-1 ">Realme</button>
-          <button class="px-3 py-1 ">Unidegi</button>
-          <button class="px-3 py-1 ">Blackview</button>
-          <button class="px-3 py-1 ">Lg </button>
-          <button class="px-3 py-1 ">OnePlus</button>
-          <button class="px-3 py-1 ">Coolpad</button>
-          <button class="px-3 py-1 ">Cubot</button>
-          <button class="px-3 py-1 ">HTc</button>
-          <button class="px-3 py-1 ">Nothing</button>
-          <button class="px-3 py-1 ">Oscal</button>
-          <button class="px-3 py-1 ">oukitel</button>
-          <button class="px-3 py-1 ">Motrola</button>
-          <button class="px-3 py-1 ">Vivo</button>
-          <button class="px-3 py-1 ">Shrap</button>
-          <button class="px-3 py-1 ">Itel</button>
-          <button class="px-3 py-1 ">Lenovo</button>
-          <button class="px-3 py-1 ">meizu</button>
-          <button class="px-3 py-1 ">Micromax</button>
-          <button class="px-3 py-1 ">Tcl</button>
-        </div>
-        <button class="solid w-50 py-2">
-          <i class="fa-solid fa-bars fa-sm mx-2"></i>
-          All Brands</button>
-        <button class="solid py-2" style="    width: 177px;">
-          <i class="fa-solid fa-volume-high fa-sm mx-2"></i>
-          RUMORS MILL</button>
-      </div>
+        <div class="col-md-4 col-5 d-none d-lg-block">
+                <button class="solid w-100 py-2">
+                    <i class="fa-solid fa-mobile fa-sm mx-2" style="color: white;"></i>
+                    Phone Finder</button>
+                <div class="devor">
+                    <button>Samsung</button>
+                    <button>Xiaomi</button>
+                    <button >Asus</button>
+                    <button>Infinix</button>
+                    <button>Apple</button>
+                    <button >Google</button>
+                    <button >AlCatel</button>
+                    <button >Ulefone</button>
+                    <button >Huawei</button>
+                    <button >Honor</button>
+                    <button >Zte</button>
+                    <button >Tecno</button>
+                    <button >Nokia</button>
+                    <button >Oppo</button>
+                    <button >Microsoft </button>
+                    <button >Dooge</button>
+                    <button >Sony</button>
+                    <button >Realme</button>
+                    <button >Unidegi</button>
+                    <button >Blackview</button>
+                    <button >Lg </button>
+                    <button >OnePlus</button>
+                    <button >Coolpad</button>
+                    <button >Cubot</button>
+                    <button >HTc</button>
+                    <button >Nothing</button>
+                    <button >Oscal</button>
+                    <button >oukitel</button>
+                    <button >Motrola</button>
+                    <button >Vivo</button>
+                    <button >Shrap</button>
+                    <button >Itel</button>
+                    <button >Lenovo</button>
+                    <button >meizu</button>
+                    <button >Micromax</button>
+                    <button >Tcl</button>
+                </div>
+                <div class="d-flex">
+
+                    <button class="solid w-50 py-2">
+                        <i class="fa-solid 
+                        fa-bars fa-sm mx-2"></i> All Brands</button>
+                    <button class="solid w-50 py-2" style="/* width: 177px; */">
+                        <i class="fa-solid fa-volume-high fa-sm mx-2"></i>
+                        RUMORS MILL</button>
+
+                </div>
+            </div>
     </div>
 
   </div>
@@ -675,7 +706,7 @@
         <div class="bg-white">
 
 
-          <table class="table forat">
+          <table class="table fora  t">
             <tbody>
               <tr>
                 <th class="spec-label">NETWORK</th>
@@ -683,6 +714,7 @@
               </tr>
               <tr>
                 <th class="spec-label">LAUNCH</th>
+                <br>
                 <td>
                   <strong>Announced</strong> 2025, August 12<br>
                   <strong>Status</strong> Available. Released 2025, August 19
@@ -917,7 +949,7 @@
             </div>
           </div>
 
-          <img src="https://fdn.gsmarena.com/imgroot/static/banners/self/review-pixel-9-pro-xl-728x90.jpg" alt="">
+          <img  src="https://fdn.gsmarena.com/imgroot/static/banners/self/review-pixel-9-pro-xl-728x90.jpg" alt="" style="width: -webkit-fill-available;">
         </div>
       </div>
 
@@ -1068,7 +1100,7 @@
       <div class="col-10 nav-wrap m-auto text-center ">
         <div class="nav-container">
           <a href="#">Home</a>
-
+          <a href="#">News</a>
           <a href="#">Reviews</a>
           <a href="#">Compare</a>
           <a href="#">Coverage</a>
@@ -1084,7 +1116,7 @@
           <a href="#">Mobile version</a>
           <a href="#">Android app</a>
           <a href="#">Tools</a>
-          <a href="contact.php">Contact us</a>
+          <a href="contact.html">Contact us</a>
           <a href="#">Merch store</a>
           <a href="#">Privacy</a>
           <a href="#">Terms of use</a>
@@ -1104,7 +1136,7 @@
 <script>
   // Enable tooltips
   var tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'))
-  tooltipTriggerList.map(function(tooltipTriggerEl) {
+  tooltipTriggerList.map(function (tooltipTriggerEl) {
     return new bootstrap.Tooltip(tooltipTriggerEl)
   })
 </script>
