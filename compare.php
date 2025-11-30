@@ -974,13 +974,13 @@ function formatDeviceSpecsJson($device)
     <div id="leftMenu" class="container show">
         <div class="row">
             <div class="col-12 d-flex align-items-center   colums-gap">
-                <a href="index.php" class="nav-link">Home</a>
-                <a href="compare.php" class="nav-link">Compare</a>
-                <a href="#" class="nav-link">Videos</a>
-                <a href="reviews.php" class="nav-link ">Reviews</a>
-                <a href="featured.php" class="nav-link d-lg-block d-none">Featured</a>
-                <a href="phonefinder.php" class="nav-link d-lg-block d-none">Phone Finder</a>
-                <a href="#" class="nav-link d-lg-block d-none">Contact</a>
+                <a href="index.php" class="nav-link navbar-bold">Home</a>
+                <a href="compare.php" class="nav-link navbar-bold">Compare</a>
+                <a href="#" class="nav-link navbar-bold">Videos</a>
+                <a href="reviews.php" class="nav-link navbar-bold">Reviews</a>
+                <a href="featured.php" class="nav-link d-lg-block d-none navbar-bold">Featured</a>
+                <a href="phonefinder.php" class="nav-link d-lg-block d-none navbar-bold">Phone Finder</a>
+                <a href="#" class="nav-link d-lg-block d-none navbar-bold">Contact</a>
                 <div style="background-color: #d50000; border-radius: 7px;" class="d-lg-none py-2"><svg
                         xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" height="16" width="16" class="mx-3">
                         <path fill="#ffffff"
@@ -997,7 +997,7 @@ function formatDeviceSpecsJson($device)
                         style="background-repeat: no-repeat; background-size: cover;" alt="">
                 </div>
             </div>
-            <div class="col-md-4 col-5 d-none d-lg-block" style="position: relative; left: 25px;">
+            <div class="col-md-4 col-5 d-none d-lg-block" style="position: relative; left: 20px;">
                 <button class="solid w-100 py-2">
                     <i class="fa-solid fa-mobile fa-sm mx-2" style="color: white;"></i>
                     Phone Finder</button>
@@ -1010,19 +1010,21 @@ function formatDeviceSpecsJson($device)
                         foreach ($brandChunks as $brandRow):
                             foreach ($brandRow as $brand):
                         ?>
-                                <button class="px-3 py-1 brand-cell" style="cursor: pointer;" data-brand-id="<?php echo $brand['id']; ?>"><?php echo htmlspecialchars($brand['name']); ?></button>
+                                <button class="brand-cell brand-item-bold" style="cursor: pointer;" data-brand-id="<?php echo $brand['id']; ?>"><?php echo htmlspecialchars($brand['name']); ?></button>
                     <?php
                             endforeach;
                         endforeach;
                     endif;
                     ?>
                 </div>
-                <button class="solid w-50 py-2" onclick="showBrandsModal()">
-                    <i class="fa-solid fa-bars fa-sm mx-2"></i>
-                    All Brands</button>
-                <button class="solid py-2" style="    width: 177px;">
-                    <i class="fa-solid fa-volume-high fa-sm mx-2"></i>
-                    RUMORS MILL</button>
+                <div class="d-flex">
+                    <button class="solid w-50 py-2" onclick="showBrandsModal()">
+                        <i class="fa-solid fa-bars fa-sm mx-2"></i>
+                        All Brands</button>
+                    <button class="solid w-50 py-2">
+                        <i class="fa-solid fa-volume-high fa-sm mx-2"></i>
+                        RUMORS MILL</button>
+                </div>
             </div>
         </div>
 
