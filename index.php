@@ -343,7 +343,7 @@ if ($_POST && isset($_POST['action'])) {
             $brandChunks = array_chunk($brands, 1); // Create chunks of 1 brand per row
             foreach ($brandChunks as $brandRow):
                 foreach ($brandRow as $brand): ?>
-                    <a href="#" style="font-weight: 400;" class="brand-cell" data-brand-id="<?php echo $brand['id']; ?>"><?php echo htmlspecialchars($brand['name']); ?></a>
+                    <a href="#" style="font-weight: 500;" class="brand-cell" data-brand-id="<?php echo $brand['id']; ?>"><?php echo htmlspecialchars($brand['name']); ?></a>
             <?php endforeach;
             endforeach; ?>
             <a href="#" onclick="showBrandsModal(); return false;" style="cursor: pointer;">[...]</a>
@@ -426,7 +426,7 @@ if ($_POST && isset($_POST['action'])) {
                         foreach ($brandChunks as $brandRow):
                             foreach ($brandRow as $brand):
                         ?>
-                                <button class="brand-cell" style="cursor: pointer; font-weight: 400;" data-brand-id="<?php echo $brand['id']; ?>"><?php echo htmlspecialchars($brand['name']); ?></button>
+                                <button class="brand-cell" style="cursor: pointer; font-weight: 500;" data-brand-id="<?php echo $brand['id']; ?>"><?php echo htmlspecialchars($brand['name']); ?></button>
                     <?php
                             endforeach;
                         endforeach;
@@ -504,7 +504,7 @@ if ($_POST && isset($_POST['action'])) {
                                                 <?php else: ?>
                                                     <img class="shrink" src="" alt="">
                                                 <?php endif; ?>
-                                                <p><?php echo htmlspecialchars($device['name'] ?? ''); ?></p>
+                                                <p style="font-weight: 500;"><?php echo htmlspecialchars($device['name'] ?? ''); ?></p>
                                             </div>
                                         <?php endforeach; ?>
                                         <?php for ($j = count($row); $j < 3; $j++): ?>
@@ -643,7 +643,7 @@ if ($_POST && isset($_POST['action'])) {
                                         <?php foreach ($row as $i => $device): ?>
                                             <div class="device-card canel<?php echo $i == 1 ? ' mx-4' : ($i == 0 ? '' : ''); ?>" data-device-id="<?php echo $device['id']; ?>" style="cursor: pointer;">
                                                 <img class="shrink" src="<?php echo htmlspecialchars($device['image'] ?? ''); ?>" alt="">
-                                                <p><?php echo htmlspecialchars($device['name'] ?? ''); ?></p>
+                                                <p style="font-weight: 500;"><?php echo htmlspecialchars($device['name'] ?? ''); ?></p>
                                             </div>
                                         <?php endforeach; ?>
                                         <?php for ($j = count($row); $j < 3; $j++): ?>
