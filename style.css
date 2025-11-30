@@ -183,7 +183,7 @@ input:focus {
 }
 
 .support .col-md-4 .solid {
-    margin-left: -13px;
+    /* margin-left: -13px; */
     background-color: #090E21;
     color: white;
 
@@ -201,14 +201,20 @@ input:focus {
 
 .devor {
     margin-left: 0;
+    grid-column-gap: 0;
+    grid-row-gap: 0;
+    grid-template-columns: 1fr 1fr 1fr 1fr;
+    grid-auto-columns: 1fr;
+    display: grid;
+
 }
 
 .devor button {
     border: none;
-    margin-left: -12px;
-    font-size: 14px;
-    font-weight: 400;
-    width: 89px;
+    font-size: 12px;
+       font-weight: 500;
+    margin-top: -1px;
+    padding: 3px 0px;
     letter-spacing: -0.19px;
     text-transform: uppercase;
     text-align: center;
@@ -242,7 +248,7 @@ input:focus {
 #leftMenu.show {
     /* position: absolute; */
     display: block;
-    top: 56px;
+    /* top: 56px; */
     z-index: 999;
 
 }
@@ -353,11 +359,14 @@ input:focus {
     overflow-y: scroll;
     overflow-x: hidden;
 }
+.canel{
+    width: 80px;
+}
 
 .shrink {
 
-    width: 100%;
-    height: 111px;
+    width: 115%;
+    height: 119px;
     margin-top: 10px;
 }
 
@@ -1203,23 +1212,6 @@ table tr:hover {
     overflow: hidden;
 }
 
-/* Ensure the first header block inside the post hero fills the area */
-.comfort-life-23>.article-info:first-child {
-    height: 100%;
-}
-
-.comfort-life-23>.article-info:first-child .bg-blur {
-    height: 100%;
-}
-
-/* Make the featured image cover the blurred section fully */
-.comfort-life-23 .bg-blur .center-img {
-    width: 100%;
-    height: 100%;
-    object-fit: cover;
-    display: block;
-}
-
 .bg-blur {
     background-image: none !important;
     height: 100%;
@@ -1927,9 +1919,8 @@ td {
 
 @media screen and (max-width:1047px) {
 
-    .devor button {
-        width: 27%;
-
+      .article-info {
+        height: auto;
     }
 
     .support {
@@ -1958,7 +1949,7 @@ td {
     }
 
     .colums-gap {
-        column-gap: 110px;
+        column-gap: 80px;
     }
 
     .paragh-div {
@@ -2099,7 +2090,7 @@ td {
     }
 
     #leftMenu.show a {
-        font-size: 19px;
+        font-size: 14px;
     }
 
     .review-card {
@@ -2232,6 +2223,19 @@ td {
         display: grid;
         grid-template-columns: repeat(2, 2fr);
     }
+    .spec-label{
+        font-size: 1rem;
+    }
+    strong{
+        font-size: 12px;
+    }
+    .table{
+        border: none;
+    }
+    .table th, .table td{
+        border: none;
+        /* padding: 4px 3px; */
+    }
 
     .center-img {
         width: -webkit-fill-available;
@@ -2246,4 +2250,6 @@ td {
         width: auto;
         display: block;
     }
+
+
 }

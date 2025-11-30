@@ -300,7 +300,7 @@
                     <button class="solid w-50 py-2">
                         <i class="fa-solid 
                         fa-bars fa-sm mx-2"></i> All Brands</button>
-                    <button class="solid w-50 py-2" style="/* width: 177px; */">
+                    <button class="solid w-50 py-2">
                         <i class="fa-solid fa-volume-high fa-sm mx-2"></i>
                         RUMORS MILL</button>
 
