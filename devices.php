@@ -64,8 +64,14 @@ if (!empty($availability_filter)) {
 
 if (!empty($device_type_filter)) {
     $filtered_phones = array_filter($filtered_phones, function ($phone) use ($device_type_filter) {
-        // Check if device has tablet-specific indicators or missing phone-specific fields
-        $isTablet = isset($phone['device_type']) ? $phone['device_type'] === 'tablet' : (!isset($phone['form_factor']) && !isset($phone['keyboard']));
+        // Heuristic: use display size to infer type (>= 7 inches => tablet)
+        $isTablet = false;
+        if (!empty($phone['display_size'])) {
+            $sizeNum = preg_replace('/[^0-9\.]/', '', (string)$phone['display_size']);
+            if ($sizeNum !== '' && is_numeric($sizeNum)) {
+                $isTablet = floatval($sizeNum) >= 7.0;
+            }
+        }
 
         if ($device_type_filter === 'phone') {
             return !$isTablet;
@@ -183,8 +189,14 @@ include 'includes/header.php';
                                     <div class="d-flex justify-content-between align-items-start mb-2">
                                         <h5 class="card-title mb-0"><?php echo htmlspecialchars($phone['name'] ?? 'Unknown Device'); ?></h5>
                                         <?php
-                                        // Determine device type
-                                        $isTablet = isset($phone['device_type']) ? $phone['device_type'] === 'tablet' : (!isset($phone['form_factor']) && !isset($phone['keyboard']));
+                                        // Determine device type using display size heuristic (>= 7 inches => Tablet)
+                                        $isTablet = false;
+                                        if (!empty($phone['display_size'])) {
+                                            $sizeNum = preg_replace('/[^0-9\.]/', '', (string)$phone['display_size']);
+                                            if ($sizeNum !== '' && is_numeric($sizeNum)) {
+                                                $isTablet = floatval($sizeNum) >= 7.0;
+                                            }
+                                        }
                                         $deviceTypeLabel = $isTablet ? 'Tablet' : 'Phone';
                                         $deviceTypeClass = $isTablet ? 'bg-info' : 'bg-primary';
                                         ?>
@@ -193,7 +205,12 @@ include 'includes/header.php';
                                     <p class="card-text">
                                         <strong>Brand:</strong> <?php echo htmlspecialchars($phone['brand'] ?? 'Unknown'); ?><br>
                                         <strong>Year:</strong> <?php echo htmlspecialchars($phone['year'] ?? 'Unknown'); ?><br>
-                                        <strong>Price:</strong> $<?php echo number_format($phone['price'], 2); ?>
+                                        <strong>Price:</strong>
+                                        <?php if (isset($phone['price']) && $phone['price'] !== null && $phone['price'] !== ''): ?>
+                                            $<?php echo number_format((float)$phone['price'], 2); ?>
+                                        <?php else: ?>
+                                            <span class="text-muted">—</span>
+                                        <?php endif; ?>
                                     </p>
 
                                     <!-- Availability Badge -->
@@ -224,15 +241,18 @@ include 'includes/header.php';
                                     <div class="mb-3">
                                         <small class="text-muted">
                                             <?php if (!empty($phone['ram'])): ?>
-                                                <i class="fas fa-memory"></i> <?php echo $phone['ram']; ?>GB RAM
+                                                <i class="fas fa-memory"></i>
+                                                <?php echo htmlspecialchars($phone['ram']); ?> RAM
                                             <?php endif; ?>
 
                                             <?php if (!empty($phone['storage'])): ?>
-                                                <i class="fas fa-hdd ms-2"></i> <?php echo $phone['storage']; ?>GB
+                                                <i class="fas fa-hdd ms-2"></i>
+                                                <?php echo htmlspecialchars($phone['storage']); ?>
                                             <?php endif; ?>
 
                                             <?php if (!empty($phone['display_size'])): ?>
-                                                <i class="fas fa-desktop ms-2"></i> <?php echo $phone['display_size']; ?>"
+                                                <i class="fas fa-desktop ms-2"></i>
+                                                <?php echo htmlspecialchars(rtrim((string)$phone['display_size'], '"')); ?>"
                                             <?php endif; ?>
                                         </small>
                                     </div>
@@ -252,7 +272,7 @@ include 'includes/header.php';
                                     <!-- Action Buttons -->
                                     <div class="mt-auto">
                                         <div class="btn-group w-100" role="group">
-                                            <a href="edit_phone.php?id=<?php echo $phone['id']; ?>"
+                                            <a href="edit_device.php?id=<?php echo $phone['id']; ?>"
                                                 class="btn btn-outline-primary btn-sm">
                                                 <i class="fas fa-edit"></i> Edit
                                             </a>
@@ -315,22 +335,22 @@ include 'includes/header.php';
                                                             <td><?php echo htmlspecialchars($phone['os']); ?></td>
                                                         </tr>
                                                     <?php endif; ?>
-                                                    <?php if (!empty($phone['chipset'])): ?>
+                                                    <?php if (!empty($phone['chipset']) || !empty($phone['chipset_name'])): ?>
                                                         <tr>
                                                             <td><strong>Chipset:</strong></td>
-                                                            <td><?php echo htmlspecialchars($phone['chipset']); ?></td>
+                                                            <td><?php echo htmlspecialchars($phone['chipset'] ?? $phone['chipset_name']); ?></td>
                                                         </tr>
                                                     <?php endif; ?>
                                                     <?php if (!empty($phone['ram'])): ?>
                                                         <tr>
                                                             <td><strong>RAM:</strong></td>
-                                                            <td><?php echo $phone['ram']; ?> GB</td>
+                                                            <td><?php echo htmlspecialchars($phone['ram']); ?></td>
                                                         </tr>
                                                     <?php endif; ?>
                                                     <?php if (!empty($phone['storage'])): ?>
                                                         <tr>
                                                             <td><strong>Storage:</strong></td>
-                                                            <td><?php echo $phone['storage']; ?> GB</td>
+                                                            <td><?php echo htmlspecialchars($phone['storage']); ?></td>
                                                         </tr>
                                                     <?php endif; ?>
                                                     <?php if (!empty($phone['display_size'])): ?>
@@ -342,13 +362,23 @@ include 'includes/header.php';
                                                     <?php if (!empty($phone['main_camera_resolution'])): ?>
                                                         <tr>
                                                             <td><strong>Main Camera:</strong></td>
-                                                            <td><?php echo $phone['main_camera_resolution']; ?> MP</td>
+                                                            <td>
+                                                                <?php
+                                                                $mc = (string)$phone['main_camera_resolution'];
+                                                                echo htmlspecialchars(preg_match('/[a-zA-Z]/', $mc) ? $mc : ($mc . ' MP'));
+                                                                ?>
+                                                            </td>
                                                         </tr>
                                                     <?php endif; ?>
                                                     <?php if (!empty($phone['battery_capacity'])): ?>
                                                         <tr>
                                                             <td><strong>Battery:</strong></td>
-                                                            <td><?php echo $phone['battery_capacity']; ?> mAh</td>
+                                                            <td>
+                                                                <?php
+                                                                $bc = (string)$phone['battery_capacity'];
+                                                                echo htmlspecialchars(preg_match('/[a-zA-Z]/', $bc) ? $bc : ($bc . ' mAh'));
+                                                                ?>
+                                                            </td>
                                                         </tr>
                                                     <?php endif; ?>
                                                 </table>
@@ -356,7 +386,7 @@ include 'includes/header.php';
                                         </div>
                                     </div>
                                     <div class="modal-footer">
-                                        <a href="edit_phone.php?id=<?php echo $phone['id']; ?>" class="btn btn-primary">Edit Device</a>
+                                        <a href="edit_device.php?id=<?php echo $phone['id']; ?>" class="btn btn-primary">Edit Device</a>
                                         <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
                                     </div>
                                 </div>

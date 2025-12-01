@@ -6,26 +6,6 @@ if (isset($_SESSION['logged_in']) && $_SESSION['logged_in'] === true) {
     header("Location: dashboard.php");
     exit();
 }
-
-$error = '';
-
-// Handle login form submission
-if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-    $username = isset($_POST['username']) ? trim($_POST['username']) : '';
-    $password = isset($_POST['password']) ? trim($_POST['password']) : '';
-
-    // Validate credentials (hardcoded for this example)
-    if ($username === 'admin' && $password === '1234') {
-        $_SESSION['logged_in'] = true;
-        $_SESSION['username'] = 'admin';
-        $_SESSION['role'] = 'admin';
-
-        header("Location: dashboard.php");
-        exit();
-    } else {
-        $error = 'Invalid username or password';
-    }
-}
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -47,13 +27,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                         <h4 class="mb-0 text-center">Admin Login</h4>
                     </div>
                     <div class="card-body">
-                        <?php if ($error): ?>
-                            <div class="alert alert-danger" role="alert">
-                                <?php echo htmlspecialchars($error); ?>
-                            </div>
-                        <?php endif; ?>
+                        <div id="alertContainer"></div>
 
-                        <form method="post" action="<?php echo htmlspecialchars($_SERVER['PHP_SELF']); ?>">
+                        <form id="loginForm">
                             <div class="mb-3">
                                 <label for="username" class="form-label">Username</label>
                                 <input type="text" class="form-control" id="username" name="username" required>
@@ -63,7 +39,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                                 <input type="password" class="form-control" id="password" name="password" required>
                             </div>
                             <div class="d-grid">
-                                <button type="submit" class="btn btn-primary">Login</button>
+                                <button type="submit" class="btn btn-primary" id="loginBtn">Login</button>
                             </div>
                         </form>
                     </div>
@@ -73,6 +49,51 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     </div>
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        document.getElementById('loginForm').addEventListener('submit', async function(e) {
+            e.preventDefault();
+
+            const username = document.getElementById('username').value;
+            const password = document.getElementById('password').value;
+            const loginBtn = document.getElementById('loginBtn');
+            const alertContainer = document.getElementById('alertContainer');
+
+            // Disable button and show loading state
+            loginBtn.disabled = true;
+            loginBtn.textContent = 'Logging in...';
+
+            try {
+                const response = await fetch('login_handler.php', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/x-www-form-urlencoded',
+                    },
+                    body: new URLSearchParams({
+                        username: username,
+                        password: password
+                    })
+                });
+
+                const data = await response.json();
+
+                if (data.success) {
+                    alertContainer.innerHTML = '<div class="alert alert-success" role="alert">Login successful! Redirecting...</div>';
+                    setTimeout(() => {
+                        window.location.href = data.redirect;
+                    }, 500);
+                } else {
+                    alertContainer.innerHTML = `<div class="alert alert-danger" role="alert">${data.message}</div>`;
+                    loginBtn.disabled = false;
+                    loginBtn.textContent = 'Login';
+                }
+            } catch (error) {
+                alertContainer.innerHTML = '<div class="alert alert-danger" role="alert">An error occurred. Please try again.</div>';
+                loginBtn.disabled = false;
+                loginBtn.textContent = 'Login';
+                console.error('Login error:', error);
+            }
+        });
+    </script>
 </body>
 
 </html>

@@ -51,11 +51,19 @@
                             <img src="iccons/instagram-color-svgrepo-com.svg" alt="Instagram" width="22px">
                         </button>
 
+                        <button type="button" class="btn" data-bs-toggle="tooltip" data-bs-placement="left"
+                            title="WiFi">
+                            <i class="fa-solid fa-wifi fa-lg" style="color: #ffffff;"></i>
+                        </button>
 
+                        <button type="button" class="btn" data-bs-toggle="tooltip" data-bs-placement="left" title="Car">
+                            <i class="fa-solid fa-car fa-lg" style="color: #ffffff;"></i>
+                        </button>
 
-
-
-
+                        <button type="button" class="btn" data-bs-toggle="tooltip" data-bs-placement="left"
+                            title="Cart">
+                            <i class="fa-solid fa-cart-shopping fa-lg" style="color: #ffffff;"></i>
+                        </button>
                     </div>
                 </div>
 
@@ -67,7 +75,17 @@
                     </svg>
                 </form>
 
+                <div>
+                    <button type="button" class="btn mb-2" data-bs-toggle="tooltip" data-bs-placement="left"
+                        title="Login">
+                        <i class="fa-solid fa-right-to-bracket fa-lg" style="color: #ffffff;"></i>
+                    </button>
 
+                    <button type="button" class="btn mb-2" data-bs-toggle="tooltip" data-bs-placement="left"
+                        title="Register">
+                        <i class="fa-solid fa-user-plus fa-lg" style="color: #ffffff;"></i>
+                    </button>
+                </div>
             </div>
 
         </nav>
@@ -140,8 +158,6 @@
     <div id="leftMenu" class="container show">
         <div class="row">
             <div class="col-12 d-flex align-items-center   colums-gap">
-                <a href="single-post-page.html" class="nav-link">Post Page</a>
-                <a href="single-divice-page.html" class="nav-link">Post Device</a>
 
                 <a href="index.html" class="nav-link">Home</a>
                 <a href="compare.html" class="nav-link">Compare</a>
@@ -237,54 +253,58 @@
                     <h1>Google pIxel 9a Review</h1>
                 </div>
             </div>
-            <div class="col-md-4 col-5 d-none d-lg-block" style="position: relative; left: 40px;">
+            <div class="col-md-4 col-5 d-none d-lg-block" style="position: relative; left: 20px;">
                 <button class="solid w-100 py-2">
                     <i class="fa-solid fa-mobile fa-sm mx-2" style="color: white;"></i>
                     Phone Finder</button>
                 <div class="devor">
-                    <button class="px-3 py-1 ">Samsung</button>
-                    <button class="px-3 py-1 ">Xiaomi</button>
-                    <button class="px-3 py-1 ">Asus</button>
-                    <button class="px-3 py-1 ">Infinix</button>
-                    <button class="px-3 py-1 ">Apple</button>
-                    <button class="px-3 py-1 ">Google</button>
-                    <button class="px-3 py-1 ">AlCatel</button>
-                    <button class="px-3 py-1 ">Ulefone</button>
-                    <button class="px-3 py-1 ">Huawei</button>
-                    <button class="px-3 py-1 ">Honor</button>
-                    <button class="px-3 py-1 ">Zte</button>
-                    <button class="px-3 py-1 ">Tecno</button>
-                    <button class="px-3 py-1 ">Nokia</button>
-                    <button class="px-3 py-1 ">Oppo</button>
-                    <button class="px-3 py-1 ">Microsoft </button>
-                    <button class="px-3 py-1 ">Dooge</button>
-                    <button class="px-3 py-1 ">Sony</button>
-                    <button class="px-3 py-1 ">Realme</button>
-                    <button class="px-3 py-1 ">Unidegi</button>
-                    <button class="px-3 py-1 ">Blackview</button>
-                    <button class="px-3 py-1 ">Lg </button>
-                    <button class="px-3 py-1 ">OnePlus</button>
-                    <button class="px-3 py-1 ">Coolpad</button>
-                    <button class="px-3 py-1 ">Cubot</button>
-                    <button class="px-3 py-1 ">HTc</button>
-                    <button class="px-3 py-1 ">Nothing</button>
-                    <button class="px-3 py-1 ">Oscal</button>
-                    <button class="px-3 py-1 ">oukitel</button>
-                    <button class="px-3 py-1 ">Motrola</button>
-                    <button class="px-3 py-1 ">Vivo</button>
-                    <button class="px-3 py-1 ">Shrap</button>
-                    <button class="px-3 py-1 ">Itel</button>
-                    <button class="px-3 py-1 ">Lenovo</button>
-                    <button class="px-3 py-1 ">meizu</button>
-                    <button class="px-3 py-1 ">Micromax</button>
-                    <button class="px-3 py-1 ">Tcl</button>
+                    <button>Samsung</button>
+                    <button>Xiaomi</button>
+                    <button >Asus</button>
+                    <button>Infinix</button>
+                    <button>Apple</button>
+                    <button >Google</button>
+                    <button >AlCatel</button>
+                    <button >Ulefone</button>
+                    <button >Huawei</button>
+                    <button >Honor</button>
+                    <button >Zte</button>
+                    <button >Tecno</button>
+                    <button >Nokia</button>
+                    <button >Oppo</button>
+                    <button >Microsoft </button>
+                    <button >Dooge</button>
+                    <button >Sony</button>
+                    <button >Realme</button>
+                    <button >Unidegi</button>
+                    <button >Blackview</button>
+                    <button >Lg </button>
+                    <button >OnePlus</button>
+                    <button >Coolpad</button>
+                    <button >Cubot</button>
+                    <button >HTc</button>
+                    <button >Nothing</button>
+                    <button >Oscal</button>
+                    <button >oukitel</button>
+                    <button >Motrola</button>
+                    <button >Vivo</button>
+                    <button >Shrap</button>
+                    <button >Itel</button>
+                    <button >Lenovo</button>
+                    <button >meizu</button>
+                    <button >Micromax</button>
+                    <button >Tcl</button>
                 </div>
-                <button class="solid w-50 py-2">
-                    <i class="fa-solid fa-bars fa-sm mx-2"></i>
-                    All Brands</button>
-                <button class="solid py-2" style="    width: 177px;">
-                    <i class="fa-solid fa-volume-high fa-sm mx-2"></i>
-                    RUMORS MILL</button>
+                <div class="d-flex">
+
+                    <button class="solid w-50 py-2">
+                        <i class="fa-solid 
+                        fa-bars fa-sm mx-2"></i> All Brands</button>
+                    <button class="solid w-50 py-2">
+                        <i class="fa-solid fa-volume-high fa-sm mx-2"></i>
+                        RUMORS MILL</button>
+
+                </div>
             </div>
         </div>
         <div class="row">
@@ -324,7 +344,8 @@
             </div>
             <div class="col-6 col-md-4" style=" position: relative; left: 28px;">
                 <img class="w-100 d-none d-lg-inline"
-                    src="https://fdn.gsmarena.com/imgroot/static/banners/self/review-iphone-16-300x250.jpg" style="height: 95%;" alt="">
+                    src="https://fdn.gsmarena.com/imgroot/static/banners/self/review-iphone-16-300x250.jpg"
+                    style="height: 95%;" alt="">
 
             </div>
         </div>
@@ -414,10 +435,11 @@
                 </div>
             </div>
             <div class="col-lg-4  col-12  bg-white ">
-                <h6 style="color: #090E21; text-transform: uppercase; font-weight: 900;" class=" mt-2 ">Latest Devices</h6>
+                <h6 style="color: #090E21; text-transform: uppercase; font-weight: 900;" class=" mt-2 ">Latest Devices
+                </h6>
                 <div class="cent">
 
-                    <div class="d-flex">
+                    <div class="d-flex align-items-start">
                         <div class="canel">
                             <img class="shrink" src="https://fdn2.gsmarena.com/vv/bigpic/vivoiy300-gt.jpg" alt="">
                             <p>Vivo y300 Gt</p>
@@ -432,7 +454,7 @@
                             <p>Vivo x200 FE</p>
                         </div>
                     </div>
-                    <div class="d-flex">
+                    <div class="d-flex align-items-start">
                         <div class="canel">
                             <img class="shrink" src="https://fdn2.gsmarena.com/vv/bigpic/vivo-x-fold3.jpg" alt="">
                             <p>Vivo X Fold5</p>
@@ -446,7 +468,7 @@
                             <p>OScal pad 100</p>
                         </div>
                     </div>
-                    <div class="d-flex">
+                    <div class="d-flex align-items-start">
                         <div class="canel">
                             <img class="shrink" src="https://fdn2.gsmarena.com/vv/bigpic/itel-city-100.jpg" alt="">
                             <p>itel city 100</p>
@@ -465,7 +487,8 @@
                 </div>
 
 
-                <h6 style="border-left: solid 5px grey ; color: #090E21; text-transform: uppercase; font-weight: 900; margin-top: 12px;" class="px-3">Popular comparisons</h6>
+                <h6 style="border-left: solid 5px grey ; color: #090E21; text-transform: uppercase; font-weight: 900; margin-top: 12px;"
+                    class="px-3">Popular comparisons</h6>
 
                 <div class="sentizer bg-white mt-2 p-3 rounded shadow-sm" style="    text-transform: Uppercase;
                                             font-size: 13px;
@@ -809,7 +832,8 @@
             </div>
 
             <div class="col-lg-4  col-12 sentizer-er  bg-white p-3">
-                <h6 style="border-left: 7px solid #EFEBE9 ; font-weight: 900; color: #090E21; text-transform: uppercase;" class=" px-2 mt-2 d-inline mt-4">Top 10
+                <h6 style="border-left: 7px solid #EFEBE9 ; font-weight: 900; color: #090E21; text-transform: uppercase;"
+                    class=" px-2 mt-2 d-inline mt-4">Top 10
                     Daily Interest</h6>
 
                 <div class="center">
@@ -875,7 +899,8 @@
                         </tbody>
                     </table>
                 </div>
-                <h6 style="border-left: 7px solid #EFEBE9 ; font-weight: 900; color: #090E21; text-transform: uppercase;" class=" px-2 mt-2 d-inline mt-4">Top 10 by
+                <h6 style="border-left: 7px solid #EFEBE9 ; font-weight: 900; color: #090E21; text-transform: uppercase;"
+                    class=" px-2 mt-2 d-inline mt-4">Top 10 by
                     Fans</h6>
                 <div class="center" style="margin-top: 12px;">
                     <table class="table table-sm custom-table">
@@ -940,13 +965,14 @@
                         </tbody>
                     </table>
                 </div>
-                <h6 style="border-left: 7px solid #EFEBE9 ; font-weight: 900; color: #090E21; text-transform: uppercase;" class=" px-2 mt-2 d-inline mt-4">In
+                <h6 style="border-left: 7px solid #EFEBE9 ; font-weight: 900; color: #090E21; text-transform: uppercase;"
+                    class=" px-2 mt-2 d-inline mt-4">In
                     Storeies
                     Now</h6>
 
                 <div class="cent">
 
-                    <div class="d-flex">
+                    <div class="d-flex ">
                         <div class="canel">
                             <img class="shrink" src="https://fdn2.gsmarena.com/vv/bigpic/nothing-cmf-phone-2-pro.jpg"
                                 alt="">
@@ -993,7 +1019,8 @@
                         </div>
                     </div>
                 </div>
-                <h6 style="border-left: solid 5px grey ; font-weight: 900; color: #090E21; text-transform: uppercase;" class="px-3 py-2 mt-3">Electric Vehicles</h6>
+                <h6 style="border-left: solid 5px grey ; font-weight: 900; color: #090E21; text-transform: uppercase;"
+                    class="px-3 py-2 mt-3">Electric Vehicles</h6>
                 <div class="d-flex">
                     <div class="col-md-4">
                         <img style="height: 60px;"
@@ -1062,7 +1089,7 @@
             <div class="col-10 nav-wrap m-auto text-center ">
                 <div class="nav-container">
                     <a href="#">Home</a>
-
+                    <a href="#">News</a>
                     <a href="#">Reviews</a>
                     <a href="#">Compare</a>
                     <a href="#">Coverage</a>

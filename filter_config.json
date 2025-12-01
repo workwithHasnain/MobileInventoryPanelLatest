@@ -1,0 +1,308 @@
+{
+    "price": {
+        "min": 0,
+        "max": 3000,
+        "step": 10,
+        "default_max": 3000
+    },
+    "year": {
+        "min": 2000,
+        "max": 2026,
+        "default_min": 2000,
+        "default_max": 2026
+    },
+    "ram": {
+        "min": 0,
+        "max": 24,
+        "step": 1,
+        "default": 0
+    },
+    "storage": {
+        "min": 0,
+        "max": 2048,
+        "step": 16,
+        "default": 0
+    },
+    "display_size": {
+        "min": 3,
+        "max": 8,
+        "step": 0.1,
+        "default_min": 3,
+        "default_max": 8
+    },
+    "display_resolution": {
+        "min": 480,
+        "max": 4320,
+        "step": 1,
+        "default_min": 480,
+        "default_max": 4320,
+        "resolution_labels": {
+            "480": "min",
+            "4320": "max"
+        }
+    },
+    "refresh_rate": {
+        "min": 0,
+        "max": 240,
+        "step": 30,
+        "default": 0
+    },
+    "network_types": [
+        "2G",
+        "3G",
+        "4G",
+        "5G"
+    ],
+    "sim_types": [
+        "Nano-SIM",
+        "Micro-SIM",
+        "Standard SIM",
+        "eSIM"
+    ],
+    "form_factors": [
+        "Slider",
+        "Candy bar",
+        "Foldable"
+    ],
+    "ip_certificates": [
+        "IP52",
+        "IP53",
+        "IP54",
+        "IP55",
+        "IP56",
+        "IP57",
+        "IP58",
+        "IP67",
+        "IP68",
+        "IP69"
+    ],
+    "dimensions": {
+        "height_min": 0,
+        "height_max": 300,
+        "height_step": 1,
+        "width_min": 0,
+        "width_max": 100,
+        "width_step": 1,
+        "thickness_min": 0,
+        "thickness_max": 30,
+        "thickness_step": 0.1,
+        "weight_min": 0,
+        "weight_max": 400,
+        "weight_step": 5
+    },
+    "colors": [
+        "Black",
+        "White",
+        "Silverr",
+        "Red",
+        "Gold",
+        "Red",
+        "Blue",
+        "Green",
+        "Purple",
+        "Pink",
+        "Gray",
+        "Brown",
+        "Orange"
+    ],
+    "frame_materials": [
+        "Stainless Steel",
+        "Aluminum",
+        "Plastic",
+        "TESTER",
+        "Carbon Fiber",
+        "Titanium",
+        "Deep blue"
+    ],
+    "back_materials": [
+        "Glass",
+        "Plastic",
+        "Metal",
+        "Ceramic",
+        "Leather"
+    ],
+    "display_technologies": [
+        "AMOLED",
+        "OLED",
+        "IPS LCD",
+        "LCD",
+        "TFT",
+        "E-ink"
+    ],
+    "display_notches": [
+        "No notch",
+        "Teardrop",
+        "Punch hole",
+        "Island",
+        "Notch"
+    ],
+    "os_families": [
+        "Android",
+        "iOS",
+        "Windows Phone",
+        "HarmonyOS",
+        "Ubuntu Touch"
+    ],
+    "os_version": {
+        "min": 0,
+        "max": 16,
+        "step": 0.5,
+        "default": 0
+    },
+    "cpu_clock": {
+        "min": 0,
+        "max": 4,
+        "step": 0.1,
+        "default": 0
+    },
+    "main_camera_mp": {
+        "min": 0,
+        "max": 200,
+        "step": 1,
+        "default": 0
+    },
+    "f_number": {
+        "min": 0,
+        "max": 4,
+        "step": 0.1,
+        "default": 0
+    },
+    "battery_capacity": {
+        "min": 0,
+        "max": 10000,
+        "step": 100,
+        "default": 0
+    },
+    "wired_charging": {
+        "min": 0,
+        "max": 300,
+        "step": 5,
+        "default": 0
+    },
+    "wireless_charging": {
+        "min": 0,
+        "max": 100,
+        "step": 5,
+        "default": 0
+    },
+    "fingerprint_types": [
+        "Side-mounted",
+        "Under-display",
+        "Rear-mounted",
+        "In-display"
+    ],
+    "wifi_versions": [
+        "WiFi 4",
+        "WiFi 5",
+        "WiFi 6",
+        "WiFi 6E",
+        "WiFi 7"
+    ],
+    "bluetooth_versions": [
+        "Bluetooth 4.0",
+        "Bluetooth 4.1",
+        "Bluetooth 4.2",
+        "Bluetooth 5.0",
+        "Bluetooth 5.1",
+        "Bluetooth 5.2",
+        "Bluetooth 5.3",
+        "Bluetooth 5.4"
+    ],
+    "usb_types": [
+        "USB Type-C",
+        "Micro USB",
+        "USB 3.0",
+        "USB 2.0"
+    ],
+    "network_2g_bands": [
+        {
+            "value": "850",
+            "label": "GSM 850"
+        },
+        {
+            "value": "900",
+            "label": "GSM 900"
+        },
+        {
+            "value": "1800",
+            "label": "GSM 1800"
+        },
+        {
+            "value": "1900",
+            "label": "GSM 1900"
+        }
+    ],
+    "network_3g_bands": [
+        {
+            "value": "850",
+            "label": "HSPA 850"
+        },
+        {
+            "value": "900",
+            "label": "HSPA 900"
+        },
+        {
+            "value": "1700",
+            "label": "HSPA 1700"
+        },
+        {
+            "value": "1900",
+            "label": "HSPA 1900"
+        },
+        {
+            "value": "2100",
+            "label": "HSPA 2100"
+        }
+    ],
+    "network_4g_bands": [
+        {
+            "value": "700",
+            "label": "LTE 700"
+        },
+        {
+            "value": "850",
+            "label": "LTE 850"
+        },
+        {
+            "value": "900",
+            "label": "LTE 900"
+        },
+        {
+            "value": "1800",
+            "label": "LTE 1800"
+        },
+        {
+            "value": "2600",
+            "label": "LTE 2600"
+        }
+    ],
+    "network_5g_bands": [
+        {
+            "value": "3500",
+            "label": "NR 3500"
+        },
+        {
+            "value": "3600",
+            "label": "NR 3600"
+        },
+        {
+            "value": "3700",
+            "label": "NR 3700"
+        },
+        {
+            "value": "3800",
+            "label": "NR 3800"
+        },
+        {
+            "value": "mmWave",
+            "label": "mmWave (24-40 GHz)"
+        }
+    ],
+    "sort_options": [
+        "newest",
+        "popularity",
+        "price_low",
+        "price_high",
+        "rating"
+    ]
+}

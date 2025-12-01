@@ -363,7 +363,7 @@ function formatMainCamera($phone)
 
     // Video
     if (!empty($phone['main_camera_video'])) {
-        $camera_parts[] = 'Video: ' . $phone['main_camera_video'];
+        $camera_parts[] = 'Video Recording: ' . $phone['main_camera_video'];
     }
 
     return !empty($camera_parts) ? implode('<br>', $camera_parts) : '<span class="text-muted">Not specified</span>';
@@ -408,7 +408,7 @@ function formatSelfieCamera($phone)
 
     // Video
     if (!empty($phone['selfie_camera_video'])) {
-        $selfie_parts[] = 'Video: ' . $phone['selfie_camera_video'];
+        $selfie_parts[] = 'Video Recording: ' . $phone['selfie_camera_video'];
     }
 
     return !empty($selfie_parts) ? implode('<br>', $selfie_parts) : '<span class="text-muted">Not specified</span>';
@@ -470,6 +470,52 @@ function formatPrice($phone)
     }
 
     return $price_line;
+}
+
+// ---- Pricing helpers (copied to align with device.php behavior) ----
+// Convert USD to EUR using a public exchange rate API
+function convertUSDtoEUR($usd_amount)
+{
+    try {
+        if ($usd_amount === null || $usd_amount === '' || !is_numeric($usd_amount)) return null;
+        $api_url = "https://open.er-api.com/v6/latest/USD";
+        $context = stream_context_create([]);
+        $response = @file_get_contents($api_url, false, $context);
+        if ($response === false) return null;
+        $data = json_decode($response, true);
+        if (isset($data['rates']['EUR']) && is_numeric($data['rates']['EUR'])) {
+            $rate = (float)$data['rates']['EUR'];
+            return $usd_amount * $rate;
+        }
+        return null;
+    } catch (Exception $e) {
+        return null;
+    }
+}
+
+// Extract numeric USD price from misc JSON (rows with field: 'Price')
+function extractPriceFromMisc($miscJson)
+{
+    if (!isset($miscJson) || $miscJson === '' || $miscJson === null) return null;
+    $decoded = json_decode($miscJson, true);
+    if (json_last_error() !== JSON_ERROR_NONE || !is_array($decoded)) return null;
+
+    foreach ($decoded as $row) {
+        $field = isset($row['field']) ? strtolower(trim((string)$row['field'])) : '';
+        $desc = isset($row['description']) ? trim((string)$row['description']) : '';
+        if ($field === 'price' && $desc !== '') {
+            // Try to extract a USD amount like $999 or 999.99
+            // First, look for an explicit $ amount
+            if (preg_match('/\$\s*([0-9]+(?:\.[0-9]{1,2})?)/', $desc, $m)) {
+                return (float)$m[1];
+            }
+            // Otherwise, fallback to the first number in the string
+            if (preg_match('/([0-9]+(?:\.[0-9]{1,2})?)/', $desc, $m)) {
+                return (float)$m[1];
+            }
+        }
+    }
+    return null;
 }
 
 // Helper function to get phone image
@@ -552,7 +598,7 @@ function formatMemory($phone)
     }
 
     if (!empty($phone['card_slot'])) {
-        $memory_parts[] = 'Card slot: ' . $phone['card_slot'];
+        $memory_parts[] = 'Expansion Slot: ' . $phone['card_slot'];
     }
 
     return !empty($memory_parts) ? implode(', ', $memory_parts) : '<span class="text-muted">Not specified</span>';
@@ -566,7 +612,7 @@ function formatSound($phone)
     $sound_parts = [];
 
     if (isset($phone['dual_speakers'])) {
-        $sound_parts[] = 'Loudspeaker: ' . ($phone['dual_speakers'] ? 'Yes' : 'No');
+        $sound_parts[] = 'Audio Output: ' . ($phone['dual_speakers'] ? 'Yes' : 'No');
     }
 
     if (isset($phone['headphone_jack'])) {
@@ -598,7 +644,7 @@ function formatCommunications($phone)
     }
 
     if (isset($phone['nfc'])) {
-        $comms_parts[] = 'NFC: ' . ($phone['nfc'] ? 'Yes' : 'No');
+        $comms_parts[] = 'Proximity: ' . ($phone['nfc'] ? 'Yes' : 'No');
     }
 
     if (isset($phone['fm_radio'])) {
@@ -657,6 +703,76 @@ function formatColors($phone)
 
     return '<span class="text-muted">Not specified</span>';
 }
+
+// ---- New JSON specs rendering (align with device.php) ----
+// Helper: render a section from JSON stored as TEXT in DB
+function renderJsonSection($jsonValue, $sectionName = '')
+{
+    if (!isset($jsonValue) || $jsonValue === '' || $jsonValue === null) return null;
+    $decoded = json_decode($jsonValue, true);
+    if (json_last_error() !== JSON_ERROR_NONE || !is_array($decoded)) {
+        // If it's not valid JSON but has text, just return as-is (escaped)
+        return htmlspecialchars((string)$jsonValue);
+    }
+    $parts = [];
+    foreach ($decoded as $row) {
+        $field = isset($row['field']) ? trim((string)$row['field']) : '';
+        $desc = isset($row['description']) ? trim((string)$row['description']) : '';
+        if ($field === '' && $desc === '') continue;
+        if ($field !== '') {
+            $line = '<strong>' . htmlspecialchars($field) . '</strong>';
+            if ($desc !== '') {
+                $line .= ' ' . htmlspecialchars($desc);
+
+                // If this is the GENERAL INFO -> Price row, append EUR conversion like device.php
+                if ($sectionName === 'GENERAL INFO' && strtolower($field) === 'price') {
+                    // Extract numeric USD amount from description
+                    $priceStr = preg_replace('/[^0-9.]/', '', $desc);
+                    if ($priceStr !== '' && is_numeric($priceStr)) {
+                        $usd = (float)$priceStr;
+                        $eur = convertUSDtoEUR($usd);
+                        if ($eur !== null) {
+                            $line .= ' / €' . number_format($eur, 2);
+                        }
+                    }
+                }
+            }
+            $parts[] = $line;
+        } else {
+            $parts[] = htmlspecialchars($desc);
+        }
+    }
+    return implode('<br>', $parts);
+}
+
+// Build specs array from grouped JSON columns
+function formatDeviceSpecsJson($device)
+{
+    $specs = [];
+    $jsonSections = [
+        'NETWORK' => $device['network'] ?? null,
+        'LAUNCH' => $device['launch'] ?? null,
+        'BODY' => $device['body'] ?? null,
+        'DISPLAY' => $device['display'] ?? null,
+        'HARDWARE' => $device['hardware'] ?? null,
+        'MEMORY' => $device['memory'] ?? null,
+        'MAIN CAMERA' => $device['main_camera'] ?? null,
+        'SELFIE CAMERA' => $device['selfie_camera'] ?? null,
+        'MULTIMEDIA' => $device['multimedia'] ?? null,
+        'CONNECTIVITY' => $device['connectivity'] ?? null,
+        'FEATURES' => $device['features'] ?? null,
+        'BATTERY' => $device['battery'] ?? null,
+        'GENERAL INFO' => $device['general_info'] ?? null,
+    ];
+
+    foreach ($jsonSections as $label => $raw) {
+        $html = renderJsonSection($raw, $label);
+        if ($html && trim($html) !== '') {
+            $specs[$label] = $html;
+        }
+    }
+    return $specs;
+}
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -682,6 +798,73 @@ function formatColors($phone)
     <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
 
     <link rel="stylesheet" href="style.css">
+    <style>
+        /* Brand Modal Styling */
+        .brand-cell-modal {
+            background-color: #fff;
+            border: 1px solid #c5b6b0;
+            color: #5D4037;
+            font-weight: 500;
+            transition: all 0.3s ease;
+            cursor: pointer;
+            font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue';
+        }
+
+        .brand-cell-modal:hover {
+            background-color: #D7CCC8 !important;
+            border-color: #8D6E63;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
+            color: #3E2723;
+        }
+
+        .brand-cell-modal:active {
+            transform: translateY(0);
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+
+        .brand-cell-modal:focus {
+            outline: none;
+            box-shadow: 0 0 0 3px rgba(141, 110, 99, 0.25);
+        }
+
+        #brandsModal .modal-dialog-scrollable {
+            max-height: 80vh;
+        }
+
+        /* Device Cell Modal Styling */
+        .device-cell-modal {
+            background-color: #fff;
+            border: 1px solid #c5b6b0;
+            color: #5D4037;
+            font-weight: 500;
+            transition: all 0.3s ease;
+            cursor: pointer;
+            font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue';
+        }
+
+        .device-cell-modal:hover {
+            background-color: #D7CCC8 !important;
+            border-color: #8D6E63;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
+            color: #3E2723;
+        }
+
+        .device-cell-modal:active {
+            transform: translateY(0);
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+
+        .device-cell-modal:focus {
+            outline: none;
+            box-shadow: 0 0 0 3px rgba(141, 110, 99, 0.25);
+        }
+
+        #devicesModal .modal-dialog-scrollable {
+            max-height: 80vh;
+        }
+    </style>
 </head>
 
 <body style="background-color: #EFEBE9;">
@@ -766,15 +949,11 @@ function formatColors($phone)
         <div class="column">
             <a href="index.php">Home</a>
             <a href="reviews.php">Reviews</a>
-            <a href="videos.php">Videos</a>
+            <a href="#">Videos</a>
             <a href="featured.php">Featured</a>
             <a href="phonefinder.php">Phone Finder</a>
             <a href="compare.php">Compare</a>
-            <a href="#">Coverage</a>
-            <a href="contact">Contact Us</a>
-            <a href="#">Merch</a>
-            <a href="#">Tip Us</a>
-            <a href="#">Privacy</a>
+            <a href="#">Contact Us</a>
         </div>
         <div class="brand-grid">
             <?php
@@ -784,7 +963,7 @@ function formatColors($phone)
                     <a href="#" class="brand-cell" data-brand-id="<?php echo $brand['id']; ?>"><?php echo htmlspecialchars($brand['name']); ?></a>
             <?php endforeach;
             endforeach; ?>
-            <a href="brands.php">[...]</a>
+            <a href="#" onclick="showBrandsModal(); return false;" style="cursor: pointer;">[...]</a>
         </div>
         <div class="menu-buttons d-flex justify-content-center ">
             <button class="btn btn-danger w-50">📱 Phone Finder</button>
@@ -795,14 +974,13 @@ function formatColors($phone)
     <div id="leftMenu" class="container show">
         <div class="row">
             <div class="col-12 d-flex align-items-center   colums-gap">
-                <a href="index.php" class="nav-link">Home</a>
-                <a href="compare.php" class="nav-link">Compare</a>
-                <a href="videos.php" class="nav-link">Videos</a>
-                <a href="reviews.php" class="nav-link ">Reviews</a>
-                <a href="news.php" class="nav-link d-lg-block d-none">News</a>
-                <a href="featured.php" class="nav-link d-lg-block d-none">Featured</a>
-                <a href="phonefinder.php" class="nav-link d-lg-block d-none">Phone Finder</a>
-                <a href="contact.php" class="nav-link d-lg-block d-none">Contact</a>
+                <a href="index.php" class="nav-link navbar-bold">Home</a>
+                <a href="compare.php" class="nav-link navbar-bold">Compare</a>
+                <a href="#" class="nav-link navbar-bold">Videos</a>
+                <a href="reviews.php" class="nav-link navbar-bold">Reviews</a>
+                <a href="featured.php" class="nav-link d-lg-block d-none navbar-bold">Featured</a>
+                <a href="phonefinder.php" class="nav-link d-lg-block d-none navbar-bold">Phone Finder</a>
+                <a href="#" class="nav-link d-lg-block d-none navbar-bold">Contact</a>
                 <div style="background-color: #d50000; border-radius: 7px;" class="d-lg-none py-2"><svg
                         xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" height="16" width="16" class="mx-3">
                         <path fill="#ffffff"
@@ -819,7 +997,7 @@ function formatColors($phone)
                         style="background-repeat: no-repeat; background-size: cover;" alt="">
                 </div>
             </div>
-            <div class="col-md-4 col-5 d-none d-lg-block" style="position: relative; left: 25px;">
+            <div class="col-md-4 col-5 d-none d-lg-block" style="position: relative; left: 20px;">
                 <button class="solid w-100 py-2">
                     <i class="fa-solid fa-mobile fa-sm mx-2" style="color: white;"></i>
                     Phone Finder</button>
@@ -832,19 +1010,21 @@ function formatColors($phone)
                         foreach ($brandChunks as $brandRow):
                             foreach ($brandRow as $brand):
                         ?>
-                                <button class="px-3 py-1 brand-cell" style="cursor: pointer;" data-brand-id="<?php echo $brand['id']; ?>"><?php echo htmlspecialchars($brand['name']); ?></button>
+                                <button class="brand-cell brand-item-bold" style="cursor: pointer;" data-brand-id="<?php echo $brand['id']; ?>"><?php echo htmlspecialchars($brand['name']); ?></button>
                     <?php
                             endforeach;
                         endforeach;
                     endif;
                     ?>
                 </div>
-                <button class="solid w-50 py-2">
-                    <i class="fa-solid fa-bars fa-sm mx-2"></i>
-                    All Brands</button>
-                <button class="solid py-2" style="    width: 177px;">
-                    <i class="fa-solid fa-volume-high fa-sm mx-2"></i>
-                    RUMORS MILL</button>
+                <div class="d-flex">
+                    <button class="solid w-50 py-2" onclick="showBrandsModal()">
+                        <i class="fa-solid fa-bars fa-sm mx-2"></i>
+                        All Brands</button>
+                    <button class="solid w-50 py-2">
+                        <i class="fa-solid fa-volume-high fa-sm mx-2"></i>
+                        RUMORS MILL</button>
+                </div>
             </div>
         </div>
 
@@ -980,165 +1160,139 @@ function formatColors($phone)
                 </tr>
             </thead>
             <tbody>
-                <tr>
-                    <td colspan="3" style="color: #f14d4d; font-size: 16px; background: #f9f9f9; font-weight: 600;">Network Technology</td>
-                </tr>
-                <tr>
-                    <td><?php echo $phone1 ? displayNetworkCapabilities($phone1) : 'N/A'; ?></td>
-                    <td><?php echo $phone2 ? displayNetworkCapabilities($phone2) : 'N/A'; ?></td>
-                    <td><?php echo $phone3 ? displayNetworkCapabilities($phone3) : 'N/A'; ?></td>
-                </tr>
+                <?php
+                // Build spec arrays from JSON for each phone (if phone selected)
+                $specs1 = $phone1 ? formatDeviceSpecsJson($phone1) : [];
+                $specs2 = $phone2 ? formatDeviceSpecsJson($phone2) : [];
+                $specs3 = $phone3 ? formatDeviceSpecsJson($phone3) : [];
 
-                <tr>
-                    <td colspan="3" style="color: #f14d4d; font-size: 16px; background: #f9f9f9; font-weight: 600;">Announcement Date</td>
-                </tr>
-                <tr>
-                    <td><?php echo $phone1 ? formatAnnouncementDate($phone1) : 'N/A'; ?></td>
-                    <td><?php echo $phone2 ? formatAnnouncementDate($phone2) : 'N/A'; ?></td>
-                    <td><?php echo $phone3 ? formatAnnouncementDate($phone3) : 'N/A'; ?></td>
-                </tr>
+                // Ordered sections (match device page logical order)
+                $orderedSections = [
+                    'NETWORK',
+                    'LAUNCH',
+                    'BODY',
+                    'DISPLAY',
+                    'HARDWARE',
+                    'MEMORY',
+                    'MAIN CAMERA',
+                    'SELFIE CAMERA',
+                    'MULTIMEDIA',
+                    'CONNECTIVITY',
+                    'FEATURES',
+                    'BATTERY',
+                    'GENERAL INFO'
+                ];
 
-                <tr>
-                    <td colspan="3" style="font-weight: 600; color: #f14d4d; font-size: 16px; background: #f9f9f9;">Availability / Status</td>
-                </tr>
-                <tr>
-                    <td><?php echo $phone1 ? displayAvailability($phone1) : 'N/A'; ?></td>
-                    <td><?php echo $phone2 ? displayAvailability($phone2) : 'N/A'; ?></td>
-                    <td><?php echo $phone3 ? displayAvailability($phone3) : 'N/A'; ?></td>
-                </tr>
+                // Fallback legacy mapping for key sections if JSON absent
+                $legacyFallback = function ($label, $phone) {
+                    if (!$phone) return 'N/A';
+                    switch ($label) {
+                        case 'NETWORK':
+                            return displayNetworkCapabilities($phone);
+                        case 'LAUNCH':
+                            // combine announcement + availability + price if present
+                            $parts = [];
+                            if (!empty($phone['release_date'])) {
+                                $parts[] = formatAnnouncementDate($phone);
+                            }
+                            if (!empty($phone['availability'])) {
+                                $parts[] = 'Status: ' . htmlspecialchars($phone['availability']);
+                            }
+                            // Prefer extracting price from general_info JSON if available
+                            $usdPrice = null;
+                            if (!empty($phone['general_info'])) {
+                                $usdPrice = extractPriceFromMisc($phone['general_info']);
+                            }
+                            if ($usdPrice === null && !empty($phone['price']) && is_numeric($phone['price'])) {
+                                $usdPrice = (float)$phone['price'];
+                            }
+                            if ($usdPrice !== null) {
+                                $priceLine = 'Price: $' . number_format($usdPrice, 2);
+                                $eur = convertUSDtoEUR($usdPrice);
+                                if ($eur !== null) {
+                                    $priceLine .= ' / €' . number_format($eur, 2);
+                                }
+                                $parts[] = $priceLine;
+                            }
+                            return !empty($parts) ? implode('<br>', $parts) : 'N/A';
+                        case 'BODY':
+                            $body = [];
+                            $dims = formatDimensions($phone);
+                            if ($dims && strpos($dims, 'Not specified') === false) $body[] = '<strong>Dimensions</strong> ' . $dims;
+                            if (!empty($phone['weight'])) $body[] = '<strong>Weight</strong> ' . htmlspecialchars($phone['weight']) . ' g';
+                            return !empty($body) ? implode('<br>', $body) : 'N/A';
+                        case 'DISPLAY':
+                            return formatDisplay($phone);
+                        case 'HARDWARE':
+                            $plat = [];
+                            if (!empty($phone['os'])) $plat[] = '<strong>OS</strong> ' . htmlspecialchars($phone['os']);
+                            if (!empty($phone['chipset_name'])) $plat[] = '<strong>System Chip</strong> ' . htmlspecialchars($phone['chipset_name']);
+                            return !empty($plat) ? implode('<br>', $plat) : 'N/A';
+                        case 'MEMORY':
+                            return formatMemory($phone);
+                        case 'MAIN CAMERA':
+                            return formatMainCamera($phone);
+                        case 'SELFIE CAMERA':
+                            return formatSelfieCamera($phone);
+                        case 'MULTIMEDIA':
+                            return formatSound($phone);
+                        case 'CONNECTIVITY':
+                            return formatCommunications($phone);
+                        case 'FEATURES':
+                            return formatFeatures($phone);
+                        case 'BATTERY':
+                            return formatBattery($phone);
+                        case 'GENERAL INFO':
+                            // Price & colors if available
+                            $miscParts = [];
+                            $colors = formatColors($phone);
+                            if ($colors && strpos($colors, 'Not specified') === false) $miscParts[] = '<strong>Colors</strong> ' . $colors;
+                            // Remove direct price display here to avoid duplication (now shown in LAUNCH)
+                            return !empty($miscParts) ? implode('<br>', $miscParts) : 'N/A';
+                        default:
+                            return 'N/A';
+                    }
+                };
 
-                <tr>
-                    <td colspan="3" style="font-weight: 600; color: #f14d4d; font-size: 16px; background: #f9f9f9;">Dimensions</td>
-                </tr>
-                <tr>
-                    <td><?php echo $phone1 ? formatDimensions($phone1) : 'N/A'; ?></td>
-                    <td><?php echo $phone2 ? formatDimensions($phone2) : 'N/A'; ?></td>
-                    <td><?php echo $phone3 ? formatDimensions($phone3) : 'N/A'; ?></td>
-                </tr>
-
-                <tr>
-                    <td colspan="3" style="font-weight: 600; color: #f14d4d; font-size: 16px; background: #f9f9f9;">Weight</td>
-                </tr>
-                <tr>
-                    <td><?php echo $phone1 ? formatWeight($phone1) : 'N/A'; ?></td>
-                    <td><?php echo $phone2 ? formatWeight($phone2) : 'N/A'; ?></td>
-                    <td><?php echo $phone3 ? formatWeight($phone3) : 'N/A'; ?></td>
-                </tr>
-
-                <tr>
-                    <td colspan="3" style="font-weight: 600; color: #f14d4d; font-size: 16px; background: #f9f9f9;">Operating System (OS)</td>
-                </tr>
-                <tr>
-                    <td><?php echo $phone1 ? formatOS($phone1) : 'N/A'; ?></td>
-                    <td><?php echo $phone2 ? formatOS($phone2) : 'N/A'; ?></td>
-                    <td><?php echo $phone3 ? formatOS($phone3) : 'N/A'; ?></td>
-                </tr>
-
-                <tr>
-                    <td colspan="3" style="font-weight: 600; color: #f14d4d; font-size: 16px; background: #f9f9f9;">Chipset</td>
-                </tr>
-                <tr>
-                    <td><?php echo $phone1 ? formatChipset($phone1) : 'N/A'; ?></td>
-                    <td><?php echo $phone2 ? formatChipset($phone2) : 'N/A'; ?></td>
-                    <td><?php echo $phone3 ? formatChipset($phone3) : 'N/A'; ?></td>
-                </tr>
-
-                <tr>
-                    <td colspan="3" style="font-weight: 600; color: #f14d4d; font-size: 16px; background: #f9f9f9;">Main Camera</td>
-                </tr>
-                <tr>
-                    <td><?php echo $phone1 ? formatMainCamera($phone1) : 'N/A'; ?></td>
-                    <td><?php echo $phone2 ? formatMainCamera($phone2) : 'N/A'; ?></td>
-                    <td><?php echo $phone3 ? formatMainCamera($phone3) : 'N/A'; ?></td>
-                </tr>
-
-                <tr>
-                    <td colspan="3" style="font-weight: 600; color: #f14d4d; font-size: 16px; background: #f9f9f9;">Selfie Camera</td>
-                </tr>
-                <tr>
-                    <td><?php echo $phone1 ? formatSelfieCamera($phone1) : 'N/A'; ?></td>
-                    <td><?php echo $phone2 ? formatSelfieCamera($phone2) : 'N/A'; ?></td>
-                    <td><?php echo $phone3 ? formatSelfieCamera($phone3) : 'N/A'; ?></td>
-                </tr>
-
-                <tr>
-                    <td colspan="3" style="font-weight: 600; color: #f14d4d; font-size: 16px; background: #f9f9f9;">Battery</td>
-                </tr>
-                <tr>
-                    <td><?php echo $phone1 ? formatBattery($phone1) : 'N/A'; ?></td>
-                    <td><?php echo $phone2 ? formatBattery($phone2) : 'N/A'; ?></td>
-                    <td><?php echo $phone3 ? formatBattery($phone3) : 'N/A'; ?></td>
-                </tr>
-
-                <tr>
-                    <td colspan="3" style="font-weight: 600; color: #f14d4d; font-size: 16px; background: #f9f9f9;">Display</td>
-                </tr>
-                <tr>
-                    <td><?php echo $phone1 ? formatDisplay($phone1) : 'N/A'; ?></td>
-                    <td><?php echo $phone2 ? formatDisplay($phone2) : 'N/A'; ?></td>
-                    <td><?php echo $phone3 ? formatDisplay($phone3) : 'N/A'; ?></td>
-                </tr>
-
-                <tr>
-                    <td colspan="3" style="font-weight: 600; color: #f14d4d; font-size: 16px; background: #f9f9f9;">Memory</td>
-                </tr>
-                <tr>
-                    <td><?php echo $phone1 ? formatMemory($phone1) : 'N/A'; ?></td>
-                    <td><?php echo $phone2 ? formatMemory($phone2) : 'N/A'; ?></td>
-                    <td><?php echo $phone3 ? formatMemory($phone3) : 'N/A'; ?></td>
-                </tr>
-
-                <tr>
-                    <td colspan="3" style="font-weight: 600; color: #f14d4d; font-size: 16px; background: #f9f9f9;">Sound</td>
-                </tr>
-                <tr>
-                    <td><?php echo $phone1 ? formatSound($phone1) : 'N/A'; ?></td>
-                    <td><?php echo $phone2 ? formatSound($phone2) : 'N/A'; ?></td>
-                    <td><?php echo $phone3 ? formatSound($phone3) : 'N/A'; ?></td>
-                </tr>
-
-                <tr>
-                    <td colspan="3" style="font-weight: 600; color: #f14d4d; font-size: 16px; background: #f9f9f9;">Communications</td>
-                </tr>
-                <tr>
-                    <td><?php echo $phone1 ? formatCommunications($phone1) : 'N/A'; ?></td>
-                    <td><?php echo $phone2 ? formatCommunications($phone2) : 'N/A'; ?></td>
-                    <td><?php echo $phone3 ? formatCommunications($phone3) : 'N/A'; ?></td>
-                </tr>
-
-                <tr>
-                    <td colspan="3" style="font-weight: 600; color: #f14d4d; font-size: 16px; background: #f9f9f9;">Features</td>
-                </tr>
-                <tr>
-                    <td><?php echo $phone1 ? formatFeatures($phone1) : 'N/A'; ?></td>
-                    <td><?php echo $phone2 ? formatFeatures($phone2) : 'N/A'; ?></td>
-                    <td><?php echo $phone3 ? formatFeatures($phone3) : 'N/A'; ?></td>
-                </tr>
-
-                <tr>
-                    <td colspan="3" style="font-weight: 600; color: #f14d4d; font-size: 16px; background: #f9f9f9;">Colors</td>
-                </tr>
-                <tr>
-                    <td><?php echo $phone1 ? formatColors($phone1) : 'N/A'; ?></td>
-                    <td><?php echo $phone2 ? formatColors($phone2) : 'N/A'; ?></td>
-                    <td><?php echo $phone3 ? formatColors($phone3) : 'N/A'; ?></td>
-                </tr>
-
-                <tr>
-                    <td colspan="3" style="font-weight: 600; color: #f14d4d; font-size: 16px; background: #f9f9f9;">Price</td>
-                </tr>
-                <tr>
-                    <td><?php echo $phone1 ? formatPrice($phone1) : 'N/A'; ?></td>
-                    <td><?php echo $phone2 ? formatPrice($phone2) : 'N/A'; ?></td>
-                    <td><?php echo $phone3 ? formatPrice($phone3) : 'N/A'; ?></td>
-                </tr>
+                foreach ($orderedSections as $section) {
+                    $val1 = isset($specs1[$section]) ? $specs1[$section] : $legacyFallback($section, $phone1);
+                    $val2 = isset($specs2[$section]) ? $specs2[$section] : $legacyFallback($section, $phone2);
+                    $val3 = isset($specs3[$section]) ? $specs3[$section] : $legacyFallback($section, $phone3);
+                    echo '<tr><td colspan="3" style="color:#f14d4d;font-size:16px;background:#f9f9f9;font-weight:600;">' . htmlspecialchars($section) . '</td></tr>';
+                    echo '<tr>';
+                    echo '<td>' . ($val1 !== '' ? $val1 : 'N/A') . '</td>';
+                    echo '<td>' . ($val2 !== '' ? $val2 : 'N/A') . '</td>';
+                    echo '<td>' . ($val3 !== '' ? $val3 : 'N/A') . '</td>';
+                    echo '</tr>';
+                }
+                ?>
             </tbody>
         </table>
 
 
 
     </div>
-
+    <!-- Newsletter Section -->
+    <div class="container mt-4 mb-4" style="max-width: 1034px;">
+        <div class="row">
+            <div class="col-12">
+                <div id="newsletter_message_container"></div>
+                <form id="newsletter_form" method="POST" action="" style="background-color: #EFEBE9; padding: 20px; border-radius: 4px; text-align: center;">
+                    <p style="margin-bottom: 12px; color: #5D4037; font-weight: 500;">Subscribe to our newsletter</p>
+                    <div style="display: flex; gap: 8px; justify-content: center; flex-wrap: wrap;">
+                        <input type="email" id="newsletter_email" name="newsletter_email" placeholder="Enter your email" required style="padding: 10px 12px; border: 1px solid #8D6E63; border-radius: 4px; font-size: 14px; flex: 1; min-width: 200px; max-width: 300px; background-color: white;">
+                        <style>
+                            input::placeholder {
+                                color: #8D6E63;
+                                opacity: 0.7;
+                            }
+                        </style>
+                        <button type="submit" id="newsletter_btn" style="padding: 10px 24px; background-color: #D50000; color: white; border: none; border-radius: 4px; cursor: pointer; font-size: 14px; white-space: nowrap; font-weight: 500;">Subscribe</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
     <div id="bottom" class="container d-flex mt-3" style="max-width: 1034px;">
         <div class="row align-items-center">
             <div class="col-md-2 m-auto col-4 d-flex justify-content-center align-items-center "> <img
@@ -1146,12 +1300,9 @@ function formatColors($phone)
             </div>
             <div class="col-10 nav-wrap m-auto text-center ">
                 <div class="nav-container">
-                    <a href="index.php">Home</a>
+                    <a href="#">Home</a>
                     <a href="reviews.php">Reviews</a>
-                    <a href="videos.php">Videos</a>
-                    <a href="featured.php">Featured</a>
-                    <a href="#">Glossary</a>
-                    <a href="#">FAQ</a>
+                    <a href="compare.php">Compare</a>
                     <a href="#"> <i class="fa-solid fa-wifi fa-sm"></i> RSS</a>
                     <a href="#"> <i class="fa-brands fa-youtube fa-sm"></i> YouTube</a>
                     <a href="#"> <i class="fa-brands fa-instagram fa-sm"></i> Instagram</a>
@@ -1159,19 +1310,77 @@ function formatColors($phone)
                     <a href="#"> <i class="fa-brands fa-facebook-f fa-sm"></i> Facebook</a>
                     <a href="#"> <i class="fa-brands fa-twitter fa-sm"></i>Twitter</a>
                     <a href="#">© 2000-2025 GSMArena.com</a>
-                    <a href="#">Mobile version</a>
-                    <a href="#">Android app</a>
-                    <a href="#">Tools</a>
-                    <a href="#">Contact us</a>
-                    <a href="#">Merch store</a>
-                    <a href="#">Privacy</a>
-                    <a href="#">Terms of use</a>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- Brands Modal -->
+    <div class="modal fade" id="brandsModal" tabindex="-1" aria-labelledby="brandsModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-lg modal-dialog-centered modal-dialog-scrollable">
+            <div class="modal-content" style="background-color: #EFEBE9; border: 2px solid #8D6E63;">
+                <div class="modal-header" style="border-bottom: 1px solid #8D6E63; background-color: #D7CCC8;">
+                    <h5 class="modal-title" id="brandsModalLabel" style="font-family:system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue'; color: #5D4037;">
+                        <i class="fas fa-industry me-2"></i>All Brands
+                    </h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="row">
+                        <?php if (!empty($brands)): ?>
+                            <?php foreach ($brands as $brand): ?>
+                                <div class="col-lg-4 col-md-6 col-sm-6 mb-3">
+                                    <button class="brand-cell-modal btn w-100 py-2 px-3" style="background-color: #fff; border: 1px solid #c5b6b0; color: #5D4037; font-weight: 500; transition: all 0.3s ease; cursor: pointer;" data-brand-id="<?php echo $brand['id']; ?>" onclick="selectBrandFromModal(<?php echo $brand['id']; ?>)">
+                                        <?php echo htmlspecialchars($brand['name']); ?>
+                                    </button>
+                                </div>
+                            <?php endforeach; ?>
+                        <?php else: ?>
+                            <div class="col-12">
+                                <div class="text-center py-5">
+                                    <i class="fas fa-industry fa-3x text-muted mb-3"></i>
+                                    <h6 class="text-muted">No brands available</h6>
+                                </div>
+                            </div>
+                        <?php endif; ?>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Devices Modal (Phones by Brand) -->
+    <div class="modal fade" id="devicesModal" tabindex="-1" aria-labelledby="deviceModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-lg modal-dialog-centered modal-dialog-scrollable">
+            <div class="modal-content" style="background-color: #EFEBE9; border: 2px solid #8D6E63;">
+                <div class="modal-header" style="border-bottom: 1px solid #8D6E63; background-color: #D7CCC8;">
+                    <h5 class="modal-title" id="deviceModalTitle" style="font-family:system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue'; color: #5D4037;">
+                        Devices
+                    </h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body" id="deviceModalBody">
+                    <div class="text-center py-5">
+                        <i class="fas fa-spinner fa-spin fa-2x text-muted"></i>
+                    </div>
                 </div>
             </div>
         </div>
     </div>
     <script src="script.js"></script>
     <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Handle brand cell clicks (from sidebar and mobile menu - open devices modal directly)
+            document.querySelectorAll('.brand-cell').forEach(function(cell) {
+                cell.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    const brandId = this.getAttribute('data-brand-id');
+                    if (brandId) {
+                        // Directly open devices modal for this brand
+                        selectBrandFromModal(brandId);
+                    }
+                });
+            });
+        });
         $(document).ready(function() {
             // Initialize Select2 for searchable dropdowns
             function formatPhoneOption(state) {
@@ -1234,6 +1443,144 @@ function formatColors($phone)
             // Redirect to the new URL
             window.location.href = url.toString();
         }
+        // Show brands modal
+        function showBrandsModal() {
+            const modal = new bootstrap.Modal(document.getElementById('brandsModal'));
+            modal.show();
+        }
+
+        // Handle brand selection from modal
+        function selectBrandFromModal(brandId) {
+            // Close the brands modal
+            const brandsModal = bootstrap.Modal.getInstance(document.getElementById('brandsModal'));
+            if (brandsModal) {
+                brandsModal.hide();
+            }
+
+            // Fetch phones for this brand
+            fetch(`get_phones_by_brand.php?brand_id=${brandId}`)
+                .then(response => response.json())
+                .then(data => {
+                    // Populate the devices modal with phones
+                    displayPhonesModal(data, brandId);
+                })
+                .catch(error => {
+                    console.error('Error fetching phones:', error);
+                    alert('Failed to load phones');
+                });
+        }
+
+        // Display phones in modal
+        function displayPhonesModal(phones, brandId) {
+            const container = document.getElementById('deviceModalBody');
+            const titleElement = document.getElementById('deviceModalTitle');
+
+            // Update title with brand name
+            const brandButton = document.querySelector(`[data-brand-id="${brandId}"]`);
+            const brandName = brandButton ? brandButton.textContent.trim() : 'Brand';
+            titleElement.innerHTML = `<i class="fas fa-mobile-alt me-2"></i>${brandName} - Devices`;
+
+            if (phones && phones.length > 0) {
+                let html = '<div class="row">';
+                phones.forEach(phone => {
+                    const phoneImage = phone.image ? `<img src="${phone.image}" alt="${phone.name}" style="width: 100%; height: 120px; object-fit: contain; margin-bottom: 8px;" onerror="this.style.display='none';">` : '';
+                    html += `
+          <div class="col-lg-4 col-md-6 col-sm-6 mb-3">
+            <button class="device-cell-modal btn w-100 p-0" style="background-color: #fff; border: 1px solid #c5b6b0; color: #5D4037; font-weight: 500; transition: all 0.3s ease; cursor: pointer; display: flex; flex-direction: column; align-items: center; overflow: hidden;" onclick="goToDevice(${phone.id})">
+              ${phoneImage}
+              <span style="padding: 8px 10px; width: 100%; text-align: center; font-size: 0.95rem;">${phone.name}</span>
+            </button>
+          </div>
+        `;
+                });
+                html += '</div>';
+                container.innerHTML = html;
+            } else {
+                container.innerHTML = `
+        <div class="text-center py-5">
+          <i class="fas fa-mobile-alt fa-3x text-muted mb-3"></i>
+          <h6 class="text-muted">No devices available for this brand</h6>
+        </div>
+      `;
+            }
+
+            // Show devices modal
+            const devicesModal = new bootstrap.Modal(document.getElementById('devicesModal'));
+            devicesModal.show();
+        }
+
+        // Navigate to device page
+        function goToDevice(deviceId) {
+            window.location.href = `device.php?id=${deviceId}`;
+        }
+
+        // Newsletter form AJAX handler
+        document.addEventListener('DOMContentLoaded', function() {
+            const form = document.getElementById('newsletter_form');
+            const messageContainer = document.getElementById('newsletter_message_container');
+            const emailInput = document.getElementById('newsletter_email');
+            const submitBtn = document.getElementById('newsletter_btn');
+
+            if (form) {
+                form.addEventListener('submit', function(e) {
+                    e.preventDefault();
+
+                    const email = emailInput.value.trim();
+                    const originalBtnText = submitBtn.textContent;
+
+                    if (!email) {
+                        showMessage('Please enter an email address.', 'error');
+                        return;
+                    }
+
+                    // Disable button and show loading state
+                    submitBtn.disabled = true;
+                    submitBtn.textContent = 'Subscribing...';
+
+                    // Send AJAX request
+                    fetch('handle_newsletter.php', {
+                            method: 'POST',
+                            headers: {
+                                'Content-Type': 'application/x-www-form-urlencoded'
+                            },
+                            body: 'newsletter_email=' + encodeURIComponent(email)
+                        })
+                        .then(response => response.json())
+                        .then(data => {
+                            if (data.success) {
+                                showMessage(data.message, 'success');
+                                emailInput.value = '';
+                                // Auto-clear message after 5 seconds
+                                setTimeout(() => {
+                                    messageContainer.innerHTML = '';
+                                }, 5000);
+                            } else {
+                                showMessage(data.message, 'error');
+                            }
+                            submitBtn.disabled = false;
+                            submitBtn.textContent = originalBtnText;
+                        })
+                        .catch(error => {
+                            showMessage('An error occurred. Please try again.', 'error');
+                            submitBtn.disabled = false;
+                            submitBtn.textContent = originalBtnText;
+                        });
+                });
+
+                function showMessage(message, type) {
+                    const bgColor = type === 'success' ? '#4CAF50' : '#f44336';
+                    messageContainer.innerHTML = '<div style="background-color: ' + bgColor + '; color: white; padding: 12px; border-radius: 4px; margin-bottom: 12px; text-align: center; animation: slideIn 0.3s ease-in-out;">' + message + '</div>';
+
+                    // Add animation style
+                    if (!document.querySelector('style[data-newsletter]')) {
+                        const style = document.createElement('style');
+                        style.setAttribute('data-newsletter', 'true');
+                        style.textContent = '@keyframes slideIn { from { opacity: 0; transform: translateY(-10px); } to { opacity: 1; transform: translateY(0); } }';
+                        document.head.appendChild(style);
+                    }
+                }
+            }
+        });
     </script>
     <style>
         /* Custom styles for Select2 phone selection */

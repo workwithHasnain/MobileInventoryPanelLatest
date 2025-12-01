@@ -22,7 +22,7 @@
 </head>
 
 <body style="background-color: #EFEBE9;">
-    <!-- Desktop Navbar of Gsmarecn -->
+       <!-- Desktop Navbar of Gsmarecn -->
     <div class="main-wrapper">
         <!-- Top Navbar -->
         <nav class="navbar navbar-dark  d-lg-inline d-none" id="navbar">
@@ -49,11 +49,19 @@
                             <img src="iccons/instagram-color-svgrepo-com.svg" alt="Instagram" width="22px">
                         </button>
 
+                        <button type="button" class="btn" data-bs-toggle="tooltip" data-bs-placement="left"
+                            title="WiFi">
+                            <i class="fa-solid fa-wifi fa-lg" style="color: #ffffff;"></i>
+                        </button>
 
+                        <button type="button" class="btn" data-bs-toggle="tooltip" data-bs-placement="left" title="Car">
+                            <i class="fa-solid fa-car fa-lg" style="color: #ffffff;"></i>
+                        </button>
 
-
-
-
+                        <button type="button" class="btn" data-bs-toggle="tooltip" data-bs-placement="left"
+                            title="Cart">
+                            <i class="fa-solid fa-cart-shopping fa-lg" style="color: #ffffff;"></i>
+                        </button>
                     </div>
                 </div>
 
@@ -65,7 +73,17 @@
                     </svg>
                 </form>
 
+                <div>
+                    <button type="button" class="btn mb-2" data-bs-toggle="tooltip" data-bs-placement="left"
+                        title="Login">
+                        <i class="fa-solid fa-right-to-bracket fa-lg" style="color: #ffffff;"></i>
+                    </button>
 
+                    <button type="button" class="btn mb-2" data-bs-toggle="tooltip" data-bs-placement="left"
+                        title="Register">
+                        <i class="fa-solid fa-user-plus fa-lg" style="color: #ffffff;"></i>
+                    </button>
+                </div>
             </div>
         </nav>
 
@@ -155,7 +173,7 @@
     </div>
     <div class="container support content-wrapper" id="Top">
         <div class="row">
-
+            
             <div class="col-8 comfort-life-zone">
                 <img src="imges/Screenshot (162).png" alt="">
             </div>
@@ -213,7 +231,7 @@
     <div class="container mt-0 varasat">
         <div class="row">
 
-
+           
             <div class="col-md-8 col-12 wrapper sentizer-er " style="background-color: #EEEEEE; ">
                 <iframe width="710" style="margin-top: 22px;" height="375"
                     src="https://www.youtube.com/embed/i3ZU9-TGJlE?si=9t_Ue5Yad0x4W7u_" title="YouTube video player"
@@ -253,7 +271,7 @@
             <div class="col-md-4  bg-white ">
                 <h6 class="text-secondary mt-2 fw-bold" style="text-transform: uppercase;">Latest Devices</h6>
                 <div class="cent">
-
+            
                     <div class="d-flex">
                         <div class="canel">
                             <img class="shrink" src="https://fdn2.gsmarena.com/vv/bigpic/vivoiy300-gt.jpg" alt="">
@@ -299,9 +317,9 @@
                 </div>
                 <h6 style="border-left: 7px solid #EFEBE9 ; text-transform: uppercase;" class="mt-3 fw-bold my-4 px-2 text-secondary mt-2 d-inline mt-4">In Storeies
                     Now</h6>
-
+            
                 <div class="cent mb-4">
-
+            
                     <div class="d-flex">
                         <div class="canel">
                             <img class="shrink" src="https://fdn2.gsmarena.com/vv/bigpic/nothing-cmf-phone-2-pro.jpg" alt="">
@@ -347,7 +365,7 @@
                 </div>
                 <img class="mt-3 w-100" style="position: sticky; top: 0;"
                     src="https://fdn.gsmarena.com/imgroot/static/banners/self/review-iphone-16e-300x250.jpg" alt="">
-
+            
             </div>
 
         </div>

@@ -4,7 +4,8 @@ ini_set('display_errors', 1);
 require_once 'auth.php';
 require_once 'phone_data.php'; // Keep for getAllPhones function
 require_once 'brand_data.php';
-require_once 'simple_device_insert.php'; // Add our new simple insertion script
+require_once 'simple_device_update.php';
+// Note: This page is for editing an existing device; insertion/update wiring will be added later.
 
 // Require login for this page
 requireLogin();
@@ -12,24 +13,102 @@ requireLogin();
 $errors = [];
 $success = false;
 
-// Handle form submission
+// Fetch device by ID and prefill values (no update wiring yet)
+$id = isset($_GET['id']) ? (int)$_GET['id'] : 0;
+$device = null;
+if ($id > 0) {
+    $device = getPhoneById($id);
+}
+if (!$device) {
+    $_SESSION['error_message'] = 'Device not found!';
+    header('Location: dashboard.php');
+    exit();
+}
+
+// Prepare current images preview (main image + array images)
+$existingImages = [];
+// Normalize backslashes
+$norm = function ($p) {
+    return is_string($p) ? str_replace('\\', '/', $p) : $p;
+};
+
+// Helper to parse PostgreSQL TEXT[] to PHP array
+$parsePgArray = function ($text) {
+    if (!is_string($text)) return [];
+    $text = trim($text);
+    if ($text === '' || $text === '{}') return [];
+    if ($text[0] === '{' && substr($text, -1) === '}') {
+        $inner = substr($text, 1, -1);
+        if ($inner === '') return [];
+        // Split on commas not inside quotes; for our simple paths (no commas), a simple explode suffices
+        $parts = explode(',', $inner);
+        // Trim quotes and whitespace
+        $clean = array_map(function ($v) {
+            $v = trim($v);
+            if ($v === 'NULL') return '';
+            // remove optional surrounding quotes
+            if ((strlen($v) >= 2) && (($v[0] === '"' && substr($v, -1) === '"') || ($v[0] === "'" && substr($v, -1) === "'"))) {
+                $v = substr($v, 1, -1);
+            }
+            return $v;
+        }, $parts);
+        return array_values(array_filter($clean, function ($v) {
+            return trim($v) !== '';
+        }));
+    }
+    return [];
+};
+
+// Add main image first if present
+if (!empty($device['image'])) {
+    $existingImages[] = $norm($device['image']);
+}
+
+// Add array images from 'images'
+if (!empty($device['images'])) {
+    if (is_array($device['images'])) {
+        foreach ($device['images'] as $img) {
+            $img = $norm($img);
+            if ($img && !in_array($img, $existingImages, true)) $existingImages[] = $img;
+        }
+    } elseif (is_string($device['images'])) {
+        foreach ($parsePgArray($device['images']) as $img) {
+            $img = $norm($img);
+            if ($img && !in_array($img, $existingImages, true)) $existingImages[] = $img;
+        }
+    }
+}
+
+// Legacy numbered images fallback if any
+for ($i = 1; $i <= 10; $i++) {
+    $key = 'image_' . $i;
+    if (!empty($device[$key])) {
+        $img = $norm($device[$key]);
+        if ($img && !in_array($img, $existingImages, true)) $existingImages[] = $img;
+    }
+}
+
+// Handle update submission
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-    // Validate required fields
+    // Basic validations similar to add
     $name = isset($_POST['name']) ? trim($_POST['name']) : '';
-    if (empty($name)) {
+    if ($name === '') {
         $errors['name'] = 'Phone name is required';
     }
-
     $brand = isset($_POST['brand']) ? trim($_POST['brand']) : '';
+    if ($brand === '') {
+        $errors['brand'] = 'Brand is required';
+    }
 
     $year = isset($_POST['year']) ? trim($_POST['year']) : '';
-
     $availability = isset($_POST['availability']) ? trim($_POST['availability']) : '';
-
     $price = isset($_POST['price']) ? trim($_POST['price']) : '';
 
-    // Handle multiple image uploads (up to 5)
-    $image_paths = [];
+    // Handle image uploads: MERGE new uploads with existing images
+    // Strategy: Keep existing images, and for each slot where a new file is uploaded, replace that slot
+    $finalImages = $existingImages; // Start with current images
+    $hasNewUploads = false;
+
     if (isset($_FILES['images']) && is_array($_FILES['images']['name'])) {
         $allowed_types = ['image/jpeg', 'image/png', 'image/gif'];
         $max_size = 5 * 1024 * 1024; // 5MB
@@ -40,63 +119,42 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             mkdir('uploads', 0777, true);
         }
 
+        // Process each upload slot
         for ($i = 0; $i < min(count($_FILES['images']['name']), $max_images); $i++) {
             if (!empty($_FILES['images']['name'][$i]) && $_FILES['images']['error'][$i] === UPLOAD_ERR_OK) {
                 $file_type = $_FILES['images']['type'][$i];
                 $file_size = $_FILES['images']['size'][$i];
 
-                // Validate file type
+                // Validate type and size
                 if (!in_array($file_type, $allowed_types)) {
                     $errors['image' . ($i + 1)] = 'Only JPG, PNG, and GIF images are allowed for image ' . ($i + 1);
-                }
-
-                // Validate file size
-                if ($file_size > $max_size) {
+                } elseif ($file_size > $max_size) {
                     $errors['image' . ($i + 1)] = 'Image ' . ($i + 1) . ' size should not exceed 5MB';
-                }
-
-                // If no errors, process the upload
-                if (!isset($errors['image' . ($i + 1)])) {
-                    // Generate unique filename
+                } else {
                     $file_extension = pathinfo($_FILES['images']['name'][$i], PATHINFO_EXTENSION);
                     $filename = 'device_' . time() . '_' . uniqid() . '_' . ($i + 1) . '.' . $file_extension;
                     $upload_path = 'uploads/' . $filename;
-
                     if (move_uploaded_file($_FILES['images']['tmp_name'][$i], $upload_path)) {
-                        $image_paths[] = $upload_path;
+                        // Replace the image at this position (or add if position doesn't exist yet)
+                        $finalImages[$i] = $upload_path;
+                        $hasNewUploads = true;
                     } else {
                         $errors['image' . ($i + 1)] = 'Failed to upload image ' . ($i + 1) . '. Please try again.';
                     }
                 }
             }
+            // If no upload for this slot and slot exists, keep existing; otherwise do nothing
         }
     }
 
-    // Set main image path (first uploaded image) for backward compatibility
-    $image_path = !empty($image_paths) ? $image_paths[0] : '';
-
-    // If no errors, save the phone data
     if (empty($errors)) {
-        // Check for exact duplicate device (same name and brand only)
-        $existing_phones = getAllPhones();
-        foreach ($existing_phones as $existing_phone) {
-            if (
-                isset($existing_phone['name']) && isset($existing_phone['brand']) &&
-                strtolower(trim($existing_phone['name'])) === strtolower(trim($name)) &&
-                strtolower(trim($existing_phone['brand'])) === strtolower(trim($brand))
-            ) {
-                $errors['general'] = 'A device with the exact name "' . htmlspecialchars($name) . '" by "' . htmlspecialchars($brand) . '" already exists. Please use a different model name. Note: The same brand can have multiple different devices.';
-                break;
-            }
-        }
-    }
+        // Reindex final images array to remove gaps
+        $finalImages = array_values($finalImages);
 
-    // If still no errors after validation, create the device
-    if (empty($errors)) {
-        // Only keep basic fields now
-        $new_phone = [
+        // Prepare update payload
+        $updated_phone = [
             // Launch
-            'release_date' => !empty($_POST['release_date']) ? $_POST['release_date'] : null,
+            'release_date' => ($_POST['release_date'] ?? null) !== '' ? $_POST['release_date'] : null,
 
             // General
             'name' => $name,
@@ -105,15 +163,13 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             'availability' => ($availability === '') ? null : $availability,
             'price' => ($price === '') ? null : $price,
             'device_page_color' => !empty($_POST['device_page_color']) ? trim($_POST['device_page_color']) : null,
-            'image' => $image_path,
-            'images' => $image_paths,
 
             // Highlight fields
             'weight' => !empty($_POST['weight']) ? trim($_POST['weight']) : null,
             'thickness' => !empty($_POST['thickness']) ? trim($_POST['thickness']) : null,
             'os' => !empty($_POST['os']) ? trim($_POST['os']) : null,
             'storage' => !empty($_POST['storage']) ? trim($_POST['storage']) : null,
-            'card_slot' => !empty($_POST['card_slot']) ? trim($_POST['card_slot']) : null,
+            'card_slot' => isset($_POST['card_slot']) && $_POST['card_slot'] !== '' ? trim($_POST['card_slot']) : null,
 
             // Stats fields
             'display_size' => !empty($_POST['display_size']) ? trim($_POST['display_size']) : null,
@@ -142,21 +198,48 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             'general_info' => isset($_POST['general_info']) ? $_POST['general_info'] : null,
         ];
 
-        $result = simpleAddDevice($new_phone);
+        // ALWAYS include merged images in the update (finalImages has existing + new uploads merged)
+        $updated_phone['image'] = !empty($finalImages) ? $finalImages[0] : null;
+        $updated_phone['images'] = $finalImages;
+
+        $result = simpleUpdateDevice($id, $updated_phone);
         if (is_array($result) && isset($result['error'])) {
-            // Set error from simpleAddDevice function
             $errors['general'] = $result['error'];
-        } else if ($result === true) {
-            // Set success message and redirect to dashboard
-            $_SESSION['success_message'] = 'Device added successfully!';
-            header('Location: dashboard.php');
+        } elseif ($result === true) {
+            $_SESSION['success_message'] = 'Device updated successfully!';
+            header('Location: device.php?id=' . $id);
             exit();
         } else {
-            // System error
-            $errors['general'] = 'Failed to save device data. Please try again.';
+            $errors['general'] = 'Failed to update device. Please try again.';
         }
     }
 }
+
+// Prefill base fields
+$name = $device['name'] ?? '';
+$brand = $device['brand'] ?? '';
+$year = $device['year'] ?? '';
+$availability = $device['availability'] ?? '';
+$price = $device['price'] ?? '';
+$device_page_color = $device['device_page_color'] ?? '#ffffff';
+
+// Highlights
+$pref_weight = $device['weight'] ?? '';
+$pref_thickness = $device['thickness'] ?? '';
+$pref_os = $device['os'] ?? '';
+$pref_storage = $device['storage'] ?? '';
+$pref_card_slot = $device['card_slot'] ?? '';
+
+// Stats
+$pref_display_size = $device['display_size'] ?? '';
+$pref_display_resolution = $device['display_resolution'] ?? '';
+$pref_main_camera_resolution = $device['main_camera_resolution'] ?? '';
+$pref_main_camera_video = $device['main_camera_video'] ?? '';
+$pref_ram = $device['ram'] ?? '';
+$pref_chipset_name = $device['chipset_name'] ?? '';
+$pref_battery_capacity = $device['battery_capacity'] ?? '';
+$pref_wired_charging = $device['wired_charging'] ?? '';
+$pref_wireless_charging = $device['wireless_charging'] ?? '';
 ?>
 
 <?php include 'includes/header.php'; ?>
@@ -164,8 +247,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 <div class="container-fluid py-4">
     <div class="row mb-4">
         <div class="col">
-            <h1>Add New Device</h1>
-            <p class="text-muted">Enter the details of the new mobile device</p>
+            <h1>Edit Device</h1>
+            <p class="text-muted">Update the details of <?php echo htmlspecialchars($device['name'] ?? 'Device'); ?></p>
         </div>
         <div class="col-auto">
             <a href="dashboard.php" class="btn btn-secondary">
@@ -194,7 +277,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             <div class="tab-content" id="deviceTypeTabContent">
                 <!-- Phone Form Tab -->
                 <div class="tab-pane fade show active" id="phone-form" role="tabpanel">
-                    <form id="add-device-form" method="post" action="<?php echo htmlspecialchars($_SERVER['PHP_SELF']); ?>" enctype="multipart/form-data">
+                    <form id="add-device-form" method="post" action="<?php echo htmlspecialchars($_SERVER['PHP_SELF'] . '?id=' . $id); ?>" enctype="multipart/form-data">
 
 
                         <!-- 1. Launch Section -->
@@ -210,7 +293,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                                         <div class="row">
                                             <div class="col-md-6">
                                                 <label for="release_date" class="form-label">Date of Release</label>
-                                                <input type="date" class="form-control" id="release_date" name="release_date">
+                                                <input type="date" class="form-control" id="release_date" name="release_date" value="<?php echo isset($_POST['release_date']) ? htmlspecialchars($_POST['release_date']) : htmlspecialchars($device['release_date'] ?? ''); ?>">
                                             </div>
                                         </div>
                                     </div>
@@ -274,7 +357,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                                                 <label for="year" class="form-label">Year *</label>
                                                 <input type="number" class="form-control <?php echo isset($errors['year']) ? 'is-invalid' : ''; ?>"
                                                     id="year" name="year" min="2000" max="<?php echo date('Y') + 2; ?>"
-                                                    value="<?php echo isset($year) ? htmlspecialchars($year) : ''; ?>">
+                                                    value="<?php echo isset($_POST['year']) ? htmlspecialchars($_POST['year']) : htmlspecialchars($year); ?>">
                                                 <?php if (isset($errors['year'])): ?>
                                                     <div class="invalid-feedback"><?php echo htmlspecialchars($errors['year']); ?></div>
                                                 <?php endif; ?>
@@ -285,10 +368,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                                                 <select class="form-select <?php echo isset($errors['availability']) ? 'is-invalid' : ''; ?>"
                                                     id="availability" name="availability">
                                                     <option value="">Select availability...</option>
-                                                    <option value="Available" <?php echo isset($availability) && $availability === 'Available' ? 'selected' : ''; ?>>Available</option>
-                                                    <option value="Coming Soon" <?php echo isset($availability) && $availability === 'Coming Soon' ? 'selected' : ''; ?>>Coming Soon</option>
-                                                    <option value="Discontinued" <?php echo isset($availability) && $availability === 'Discontinued' ? 'selected' : ''; ?>>Discontinued</option>
-                                                    <option value="Rumored" <?php echo isset($availability) && $availability === 'Rumored' ? 'selected' : ''; ?>>Rumored</option>
+                                                    <?php $currentAvailability = isset($_POST['availability']) ? $_POST['availability'] : $availability; ?>
+                                                    <option value="Available" <?php echo ($currentAvailability === 'Available') ? 'selected' : ''; ?>>Available</option>
+                                                    <option value="Coming Soon" <?php echo ($currentAvailability === 'Coming Soon') ? 'selected' : ''; ?>>Coming Soon</option>
+                                                    <option value="Discontinued" <?php echo ($currentAvailability === 'Discontinued') ? 'selected' : ''; ?>>Discontinued</option>
+                                                    <option value="Rumored" <?php echo ($currentAvailability === 'Rumored') ? 'selected' : ''; ?>>Rumored</option>
                                                 </select>
                                                 <?php if (isset($errors['availability'])): ?>
                                                     <div class="invalid-feedback"><?php echo htmlspecialchars($errors['availability']); ?></div>
@@ -301,7 +385,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                                                     <span class="input-group-text">$</span>
                                                     <input type="number" step="0.01" class="form-control <?php echo isset($errors['price']) ? 'is-invalid' : ''; ?>"
                                                         id="price" name="price" min="0.01"
-                                                        value="<?php echo isset($price) ? htmlspecialchars($price) : ''; ?>">
+                                                        value="<?php echo isset($_POST['price']) ? htmlspecialchars($_POST['price']) : htmlspecialchars($price); ?>">
                                                     <?php if (isset($errors['price'])): ?>
                                                         <div class="invalid-feedback"><?php echo htmlspecialchars($errors['price']); ?></div>
                                                     <?php endif; ?>
@@ -311,7 +395,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                                             <div class="col-md-4 mb-3">
                                                 <label for="device_page_color" class="form-label">Device Page Color</label>
                                                 <input type="color" class="form-control form-control-color" id="device_page_color" name="device_page_color"
-                                                    value="<?php echo isset($_POST['device_page_color']) ? htmlspecialchars($_POST['device_page_color']) : '#ffffff'; ?>"
+                                                    value="<?php echo isset($_POST['device_page_color']) ? htmlspecialchars($_POST['device_page_color']) : htmlspecialchars($device_page_color); ?>"
                                                     title="Choose a color for the device page theme">
                                                 <small class="form-text text-muted">Color theme for device page</small>
                                             </div>
@@ -324,37 +408,38 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                                             <div class="col-md-3 mb-3">
                                                 <label for="weight" class="form-label">Weight (g)</label>
                                                 <input type="text" class="form-control" id="weight" name="weight" placeholder="e.g., 195"
-                                                    value="<?php echo isset($_POST['weight']) ? htmlspecialchars($_POST['weight']) : ''; ?>">
+                                                    value="<?php echo isset($_POST['weight']) ? htmlspecialchars($_POST['weight']) : htmlspecialchars($pref_weight); ?>">
                                                 <small class="form-text text-muted">In grams</small>
                                             </div>
 
                                             <div class="col-md-3 mb-3">
                                                 <label for="thickness" class="form-label">Thickness (mm)</label>
                                                 <input type="text" class="form-control" id="thickness" name="thickness" placeholder="e.g., 8.5"
-                                                    value="<?php echo isset($_POST['thickness']) ? htmlspecialchars($_POST['thickness']) : ''; ?>">
+                                                    value="<?php echo isset($_POST['thickness']) ? htmlspecialchars($_POST['thickness']) : htmlspecialchars($pref_thickness); ?>">
                                                 <small class="form-text text-muted">In millimeters</small>
                                             </div>
 
                                             <div class="col-md-3 mb-3">
                                                 <label for="os" class="form-label">Operating System</label>
                                                 <input type="text" class="form-control" id="os" name="os" placeholder="e.g., Android 14"
-                                                    value="<?php echo isset($_POST['os']) ? htmlspecialchars($_POST['os']) : ''; ?>">
+                                                    value="<?php echo isset($_POST['os']) ? htmlspecialchars($_POST['os']) : htmlspecialchars($pref_os); ?>">
                                                 <small class="form-text text-muted">OS name & version</small>
                                             </div>
 
                                             <div class="col-md-3 mb-3">
                                                 <label for="storage" class="form-label">Storage</label>
                                                 <input type="text" class="form-control" id="storage" name="storage" placeholder="e.g., 256GB"
-                                                    value="<?php echo isset($_POST['storage']) ? htmlspecialchars($_POST['storage']) : ''; ?>">
+                                                    value="<?php echo isset($_POST['storage']) ? htmlspecialchars($_POST['storage']) : htmlspecialchars($pref_storage); ?>">
                                                 <small class="form-text text-muted">Storage capacity</small>
                                             </div>
 
                                             <div class="col-md-3 mb-3">
                                                 <label for="card_slot" class="form-label">Memory Card Slot</label>
+                                                <?php $currentCard = isset($_POST['card_slot']) ? $_POST['card_slot'] : $pref_card_slot; ?>
                                                 <select class="form-select" id="card_slot" name="card_slot">
-                                                    <option value="No">Select...</option>
-                                                    <option value="Yes">Yes (Expandable)</option>
-                                                    <option value="No">No</option>
+                                                    <option value="">Select...</option>
+                                                    <option value="Yes" <?php echo ($currentCard === 'Yes') ? 'selected' : ''; ?>>Yes (Expandable)</option>
+                                                    <option value="No" <?php echo ($currentCard === 'No') ? 'selected' : ''; ?>>No</option>
                                                 </select>
                                             </div>
 
@@ -366,68 +451,85 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                                             <div class="col-md-3 mb-3">
                                                 <label for="display_size" class="form-label">Display Size</label>
                                                 <input type="text" class="form-control" id="display_size" name="display_size" placeholder="e.g., 6.1"
-                                                    value="<?php echo isset($_POST['display_size']) ? htmlspecialchars($_POST['display_size']) : ''; ?>">
+                                                    value="<?php echo isset($_POST['display_size']) ? htmlspecialchars($_POST['display_size']) : htmlspecialchars($pref_display_size); ?>">
                                                 <small class="form-text text-muted">In inches (without ")</small>
                                             </div>
 
                                             <div class="col-md-3 mb-3">
                                                 <label for="display_resolution" class="form-label">Display Resolution</label>
                                                 <input type="text" class="form-control" id="display_resolution" name="display_resolution" placeholder="e.g., 1080 x 2340"
-                                                    value="<?php echo isset($_POST['display_resolution']) ? htmlspecialchars($_POST['display_resolution']) : ''; ?>">
+                                                    value="<?php echo isset($_POST['display_resolution']) ? htmlspecialchars($_POST['display_resolution']) : htmlspecialchars($pref_display_resolution); ?>">
                                                 <small class="form-text text-muted">Width x Height</small>
                                             </div>
 
                                             <div class="col-md-3 mb-3">
                                                 <label for="main_camera_resolution" class="form-label">Main Camera</label>
                                                 <input type="text" class="form-control" id="main_camera_resolution" name="main_camera_resolution" placeholder="e.g., 50 MP"
-                                                    value="<?php echo isset($_POST['main_camera_resolution']) ? htmlspecialchars($_POST['main_camera_resolution']) : ''; ?>">
+                                                    value="<?php echo isset($_POST['main_camera_resolution']) ? htmlspecialchars($_POST['main_camera_resolution']) : htmlspecialchars($pref_main_camera_resolution); ?>">
                                                 <small class="form-text text-muted">Megapixels</small>
                                             </div>
 
                                             <div class="col-md-3 mb-3">
                                                 <label for="main_camera_video" class="form-label">Camera Video</label>
                                                 <input type="text" class="form-control" id="main_camera_video" name="main_camera_video" placeholder="e.g., 4K@60fps"
-                                                    value="<?php echo isset($_POST['main_camera_video']) ? htmlspecialchars($_POST['main_camera_video']) : ''; ?>">
+                                                    value="<?php echo isset($_POST['main_camera_video']) ? htmlspecialchars($_POST['main_camera_video']) : htmlspecialchars($pref_main_camera_video); ?>">
                                                 <small class="form-text text-muted">Video capability</small>
                                             </div>
 
                                             <div class="col-md-3 mb-3">
                                                 <label for="ram" class="form-label">RAM</label>
                                                 <input type="text" class="form-control" id="ram" name="ram" placeholder="e.g., 8GB"
-                                                    value="<?php echo isset($_POST['ram']) ? htmlspecialchars($_POST['ram']) : ''; ?>">
+                                                    value="<?php echo isset($_POST['ram']) ? htmlspecialchars($_POST['ram']) : htmlspecialchars($pref_ram); ?>">
                                                 <small class="form-text text-muted">Memory size</small>
                                             </div>
 
                                             <div class="col-md-3 mb-3">
                                                 <label for="chipset_name" class="form-label">Chipset</label>
                                                 <input type="text" class="form-control" id="chipset_name" name="chipset_name" placeholder="e.g., Snapdragon 8 Gen 2"
-                                                    value="<?php echo isset($_POST['chipset_name']) ? htmlspecialchars($_POST['chipset_name']) : ''; ?>">
+                                                    value="<?php echo isset($_POST['chipset_name']) ? htmlspecialchars($_POST['chipset_name']) : htmlspecialchars($pref_chipset_name); ?>">
                                                 <small class="form-text text-muted">Processor name</small>
                                             </div>
 
                                             <div class="col-md-2 mb-3">
                                                 <label for="battery_capacity" class="form-label">Battery</label>
                                                 <input type="text" class="form-control" id="battery_capacity" name="battery_capacity" placeholder="e.g., 5000"
-                                                    value="<?php echo isset($_POST['battery_capacity']) ? htmlspecialchars($_POST['battery_capacity']) : ''; ?>">
+                                                    value="<?php echo isset($_POST['battery_capacity']) ? htmlspecialchars($_POST['battery_capacity']) : htmlspecialchars($pref_battery_capacity); ?>">
                                                 <small class="form-text text-muted">5000mAh</small>
                                             </div>
 
                                             <div class="col-md-2 mb-3">
                                                 <label for="wired_charging" class="form-label">Wired Charging</label>
                                                 <input type="text" class="form-control" id="wired_charging" name="wired_charging" placeholder="e.g., 65W"
-                                                    value="<?php echo isset($_POST['wired_charging']) ? htmlspecialchars($_POST['wired_charging']) : ''; ?>">
+                                                    value="<?php echo isset($_POST['wired_charging']) ? htmlspecialchars($_POST['wired_charging']) : htmlspecialchars($pref_wired_charging); ?>">
                                                 <small class="form-text text-muted">Charging speed</small>
                                             </div>
 
                                             <div class="col-md-2 mb-3">
                                                 <label for="wireless_charging" class="form-label">Wireless Charging</label>
                                                 <input type="text" class="form-control" id="wireless_charging" name="wireless_charging" placeholder="e.g., 15W"
-                                                    value="<?php echo isset($_POST['wireless_charging']) ? htmlspecialchars($_POST['wireless_charging']) : ''; ?>">
+                                                    value="<?php echo isset($_POST['wireless_charging']) ? htmlspecialchars($_POST['wireless_charging']) : htmlspecialchars($pref_wireless_charging); ?>">
                                                 <small class="form-text text-muted">Wireless speed</small>
                                             </div>
 
                                             <div class="col-md-12 mb-3">
                                                 <label class="form-label">Phone Images (up to 5)</label>
+                                                <?php if (!empty($existingImages)): ?>
+                                                    <div class="mb-3">
+                                                        <div class="fw-semibold mb-2">Current Images</div>
+                                                        <div class="row g-3">
+                                                            <?php foreach ($existingImages as $idx => $imgPath): ?>
+                                                                <div class="col-6 col-sm-4 col-md-3 col-lg-2">
+                                                                    <div class="border rounded p-1 h-100 text-center">
+                                                                        <img src="<?php echo htmlspecialchars($imgPath); ?>" alt="Current image <?php echo $idx + 1; ?>" class="img-fluid" style="max-height: 120px; object-fit: contain;">
+                                                                        <div class="small text-muted mt-1">
+                                                                            <?php echo $idx === 0 ? 'Main' : 'Image ' . ($idx + 1); ?>
+                                                                        </div>
+                                                                    </div>
+                                                                </div>
+                                                            <?php endforeach; ?>
+                                                        </div>
+                                                    </div>
+                                                <?php endif; ?>
                                                 <div class="row">
                                                     <div class="col-md-4 mb-2">
                                                         <label for="image1" class="form-label">Image 1 (Main)</label>
@@ -719,24 +821,24 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
                         <!-- Hidden inputs to carry serialized specs JSON for 13 grouped columns -->
                         <div id="specs-hidden-inputs">
-                            <input type="hidden" name="network" id="spec_network" />
-                            <input type="hidden" name="launch" id="spec_launch" />
-                            <input type="hidden" name="body" id="spec_body" />
-                            <input type="hidden" name="display" id="spec_display" />
-                            <input type="hidden" name="hardware" id="spec_hardware" />
-                            <input type="hidden" name="memory" id="spec_memory" />
-                            <input type="hidden" name="main_camera" id="spec_main_camera" />
-                            <input type="hidden" name="selfie_camera" id="spec_selfie_camera" />
-                            <input type="hidden" name="multimedia" id="spec_multimedia" />
-                            <input type="hidden" name="connectivity" id="spec_connectivity" />
-                            <input type="hidden" name="features" id="spec_features" />
-                            <input type="hidden" name="battery" id="spec_battery" />
-                            <input type="hidden" name="general_info" id="spec_general_info" />
+                            <input type="hidden" name="network" id="spec_network" value="<?php echo htmlspecialchars($device['network'] ?? ''); ?>" />
+                            <input type="hidden" name="launch" id="spec_launch" value="<?php echo htmlspecialchars($device['launch'] ?? ''); ?>" />
+                            <input type="hidden" name="body" id="spec_body" value="<?php echo htmlspecialchars($device['body'] ?? ''); ?>" />
+                            <input type="hidden" name="display" id="spec_display" value="<?php echo htmlspecialchars($device['display'] ?? ''); ?>" />
+                            <input type="hidden" name="hardware" id="spec_hardware" value="<?php echo htmlspecialchars($device['hardware'] ?? ''); ?>" />
+                            <input type="hidden" name="memory" id="spec_memory" value="<?php echo htmlspecialchars($device['memory'] ?? ''); ?>" />
+                            <input type="hidden" name="main_camera" id="spec_main_camera" value="<?php echo htmlspecialchars($device['main_camera'] ?? ''); ?>" />
+                            <input type="hidden" name="selfie_camera" id="spec_selfie_camera" value="<?php echo htmlspecialchars($device['selfie_camera'] ?? ''); ?>" />
+                            <input type="hidden" name="multimedia" id="spec_multimedia" value="<?php echo htmlspecialchars($device['multimedia'] ?? ''); ?>" />
+                            <input type="hidden" name="connectivity" id="spec_connectivity" value="<?php echo htmlspecialchars($device['connectivity'] ?? ''); ?>" />
+                            <input type="hidden" name="features" id="spec_features" value="<?php echo htmlspecialchars($device['features'] ?? ''); ?>" />
+                            <input type="hidden" name="battery" id="spec_battery" value="<?php echo htmlspecialchars($device['battery'] ?? ''); ?>" />
+                            <input type="hidden" name="general_info" id="spec_general_info" value="<?php echo htmlspecialchars($device['general_info'] ?? ''); ?>" />
                         </div>
 
                         <div class="d-flex justify-content-end mt-3">
                             <a href="dashboard.php" class="btn btn-secondary me-2">Cancel</a>
-                            <button type="submit" class="btn btn-primary">Save Phone</button>
+                            <button type="submit" class="btn btn-primary">Save Changes</button>
                         </div>
                     </form>
                 </div>
@@ -847,6 +949,124 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             // Ensure action buttons are visible even when Field is empty
             fieldCell.appendChild(actions);
         });
+
+        // Prefill sections from hidden JSON (when editing existing device)
+        (function prefillFromHidden() {
+            const sectionKeyMap = {
+                'Network': 'network',
+                'Launch': 'launch',
+                'Body': 'body',
+                'Display': 'display',
+                'Hardware': 'hardware',
+                'Memory': 'memory',
+                'Main Camera': 'main_camera',
+                'Selfie camera': 'selfie_camera',
+                'Multimedia': 'multimedia',
+                'Connectivity': 'connectivity',
+                'Features': 'features',
+                'Battery': 'battery',
+                'General Info': 'general_info'
+            };
+
+            const getJsonArray = (key) => {
+                const el = document.getElementById('spec_' + key);
+                if (!el) return [];
+                const raw = (el.value || '').trim();
+                if (!raw) return [];
+                try {
+                    const parsed = JSON.parse(raw);
+                    return Array.isArray(parsed) ? parsed : [];
+                } catch (e) {
+                    console.warn('Invalid JSON for', key, e);
+                    return [];
+                }
+            };
+
+            // Helper to build a row mirroring our editable/actions structure
+            const makeRow = (sectionName, fieldText, descText, isFirst) => {
+                const tr = document.createElement('tr');
+                tr.dataset.section = sectionName;
+                tr.dataset.isFirst = isFirst ? 'true' : 'false';
+
+                const tdSection = document.createElement('td');
+                tdSection.contentEditable = 'false';
+                tdSection.textContent = isFirst ? sectionName : '';
+
+                const tdField = document.createElement('td');
+                const fieldSpan = document.createElement('span');
+                fieldSpan.contentEditable = 'true';
+                fieldSpan.style.display = 'inline-block';
+                fieldSpan.style.minWidth = '60%';
+                fieldSpan.textContent = fieldText || '';
+                const actions = document.createElement('span');
+                actions.className = 'float-end';
+                actions.contentEditable = 'false';
+                if (isFirst) {
+                    const addBtn = document.createElement('button');
+                    addBtn.type = 'button';
+                    addBtn.className = 'btn btn-sm btn-outline-primary btn-add-field';
+                    addBtn.title = 'Add field';
+                    addBtn.dataset.section = sectionName;
+                    addBtn.innerHTML = '<i class="fas fa-plus"></i>';
+                    actions.appendChild(addBtn);
+                } else {
+                    const removeBtn = document.createElement('button');
+                    removeBtn.type = 'button';
+                    removeBtn.className = 'btn btn-sm btn-outline-danger btn-remove-field';
+                    removeBtn.title = 'Remove field';
+                    removeBtn.innerHTML = '<i class="fas fa-minus"></i>';
+                    actions.appendChild(removeBtn);
+                }
+                tdField.appendChild(fieldSpan);
+                tdField.appendChild(actions);
+
+                const tdDesc = document.createElement('td');
+                tdDesc.contentEditable = 'true';
+                tdDesc.textContent = descText || '';
+
+                tr.appendChild(tdSection);
+                tr.appendChild(tdField);
+                tr.appendChild(tdDesc);
+                return tr;
+            };
+
+            // For each section, if we have JSON, replace the template rows with data rows
+            Object.entries(sectionKeyMap).forEach(([sectionName, key]) => {
+                const items = getJsonArray(key);
+                if (!items.length) return;
+
+                // Find the first row index for this section in current table
+                const rows = [...tbody.rows];
+                let firstIdx = rows.findIndex(r => (r.cells[0]?.textContent || '').trim() === sectionName);
+                if (firstIdx === -1) return; // section not found
+
+                // Determine the last index for this section (contiguous block)
+                let lastIdx = firstIdx;
+                for (let i = firstIdx + 1; i < rows.length; i++) {
+                    const secText = (rows[i].cells[0]?.textContent || '').trim();
+                    if (secText !== '') break; // next section block reached
+                    lastIdx = i;
+                }
+
+                // Remove existing block
+                for (let i = lastIdx; i >= firstIdx; i--) {
+                    tbody.deleteRow(i);
+                }
+
+                // Insert new rows for this section based on JSON
+                let insertBeforeNode = tbody.rows[firstIdx] || null; // if null, append at end
+                items.forEach((it, idx) => {
+                    const field = (it && typeof it.field === 'string') ? it.field : '';
+                    const desc = (it && typeof it.description === 'string') ? it.description : '';
+                    const row = makeRow(sectionName, field, desc, idx === 0);
+                    if (insertBeforeNode) {
+                        tbody.insertBefore(row, insertBeforeNode);
+                    } else {
+                        tbody.appendChild(row);
+                    }
+                });
+            });
+        })();
 
         // Event delegation for add/remove
         tbody.addEventListener('click', function(e) {
