@@ -498,97 +498,107 @@ $brands = $brands_stmt->fetchAll();
                                         <div class="canel<?php echo $j == 1 ?  : ($j == 0 ? '' : ''); ?>"></div>
                                     <?php endfor; ?>
                                 </div>
-                            <?php endforeach; ?>
-                        <?php endif; ?>
-                    </div>
+                            <?php else: ?>
+                                <?php $chunks = array_chunk($devices, 3); ?>
+                                <?php foreach ($chunks as $row): ?>
+                                    <div class="d-flex">
+                                        <?php foreach ($row as $i => $device): ?>
+                                            <div class="device-card canel<?php echo $i == 1 ? ' mx-4' : ($i == 0 ? '' : ''); ?>" data-device-id="<?php echo $device['id']; ?>" style="cursor: pointer; text-align: center;">
+                                                <?php if (isset($device['image']) && !empty($device['image'])): ?>
+                                                    <img class="shrink" src="<?php echo htmlspecialchars($device['image']); ?>" alt="">
+                                                <?php else: ?>
+                                                    <img class="shrink" src="" alt="">
+                                                <?php endif; ?>
+                                                <p class="brand-item-bold"><?php echo htmlspecialchars($device['name'] ?? ''); ?></p>
+                                            </div>
+                                        <?php endforeach; ?>
+                                        <?php for ($j = count($row); $j < 3; $j++): ?>
+                                            <div class="canel<?php echo $j == 1 ? ' mx-4' : ($j == 0 ? '' : ''); ?>"></div>
+                                        <?php endfor; ?>
+                                    </div>
+                                <?php endforeach; ?>
+                            <?php endif; ?>
+                        </div>
 
-                    <h6 style="border-left: solid 5px grey ; color: #090E21; text-transform: uppercase; font-weight: 900; margin-top: 12px;"
-                        class="px-3">Popular comparisons</h6>
+                        <h6 style="border-left: solid 5px grey ; color: #090E21; text-transform: uppercase; font-weight: 900; margin-top: 12px;"
+                            class="px-3">Popular comparisons</h6>
 
-                    <div class="sentizer bg-white mt-2 p-3 rounded shadow-sm" style="    text-transform: Uppercase;
-                                            font-size: 13px;
-                                            font-weight: 700;">
-                        <div class="row">
-                            <div class="col-12">
-                                <?php if (empty($topComparisons)): ?>
-                                    <p class="mb-2" style=" text-transform: capitalize;">No Comparisons Yet</p>
-                                <?php else: ?>
-                                    <?php foreach ($topComparisons as $index => $comparison): ?>
-                                        <!-- if $index is odd -->
-                                        <?php if ((($index + 1) % 2) != 0): ?>
-                                            <p class="mb-2 clickable-comparison" data-device1-id="<?php echo $comparison['device1_id'] ?? ''; ?>"
-                                                data-device2-id="<?php echo $comparison['device2_id'] ?? ''; ?>"
-                                                style="cursor: pointer; background-color: #ffe6f0; color: #090E21; text-transform: capitalize;"><?php echo htmlspecialchars($comparison['device1_name'] ?? $comparison['device1'] ?? 'Unknown'); ?> vs.
-                                                <?php echo htmlspecialchars($comparison['device2_name'] ?? $comparison['device2'] ?? 'Unknown'); ?></p>
-                                        <?php else: ?>
-                                            <!-- else if $index is even -->
-                                            <p class="mb-2 clickable-comparison" data-device1-id="<?php echo $comparison['device1_id'] ?? ''; ?>"
-                                                data-device2-id="<?php echo $comparison['device2_id'] ?? ''; ?>" style="cursor: pointer; text-transform: capitalize;"><?php echo htmlspecialchars($comparison['device1_name'] ?? $comparison['device1'] ?? 'Unknown'); ?> vs. <?php echo htmlspecialchars($comparison['device2_name'] ?? $comparison['device2'] ?? 'Unknown'); ?></p>
-                                        <?php endif; ?>
-                                    <?php endforeach; ?>
-                                <?php endif; ?>
+                        <div class="sentizer bg-white mt-2 p-3 rounded shadow-sm" style="    text-transform: Uppercase;
+                                                    font-size: 13px;
+                                                    font-weight: 700;">
+                            <div class="row">
+                                <div class="col-12">
+                                    <?php if (empty($topComparisons)): ?>
+                                        <p class="mb-2" style=" text-transform: capitalize;">No Comparisons Yet</p>
+                                    <?php else: ?>
+                                        <?php foreach ($topComparisons as $index => $comparison): ?>
+                                            <!-- if $index is odd -->
+                                            <?php if ((($index + 1) % 2) != 0): ?>
+                                                <p class="mb-2 clickable-comparison" data-device1-id="<?php echo $comparison['device1_id'] ?? ''; ?>"
+                                                    data-device2-id="<?php echo $comparison['device2_id'] ?? ''; ?>"
+                                                    style="cursor: pointer; background-color: #ffe6f0; color: #090E21; text-transform: capitalize;"><?php echo htmlspecialchars($comparison['device1_name'] ?? $comparison['device1'] ?? 'Unknown'); ?> vs.
+                                                    <?php echo htmlspecialchars($comparison['device2_name'] ?? $comparison['device2'] ?? 'Unknown'); ?></p>
+                                            <?php else: ?>
+                                                <!-- else if $index is even -->
+                                                <p class="mb-2 clickable-comparison" data-device1-id="<?php echo $comparison['device1_id'] ?? ''; ?>"
+                                                    data-device2-id="<?php echo $comparison['device2_id'] ?? ''; ?>" style="cursor: pointer; text-transform: capitalize;"><?php echo htmlspecialchars($comparison['device1_name'] ?? $comparison['device1'] ?? 'Unknown'); ?> vs. <?php echo htmlspecialchars($comparison['device2_name'] ?? $comparison['device2'] ?? 'Unknown'); ?></p>
+                                            <?php endif; ?>
+                                        <?php endforeach; ?>
+                                    <?php endif; ?>
+                                </div>
                             </div>
                         </div>
-                    </div>
-                    <h6 style="border-left: 7px solid #EFEBE9 ; font-weight: 900; color: #090E21; text-transform: uppercase;"
-                        class=" px-2 mt-2 d-inline mt-4">Top 10
-                        Daily Interest</h6>
+                        <h6 style="border-left: 7px solid #EFEBE9 ; font-weight: 900; color: #090E21; text-transform: uppercase;"
+                            class=" px-2 mt-2 d-inline mt-4">Top 10
+                            Daily Interest</h6>
 
-                    <div class="center">
-                        <table class="table table-sm custom-table">
-                            <thead>
-                                <tr style="background-color: #4c7273; color: white;">
-                                    <th style="color: white;">#</th>
-                                    <th style="color: white;">Devices</th>
-                                    <th style="color: white;">Daily Hits</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                <?php if (empty($topViewedDevices)): ?>
-                                    <tr>
-                                        <th scope="row"></th>
-                                        <td class="text-start">Not Enough Data Exists</td>
-                                        <td class="text-end"></td>
+                        <div class="center">
+                            <table class="table table-sm custom-table">
+                                <thead>
+                                    <tr style="background-color: #4c7273; color: white;">
+                                        <th style="color: white;">#</th>
+                                        <th style="color: white;">Devices</th>
+                                        <th style="color: white;">Daily Hits</th>
                                     </tr>
-                                <?php else: ?>
-                                    <?php foreach ($topViewedDevices as $index => $device):
-                                        if (($index + 1) % 2 != 0): ?>
-                                            <tr class="clickable-row" data-device-id="<?php echo $device['id']; ?>" style="cursor: pointer;">
-                                                <th scope="row"><?php echo $index + 1; ?></th>
-                                                <td class="text-start"><?php echo htmlspecialchars($device['brand_name']); ?> <?php echo htmlspecialchars($device['name']); ?></td>
-                                                <td class="text-end"><?php echo $device['view_count']; ?></td>
-                                            </tr>
-                                        <?php else: ?>
-                                            <tr class="highlight clickable-row" data-device-id="<?php echo $device['id']; ?>" style="cursor: pointer;">
-                                                <th scope="row" class="text-white"><?php echo $index + 1; ?></th>
-                                                <td class="text-start"><?php echo htmlspecialchars($device['brand_name']); ?> <?php echo htmlspecialchars($device['name']); ?></td>
-                                                <td class="text-end"><?php echo $device['view_count']; ?></td>
-                                            </tr>
-                                <?php
-                                        endif;
-                                    endforeach;
-                                endif; ?>
-                            </tbody>
-                        </table>
-                    </div>
-                    <h6 style="border-left: 7px solid #EFEBE9 ; font-weight: 900; color: #090E21; text-transform: uppercase;"
-                        class=" px-2 mt-2 d-inline mt-4">Top 10 by
-                        Fans</h6>
-                    <div class="center" style="margin-top: 12px;">
-                        <table class="table table-sm custom-table">
-                            <thead>
-                                <tr class="text-white" style="background-color: #14222D;">
-                                    <th style="color: white;  font-size: 15px;  ">#</th>
-                                    <th style="color: white;  font-size: 15px;">Device</th>
-                                    <th style="color: white;  font-size: 15px;">Reviews</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                <?php if (empty($topReviewedDevices)): ?>
-                                    <tr>
-                                        <th scope="row"></th>
-                                        <td class="text-start">Not Enough Data Exists</td>
-                                        <td class="text-end"></td>
+                                </thead>
+                                <tbody>
+                                    <?php if (empty($topViewedDevices)): ?>
+                                        <tr>
+                                            <th scope="row"></th>
+                                            <td class="text-start">Not Enough Data Exists</td>
+                                            <td class="text-end"></td>
+                                        </tr>
+                                    <?php else: ?>
+                                        <?php foreach ($topViewedDevices as $index => $device):
+                                            if (($index + 1) % 2 != 0): ?>
+                                                <tr class="clickable-row" data-device-id="<?php echo $device['id']; ?>" style="cursor: pointer;">
+                                                    <th scope="row"><?php echo $index + 1; ?></th>
+                                                    <td class="text-start"><?php echo htmlspecialchars($device['brand_name']); ?> <?php echo htmlspecialchars($device['name']); ?></td>
+                                                    <td class="text-end"><?php echo $device['view_count']; ?></td>
+                                                </tr>
+                                            <?php else: ?>
+                                                <tr class="highlight clickable-row" data-device-id="<?php echo $device['id']; ?>" style="cursor: pointer;">
+                                                    <th scope="row" class="text-white"><?php echo $index + 1; ?></th>
+                                                    <td class="text-start"><?php echo htmlspecialchars($device['brand_name']); ?> <?php echo htmlspecialchars($device['name']); ?></td>
+                                                    <td class="text-end"><?php echo $device['view_count']; ?></td>
+                                                </tr>
+                                    <?php
+                                            endif;
+                                        endforeach;
+                                    endif; ?>
+                                </tbody>
+                            </table>
+                        </div>
+                        <h6 style="border-left: 7px solid #EFEBE9 ; font-weight: 900; color: #090E21; text-transform: uppercase;"
+                            class=" px-2 mt-2 d-inline mt-4">Top 10 by
+                            Fans</h6>
+                        <div class="center" style="margin-top: 12px;">
+                            <table class="table table-sm custom-table">
+                                <thead>
+                                    <tr class="text-white" style="background-color: #14222D;">
+                                        <th style="color: white;  font-size: 15px;  ">#</th>
+                                        <th style="color: white;  font-size: 15px;">Device</th>
+                                        <th style="color: white;  font-size: 15px;">Reviews</th>
                                     </tr>
                                 <?php else: ?>
                                     <?php foreach ($topReviewedDevices as $index => $device):
@@ -637,11 +647,25 @@ $brands = $brands_stmt->fetchAll();
                                         <div class="canel<?php echo $j == 1 ?  : ($j == 0 ? '' : ''); ?>"></div>
                                     <?php endfor; ?>
                                 </div>
-                            <?php endforeach; ?>
-                        <?php endif; ?>
+                            <?php else: ?>
+                                <?php $chunks = array_chunk($latestDevices, 3); ?>
+                                <?php foreach ($chunks as $row): ?>
+                                    <div class="d-flex">
+                                        <?php foreach ($row as $i => $device): ?>
+                                            <div class="device-card canel<?php echo $i == 1 ? ' mx-4' : ($i == 0 ? '' : ''); ?>" data-device-id="<?php echo $device['id']; ?>" style="cursor: pointer;">
+                                                <img class="shrink" src="<?php echo htmlspecialchars($device['image'] ?? ''); ?>" alt="">
+                                                <p class="brand-item-bold"><?php echo htmlspecialchars($device['name'] ?? ''); ?></p>
+                                            </div>
+                                        <?php endforeach; ?>
+                                        <?php for ($j = count($row); $j < 3; $j++): ?>
+                                            <div class="canel<?php echo $j == 1 ? ' mx-4' : ($j == 0 ? '' : ''); ?>"></div>
+                                        <?php endfor; ?>
+                                    </div>
+                                <?php endforeach; ?>
+                            <?php endif; ?>
+                        </div>
+
                     </div>
-                </div>
-            </div>
         </div>
         <!-- Newsletter Section -->
         <div class="container mt-4 mb-4" style="max-width: 1034px;">
