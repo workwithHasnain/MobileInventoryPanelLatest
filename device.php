@@ -1650,7 +1650,7 @@ if ($_POST && isset($_POST['submit_comment'])) {
 
 
       </div>
-      <div class="col-md-4 col-5 d-none d-lg-block" style="position: relative; left: 25px;">
+      <div class="col-md-4 col-5 d-none d-lg-block" style="position: relative; left: 14px;">
         <button class="solid w-100 py-2">
           <i class="fa-solid fa-mobile fa-sm mx-2" style="color: white;"></i>
           Phone Finder</button>
@@ -1800,7 +1800,7 @@ if ($_POST && isset($_POST['submit_comment'])) {
             </div>
           </div>
 
-          <img src="https://fdn.gsmarena.com/imgroot/static/banners/self/review-pixel-9-pro-xl-728x90.jpg" alt="">
+          <img src="https://fdn.gsmarena.com/imgroot/static/banners/self/review-pixel-9-pro-xl-728x90.jpg" alt="" class="webkit">
         </div>
       </div>
 
