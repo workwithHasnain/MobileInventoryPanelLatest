@@ -465,38 +465,15 @@ $brands = $brands_stmt->fetchAll();
             <?php endforeach;
             endif; ?>
 
-            <div class="col-lg-4  col-12  bg-white p-3">
-
-
-                <div class="center w-100 " style="margin-top: 12px;">
-                    <h6 style="color: #090E21; text-transform: uppercase; font-weight: 900;" class=" mt-2 ">Latest Devices
-                    </h6>
-                    <div class="cent">
-                        <?php if (empty($devices)): ?>
-                            <div class="text-center py-5">
-                                <i class="fas fa-mobile-alt fa-3x text-muted mb-3"></i>
-                                <h4 class="text-muted">No Devices Available</h4>
-                                <p class="text-muted">Check back later for new devices!</p>
-                            </div>
-                        <?php else: ?>
-                            <?php $chunks = array_chunk($devices, 3); ?>
-                            <?php foreach ($chunks as $row): ?>
-                                <div class="d-flex" style="gap: 15px;">
-                                    <?php foreach ($row as $i => $device): ?>
-                                        <div class="device-card canel<?php echo $i == 1 ? : ($i == 0 ? '' : ''); ?>" data-device-id="<?php echo $device['id']; ?>" style="cursor: pointer;">
-                                            <?php if (isset($device['images']) && !empty($device['images'])): ?>
-                                                <img class="shrink" src="<?php echo htmlspecialchars($device['images'][0]); ?>" alt="">
-                                            <?php elseif (isset($device['image']) && !empty($device['image'])): ?>
-                                                <img class="shrink" src="<?php echo htmlspecialchars($device['image']); ?>" alt="">
-                                            <?php else: ?>
-                                                <img class="shrink" src="" alt="">
-                                            <?php endif; ?>
-                                            <p><?php echo htmlspecialchars($device['name'] ?? ''); ?></p>
-                                        </div>
-                                    <?php endforeach; ?>
-                                    <?php for ($j = count($row); $j < 3; $j++): ?>
-                                        <div class="canel<?php echo $j == 1 ?  : ($j == 0 ? '' : ''); ?>"></div>
-                                    <?php endfor; ?>
+            <div class="col-lg-4  col-12 sentizer-er  bg-white p-3">
+                        <h6 style="color: #090E21; text-transform: uppercase; font-weight: 900;" class=" mt-2 ">Latest Devices
+                        </h6>
+                        <div class="cent">
+                            <?php if (empty($devices)): ?>
+                                <div class="text-center py-5">
+                                    <i class="fas fa-mobile-alt fa-3x text-muted mb-3"></i>
+                                    <h4 class="text-muted">No Devices Available</h4>
+                                    <p class="text-muted">Check back later for new devices!</p>
                                 </div>
                             <?php else: ?>
                                 <?php $chunks = array_chunk($devices, 3); ?>
@@ -600,52 +577,46 @@ $brands = $brands_stmt->fetchAll();
                                         <th style="color: white;  font-size: 15px;">Device</th>
                                         <th style="color: white;  font-size: 15px;">Reviews</th>
                                     </tr>
-                                <?php else: ?>
-                                    <?php foreach ($topReviewedDevices as $index => $device):
-                                        if (($index + 1) % 2 != 0): ?>
-                                            <tr class="clickable-row" data-device-id="<?php echo $device['id']; ?>" style="cursor: pointer;">
-                                                <th scope="row"><?php echo $index + 1; ?></th>
-                                                <td class="text-start"><?php echo htmlspecialchars($device['brand_name']); ?> <?php echo htmlspecialchars($device['name']); ?></td>
-                                                <td class="text-end"><?php echo $device['review_count']; ?></td>
-                                            </tr>
-                                        <?php else: ?>
-                                            <tr class="highlight-12 clickable-row" data-device-id="<?php echo $device['id']; ?>" style="cursor: pointer;">
-                                                <th scope="row" class="text-white"><?php echo $index + 1; ?></th>
-                                                <td class="text-start"><?php echo htmlspecialchars($device['brand_name']); ?> <?php echo htmlspecialchars($device['name']); ?></td>
-                                                <td class="text-end"><?php echo $device['review_count']; ?></td>
-                                            </tr>
-                                <?php
-                                        endif;
-                                    endforeach;
-                                endif; ?>
-                            </tbody>
-                        </table>
-                    </div>
-                    <h6 style="border-left: 7px solid #EFEBE9 ; font-weight: 900; color: #090E21; text-transform: uppercase;"
-                        class=" px-2 mt-2 d-inline mt-4">In
-                        Stores
-                        Now</h6>
+                                </thead>
+                                <tbody>
+                                    <?php if (empty($topReviewedDevices)): ?>
+                                        <tr>
+                                            <th scope="row"></th>
+                                            <td class="text-start">Not Enough Data Exists</td>
+                                            <td class="text-end"></td>
+                                        </tr>
+                                    <?php else: ?>
+                                        <?php foreach ($topReviewedDevices as $index => $device):
+                                            if (($index + 1) % 2 != 0): ?>
+                                                <tr class="clickable-row" data-device-id="<?php echo $device['id']; ?>" style="cursor: pointer;">
+                                                    <th scope="row"><?php echo $index + 1; ?></th>
+                                                    <td class="text-start"><?php echo htmlspecialchars($device['brand_name']); ?> <?php echo htmlspecialchars($device['name']); ?></td>
+                                                    <td class="text-end"><?php echo $device['review_count']; ?></td>
+                                                </tr>
+                                            <?php else: ?>
+                                                <tr class="highlight-12 clickable-row" data-device-id="<?php echo $device['id']; ?>" style="cursor: pointer;">
+                                                    <th scope="row" class="text-white"><?php echo $index + 1; ?></th>
+                                                    <td class="text-start"><?php echo htmlspecialchars($device['brand_name']); ?> <?php echo htmlspecialchars($device['name']); ?></td>
+                                                    <td class="text-end"><?php echo $device['review_count']; ?></td>
+                                                </tr>
+                                    <?php
+                                            endif;
+                                        endforeach;
+                                    endif; ?>
+                                </tbody>
+                            </table>
+                        </div>
+                        <h6 style="border-left: 7px solid #EFEBE9 ; font-weight: 900; color: #090E21; text-transform: uppercase;"
+                            class=" px-2 mt-2 d-inline mt-4">In
+                            Stores
+                            Now</h6>
 
-                    <div class="cent">
-                        <?php if (empty($latestDevices)): ?>
-                            <div class="text-center py-5">
-                                <i class="fas fa-mobile-alt fa-3x text-muted mb-3"></i>
-                                <h4 class="text-muted">No Devices Available</h4>
-                                <p class="text-muted">Check back later for new devices!</p>
-                            </div>
-                        <?php else: ?>
-                            <?php $chunks = array_chunk($latestDevices, 3); ?>
-                            <?php foreach ($chunks as $row): ?>
-                                <div class="d-flex" style="gap: 15px;">
-                                    <?php foreach ($row as $i => $device): ?>
-                                        <div class="device-card canel<?php echo $i == 1 ? : ($i == 0 ? '' : ''); ?>" data-device-id="<?php echo $device['id']; ?>" style="cursor: pointer;">
-                                            <img class="shrink" src="<?php echo htmlspecialchars($device['image'] ?? ''); ?>" alt="">
-                                            <p class="brand-item-bold"><?php echo htmlspecialchars($device['name'] ?? ''); ?></p>
-                                        </div>
-                                    <?php endforeach; ?>
-                                    <?php for ($j = count($row); $j < 3; $j++): ?>
-                                        <div class="canel<?php echo $j == 1 ?  : ($j == 0 ? '' : ''); ?>"></div>
-                                    <?php endfor; ?>
+                        <div class="cent">
+                            <?php if (empty($latestDevices)): ?>
+                                <div class="text-center py-5">
+                                    <i class="fas fa-mobile-alt fa-3x text-muted mb-3"></i>
+                                    <h4 class="text-muted">No Devices Available</h4>
+                                    <p class="text-muted">Check back later for new devices!</p>
                                 </div>
                             <?php else: ?>
                                 <?php $chunks = array_chunk($latestDevices, 3); ?>
