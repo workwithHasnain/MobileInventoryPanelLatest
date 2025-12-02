@@ -682,7 +682,7 @@ input:focus {
 
 .whitening {
     font-size: 15px;
-    margin-left: 12px;
+    /* margin-left: 12px; */
 }
 
 .mobiles-button:hover {
