@@ -1150,8 +1150,67 @@ function formatDeviceSpecsJson($device)
                 </div>
             </div>
         </div>
+ <div  class="comparison-wrapper">
+    <style>
 
-        <table>
+/* Wrapper that allows horizontal scroll */
+.comparison-wrapper {
+    width: 100%;
+    overflow-x: auto;
+    overflow-y: hidden;
+    -webkit-overflow-scrolling: touch;
+    border: 1px solid #e5e5e5;
+    border-radius: 10px;
+}
+
+/* Table full width but no wrap issues */
+.comparison-table {
+    width: 100%;
+    border-collapse: collapse;
+    min-width: 900px; /* enough for 3 phones */
+    table-layout: fixed;
+}
+
+.comparison-table th,
+.comparison-table td {
+    border: 1px solid #ddd;
+    padding: 12px;
+    vertical-align: top;
+    text-align: left;
+    word-wrap: break-word;
+    font-size: 15px;
+}
+
+/* Section headings */
+.comparison-table td[colspan="3"] {
+    background: #f7f7f7;
+    font-weight: 700;
+    color: #e63946;
+    font-size: 16px;
+    text-transform: uppercase;
+}
+
+/* Mobile: enable TRUE GSMArena style scroll */
+@media(max-width: 768px) {
+
+    .comparison-wrapper {
+        overflow-x: scroll;
+        white-space: nowrap;
+    }
+
+    .comparison-table {
+        min-width: 800px; /* Adjust for smooth scroll */
+    }
+
+    .comparison-table th,
+    .comparison-table td {
+        white-space: normal; /* readable text */
+        font-size: 14px;
+    }
+}
+
+    </style>
+        <table class="comparison-table">
             <thead>
                 <tr>
                     <th><?php echo $phone1 ? getPhoneName($phone1) : 'Select Phone 1'; ?></th>
@@ -1269,7 +1328,7 @@ function formatDeviceSpecsJson($device)
             </tbody>
         </table>
 
-
+ </div>
 
     </div>
     <!-- Newsletter Section -->
