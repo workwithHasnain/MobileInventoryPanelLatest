@@ -398,7 +398,7 @@
                 <tr>
                     <td colspan="3" style=" font-weight: 600;    color: #f14d4d;
     font-size: 16px; background: #f9f9f9;">Main Camera</td>
-                </tr>
+                </tr>   
                 <tr>
                     <td>200 MP + 12 MP (ultrawide)</td>
                     <td>48 MP + 12 MP (ultrawide)</td>

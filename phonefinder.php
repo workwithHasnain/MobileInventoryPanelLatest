@@ -244,7 +244,7 @@ if (!$filterConfig) {
                         style="background-repeat: no-repeat; background-size: cover;" alt="">
                 </div>
             </div>
-            <div class="col-md-4 col-5 d-none d-lg-block" style="position: relative; left: 25px;">
+            <div class="col-md-4 col-5 d-none d-lg-block" style="position: relative; left: 14px;">
                 <button class="solid w-100 py-2">
                     <i class="fa-solid fa-mobile fa-sm mx-2" style="color: white;"></i>
                     Phone Finder</button>
@@ -277,7 +277,7 @@ if (!$filterConfig) {
 
     </div>
 
-    <div class="container bg-white mt-3 vwr">
+    <div class="container bg-white margin-top-4rem vwr">
         <div class="row">
             <div class="col-lg-6 col-12">
                 <div class="filter-header">General</div>

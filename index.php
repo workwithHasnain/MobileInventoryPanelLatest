@@ -373,7 +373,7 @@ if ($_POST && isset($_POST['action'])) {
         </div>
     </div>
 
-    <div class="container featured ">
+    <div class="container featured margin-top-4rem">
         <h2 class="section">Featured</h2>
         <div class="featured-section">
             <?php if (empty($posts)): ?>
@@ -413,7 +413,7 @@ if ($_POST && isset($_POST['action'])) {
                     </div>
                 </div>
             <?php endforeach; ?>
-            <div class="col-md-4 col-5 d-none d-lg-block" style="position: relative; left: 25px;">
+            <div class="col-md-4 col-5 d-none d-lg-block" style="position: relative; left: 28px;">
                 <button class="solid w-100 py-2">
                     <i class="fa-solid fa-mobile fa-sm mx-2" style="color: white;"></i>
                     Phone Finder</button>
@@ -518,7 +518,7 @@ if ($_POST && isset($_POST['action'])) {
                         <h6 style="border-left: solid 5px grey ; color: #090E21; text-transform: uppercase; font-weight: 900; margin-top: 12px;"
                             class="px-3">Popular comparisons</h6>
 
-                        <div class="sentizer bg-white mt-2 p-3 rounded shadow-sm" style="    text-transform: Uppercase;
+                        <div class="sentizer bg-white mt-2 p-3 rounded " style="    text-transform: Uppercase;
                                                     font-size: 13px;
                                                     font-weight: 700;">
                             <div class="row">
