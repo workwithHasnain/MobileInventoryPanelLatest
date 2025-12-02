@@ -997,7 +997,7 @@ function formatDeviceSpecsJson($device)
                         style="background-repeat: no-repeat; background-size: cover;" alt="">
                 </div>
             </div>
-            <div class="col-md-4 col-5 d-none d-lg-block" style="position: relative; left: 14px;">
+            <div class="col-md-4 col-5 d-none d-lg-block" style="position: relative; left: 12px;">
                 <button class="solid w-100 py-2">
                     <i class="fa-solid fa-mobile fa-sm mx-2" style="color: white;"></i>
                     Phone Finder</button>
@@ -1035,7 +1035,7 @@ function formatDeviceSpecsJson($device)
                 <div class="compare-checkbox">
                     <label>
                         Compare
-                        <select id="phone1-select" name="phone1" class="bg-white w-100 mx-2 text-center-auto border phone-search-select" onchange="updateComparison(1, this.value)">
+                        <select id="phone1-select"   name="phone1" class="bg-white mx-2 text-center-auto border phone-search-select" onchange="updateComparison(1, this.value)">
                             <option value="">Select Phone 1</option>
                             <?php foreach ($phones as $phone): ?>
                                 <option value="<?php echo $phone['id']; ?>" data-image="<?php echo htmlspecialchars(getPhoneImage($phone)); ?>" data-name="<?php echo htmlspecialchars(getPhoneName($phone)); ?>" <?php echo ($phone1 && $phone1['id'] == $phone['id']) ? 'selected' : ''; ?>>

@@ -396,7 +396,7 @@ $latestDevices = array_slice(array_reverse($latestDevices), 0, 9);
 
             </div>
 
-            <div class="col-md-4 col-5 d-none d-lg-block" style="position: relative; left: 14px;">
+            <div class="col-md-4 col-5 d-none d-lg-block" style="position: relative; left: 12px;">
                 <button class="solid w-100 py-2">
                     <i class="fa-solid fa-mobile fa-sm mx-2" style="color: white;"></i>
                     Phone Finder</button>
@@ -490,9 +490,9 @@ $latestDevices = array_slice(array_reverse($latestDevices), 0, 9);
                         <?php else: ?>
                             <?php $chunks = array_chunk($devices, 3); ?>
                             <?php foreach ($chunks as $row): ?>
-                                <div class="d-flex">
+                                <div class="d-flex" style="gap: 15px;">
                                     <?php foreach ($row as $i => $device): ?>
-                                        <div class="device-card canel<?php echo $i == 1 ? ' mx-4' : ($i == 0 ? '' : ''); ?>" data-device-id="<?php echo $device['id']; ?>" style="cursor: pointer;">
+                                        <div class="device-card canel<?php echo $i == 1 ? : ($i == 0 ? '' : ''); ?>" data-device-id="<?php echo $device['id']; ?>" style="cursor: pointer;">
                                             <?php if (isset($device['images']) && !empty($device['images'])): ?>
                                                 <img class="shrink" src="<?php echo htmlspecialchars($device['images'][0]); ?>" alt="">
                                             <?php elseif (isset($device['image']) && !empty($device['image'])): ?>
@@ -504,7 +504,7 @@ $latestDevices = array_slice(array_reverse($latestDevices), 0, 9);
                                         </div>
                                     <?php endforeach; ?>
                                     <?php for ($j = count($row); $j < 3; $j++): ?>
-                                        <div class="canel<?php echo $j == 1 ? ' mx-4' : ($j == 0 ? '' : ''); ?>"></div>
+                                        <div class="canel<?php echo $j == 1 ?  : ($j == 0 ? '' : ''); ?>"></div>
                                     <?php endfor; ?>
                                 </div>
                             <?php endforeach; ?>
@@ -514,7 +514,7 @@ $latestDevices = array_slice(array_reverse($latestDevices), 0, 9);
                     <h6 style="border-left: solid 5px grey ; color: #090E21; text-transform: uppercase; font-weight: 900; margin-top: 12px;"
                         class="px-3">Popular comparisons</h6>
 
-                    <div class="sentizer bg-white mt-2 p-3 rounded shadow-sm" style="    text-transform: Uppercase;
+                    <div class="sentizer bg-white mt-2 p-3 rounded " style="    text-transform: Uppercase;
                                             font-size: 13px;
                                             font-weight: 700;">
                         <div class="row">
@@ -635,15 +635,15 @@ $latestDevices = array_slice(array_reverse($latestDevices), 0, 9);
                         <?php else: ?>
                             <?php $chunks = array_chunk($latestDevices, 3); ?>
                             <?php foreach ($chunks as $row): ?>
-                                <div class="d-flex">
+                                <div class="d-flex" style="gap: 15px;">
                                     <?php foreach ($row as $i => $device): ?>
-                                        <div class="device-card canel<?php echo $i == 1 ? ' mx-4' : ($i == 0 ? '' : ''); ?>" data-device-id="<?php echo $device['id']; ?>" style="cursor: pointer;">
+                                        <div class="device-card canel<?php echo $i == 1 ? : ($i == 0 ? '' : ''); ?>" data-device-id="<?php echo $device['id']; ?>" style="cursor: pointer;">
                                             <img class="shrink" src="<?php echo htmlspecialchars($device['image'] ?? ''); ?>" alt="">
                                             <p><?php echo htmlspecialchars($device['name'] ?? ''); ?></p>
                                         </div>
                                     <?php endforeach; ?>
                                     <?php for ($j = count($row); $j < 3; $j++): ?>
-                                        <div class="canel<?php echo $j == 1 ? ' mx-4' : ($j == 0 ? '' : ''); ?>"></div>
+                                        <div class="canel<?php echo $j == 1 ? : ($j == 0 ? '' : ''); ?>"></div>
                                     <?php endfor; ?>
                                 </div>
                             <?php endforeach; ?>

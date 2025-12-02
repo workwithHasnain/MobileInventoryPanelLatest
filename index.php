@@ -496,9 +496,9 @@ if ($_POST && isset($_POST['action'])) {
                             <?php else: ?>
                                 <?php $chunks = array_chunk($devices, 3); ?>
                                 <?php foreach ($chunks as $row): ?>
-                                    <div class="d-flex">
+                                    <div class="d-flex" style="gap: 15px;">
                                         <?php foreach ($row as $i => $device): ?>
-                                            <div class="device-card canel<?php echo $i == 1 ? ' mx-4' : ($i == 0 ? '' : ''); ?>" data-device-id="<?php echo $device['id']; ?>" style="cursor: pointer; text-align: center;">
+                                            <div class="device-card canel<?php echo $i == 1 ?  : ($i == 0 ? '' : ''); ?>" data-device-id="<?php echo $device['id']; ?>" style="cursor: pointer; text-align: center;">
                                                 <?php if (isset($device['image']) && !empty($device['image'])): ?>
                                                     <img class="shrink" src="<?php echo htmlspecialchars($device['image']); ?>" alt="">
                                                 <?php else: ?>
@@ -508,7 +508,7 @@ if ($_POST && isset($_POST['action'])) {
                                             </div>
                                         <?php endforeach; ?>
                                         <?php for ($j = count($row); $j < 3; $j++): ?>
-                                            <div class="canel<?php echo $j == 1 ? ' mx-4' : ($j == 0 ? '' : ''); ?>"></div>
+                                            <div class="canel<?php echo $j == 1 ? : ($j == 0 ? '' : ''); ?>"></div>
                                         <?php endfor; ?>
                                     </div>
                                 <?php endforeach; ?>
@@ -639,9 +639,9 @@ if ($_POST && isset($_POST['action'])) {
                             <?php else: ?>
                                 <?php $chunks = array_chunk($latestDevices, 3); ?>
                                 <?php foreach ($chunks as $row): ?>
-                                    <div class="d-flex">
+                                    <div class="d-flex" style="gap: 15px;">
                                         <?php foreach ($row as $i => $device): ?>
-                                            <div class="device-card canel<?php echo $i == 1 ? ' mx-4' : ($i == 0 ? '' : ''); ?>" data-device-id="<?php echo $device['id']; ?>" style="cursor: pointer;">
+                                            <div class="device-card canel<?php echo $i == 1 ?  : ($i == 0 ? '' : ''); ?>" data-device-id="<?php echo $device['id']; ?>" style="cursor: pointer;">
                                                 <img class="shrink" src="<?php echo htmlspecialchars($device['image'] ?? ''); ?>" alt="">
                                                 <p class="brand-item-bold"><?php echo htmlspecialchars($device['name'] ?? ''); ?></p>
                                             </div>

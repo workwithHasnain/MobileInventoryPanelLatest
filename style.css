@@ -20,6 +20,8 @@ body {
 }
 .brand-item-bold {
     font-weight: 600 !important;
+    
+    
 }
 .navbar-bold {
     font-weight: 700 !important;
@@ -368,19 +370,22 @@ input:focus {
 .cent {
     height: 400px;
     overflow-y: scroll;
+    padding-top: 10px;
     overflow-x: hidden;
 }
+.cent .d-flex{
+    gap: 12px;
+}
 .canel {
-    width: 80px;
+    /* width: 80px; */
     display: flex;
     row-gap: 5px;
+    align-items: center;
     flex-direction: column;
 }
 
 .shrink {
-
     height: 119px;
-    margin-top: 10px;
 }
 
 .canel p {
@@ -2173,6 +2178,7 @@ td {
     .cent {
         margin-top: 12px;
     }
+
 
     .cent h5 {
         margin-top: 12px;
