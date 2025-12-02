@@ -388,7 +388,7 @@ $brands = $brands_stmt->fetchAll();
                 </div>
 
             </div>
-            <div class="col-md-4 col-5 d-none d-lg-block" style="position: relative; left: 10px;">
+            <div class="col-md-4 col-5 d-none d-lg-block" style="position: relative; left: 25px;">
                 <button class="solid w-100 py-2">
                     <i class="fa-solid fa-mobile fa-sm mx-2" style="color: white;"></i>
                     Phone Finder</button>
@@ -421,7 +421,7 @@ $brands = $brands_stmt->fetchAll();
         </div>
     </div>
     <div class="container mt-0  ">
-        <div class="row" style="margin-top: 20px;">
+        <div class="row">
             <?php
             if (empty($posts)):
             ?>
