@@ -1477,9 +1477,8 @@ if ($_POST && isset($_POST['submit_comment'])) {
             foreach ($statKeys as $key):
               if (isset($deviceStats[$key])):
                 $stat = $deviceStats[$key];
-                $borderClass = $colIndex > 0 ? 'border-start' : '';
             ?>
-                <div class="col-3 spec-item <?php echo $borderClass; ?>">
+                <div class="col-3 spec-item border-start">
                   <img src="<?php echo htmlspecialchars($stat['icon']); ?>" style="width: 25px;" alt="" onerror="this.style.display='none'">
                   <div class="spec-title"><?php echo htmlspecialchars($stat['title']); ?></div>
                   <div class="spec-subtitle"><?php echo htmlspecialchars($stat['subtitle']); ?></div>
@@ -1591,6 +1590,16 @@ if ($_POST && isset($_POST['submit_comment'])) {
                     <li><span>ℹ️ Specifications loading...</span></li>
                   <?php endif; ?>
                 </ul>
+                <div class="d-flex stats-bar text-center">
+                  <div class="stat-item">
+                    <div> </div>
+                    <div class="stat-label">605,568 HITS</div>
+                  </div>
+                  <div class="stat-item">
+                    <div> <i class="fa-solid fa-heart fa-md" style="color: #ffffff;"></i></div>
+                    <div class="stat-label">       </div>
+                  </div>
+                </div>
               </div>
 
               <!-- Specs Row (aligned with image) -->
@@ -1601,9 +1610,8 @@ if ($_POST && isset($_POST['submit_comment'])) {
                 foreach ($statKeys as $key):
                   if (isset($deviceStats[$key])):
                     $stat = $deviceStats[$key];
-                    $borderClass = $colIndex > 0 ? 'border-start' : '';
                 ?>
-                    <div class="col-3 spec-item <?php echo $borderClass; ?>">
+                    <div class="col-3 spec-item border-start">
                       <img src="<?php echo htmlspecialchars($stat['icon']); ?>" style="width: 25px;" alt="" onerror="this.style.display='none'">
                       <div class="spec-title"><?php echo htmlspecialchars($stat['title']); ?></div>
                       <div class="spec-subtitle"><?php echo htmlspecialchars($stat['subtitle']); ?></div>
