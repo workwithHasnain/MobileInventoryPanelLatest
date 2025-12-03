@@ -186,40 +186,40 @@
                 <div class="devor">
                     <button>Samsung</button>
                     <button>Xiaomi</button>
-                    <button >Asus</button>
+                    <button>Asus</button>
                     <button>Infinix</button>
                     <button>Apple</button>
-                    <button >Google</button>
-                    <button >AlCatel</button>
-                    <button >Ulefone</button>
-                    <button >Huawei</button>
-                    <button >Honor</button>
-                    <button >Zte</button>
-                    <button >Tecno</button>
-                    <button >Nokia</button>
-                    <button >Oppo</button>
-                    <button >Microsoft </button>
-                    <button >Dooge</button>
-                    <button >Sony</button>
-                    <button >Realme</button>
-                    <button >Unidegi</button>
-                    <button >Blackview</button>
-                    <button >Lg </button>
-                    <button >OnePlus</button>
-                    <button >Coolpad</button>
-                    <button >Cubot</button>
-                    <button >HTc</button>
-                    <button >Nothing</button>
-                    <button >Oscal</button>
-                    <button >oukitel</button>
-                    <button >Motrola</button>
-                    <button >Vivo</button>
-                    <button >Shrap</button>
-                    <button >Itel</button>
-                    <button >Lenovo</button>
-                    <button >meizu</button>
-                    <button >Micromax</button>
-                    <button >Tcl</button>
+                    <button>Google</button>
+                    <button>AlCatel</button>
+                    <button>Ulefone</button>
+                    <button>Huawei</button>
+                    <button>Honor</button>
+                    <button>Zte</button>
+                    <button>Tecno</button>
+                    <button>Nokia</button>
+                    <button>Oppo</button>
+                    <button>Microsoft </button>
+                    <button>Dooge</button>
+                    <button>Sony</button>
+                    <button>Realme</button>
+                    <button>Unidegi</button>
+                    <button>Blackview</button>
+                    <button>Lg </button>
+                    <button>OnePlus</button>
+                    <button>Coolpad</button>
+                    <button>Cubot</button>
+                    <button>HTc</button>
+                    <button>Nothing</button>
+                    <button>Oscal</button>
+                    <button>oukitel</button>
+                    <button>Motrola</button>
+                    <button>Vivo</button>
+                    <button>Shrap</button>
+                    <button>Itel</button>
+                    <button>Lenovo</button>
+                    <button>meizu</button>
+                    <button>Micromax</button>
+                    <button>Tcl</button>
                 </div>
                 <div class="d-flex">
 
@@ -398,7 +398,7 @@
                 <tr>
                     <td colspan="3" style=" font-weight: 600;    color: #f14d4d;
     font-size: 16px; background: #f9f9f9;">Main Camera</td>
-                </tr>   
+                </tr>
                 <tr>
                     <td>200 MP + 12 MP (ultrawide)</td>
                     <td>48 MP + 12 MP (ultrawide)</td>

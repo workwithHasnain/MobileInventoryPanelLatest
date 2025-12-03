@@ -22,12 +22,12 @@
 </head>
 
 <body style="background-color: #EFEBE9;">
-       <!-- Desktop Navbar of Gsmarecn -->
+    <!-- Desktop Navbar of Gsmarecn -->
     <div class="main-wrapper">
         <!-- Top Navbar -->
         <nav class="navbar navbar-dark  d-lg-inline d-none" id="navbar">
             <div class="container const d-flex align-items-center justify-content-between">
-                <button class="navbar-toggler mb-2" type="button" onclick="toggleMenu()">
+                <button title="x" class="navbar-toggler mb-2" type="button" onclick="toggleMenu()">
                     <img style="height: 40px;"
                         src="https://cdn.prod.website-files.com/67f21c9d62aa4c4c685a7277/684091b39228b431a556d811_download-removebg-preview.png"
                         alt="">
@@ -101,10 +101,11 @@
             <a class="logo text-white " href="#">GSMArena</a>
         </a>
         <div class="d-flex justify-content-end">
-            <button type="button" class="btn float-end ml-5" data-bs-toggle="tooltip" data-bs-placement="left">
+            <button title="x" type="button" class="btn float-end ml-5" data-bs-toggle="tooltip"
+                data-bs-placement="left">
                 <i class="fa-solid fa-right-to-bracket fa-lg" style="color: #ffffff;"></i>
             </button>
-            <button type="button" class="btn float-end " data-bs-toggle="tooltip" data-bs-placement="left">
+            <button title="x" type="button" class="btn float-end " data-bs-toggle="tooltip" data-bs-placement="left">
                 <i class="fa-solid fa-user-plus fa-lg" style="color: #ffffff;"></i>
             </button>
         </div>
@@ -173,7 +174,7 @@
     </div>
     <div class="container support content-wrapper" id="Top">
         <div class="row">
-            
+
             <div class="col-8 comfort-life-zone">
                 <img src="imges/Screenshot (162).png" alt="">
             </div>
@@ -231,7 +232,7 @@
     <div class="container mt-0 varasat">
         <div class="row">
 
-           
+
             <div class="col-md-8 col-12 wrapper sentizer-er " style="background-color: #EEEEEE; ">
                 <iframe width="710" style="margin-top: 22px;" height="375"
                     src="https://www.youtube.com/embed/i3ZU9-TGJlE?si=9t_Ue5Yad0x4W7u_" title="YouTube video player"
@@ -271,14 +272,15 @@
             <div class="col-md-4  bg-white ">
                 <h6 class="text-secondary mt-2 fw-bold" style="text-transform: uppercase;">Latest Devices</h6>
                 <div class="cent">
-            
+
                     <div class="d-flex">
                         <div class="canel">
                             <img class="shrink" src="https://fdn2.gsmarena.com/vv/bigpic/vivoiy300-gt.jpg" alt="">
                             <p>Vivo y300 Gt</p>
                         </div>
                         <div class="canel mx-4">
-                            <img class="shrink" src="https://fdn2.gsmarena.com/vv/bigpic/samsung-galaxy-m56-5g.jpg" alt="">
+                            <img class="shrink" src="https://fdn2.gsmarena.com/vv/bigpic/samsung-galaxy-m56-5g.jpg"
+                                alt="">
                             <p>Sumsung Galaxy f56</p>
                         </div>
                         <div class="canel ">
@@ -306,27 +308,32 @@
                             <p>itel city 100</p>
                         </div>
                         <div class="canel mx-4">
-                            <img class="shrink" src="https://fdn2.gsmarena.com/vv/bigpic/motorola-edge-60-fusion.jpg" alt="">
+                            <img class="shrink" src="https://fdn2.gsmarena.com/vv/bigpic/motorola-edge-60-fusion.jpg"
+                                alt="">
                             <p>Motorla Edge 60</p>
                         </div>
                         <div class="canel ">
-                            <img class="shrink" src="https://fdn2.gsmarena.com/vv/bigpic/sony-xperia-1-vi-red.jpg" alt="">
+                            <img class="shrink" src="https://fdn2.gsmarena.com/vv/bigpic/sony-xperia-1-vi-red.jpg"
+                                alt="">
                             <p>Song xperia -1 VII</p>
                         </div>
                     </div>
                 </div>
-                <h6 style="border-left: 7px solid #EFEBE9 ; text-transform: uppercase;" class="mt-3 fw-bold my-4 px-2 text-secondary mt-2 d-inline mt-4">In Storeies
+                <h6 style="border-left: 7px solid #EFEBE9 ; text-transform: uppercase;"
+                    class="mt-3 fw-bold my-4 px-2 text-secondary mt-2 d-inline mt-4">In Storeies
                     Now</h6>
-            
+
                 <div class="cent mb-4">
-            
+
                     <div class="d-flex">
                         <div class="canel">
-                            <img class="shrink" src="https://fdn2.gsmarena.com/vv/bigpic/nothing-cmf-phone-2-pro.jpg" alt="">
+                            <img class="shrink" src="https://fdn2.gsmarena.com/vv/bigpic/nothing-cmf-phone-2-pro.jpg"
+                                alt="">
                             <p>Nothing Cmf 2 </p>
                         </div>
                         <div class="canel mx-4">
-                            <img class="shrink" src="https://fdn2.gsmarena.com/vv/bigpic/motorola-edge-60-pro.jpg" alt="">
+                            <img class="shrink" src="https://fdn2.gsmarena.com/vv/bigpic/motorola-edge-60-pro.jpg"
+                                alt="">
                             <p>Motrola edge 60 </p>
                         </div>
                         <div class="canel ">
@@ -344,7 +351,8 @@
                             <p>Motrola Edge 16</p>
                         </div>
                         <div class="canel ">
-                            <img class="shrink" src="https://fdn2.gsmarena.com/vv/bigpic/motorola-razr-60-ultra-5g.jpg" alt="">
+                            <img class="shrink" src="https://fdn2.gsmarena.com/vv/bigpic/motorola-razr-60-ultra-5g.jpg"
+                                alt="">
                             <p>motorola razr 60 ultra</p>
                         </div>
                     </div>
@@ -354,7 +362,8 @@
                             <p>Vivo iQ00 Z10 x</p>
                         </div>
                         <div class="canel mx-4">
-                            <img class="shrink" src="https://fdn2.gsmarena.com/vv/bigpic/motorola-moto-g-stylus-5g-2025.jpg" alt="">
+                            <img class="shrink"
+                                src="https://fdn2.gsmarena.com/vv/bigpic/motorola-moto-g-stylus-5g-2025.jpg" alt="">
                             <p>Motrola Moto G </p>
                         </div>
                         <div class="canel ">
@@ -365,7 +374,7 @@
                 </div>
                 <img class="mt-3 w-100" style="position: sticky; top: 0;"
                     src="https://fdn.gsmarena.com/imgroot/static/banners/self/review-iphone-16e-300x250.jpg" alt="">
-            
+
             </div>
 
         </div>

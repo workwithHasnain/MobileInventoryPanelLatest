@@ -1238,7 +1238,8 @@ if ($_POST && isset($_POST['submit_comment'])) {
       width: 165px;
       position: relative;
       z-index: 2;
-      background: #fff;
+      background: url("<?php echo htmlspecialchars($device['image'] ?? $device['image_1'] ?? 'https://via.placeholder.com/300x400?text=No+Image'); ?>");
+      /* background: #fff; */
     }
 
     tr {
@@ -1572,11 +1573,7 @@ if ($_POST && isset($_POST['submit_comment'])) {
           <div class="d-flex" style="align-items: flex-start;">
 
             <!-- Left: Phone Image -->
-            <div class="phone-image me-3 pt-2 px-2">
-              <img style="    height: -webkit-fill-available;
-    width: 100%;
-    padding: 12px;" src="<?php echo htmlspecialchars($device['image'] ?? $device['image_1'] ?? 'https://via.placeholder.com/300x400?text=No+Image'); ?>" alt="<?php echo htmlspecialchars(($device['brand_name'] ?? '') . ' ' . ($device['name'] ?? 'Device')); ?> phone image" />
-            </div>
+            <div class="phone-image me-3 pt-2 px-2"></div>
 
             <!-- Right: Details + Stats + Specs -->
             <div class="flex-grow-1 position-relative" style="z-index: 100;">
