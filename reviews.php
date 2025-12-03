@@ -414,7 +414,7 @@ $brands = $brands_stmt->fetchAll();
                         All Brands</button>
                     <button class="solid w-50 py-2">
                         <i class="fa-solid fa-volume-high fa-sm mx-2"></i>
-                    RUMORS MILL</button>
+                        RUMORS MILL</button>
                 </div>
             </div>
 
@@ -483,7 +483,7 @@ $brands = $brands_stmt->fetchAll();
                             <?php foreach ($chunks as $row): ?>
                                 <div class="d-flex" style="gap: 15px;">
                                     <?php foreach ($row as $i => $device): ?>
-                                        <div class="device-card canel <?php echo $i == 1 ? : ($i == 0 ? '' : ''); ?>" data-device-id="<?php echo $device['id']; ?>" style="cursor: pointer;">
+                                        <div class="device-card canel" data-device-id="<?php echo $device['id']; ?>" style="cursor: pointer;">
                                             <?php if (isset($device['images']) && !empty($device['images'])): ?>
                                                 <img class="shrink" src="<?php echo htmlspecialchars($device['images'][0]); ?>" alt="">
                                             <?php elseif (isset($device['image']) && !empty($device['image'])): ?>
@@ -495,7 +495,7 @@ $brands = $brands_stmt->fetchAll();
                                         </div>
                                     <?php endforeach; ?>
                                     <?php for ($j = count($row); $j < 3; $j++): ?>
-                                        <div class="canel <?php echo $j == 1 ?  : ($j == 0 ? '' : ''); ?>"></div>
+                                        <div class="canel <?php echo $j == 1 ?: ($j == 0 ? '' : ''); ?>"></div>
                                     <?php endfor; ?>
                                 </div>
                             <?php endforeach; ?>
@@ -628,13 +628,13 @@ $brands = $brands_stmt->fetchAll();
                             <?php foreach ($chunks as $row): ?>
                                 <div class="d-flex" style="gap: 15px;">
                                     <?php foreach ($row as $i => $device): ?>
-                                        <div class="device-card canel <?php echo $i == 1 ? : ($i == 0 ? '' : ''); ?>" data-device-id="<?php echo $device['id']; ?>" style="cursor: pointer;">
+                                        <div class="device-card canel" data-device-id="<?php echo $device['id']; ?>" style="cursor: pointer;">
                                             <img class="shrink" src="<?php echo htmlspecialchars($device['image'] ?? ''); ?>" alt="">
                                             <p class="brand-item-bold"><?php echo htmlspecialchars($device['name'] ?? ''); ?></p>
                                         </div>
                                     <?php endforeach; ?>
                                     <?php for ($j = count($row); $j < 3; $j++): ?>
-                                        <div class="canel <?php echo $j == 1 ?  : ($j == 0 ? '' : ''); ?>"></div>
+                                        <div class="canel <?php echo $j == 1 ?: ($j == 0 ? '' : ''); ?>"></div>
                                     <?php endfor; ?>
                                 </div>
                             <?php endforeach; ?>

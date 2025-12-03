@@ -368,70 +368,71 @@ if ($_POST && isset($_POST['action'])) {
             opacity: .5;
             cursor: not-allowed;
         }
+
         /* Brand Modal Styling */
         .brand-cell-modal {
-        background-color: #fff;
-        border: 1px solid #c5b6b0;
-        color: #5D4037;
-        font-weight: 500;
-        transition: all 0.3s ease;
-        cursor: pointer;
-        font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue';
+            background-color: #fff;
+            border: 1px solid #c5b6b0;
+            color: #5D4037;
+            font-weight: 500;
+            transition: all 0.3s ease;
+            cursor: pointer;
+            font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue';
         }
 
         .brand-cell-modal:hover {
-        background-color: #D7CCC8 !important;
-        border-color: #8D6E63;
-        transform: translateY(-2px);
-        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
-        color: #3E2723;
+            background-color: #D7CCC8 !important;
+            border-color: #8D6E63;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
+            color: #3E2723;
         }
 
         .brand-cell-modal:active {
-        transform: translateY(0);
-        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+            transform: translateY(0);
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
         }
 
         .brand-cell-modal:focus {
-        outline: none;
-        box-shadow: 0 0 0 3px rgba(141, 110, 99, 0.25);
+            outline: none;
+            box-shadow: 0 0 0 3px rgba(141, 110, 99, 0.25);
         }
 
         #brandsModal .modal-dialog-scrollable {
-        max-height: 80vh;
+            max-height: 80vh;
         }
 
         /* Device Cell Modal Styling */
         .device-cell-modal {
-        background-color: #fff;
-        border: 1px solid #c5b6b0;
-        color: #5D4037;
-        font-weight: 500;
-        transition: all 0.3s ease;
-        cursor: pointer;
-        font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue';
+            background-color: #fff;
+            border: 1px solid #c5b6b0;
+            color: #5D4037;
+            font-weight: 500;
+            transition: all 0.3s ease;
+            cursor: pointer;
+            font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue';
         }
 
         .device-cell-modal:hover {
-        background-color: #D7CCC8 !important;
-        border-color: #8D6E63;
-        transform: translateY(-2px);
-        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
-        color: #3E2723;
+            background-color: #D7CCC8 !important;
+            border-color: #8D6E63;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
+            color: #3E2723;
         }
 
         .device-cell-modal:active {
-        transform: translateY(0);
-        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+            transform: translateY(0);
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
         }
 
         .device-cell-modal:focus {
-        outline: none;
-        box-shadow: 0 0 0 3px rgba(141, 110, 99, 0.25);
+            outline: none;
+            box-shadow: 0 0 0 3px rgba(141, 110, 99, 0.25);
         }
 
         #devicesModal .modal-dialog-scrollable {
-        max-height: 80vh;
+            max-height: 80vh;
         }
     </style>
 </head>
@@ -829,7 +830,7 @@ if ($_POST && isset($_POST['action'])) {
                             <?php foreach ($chunks as $row): ?>
                                 <div class="d-flex" style="gap: 15px;">
                                     <?php foreach ($row as $i => $device): ?>
-                                        <div class="device-card canel <?php echo $i == 1 ? : ($i == 0 ? '' : ''); ?>" data-device-id="<?php echo $device['id']; ?>" style="cursor: pointer;">
+                                        <div class="device-card canel" data-device-id="<?php echo $device['id']; ?>" style="cursor: pointer;">
                                             <?php if (isset($device['image']) && !empty($device['image'])): ?>
                                                 <img class="shrink" src="<?php echo htmlspecialchars($device['image']); ?>" alt="">
                                             <?php else: ?>
@@ -839,7 +840,7 @@ if ($_POST && isset($_POST['action'])) {
                                         </div>
                                     <?php endforeach; ?>
                                     <?php for ($j = count($row); $j < 3; $j++): ?>
-                                        <div class="canel <?php echo $j == 1 ? : ($j == 0 ? '' : ''); ?>"></div>
+                                        <div class="canel <?php echo $j == 1 ?: ($j == 0 ? '' : ''); ?>"></div>
                                     <?php endfor; ?>
                                 </div>
                             <?php endforeach; ?>
@@ -970,15 +971,15 @@ if ($_POST && isset($_POST['action'])) {
                         <?php else: ?>
                             <?php $chunks = array_chunk($latestDevices, 3); ?>
                             <?php foreach ($chunks as $row): ?>
-                                <div class="d-flex"  style="gap: 15px;">
+                                <div class="d-flex" style="gap: 15px;">
                                     <?php foreach ($row as $i => $device): ?>
-                                        <div class="device-card canel <?php echo $i == 1 ? : ($i == 0 ? '' : ''); ?>" data-device-id="<?php echo $device['id']; ?>" style="cursor: pointer;">
+                                        <div class="device-card canel" data-device-id="<?php echo $device['id']; ?>" style="cursor: pointer;">
                                             <img class="shrink" src="<?php echo htmlspecialchars($device['image'] ?? ''); ?>" alt="">
                                             <p class="brand-item-bold"><?php echo htmlspecialchars($device['name'] ?? ''); ?></p>
                                         </div>
                                     <?php endforeach; ?>
                                     <?php for ($j = count($row); $j < 3; $j++): ?>
-                                        <div class="canel <?php echo $j == 1 ? : ($j == 0 ? '' : ''); ?>"></div>
+                                        <div class="canel <?php echo $j == 1 ?: ($j == 0 ? '' : ''); ?>"></div>
                                     <?php endfor; ?>
                                 </div>
                             <?php endforeach; ?>
@@ -990,26 +991,26 @@ if ($_POST && isset($_POST['action'])) {
             </div>
         </div>
         <!-- Newsletter Section -->
-    <div class="container mt-4 mb-4" style="max-width: 1034px;">
-      <div class="row">
-        <div class="col-12">
-          <div id="newsletter_message_container"></div>
-          <form id="newsletter_form" method="POST" action="" style="background-color: #EFEBE9; padding: 20px; border-radius: 4px; text-align: center;">
-            <p style="margin-bottom: 12px; color: #5D4037; font-weight: 500;">Subscribe to our newsletter</p>
-            <div style="display: flex; gap: 8px; justify-content: center; flex-wrap: wrap;">
-              <input type="email" id="newsletter_email" name="newsletter_email" placeholder="Enter your email" required style="padding: 10px 12px; border: 1px solid #8D6E63; border-radius: 4px; font-size: 14px; flex: 1; min-width: 200px; max-width: 300px; background-color: white;">
-              <style>
-                input::placeholder {
-                  color: #8D6E63;
-                  opacity: 0.7;
-                }
-              </style>
-              <button type="submit" id="newsletter_btn" style="padding: 10px 24px; background-color: #D50000; color: white; border: none; border-radius: 4px; cursor: pointer; font-size: 14px; white-space: nowrap; font-weight: 500;">Subscribe</button>
+        <div class="container mt-4 mb-4" style="max-width: 1034px;">
+            <div class="row">
+                <div class="col-12">
+                    <div id="newsletter_message_container"></div>
+                    <form id="newsletter_form" method="POST" action="" style="background-color: #EFEBE9; padding: 20px; border-radius: 4px; text-align: center;">
+                        <p style="margin-bottom: 12px; color: #5D4037; font-weight: 500;">Subscribe to our newsletter</p>
+                        <div style="display: flex; gap: 8px; justify-content: center; flex-wrap: wrap;">
+                            <input type="email" id="newsletter_email" name="newsletter_email" placeholder="Enter your email" required style="padding: 10px 12px; border: 1px solid #8D6E63; border-radius: 4px; font-size: 14px; flex: 1; min-width: 200px; max-width: 300px; background-color: white;">
+                            <style>
+                                input::placeholder {
+                                    color: #8D6E63;
+                                    opacity: 0.7;
+                                }
+                            </style>
+                            <button type="submit" id="newsletter_btn" style="padding: 10px 24px; background-color: #D50000; color: white; border: none; border-radius: 4px; cursor: pointer; font-size: 14px; white-space: nowrap; font-weight: 500;">Subscribe</button>
+                        </div>
+                    </form>
+                </div>
             </div>
-          </form>
         </div>
-      </div>
-    </div>
         <div id="bottom" class="container d-flex mt-3" style="max-width: 1034px;">
             <div class="row align-items-center">
                 <div class="col-md-2 m-auto col-4 d-flex justify-content-center align-items-center "> <img
@@ -1032,57 +1033,57 @@ if ($_POST && isset($_POST['action'])) {
             </div>
         </div>
         <!-- Brands Modal -->
-    <div class="modal fade" id="brandsModal" tabindex="-1" aria-labelledby="brandsModalLabel" aria-hidden="true">
-      <div class="modal-dialog modal-lg modal-dialog-centered modal-dialog-scrollable">
-        <div class="modal-content" style="background-color: #EFEBE9; border: 2px solid #8D6E63;">
-          <div class="modal-header" style="border-bottom: 1px solid #8D6E63; background-color: #D7CCC8;">
-            <h5 class="modal-title" id="brandsModalLabel" style="font-family:system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue'; color: #5D4037;">
-              <i class="fas fa-industry me-2"></i>All Brands
-            </h5>
-            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-          </div>
-          <div class="modal-body">
-            <div class="row">
-              <?php if (!empty($brands)): ?>
-                <?php foreach ($brands as $brand): ?>
-                  <div class="col-lg-4 col-md-6 col-sm-6 mb-3">
-                    <button class="brand-cell-modal btn w-100 py-2 px-3" style="background-color: #fff; border: 1px solid #c5b6b0; color: #5D4037; font-weight: 500; transition: all 0.3s ease; cursor: pointer;" data-brand-id="<?php echo $brand['id']; ?>" onclick="selectBrandFromModal(<?php echo $brand['id']; ?>)">
-                      <?php echo htmlspecialchars($brand['name']); ?>
-                    </button>
-                  </div>
-                <?php endforeach; ?>
-              <?php else: ?>
-                <div class="col-12">
-                  <div class="text-center py-5">
-                    <i class="fas fa-industry fa-3x text-muted mb-3"></i>
-                    <h6 class="text-muted">No brands available</h6>
-                  </div>
+        <div class="modal fade" id="brandsModal" tabindex="-1" aria-labelledby="brandsModalLabel" aria-hidden="true">
+            <div class="modal-dialog modal-lg modal-dialog-centered modal-dialog-scrollable">
+                <div class="modal-content" style="background-color: #EFEBE9; border: 2px solid #8D6E63;">
+                    <div class="modal-header" style="border-bottom: 1px solid #8D6E63; background-color: #D7CCC8;">
+                        <h5 class="modal-title" id="brandsModalLabel" style="font-family:system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue'; color: #5D4037;">
+                            <i class="fas fa-industry me-2"></i>All Brands
+                        </h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body">
+                        <div class="row">
+                            <?php if (!empty($brands)): ?>
+                                <?php foreach ($brands as $brand): ?>
+                                    <div class="col-lg-4 col-md-6 col-sm-6 mb-3">
+                                        <button class="brand-cell-modal btn w-100 py-2 px-3" style="background-color: #fff; border: 1px solid #c5b6b0; color: #5D4037; font-weight: 500; transition: all 0.3s ease; cursor: pointer;" data-brand-id="<?php echo $brand['id']; ?>" onclick="selectBrandFromModal(<?php echo $brand['id']; ?>)">
+                                            <?php echo htmlspecialchars($brand['name']); ?>
+                                        </button>
+                                    </div>
+                                <?php endforeach; ?>
+                            <?php else: ?>
+                                <div class="col-12">
+                                    <div class="text-center py-5">
+                                        <i class="fas fa-industry fa-3x text-muted mb-3"></i>
+                                        <h6 class="text-muted">No brands available</h6>
+                                    </div>
+                                </div>
+                            <?php endif; ?>
+                        </div>
+                    </div>
                 </div>
-              <?php endif; ?>
             </div>
-          </div>
         </div>
-      </div>
-    </div>
 
-    <!-- Devices Modal (Phones by Brand) -->
-    <div class="modal fade" id="devicesModal" tabindex="-1" aria-labelledby="deviceModalLabel" aria-hidden="true">
-      <div class="modal-dialog modal-lg modal-dialog-centered modal-dialog-scrollable">
-        <div class="modal-content" style="background-color: #EFEBE9; border: 2px solid #8D6E63;">
-          <div class="modal-header" style="border-bottom: 1px solid #8D6E63; background-color: #D7CCC8;">
-            <h5 class="modal-title" id="deviceModalTitle" style="font-family:system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue'; color: #5D4037;">
-              Devices
-            </h5>
-            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-          </div>
-          <div class="modal-body" id="deviceModalBody">
-            <div class="text-center py-5">
-              <i class="fas fa-spinner fa-spin fa-2x text-muted"></i>
+        <!-- Devices Modal (Phones by Brand) -->
+        <div class="modal fade" id="devicesModal" tabindex="-1" aria-labelledby="deviceModalLabel" aria-hidden="true">
+            <div class="modal-dialog modal-lg modal-dialog-centered modal-dialog-scrollable">
+                <div class="modal-content" style="background-color: #EFEBE9; border: 2px solid #8D6E63;">
+                    <div class="modal-header" style="border-bottom: 1px solid #8D6E63; background-color: #D7CCC8;">
+                        <h5 class="modal-title" id="deviceModalTitle" style="font-family:system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue'; color: #5D4037;">
+                            Devices
+                        </h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body" id="deviceModalBody">
+                        <div class="text-center py-5">
+                            <i class="fas fa-spinner fa-spin fa-2x text-muted"></i>
+                        </div>
+                    </div>
+                </div>
             </div>
-          </div>
         </div>
-      </div>
-    </div>
         <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
 
         <script>
@@ -1309,14 +1310,14 @@ if ($_POST && isset($_POST['action'])) {
 
                 // Handle brand cell clicks (from sidebar and mobile menu - open devices modal directly)
                 document.querySelectorAll('.brand-cell').forEach(function(cell) {
-                cell.addEventListener('click', function(e) {
-                    e.preventDefault();
-                    const brandId = this.getAttribute('data-brand-id');
-                    if (brandId) {
-                    // Directly open devices modal for this brand
-                    selectBrandFromModal(brandId);
-                    }
-                });
+                    cell.addEventListener('click', function(e) {
+                        e.preventDefault();
+                        const brandId = this.getAttribute('data-brand-id');
+                        if (brandId) {
+                            // Directly open devices modal for this brand
+                            selectBrandFromModal(brandId);
+                        }
+                    });
                 });
 
                 // Handle comparison row clicks
@@ -1391,47 +1392,47 @@ if ($_POST && isset($_POST['action'])) {
                 }
             });
             // Show brands modal
-  function showBrandsModal() {
-    const modal = new bootstrap.Modal(document.getElementById('brandsModal'));
-    modal.show();
-  }
+            function showBrandsModal() {
+                const modal = new bootstrap.Modal(document.getElementById('brandsModal'));
+                modal.show();
+            }
 
-  // Handle brand selection from modal
-  function selectBrandFromModal(brandId) {
-    // Close the brands modal
-    const brandsModal = bootstrap.Modal.getInstance(document.getElementById('brandsModal'));
-    if (brandsModal) {
-      brandsModal.hide();
-    }
+            // Handle brand selection from modal
+            function selectBrandFromModal(brandId) {
+                // Close the brands modal
+                const brandsModal = bootstrap.Modal.getInstance(document.getElementById('brandsModal'));
+                if (brandsModal) {
+                    brandsModal.hide();
+                }
 
-    // Fetch phones for this brand
-    fetch(`get_phones_by_brand.php?brand_id=${brandId}`)
-      .then(response => response.json())
-      .then(data => {
-        // Populate the devices modal with phones
-        displayPhonesModal(data, brandId);
-      })
-      .catch(error => {
-        console.error('Error fetching phones:', error);
-        alert('Failed to load phones');
-      });
-  }
+                // Fetch phones for this brand
+                fetch(`get_phones_by_brand.php?brand_id=${brandId}`)
+                    .then(response => response.json())
+                    .then(data => {
+                        // Populate the devices modal with phones
+                        displayPhonesModal(data, brandId);
+                    })
+                    .catch(error => {
+                        console.error('Error fetching phones:', error);
+                        alert('Failed to load phones');
+                    });
+            }
 
-  // Display phones in modal
-  function displayPhonesModal(phones, brandId) {
-    const container = document.getElementById('deviceModalBody');
-    const titleElement = document.getElementById('deviceModalTitle');
+            // Display phones in modal
+            function displayPhonesModal(phones, brandId) {
+                const container = document.getElementById('deviceModalBody');
+                const titleElement = document.getElementById('deviceModalTitle');
 
-    // Update title with brand name
-    const brandButton = document.querySelector(`[data-brand-id="${brandId}"]`);
-    const brandName = brandButton ? brandButton.textContent.trim() : 'Brand';
-    titleElement.innerHTML = `<i class="fas fa-mobile-alt me-2"></i>${brandName} - Devices`;
+                // Update title with brand name
+                const brandButton = document.querySelector(`[data-brand-id="${brandId}"]`);
+                const brandName = brandButton ? brandButton.textContent.trim() : 'Brand';
+                titleElement.innerHTML = `<i class="fas fa-mobile-alt me-2"></i>${brandName} - Devices`;
 
-    if (phones && phones.length > 0) {
-      let html = '<div class="row">';
-      phones.forEach(phone => {
-        const phoneImage = phone.image ? `<img src="${phone.image}" alt="${phone.name}" style="width: 100%; height: 120px; object-fit: contain; margin-bottom: 8px;" onerror="this.style.display='none';">` : '';
-        html += `
+                if (phones && phones.length > 0) {
+                    let html = '<div class="row">';
+                    phones.forEach(phone => {
+                        const phoneImage = phone.image ? `<img src="${phone.image}" alt="${phone.name}" style="width: 100%; height: 120px; object-fit: contain; margin-bottom: 8px;" onerror="this.style.display='none';">` : '';
+                        html += `
           <div class="col-lg-4 col-md-6 col-sm-6 mb-3">
             <button class="device-cell-modal btn w-100 p-0" style="background-color: #fff; border: 1px solid #c5b6b0; color: #5D4037; font-weight: 500; transition: all 0.3s ease; cursor: pointer; display: flex; flex-direction: column; align-items: center; overflow: hidden;" onclick="goToDevice(${phone.id})">
               ${phoneImage}
@@ -1439,95 +1440,95 @@ if ($_POST && isset($_POST['action'])) {
             </button>
           </div>
         `;
-      });
-      html += '</div>';
-      container.innerHTML = html;
-    } else {
-      container.innerHTML = `
+                    });
+                    html += '</div>';
+                    container.innerHTML = html;
+                } else {
+                    container.innerHTML = `
         <div class="text-center py-5">
           <i class="fas fa-mobile-alt fa-3x text-muted mb-3"></i>
           <h6 class="text-muted">No devices available for this brand</h6>
         </div>
       `;
-    }
+                }
 
-    // Show devices modal
-    const devicesModal = new bootstrap.Modal(document.getElementById('devicesModal'));
-    devicesModal.show();
-  }
-
-  // Navigate to device page
-  function goToDevice(deviceId) {
-    window.location.href = `device.php?id=${deviceId}`;
-  }
-  
-  // Newsletter form AJAX handler
-  document.addEventListener('DOMContentLoaded', function() {
-    const form = document.getElementById('newsletter_form');
-    const messageContainer = document.getElementById('newsletter_message_container');
-    const emailInput = document.getElementById('newsletter_email');
-    const submitBtn = document.getElementById('newsletter_btn');
-
-    if (form) {
-      form.addEventListener('submit', function(e) {
-        e.preventDefault();
-
-        const email = emailInput.value.trim();
-        const originalBtnText = submitBtn.textContent;
-
-        if (!email) {
-          showMessage('Please enter an email address.', 'error');
-          return;
-        }
-
-        // Disable button and show loading state
-        submitBtn.disabled = true;
-        submitBtn.textContent = 'Subscribing...';
-
-        // Send AJAX request
-        fetch('handle_newsletter.php', {
-            method: 'POST',
-            headers: {
-              'Content-Type': 'application/x-www-form-urlencoded'
-            },
-            body: 'newsletter_email=' + encodeURIComponent(email)
-          })
-          .then(response => response.json())
-          .then(data => {
-            if (data.success) {
-              showMessage(data.message, 'success');
-              emailInput.value = '';
-              // Auto-clear message after 5 seconds
-              setTimeout(() => {
-                messageContainer.innerHTML = '';
-              }, 5000);
-            } else {
-              showMessage(data.message, 'error');
+                // Show devices modal
+                const devicesModal = new bootstrap.Modal(document.getElementById('devicesModal'));
+                devicesModal.show();
             }
-            submitBtn.disabled = false;
-            submitBtn.textContent = originalBtnText;
-          })
-          .catch(error => {
-            showMessage('An error occurred. Please try again.', 'error');
-            submitBtn.disabled = false;
-            submitBtn.textContent = originalBtnText;
-          });
-      });
 
-      function showMessage(message, type) {
-        const bgColor = type === 'success' ? '#4CAF50' : '#f44336';
-        messageContainer.innerHTML = '<div style="background-color: ' + bgColor + '; color: white; padding: 12px; border-radius: 4px; margin-bottom: 12px; text-align: center; animation: slideIn 0.3s ease-in-out;">' + message + '</div>';
+            // Navigate to device page
+            function goToDevice(deviceId) {
+                window.location.href = `device.php?id=${deviceId}`;
+            }
 
-        // Add animation style
-        if (!document.querySelector('style[data-newsletter]')) {
-          const style = document.createElement('style');
-          style.setAttribute('data-newsletter', 'true');
-          style.textContent = '@keyframes slideIn { from { opacity: 0; transform: translateY(-10px); } to { opacity: 1; transform: translateY(0); } }';
-          document.head.appendChild(style);
-        }
-      }
-    }
-  });
+            // Newsletter form AJAX handler
+            document.addEventListener('DOMContentLoaded', function() {
+                const form = document.getElementById('newsletter_form');
+                const messageContainer = document.getElementById('newsletter_message_container');
+                const emailInput = document.getElementById('newsletter_email');
+                const submitBtn = document.getElementById('newsletter_btn');
+
+                if (form) {
+                    form.addEventListener('submit', function(e) {
+                        e.preventDefault();
+
+                        const email = emailInput.value.trim();
+                        const originalBtnText = submitBtn.textContent;
+
+                        if (!email) {
+                            showMessage('Please enter an email address.', 'error');
+                            return;
+                        }
+
+                        // Disable button and show loading state
+                        submitBtn.disabled = true;
+                        submitBtn.textContent = 'Subscribing...';
+
+                        // Send AJAX request
+                        fetch('handle_newsletter.php', {
+                                method: 'POST',
+                                headers: {
+                                    'Content-Type': 'application/x-www-form-urlencoded'
+                                },
+                                body: 'newsletter_email=' + encodeURIComponent(email)
+                            })
+                            .then(response => response.json())
+                            .then(data => {
+                                if (data.success) {
+                                    showMessage(data.message, 'success');
+                                    emailInput.value = '';
+                                    // Auto-clear message after 5 seconds
+                                    setTimeout(() => {
+                                        messageContainer.innerHTML = '';
+                                    }, 5000);
+                                } else {
+                                    showMessage(data.message, 'error');
+                                }
+                                submitBtn.disabled = false;
+                                submitBtn.textContent = originalBtnText;
+                            })
+                            .catch(error => {
+                                showMessage('An error occurred. Please try again.', 'error');
+                                submitBtn.disabled = false;
+                                submitBtn.textContent = originalBtnText;
+                            });
+                    });
+
+                    function showMessage(message, type) {
+                        const bgColor = type === 'success' ? '#4CAF50' : '#f44336';
+                        messageContainer.innerHTML = '<div style="background-color: ' + bgColor + '; color: white; padding: 12px; border-radius: 4px; margin-bottom: 12px; text-align: center; animation: slideIn 0.3s ease-in-out;">' + message + '</div>';
+
+                        // Add animation style
+                        if (!document.querySelector('style[data-newsletter]')) {
+                            const style = document.createElement('style');
+                            style.setAttribute('data-newsletter', 'true');
+                            style.textContent = '@keyframes slideIn { from { opacity: 0; transform: translateY(-10px); } to { opacity: 1; transform: translateY(0); } }';
+                            document.head.appendChild(style);
+                        }
+                    }
+                }
+            });
         </script>
         <script src="script.js"></script>
 </body>
