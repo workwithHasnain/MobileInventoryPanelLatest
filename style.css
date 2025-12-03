@@ -391,7 +391,8 @@ input:focus {
 .canel p {
     max-width: 66px;
     text-align: center;
-    font-size: 12px;
+    text-transform: capitalize;
+    font-size: 13px;
     line-height: 17px;
 }
 
@@ -682,7 +683,6 @@ input:focus {
 
 .whitening {
     font-size: 15px;
-    /* margin-left: 12px; */
 }
 
 .mobiles-button:hover {
@@ -746,9 +746,10 @@ input:focus {
 
 .review-card-meta {
     font-size: 0.9rem;
+    justify-content: space-between;
     color: #666;
     display: flex;
-    justify-content: space-between;
+    width: 100%;
     align-items: center;
 }
 
