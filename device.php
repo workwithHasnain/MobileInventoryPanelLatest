@@ -1231,6 +1231,19 @@ if ($_POST && isset($_POST['submit_comment'])) {
       background: linear-gradient(90deg, #fff 0%, #fcfeff 2%, rgba(125, 185, 232, 0));
       z-index: 1;
     }
+@media (width:786px) {
+   .phone-image:after {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: 165px;
+    width: 229px;
+    height: 100%;
+    background: transparent;
+    z-index: 1;
+}
+}
+
 <?php
 $image = $device["image"] ?? $device["image_1"] ?? "https://via.placeholder.com/300x400?text=No+Image";
 ?>
@@ -1426,101 +1439,212 @@ $image = $device["image"] ?? $device["image_1"] ?? "https://via.placeholder.com/
       max-height: 80vh;
     }
   </style>
+<div class="d-lg-none d-block">
+
+<div class="phone-box">
+<?php 
+$title = $device['brand_name'] 
+        . ' ' 
+        . (
+            $device['name'] 
+            ?? $device['model_name'] 
+            ?? $device['phone_name'] 
+            ?? $device['title'] 
+            ?? ''
+        );
+?>
+<h2 class="phone-title"><?php echo htmlspecialchars($title); ?></h2>
 
 
-  <div class="d-lg-none d-block">
-    <div class="card" role="region" aria-label="<?php echo htmlspecialchars(($device['brand_name'] ?? '') . ' ' . ($device['name'] ?? 'Device')); ?> Phone Info" style="<?php
-                                                                                                                                                                        if (!empty($device['device_page_color'])) {
-                                                                                                                                                                          $color = htmlspecialchars($device['device_page_color']);
-                                                                                                                                                                          echo "background: " . $color . " !important;";
-                                                                                                                                                                        }
-                                                                                                                                                                        ?>">
+    <p class="phone-subtitle">SPECIFICATIONS</p>
 
-      <div class="article-info">
-        <div class="bg-blur">
-          <p class="vr-hide"
-            style=" font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue'; text-transform: capitalize; text-shadow: 1px 1px 2px rgba(0, 0, 0, .4);">
-            <?php echo htmlspecialchars(($device['brand_name'] ?? '') . ' ' . ($device['name'] ?? 'Device')); ?>
-          </p>
-          <svg class="float-end mx-3 mt-1" xmlns="http://www.w3.org/2000/svg" height="34" width="34"
-            viewBox="0 0 640 640"><!--!Font Awesome Free v7.0.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free Copyright 2025 Fonticons, Inc.-->
-            <path fill="#ffffff"
-              d="M448 256C501 256 544 213 544 160C544 107 501 64 448 64C395 64 352 107 352 160C352 165.4 352.5 170.8 353.3 176L223.6 248.1C206.7 233.1 184.4 224 160 224C107 224 64 267 64 320C64 373 107 416 160 416C184.4 416 206.6 406.9 223.6 391.9L353.3 464C352.4 469.2 352 474.5 352 480C352 533 395 576 448 576C501 576 544 533 544 480C544 427 501 384 448 384C423.6 384 401.4 393.1 384.4 408.1L254.7 336C255.6 330.8 256 325.5 256 320C256 314.5 255.5 309.2 254.7 304L384.4 231.9C401.3 246.9 423.6 256 448 256z" />
-          </svg>
-        </div>
-      </div>
-      <div class="d-lg-flex  d-block" style="align-items: flex-start; ">
+    <!-- MAIN CONTENT -->
+    <div class="phone-main">
 
-        <!-- Left: Phone Image -->
-        <div class="phone-image me-3 pt-2 px-2">
-
+        <!-- LEFT IMAGE AS BACKGROUND -->
+        <div class="phone-image"
+             style="background-image: url('<?php echo htmlspecialchars($device['image']); ?>');">
         </div>
 
-        <!-- Right: Details + Stats + Specs -->
-        <div class="flex-grow-1 position-relative" style="z-index: 100;">
+        <!-- RIGHT SPECS COLUMN -->
+        <div class="spec-col">
 
-          <!-- Phone Details + Stats -->
-          <div class="d-flex justify-content-between mb-3">
-
-            <ul class="phone-details d-lg-block d-none list-unstyled mb-0">
-              <?php if (!empty($deviceHighlights)): ?>
-                <?php foreach ($deviceHighlights as $highlight): ?>
-                  <li><span><?php echo htmlspecialchars($highlight); ?></span></li>
-                <?php endforeach; ?>
-              <?php else: ?>
-                <li><span>📅 Release date not available</span></li>
-                <li><span>ℹ️ Specifications loading...</span></li>
-              <?php endif; ?>
-            </ul>
-          </div>
-
-          <!-- Specs Row (aligned with image) -->
-          <div class="row text-center d-block g-0  pt-2 specs-bar">
             <?php
-            $statKeys = ['display', 'camera', 'performance', 'battery'];
-            $colIndex = 0;
+            $statKeys = ['display','camera','performance','battery'];
+
             foreach ($statKeys as $key):
-              if (isset($deviceStats[$key])):
-                $stat = $deviceStats[$key];
-                $borderClass = $colIndex > 0 ? 'border-start' : '';
+                if (isset($deviceStats[$key])):
+                    $stat = $deviceStats[$key];
             ?>
-                <div class="col-3 spec-item <?php echo $borderClass; ?>">
-                  <img src="<?php echo htmlspecialchars($stat['icon']); ?>" style="width: 25px;" alt="" onerror="this.style.display='none'">
-                  <div class="spec-title"><?php echo htmlspecialchars($stat['title']); ?></div>
-                  <div class="spec-subtitle"><?php echo htmlspecialchars($stat['subtitle']); ?></div>
+
+            <div class="spec-row">
+                <img src="<?php echo htmlspecialchars($stat['icon']); ?>" class="spec-icon" alt="">
+                
+                <div class="spec-text">
+                    <strong><?php echo htmlspecialchars($stat['title']); ?></strong>
+                    <small><?php echo htmlspecialchars($stat['subtitle']); ?></small>
                 </div>
-            <?php
-                $colIndex++;
-              endif;
-            endforeach;
-            ?>
-          </div>
+            </div>
+
+            <?php endif; endforeach; ?>
 
         </div>
-      </div>
-      <div class="article-info">
-        <div class="bg-blur">
-          <div class="d-lg-none d-block justify-content-end">
-            <div class="d-flex flexiable mt-2">
-              <img src="/imges/download-removebg-preview.png" alt="">
-              <h5 style="font-family:system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue' ; font-size: 16px;" class="mt-2" onclick="document.getElementById('comments').scrollIntoView({behavior:'smooth', block:'start'});">OPINIONS </h5>
-            </div>
-            <div class="d-flex flexiable mt-2">
-              <img src="/imges/download-removebg-preview.png" alt="">
-              <h5 style="font-family:system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue' ; font-size: 16px;" class="mt-2" onclick="window.location.href='compare.php?phone1=<?php echo $device['id']; ?>'">COMPARE </h5>
-            </div>
-            <div class="d-flex flexiable mt-2">
-              <img src="/imges/download-removebg-preview.png" alt="">
-              <h5 style="font-family:system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue' ; font-size: 16px; cursor: pointer;" class="mt-2" onclick="showPicturesModal()">PICTURES </h5>
-            </div>
-          </div>
+    </div>
 
+    <!-- BOTTOM SECTION -->
+    <div class="bottom-section">
+
+        <button class="review-btn">
+            READ OUR REVIEW
+        </button>
+
+        <div style="display: flex; gap: 22px;">
+
+            <!-- Popularity -->
+            <div class="stat-box">
+                <img src="/imges/stat-down.png" alt="">
+                <p>
+                    <?php echo htmlspecialchars($device['popularity'] ?? '0'); ?>%<br>
+                    <small><?php echo number_format($device['hits'] ?? 0); ?> hits</small>
+                </p>
+            </div>
+
+            <!-- Fans -->
+            <div class="stat-box">
+                <img src="/imges/heart.png" alt="">
+                <p>
+                    <?php echo htmlspecialchars($device['fans'] ?? '0'); ?><br>
+                    <small>Become a fan</small>
+                </p>
+            </div>
 
         </div>
-      </div>
 
     </div>
-  </div>
+
+</div>
+
+</div>
+
+
+<<style>
+
+/* OUTER BOX */
+.phone-box {
+    background: #fff;
+    border: 1px solid #dcdcdc;
+    padding: 16px;
+    border-radius: 4px;
+    width: 100%;
+    font-family: Arial, sans-serif;
+}
+
+/* TITLE */
+.phone-title {
+    font-size: 26px;
+    font-weight: 700;
+    margin: 0;
+    color: #111;
+}
+
+.phone-subtitle {
+    font-size: 12px;
+    color: #9b9b9b;
+    letter-spacing: 1px;
+    margin-top: 4px;
+    margin-bottom: 14px;
+}
+
+/* MAIN WRAPPER */
+.phone-main {
+    display: flex;
+    gap: 14px;
+}
+
+/* RIGHT SPECS BOX */
+.spec-col {
+    flex: 1;
+    background: #f7f7f7;
+    padding: 12px;
+    position: relative;
+    border-radius: 4px;
+    z-index: 100;
+}
+
+/* SPEC ROW */
+.spec-row {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 18px;
+}
+
+.spec-icon {
+    width: 22px;
+    opacity: .65;
+}
+
+.spec-text strong {
+    font-size: 17px;
+    font-weight: 700;
+    color: #222;
+    display: block;
+    font-family: 'Arial';
+    line-height: 16px;
+}
+
+.spec-text small {
+    font-size: 13px;
+    color: #666;
+    font-family: 'arial';
+    display: block;
+    margin-top: 1px;
+}
+/* REVIEW BUTTON */
+.review-btn {
+    background: #d50000;
+    border: none;
+    color: #fff;
+    padding: 10px 22px;
+    border-radius: 5px;
+    font-size: 15px;
+    font-weight: 700;
+}
+
+/* BOTTOM ROW */
+.bottom-section {
+    margin-top: 16px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+/* STATS */
+.stat-box {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+}
+
+.stat-box img {
+    width: 22px;
+    opacity: 0.75;
+}
+
+.stat-box p {
+    margin: 0;
+    font-size: 14px;
+    line-height: 14px;
+}
+
+.stat-box small {
+    font-size: 11px;
+    color: #666;
+}
+
+</style>
+
+
   <div class="container d-lg-block d-none">
     <div class="row">
       <div class="article-info">
@@ -1884,7 +2008,7 @@ $image = $device["image"] ?? $device["image_1"] ?? "https://via.placeholder.com/
             <h6 style="border-left: solid 5px grey ; color: #090E21; text-transform: uppercase; font-weight: 900; margin-top: 12px;"
               class="px-3">Popular comparisons</h6>
 
-            <div class="sentizer bg-white mt-2 p-3 rounded shadow-sm" style="    text-transform: Uppercase;
+            <div class="sentizer bg-white mt-2 p-3 rounded" style="    text-transform: Uppercase;
                                             font-size: 13px;
                                             font-weight: 700;">
               <div class="row">

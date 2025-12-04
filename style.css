@@ -724,7 +724,6 @@ input:focus {
 
 .review-card img {
     width: 100%;
-    height: 180px;
     display: block;
 }
 
@@ -2120,6 +2119,9 @@ td {
         margin-left: 0;
     }
 
+    .phone-image:after{
+        background-color: none;
+    }
     #leftMenu.show a {
         font-size: 14px;
     }
