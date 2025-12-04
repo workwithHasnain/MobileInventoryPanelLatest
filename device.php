@@ -717,7 +717,7 @@ function generateDeviceStats($device)
   $display_title = !empty($device['display_size']) ? $device['display_size'] . '"' : 'N/A';
   $display_subtitle = $device['display_resolution'] ?? 'Unknown';
   $stats['display'] = [
-    'icon' => 'imges/vrer.png',
+    'icon' => 'https://itsahmedali21.github.io/GSMArena/imges/vrer.png',
     'title' => $display_title,
     'subtitle' => $display_subtitle
   ];
@@ -743,7 +743,7 @@ function generateDeviceStats($device)
     $camera_subtitle = '1080p';
   }
   $stats['camera'] = [
-    'icon' => 'imges/bett-removebg-preview.png',
+    'icon' => 'https://itsahmedali21.github.io/GSMArena/imges/bett-removebg-preview.png',
     'title' => $camera_title,
     'subtitle' => $camera_subtitle
   ];
@@ -770,7 +770,7 @@ function generateDeviceStats($device)
     }
   }
   $stats['performance'] = [
-    'icon' => 'imges/encypt-removebg-preview.png',
+    'icon' => 'https://itsahmedali21.github.io/GSMArena/imges/encypt-removebg-preview.png',
     'title' => $perf_title,
     'subtitle' => $perf_subtitle
   ];
@@ -784,7 +784,7 @@ function generateDeviceStats($device)
     $battery_subtitle = $device['wireless_charging'] . ' wireless';
   }
   $stats['battery'] = [
-    'icon' => 'imges/lowtry-removebg-preview.png',
+    'icon' => 'https://itsahmedali21.github.io/GSMArena/imges/lowtry-removebg-preview.png',
     'title' => $battery_title,
     'subtitle' => $battery_subtitle
   ];
@@ -1132,9 +1132,9 @@ if ($_POST && isset($_POST['submit_comment'])) {
     }
 
     .spec-item {
-      padding: 20px;
+      padding: 16px 20px;
       display: flex;
-      row-gap: 8px;
+      row-gap: 4px;
       flex-direction: column;
       align-items: baseline;
       justify-content: space-around;
@@ -1231,16 +1231,24 @@ if ($_POST && isset($_POST['submit_comment'])) {
       background: linear-gradient(90deg, #fff 0%, #fcfeff 2%, rgba(125, 185, 232, 0));
       z-index: 1;
     }
+<?php
+$image = $device["image"] ?? $device["image_1"] ?? "https://via.placeholder.com/300x400?text=No+Image";
+?>
 
-    .phone-image {
-      display: block;
-      height: -webkit-fill-available;
-      width: 165px;
-      position: relative;
-      z-index: 2;
-      background: #fff;
-    }
 
+.phone-image {
+    margin-left: 5px;
+    display: block;
+    height: -webkit-fill-available;
+    width: 165px;
+    position: relative;
+    z-index: 2;
+    background: url(<?php echo $image; ?>);
+    background-position: right;
+    background-color: #fff;
+    background-size: contain;
+    background-repeat: no-repeat;
+}
     tr {
       background-color: white;
       margin-bottom: 10px;
@@ -1445,9 +1453,7 @@ if ($_POST && isset($_POST['submit_comment'])) {
 
         <!-- Left: Phone Image -->
         <div class="phone-image me-3 pt-2 px-2">
-          <img style="    height: -webkit-fill-available;
-    width: 100%;
-    padding: 12px;" src="<?php echo htmlspecialchars($device['image'] ?? $device['image_1'] ?? 'https://via.placeholder.com/300x400?text=No+Image'); ?>" alt="<?php echo htmlspecialchars(($device['brand_name'] ?? '') . ' ' . ($device['name'] ?? 'Device')); ?> phone image" />
+
         </div>
 
         <!-- Right: Details + Stats + Specs -->
@@ -1572,11 +1578,13 @@ if ($_POST && isset($_POST['submit_comment'])) {
           <div class="d-flex" style="align-items: flex-start;">
 
             <!-- Left: Phone Image -->
-            <div class="phone-image me-3 pt-2 px-2">
-              <img style="    height: -webkit-fill-available;
-    width: 100%;
-    padding: 12px;" src="<?php echo htmlspecialchars($device['image'] ?? $device['image_1'] ?? 'https://via.placeholder.com/300x400?text=No+Image'); ?>" alt="<?php echo htmlspecialchars(($device['brand_name'] ?? '') . ' ' . ($device['name'] ?? 'Device')); ?> phone image" />
-            </div>
+          <div style="
+    height: -webkit-fill-available;
+    background: white;
+">
+            <!-- Left: Phone Image -->
+            <div class="phone-image me-3 py-2  px-2"></div>
+</div>
 
             <!-- Right: Details + Stats + Specs -->
             <div class="flex-grow-1 position-relative" style="z-index: 100;">
