@@ -1937,7 +1937,7 @@ $title = $device['brand_name']
       </div>
 
       <!-- Left Section -->
-      <div class="col-lg-4 bg-white col-md-5 order-1 order-md-2">
+      <div class="col-lg-4 bg-white col-md-5 order-1 order-md-2 p-3">
         <div class="mb-4">
 
           <h6 style="border-left: solid 5px grey ;text-transform: uppercase;" class=" fw-bold px-3 text-secondary mt-3">

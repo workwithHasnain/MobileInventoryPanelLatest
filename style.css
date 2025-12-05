@@ -371,6 +371,7 @@ input:focus {
     height: 400px;
     overflow-y: scroll;
     padding-top: 10px;
+    padding-left: 10px;
     overflow-x: hidden;
 }
 .cent .d-flex{
@@ -2167,7 +2168,6 @@ td {
     .col-4 .solid {
         max-width: 200px;
     }
-
     .rena {
         width: 100%;
         background: #EEEEEE;
@@ -2181,6 +2181,7 @@ td {
 
     .cent {
         margin-top: 12px;
+        margin-left: 5px;
     }
 
 
