@@ -1652,7 +1652,6 @@ function formatDeviceSpecsJson($device)
         .phone-select-container .select2-selection__rendered {
             line-height: 36px;
             padding-left: 8px;
-            width: 200px;
         }
 
         .phone-select-container .select2-selection__arrow {
@@ -1686,9 +1685,6 @@ function formatDeviceSpecsJson($device)
             display: inline-flex;
             align-items: center;
             gap: 8px;
-        }
-        .select2-container{
-            width: min-content;
         }
     </style>
 </body>

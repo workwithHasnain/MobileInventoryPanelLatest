@@ -1,0 +1,103 @@
+<?php
+/**
+ * Database configuration and connection
+ */
+
+// Database configuration
+$host = getenv('PGHOST') ?: 'localhost';
+$port = getenv('PGPORT') ?: '5432';
+$dbname = getenv('PGDATABASE') ?: 'phone_management';
+$username = getenv('PGUSER') ?: 'postgres';
+$password = getenv('PGPASSWORD') ?: '';
+
+// Create PDO connection string for PostgreSQL
+$dsn = "pgsql:host=$host;port=$port;dbname=$dbname";
+
+try {
+    $pdo = new PDO($dsn, $username, $password, [
+        PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION,
+        PDO::ATTR_DEFAULT_FETCH_MODE => PDO::FETCH_ASSOC,
+        PDO::ATTR_EMULATE_PREPARES => false,
+        PDO::ATTR_PERSISTENT => false,
+        PDO::ATTR_TIMEOUT => 30
+    ]);
+} catch (PDOException $e) {
+    die("Database connection failed: " . $e->getMessage());
+}
+
+/**
+ * Reconnect to database if connection is lost
+ */
+function reconnectDatabase() {
+    global $pdo, $dsn, $username, $password;
+    try {
+        $pdo = new PDO($dsn, $username, $password, [
+            PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION,
+            PDO::ATTR_DEFAULT_FETCH_MODE => PDO::FETCH_ASSOC,
+            PDO::ATTR_EMULATE_PREPARES => false,
+            PDO::ATTR_PERSISTENT => false,
+            PDO::ATTR_TIMEOUT => 30
+        ]);
+        return true;
+    } catch (PDOException $e) {
+        error_log("Database reconnection failed: " . $e->getMessage());
+        return false;
+    }
+}
+
+/**
+ * Execute a query and return results
+ */
+function executeQuery($sql, $params = []) {
+    global $pdo;
+    try {
+        $stmt = $pdo->prepare($sql);
+        $stmt->execute($params);
+        return $stmt;
+    } catch (PDOException $e) {
+        // Try to reconnect on connection errors
+        if (strpos($e->getMessage(), 'connection') !== false || strpos($e->getMessage(), 'server has gone away') !== false) {
+            error_log("Connection lost, attempting to reconnect...");
+            if (reconnectDatabase()) {
+                $stmt = $pdo->prepare($sql);
+                $stmt->execute($params);
+                return $stmt;
+            }
+        }
+        error_log("Database query error: " . $e->getMessage());
+        throw $e;
+    }
+}
+
+/**
+ * Get the last inserted ID
+ */
+function getLastInsertId() {
+    global $pdo;
+    return $pdo->lastInsertId();
+}
+
+/**
+ * Begin transaction
+ */
+function beginTransaction() {
+    global $pdo;
+    return $pdo->beginTransaction();
+}
+
+/**
+ * Commit transaction
+ */
+function commitTransaction() {
+    global $pdo;
+    return $pdo->commit();
+}
+
+/**
+ * Rollback transaction
+ */
+function rollbackTransaction() {
+    global $pdo;
+    return $pdo->rollBack();
+}
+?>

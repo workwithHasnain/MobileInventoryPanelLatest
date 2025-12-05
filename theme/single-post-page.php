@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="en">
 
-
+ 
 <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
@@ -30,7 +30,7 @@
         <!-- Top Navbar -->
         <nav class="navbar navbar-dark  d-lg-inline d-none" id="navbar">
             <div class="container const d-flex align-items-center justify-content-between">
-                <button title="x" class="navbar-toggler mb-2" type="button" onclick="toggleMenu()">
+                <button class="navbar-toggler mb-2" type="button" onclick="toggleMenu()">
                     <img style="height: 40px;"
                         src="https://cdn.prod.website-files.com/67f21c9d62aa4c4c685a7277/684091b39228b431a556d811_download-removebg-preview.png"
                         alt="">
@@ -42,27 +42,26 @@
 
                 <div class="controvecy mb-2">
                     <div class="icon-container">
-                        <button title="x" type="button" class="btn border-right" data-bs-toggle="tooltip"
-                            data-bs-placement="left" title="YouTube">
+                        <button type="button" class="btn border-right" data-bs-toggle="tooltip" data-bs-placement="left"
+                            title="YouTube">
                             <img src="iccons/youtube-color-svgrepo-com.svg" alt="YouTube" width="30px">
                         </button>
 
-                        <button title="x" type="button" class="btn" data-bs-toggle="tooltip" data-bs-placement="left"
+                        <button type="button" class="btn" data-bs-toggle="tooltip" data-bs-placement="left"
                             title="Instagram">
                             <img src="iccons/instagram-color-svgrepo-com.svg" alt="Instagram" width="22px">
                         </button>
 
-                        <button title="x" type="button" class="btn" data-bs-toggle="tooltip" data-bs-placement="left"
+                        <button type="button" class="btn" data-bs-toggle="tooltip" data-bs-placement="left"
                             title="WiFi">
                             <i class="fa-solid fa-wifi fa-lg" style="color: #ffffff;"></i>
                         </button>
 
-                        <button title="x" type="button" class="btn" data-bs-toggle="tooltip" data-bs-placement="left"
-                            title="Car">
+                        <button type="button" class="btn" data-bs-toggle="tooltip" data-bs-placement="left" title="Car">
                             <i class="fa-solid fa-car fa-lg" style="color: #ffffff;"></i>
                         </button>
 
-                        <button title="x" type="button" class="btn" data-bs-toggle="tooltip" data-bs-placement="left"
+                        <button type="button" class="btn" data-bs-toggle="tooltip" data-bs-placement="left"
                             title="Cart">
                             <i class="fa-solid fa-cart-shopping fa-lg" style="color: #ffffff;"></i>
                         </button>
@@ -78,12 +77,12 @@
                 </form>
 
                 <div>
-                    <button title="x" type="button" class="btn mb-2" data-bs-toggle="tooltip" data-bs-placement="left"
+                    <button type="button" class="btn mb-2" data-bs-toggle="tooltip" data-bs-placement="left"
                         title="Login">
                         <i class="fa-solid fa-right-to-bracket fa-lg" style="color: #ffffff;"></i>
                     </button>
 
-                    <button title="x" type="button" class="btn mb-2" data-bs-toggle="tooltip" data-bs-placement="left"
+                    <button type="button" class="btn mb-2" data-bs-toggle="tooltip" data-bs-placement="left"
                         title="Register">
                         <i class="fa-solid fa-user-plus fa-lg" style="color: #ffffff;"></i>
                     </button>
@@ -96,9 +95,8 @@
     <!-- Mobile Navbar of Gsmarecn -->
     <nav id="navbar" class="mobile-navbar d-lg-none d-flex justify-content-between  align-items-center">
 
-        <button title="x" class="navbar-toggler text-white" type="button" data-bs-toggle="collapse"
-            data-bs-target="#mobileMenu" aria-controls="mobileMenu" aria-expanded="false"
-            aria-label="Toggle navigation">
+        <button class="navbar-toggler text-white" type="button" data-bs-toggle="collapse" data-bs-target="#mobileMenu"
+            aria-controls="mobileMenu" aria-expanded="false" aria-label="Toggle navigation">
             <img style="height: 40px;"
                 src="https://cdn.prod.website-files.com/67f21c9d62aa4c4c685a7277/684091b39228b431a556d811_download-removebg-preview.png"
                 alt="">
@@ -107,11 +105,10 @@
             <a class="logo text-white " href="#">GSMArena</a>
         </a>
         <div class="d-flex justify-content-end">
-            <button title="x" type="button" class="btn float-end ml-5" data-bs-toggle="tooltip"
-                data-bs-placement="left">
+            <button type="button" class="btn float-end ml-5" data-bs-toggle="tooltip" data-bs-placement="left">
                 <i class="fa-solid fa-right-to-bracket fa-lg" style="color: #ffffff;"></i>
             </button>
-            <button title="x" type="button" class="btn float-end " data-bs-toggle="tooltip" data-bs-placement="left">
+            <button type="button" class="btn float-end " data-bs-toggle="tooltip" data-bs-placement="left">
                 <i class="fa-solid fa-user-plus fa-lg" style="color: #ffffff;"></i>
             </button>
         </div>
@@ -154,8 +151,8 @@
             <a href="#">[...]</a>
         </div>
         <div class="menu-buttons d-flex justify-content-center ">
-            <button title="x" class="btn btn-danger w-50">📱 Phone Finder</button>
-            <button title="x" class="btn btn-primary w-50">📲 My Phone</button>
+            <button class="btn btn-danger w-50">📱 Phone Finder</button>
+            <button class="btn btn-primary w-50">📲 My Phone</button>
         </div>
     </div>
     <!-- Display Menu of Gsmarecn -->
@@ -181,8 +178,7 @@
 
     <div class=" mt-4 d-lg-none d-block bg-white">
         <h3 style="font-size: 23px;
-        font-weight: 600; font-family: 'oswald';" class="mx-3 my-5">LG is pushing Apple to use the iPad Pro's Tandem
-            OLED tech in
+        font-weight: 600; font-family: 'oswald';" class="mx-3 my-5">LG is pushing Apple to use the iPad Pro's Tandem OLED tech in
             future iPhones</h3>
         <img style="    height: 100%;
     width: -webkit-fill-available;" src="/imges/ever1.jpg" alt="">
@@ -226,51 +222,51 @@
                 </div>
             </div>
             <div class="col-md-4 col-5 d-none d-lg-block" style="position: relative; left: 12px;">
-                <button title="x" class="solid w-100 py-2">
+                <button class="solid w-100 py-2">
                     <i class="fa-solid fa-mobile fa-sm mx-2" style="color: white;"></i>
                     Phone Finder</button>
                 <div class="devor">
-                    <button title="x" class="px-3 py-1 ">Sumsung</button>
-                    <button title="x" class="px-3 py-1 ">Xiaomi</button>
-                    <button title="x" class="px-3 py-1 ">Asus</button>
-                    <button title="x" class="px-3 py-1 ">Infinix</button>
-                    <button title="x" class="px-3 py-1 ">Apple</button>
-                    <button title="x" class="px-3 py-1 ">Google</button>
-                    <button title="x" class="px-3 py-1 ">AlCatel</button>
-                    <button title="x" class="px-3 py-1 ">Ulefone</button>
-                    <button title="x" class="px-3 py-1 ">Huawei</button>
-                    <button title="x" class="px-3 py-1 ">Honor</button>
-                    <button title="x" class="px-3 py-1 ">Zte</button>
-                    <button title="x" class="px-3 py-1 ">Tecno</button>
-                    <button title="x" class="px-3 py-1 ">Nokia</button>
-                    <button title="x" class="px-3 py-1 ">Oppo</button>
-                    <button title="x" class="px-3 py-1 ">Microsoft </button>
-                    <button title="x" class="px-3 py-1 ">Dooge</button>
-                    <button title="x" class="px-3 py-1 ">Sony</button>
-                    <button title="x" class="px-3 py-1 ">Realme</button>
-                    <button title="x" class="px-3 py-1 ">Unidegi</button>
-                    <button title="x" class="px-3 py-1 ">Blackview</button>
-                    <button title="x" class="px-3 py-1 ">Lg </button>
-                    <button title="x" class="px-3 py-1 ">OnePlus</button>
-                    <button title="x" class="px-3 py-1 ">Coolpad</button>
-                    <button title="x" class="px-3 py-1 ">Cubot</button>
-                    <button title="x" class="px-3 py-1 ">HTc</button>
-                    <button title="x" class="px-3 py-1 ">Nothing</button>
-                    <button title="x" class="px-3 py-1 ">Oscal</button>
-                    <button title="x" class="px-3 py-1 ">oukitel</button>
-                    <button title="x" class="px-3 py-1 ">Motrola</button>
-                    <button title="x" class="px-3 py-1 ">Vivo</button>
-                    <button title="x" class="px-3 py-1 ">Shrap</button>
-                    <button title="x" class="px-3 py-1 ">Itel</button>
-                    <button title="x" class="px-3 py-1 ">Lenovo</button>
-                    <button title="x" class="px-3 py-1 ">meizu</button>
-                    <button title="x" class="px-3 py-1 ">Micromax</button>
-                    <button title="x" class="px-3 py-1 ">Tcl</button>
+                    <button class="px-3 py-1 ">Sumsung</button>
+                    <button class="px-3 py-1 ">Xiaomi</button>
+                    <button class="px-3 py-1 ">Asus</button>
+                    <button class="px-3 py-1 ">Infinix</button>
+                    <button class="px-3 py-1 ">Apple</button>
+                    <button class="px-3 py-1 ">Google</button>
+                    <button class="px-3 py-1 ">AlCatel</button>
+                    <button class="px-3 py-1 ">Ulefone</button>
+                    <button class="px-3 py-1 ">Huawei</button>
+                    <button class="px-3 py-1 ">Honor</button>
+                    <button class="px-3 py-1 ">Zte</button>
+                    <button class="px-3 py-1 ">Tecno</button>
+                    <button class="px-3 py-1 ">Nokia</button>
+                    <button class="px-3 py-1 ">Oppo</button>
+                    <button class="px-3 py-1 ">Microsoft </button>
+                    <button class="px-3 py-1 ">Dooge</button>
+                    <button class="px-3 py-1 ">Sony</button>
+                    <button class="px-3 py-1 ">Realme</button>
+                    <button class="px-3 py-1 ">Unidegi</button>
+                    <button class="px-3 py-1 ">Blackview</button>
+                    <button class="px-3 py-1 ">Lg </button>
+                    <button class="px-3 py-1 ">OnePlus</button>
+                    <button class="px-3 py-1 ">Coolpad</button>
+                    <button class="px-3 py-1 ">Cubot</button>
+                    <button class="px-3 py-1 ">HTc</button>
+                    <button class="px-3 py-1 ">Nothing</button>
+                    <button class="px-3 py-1 ">Oscal</button>
+                    <button class="px-3 py-1 ">oukitel</button>
+                    <button class="px-3 py-1 ">Motrola</button>
+                    <button class="px-3 py-1 ">Vivo</button>
+                    <button class="px-3 py-1 ">Shrap</button>
+                    <button class="px-3 py-1 ">Itel</button>
+                    <button class="px-3 py-1 ">Lenovo</button>
+                    <button class="px-3 py-1 ">meizu</button>
+                    <button class="px-3 py-1 ">Micromax</button>
+                    <button class="px-3 py-1 ">Tcl</button>
                 </div>
-                <button title="x" class="solid w-50 py-2">
+                <button class="solid w-50 py-2">
                     <i class="fa-solid fa-bars fa-sm mx-2"></i>
                     All Brands</button>
-                <button title="x" class="solid py-2" style="    width: 177px;">
+                <button class="solid py-2" style="    width: 177px;">
                     <i class="fa-solid fa-volume-high fa-sm mx-2"></i>
                     RUMORS MILL</button>
             </div>
@@ -284,13 +280,13 @@
                     <div class="d-flex align-items-center justify-content-between  gap-portion">
                         <div class="d-flex">
 
-                            <button title="x" class="section-button">Vlad</button>
+                            <button class="section-button">Vlad</button>
                             <p class="my-2 portion-headline mx-1">27 Augest 2025</p>
                         </div>
                         <div>
-                            <button title="x" class="section-button">Apple</button>
-                            <button title="x" class="section-button">IOs</button>
-                            <button title="x" class="section-button">Rumors</button>
+                            <button class="section-button">Apple</button>
+                            <button class="section-button">IOs</button>
+                            <button class="section-button">Rumors</button>
                         </div>
                     </div>
                 </div>
@@ -439,8 +435,8 @@
                         </div>
                         <div class="button-secondary-div d-flex justify-content-between align-items-center ">
                             <div class="d-flex">
-                                <button title="x" class="button-links">read all comments</button>
-                                <button title="x" class="button-links">post your comment</button>
+                                <button class="button-links">read all comments</button>
+                                <button class="button-links">post your comment</button>
                             </div>
                             <p class="div-last">Total reader comments: <b>34</b> </p>
                         </div>
@@ -448,7 +444,7 @@
                 </div>
             </div>
             <div class="col-lg-4  col-12  bg-white p-3">
-                <img alt="x" src="https://fdn.gsmarena.com/imgroot/static/banners/self/review-pixel-9-pro-300x250.jpg"
+                <img src="https://fdn.gsmarena.com/imgroot/static/banners/self/review-pixel-9-pro-300x250.jpg"
                     class=" d-block mx-auto" style="width: 300px;">
                 <div class="d-flex">
                     <h5 class="text-secondary mt-2 d-inline fw-bold " style="text-transform: uppercase;">top 10 by Daily
@@ -547,8 +543,7 @@
                 </div>
 
                 <div style="position: sticky;margin-top: 12px; top: 0;">
-                    <img alt="x"
-                        src="https://fdn.gsmarena.com/imgroot/static/banners/self/review-galaxy-s25-300x250.jpg"
+                    <img src="https://fdn.gsmarena.com/imgroot/static/banners/self/review-galaxy-s25-300x250.jpg"
                         class=" d-block mx-auto" style="width: 300px;">
                 </div>
 

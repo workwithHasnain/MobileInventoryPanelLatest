@@ -213,7 +213,7 @@ input:focus {
 .devor button {
     border: none;
     font-size: 12px;
-    font-weight: 500;
+       font-weight: 500;
     margin-top: -1px;
     padding: 3px 0px;
     letter-spacing: -0.19px;
@@ -360,8 +360,7 @@ input:focus {
     overflow-y: scroll;
     overflow-x: hidden;
 }
-
-.canel {
+.canel{
     width: 80px;
 }
 
@@ -1921,7 +1920,7 @@ td {
 
 @media screen and (max-width:1047px) {
 
-    .article-info {
+      .article-info {
         height: auto;
     }
 
@@ -2225,21 +2224,16 @@ td {
         display: grid;
         grid-template-columns: repeat(2, 2fr);
     }
-
-    .spec-label {
+    .spec-label{
         font-size: 1rem;
     }
-
-    strong {
+    strong{
         font-size: 12px;
     }
-
-    .table {
+    .table{
         border: none;
     }
-
-    .table th,
-    .table td {
+    .table th, .table td{
         border: none;
         /* padding: 4px 3px; */
     }
