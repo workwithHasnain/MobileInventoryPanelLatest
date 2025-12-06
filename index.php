@@ -514,7 +514,7 @@ if ($_POST && isset($_POST['action'])) {
                                 <?php endforeach; ?>
                             <?php endif; ?>
                         </div>
-
+                                    
                         <h6 style="border-left: solid 5px grey ; color: #090E21; text-transform: uppercase; font-weight: 900; margin-top: 12px;"
                             class="px-3">Popular comparisons</h6>
 
