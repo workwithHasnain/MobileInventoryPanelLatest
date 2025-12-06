@@ -304,8 +304,18 @@ function formatDeviceSpecs($device)
 {
   $specs = [];
 
+  // Helper: truncate text to max characters with expandable ellipsis
+  $truncateText = function ($text, $maxLength = 60) {
+    if (strlen($text) > $maxLength) {
+      $truncated = substr($text, 0, $maxLength);
+      // Store full text in data attribute and show clickable ellipsis
+      return htmlspecialchars($truncated) . '<span class="expand-dots" data-full="' . str_replace('"', '&quot;', htmlspecialchars($text)) . '" style="cursor: pointer; color: #0066cc;">...</span>';
+    }
+    return htmlspecialchars($text);
+  };
+
   // Helper: render a section from JSON stored as TEXT in DB
-  $renderJsonSection = function ($jsonValue, $sectionName = '') {
+  $renderJsonSection = function ($jsonValue, $sectionName = '') use ($truncateText) {
     if (!isset($jsonValue) || $jsonValue === '' || $jsonValue === null) return null;
     $decoded = json_decode($jsonValue, true);
     if (json_last_error() !== JSON_ERROR_NONE || !is_array($decoded)) {
@@ -320,7 +330,8 @@ function formatDeviceSpecs($device)
       if ($field !== '') {
         $line = '<strong>' . htmlspecialchars($field) . '</strong>';
         if ($desc !== '') {
-          $line .= ' ' . htmlspecialchars($desc);
+          // Truncate description to 60 characters
+          $line .= ' ' . $truncateText($desc, 60);
 
           // Add EUR conversion for price field in GENERAL INFO section
           if ($sectionName === 'GENERAL INFO' && strtolower($field) === 'price') {
@@ -375,8 +386,8 @@ function formatDeviceSpecs($device)
     if (!empty($device['network_5g'])) $network_tech[] = '5G';
 
     if (!empty($network_tech)) {
-      $network_details = '<strong>Technology</strong> ' . implode(' / ', $network_tech);
-      if (!empty($device['dual_sim'])) $network_details .= '<br><strong>Connectivity Slot</strong> Dual SIM';
+      $network_details = '<strong>Technology</strong> ' . $truncateText(implode(' / ', $network_tech), 60);
+      if (!empty($device['dual_sim'])) $network_details .= '<br><strong>Connectivity Slot</strong> ' . $truncateText('Dual SIM', 60);
       if (!empty($device['esim'])) $network_details .= ', eSIM';
       if (!empty($device['sim_size'])) $network_details .= ' (' . $device['sim_size'] . ')';
       $specs['NETWORK'] = $network_details;
@@ -387,11 +398,11 @@ function formatDeviceSpecs($device)
   if (!isset($specs['LAUNCH']) && (!empty($device['release_date']) || !empty($device['availability']) || !empty($device['price']))) {
     $launch_details = '';
     if (!empty($device['release_date'])) {
-      $launch_details .= '<strong>Released</strong> ' . date('F j, Y', strtotime($device['release_date']));
+      $launch_details .= '<strong>Released</strong> ' . $truncateText(date('F j, Y', strtotime($device['release_date'])), 60);
     }
     if (!empty($device['availability'])) {
       if ($launch_details) $launch_details .= '<br>';
-      $launch_details .= '<strong>Availability</strong> ' . $device['availability'];
+      $launch_details .= '<strong>Availability</strong> ' . $truncateText($device['availability'], 60);
     }
     if (!empty($device['price'])) {
       $price_usd = number_format($device['price'], 2);
@@ -410,16 +421,14 @@ function formatDeviceSpecs($device)
   if (!isset($specs['BODY']) && (!empty($device['dimensions']) || !empty($device['height']) || !empty($device['width']) || !empty($device['thickness']) || !empty($device['weight']))) {
     $body_details = '';
     if (!empty($device['dimensions'])) {
-      $body_details .= '<strong>Dimensions</strong> ' . $device['dimensions'];
+      $body_details .= '<strong>Dimensions</strong> ' . $truncateText($device['dimensions'], 60);
     } elseif (!empty($device['height']) && !empty($device['width']) && !empty($device['thickness'])) {
-      $body_details .= '<strong>Dimensions</strong> ' .
-        $device['height'] . ' x ' .
-        $device['width'] . ' x ' .
-        $device['thickness'] . ' mm';
+      $dims = $device['height'] . ' x ' . $device['width'] . ' x ' . $device['thickness'] . ' mm';
+      $body_details .= '<strong>Dimensions</strong> ' . $truncateText($dims, 60);
     }
     if (!empty($device['weight'])) {
       if ($body_details) $body_details .= '<br>';
-      $body_details .= '<strong>Weight</strong> ' . $device['weight'] . ' g';
+      $body_details .= '<strong>Weight</strong> ' . $truncateText($device['weight'] . ' g', 60);
     }
     $specs['BODY'] = $body_details;
   }
@@ -428,19 +437,20 @@ function formatDeviceSpecs($device)
   if (!isset($specs['DISPLAY']) && (!empty($device['display_type']) || !empty($device['display_size']) || !empty($device['display_resolution']))) {
     $display_details = '';
     if (!empty($device['display_type'])) {
-      $display_details .= '<strong>Type</strong> ' . $device['display_type'];
-      if (!empty($device['display_technology'])) $display_details .= ', ' . $device['display_technology'];
-      if (!empty($device['refresh_rate'])) $display_details .= ', ' . $device['refresh_rate'] . 'Hz';
-      if (!empty($device['hdr'])) $display_details .= ', HDR';
-      if (!empty($device['billion_colors'])) $display_details .= ', 1B colors';
+      $displayType = $device['display_type'];
+      if (!empty($device['display_technology'])) $displayType .= ', ' . $device['display_technology'];
+      if (!empty($device['refresh_rate'])) $displayType .= ', ' . $device['refresh_rate'] . 'Hz';
+      if (!empty($device['hdr'])) $displayType .= ', HDR';
+      if (!empty($device['billion_colors'])) $displayType .= ', 1B colors';
+      $display_details .= '<strong>Type</strong> ' . $truncateText($displayType, 60);
     }
     if (!empty($device['display_size'])) {
       if ($display_details) $display_details .= '<br>';
-      $display_details .= '<strong>Size</strong> ' . $device['display_size'] . ' inches';
+      $display_details .= '<strong>Size</strong> ' . $truncateText($device['display_size'] . ' inches', 60);
     }
     if (!empty($device['display_resolution'])) {
       if ($display_details) $display_details .= '<br>';
-      $display_details .= '<strong>Resolution</strong> ' . $device['display_resolution'];
+      $display_details .= '<strong>Resolution</strong> ' . $truncateText($device['display_resolution'], 60);
     }
     $specs['DISPLAY'] = $display_details;
   }
@@ -449,21 +459,22 @@ function formatDeviceSpecs($device)
   if (!isset($specs['HARDWARE']) && (!empty($device['os']) || !empty($device['chipset_name']) || !empty($device['cpu_cores']) || !empty($device['gpu']))) {
     $platform_details = '';
     if (!empty($device['os'])) {
-      $platform_details .= '<strong>OS</strong> ' . $device['os'];
+      $platform_details .= '<strong>OS</strong> ' . $truncateText($device['os'], 60);
     }
     if (!empty($device['chipset_name'])) {
       if ($platform_details) $platform_details .= '<br>';
-      $platform_details .= '<strong>System Chip</strong> ' . $device['chipset_name'];
+      $platform_details .= '<strong>System Chip</strong> ' . $truncateText($device['chipset_name'], 60);
     }
     if (!empty($device['cpu_cores']) || !empty($device['cpu_frequency'])) {
       if ($platform_details) $platform_details .= '<br>';
-      $platform_details .= '<strong>Processor</strong> ';
-      if (!empty($device['cpu_cores'])) $platform_details .= $device['cpu_cores'] . '-core';
-      if (!empty($device['cpu_frequency'])) $platform_details .= ' (' . $device['cpu_frequency'] . ' GHz)';
+      $cpu_info = '';
+      if (!empty($device['cpu_cores'])) $cpu_info .= $device['cpu_cores'] . '-core';
+      if (!empty($device['cpu_frequency'])) $cpu_info .= ' (' . $device['cpu_frequency'] . ' GHz)';
+      $platform_details .= '<strong>Processor</strong> ' . $truncateText($cpu_info, 60);
     }
     if (!empty($device['gpu'])) {
       if ($platform_details) $platform_details .= '<br>';
-      $platform_details .= '<strong>GPU</strong> ' . $device['gpu'];
+      $platform_details .= '<strong>GPU</strong> ' . $truncateText($device['gpu'], 60);
     }
     $specs['HARDWARE'] = $platform_details;
   }
@@ -472,13 +483,14 @@ function formatDeviceSpecs($device)
   if (!isset($specs['MEMORY']) && (!empty($device['ram']) || !empty($device['storage']) || !empty($device['card_slot']))) {
     $memory_details = '';
     if (!empty($device['card_slot'])) {
-      $memory_details .= '<strong>Expansion Slot</strong> ' . htmlspecialchars($device['card_slot']);
+      $memory_details .= '<strong>Expansion Slot</strong> ' . $truncateText(htmlspecialchars($device['card_slot']), 60);
     }
     if (!empty($device['storage']) || !empty($device['ram'])) {
       if ($memory_details) $memory_details .= '<br>';
-      $memory_details .= '<strong>Storage</strong> ';
-      if (!empty($device['storage'])) $memory_details .= $device['storage'];
-      if (!empty($device['ram'])) $memory_details .= ' RAM: ' . $device['ram'];
+      $storage_info = '';
+      if (!empty($device['storage'])) $storage_info .= $device['storage'];
+      if (!empty($device['ram'])) $storage_info .= ' RAM: ' . $device['ram'];
+      $memory_details .= '<strong>Storage</strong> ' . $truncateText($storage_info, 60);
     }
     $specs['MEMORY'] = $memory_details;
   }
@@ -492,7 +504,7 @@ function formatDeviceSpecs($device)
       $camera_details .= '<strong>Single</strong><br>';
     }
     if (!empty($device['main_camera_resolution'])) {
-      $camera_details .= $device['main_camera_resolution'];
+      $camera_details .= $truncateText($device['main_camera_resolution'], 60);
     }
 
     // Camera features
@@ -512,10 +524,10 @@ function formatDeviceSpecs($device)
     }
 
     if (!empty($features)) {
-      $camera_details .= '<br><strong>Features</strong> ' . implode(', ', $features);
+      $camera_details .= '<br><strong>Features</strong> ' . $truncateText(implode(', ', $features), 60);
     }
     if (!empty($device['main_camera_video'])) {
-      $camera_details .= '<br><strong>Video Recording</strong> ' . $device['main_camera_video'];
+      $camera_details .= '<br><strong>Video Recording</strong> ' . $truncateText($device['main_camera_video'], 60);
     }
     $specs['MAIN CAMERA'] = $camera_details;
   }
@@ -529,18 +541,18 @@ function formatDeviceSpecs($device)
       $selfie_details .= '<strong>Single</strong> ';
     }
     if (!empty($device['selfie_camera_resolution'])) {
-      $selfie_details .= $device['selfie_camera_resolution'];
+      $selfie_details .= $truncateText($device['selfie_camera_resolution'], 60);
     }
     if (isset($device['selfie_camera_features']) && is_array($device['selfie_camera_features'])) {
-      $selfie_details .= '<br><strong>Features</strong> ' . implode(', ', $device['selfie_camera_features']);
+      $selfie_details .= '<br><strong>Features</strong> ' . $truncateText(implode(', ', $device['selfie_camera_features']), 60);
     } elseif (isset($device['selfie_camera_features']) && is_string($device['selfie_camera_features'])) {
       // Handle PostgreSQL array string format
       $array_features = str_replace(['{', '}'], '', $device['selfie_camera_features']);
       $array_features = explode(',', $array_features);
-      $selfie_details .= '<br><strong>Features</strong> ' . implode(', ', array_map('trim', $array_features));
+      $selfie_details .= '<br><strong>Features</strong> ' . $truncateText(implode(', ', array_map('trim', $array_features)), 60);
     }
     if (!empty($device['selfie_camera_video'])) {
-      $selfie_details .= '<br><strong>Video Recording</strong> ' . $device['selfie_camera_video'];
+      $selfie_details .= '<br><strong>Video Recording</strong> ' . $truncateText($device['selfie_camera_video'], 60);
     }
     $specs['SELFIE CAMERA'] = $selfie_details;
   }
@@ -562,11 +574,11 @@ function formatDeviceSpecs($device)
   if (!isset($specs['CONNECTIVITY'])) {
     $comms_details = '';
     if (!empty($device['wifi'])) {
-      $comms_details .= '<strong>WLAN</strong> ' . $device['wifi'];
+      $comms_details .= '<strong>WLAN</strong> ' . $truncateText($device['wifi'], 60);
     }
     if (!empty($device['bluetooth'])) {
       if ($comms_details) $comms_details .= '<br>';
-      $comms_details .= '<strong>Bluetooth</strong> ' . $device['bluetooth'];
+      $comms_details .= '<strong>Bluetooth</strong> ' . $truncateText($device['bluetooth'], 60);
     }
     if (isset($device['gps']) && $device['gps'] !== null) {
       if ($comms_details) $comms_details .= '<br>';
@@ -582,7 +594,7 @@ function formatDeviceSpecs($device)
     }
     if (!empty($device['usb'])) {
       if ($comms_details) $comms_details .= '<br>';
-      $comms_details .= '<strong>USB</strong> ' . $device['usb'];
+      $comms_details .= '<strong>USB</strong> ' . $truncateText($device['usb'], 60);
     }
     if ($comms_details) {
       $specs['CONNECTIVITY'] = $comms_details;
@@ -607,7 +619,7 @@ function formatDeviceSpecs($device)
 
     if (!empty($sensors)) {
       if ($features_details) $features_details .= '<br>';
-      $features_details .= '<strong>Sensors</strong> ' . implode(', ', $sensors);
+      $features_details .= '<strong>Sensors</strong> ' . $truncateText(implode(', ', $sensors), 60);
     }
 
     if ($features_details) {
@@ -619,12 +631,14 @@ function formatDeviceSpecs($device)
   if (!isset($specs['BATTERY']) && (!empty($device['battery_capacity']) || !empty($device['battery_sic']))) {
     $battery_details = '';
     if (!empty($device['battery_capacity'])) {
-      $battery_details .= '<strong>Capacity</strong> ' . $device['battery_capacity'];
-      if (!empty($device['battery_sic'])) $battery_details .= ' (Silicon)';
+      $battery_capacity = $device['battery_capacity'];
+      if (!empty($device['battery_sic'])) $battery_capacity .= ' (Silicon)';
+      $battery_details .= '<strong>Capacity</strong> ' . $truncateText($battery_capacity, 60);
     }
 
     if (isset($device['battery_removable']) && $device['battery_removable'] !== null) {
-      $battery_details .= '<br><strong>Removable</strong> ' . ($device['battery_removable'] ? 'Yes' : 'No');
+      if ($battery_details) $battery_details .= '<br>';
+      $battery_details .= '<strong>Removable</strong> ' . ($device['battery_removable'] ? 'Yes' : 'No');
     }
 
     // Charging information
@@ -633,7 +647,8 @@ function formatDeviceSpecs($device)
     if (!empty($device['wireless_charging'])) $charging[] = 'Wireless: ' . $device['wireless_charging'];
 
     if (!empty($charging)) {
-      $battery_details .= '<br><strong>Charging</strong> ' . implode(', ', $charging);
+      if ($battery_details) $battery_details .= '<br>';
+      $battery_details .= '<strong>Charging</strong> ' . $truncateText(implode(', ', $charging), 60);
     }
 
     $specs['BATTERY'] = $battery_details;
@@ -641,12 +656,12 @@ function formatDeviceSpecs($device)
 
   // Colors (legacy field) - keep if present
   if (isset($device['colors']) && is_array($device['colors'])) {
-    $specs['COLORS'] = '<strong>Available</strong> ' . implode(', ', $device['colors']);
+    $specs['COLORS'] = '<strong>Available</strong> ' . $truncateText(implode(', ', $device['colors']), 60);
   } elseif (isset($device['colors']) && is_string($device['colors'])) {
     // Handle PostgreSQL array string format
     $array_colors = str_replace(['{', '}'], '', $device['colors']);
     $array_colors = explode(',', $array_colors);
-    $specs['COLORS'] = '<strong>Available</strong> ' . implode(', ', array_map('trim', $array_colors));
+    $specs['COLORS'] = '<strong>Available</strong> ' . $truncateText(implode(', ', array_map('trim', $array_colors)), 60);
   }
 
   return $specs;
@@ -2691,6 +2706,31 @@ if ($_POST && isset($_POST['submit_comment'])) {
           style.textContent = '@keyframes slideIn { from { opacity: 0; transform: translateY(-10px); } to { opacity: 1; transform: translateY(0); } }';
           document.head.appendChild(style);
         }
+      }
+    }
+  });
+
+  // Handle expandable text for truncated descriptions
+  document.addEventListener('click', function(e) {
+    if (e.target.classList.contains('expand-dots')) {
+      const fullText = e.target.getAttribute('data-full');
+      if (fullText) {
+        // Decode HTML entities
+        const temp = document.createElement('div');
+        temp.innerHTML = fullText;
+        const decodedText = temp.textContent || temp.innerText || '';
+
+        // Get the text node that contains the truncated text (should be before the expand-dots span)
+        const dotsSpan = e.target;
+        const prevNode = dotsSpan.previousSibling;
+
+        if (prevNode && prevNode.nodeType === Node.TEXT_NODE) {
+          // Replace the text node with the full text
+          prevNode.textContent = decodedText;
+        }
+
+        // Remove the expand-dots span
+        dotsSpan.remove();
       }
     }
   });

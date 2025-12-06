@@ -18,20 +18,25 @@ body {
     font-variation-settings:
         "wdth" 100;
 }
+
 .brand-item-bold {
     font-weight: 600 !important;
-    
-    
+
+
 }
+
 .navbar-bold {
     font-weight: 700 !important;
 }
-.margin-top-4rem{
+
+.margin-top-4rem {
     margin-top: 0;
 }
+
 a {
     text-decoration: none;
 }
+
 h1,
 h2,
 h3,
@@ -225,7 +230,7 @@ input:focus {
 .devor button {
     border: none;
     font-size: 12px;
-       font-weight: 500;
+    font-weight: 500;
     margin-top: -1px;
     padding: 3px 0px;
     letter-spacing: -0.19px;
@@ -304,6 +309,7 @@ input:focus {
 .rounded {
     width: -webkit-fill-available;
 }
+
 .col-lg-4.conjection-froud img {
     width: 362px;
     margin-top: 0px;
@@ -312,6 +318,7 @@ input:focus {
     height: 161px;
     border-radius: 6px;
 }
+
 .col-lg-4.conjection-froud h1,
 .froud h1 {
     bottom: 85px;
@@ -373,9 +380,11 @@ input:focus {
     padding-top: 10px;
     overflow-x: hidden;
 }
-.cent .d-flex{
+
+.cent .d-flex {
     gap: 12px;
 }
+
 .canel {
     /* width: 80px; */
     display: flex;
@@ -728,7 +737,7 @@ input:focus {
 }
 
 
-    .review-card-body {
+.review-card-body {
     height: 155px;
     padding: 16px 20px;
     display: flex;
@@ -1070,6 +1079,7 @@ input:hover {
     background-color: #F3F3F3;
     padding: 5px;
 }
+
 .compare-checkbox label {
     font-weight: bold;
     width: 315px;
@@ -1940,7 +1950,7 @@ td {
 
 @media screen and (max-width:1047px) {
 
-      .article-info {
+    .article-info {
         height: auto;
     }
 
@@ -1958,18 +1968,21 @@ td {
     .gap {
         column-gap: 60px;
     }
-    .margin-top-4rem{
+
+    .margin-top-4rem {
         margin-top: 4rem;
     }
+
     .colums-gap {
-    column-gap: 69px;
-}
+        column-gap: 69px;
+    }
 }
 
 @media screen and (max-width: 991.98px) {
-     .margin-top-4rem{
+    .margin-top-4rem {
         margin-top: 0rem;
     }
+
     .desktop-navbar {
         display: none;
     }
@@ -2119,9 +2132,10 @@ td {
         margin-left: 0;
     }
 
-    .phone-image:after{
+    .phone-image:after {
         background-color: none;
     }
+
     #leftMenu.show a {
         font-size: 14px;
     }
@@ -2257,16 +2271,21 @@ td {
         display: grid;
         grid-template-columns: repeat(2, 2fr);
     }
-    .spec-label{
+
+    .spec-label {
         font-size: 1rem;
     }
-    strong{
+
+    strong {
         font-size: 12px;
     }
-    .table{
+
+    .table {
         border: none;
     }
-    .table th, .table td{
+
+    .table th,
+    .table td {
         border: none;
         /* padding: 4px 3px; */
     }
