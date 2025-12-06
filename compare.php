@@ -1686,6 +1686,9 @@ function formatDeviceSpecsJson($device)
             align-items: center;
             gap: 8px;
         }
+        .select2-container{
+            width: min-content;
+        }
     </style>
 </body>
 
