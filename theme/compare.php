@@ -241,7 +241,7 @@
                 <div class="compare-checkbox">
                     <label>
                         Compare
-                        <input type="text" name="compare" class="bg-white w-100 mx-2 text-center-auto border"
+                        <input type="text" name="compare" class="bg-white text-center-auto border"
                             placeholder="Search" />
                     </label>
                 </div>
@@ -263,7 +263,7 @@
                 <div class="compare-checkbox">
                     <label>
                         Compare
-                        <input type="text" name="compare" class="bg-white w-100 mx-2 text-center-auto border"
+                        <input type="text" name="compare" class="bg-white  text-center-auto border"
                             placeholder="Campare" />
                     </label>
                 </div>
@@ -287,7 +287,7 @@
                 <div class="compare-checkbox">
                     <label>
                         Compare
-                        <input type="text" name="compare" class="bg-white w-100 mx-2 text-center-auto border"
+                        <input type="text" name="compare" class="bg-white text-center-auto border"
                             placeholder="Campare" />
                     </label>
                 </div>
@@ -398,7 +398,7 @@
                 <tr>
                     <td colspan="3" style=" font-weight: 600;    color: #f14d4d;
     font-size: 16px; background: #f9f9f9;">Main Camera</td>
-                </tr>   
+                </tr>
                 <tr>
                     <td>200 MP + 12 MP (ultrawide)</td>
                     <td>48 MP + 12 MP (ultrawide)</td>

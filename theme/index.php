@@ -260,47 +260,47 @@
                 <div class="devor">
                     <button>Samsung</button>
                     <button>Xiaomi</button>
-                    <button >Asus</button>
+                    <button>Asus</button>
                     <button>Infinix</button>
                     <button>Apple</button>
-                    <button >Google</button>
-                    <button >AlCatel</button>
-                    <button >Ulefone</button>
-                    <button >Huawei</button>
-                    <button >Honor</button>
-                    <button >Zte</button>
-                    <button >Tecno</button>
-                    <button >Nokia</button>
-                    <button >Oppo</button>
-                    <button >Microsoft </button>
-                    <button >Dooge</button>
-                    <button >Sony</button>
-                    <button >Realme</button>
-                    <button >Unidegi</button>
-                    <button >Blackview</button>
-                    <button >Lg </button>
-                    <button >OnePlus</button>
-                    <button >Coolpad</button>
-                    <button >Cubot</button>
-                    <button >HTc</button>
-                    <button >Nothing</button>
-                    <button >Oscal</button>
-                    <button >oukitel</button>
-                    <button >Motrola</button>
-                    <button >Vivo</button>
-                    <button >Shrap</button>
-                    <button >Itel</button>
-                    <button >Lenovo</button>
-                    <button >meizu</button>
-                    <button >Micromax</button>
-                    <button >Tcl</button>
+                    <button>Google</button>
+                    <button>AlCatel</button>
+                    <button>Ulefone</button>
+                    <button>Huawei</button>
+                    <button>Honor</button>
+                    <button>Zte</button>
+                    <button>Tecno</button>
+                    <button>Nokia</button>
+                    <button>Oppo</button>
+                    <button>Microsoft </button>
+                    <button>Dooge</button>
+                    <button>Sony</button>
+                    <button>Realme</button>
+                    <button>Unidegi</button>
+                    <button>Blackview</button>
+                    <button>Lg </button>
+                    <button>OnePlus</button>
+                    <button>Coolpad</button>
+                    <button>Cubot</button>
+                    <button>HTc</button>
+                    <button>Nothing</button>
+                    <button>Oscal</button>
+                    <button>oukitel</button>
+                    <button>Motrola</button>
+                    <button>Vivo</button>
+                    <button>Shrap</button>
+                    <button>Itel</button>
+                    <button>Lenovo</button>
+                    <button>meizu</button>
+                    <button>Micromax</button>
+                    <button>Tcl</button>
                 </div>
                 <div class="d-flex">
 
                     <button class="solid w-50 py-2">
                         <i class="fa-solid 
                         fa-bars fa-sm mx-2"></i> All Brands</button>
-                    <button class="solid w-50 py-2">
+                    <button class="solid w-50 py-2" style="/* width: 177px; */">
                         <i class="fa-solid fa-volume-high fa-sm mx-2"></i>
                         RUMORS MILL</button>
 
@@ -434,99 +434,103 @@
                     </div>
                 </div>
             </div>
-            <div class="col-lg-4  col-12  bg-white ">
-                <h6 style="color: #090E21; text-transform: uppercase; font-weight: 900;" class=" mt-2 ">Latest Devices
-                </h6>
-                <div class="cent">
-
-                    <div class="d-flex align-items-start">
-                        <div class="canel">
-                            <img class="shrink" src="https://fdn2.gsmarena.com/vv/bigpic/vivoiy300-gt.jpg" alt="">
-                            <p>Vivo y300 Gt</p>
-                        </div>
-                        <div class="canel mx-4">
-                            <img class="shrink" src="https://fdn2.gsmarena.com/vv/bigpic/samsung-galaxy-m56-5g.jpg"
-                                alt="">
-                            <p>Sumsung Galaxy f56</p>
-                        </div>
-                        <div class="canel ">
-                            <img class="shrink" src="https://fdn2.gsmarena.com/vv/bigpic/vivo-x200-pro-mini.jpg" alt="">
-                            <p>Vivo x200 FE</p>
-                        </div>
+            <div class="col-lg-4  col-12  bg-white " style="margin-top: 18px;"> 
+                <h4 class="section-heading ">In stores now</h4>
+                <div class="d-none d-lg-flex" style="overflow: hidden;
+    overflow-y: auto;
+    max-height: 390px;
+    width: 320px;
+    flex-wrap: wrap;"><a href="#" class="module-phones-link"><img
+                            src="https://fdn2.gsmarena.com/vv/bigpic/oneplus-ace-6t.jpg"><br>OnePlus Ace 6T</a><a
+                        href="" class="module-phones-link"><img
+                            src="https://fdn2.gsmarena.com/vv/bigpic/xiaomi-poco-f8-ultra-.jpg"><br>Xiaomi Poco F8
+                        Ultra</a><a href="" class="module-phones-link"><img
+                            src="https://fdn2.gsmarena.com/vv/bigpic/xiaomi-poco-f8-pro.jpg"><br>Xiaomi Poco F8
+                        Pro</a><a href="vivo_x300_pro_5g-14225.php" class="module-phones-link"><img
+                            src="https://fdn2.gsmarena.com/vv/bigpic/vivo-x300-pro.jpg"><br>vivo X300 Pro</a><a
+                        href="oukitel_wp60_5g-14335.php" class="module-phones-link"><img
+                            src="https://fdn2.gsmarena.com/vv/bigpic/oukitel-wp60.jpg"><br>Oukitel WP60</a><a
+                        href="vivo_x300_5g-14224.php" class="module-phones-link"><img
+                            src="https://fdn2.gsmarena.com/vv/bigpic/vivo-x300.jpg"><br>vivo X300</a><a
+                        href="vivo_iqoo_15_5g-14198.php" class="module-phones-link"><img
+                            src="https://fdn2.gsmarena.com/vv/bigpic/vivo-iqoo-15.jpg"><br>vivo iQOO 15</a><a
+                        href="oneplus_15_5g-14206.php" class="module-phones-link"><img
+                            src="https://fdn2.gsmarena.com/vv/bigpic/oneplus-15.jpg"><br>OnePlus 15</a><a
+                        href="zte_nubia_redmagic_11_pro_5g_int-14277.php" class="module-phones-link"><img
+                            src="https://fdn2.gsmarena.com/vv/bigpic/zte-nubia-red-magic-11-pro-plus.jpg"><br>ZTE nubia
+                        RedMagic 11 Pro</a>
                     </div>
-                    <div class="d-flex align-items-start">
-                        <div class="canel">
-                            <img class="shrink" src="https://fdn2.gsmarena.com/vv/bigpic/vivo-x-fold3.jpg" alt="">
-                            <p>Vivo X Fold5</p>
-                        </div>
-                        <div class="canel mx-4">
-                            <img class="shrink" src="https://fdn2.gsmarena.com/vv/bigpic/itel-a90.jpg" alt="">
-                            <p>Itel A90</p>
-                        </div>
-                        <div class="canel ">
-                            <img class="shrink" src="https://fdn2.gsmarena.com/vv/bigpic/oscal-pad-100.jpg" alt="">
-                            <p>OScal pad 100</p>
-                        </div>
+            <div id="instores-container"
+                class=" d-block d-lg-none swiper-container material-card swiper-container-horizontal">
+                <div class="scroller-phones swiper-wrapper">
+                    <div class="swiper-slide swiper-slide-active">
+                        <div class="swiper-half-slide"><a href=""><span><img
+                                        src="https://fdn2.gsmarena.com/vv/bigpic/oneplus-ace-6t.jpg"
+                                        alt="OnePlus Ace 6T 5G"></span><strong>OnePlus Ace 6T 5G</strong></a></div>
+                        <div class="swiper-half-slide"><a href=""><span><img
+                                        src="https://fdn2.gsmarena.com/vv/bigpic/xiaomi-poco-f8-ultra-.jpg"
+                                        alt="Xiaomi Poco F8 Ultra 5G"></span><strong>Xiaomi Poco F8 Ultra
+                                    5G</strong></a></div>
                     </div>
-                    <div class="d-flex align-items-start">
-                        <div class="canel">
-                            <img class="shrink" src="https://fdn2.gsmarena.com/vv/bigpic/itel-city-100.jpg" alt="">
-                            <p>itel city 100</p>
+                    <div class="swiper-slide swiper-slide-next">
+                        <div class="swiper-half-slide"><a href="xiaomi_poco_f8_pro_5g-14303.php"><span><img
+                                        src="https://fdn2.gsmarena.com/vv/bigpic/xiaomi-poco-f8-pro.jpg"
+                                        alt="Xiaomi Poco F8 Pro 5G"></span><strong>Xiaomi Poco F8 Pro 5G</strong></a>
                         </div>
-                        <div class="canel mx-4">
-                            <img class="shrink" src="https://fdn2.gsmarena.com/vv/bigpic/motorola-edge-60-fusion.jpg"
-                                alt="">
-                            <p>Motorla Edge 60</p>
-                        </div>
-                        <div class="canel ">
-                            <img class="shrink" src="https://fdn2.gsmarena.com/vv/bigpic/sony-xperia-1-vi-red.jpg"
-                                alt="">
-                            <p>Song xperia -1 VII</p>
-                        </div>
+                        <div class="swiper-half-slide"><a href="vivo_x300_pro_5g-14225.php"><span><img
+                                        src="https://fdn2.gsmarena.com/vv/bigpic/vivo-x300-pro.jpg"
+                                        alt="vivo X300 Pro 5G"></span><strong>vivo X300 Pro 5G</strong></a></div>
+                    </div>
+                    <div class="swiper-slide">
+                        <div class="swiper-half-slide"><a href="oukitel_wp60_5g-14335.php"><span><img
+                                        src="https://fdn2.gsmarena.com/vv/bigpic/oukitel-wp60.jpg"
+                                        alt="Oukitel WP60 5G"></span><strong>Oukitel WP60 5G</strong></a></div>
+                        <div class="swiper-half-slide"><a href="vivo_x300_5g-14224.php"><span><img
+                                        src="https://fdn2.gsmarena.com/vv/bigpic/vivo-x300.jpg"
+                                        alt="vivo X300 5G"></span><strong>vivo X300 5G</strong></a></div>
                     </div>
                 </div>
-
-
-                <h6 style="border-left: solid 5px grey ; color: #090E21; text-transform: uppercase; font-weight: 900; margin-top: 12px;"
-                    class="px-3">Popular comparisons</h6>
-
-                <div class="sentizer bg-white mt-2 p-3 rounded shadow-sm" style="    text-transform: Uppercase;
+                <div class="swiper-scrollbar" style="opacity: 0;">
+                    <div class="swiper-scrollbar-drag" style="width: 1051.88px;"></div>
+                </div>
+            </div>
+            <h6 style="border-left: solid 5px grey ; color: #090E21; text-transform: uppercase; font-weight: 900; margin-top: 12px;"
+                class="px-3">Popular comparisons</h6>
+            <div class="sentizer bg-white mt-2 p-3 rounded shadow-sm" style="    text-transform: Uppercase;
                                             font-size: 13px;
                                             font-weight: 700;">
-                    <div class="row">
-                        <div class="col-12">
-                            <p class="mb-2"
-                                style="background-color: #ffe6f0; color: #090E21; text-transform: capitalize;">Samsung
-                                Galaxy A55 vs.
-                                Galaxy A56</p>
-                            <p class="mb-2" style=" text-transform: capitalize;">Apple iPhone 16 Pro Max vs. Galaxy S25
-                                Ultra</p>
-                            <p class="mb-2" style="background-color: #ffe6f0; text-transform: capitalize; ">Samsung
-                                Galaxy S24 Ultra vs. Galaxy S25
-                                Ultra</p>
-                            <p class="mb-2" style=" text-transform: capitalize;">Samsung Galaxy A36 vs. Galaxy A56</p>
-                            <p class="mb-2" style="background-color: #ffe6f0; text-transform: capitalize;">Samsung
-                                Galaxy S24 FE vs. Galaxy A56</p>
-                            <p class="mb-2" style=" text-transform: capitalize;">Apple iPhone 13 vs. Apple iPhone 14</p>
-                            <p class="mb-2" style="background-color: #ffe6f0;text-transform: capitalize;">Samsung Galaxy
-                                S23 Ultra vs. Galaxy S24
-                                Ultra</p>
-                            <p class="mb-2" style=" text-transform: capitalize;">Samsung Galaxy S24 vs. Galaxy S24 FE
-                            </p>
-                            <p class="mb-2" style="background-color: #ffe6f0;text-transform: capitalize;">Xiaomi Redmi
-                                Note 14 Pro+ vs.
-                                Redmi 14 Pro </p>
-                            <p class="mb-2" style=" text-transform: capitalize;">Apple iPhone 16 Pro Max vs. iPhone 16
-                                Pro</p>
-                            <p class="mb-0" style="background-color: #ffe6f0;text-transform: capitalize;">Samsung Galaxy
-                                S24 vs. Galaxy S25</p>
-                        </div>
+                <div class="row">
+                    <div class="col-12">
+                        <p class="mb-2" style="background-color: #ffe6f0; color: #090E21; text-transform: capitalize;">
+                            Samsung
+                            Galaxy A55 vs.
+                            Galaxy A56</p>
+                        <p class="mb-2" style=" text-transform: capitalize;">Apple iPhone 16 Pro Max vs. Galaxy S25
+                            Ultra</p>
+                        <p class="mb-2" style="background-color: #ffe6f0; text-transform: capitalize; ">Samsung
+                            Galaxy S24 Ultra vs. Galaxy S25
+                            Ultra</p>
+                        <p class="mb-2" style=" text-transform: capitalize;">Samsung Galaxy A36 vs. Galaxy A56</p>
+                        <p class="mb-2" style="background-color: #ffe6f0; text-transform: capitalize;">Samsung
+                            Galaxy S24 FE vs. Galaxy A56</p>
+                        <p class="mb-2" style=" text-transform: capitalize;">Apple iPhone 13 vs. Apple iPhone 14</p>
+                        <p class="mb-2" style="background-color: #ffe6f0;text-transform: capitalize;">Samsung Galaxy
+                            S23 Ultra vs. Galaxy S24
+                            Ultra</p>
+                        <p class="mb-2" style=" text-transform: capitalize;">Samsung Galaxy S24 vs. Galaxy S24 FE
+                        </p>
+                        <p class="mb-2" style="background-color: #ffe6f0;text-transform: capitalize;">Xiaomi Redmi
+                            Note 14 Pro+ vs.
+                            Redmi 14 Pro </p>
+                        <p class="mb-2" style=" text-transform: capitalize;">Apple iPhone 16 Pro Max vs. iPhone 16
+                            Pro</p>
+                        <p class="mb-0" style="background-color: #ffe6f0;text-transform: capitalize;">Samsung Galaxy
+                            S24 vs. Galaxy S25</p>
                     </div>
                 </div>
-
-
             </div>
         </div>
+    </div>
     </div>
     <div class="container mt-0 war ">
         <div class="row">
