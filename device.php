@@ -1807,17 +1807,18 @@ if ($_POST && isset($_POST['submit_comment'])) {
             <!-- <img src="https://fdn.gsmarena.com/imgroot/static/banners/self/review-pixel-9-pro-xl-728x90.jpg" alt="" class="webkit"> -->
           </div>
         </div>
-
         <!-- Left Section -->
-        <div class="">
-          <div class="col-lg-4  col-12 sentizer-er  bg-white p-3" style="margin-top: 18px;">
-              <?php include 'includes/latest-devices.php'; ?>
-              <?php include 'includes/comparisons-devices.php'; ?>
-              <?php include 'includes/topviewed-devices.php'; ?>
-              <?php include 'includes/topreviewed-devices.php'; ?>
-              <?php include 'includes/instoresnow-devices.php'; ?>
-            </div>
+        <div class="col-lg-4 bg-white col-md-5 order-1 order-md-2">
+          <div class="mb-4">
+            <?php include 'includes/latest-devices.php'; ?>
+            <?php include 'includes/comparisons-devices.php'; ?>
+            <?php include 'includes/topviewed-devices.php'; ?>
+            <?php include 'includes/topreviewed-devices.php'; ?>
+            <?php include 'includes/instoresnow-devices.php'; ?>
+          </div>
+        </div>
       </div>
+    </div>
       <?php include 'includes/gsmfooter.php'; ?>
 
       <!-- Brands Modal -->
