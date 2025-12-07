@@ -1691,7 +1691,7 @@ if ($_POST && isset($_POST['submit_comment'])) {
     padding-right: -2px;">
     <div class="row">
       <div class="col-lg-8 col-md-7 order-2 order-md-1">
-        <div class="bg-white">
+        <div class="bg-white" style="margin-left: 10px;">
           <table class="table forat">
             <tbody>
               <?php if (!empty($deviceSpecs)): ?>
@@ -1716,8 +1716,8 @@ if ($_POST && isset($_POST['submit_comment'])) {
           </table>
 
           <p style="font-size: 13px;
-    text-transform: capitalize;
-    padding: 6px 19px;"> <strong>Disclaimer:</strong>We can not guarantee that the information on this page is 100%
+          text-transform: capitalize;
+          padding: 6px 19px;"> <strong>Disclaimer:</strong>We can not guarantee that the information on this page is 100%
             correct.</p>
 
           <div class="d-block d-lg-flex"> <button
