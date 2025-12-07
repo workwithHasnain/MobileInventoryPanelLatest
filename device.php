@@ -1545,6 +1545,14 @@ if ($_POST && isset($_POST['submit_comment'])) {
       font-size: 11px;
       color: #666;
     }
+    .row>* {
+      flex-shrink: 0;
+      width: 100%;
+      max-width: 100%;
+      padding-right: calc(var(--bs-gutter-x) * .0);
+      padding-left: calc(var(--bs-gutter-x) * .5);
+      margin-top: var(--bs-gutter-y);
+    }
   </style>
   <div class="container  d-lg-block d-none support content-wrapper" id="Top"
     style=" margin-top: 4rem; padding-left: 0;">
@@ -1692,8 +1700,6 @@ if ($_POST && isset($_POST['submit_comment'])) {
     <div class="row">
       <div class="col-lg-8 col-md-7 order-2 order-md-1">
         <div class="bg-white">
-
-
           <table class="table forat">
             <tbody>
               <?php if (!empty($deviceSpecs)): ?>
