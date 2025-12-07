@@ -704,9 +704,19 @@ function formatColors($phone)
     return '<span class="text-muted">Not specified</span>';
 }
 
+// ---- Text truncation helper ----
+$truncateText = function ($text, $maxLength = 60) {
+    if (strlen($text) > $maxLength) {
+        $truncated = substr($text, 0, $maxLength);
+        // Store full text in data attribute and show clickable ellipsis
+        return htmlspecialchars($truncated) . '<span class="expand-dots" data-full="' . str_replace('"', '&quot;', htmlspecialchars($text)) . '" style="cursor: pointer; color: #d50000;">...read more</span>';
+    }
+    return htmlspecialchars($text);
+};
+
 // ---- New JSON specs rendering (align with device.php) ----
 // Helper: render a section from JSON stored as TEXT in DB
-function renderJsonSection($jsonValue, $sectionName = '')
+function renderJsonSection($jsonValue, $sectionName = '', $truncateFunc = null)
 {
     if (!isset($jsonValue) || $jsonValue === '' || $jsonValue === null) return null;
     $decoded = json_decode($jsonValue, true);
@@ -722,7 +732,8 @@ function renderJsonSection($jsonValue, $sectionName = '')
         if ($field !== '') {
             $line = '<strong>' . htmlspecialchars($field) . '</strong>';
             if ($desc !== '') {
-                $line .= ' ' . htmlspecialchars($desc);
+                // Truncate description to 60 characters with expand functionality
+                $line .= ' ' . $truncateFunc($desc, 60);
 
                 // If this is the GENERAL INFO -> Price row, append EUR conversion like device.php
                 if ($sectionName === 'GENERAL INFO' && strtolower($field) === 'price') {
@@ -746,7 +757,7 @@ function renderJsonSection($jsonValue, $sectionName = '')
 }
 
 // Build specs array from grouped JSON columns
-function formatDeviceSpecsJson($device)
+function formatDeviceSpecsJson($device, $truncateFunc = null)
 {
     $specs = [];
     $jsonSections = [
@@ -766,7 +777,7 @@ function formatDeviceSpecsJson($device)
     ];
 
     foreach ($jsonSections as $label => $raw) {
-        $html = renderJsonSection($raw, $label);
+        $html = renderJsonSection($raw, $label, $truncateFunc);
         if ($html && trim($html) !== '') {
             $specs[$label] = $html;
         }
@@ -916,7 +927,7 @@ function formatDeviceSpecsJson($device)
                 <div class="compare-checkbox">
                     <label>
                         Compare
-                        <select id="phone1-select"   name="phone1" class="bg-white text-center-auto border phone-search-select" onchange="updateComparison(1, this.value)">
+                        <select id="phone1-select" name="phone1" class="bg-white text-center-auto border phone-search-select" onchange="updateComparison(1, this.value)">
                             <option value="">Select Phone 1</option>
                             <?php foreach ($phones as $phone): ?>
                                 <option value="<?php echo $phone['id']; ?>" data-image="<?php echo htmlspecialchars(getPhoneImage($phone)); ?>" data-name="<?php echo htmlspecialchars(getPhoneName($phone)); ?>" <?php echo ($phone1 && $phone1['id'] == $phone['id']) ? 'selected' : ''; ?>>
@@ -1031,185 +1042,186 @@ function formatDeviceSpecsJson($device)
                 </div>
             </div>
         </div>
- <div  class="comparison-wrapper">
-    <style>
-
-/* Wrapper that allows horizontal scroll */
-.comparison-wrapper {
-    width: 100%;
-    overflow-x: auto;
-    overflow-y: hidden;
-    -webkit-overflow-scrolling: touch;
-    border: 1px solid #e5e5e5;
-    border-radius: 10px;
-}
-
-/* Table full width but no wrap issues */
-.comparison-table {
-    width: 100%;
-    border-collapse: collapse;
-    min-width: 900px; /* enough for 3 phones */
-    table-layout: fixed;
-}
-
-.comparison-table th,
-.comparison-table td {
-    border: 1px solid #ddd;
-    padding: 12px;
-    vertical-align: top;
-    text-align: left;
-    word-wrap: break-word;
-    font-size: 15px;
-}
-
-/* Section headings */
-.comparison-table td[colspan="3"] {
-    background: #f7f7f7;
-    font-weight: 700;
-    color: #e63946;
-    font-size: 16px;
-    text-transform: uppercase;
-}
-
-/* Mobile: enable TRUE GSMArena style scroll */
-@media(max-width: 768px) {
-
-    .comparison-wrapper {
-        overflow-x: scroll;
-        white-space: nowrap;
-    }
-
-    .comparison-table {
-        min-width: 800px; /* Adjust for smooth scroll */
-    }
-
-    .comparison-table th,
-    .comparison-table td {
-        white-space: normal; /* readable text */
-        font-size: 14px;
-    }
-}
-
-    </style>
-        <table class="comparison-table">
-            <thead>
-                <tr>
-                    <th><?php echo $phone1 ? getPhoneName($phone1) : 'Select Phone 1'; ?></th>
-                    <th><?php echo $phone2 ? getPhoneName($phone2) : 'Select Phone 2'; ?></th>
-                    <th><?php echo $phone3 ? getPhoneName($phone3) : 'Select Phone 3'; ?></th>
-                </tr>
-            </thead>
-            <tbody>
-                <?php
-                // Build spec arrays from JSON for each phone (if phone selected)
-                $specs1 = $phone1 ? formatDeviceSpecsJson($phone1) : [];
-                $specs2 = $phone2 ? formatDeviceSpecsJson($phone2) : [];
-                $specs3 = $phone3 ? formatDeviceSpecsJson($phone3) : [];
-
-                // Ordered sections (match device page logical order)
-                $orderedSections = [
-                    'NETWORK',
-                    'LAUNCH',
-                    'BODY',
-                    'DISPLAY',
-                    'HARDWARE',
-                    'MEMORY',
-                    'MAIN CAMERA',
-                    'SELFIE CAMERA',
-                    'MULTIMEDIA',
-                    'CONNECTIVITY',
-                    'FEATURES',
-                    'BATTERY',
-                    'GENERAL INFO'
-                ];
-
-                // Fallback legacy mapping for key sections if JSON absent
-                $legacyFallback = function ($label, $phone) {
-                    if (!$phone) return 'N/A';
-                    switch ($label) {
-                        case 'NETWORK':
-                            return displayNetworkCapabilities($phone);
-                        case 'LAUNCH':
-                            // combine announcement + availability + price if present
-                            $parts = [];
-                            if (!empty($phone['release_date'])) {
-                                $parts[] = formatAnnouncementDate($phone);
-                            }
-                            if (!empty($phone['availability'])) {
-                                $parts[] = 'Status: ' . htmlspecialchars($phone['availability']);
-                            }
-                            // Prefer extracting price from general_info JSON if available
-                            $usdPrice = null;
-                            if (!empty($phone['general_info'])) {
-                                $usdPrice = extractPriceFromMisc($phone['general_info']);
-                            }
-                            if ($usdPrice === null && !empty($phone['price']) && is_numeric($phone['price'])) {
-                                $usdPrice = (float)$phone['price'];
-                            }
-                            if ($usdPrice !== null) {
-                                $priceLine = 'Price: $' . number_format($usdPrice, 2);
-                                $eur = convertUSDtoEUR($usdPrice);
-                                if ($eur !== null) {
-                                    $priceLine .= ' / €' . number_format($eur, 2);
-                                }
-                                $parts[] = $priceLine;
-                            }
-                            return !empty($parts) ? implode('<br>', $parts) : 'N/A';
-                        case 'BODY':
-                            $body = [];
-                            $dims = formatDimensions($phone);
-                            if ($dims && strpos($dims, 'Not specified') === false) $body[] = '<strong>Dimensions</strong> ' . $dims;
-                            if (!empty($phone['weight'])) $body[] = '<strong>Weight</strong> ' . htmlspecialchars($phone['weight']) . ' g';
-                            return !empty($body) ? implode('<br>', $body) : 'N/A';
-                        case 'DISPLAY':
-                            return formatDisplay($phone);
-                        case 'HARDWARE':
-                            $plat = [];
-                            if (!empty($phone['os'])) $plat[] = '<strong>OS</strong> ' . htmlspecialchars($phone['os']);
-                            if (!empty($phone['chipset_name'])) $plat[] = '<strong>System Chip</strong> ' . htmlspecialchars($phone['chipset_name']);
-                            return !empty($plat) ? implode('<br>', $plat) : 'N/A';
-                        case 'MEMORY':
-                            return formatMemory($phone);
-                        case 'MAIN CAMERA':
-                            return formatMainCamera($phone);
-                        case 'SELFIE CAMERA':
-                            return formatSelfieCamera($phone);
-                        case 'MULTIMEDIA':
-                            return formatSound($phone);
-                        case 'CONNECTIVITY':
-                            return formatCommunications($phone);
-                        case 'FEATURES':
-                            return formatFeatures($phone);
-                        case 'BATTERY':
-                            return formatBattery($phone);
-                        case 'GENERAL INFO':
-                            // Price & colors if available
-                            $miscParts = [];
-                            $colors = formatColors($phone);
-                            if ($colors && strpos($colors, 'Not specified') === false) $miscParts[] = '<strong>Colors</strong> ' . $colors;
-                            // Remove direct price display here to avoid duplication (now shown in LAUNCH)
-                            return !empty($miscParts) ? implode('<br>', $miscParts) : 'N/A';
-                        default:
-                            return 'N/A';
-                    }
-                };
-
-                foreach ($orderedSections as $section) {
-                    $val1 = isset($specs1[$section]) ? $specs1[$section] : $legacyFallback($section, $phone1);
-                    $val2 = isset($specs2[$section]) ? $specs2[$section] : $legacyFallback($section, $phone2);
-                    $val3 = isset($specs3[$section]) ? $specs3[$section] : $legacyFallback($section, $phone3);
-                    echo '<tr><td colspan="3" style="color:#f14d4d;font-size:16px;background:#f9f9f9;font-weight:600;">' . htmlspecialchars($section) . '</td></tr>';
-                    echo '<tr>';
-                    echo '<td>' . ($val1 !== '' ? $val1 : 'N/A') . '</td>';
-                    echo '<td>' . ($val2 !== '' ? $val2 : 'N/A') . '</td>';
-                    echo '<td>' . ($val3 !== '' ? $val3 : 'N/A') . '</td>';
-                    echo '</tr>';
+        <div class="comparison-wrapper">
+            <style>
+                /* Wrapper that allows horizontal scroll */
+                .comparison-wrapper {
+                    width: 100%;
+                    overflow-x: auto;
+                    overflow-y: hidden;
+                    -webkit-overflow-scrolling: touch;
+                    border: 1px solid #e5e5e5;
+                    border-radius: 10px;
                 }
-                ?>
-            </tbody>
-        </table>
 
- </div>
+                /* Table full width but no wrap issues */
+                .comparison-table {
+                    width: 100%;
+                    border-collapse: collapse;
+                    min-width: 900px;
+                    /* enough for 3 phones */
+                    table-layout: fixed;
+                }
+
+                .comparison-table th,
+                .comparison-table td {
+                    border: 1px solid #ddd;
+                    padding: 12px;
+                    vertical-align: top;
+                    text-align: left;
+                    word-wrap: break-word;
+                    font-size: 15px;
+                }
+
+                /* Section headings */
+                .comparison-table td[colspan="3"] {
+                    background: #f7f7f7;
+                    font-weight: 700;
+                    color: #e63946;
+                    font-size: 16px;
+                    text-transform: uppercase;
+                }
+
+                /* Mobile: enable TRUE GSMArena style scroll */
+                @media(max-width: 768px) {
+
+                    .comparison-wrapper {
+                        overflow-x: scroll;
+                        white-space: nowrap;
+                    }
+
+                    .comparison-table {
+                        min-width: 800px;
+                        /* Adjust for smooth scroll */
+                    }
+
+                    .comparison-table th,
+                    .comparison-table td {
+                        white-space: normal;
+                        /* readable text */
+                        font-size: 14px;
+                    }
+                }
+            </style>
+            <table class="comparison-table">
+                <thead>
+                    <tr>
+                        <th><?php echo $phone1 ? getPhoneName($phone1) : 'Select Phone 1'; ?></th>
+                        <th><?php echo $phone2 ? getPhoneName($phone2) : 'Select Phone 2'; ?></th>
+                        <th><?php echo $phone3 ? getPhoneName($phone3) : 'Select Phone 3'; ?></th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <?php
+                    // Build spec arrays from JSON for each phone (if phone selected)
+                    $specs1 = $phone1 ? formatDeviceSpecsJson($phone1, $truncateText) : [];
+                    $specs2 = $phone2 ? formatDeviceSpecsJson($phone2, $truncateText) : [];
+                    $specs3 = $phone3 ? formatDeviceSpecsJson($phone3, $truncateText) : [];
+
+                    // Ordered sections (match device page logical order)
+                    $orderedSections = [
+                        'NETWORK',
+                        'LAUNCH',
+                        'BODY',
+                        'DISPLAY',
+                        'HARDWARE',
+                        'MEMORY',
+                        'MAIN CAMERA',
+                        'SELFIE CAMERA',
+                        'MULTIMEDIA',
+                        'CONNECTIVITY',
+                        'FEATURES',
+                        'BATTERY',
+                        'GENERAL INFO'
+                    ];
+
+                    // Fallback legacy mapping for key sections if JSON absent
+                    $legacyFallback = function ($label, $phone) {
+                        if (!$phone) return 'N/A';
+                        switch ($label) {
+                            case 'NETWORK':
+                                return displayNetworkCapabilities($phone);
+                            case 'LAUNCH':
+                                // combine announcement + availability + price if present
+                                $parts = [];
+                                if (!empty($phone['release_date'])) {
+                                    $parts[] = formatAnnouncementDate($phone);
+                                }
+                                if (!empty($phone['availability'])) {
+                                    $parts[] = 'Status: ' . htmlspecialchars($phone['availability']);
+                                }
+                                // Prefer extracting price from general_info JSON if available
+                                $usdPrice = null;
+                                if (!empty($phone['general_info'])) {
+                                    $usdPrice = extractPriceFromMisc($phone['general_info']);
+                                }
+                                if ($usdPrice === null && !empty($phone['price']) && is_numeric($phone['price'])) {
+                                    $usdPrice = (float)$phone['price'];
+                                }
+                                if ($usdPrice !== null) {
+                                    $priceLine = 'Price: $' . number_format($usdPrice, 2);
+                                    $eur = convertUSDtoEUR($usdPrice);
+                                    if ($eur !== null) {
+                                        $priceLine .= ' / €' . number_format($eur, 2);
+                                    }
+                                    $parts[] = $priceLine;
+                                }
+                                return !empty($parts) ? implode('<br>', $parts) : 'N/A';
+                            case 'BODY':
+                                $body = [];
+                                $dims = formatDimensions($phone);
+                                if ($dims && strpos($dims, 'Not specified') === false) $body[] = '<strong>Dimensions</strong> ' . $dims;
+                                if (!empty($phone['weight'])) $body[] = '<strong>Weight</strong> ' . htmlspecialchars($phone['weight']) . ' g';
+                                return !empty($body) ? implode('<br>', $body) : 'N/A';
+                            case 'DISPLAY':
+                                return formatDisplay($phone);
+                            case 'HARDWARE':
+                                $plat = [];
+                                if (!empty($phone['os'])) $plat[] = '<strong>OS</strong> ' . htmlspecialchars($phone['os']);
+                                if (!empty($phone['chipset_name'])) $plat[] = '<strong>System Chip</strong> ' . htmlspecialchars($phone['chipset_name']);
+                                return !empty($plat) ? implode('<br>', $plat) : 'N/A';
+                            case 'MEMORY':
+                                return formatMemory($phone);
+                            case 'MAIN CAMERA':
+                                return formatMainCamera($phone);
+                            case 'SELFIE CAMERA':
+                                return formatSelfieCamera($phone);
+                            case 'MULTIMEDIA':
+                                return formatSound($phone);
+                            case 'CONNECTIVITY':
+                                return formatCommunications($phone);
+                            case 'FEATURES':
+                                return formatFeatures($phone);
+                            case 'BATTERY':
+                                return formatBattery($phone);
+                            case 'GENERAL INFO':
+                                // Price & colors if available
+                                $miscParts = [];
+                                $colors = formatColors($phone);
+                                if ($colors && strpos($colors, 'Not specified') === false) $miscParts[] = '<strong>Colors</strong> ' . $colors;
+                                // Remove direct price display here to avoid duplication (now shown in LAUNCH)
+                                return !empty($miscParts) ? implode('<br>', $miscParts) : 'N/A';
+                            default:
+                                return 'N/A';
+                        }
+                    };
+
+                    foreach ($orderedSections as $section) {
+                        $val1 = isset($specs1[$section]) ? $specs1[$section] : $legacyFallback($section, $phone1);
+                        $val2 = isset($specs2[$section]) ? $specs2[$section] : $legacyFallback($section, $phone2);
+                        $val3 = isset($specs3[$section]) ? $specs3[$section] : $legacyFallback($section, $phone3);
+                        echo '<tr><td colspan="3" style="color:#f14d4d;font-size:16px;background:#f9f9f9;font-weight:600;">' . htmlspecialchars($section) . '</td></tr>';
+                        echo '<tr>';
+                        echo '<td>' . ($val1 !== '' ? $val1 : 'N/A') . '</td>';
+                        echo '<td>' . ($val2 !== '' ? $val2 : 'N/A') . '</td>';
+                        echo '<td>' . ($val3 !== '' ? $val3 : 'N/A') . '</td>';
+                        echo '</tr>';
+                    }
+                    ?>
+                </tbody>
+            </table>
+
+        </div>
 
     </div>
     <?php include 'includes/gsmfooter.php'; ?>
@@ -1526,10 +1538,37 @@ function formatDeviceSpecsJson($device)
             align-items: center;
             gap: 8px;
         }
-        .select2-container{
+
+        .select2-container {
             width: min-content;
         }
     </style>
+    <script>
+        // Handle expandable text for truncated descriptions
+        document.addEventListener('click', function(e) {
+            if (e.target.classList.contains('expand-dots')) {
+                const fullText = e.target.getAttribute('data-full');
+                if (fullText) {
+                    // Decode HTML entities
+                    const temp = document.createElement('div');
+                    temp.innerHTML = fullText;
+                    const decodedText = temp.textContent || temp.innerText || '';
+
+                    // Get the text node that contains the truncated text (should be before the expand-dots span)
+                    const dotsSpan = e.target;
+                    const prevNode = dotsSpan.previousSibling;
+
+                    if (prevNode && prevNode.nodeType === Node.TEXT_NODE) {
+                        // Replace the text node with the full text
+                        prevNode.textContent = decodedText;
+                    }
+
+                    // Remove the expand-dots span
+                    dotsSpan.remove();
+                }
+            }
+        });
+    </script>
 </body>
 
 </html>
