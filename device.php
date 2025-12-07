@@ -1688,7 +1688,7 @@ if ($_POST && isset($_POST['submit_comment'])) {
 
   <div class="container my-2" style="
     padding-left: 0;
-    padding-right: 2px;">
+    padding-right: -2px;">
     <div class="row">
       <div class="col-lg-8 col-md-7 order-2 order-md-1">
         <div class="bg-white" style="margin-left: 10px;">
@@ -1805,13 +1805,14 @@ if ($_POST && isset($_POST['submit_comment'])) {
         </div>
       </div>
       <!-- Left Section -->
-      <div class="col-lg-4  col-12 sentizer-er  bg-white p-3" style="margin-top: 18px;">
-        
+      <div class="col-lg-4 bg-white col-md-5 order-1 order-md-2" style="padding-right: 0px;">
+        <div class="mb-4">
           <?php include 'includes/latest-devices.php'; ?>
           <?php include 'includes/comparisons-devices.php'; ?>
           <?php include 'includes/topviewed-devices.php'; ?>
           <?php include 'includes/topreviewed-devices.php'; ?>
           <?php include 'includes/instoresnow-devices.php'; ?>
+        </div>
       </div>
     </div>
   </div>
