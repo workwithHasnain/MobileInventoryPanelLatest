@@ -1,5 +1,5 @@
 <h4 class="section-heading ">In Stores Now</h4>
-<div class="d-none d-lg-flex" style="overflow: hidden; overflow-y: auto; max-height: 390px; width: 320px; flex-wrap: wrap;">
+<div class="d-none d-lg-flex" style="overflow: hidden; overflow-y: auto; max-height: 390px; width: 320px; flex-wrap: wrap; justify-content: space-evenly; align-content: flex-start;">
     <?php if (empty($devices)): ?>
         <div class="text-center py-5">
             <i class="fas fa-mobile-alt fa-3x text-muted mb-3"></i>
