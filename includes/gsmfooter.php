@@ -1,5 +1,5 @@
 <div style="background-color: #151a2dba;">
-    <div id="bottom" class="container py-3 bottom" style="max-width: 1034px;">
+    <div id="bottom" class="container py-3 bottom">
         <div class="row">
             <div class="col-12">
                 <div id="newsletter_message_container"></div>
