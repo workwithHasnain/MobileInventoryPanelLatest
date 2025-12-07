@@ -8,9 +8,9 @@
         </div>
     <?php else: $chunks = array_chunk($devices, 3); ?>
         <?php foreach ($chunks as $row): ?>
-            <div style="display: flex; justify-content: flex-start; width: 100%;">
+            <div style="display: flex; justify-content: flex-start; width: 100%; gap: 0;">
                 <?php foreach ($row as $i => $device): ?>
-                    <a href="#" data-device-id="<?php echo $device['id']; ?>" class="module-phones-link" style="float: none;" onclick="goToDevice(<?php echo $device['id']; ?>); return false;">
+                    <a href="#" data-device-id="<?php echo $device['id']; ?>" class="module-phones-link" style="float: none; flex: 1; margin: 0;" onclick="goToDevice(<?php echo $device['id']; ?>); return false;">
                         <?php if (isset($device['image']) && !empty($device['image'])): ?>
                             <img src="<?php echo htmlspecialchars($device['image']); ?>" alt="">
                         <?php else: ?>
