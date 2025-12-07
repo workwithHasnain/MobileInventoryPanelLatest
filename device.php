@@ -1396,7 +1396,7 @@ if ($_POST && isset($_POST['submit_comment'])) {
       </div>
 
       <!-- BOTTOM SECTION -->
-      <div class="bottom-section">
+      <!-- <div class="bottom-section">
 
         <button class="review-btn">
           READ OUR REVIEW
@@ -1404,27 +1404,25 @@ if ($_POST && isset($_POST['submit_comment'])) {
 
         <div style="display: flex; gap: 22px;">
 
-          <!-- Popularity -->
           <div class="stat-box">
             <img src="/imges/stat-down.png" alt="">
             <p>
-              <?php echo htmlspecialchars($device['popularity'] ?? '0'); ?>%<br>
-              <small><?php echo number_format($device['hits'] ?? 0); ?> hits</small>
+              0%<br>
+              <small>0 hits</small>
             </p>
           </div>
 
-          <!-- Fans -->
           <div class="stat-box">
             <img src="/imges/heart.png" alt="">
             <p>
-              <?php echo htmlspecialchars($device['fans'] ?? '0'); ?><br>
+              0<br>
               <small>Become a fan</small>
             </p>
           </div>
 
         </div>
 
-      </div>
+      </div> -->
 
     </div>
 
