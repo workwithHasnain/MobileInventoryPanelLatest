@@ -309,7 +309,7 @@ function formatDeviceSpecs($device)
     if (strlen($text) > $maxLength) {
       $truncated = substr($text, 0, $maxLength);
       // Store full text in data attribute and show clickable ellipsis
-      return htmlspecialchars($truncated) . '<span class="expand-dots" data-full="' . str_replace('"', '&quot;', htmlspecialchars($text)) . '" style="cursor: pointer; color: #d50000;">...read more</span>';
+      return htmlspecialchars($truncated) . '<span class="expand-dots" data-full="' . str_replace('"', '&quot;', htmlspecialchars($text)) . '" style="cursor: pointer; color: #d50000; font-weight: bold;">  ...</span>';
     }
     return htmlspecialchars($text);
   };
