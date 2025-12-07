@@ -1251,8 +1251,8 @@ cubic-bezier(0.26, 0.695, 0.375, 0.965);
     margin: 0 5px 0 0;
     position: relative;
     margin: 0 auto;
-    width: 105px;
-    aspect-ratio: 160 / 212;
+    width: 75px;
+    /* aspect-ratio: 160 / 212; */
 }
 
 .swiper-slide img {
