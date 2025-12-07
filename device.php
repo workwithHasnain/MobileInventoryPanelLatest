@@ -1549,7 +1549,7 @@ if ($_POST && isset($_POST['submit_comment'])) {
       flex-shrink: 0;
       width: 100%;
       max-width: 100%;
-      padding-right: calc(var(--bs-gutter-x) * .0);
+      padding-right: 0;
       padding-left: calc(var(--bs-gutter-x) * .5);
       margin-top: var(--bs-gutter-y);
     }
