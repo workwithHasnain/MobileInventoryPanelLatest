@@ -1805,7 +1805,7 @@ if ($_POST && isset($_POST['submit_comment'])) {
         </div>
       </div>
       <!-- Left Section -->
-      <div class="col-lg-4 bg-white col-md-5 order-1 order-md-2">
+      <div class="col-lg-4 bg-white col-md-5 order-1 order-md-2" style="padding-right: 0px;">
         <div class="mb-4">
           <?php include 'includes/latest-devices.php'; ?>
           <?php include 'includes/comparisons-devices.php'; ?>
