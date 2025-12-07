@@ -1,5 +1,5 @@
 <h4 class="section-heading ">In Stores Now</h4>
-<div class="d-none d-lg-flex" style="overflow: hidden; overflow-y: auto; max-height: 390px; width: 320px; flex-wrap: wrap; justify-content: center; align-content: flex-start;">
+<div class="d-none d-lg-flex" style="overflow: hidden; overflow-y: auto; max-height: 390px; width: 320px; flex-wrap: wrap; flex-direction: column;">
     <?php if (empty($devices)): ?>
         <div class="text-center py-5">
             <i class="fas fa-mobile-alt fa-3x text-muted mb-3"></i>
@@ -8,6 +8,7 @@
         </div>
     <?php else: $chunks = array_chunk($devices, 3); ?>
         <?php foreach ($chunks as $row): ?>
+            <div style="display: flex; justify-content: center; width: 100%;">
             <?php foreach ($row as $i => $device): ?>
                 <a href="#" data-device-id="<?php echo $device['id']; ?>" class="module-phones-link" onclick="goToDevice(<?php echo $device['id']; ?>); return false;">
                     <?php if (isset($device['image']) && !empty($device['image'])): ?>
@@ -19,6 +20,7 @@
                     <?php echo htmlspecialchars($device['name'] ?? ''); ?>
                 </a>
             <?php endforeach; ?>
+            </div>
         <?php endforeach; ?>
     <?php endif; ?>
 </div>
