@@ -352,6 +352,7 @@ $brands = $brands_stmt->fetchAll();
                 <?php include 'includes/instoresnow-devices.php'; ?>
             </div>
         </div>
+    </div>
         <?php include 'includes/gsmfooter.php'; ?>
         <!-- Brands Modal -->
         <div class="modal fade" id="brandsModal" tabindex="-1" aria-labelledby="brandsModalLabel" aria-hidden="true">
