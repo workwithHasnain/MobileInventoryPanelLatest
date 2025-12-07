@@ -267,14 +267,12 @@ $latestDevices = array_slice(array_reverse($latestDevices), 0, 9);
                             <span class="text-white">No tags available</span>
                         <?php endif; ?>
                     </div>
-
                     <form method="get" action="featured.php" class="comon">
                         <label for="hero-search" class="text-white whitening ">Search For</label>
                         <input id="hero-search" name="q" type="text" class="bg-white" placeholder="Search posts..." value="<?php echo htmlspecialchars($q ?? ''); ?>">
                         <button type="submit" class="mobiles-button bg-grey">Search</button>
                     </form>
                 </div>
-
             </div>
 
             <div class="col-md-4 col-5 d-none d-lg-block" style="position: relative; left: 12px;">

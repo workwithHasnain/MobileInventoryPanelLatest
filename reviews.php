@@ -246,10 +246,10 @@ $brands = $brands_stmt->fetchAll();
     <?php include 'includes/gsmheader.php'; ?>
     <div class="container support content-wrapper" id="Top">
         <div class="row">
-
-            <div class="col-md-8 col-5  d-md-inline col-12 ">
-                <div class="comfort-life-zone d-none d-lg-block position-absolute">
-                    <img src="imges/Screenshot (160).png" alt="">
+            <div class="col-md-8 col-5  d-lg-inline d-none col-12 ">
+                <div class="comfort-life position-absolute">
+                    <img class="w-100 h-100" src="imges/Screenshot (160).png"
+                        style="background-repeat: no-repeat; background-size: cover;" alt="">
                     <div class="position-absolute d-flex mt-1">
                         <label class="text-white whitening ">Popular Tags</label>
                         <?php if (!empty($popularTags)): ?>
@@ -260,14 +260,12 @@ $brands = $brands_stmt->fetchAll();
                             <span class="text-white">No tags available</span>
                         <?php endif; ?>
                     </div>
-
                     <form method="get" action="reviews.php" class="comon">
                         <label for="hero-search-reviews" class="text-white whitening ">Search For</label>
                         <input id="hero-search-reviews" name="q" type="text" class="bg-white" placeholder="Search posts..." value="<?php echo htmlspecialchars($q ?? ''); ?>">
                         <button type="submit" class="mobiles-button bg-grey">Search</button>
                     </form>
                 </div>
-
             </div>
             <div class="col-md-4 col-5 d-none d-lg-block" style="position: relative; left: 12px;">
                 <button class="solid w-100 py-2">
