@@ -455,7 +455,7 @@ if ($_POST && isset($_POST['action'])) {
 
         .comfort-life-23 .center-img {
             width: 100% !important;
-            height: auto !important;
+            /* height: auto !important; */
             display: block !important;
             max-width: 100% !important;
         }
