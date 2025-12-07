@@ -8,18 +8,18 @@
         </div>
     <?php else: $chunks = array_chunk($devices, 3); ?>
         <?php foreach ($chunks as $row): ?>
-            <div style="display: flex; justify-content: center; width: 100%;">
-            <?php foreach ($row as $i => $device): ?>
-                <a href="#" data-device-id="<?php echo $device['id']; ?>" class="module-phones-link" onclick="goToDevice(<?php echo $device['id']; ?>); return false;">
-                    <?php if (isset($device['image']) && !empty($device['image'])): ?>
-                        <img src="<?php echo htmlspecialchars($device['image']); ?>" alt="">
-                    <?php else: ?>
-                        <img src="" alt="">
-                    <?php endif; ?>
-                    <br>
-                    <?php echo htmlspecialchars($device['name'] ?? ''); ?>
-                </a>
-            <?php endforeach; ?>
+            <div style="display: flex; justify-content: flex-start; width: 100%;">
+                <?php foreach ($row as $i => $device): ?>
+                    <a href="#" data-device-id="<?php echo $device['id']; ?>" class="module-phones-link" style="float: none;" onclick="goToDevice(<?php echo $device['id']; ?>); return false;">
+                        <?php if (isset($device['image']) && !empty($device['image'])): ?>
+                            <img src="<?php echo htmlspecialchars($device['image']); ?>" alt="">
+                        <?php else: ?>
+                            <img src="" alt="">
+                        <?php endif; ?>
+                        <br>
+                        <?php echo htmlspecialchars($device['name'] ?? ''); ?>
+                    </a>
+                <?php endforeach; ?>
             </div>
         <?php endforeach; ?>
     <?php endif; ?>
