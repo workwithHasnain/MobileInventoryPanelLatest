@@ -436,58 +436,70 @@
             </div>
             <div class="col-lg-4  col-12  bg-white " style="margin-top: 18px;"> 
                 <h4 class="section-heading ">In stores now</h4>
-                <div class="d-none d-lg-flex" style="overflow: hidden;
-    overflow-y: auto;
-    max-height: 390px;
-    width: 320px;
-    flex-wrap: wrap;"><a href="#" class="module-phones-link"><img
-                            src="https://fdn2.gsmarena.com/vv/bigpic/oneplus-ace-6t.jpg"><br>OnePlus Ace 6T</a><a
-                        href="" class="module-phones-link"><img
-                            src="https://fdn2.gsmarena.com/vv/bigpic/xiaomi-poco-f8-ultra-.jpg"><br>Xiaomi Poco F8
-                        Ultra</a><a href="" class="module-phones-link"><img
-                            src="https://fdn2.gsmarena.com/vv/bigpic/xiaomi-poco-f8-pro.jpg"><br>Xiaomi Poco F8
-                        Pro</a><a href="vivo_x300_pro_5g-14225.php" class="module-phones-link"><img
-                            src="https://fdn2.gsmarena.com/vv/bigpic/vivo-x300-pro.jpg"><br>vivo X300 Pro</a><a
-                        href="oukitel_wp60_5g-14335.php" class="module-phones-link"><img
-                            src="https://fdn2.gsmarena.com/vv/bigpic/oukitel-wp60.jpg"><br>Oukitel WP60</a><a
-                        href="vivo_x300_5g-14224.php" class="module-phones-link"><img
-                            src="https://fdn2.gsmarena.com/vv/bigpic/vivo-x300.jpg"><br>vivo X300</a><a
-                        href="vivo_iqoo_15_5g-14198.php" class="module-phones-link"><img
-                            src="https://fdn2.gsmarena.com/vv/bigpic/vivo-iqoo-15.jpg"><br>vivo iQOO 15</a><a
-                        href="oneplus_15_5g-14206.php" class="module-phones-link"><img
-                            src="https://fdn2.gsmarena.com/vv/bigpic/oneplus-15.jpg"><br>OnePlus 15</a><a
-                        href="zte_nubia_redmagic_11_pro_5g_int-14277.php" class="module-phones-link"><img
-                            src="https://fdn2.gsmarena.com/vv/bigpic/zte-nubia-red-magic-11-pro-plus.jpg"><br>ZTE nubia
-                        RedMagic 11 Pro</a>
-                    </div>
+                <div class="d-none d-lg-flex" style="overflow: hidden;overflow-y: auto;max-height: 390px;width: 320px;flex-wrap: wrap;">
+                    <a href="#" class="module-phones-link">
+                        <img
+                            src="https://fdn2.gsmarena.com/vv/bigpic/oneplus-ace-6t.jpg">
+                            <br>
+                            OnePlus Ace 6T
+                    </a>
+                </div>
             <div id="instores-container"
                 class=" d-block d-lg-none swiper-container material-card swiper-container-horizontal">
                 <div class="scroller-phones swiper-wrapper">
                     <div class="swiper-slide swiper-slide-active">
-                        <div class="swiper-half-slide"><a href=""><span><img
-                                        src="https://fdn2.gsmarena.com/vv/bigpic/oneplus-ace-6t.jpg"
-                                        alt="OnePlus Ace 6T 5G"></span><strong>OnePlus Ace 6T 5G</strong></a></div>
-                        <div class="swiper-half-slide"><a href=""><span><img
-                                        src="https://fdn2.gsmarena.com/vv/bigpic/xiaomi-poco-f8-ultra-.jpg"
-                                        alt="Xiaomi Poco F8 Ultra 5G"></span><strong>Xiaomi Poco F8 Ultra
-                                    5G</strong></a></div>
+                        <div class="swiper-half-slide">
+                            <a href="">
+                                <span>
+                                    <img src="https://fdn2.gsmarena.com/vv/bigpic/oneplus-ace-6t.jpg" alt="OnePlus Ace 6T 5G">
+                                </span>
+                                <strong>OnePlus Ace 6T 5G</strong>
+                            </a>
+                        </div>
+                        <div class="swiper-half-slide">
+                            <a href="">
+                                <span>
+                                    <img src="https://fdn2.gsmarena.com/vv/bigpic/xiaomi-poco-f8-ultra-.jpg" alt="Xiaomi Poco F8 Ultra 5G">
+                                </span>
+                                <strong>Xiaomi Poco F8 Ultra 5G</strong>
+                            </a>
+                        </div>
                     </div>
                     <div class="swiper-slide swiper-slide-next">
-                        <div class="swiper-half-slide"><a href="xiaomi_poco_f8_pro_5g-14303.php"><span><img
-                                        src="https://fdn2.gsmarena.com/vv/bigpic/xiaomi-poco-f8-pro.jpg"
-                                        alt="Xiaomi Poco F8 Pro 5G"></span><strong>Xiaomi Poco F8 Pro 5G</strong></a>
+                        <div class="swiper-half-slide">
+                            <a href="">
+                                <span>
+                                    <img src="https://fdn2.gsmarena.com/vv/bigpic/oneplus-ace-6t.jpg" alt="OnePlus Ace 6T 5G">
+                                </span>
+                                <strong>OnePlus Ace 6T 5G</strong>
+                            </a>
                         </div>
-                        <div class="swiper-half-slide"><a href="vivo_x300_pro_5g-14225.php"><span><img
-                                        src="https://fdn2.gsmarena.com/vv/bigpic/vivo-x300-pro.jpg"
-                                        alt="vivo X300 Pro 5G"></span><strong>vivo X300 Pro 5G</strong></a></div>
+                        <div class="swiper-half-slide">
+                            <a href="">
+                                <span>
+                                    <img src="https://fdn2.gsmarena.com/vv/bigpic/xiaomi-poco-f8-ultra-.jpg" alt="Xiaomi Poco F8 Ultra 5G">
+                                </span>
+                                <strong>Xiaomi Poco F8 Ultra 5G</strong>
+                            </a>
+                        </div>
                     </div>
                     <div class="swiper-slide">
-                        <div class="swiper-half-slide"><a href="oukitel_wp60_5g-14335.php"><span><img
-                                        src="https://fdn2.gsmarena.com/vv/bigpic/oukitel-wp60.jpg"
-                                        alt="Oukitel WP60 5G"></span><strong>Oukitel WP60 5G</strong></a></div>
-                        <div class="swiper-half-slide"><a href="vivo_x300_5g-14224.php"><span><img
-                                        src="https://fdn2.gsmarena.com/vv/bigpic/vivo-x300.jpg"
-                                        alt="vivo X300 5G"></span><strong>vivo X300 5G</strong></a></div>
+                        <div class="swiper-half-slide">
+                            <a href="">
+                                <span>
+                                    <img src="https://fdn2.gsmarena.com/vv/bigpic/oneplus-ace-6t.jpg" alt="OnePlus Ace 6T 5G">
+                                </span>
+                                <strong>OnePlus Ace 6T 5G</strong>
+                            </a>
+                        </div>
+                        <div class="swiper-half-slide">
+                            <a href="">
+                                <span>
+                                    <img src="https://fdn2.gsmarena.com/vv/bigpic/xiaomi-poco-f8-ultra-.jpg" alt="Xiaomi Poco F8 Ultra 5G">
+                                </span>
+                                <strong>Xiaomi Poco F8 Ultra 5G</strong>
+                            </a>
+                        </div>
                     </div>
                 </div>
                 <div class="swiper-scrollbar" style="opacity: 0;">

@@ -869,126 +869,7 @@ function formatDeviceSpecsJson($device)
 
 <body style="background-color: #EFEBE9;">
     <!-- Desktop Navbar of Gsmarecn -->
-    <div class="main-wrapper">
-        <!-- Top Navbar -->
-        <nav class="navbar navbar-dark  d-lg-inline d-none" id="navbar">
-            <div class="container const d-flex align-items-center justify-content-between">
-                <button class="navbar-toggler mb-2" type="button" onclick="toggleMenu()">
-                    <img style="height: 40px;"
-                        src="https://cdn.prod.website-files.com/67f21c9d62aa4c4c685a7277/684091b39228b431a556d811_download-removebg-preview.png"
-                        alt="">
-                </button>
-
-                <a class="navbar-brand d-flex align-items-center" href="#">
-                    <img src="imges/download.png" alt="GSMArena Logo" />
-                </a>
-
-                <div class="controvecy mb-2">
-                    <div class="icon-container">
-                        <button type="button" class="btn border-right" data-bs-toggle="tooltip" data-bs-placement="left"
-                            title="YouTube">
-                            <img src="iccons/youtube-color-svgrepo-com.svg" alt="YouTube" width="30px">
-                        </button>
-
-                        <button type="button" class="btn" data-bs-toggle="tooltip" data-bs-placement="left"
-                            title="Instagram">
-                            <img src="iccons/instagram-color-svgrepo-com.svg" alt="Instagram" width="22px">
-                        </button>
-
-
-
-
-
-
-                    </div>
-                </div>
-
-                <form action="" class="central d-flex align-items-center">
-                    <input type="text" class="no-focus-border" placeholder="Search">
-                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" height="24" width="24" class="ms-2">
-                        <path fill="#ffffff"
-                            d="M416 208c0 45.9-14.9 88.3-40 122.7L502.6 457.4c12.5 12.5 12.5 32.8 0 45.3s-32.8 12.5-45.3 0L330.7 376c-34.4 25.2-76.8 40-122.7 40C93.1 416 0 322.9 0 208S93.1 0 208 0S416 93.1 416 208zM208 352a144 144 0 1 0 0-288 144 144 0 1 0 0 288z" />
-                    </svg>
-                </form>
-
-
-            </div>
-        </nav>
-
-    </div>
-    <!-- Mobile Navbar of Gsmarecn -->
-    <nav id="navbar" class="mobile-navbar d-lg-none d-flex justify-content-between  align-items-center">
-
-        <button class="navbar-toggler text-white" type="button" data-bs-toggle="collapse" data-bs-target="#mobileMenu"
-            aria-controls="mobileMenu" aria-expanded="false" aria-label="Toggle navigation">
-            <img style="height: 40px;"
-                src="https://cdn.prod.website-files.com/67f21c9d62aa4c4c685a7277/684091b39228b431a556d811_download-removebg-preview.png"
-                alt="">
-        </button>
-        <a class="navbar-brand d-flex align-items-center" href="#">
-            <a class="logo text-white " href="#">GSMArena</a>
-        </a>
-        <div class="d-flex justify-content-end">
-            <button type="button" class="btn float-end ml-5" data-bs-toggle="tooltip" data-bs-placement="left">
-                <i class="fa-solid fa-right-to-bracket fa-lg" style="color: #ffffff;"></i>
-            </button>
-            <button type="button" class="btn float-end " data-bs-toggle="tooltip" data-bs-placement="left">
-                <i class="fa-solid fa-user-plus fa-lg" style="color: #ffffff;"></i>
-            </button>
-        </div>
-    </nav>
-    <!-- Mobile Collapse of Gsmarecn -->
-    <div class="collapse mobile-menu d-lg-none" id="mobileMenu">
-        <div class="menu-icons">
-            <i class="fas fa-home"></i>
-            <i class="fab fa-facebook-f"></i>
-            <i class="fab fa-instagram"></i>
-            <i class="fab fa-tiktok"></i>
-            <i class="fas fa-share-alt"></i>
-        </div>
-        <div class="column">
-            <a href="index.php">Home</a>
-            <a href="reviews.php">Reviews</a>
-            <a href="#">Videos</a>
-            <a href="featured.php">Featured</a>
-            <a href="phonefinder.php">Phone Finder</a>
-            <a href="compare.php">Compare</a>
-            <a href="#">Contact Us</a>
-        </div>
-        <div class="brand-grid">
-            <?php
-            $brandChunks = array_chunk($brands, 1); // Create chunks of 1 brand per row
-            foreach ($brandChunks as $brandRow):
-                foreach ($brandRow as $brand): ?>
-                    <a href="#" class="brand-cell" data-brand-id="<?php echo $brand['id']; ?>"><?php echo htmlspecialchars($brand['name']); ?></a>
-            <?php endforeach;
-            endforeach; ?>
-            <a href="#" onclick="showBrandsModal(); return false;" style="cursor: pointer;">[...]</a>
-        </div>
-        <div class="menu-buttons d-flex justify-content-center ">
-            <button class="btn btn-danger w-50">📱 Phone Finder</button>
-            <button class="btn btn-primary w-50">📲 My Phone</button>
-        </div>
-    </div>
-    <!-- Display Menu of Gsmarecn -->
-    <div id="leftMenu" class="container show">
-        <div class="row">
-            <div class="col-12 d-flex align-items-center   colums-gap">
-                <a href="index.php" class="nav-link navbar-bold">Home</a>
-                <a href="compare.php" class="nav-link navbar-bold">Compare</a>
-                <a href="#" class="nav-link navbar-bold">Videos</a>
-                <a href="reviews.php" class="nav-link navbar-bold">Reviews</a>
-                <a href="featured.php" class="nav-link d-lg-block d-none navbar-bold">Featured</a>
-                <a href="phonefinder.php" class="nav-link d-lg-block d-none navbar-bold">Phone Finder</a>
-                <a href="#" class="nav-link d-lg-block d-none navbar-bold">Contact</a>
-                <div style="background-color: #d50000; border-radius: 7px;" class="d-lg-none py-2"><svg
-                        xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" height="16" width="16" class="mx-3">
-                        <path fill="#ffffff"
-                            d="M416 208c0 45.9-14.9 88.3-40 122.7L502.6 457.4c12.5 12.5 12.5 32.8 0 45.3s-32.8 12.5-45.3 0L330.7 376c-34.4 25.2-76.8 40-122.7 40C93.1 416 0 322.9 0 208S93.1 0 208 0S416 93.1 416 208zM208 352a144 144 0 1 0 0-288 144 144 0 1 0 0 288z" />
-                    </svg></div>
-            </div>
-        </div>
-    </div>
+    <?php include 'includes/gsmheader.php'; ?>
     <div class="container support content-wrapper" id="Top">
         <div class="row">
             <div class="col-md-8 col-5  d-lg-inline d-none ">
@@ -1035,7 +916,7 @@ function formatDeviceSpecsJson($device)
                 <div class="compare-checkbox">
                     <label>
                         Compare
-                        <select id="phone1-select"   name="phone1" class="bg-white mx-2 text-center-auto border phone-search-select" onchange="updateComparison(1, this.value)">
+                        <select id="phone1-select"   name="phone1" class="bg-white text-center-auto border phone-search-select" onchange="updateComparison(1, this.value)">
                             <option value="">Select Phone 1</option>
                             <?php foreach ($phones as $phone): ?>
                                 <option value="<?php echo $phone['id']; ?>" data-image="<?php echo htmlspecialchars(getPhoneImage($phone)); ?>" data-name="<?php echo htmlspecialchars(getPhoneName($phone)); ?>" <?php echo ($phone1 && $phone1['id'] == $phone['id']) ? 'selected' : ''; ?>>
@@ -1073,7 +954,7 @@ function formatDeviceSpecsJson($device)
                 <div class="compare-checkbox">
                     <label>
                         Compare
-                        <select id="phone2-select" name="phone2" class="bg-white w-100 mx-2 text-center-auto border phone-search-select" onchange="updateComparison(2, this.value)">
+                        <select id="phone2-select" name="phone2" class="bg-white text-center-auto border phone-search-select" onchange="updateComparison(2, this.value)">
                             <option value="">Select Phone 2</option>
                             <?php foreach ($phones as $phone): ?>
                                 <option value="<?php echo $phone['id']; ?>" data-image="<?php echo htmlspecialchars(getPhoneImage($phone)); ?>" data-name="<?php echo htmlspecialchars(getPhoneName($phone)); ?>" <?php echo ($phone2 && $phone2['id'] == $phone['id']) ? 'selected' : ''; ?>>
@@ -1113,7 +994,7 @@ function formatDeviceSpecsJson($device)
                 <div class="compare-checkbox">
                     <label>
                         Compare
-                        <select id="phone3-select" name="phone3" class="bg-white w-100 mx-2 text-center-auto border phone-search-select" onchange="updateComparison(3, this.value)">
+                        <select id="phone3-select" name="phone3" class="bg-white text-center-auto border phone-search-select" onchange="updateComparison(3, this.value)">
                             <option value="">Select Phone 3</option>
                             <?php foreach ($phones as $phone): ?>
                                 <option value="<?php echo $phone['id']; ?>" data-image="<?php echo htmlspecialchars(getPhoneImage($phone)); ?>" data-name="<?php echo htmlspecialchars(getPhoneName($phone)); ?>" <?php echo ($phone3 && $phone3['id'] == $phone['id']) ? 'selected' : ''; ?>>
@@ -1331,48 +1212,7 @@ function formatDeviceSpecsJson($device)
  </div>
 
     </div>
-    <!-- Newsletter Section -->
-    <div class="container mt-4 mb-4" style="max-width: 1034px;">
-        <div class="row">
-            <div class="col-12">
-                <div id="newsletter_message_container"></div>
-                <form id="newsletter_form" method="POST" action="" style="background-color: #EFEBE9; padding: 20px; border-radius: 4px; text-align: center;">
-                    <p style="margin-bottom: 12px; color: #5D4037; font-weight: 500;">Subscribe to our newsletter</p>
-                    <div style="display: flex; gap: 8px; justify-content: center; flex-wrap: wrap;">
-                        <input type="email" id="newsletter_email" name="newsletter_email" placeholder="Enter your email" required style="padding: 10px 12px; border: 1px solid #8D6E63; border-radius: 4px; font-size: 14px; flex: 1; min-width: 200px; max-width: 300px; background-color: white;">
-                        <style>
-                            input::placeholder {
-                                color: #8D6E63;
-                                opacity: 0.7;
-                            }
-                        </style>
-                        <button type="submit" id="newsletter_btn" style="padding: 10px 24px; background-color: #D50000; color: white; border: none; border-radius: 4px; cursor: pointer; font-size: 14px; white-space: nowrap; font-weight: 500;">Subscribe</button>
-                    </div>
-                </form>
-            </div>
-        </div>
-    </div>
-    <div id="bottom" class="container d-flex mt-3" style="max-width: 1034px;">
-        <div class="row align-items-center">
-            <div class="col-md-2 m-auto col-4 d-flex justify-content-center align-items-center "> <img
-                    src="https://fdn2.gsmarena.com/w/css/logo-gsmarena-com.png" alt="">
-            </div>
-            <div class="col-10 nav-wrap m-auto text-center ">
-                <div class="nav-container">
-                    <a href="#">Home</a>
-                    <a href="reviews.php">Reviews</a>
-                    <a href="compare.php">Compare</a>
-                    <a href="#"> <i class="fa-solid fa-wifi fa-sm"></i> RSS</a>
-                    <a href="#"> <i class="fa-brands fa-youtube fa-sm"></i> YouTube</a>
-                    <a href="#"> <i class="fa-brands fa-instagram fa-sm"></i> Instagram</a>
-                    <a href="#"> <i class="fa-brands fa-tiktok fa-sm"></i>TikTok</a>
-                    <a href="#"> <i class="fa-brands fa-facebook-f fa-sm"></i> Facebook</a>
-                    <a href="#"> <i class="fa-brands fa-twitter fa-sm"></i>Twitter</a>
-                    <a href="#">© 2000-2025 GSMArena.com</a>
-                </div>
-            </div>
-        </div>
-    </div>
+    <?php include 'includes/gsmfooter.php'; ?>
     <!-- Brands Modal -->
     <div class="modal fade" id="brandsModal" tabindex="-1" aria-labelledby="brandsModalLabel" aria-hidden="true">
         <div class="modal-dialog modal-lg modal-dialog-centered modal-dialog-scrollable">

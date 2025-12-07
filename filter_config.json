@@ -93,7 +93,8 @@
     "colors": [
         "Black",
         "White",
-        "Silverr",
+        "Silver",
+        "New Silver",
         "Red",
         "Gold",
         "Red",
@@ -118,6 +119,7 @@
         "Glass",
         "Plastic",
         "Metal",
+        "Petal",
         "Ceramic",
         "Leather"
     ],
