@@ -335,7 +335,7 @@ if ($_POST && isset($_POST['action'])) {
                                 <img class="review-list-item-image" src="<?php echo htmlspecialchars($post['featured_image']); ?>" alt="<?php echo htmlspecialchars($post['title']); ?>" style="cursor:pointer;" onclick="window.location.href='post.php?slug=<?php echo urlencode($post['slug']); ?>'">
                             <?php endif; ?>
                            <div class="card-text">
-                            <h1 style="cursor:pointer;" onclick="window.location.href='post.php?slug=<?php echo urlencode($post['slug']); ?>'"><?php echo htmlspecialchars($post['title']); ?></h1>
+                            <h1 style="cursor:pointer; overflow-wrap: break-word;" onclick="window.location.href='post.php?slug=<?php echo urlencode($post['slug']); ?>'"><?php echo htmlspecialchars($post['title']); ?></h1>
                         </div>
 
                             </div>
