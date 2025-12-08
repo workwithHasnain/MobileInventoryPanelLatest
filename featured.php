@@ -257,7 +257,7 @@ $latestDevices = array_slice(array_reverse($latestDevices), 0, 9);
                 <div class="comfort-life position-absolute">
                     <img class="w-100 h-100" src="imges/Screenshot (163).png"
                         style="background-repeat: no-repeat; background-size: cover;" alt="">
-                    <div class="position-absolute d-flex mt-1">
+                    <div class="position-absolute d-flex mt-1" style="top: 0; flex-wrap: wrap; gap: 8px;">
                         <label class="text-white whitening ">Popular Tags</label>
                         <?php if (!empty($popularTags)): ?>
                             <?php foreach ($popularTags as $tag => $count): ?>
