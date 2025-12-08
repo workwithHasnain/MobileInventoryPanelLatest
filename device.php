@@ -1689,7 +1689,7 @@ if ($_POST && isset($_POST['submit_comment'])) {
     padding-left: 0;
     padding-right: -2px;">
     <div class="row">
-      <div class="col-lg-8 col-md-7 order-2 order-md-1">
+      <div class="col-lg-8 col-md-7 order-2 order-md-1" style="padding-right: 0;">
         <div class="bg-white">
           <table class="table forat">
             <tbody>
