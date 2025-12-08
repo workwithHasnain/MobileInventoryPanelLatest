@@ -18,10 +18,12 @@ body {
     font-variation-settings:
         "wdth" 100;
 }
-.bottom{
+
+.bottom {
     background-color: #1B2035;
     color: white;
 }
+
 .brand-item-bold {
     font-weight: 600 !important;
 
@@ -717,9 +719,11 @@ input:focus {
     background-color: #fff;
     overflow: hidden;
     transition: transform 0.3s ease;
-    /* margin-bottom: 14px; */
     margin-top: 12px;
-    width: 340px;
+    width: 100%;
+    height: 355px;
+    display: flex;
+    flex-direction: column;
 }
 
 .review-card:hover {
@@ -728,32 +732,54 @@ input:focus {
 
 .review-card img {
     width: 100%;
-    height: 180px;
+    height: 220px;
+    object-fit: cover;
     display: block;
+    flex-shrink: 0;
 }
 
 .review-card-body {
     padding: 16px 20px;
+    display: flex;
+    flex-direction: column;
+    flex-grow: 1;
+    justify-content: space-between;
 }
 
 .review-card-title {
-    font-size: 1.2rem;
+    font-size: 1rem;
     font-weight: 600;
     margin-bottom: 8px;
     color: #222;
+    line-height: 1.4;
+    display: -webkit-box;
+    -webkit-line-clamp: 3;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+    flex-grow: 1;
 }
 
 .review-card-meta {
-    font-size: 0.9rem;
+    font-size: 0.8rem;
     color: #666;
     display: flex;
     justify-content: space-between;
     align-items: center;
+    flex-shrink: 0;
 }
 
 .review-card-meta i {
     color: #ff4d4d;
     margin-right: 5px;
+}
+
+.sentizer-erx {
+    display: flex;
+    flex-direction: column;
+}
+
+.sentizer-erx .review-card {
+    height: 355px !important;
 }
 
 .filter-container {
@@ -1067,7 +1093,9 @@ a {
     padding: 0;
     margin-bottom: 30px;
 }
-.module, a.module-phones-link {
+
+.module,
+a.module-phones-link {
     position: relative;
 }
 
@@ -1077,6 +1105,7 @@ a {
     width: calc(100% + 10px);
     background: #fff;
 }
+
 .section-heading {
     border-bottom: none;
     border-left: 10px solid;
@@ -1116,6 +1145,7 @@ a {
 .module-phones>h4~div {
     padding-top: 5px;
 }
+
 .module-latest div {
     scrollbar-width: thin;
     display: -ms-flexbox;
@@ -1124,20 +1154,23 @@ a {
     flex-wrap: wrap;
     -ms-flex-pack: distribute;
     justify-content: space-around;
-}   
+}
 
 
 .module-latest .module-phones-link {
     margin: 0 7px;
 }
 
-.module, a.module-phones-link {
+.module,
+a.module-phones-link {
     position: relative;
 }
+
 .module a {
     font: 700 13px / 18px system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue';
     color: #444;
 }
+
 .module-phones-link {
     float: left;
     display: block;
@@ -1153,8 +1186,7 @@ a {
 
 
 .module a img {
-    transition: transform 1s 
-cubic-bezier(0.26, 0.695, 0.375, 0.965);
+    transition: transform 1s cubic-bezier(0.26, 0.695, 0.375, 0.965);
 }
 
 @supports (filter:brightness(0.953)) {
@@ -1162,6 +1194,7 @@ cubic-bezier(0.26, 0.695, 0.375, 0.965);
         filter: brightness(0.953);
     }
 }
+
 .module-phones-link img {
     /* width: 115%; */
     height: 119px;
@@ -1184,14 +1217,17 @@ cubic-bezier(0.26, 0.695, 0.375, 0.965);
     padding-top: 15px;
 }
 
-.material-card, .top-shadow {
+.material-card,
+.top-shadow {
     /* box-shadow: 0px 2px 4px var(--color-card-shadow, #cfcfcf); */
     background-color: var(--color-card-background);
     padding: 15px 0px;
     margin: 10px 0px;
 
 }
-.swiper-container-android .swiper-slide, .swiper-wrapper {
+
+.swiper-container-android .swiper-slide,
+.swiper-wrapper {
     -ms-transform: translateZ(0);
     transform: translateZ(0);
 }
@@ -1214,11 +1250,13 @@ cubic-bezier(0.26, 0.695, 0.375, 0.965);
     background: none;
     margin-top: 5px;
 }
+
 @media (orientation: landscape) {
     .swiper-slide {
         width: 42%;
     }
 }
+
 .swiper-slide {
     -ms-flex: 1 0 auto;
     flex: 1 0 auto;
@@ -1290,7 +1328,7 @@ cubic-bezier(0.26, 0.695, 0.375, 0.965);
     background-color: #F3F3F3;
     padding: 5px;
     overflow: hidden;
- 
+
 }
 
 .compare-checkbox label {
@@ -1504,6 +1542,7 @@ table tr:hover {
     opacity: .85;
     font-weight: 500;
 }
+
 .gap-portion {
     overflow: hidden;
     margin: 0 30px 15px;
@@ -2113,9 +2152,10 @@ td {
     .spec-item:last-child {
         border-bottom: none;
     }
+
     .compare-checkbox input {
-    width: 138%;
-}
+        width: 138%;
+    }
 }
 
 @media (min-width: 810px) and (max-width: 1024px) {
