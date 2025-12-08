@@ -156,7 +156,6 @@
             }
         }
         .module-phones-link img {
-            width: 115%;
             height: 119px;
             left: -5px;
             position: relative;
@@ -239,7 +238,7 @@
             margin: 0 5px 0 0;
             position: relative;
             margin: 0 auto;
-            width: 105px;
+            width: 120px;
             aspect-ratio: 160 / 212;
         }
 
