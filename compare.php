@@ -962,13 +962,15 @@ function formatDeviceSpecsStructured($device)
     <?php include 'includes/gsmheader.php'; ?>
     <div class="container support content-wrapper" id="Top">
         <div class="row">
-            <div class="col-md-8 col-5  d-lg-inline d-none ">
+            <div class="col-md-8 col-5  d-lg-inline d-none " style="padding: 0; position: relative;">
                 <div class="comfort-life position-absolute">
                     <img class="w-100 h-100" src="imges/magnifient sectton.jpeg"
                         style="background-repeat: no-repeat; background-size: cover;" alt="">
                 </div>
             </div>
-            <div class="col-md-4 col-5 d-none d-lg-block" style="position: relative; left: 12px;">
+            <div class="col-md-4 col-5 d-none d-lg-block" style="    position: relative;
+    /* left: 12px; */
+    padding: 0;">
                 <button class="solid w-100 py-2">
                     <i class="fa-solid fa-mobile fa-sm mx-2" style="color: white;"></i>
                     Phone Finder</button>
