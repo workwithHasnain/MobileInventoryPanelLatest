@@ -11,13 +11,13 @@
                     <?php if ((($index + 1) % 2) != 0): ?>
                         <p class="mb-2 px-1 clickable-comparison" data-device1-id="<?php echo $comparison['device1_id'] ?? ''; ?>"
                             data-device2-id="<?php echo $comparison['device2_id'] ?? ''; ?>"
-                            style="white-space: nowrap; cursor: pointer; background-color: #ffe6f0; color: #090E21; text-transform: capitalize;"><?php $text = htmlspecialchars(($comparison['device1_name'] ?? $comparison['device1'] ?? 'Unknown') . ' vs. ' . ($comparison['device2_name'] ?? $comparison['device2'] ?? 'Unknown'));
-                                                                                                                            echo strlen($text) > 41 ? substr($text, 0, 41) . '...' : $text; ?></p>
+                            style="white-space: nowrap; overflow: hidden; text-overflow: ellipsis; cursor: pointer; background-color: #ffe6f0; color: #090E21; text-transform: capitalize;"><?php $text = htmlspecialchars(($comparison['device1_name'] ?? $comparison['device1'] ?? 'Unknown') . ' vs. ' . ($comparison['device2_name'] ?? $comparison['device2'] ?? 'Unknown'));
+                                                                                                                                                                                            echo $text; ?></p>
                     <?php else: ?>
                         <!-- else if $index is even -->
                         <p class="mb-2 px-1 clickable-comparison" data-device1-id="<?php echo $comparison['device1_id'] ?? ''; ?>"
-                            data-device2-id="<?php echo $comparison['device2_id'] ?? ''; ?>" style="white-space: nowrap; cursor: pointer; text-transform: capitalize;"><?php $text = htmlspecialchars(($comparison['device1_name'] ?? $comparison['device1'] ?? 'Unknown') . ' vs. ' . ($comparison['device2_name'] ?? $comparison['device2'] ?? 'Unknown'));
-                                                                                                                                                    echo strlen($text) > 41 ? substr($text, 0, 41) . '...' : $text; ?></p>
+                            data-device2-id="<?php echo $comparison['device2_id'] ?? ''; ?>" style="white-space: nowrap; overflow: hidden; text-overflow: ellipsis; cursor: pointer; text-transform: capitalize;"><?php $text = htmlspecialchars(($comparison['device1_name'] ?? $comparison['device1'] ?? 'Unknown') . ' vs. ' . ($comparison['device2_name'] ?? $comparison['device2'] ?? 'Unknown'));
+                                                                                                                                                                                                                    echo $text; ?></p>
                     <?php endif; ?>
                 <?php endforeach; ?>
             <?php endif; ?>
