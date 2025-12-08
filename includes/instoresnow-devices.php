@@ -238,8 +238,8 @@
             margin: 0 5px 0 0;
             position: relative;
             margin: 0 auto;
-            width: 120px;
-            aspect-ratio: 160 / 212;
+            /* width: 120px;
+            aspect-ratio: 160 / 212; */
         }
 
         .swiper-slide img {
