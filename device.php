@@ -1145,8 +1145,7 @@ if ($_POST && isset($_POST['submit_comment'])) {
 
     <?php
     $image = $device["image"] ?? $device["image_1"] ?? "https://via.placeholder.com/300x400?text=No+Image";
-    ?>
-    .phone-image {
+    ?>.phone-image {
       margin-left: 5px;
       display: block;
       height: -webkit-fill-available;
@@ -1689,7 +1688,7 @@ if ($_POST && isset($_POST['submit_comment'])) {
     padding-left: 0;
     padding-right: -2px;">
     <div class="row">
-      <div class="col-lg-8 col-md-7 order-2 order-md-1" style="padding-right: 0;">
+      <div class="col-lg-8 col-md-7 order-1" style="padding-right: 0;">
         <div class="bg-white">
           <table class="table forat">
             <tbody>
@@ -1733,17 +1732,13 @@ if ($_POST && isset($_POST['submit_comment'])) {
             </tbody>
           </table>
 
-          <p style="font-size: 13px;
-    text-transform: capitalize;
-    padding: 6px 19px;"> <strong>Disclaimer:</strong>We can not guarantee that the information on this page is 100%
+          <p style="font-size: 13px; text-transform: capitalize; padding: 6px 19px;"> <strong>Disclaimer:</strong>We can not guarantee that the information on this page is 100%
             correct.</p>
-
           <div class="d-block d-lg-flex">
             <button class="pad" onclick="window.location.href='compare.php?phone1=<?php echo $device['id']; ?>'">COMPARE</button>
             <button class="pad" onclick="document.getElementById('comments').scrollIntoView({behavior:'smooth', block:'start'});">OPINIONS</button>
             <button class="pad" onclick="showPicturesModal()">PICTURES</button>
           </div>
-
           <div class="comments" id="comments">
             <h5 class="border-bottom reader py-3 mx-2"><?php echo htmlspecialchars(($device['brand_name'] ?? '') . ' ' . ($device['name'] ?? 'Device')); ?> - user opinions and reviews</h5>
 
@@ -1823,7 +1818,7 @@ if ($_POST && isset($_POST['submit_comment'])) {
         </div>
       </div>
       <!-- Left Section -->
-      <div class="col-lg-4 bg-white col-md-5 order-1 order-md-2" style="padding-right: 0;">
+      <div class="col-lg-4 bg-white col-md-5 order-2" style="padding-right: 0;">
         <div class="mb-4">
           <?php include 'includes/latest-devices.php'; ?>
           <?php include 'includes/comparisons-devices.php'; ?>
