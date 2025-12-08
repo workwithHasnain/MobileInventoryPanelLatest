@@ -283,7 +283,7 @@ if ($_POST && isset($_POST['action'])) {
             <?php endif; ?>
         </div>
     </div>
-    <div class="container support content-wrapper" id="Top">
+    <div class="container support content-wrapper" id="Top" style="padding: 0px;">
         <div class="row">
             <?php
             // Show up to 4 featured posts in two columns, 2 per column
@@ -291,7 +291,7 @@ if ($_POST && isset($_POST['action'])) {
             $chunks = array_chunk($featuredPreview, 2);
             foreach ($chunks as $colIndex => $colPosts):
             ?>
-                <div class="<?php echo $colIndex === 0 || $colIndex === 2 ? 'col-lg-4 col-6 conjection-froud  bobile' : 'col-6 col-lg-4 conjection-froud'; ?>" <?php echo $colIndex === 1 ? ' style="margin-left: 7px;"' : ''; ?>>
+                <div class="<?php echo $colIndex === 0 || $colIndex === 2 ? 'col-lg-4 col-6 conjection-froud  bobile' : 'col-6 col-lg-4 conjection-froud'; ?>" <?php echo $colIndex === 1 ? ' style="margin-left: 0px;"' : ''; ?>>
                     <div class="review-column-list-item review-column-list-item-secondary " style="cursor:pointer;">
                         <?php foreach ($colPosts as $post): ?>
                             <?php if (!empty($post['featured_image'])): ?>
@@ -302,7 +302,7 @@ if ($_POST && isset($_POST['action'])) {
                     </div>
                 </div>
             <?php endforeach; ?>
-            <div class="col-md-4 col-5 d-none d-lg-block" style="position: relative; left: 28px;">
+            <div class="col-md-4 col-5 d-none d-lg-block" style="position: relative; left: 0; padding-left: 0px;">
                 <button class="solid w-100 py-2">
                     <i class="fa-solid fa-mobile fa-sm mx-2" style="color: white;"></i>
                     Phone Finder</button>
