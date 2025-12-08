@@ -269,7 +269,7 @@ input:focus {
 .bobile {
     position: relative;
     max-width: 100%;
-    margin-left: -23px;
+    margin-left: 0px;
 }
 
 .bobile img {
@@ -294,8 +294,7 @@ input:focus {
 }
 
 .col-lg-4.conjection-froud img {
-    width: 363px;
-    margin-left: 11px;
+    width: 100%;
     height: 172px;
     border-radius: 6px;
 }
