@@ -313,7 +313,7 @@ input:focus {
 }
 
 .col-lg-4.conjection-froud img {
-    width: 100%;
+    width: 96%;
     margin-top: 0px;
     height: 161px;
     border-radius: 6px;
@@ -323,10 +323,7 @@ input:focus {
 
 .col-lg-4.conjection-froud h1,
 .froud h1 {
-    bottom: 72px;
-    left: 25px;
     margin: 0;
-    height: 20px;
     color: white;
     font-size: 1.5rem;
     font-weight: bold;
