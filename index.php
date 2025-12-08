@@ -372,7 +372,7 @@ if ($_POST && isset($_POST['action'])) {
                         </div>
                     <?php endforeach; ?>
 
-                    <div class="col-lg-4  col-12 sentizer-er  bg-white p-3" style="margin-top: 18px;">
+                    <div class="col-lg-4 col-12 bg-white" style="margin-top: 18px;">
                         <?php include 'includes/latest-devices.php'; ?>
                         <?php include 'includes/comparisons-devices.php'; ?>
                         <?php include 'includes/topviewed-devices.php'; ?>

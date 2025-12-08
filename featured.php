@@ -352,7 +352,7 @@ $latestDevices = array_slice(array_reverse($latestDevices), 0, 9);
             <?php endforeach;
             endif; ?>
 
-            <div class="col-lg-4  col-12 sentizer-er  bg-white p-3" style="margin-top: 18px;">
+            <div class="col-lg-4 col-12 bg-white" style="margin-top: 18px;">
                 <?php include 'includes/latest-devices.php'; ?>
                 <?php include 'includes/comparisons-devices.php'; ?>
                 <?php include 'includes/topviewed-devices.php'; ?>
