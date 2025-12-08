@@ -12,7 +12,7 @@
 
         <!-- DESKTOP VIEW -->
         <div class="d-none d-lg-flex"
-            style="overflow-y: auto; max-height:390px; width:320px; flex-wrap:wrap; overflow-x:hidden;">
+            style="overflow-y: auto; max-height:390px; width:100%; justify-content: center; flex-wrap:wrap; overflow-x:hidden; gap: 15px; padding: 0; margin: 0;">
 
             <?php foreach ($devices as $device): ?>
                 <a href="device.php?id=<?php echo $device['id']; ?>" class="module-phones-link">
@@ -158,7 +158,7 @@
         .module-phones-link img {
             height: 119px;
             left: -5px;
-            position: relative;
+            /* position: relative; */
             padding: 5px;
             z-index: 1;
             opacity: .953;

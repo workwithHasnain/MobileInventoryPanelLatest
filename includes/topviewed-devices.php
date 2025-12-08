@@ -7,7 +7,7 @@
                                     <tr style="background-color: #4c7273; color: white;">
                                         <th style="color: white;">#</th>
                                         <th style="color: white;">Devices</th>
-                                        <th style="color: white;">Daily Hits</th>
+                                        <th style="white-space: nowrap; color: white;">Daily Hits</th>
                                     </tr>
                                 </thead>
                                 <tbody>

@@ -7,7 +7,7 @@
                                     <tr class="text-white" style="background-color: #14222D;">
                                         <th style="color: white;  font-size: 15px;  ">#</th>
                                         <th style="color: white;  font-size: 15px;">Device</th>
-                                        <th style="color: white;  font-size: 15px;">Reviews</th>
+                                        <th style="white-space: nowrap; color: white;  font-size: 15px;">Reviews</th>
                                     </tr>
                                 </thead>
                                 <tbody>
