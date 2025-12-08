@@ -283,7 +283,43 @@ if ($_POST && isset($_POST['action'])) {
             <?php endif; ?>
         </div>
     </div>
-    <div class="container support content-wrapper" id="Top" style="padding: 0px;">
+
+
+    <style>
+        .review-column-list-item-secondary {
+                cursor: pointer;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+        }
+        .card-wrap {
+  position: relative;
+  width: 100%;       /* or 100% */
+  height: 164px;
+  overflow: hidden; 
+}
+
+.review-list-item-image {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.card-text {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  width: 100%;
+  padding: 10px;
+  box-sizing: border-box;
+  color: #fff;
+  font-weight: 700;
+
+}
+    </style>
+    <div class="container support content-wrapper" id="Top">
         <div class="row">
             <?php
             // Show up to 4 featured posts in two columns, 2 per column
@@ -291,13 +327,18 @@ if ($_POST && isset($_POST['action'])) {
             $chunks = array_chunk($featuredPreview, 2);
             foreach ($chunks as $colIndex => $colPosts):
             ?>
-                <div class="<?php echo $colIndex === 0 || $colIndex === 2 ? 'col-lg-4 col-6 conjection-froud  bobile' : 'col-6 col-lg-4 conjection-froud'; ?>" <?php echo $colIndex === 1 ? ' style="margin-left: 0px;"' : ''; ?>>
+                <div style="padding:0px;"  class="<?php echo $colIndex === 0 || $colIndex === 2 ? 'col-lg-4 col-6 conjection-froud  bobile' : 'col-6 col-lg-4 conjection-froud'; ?>" <?php echo $colIndex === 1 ? ' style="margin-left: 0px;"' : ''; ?>>
                     <div class="review-column-list-item review-column-list-item-secondary " style="cursor:pointer;">
                         <?php foreach ($colPosts as $post): ?>
+                            <div class="card-wrap">
                             <?php if (!empty($post['featured_image'])): ?>
                                 <img class="review-list-item-image" src="<?php echo htmlspecialchars($post['featured_image']); ?>" alt="<?php echo htmlspecialchars($post['title']); ?>" style="cursor:pointer;" onclick="window.location.href='post.php?slug=<?php echo urlencode($post['slug']); ?>'">
                             <?php endif; ?>
+                           <div class="card-text">
                             <h1 style="cursor:pointer;" onclick="window.location.href='post.php?slug=<?php echo urlencode($post['slug']); ?>'"><?php echo htmlspecialchars($post['title']); ?></h1>
+                        </div>
+
+                            </div>
                         <?php endforeach; ?>
                     </div>
                 </div>
