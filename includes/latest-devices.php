@@ -45,7 +45,7 @@
                                         <img style="height:119px" src="<?php echo htmlspecialchars($device['image']); ?>"
                                              alt="<?php echo htmlspecialchars($device['name']); ?>">
                                     </span>
-                                    <strong><?php echo htmlspecialchars($device['name']); ?></strong>
+                                    <strong style="margin:0px"><?php echo htmlspecialchars($device['name']); ?></strong>
                                 </a>
                             </div>
                         <?php endforeach; ?>
