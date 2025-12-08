@@ -20,9 +20,6 @@
     justify-content: flex-start;" >
                     <img style="position:relative;left:0;" src="<?php echo htmlspecialchars($device['image']); ?>" alt="">
                     <?php echo htmlspecialchars($device['name']); ?>
-                <a href="device.php?id=<?php echo $device['id']; ?>" class="module-phones-link">
-                    <img src="<?php echo htmlspecialchars($device['image']); ?>" alt="">
-                    <br><?php echo htmlspecialchars($device['name']); ?>
                 </a>
             <?php endforeach; ?>
 
@@ -49,10 +46,6 @@
                                              alt="<?php echo htmlspecialchars($device['name']); ?>">
                                     </span>
                                     <strong style="margin:0px"><?php echo htmlspecialchars($device['name']); ?></strong>
-                                        <img src="<?php echo htmlspecialchars($device['image']); ?>"
-                                             alt="<?php echo htmlspecialchars($device['name']); ?>">
-                                    </span>
-                                    <strong><?php echo htmlspecialchars($device['name']); ?></strong>
                                 </a>
                             </div>
                         <?php endforeach; ?>

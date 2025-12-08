@@ -2021,9 +2021,48 @@ if (!$filterConfig) {
             window.location.href = `device.php?id=${deviceId}`;
         }
     </script>
-    <?php
-    include 'includes/gsmfooter.php';
-    ?>
+    <!-- Newsletter Section -->
+    <div class="container mt-4 mb-4" style="max-width: 1034px;">
+        <div class="row">
+            <div class="col-12">
+                <div id="newsletter_message_container"></div>
+                <form id="newsletter_form" method="POST" action="" style="background-color: #EFEBE9; padding: 20px; border-radius: 4px; text-align: center;">
+                    <p style="margin-bottom: 12px; color: #5D4037; font-weight: 500;">Subscribe to our newsletter</p>
+                    <div style="display: flex; gap: 8px; justify-content: center; flex-wrap: wrap;">
+                        <input type="email" id="newsletter_email" name="newsletter_email" placeholder="Enter your email" required style="padding: 10px 12px; border: 1px solid #8D6E63; border-radius: 4px; font-size: 14px; flex: 1; min-width: 200px; max-width: 300px; background-color: white;">
+                        <style>
+                            input::placeholder {
+                                color: #8D6E63;
+                                opacity: 0.7;
+                            }
+                        </style>
+                        <button type="submit" id="newsletter_btn" style="padding: 10px 24px; background-color: #D50000; color: white; border: none; border-radius: 4px; cursor: pointer; font-size: 14px; white-space: nowrap; font-weight: 500;">Subscribe</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+    <div id="bottom" class="container d-flex" style="max-width: 1034px;">
+        <div class="row align-items-center">
+            <div class="col-md-2 m-auto col-4 d-flex justify-content-center align-items-center "> <img
+                    src="https://fdn2.gsmarena.com/w/css/logo-gsmarena-com.png" alt="">
+            </div>
+            <div class="col-10 nav-wrap m-auto text-center ">
+                <div class="nav-container">
+                    <a href="#">Home</a>
+                    <a href="reviews.php">Reviews</a>
+                    <a href="compare.php">Compare</a>
+                    <a href="#"> <i class="fa-solid fa-wifi fa-sm"></i> RSS</a>
+                    <a href="#"> <i class="fa-brands fa-youtube fa-sm"></i> YouTube</a>
+                    <a href="#"> <i class="fa-brands fa-instagram fa-sm"></i> Instagram</a>
+                    <a href="#"> <i class="fa-brands fa-tiktok fa-sm"></i>TikTok</a>
+                    <a href="#"> <i class="fa-brands fa-facebook-f fa-sm"></i> Facebook</a>
+                    <a href="#"> <i class="fa-brands fa-twitter fa-sm"></i>Twitter</a>
+                    <a href="#">© 2000-2025 GSMArena.com</a>
+                </div>
+            </div>
+        </div>
+    </div>
     <!-- Brands Modal -->
     <div class="modal fade" id="brandsModal" tabindex="-1" aria-labelledby="brandsModalLabel" aria-hidden="true">
         <div class="modal-dialog modal-lg modal-dialog-centered modal-dialog-scrollable">
