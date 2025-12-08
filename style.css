@@ -689,8 +689,8 @@ input:focus {
     border-radius: 4px;
     cursor: pointer;
 }
-
 .whitening {
+    margin-left: 15px;
     font-size: 15px;
 }
 
