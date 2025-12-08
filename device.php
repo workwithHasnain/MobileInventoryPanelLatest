@@ -971,9 +971,6 @@ if ($_POST && isset($_POST['submit_comment'])) {
   <!-- Font Awesome (for icons) -->
   <script src="https://kit.fontawesome.com/your-kit-code.js" crossorigin="anonymous"></script>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" />
-  <script>
-
-  </script>
 
   <link rel="stylesheet" href="style.css">
 </head>
@@ -1103,7 +1100,6 @@ if ($_POST && isset($_POST['submit_comment'])) {
       right: 0;
       bottom: 0;
       background: inherit;
-      /* same background lega */
       filter: blur(5px);
       z-index: 1;
     }
@@ -1111,7 +1107,6 @@ if ($_POST && isset($_POST['submit_comment'])) {
     .card-header * {
       position: relative;
       z-index: 2;
-      /* content clear dikhayega */
     }
 
     .vr-hide {
@@ -1150,7 +1145,8 @@ if ($_POST && isset($_POST['submit_comment'])) {
 
     <?php
     $image = $device["image"] ?? $device["image_1"] ?? "https://via.placeholder.com/300x400?text=No+Image";
-    ?>.phone-image {
+    ?>
+    .phone-image {
       margin-left: 5px;
       display: block;
       height: -webkit-fill-available;
@@ -1340,7 +1336,8 @@ if ($_POST && isset($_POST['submit_comment'])) {
     #devicesModal .modal-dialog-scrollable {
       max-height: 80vh;
     }
-    .pad{
+
+    .pad {
       font-weight: 700;
     }
   </style>
@@ -1547,6 +1544,14 @@ if ($_POST && isset($_POST['submit_comment'])) {
       font-size: 11px;
       color: #666;
     }
+    .row>* {
+    flex-shrink: 0;
+    width: 100%;
+    max-width: 100%;
+    padding-right: 0;
+    padding-left: calc(var(--bs-gutter-x) * .5);
+    margin-top: var(--bs-gutter-y);
+}
   </style>
   <div class="container  d-lg-block d-none support content-wrapper" id="Top"
     style=" margin-top: 4rem; padding-left: 0;">
@@ -1700,10 +1705,17 @@ if ($_POST && isset($_POST['submit_comment'])) {
                 <?php $firstRowInSection = true; ?>
                 <?php foreach ($deviceSpecs as $category => $rows): ?>
                   <?php if (is_array($rows) && !empty($rows)): ?>
+                    <!-- Mobile: Section title as separate row -->
+                    <tr class="d-lg-none">
+                      <th class="spec-label" colspan="2"><?php echo htmlspecialchars($category); ?></th>
+                    </tr>
+
+                    <!-- Desktop + Mobile spec rows -->
                     <?php foreach ($rows as $rowIndex => $rowData): ?>
                       <tr>
+                        <!-- Desktop only: rowspan on first row -->
                         <?php if ($rowIndex === 0): ?>
-                          <th class="spec-label" rowspan="<?php echo count($rows); ?>"><?php echo htmlspecialchars($category); ?></th>
+                          <th class="spec-label d-none d-lg-table-cell" rowspan="<?php echo count($rows); ?>"><?php echo htmlspecialchars($category); ?></th>
                         <?php endif; ?>
                         <td class="spec-subtitle"><strong><?php echo htmlspecialchars($rowData['field']); ?></strong></td>
                         <td class="spec-description"><?php echo htmlspecialchars($rowData['description']); ?></td>
