@@ -1,5 +1,5 @@
-<h6 style="border-left: solid 5px grey ; color: #090E21; text-transform: uppercase; font-weight: 900; margin-top: 12px;"
-    class="px-3">Popular comparisons</h6>
+<h6 style="border-left: solid 5px grey; text-transform: uppercase; margin-top: 12px;"
+    class="px-3 section-heading">Popular comparisons</h6>
 <div class="sentizer bg-white mt-2 p-3 rounded " style="text-transform: uppercase; font-size: 13px; font-weight: 700;">
     <div class="row">
         <div class="col-12">

@@ -1,5 +1,5 @@
-<h6 style="border-left: 7px solid #EFEBE9 ; font-weight: 900; color: #090E21; text-transform: uppercase;"
-                            class=" px-2 mt-2 d-inline mt-4">Top 10
+<h6 style="border-left: 7px solid #EFEBE9; text-transform: uppercase;"
+                            class=" px-2 mt-2 d-inline mt-4 section-heading">Top 10
                             Daily Interest</h6>
                         <div class="center">
                             <table class="table table-sm custom-table">
