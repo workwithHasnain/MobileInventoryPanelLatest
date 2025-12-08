@@ -12,12 +12,12 @@
                         <p class="mb-2 clickable-comparison" data-device1-id="<?php echo $comparison['device1_id'] ?? ''; ?>"
                             data-device2-id="<?php echo $comparison['device2_id'] ?? ''; ?>"
                             style="cursor: pointer; background-color: #ffe6f0; color: #090E21; text-transform: capitalize;"><?php $text = htmlspecialchars(($comparison['device1_name'] ?? $comparison['device1'] ?? 'Unknown') . ' vs. ' . ($comparison['device2_name'] ?? $comparison['device2'] ?? 'Unknown'));
-                                                                                                                            echo strlen($text) > 35 ? substr($text, 0, 35) . '...' : $text; ?></p>
+                                                                                                                            echo strlen($text) > 45 ? substr($text, 0, 45) . '...' : $text; ?></p>
                     <?php else: ?>
                         <!-- else if $index is even -->
                         <p class="mb-2 clickable-comparison" data-device1-id="<?php echo $comparison['device1_id'] ?? ''; ?>"
                             data-device2-id="<?php echo $comparison['device2_id'] ?? ''; ?>" style="cursor: pointer; text-transform: capitalize;"><?php $text = htmlspecialchars(($comparison['device1_name'] ?? $comparison['device1'] ?? 'Unknown') . ' vs. ' . ($comparison['device2_name'] ?? $comparison['device2'] ?? 'Unknown'));
-                                                                                                                                                    echo strlen($text) > 35 ? substr($text, 0, 35) . '...' : $text; ?></p>
+                                                                                                                                                    echo strlen($text) > 45 ? substr($text, 0, 45) . '...' : $text; ?></p>
                     <?php endif; ?>
                 <?php endforeach; ?>
             <?php endif; ?>
