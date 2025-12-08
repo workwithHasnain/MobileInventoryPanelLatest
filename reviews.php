@@ -244,13 +244,13 @@ $brands = $brands_stmt->fetchAll();
 <body style="background-color: #EFEBE9;">
     <!-- Desktop Navbar of Gsmarecn -->
     <?php include 'includes/gsmheader.php'; ?>
-    <div class="container support content-wrapper" id="Top" style="padding: 0px;">
+    <div class="container support content-wrapper" id="Top">
         <div class="row">
             <div class="col-md-8 col-5  d-lg-inline d-none col-12 ">
                 <div class="comfort-life position-absolute">
                     <img class="w-100 h-100" src="imges/Screenshot (160).png"
                         style="background-repeat: no-repeat; background-size: cover;" alt="">
-                    <div class="position-absolute d-flex mt-1 ml-2" style="top: 0; flex-wrap: wrap; gap: 8px;">
+                    <div class="position-absolute d-flex mt-1 ml-2"  style="top: 0; flex-wrap: wrap; gap: 8px;">
                         <label class="text-white whitening px-2">Popular Tags</label>
                         <?php if (!empty($popularTags)): ?>
                             <?php foreach ($popularTags as $tag => $count): ?>
@@ -353,193 +353,193 @@ $brands = $brands_stmt->fetchAll();
             </div>
         </div>
     </div>
-    <?php include 'includes/gsmfooter.php'; ?>
-    <!-- Brands Modal -->
-    <div class="modal fade" id="brandsModal" tabindex="-1" aria-labelledby="brandsModalLabel" aria-hidden="true">
-        <div class="modal-dialog modal-lg modal-dialog-centered modal-dialog-scrollable">
-            <div class="modal-content" style="background-color: #EFEBE9; border: 2px solid #8D6E63;">
-                <div class="modal-header" style="border-bottom: 1px solid #8D6E63; background-color: #D7CCC8;">
-                    <h5 class="modal-title" id="brandsModalLabel" style="font-family:system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue'; color: #5D4037;">
-                        <i class="fas fa-industry me-2"></i>All Brands
-                    </h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                </div>
-                <div class="modal-body">
-                    <div class="row">
-                        <?php if (!empty($brands)): ?>
-                            <?php foreach ($brands as $brand): ?>
-                                <div class="col-lg-4 col-md-6 col-sm-6 mb-3">
-                                    <button class="brand-cell-modal btn w-100 py-2 px-3" style="background-color: #fff; border: 1px solid #c5b6b0; color: #5D4037; font-weight: 500; transition: all 0.3s ease; cursor: pointer;" data-brand-id="<?php echo $brand['id']; ?>" onclick="selectBrandFromModal(<?php echo $brand['id']; ?>)">
-                                        <?php echo htmlspecialchars($brand['name']); ?>
-                                    </button>
+        <?php include 'includes/gsmfooter.php'; ?>
+        <!-- Brands Modal -->
+        <div class="modal fade" id="brandsModal" tabindex="-1" aria-labelledby="brandsModalLabel" aria-hidden="true">
+            <div class="modal-dialog modal-lg modal-dialog-centered modal-dialog-scrollable">
+                <div class="modal-content" style="background-color: #EFEBE9; border: 2px solid #8D6E63;">
+                    <div class="modal-header" style="border-bottom: 1px solid #8D6E63; background-color: #D7CCC8;">
+                        <h5 class="modal-title" id="brandsModalLabel" style="font-family:system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue'; color: #5D4037;">
+                            <i class="fas fa-industry me-2"></i>All Brands
+                        </h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body">
+                        <div class="row">
+                            <?php if (!empty($brands)): ?>
+                                <?php foreach ($brands as $brand): ?>
+                                    <div class="col-lg-4 col-md-6 col-sm-6 mb-3">
+                                        <button class="brand-cell-modal btn w-100 py-2 px-3" style="background-color: #fff; border: 1px solid #c5b6b0; color: #5D4037; font-weight: 500; transition: all 0.3s ease; cursor: pointer;" data-brand-id="<?php echo $brand['id']; ?>" onclick="selectBrandFromModal(<?php echo $brand['id']; ?>)">
+                                            <?php echo htmlspecialchars($brand['name']); ?>
+                                        </button>
+                                    </div>
+                                <?php endforeach; ?>
+                            <?php else: ?>
+                                <div class="col-12">
+                                    <div class="text-center py-5">
+                                        <i class="fas fa-industry fa-3x text-muted mb-3"></i>
+                                        <h6 class="text-muted">No brands available</h6>
+                                    </div>
                                 </div>
-                            <?php endforeach; ?>
-                        <?php else: ?>
-                            <div class="col-12">
-                                <div class="text-center py-5">
-                                    <i class="fas fa-industry fa-3x text-muted mb-3"></i>
-                                    <h6 class="text-muted">No brands available</h6>
-                                </div>
-                            </div>
-                        <?php endif; ?>
+                            <?php endif; ?>
+                        </div>
                     </div>
                 </div>
             </div>
         </div>
-    </div>
 
-    <!-- Devices Modal (Phones by Brand) -->
-    <div class="modal fade" id="devicesModal" tabindex="-1" aria-labelledby="deviceModalLabel" aria-hidden="true">
-        <div class="modal-dialog modal-lg modal-dialog-centered modal-dialog-scrollable">
-            <div class="modal-content" style="background-color: #EFEBE9; border: 2px solid #8D6E63;">
-                <div class="modal-header" style="border-bottom: 1px solid #8D6E63; background-color: #D7CCC8;">
-                    <h5 class="modal-title" id="deviceModalTitle" style="font-family:system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue'; color: #5D4037;">
-                        Devices
-                    </h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                </div>
-                <div class="modal-body" id="deviceModalBody">
-                    <div class="text-center py-5">
-                        <i class="fas fa-spinner fa-spin fa-2x text-muted"></i>
+        <!-- Devices Modal (Phones by Brand) -->
+        <div class="modal fade" id="devicesModal" tabindex="-1" aria-labelledby="deviceModalLabel" aria-hidden="true">
+            <div class="modal-dialog modal-lg modal-dialog-centered modal-dialog-scrollable">
+                <div class="modal-content" style="background-color: #EFEBE9; border: 2px solid #8D6E63;">
+                    <div class="modal-header" style="border-bottom: 1px solid #8D6E63; background-color: #D7CCC8;">
+                        <h5 class="modal-title" id="deviceModalTitle" style="font-family:system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue'; color: #5D4037;">
+                            Devices
+                        </h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body" id="deviceModalBody">
+                        <div class="text-center py-5">
+                            <i class="fas fa-spinner fa-spin fa-2x text-muted"></i>
+                        </div>
                     </div>
                 </div>
             </div>
         </div>
-    </div>
-    <script>
-        // Handle clickable table rows for devices
-        document.addEventListener('DOMContentLoaded', function() {
-            // Handle device row clicks (for views and reviews tables)
-            document.querySelectorAll('.clickable-row').forEach(function(row) {
-                row.addEventListener('click', function() {
-                    const deviceId = this.getAttribute('data-device-id');
-                    if (deviceId) {
-                        // Track the view
-                        fetch('track_device_view.php', {
-                            method: 'POST',
-                            headers: {
-                                'Content-Type': 'application/x-www-form-urlencoded',
-                            },
-                            body: 'device_id=' + encodeURIComponent(deviceId)
-                        });
+        <script>
+            // Handle clickable table rows for devices
+            document.addEventListener('DOMContentLoaded', function() {
+                // Handle device row clicks (for views and reviews tables)
+                document.querySelectorAll('.clickable-row').forEach(function(row) {
+                    row.addEventListener('click', function() {
+                        const deviceId = this.getAttribute('data-device-id');
+                        if (deviceId) {
+                            // Track the view
+                            fetch('track_device_view.php', {
+                                method: 'POST',
+                                headers: {
+                                    'Content-Type': 'application/x-www-form-urlencoded',
+                                },
+                                body: 'device_id=' + encodeURIComponent(deviceId)
+                            });
 
-                        // Show device details modal
-                        showDeviceDetails(deviceId);
-                    }
+                            // Show device details modal
+                            showDeviceDetails(deviceId);
+                        }
+                    });
+                });
+
+                // Handle device card clicks (for latest devices grid)
+                document.querySelectorAll('.device-card').forEach(function(card) {
+                    card.addEventListener('click', function() {
+                        const deviceId = this.getAttribute('data-device-id');
+                        if (deviceId) {
+                            // Track the view
+                            fetch('track_device_view.php', {
+                                method: 'POST',
+                                headers: {
+                                    'Content-Type': 'application/x-www-form-urlencoded',
+                                },
+                                body: 'device_id=' + encodeURIComponent(deviceId)
+                            });
+
+                            // Show device details modal
+                            showDeviceDetails(deviceId);
+                        }
+                    });
+                });
+
+                // Handle brand cell clicks (from sidebar and mobile menu - open devices modal directly)
+                document.querySelectorAll('.brand-cell').forEach(function(cell) {
+                    cell.addEventListener('click', function(e) {
+                        e.preventDefault();
+                        const brandId = this.getAttribute('data-brand-id');
+                        if (brandId) {
+                            // Directly open devices modal for this brand
+                            selectBrandFromModal(brandId);
+                        }
+                    });
                 });
             });
 
-            // Handle device card clicks (for latest devices grid)
-            document.querySelectorAll('.device-card').forEach(function(card) {
-                card.addEventListener('click', function() {
-                    const deviceId = this.getAttribute('data-device-id');
-                    if (deviceId) {
-                        // Track the view
-                        fetch('track_device_view.php', {
-                            method: 'POST',
-                            headers: {
-                                'Content-Type': 'application/x-www-form-urlencoded',
-                            },
-                            body: 'device_id=' + encodeURIComponent(deviceId)
-                        });
-
-                        // Show device details modal
-                        showDeviceDetails(deviceId);
-                    }
-                });
-            });
-
-            // Handle brand cell clicks (from sidebar and mobile menu - open devices modal directly)
-            document.querySelectorAll('.brand-cell').forEach(function(cell) {
-                cell.addEventListener('click', function(e) {
-                    e.preventDefault();
-                    const brandId = this.getAttribute('data-brand-id');
-                    if (brandId) {
-                        // Directly open devices modal for this brand
-                        selectBrandFromModal(brandId);
-                    }
-                });
-            });
-        });
-
-        // Show post details in modal
-        function showPostDetails(postId) {
-            fetch(`get_post_details.php?id=${postId}`)
-                .then(response => response.text())
-                .then(data => {
-                    window.location.href = `post.php?id=${postId}`;
-                })
-                .catch(error => {
-                    console.error('Error:', error);
-                    alert('Failed to load post details');
-                });
-        }
-
-        // Show device details in modal
-        function showDeviceDetails(deviceId) {
-            fetch(`get_device_details.php?id=${deviceId}`)
-                .then(response => response.text())
-                .then(data => {
-                    window.location.href = `device.php?id=${deviceId}`;
-                })
-                .catch(error => {
-                    console.error('Error:', error);
-                    alert('Failed to load device details');
-                });
-        }
-
-
-
-        // Auto-dismiss alerts after 5 seconds
-        setTimeout(function() {
-            var alerts = document.querySelectorAll('.alert');
-            alerts.forEach(function(alert) {
-                var bsAlert = new bootstrap.Alert(alert);
-                bsAlert.close();
-            });
-        }, 5000);
-        // Show brands modal
-        function showBrandsModal() {
-            const modal = new bootstrap.Modal(document.getElementById('brandsModal'));
-            modal.show();
-        }
-
-        // Handle brand selection from modal
-        function selectBrandFromModal(brandId) {
-            // Close the brands modal
-            const brandsModal = bootstrap.Modal.getInstance(document.getElementById('brandsModal'));
-            if (brandsModal) {
-                brandsModal.hide();
+            // Show post details in modal
+            function showPostDetails(postId) {
+                fetch(`get_post_details.php?id=${postId}`)
+                    .then(response => response.text())
+                    .then(data => {
+                        window.location.href = `post.php?id=${postId}`;
+                    })
+                    .catch(error => {
+                        console.error('Error:', error);
+                        alert('Failed to load post details');
+                    });
             }
 
-            // Fetch phones for this brand
-            fetch(`get_phones_by_brand.php?brand_id=${brandId}`)
-                .then(response => response.json())
-                .then(data => {
-                    // Populate the devices modal with phones
-                    displayPhonesModal(data, brandId);
-                })
-                .catch(error => {
-                    console.error('Error fetching phones:', error);
-                    alert('Failed to load phones');
+            // Show device details in modal
+            function showDeviceDetails(deviceId) {
+                fetch(`get_device_details.php?id=${deviceId}`)
+                    .then(response => response.text())
+                    .then(data => {
+                        window.location.href = `device.php?id=${deviceId}`;
+                    })
+                    .catch(error => {
+                        console.error('Error:', error);
+                        alert('Failed to load device details');
+                    });
+            }
+
+
+
+            // Auto-dismiss alerts after 5 seconds
+            setTimeout(function() {
+                var alerts = document.querySelectorAll('.alert');
+                alerts.forEach(function(alert) {
+                    var bsAlert = new bootstrap.Alert(alert);
+                    bsAlert.close();
                 });
-        }
+            }, 5000);
+            // Show brands modal
+            function showBrandsModal() {
+                const modal = new bootstrap.Modal(document.getElementById('brandsModal'));
+                modal.show();
+            }
 
-        // Display phones in modal
-        function displayPhonesModal(phones, brandId) {
-            const container = document.getElementById('deviceModalBody');
-            const titleElement = document.getElementById('deviceModalTitle');
+            // Handle brand selection from modal
+            function selectBrandFromModal(brandId) {
+                // Close the brands modal
+                const brandsModal = bootstrap.Modal.getInstance(document.getElementById('brandsModal'));
+                if (brandsModal) {
+                    brandsModal.hide();
+                }
 
-            // Update title with brand name
-            const brandButton = document.querySelector(`[data-brand-id="${brandId}"]`);
-            const brandName = brandButton ? brandButton.textContent.trim() : 'Brand';
-            titleElement.innerHTML = `<i class="fas fa-mobile-alt me-2"></i>${brandName} - Devices`;
+                // Fetch phones for this brand
+                fetch(`get_phones_by_brand.php?brand_id=${brandId}`)
+                    .then(response => response.json())
+                    .then(data => {
+                        // Populate the devices modal with phones
+                        displayPhonesModal(data, brandId);
+                    })
+                    .catch(error => {
+                        console.error('Error fetching phones:', error);
+                        alert('Failed to load phones');
+                    });
+            }
 
-            if (phones && phones.length > 0) {
-                let html = '<div class="row">';
-                phones.forEach(phone => {
-                    const phoneImage = phone.image ? `<img src="${phone.image}" alt="${phone.name}" style="width: 100%; height: 120px; object-fit: contain; margin-bottom: 8px;" onerror="this.style.display='none';">` : '';
-                    html += `
+            // Display phones in modal
+            function displayPhonesModal(phones, brandId) {
+                const container = document.getElementById('deviceModalBody');
+                const titleElement = document.getElementById('deviceModalTitle');
+
+                // Update title with brand name
+                const brandButton = document.querySelector(`[data-brand-id="${brandId}"]`);
+                const brandName = brandButton ? brandButton.textContent.trim() : 'Brand';
+                titleElement.innerHTML = `<i class="fas fa-mobile-alt me-2"></i>${brandName} - Devices`;
+
+                if (phones && phones.length > 0) {
+                    let html = '<div class="row">';
+                    phones.forEach(phone => {
+                        const phoneImage = phone.image ? `<img src="${phone.image}" alt="${phone.name}" style="width: 100%; height: 120px; object-fit: contain; margin-bottom: 8px;" onerror="this.style.display='none';">` : '';
+                        html += `
           <div class="col-lg-4 col-md-6 col-sm-6 mb-3">
             <button class="device-cell-modal btn w-100 p-0" style="background-color: #fff; border: 1px solid #c5b6b0; color: #5D4037; font-weight: 500; transition: all 0.3s ease; cursor: pointer; display: flex; flex-direction: column; align-items: center; overflow: hidden;" onclick="goToDevice(${phone.id})">
               ${phoneImage}
@@ -547,97 +547,97 @@ $brands = $brands_stmt->fetchAll();
             </button>
           </div>
         `;
-                });
-                html += '</div>';
-                container.innerHTML = html;
-            } else {
-                container.innerHTML = `
+                    });
+                    html += '</div>';
+                    container.innerHTML = html;
+                } else {
+                    container.innerHTML = `
         <div class="text-center py-5">
           <i class="fas fa-mobile-alt fa-3x text-muted mb-3"></i>
           <h6 class="text-muted">No devices available for this brand</h6>
         </div>
       `;
+                }
+
+                // Show devices modal
+                const devicesModal = new bootstrap.Modal(document.getElementById('devicesModal'));
+                devicesModal.show();
             }
 
-            // Show devices modal
-            const devicesModal = new bootstrap.Modal(document.getElementById('devicesModal'));
-            devicesModal.show();
-        }
+            // Navigate to device page
+            function goToDevice(deviceId) {
+                window.location.href = `device.php?id=${deviceId}`;
+            }
 
-        // Navigate to device page
-        function goToDevice(deviceId) {
-            window.location.href = `device.php?id=${deviceId}`;
-        }
+            // Newsletter form AJAX handler
+            document.addEventListener('DOMContentLoaded', function() {
+                const form = document.getElementById('newsletter_form');
+                const messageContainer = document.getElementById('newsletter_message_container');
+                const emailInput = document.getElementById('newsletter_email');
+                const submitBtn = document.getElementById('newsletter_btn');
 
-        // Newsletter form AJAX handler
-        document.addEventListener('DOMContentLoaded', function() {
-            const form = document.getElementById('newsletter_form');
-            const messageContainer = document.getElementById('newsletter_message_container');
-            const emailInput = document.getElementById('newsletter_email');
-            const submitBtn = document.getElementById('newsletter_btn');
+                if (form) {
+                    form.addEventListener('submit', function(e) {
+                        e.preventDefault();
 
-            if (form) {
-                form.addEventListener('submit', function(e) {
-                    e.preventDefault();
+                        const email = emailInput.value.trim();
+                        const originalBtnText = submitBtn.textContent;
 
-                    const email = emailInput.value.trim();
-                    const originalBtnText = submitBtn.textContent;
+                        if (!email) {
+                            showMessage('Please enter an email address.', 'error');
+                            return;
+                        }
 
-                    if (!email) {
-                        showMessage('Please enter an email address.', 'error');
-                        return;
-                    }
+                        // Disable button and show loading state
+                        submitBtn.disabled = true;
+                        submitBtn.textContent = 'Subscribing...';
 
-                    // Disable button and show loading state
-                    submitBtn.disabled = true;
-                    submitBtn.textContent = 'Subscribing...';
+                        // Send AJAX request
+                        fetch('handle_newsletter.php', {
+                                method: 'POST',
+                                headers: {
+                                    'Content-Type': 'application/x-www-form-urlencoded'
+                                },
+                                body: 'newsletter_email=' + encodeURIComponent(email)
+                            })
+                            .then(response => response.json())
+                            .then(data => {
+                                if (data.success) {
+                                    showMessage(data.message, 'success');
+                                    emailInput.value = '';
+                                    // Auto-clear message after 5 seconds
+                                    setTimeout(() => {
+                                        messageContainer.innerHTML = '';
+                                    }, 5000);
+                                } else {
+                                    showMessage(data.message, 'error');
+                                }
+                                submitBtn.disabled = false;
+                                submitBtn.textContent = originalBtnText;
+                            })
+                            .catch(error => {
+                                showMessage('An error occurred. Please try again.', 'error');
+                                submitBtn.disabled = false;
+                                submitBtn.textContent = originalBtnText;
+                            });
+                    });
 
-                    // Send AJAX request
-                    fetch('handle_newsletter.php', {
-                            method: 'POST',
-                            headers: {
-                                'Content-Type': 'application/x-www-form-urlencoded'
-                            },
-                            body: 'newsletter_email=' + encodeURIComponent(email)
-                        })
-                        .then(response => response.json())
-                        .then(data => {
-                            if (data.success) {
-                                showMessage(data.message, 'success');
-                                emailInput.value = '';
-                                // Auto-clear message after 5 seconds
-                                setTimeout(() => {
-                                    messageContainer.innerHTML = '';
-                                }, 5000);
-                            } else {
-                                showMessage(data.message, 'error');
-                            }
-                            submitBtn.disabled = false;
-                            submitBtn.textContent = originalBtnText;
-                        })
-                        .catch(error => {
-                            showMessage('An error occurred. Please try again.', 'error');
-                            submitBtn.disabled = false;
-                            submitBtn.textContent = originalBtnText;
-                        });
-                });
+                    function showMessage(message, type) {
+                        const bgColor = type === 'success' ? '#4CAF50' : '#f44336';
+                        messageContainer.innerHTML = '<div style="background-color: ' + bgColor + '; color: white; padding: 12px; border-radius: 4px; margin-bottom: 12px; text-align: center; animation: slideIn 0.3s ease-in-out;">' + message + '</div>';
 
-                function showMessage(message, type) {
-                    const bgColor = type === 'success' ? '#4CAF50' : '#f44336';
-                    messageContainer.innerHTML = '<div style="background-color: ' + bgColor + '; color: white; padding: 12px; border-radius: 4px; margin-bottom: 12px; text-align: center; animation: slideIn 0.3s ease-in-out;">' + message + '</div>';
-
-                    // Add animation style
-                    if (!document.querySelector('style[data-newsletter]')) {
-                        const style = document.createElement('style');
-                        style.setAttribute('data-newsletter', 'true');
-                        style.textContent = '@keyframes slideIn { from { opacity: 0; transform: translateY(-10px); } to { opacity: 1; transform: translateY(0); } }';
-                        document.head.appendChild(style);
+                        // Add animation style
+                        if (!document.querySelector('style[data-newsletter]')) {
+                            const style = document.createElement('style');
+                            style.setAttribute('data-newsletter', 'true');
+                            style.textContent = '@keyframes slideIn { from { opacity: 0; transform: translateY(-10px); } to { opacity: 1; transform: translateY(0); } }';
+                            document.head.appendChild(style);
+                        }
                     }
                 }
-            }
-        });
-    </script>
-    <script src="script.js"></script>
+            });
+        </script>
+        <script src="script.js"></script>
 </body>
 
 </html>

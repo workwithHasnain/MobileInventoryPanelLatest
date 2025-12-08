@@ -960,7 +960,7 @@ function formatDeviceSpecsStructured($device)
 <body style="background-color: #EFEBE9;">
     <!-- Desktop Navbar of Gsmarecn -->
     <?php include 'includes/gsmheader.php'; ?>
-    <div class="container support content-wrapper" id="Top" style="padding: 0px;">
+    <div class="container support content-wrapper" id="Top">
         <div class="row">
             <div class="col-md-8 col-5  d-lg-inline d-none ">
                 <div class="comfort-life position-absolute">

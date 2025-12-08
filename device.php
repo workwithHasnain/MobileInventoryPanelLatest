@@ -1340,8 +1340,7 @@ if ($_POST && isset($_POST['submit_comment'])) {
     #devicesModal .modal-dialog-scrollable {
       max-height: 80vh;
     }
-
-    .pad {
+    .pad{
       font-weight: 700;
     }
   </style>
@@ -1549,7 +1548,7 @@ if ($_POST && isset($_POST['submit_comment'])) {
       color: #666;
     }
   </style>
-  <div class="container  d-lg-block d-none support content-wrapper" id="Top" style="padding: 0px;"
+  <div class="container  d-lg-block d-none support content-wrapper" id="Top"
     style=" margin-top: 4rem; padding-left: 0;">
     <div class="row">
       <div class="col-md-8 ">

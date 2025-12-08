@@ -318,21 +318,21 @@
       background: linear-gradient(90deg, #fff 0%, #fcfeff 2%, rgba(125, 185, 232, 0));
       z-index: 1;
     }
-
+    
     .phone-image {
-      margin-left: 5px;
-      display: block;
-      height: -webkit-fill-available;
-      width: 165px;
-      position: relative;
-      z-index: 2;
-      background: url("https://fdn2.gsmarena.com/vv/bigpic/samsung-galaxy-s24-ultra-5g-sm-s928-stylus.jpg");
-      /* background: #fff; */
-      background-position: right;
-      background-color: #fff;
-      background-size: contain;
-      background-repeat: no-repeat;
-    }
+     margin-left: 5px;
+    display: block;
+    height: -webkit-fill-available;
+    width: 165px;
+    position: relative;
+    z-index: 2;
+    background: url("https://fdn2.gsmarena.com/vv/bigpic/samsung-galaxy-s24-ultra-5g-sm-s928-stylus.jpg");
+    /* background: #fff; */
+    background-position: right;
+    background-color: #fff;
+    background-size: contain;
+    background-repeat: no-repeat;
+}
 
     tr {
       background-color: white;
@@ -392,15 +392,15 @@
       <div class="d-lg-flex  d-block" style="align-items: flex-start; ">
 
         <!-- Left: Phone Image -->
-        <div style=" 
+         <div style=" 
          height: 200px;
     height: -webkit-fill-available;
     background: white;
    padding-top: 5px;    
 ">
-          <!-- Left: Phone Image -->
-          <div class="phone-image me-3 pt-2 px-2" style="height: 200px;"></div>
-        </div>
+            <!-- Left: Phone Image -->
+            <div class="phone-image me-3 pt-2 px-2" style="height: 200px;"></div>
+</div>
 
         <!-- Right: Details + Stats + Specs -->
         <div class="flex-grow-1 position-relative" style="z-index: 100;">
@@ -428,32 +428,32 @@
           </div>
 
           <!-- Specs Row (aligned with image) -->
-          <div class="row text-center d-block g-0  pt-2 specs-bar">
-            <div class="col-3 spec-item">
-              <img src="imges/vrer.png" style="width: 25px;" alt="">
+           <div class="row text-center d-block g-0  pt-2 specs-bar">
+                <div class="col-3 spec-item">
+                  <img src="imges/vrer.png" style="width: 25px;" alt="">
 
-              <div class="spec-title"> 6.77"</div>
-              <div class="spec-subtitle">1080x2392 px</div>
-            </div>
-            <div class="col-3 spec-item border-start">
-              <img src="imges/bett-removebg-preview.png" style="width: 35px;" alt="">
+                  <div class="spec-title"> 6.77"</div>
+                  <div class="spec-subtitle">1080x2392 px</div>
+                </div>
+                <div class="col-3 spec-item border-start">
+                  <img src="imges/bett-removebg-preview.png" style="width: 35px;" alt="">
 
-              <div class="spec-title">50MP</div>
-              <div class="spec-subtitle">2160p</div>
-            </div>
-            <div class="col-3 spec-item border-start">
-              <img src="imges/encypt-removebg-preview.png" style="width: 38px;" alt="">
+                  <div class="spec-title">50MP</div>
+                  <div class="spec-subtitle">2160p</div>
+                </div>
+                <div class="col-3 spec-item border-start">
+                  <img src="imges/encypt-removebg-preview.png" style="width: 38px;" alt="">
 
-              <div class="spec-title">8-16GB</div>
-              <div class="spec-subtitle">Snapdragon 7</div>
-            </div>
-            <div class="col-3 spec-item border-start">
-              <img src="imges/lowtry-removebg-preview.png" style="width: 35px;" alt="">
+                  <div class="spec-title">8-16GB</div>
+                  <div class="spec-subtitle">Snapdragon 7</div>
+                </div>
+                <div class="col-3 spec-item border-start">
+                  <img src="imges/lowtry-removebg-preview.png" style="width: 35px;" alt="">
 
-              <div class="spec-title">6500mAh</div>
-              <div class="spec-subtitle">90W</div>
-            </div>
-          </div>
+                  <div class="spec-title">6500mAh</div>
+                  <div class="spec-subtitle">90W</div>
+                </div>
+              </div>
 
         </div>
       </div>
@@ -523,7 +523,7 @@
 
     </div>
   </div>
-  <div class="container  d-lg-block d-none support content-wrapper" id="Top" style="padding: 0px;"
+  <div class="container  d-lg-block d-none support content-wrapper" id="Top"
     style=" margin-top: 2rem; padding-left: 0;">
     <div class="row">
       <div class="col-md-8 ">
@@ -545,14 +545,14 @@
           <div class="d-flex" style="align-items: flex-start;">
 
             <!-- Left: Phone Image -->
-            <div style="
+             <div style="
     height: -webkit-fill-available;
     background: white;
 ">
-              <!-- Left: Phone Image -->
-              <div class="phone-image me-3 pt-2 px-2"></div>
-            </div>
-
+            <!-- Left: Phone Image -->
+            <div class="phone-image me-3 pt-2 px-2"></div>
+</div>
+          
             <!-- Right: Details + Stats + Specs -->
             <div class="flex-grow-1 position-relative" style="z-index: 100;">
 
@@ -641,59 +641,59 @@
 
 
       </div>
-      <div class="col-md-4 col-5 d-none d-lg-block">
-        <button class="solid w-100 py-2">
-          <i class="fa-solid fa-mobile fa-sm mx-2" style="color: white;"></i>
-          Phone Finder</button>
-        <div class="devor">
-          <button>Samsung</button>
-          <button>Xiaomi</button>
-          <button>Asus</button>
-          <button>Infinix</button>
-          <button>Apple</button>
-          <button>Google</button>
-          <button>AlCatel</button>
-          <button>Ulefone</button>
-          <button>Huawei</button>
-          <button>Honor</button>
-          <button>Zte</button>
-          <button>Tecno</button>
-          <button>Nokia</button>
-          <button>Oppo</button>
-          <button>Microsoft </button>
-          <button>Dooge</button>
-          <button>Sony</button>
-          <button>Realme</button>
-          <button>Unidegi</button>
-          <button>Blackview</button>
-          <button>Lg </button>
-          <button>OnePlus</button>
-          <button>Coolpad</button>
-          <button>Cubot</button>
-          <button>HTc</button>
-          <button>Nothing</button>
-          <button>Oscal</button>
-          <button>oukitel</button>
-          <button>Motrola</button>
-          <button>Vivo</button>
-          <button>Shrap</button>
-          <button>Itel</button>
-          <button>Lenovo</button>
-          <button>meizu</button>
-          <button>Micromax</button>
-          <button>Tcl</button>
-        </div>
-        <div class="d-flex">
+        <div class="col-md-4 col-5 d-none d-lg-block">
+                <button class="solid w-100 py-2">
+                    <i class="fa-solid fa-mobile fa-sm mx-2" style="color: white;"></i>
+                    Phone Finder</button>
+                <div class="devor">
+                    <button>Samsung</button>
+                    <button>Xiaomi</button>
+                    <button >Asus</button>
+                    <button>Infinix</button>
+                    <button>Apple</button>
+                    <button >Google</button>
+                    <button >AlCatel</button>
+                    <button >Ulefone</button>
+                    <button >Huawei</button>
+                    <button >Honor</button>
+                    <button >Zte</button>
+                    <button >Tecno</button>
+                    <button >Nokia</button>
+                    <button >Oppo</button>
+                    <button >Microsoft </button>
+                    <button >Dooge</button>
+                    <button >Sony</button>
+                    <button >Realme</button>
+                    <button >Unidegi</button>
+                    <button >Blackview</button>
+                    <button >Lg </button>
+                    <button >OnePlus</button>
+                    <button >Coolpad</button>
+                    <button >Cubot</button>
+                    <button >HTc</button>
+                    <button >Nothing</button>
+                    <button >Oscal</button>
+                    <button >oukitel</button>
+                    <button >Motrola</button>
+                    <button >Vivo</button>
+                    <button >Shrap</button>
+                    <button >Itel</button>
+                    <button >Lenovo</button>
+                    <button >meizu</button>
+                    <button >Micromax</button>
+                    <button >Tcl</button>
+                </div>
+                <div class="d-flex">
 
-          <button class="solid w-50 py-2">
-            <i class="fa-solid 
+                    <button class="solid w-50 py-2">
+                        <i class="fa-solid 
                         fa-bars fa-sm mx-2"></i> All Brands</button>
-          <button class="solid w-50 py-2" style="/* width: 177px; */">
-            <i class="fa-solid fa-volume-high fa-sm mx-2"></i>
-            RUMORS MILL</button>
+                    <button class="solid w-50 py-2" style="/* width: 177px; */">
+                        <i class="fa-solid fa-volume-high fa-sm mx-2"></i>
+                        RUMORS MILL</button>
 
-        </div>
-      </div>
+                </div>
+            </div>
     </div>
 
   </div>
@@ -949,7 +949,7 @@
             </div>
           </div>
 
-          <img src="https://fdn.gsmarena.com/imgroot/static/banners/self/review-pixel-9-pro-xl-728x90.jpg" alt="" style="width: -webkit-fill-available;">
+          <img  src="https://fdn.gsmarena.com/imgroot/static/banners/self/review-pixel-9-pro-xl-728x90.jpg" alt="" style="width: -webkit-fill-available;">
         </div>
       </div>
 
@@ -1136,7 +1136,7 @@
 <script>
   // Enable tooltips
   var tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'))
-  tooltipTriggerList.map(function(tooltipTriggerEl) {
+  tooltipTriggerList.map(function (tooltipTriggerEl) {
     return new bootstrap.Tooltip(tooltipTriggerEl)
   })
 </script>

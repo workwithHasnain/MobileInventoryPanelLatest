@@ -22,7 +22,7 @@
 </head>
 
 <body style="background-color: #EFEBE9;">
-    <!-- Desktop Navbar of Gsmarecn -->
+     <!-- Desktop Navbar of Gsmarecn -->
     <div class="main-wrapper">
         <!-- Top Navbar -->
         <nav class="navbar navbar-dark  d-lg-inline d-none" id="navbar">
@@ -171,16 +171,16 @@
             </div>
         </div>
     </div>
-    <div class="container support content-wrapper" id="Top" style="padding: 0px;">
+    <div class="container support content-wrapper" id="Top">
         <div class="row">
-
+          
             <div class="col-md-8 col-5  d-lg-inline d-none ">
                 <div class="comfort-life position-absolute">
                     <img class="w-100 h-100 " src="imges/download-first.jpeg"
                         style="background-repeat: no-repeat; background-size: cover;" alt="">
                 </div>
             </div>
-            <div class="col-md-4 col-5 d-none d-lg-block" style="position: relative; left: 25px;">
+             <div class="col-md-4 col-5 d-none d-lg-block" style="position: relative; left: 25px;">
                 <button class="solid w-100 py-2">
                     <i class="fa-solid fa-mobile fa-sm mx-2" style="color: white;"></i>
                     Phone Finder</button>
@@ -234,7 +234,7 @@
     </div>
     <div class="container mt-0  ">
         <div class="row">
-
+           
             <div class="col-lg-8 col-md-6  col-12  sentizer-er" style="background-color: white; ">
                 <h4 class="western">We do appreciate your feedback</h4>
                 <div class="paragh-div">
@@ -263,13 +263,13 @@
 
                 </div>
             </div>
-            <div class="col-lg-4 col-md-6 col-12  bg-white p-3">
-
+            <div class="col-lg-4 col-md-6 col-12  bg-white p-3" >
+            
                 <img src="https://fdn.gsmarena.com/imgroot/static/banners/self/arenaev-300x250.jpg" class="w-100 "
                     style="width: 400px;" alt="">
-
+            
                 <div class="cent">
-
+            
                     <div class="d-flex">
                         <div class="canel">
                             <img class="shrink" src="https://fdn2.gsmarena.com/vv/bigpic/nothing-cmf-phone-2-pro.jpg" alt="">
@@ -313,7 +313,7 @@
                         </div>
                     </div>
                 </div>
-
+            
             </div>
         </div>
     </div>

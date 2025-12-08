@@ -22,7 +22,7 @@
 </head>
 
 <body style="background-color: #EFEBE9;">
-    <!-- Desktop Navbar of Gsmarecn -->
+      <!-- Desktop Navbar of Gsmarecn -->
     <div class="main-wrapper">
         <!-- Top Navbar -->
         <nav class="navbar navbar-dark  d-lg-inline d-none" id="navbar">
@@ -171,7 +171,7 @@
             </div>
         </div>
     </div>
-    <div class="container support content-wrapper" id="Top" style="padding: 0px;">
+    <div class="container support content-wrapper" id="Top">
         <div class="row">
 
             <div class="col-md-8 col-5  d-lg-inline d-none col-12 ">
@@ -198,7 +198,7 @@
                 </div>
 
             </div>
-            <div class="col-md-4 col-5 d-none d-lg-block" style="position: relative; left: 25px;">
+             <div class="col-md-4 col-5 d-none d-lg-block" style="position: relative; left: 25px;">
                 <button class="solid w-100 py-2">
                     <i class="fa-solid fa-mobile fa-sm mx-2" style="color: white;"></i>
                     Phone Finder</button>
@@ -437,13 +437,13 @@
                     <h1 class="common">Google pIxel 9a Review</h1>
                 </div>
                 <div class="d-flex">
-                    <h5 class="text-secondary mt-2 d-inline fw-bold " style="text-transform: uppercase;">top 10 by Daily Interest </h5>
+                    <h5 class="text-secondary mt-2 d-inline fw-bold " style="text-transform: uppercase;" >top 10 by Daily Interest </h5>
                 </div>
                 <div class="center w-100">
                     <table class="table table-sm custom-table">
                         <thead>
                             <tr class="text-white " style="background-color: #4C7273;">
-                                <th style="color: white;">#</th>
+                                <th  style="color: white;">#</th>
                                 <th style="color: white;">Devices</th>
                                 <th style="color: white;">Daily Hits</th>
                             </tr>
@@ -503,11 +503,11 @@
                     </table>
                 </div>
                 <div class="center w-100 " style="margin-top: 12px;">
-                    <h5 class="text-secondary mt-2 d-inline fw-bold " style="text-transform: uppercase;">top 10 by Fans </h5>
-
+                    <h5 class="text-secondary mt-2 d-inline fw-bold " style="text-transform: uppercase;" >top 10 by Fans </h5>
+                    
                     <table class="table table-sm custom-table">
                         <thead>
-                            <tr class="text-white" style="background-color: #14222D;">
+                        <tr class="text-white" style="background-color: #14222D;">
                                 <th style="color: white;  font-size: 15px;  ">#</th>
                                 <th style="color: white;  font-size: 15px;">Device</th>
                                 <th style="color: white;  font-size: 15px;">Favorites</th>
