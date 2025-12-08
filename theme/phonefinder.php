@@ -22,7 +22,7 @@
 </head>
 
 <body style="background-color: #EFEBE9;">
-      <!-- Desktop Navbar of Gsmarecn -->
+    <!-- Desktop Navbar of Gsmarecn -->
     <div class="main-wrapper">
         <!-- Top Navbar -->
         <nav class="navbar navbar-dark  d-lg-inline d-none" id="navbar">
@@ -173,7 +173,7 @@
     </div>
     <div class="container support content-wrapper" id="Top">
         <div class="row">
-           
+
             <div class="col-md-8 col-5  d-md-inline  ">
                 <div class="comfort-life position-absolute d-lg-block d-none ">
                     <img class="w-100 h-100" src="imges/magnifient sectton.jpeg"
@@ -187,47 +187,47 @@
                 <div class="devor">
                     <button>Samsung</button>
                     <button>Xiaomi</button>
-                    <button >Asus</button>
+                    <button>Asus</button>
                     <button>Infinix</button>
                     <button>Apple</button>
-                    <button >Google</button>
-                    <button >AlCatel</button>
-                    <button >Ulefone</button>
-                    <button >Huawei</button>
-                    <button >Honor</button>
-                    <button >Zte</button>
-                    <button >Tecno</button>
-                    <button >Nokia</button>
-                    <button >Oppo</button>
-                    <button >Microsoft </button>
-                    <button >Dooge</button>
-                    <button >Sony</button>
-                    <button >Realme</button>
-                    <button >Unidegi</button>
-                    <button >Blackview</button>
-                    <button >Lg </button>
-                    <button >OnePlus</button>
-                    <button >Coolpad</button>
-                    <button >Cubot</button>
-                    <button >HTc</button>
-                    <button >Nothing</button>
-                    <button >Oscal</button>
-                    <button >oukitel</button>
-                    <button >Motrola</button>
-                    <button >Vivo</button>
-                    <button >Shrap</button>
-                    <button >Itel</button>
-                    <button >Lenovo</button>
-                    <button >meizu</button>
-                    <button >Micromax</button>
-                    <button >Tcl</button>
+                    <button>Google</button>
+                    <button>AlCatel</button>
+                    <button>Ulefone</button>
+                    <button>Huawei</button>
+                    <button>Honor</button>
+                    <button>Zte</button>
+                    <button>Tecno</button>
+                    <button>Nokia</button>
+                    <button>Oppo</button>
+                    <button>Microsoft </button>
+                    <button>Dooge</button>
+                    <button>Sony</button>
+                    <button>Realme</button>
+                    <button>Unidegi</button>
+                    <button>Blackview</button>
+                    <button>Lg </button>
+                    <button>OnePlus</button>
+                    <button>Coolpad</button>
+                    <button>Cubot</button>
+                    <button>HTc</button>
+                    <button>Nothing</button>
+                    <button>Oscal</button>
+                    <button>oukitel</button>
+                    <button>Motrola</button>
+                    <button>Vivo</button>
+                    <button>Shrap</button>
+                    <button>Itel</button>
+                    <button>Lenovo</button>
+                    <button>meizu</button>
+                    <button>Micromax</button>
+                    <button>Tcl</button>
                 </div>
                 <div class="d-flex">
 
                     <button class="solid w-50 py-2">
                         <i class="fa-solid 
                         fa-bars fa-sm mx-2"></i> All Brands</button>
-                    <button class="solid w-50 py-2" style="/* width: 177px; */">
+                    <button class="solid w-50 py-2">
                         <i class="fa-solid fa-volume-high fa-sm mx-2"></i>
                         RUMORS MILL</button>
 

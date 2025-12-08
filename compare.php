@@ -704,9 +704,69 @@ function formatColors($phone)
     return '<span class="text-muted">Not specified</span>';
 }
 
+// ---- Text truncation helper ----
+$truncateText = function ($text, $maxLength = 60) {
+    if (strlen($text) > $maxLength) {
+        $truncated = substr($text, 0, $maxLength);
+        // Store full text in data attribute and show clickable ellipsis
+        return htmlspecialchars($truncated) . '<span class="expand-dots" data-full="' . str_replace('"', '&quot;', htmlspecialchars($text)) . '" style="cursor: pointer; color: #d50000; font-weight: bold;">  ...</span>';
+    }
+    return htmlspecialchars($text);
+};
+
 // ---- New JSON specs rendering (align with device.php) ----
-// Helper: render a section from JSON stored as TEXT in DB
-function renderJsonSection($jsonValue, $sectionName = '')
+// Helper: parse JSON section and return structured array of field+description pairs (for 2-column layout in comparison)
+function parseJsonSectionStructured($jsonValue, $sectionName = '', $truncateFunc = null)
+{
+    if (!isset($jsonValue) || $jsonValue === '' || $jsonValue === null) return [];
+    $decoded = json_decode($jsonValue, true);
+    if (json_last_error() !== JSON_ERROR_NONE || !is_array($decoded)) {
+        return [];
+    }
+
+    $rows = [];
+    foreach ($decoded as $row) {
+        $field = isset($row['field']) ? trim((string)$row['field']) : '';
+        $desc = isset($row['description']) ? trim((string)$row['description']) : '';
+
+        if ($field === '' && $desc === '') continue;
+
+        if ($field !== '') {
+            // New field entry
+            $description = $desc;
+
+            // Add EUR conversion for price if applicable
+            if ($sectionName === 'GENERAL INFO' && strtolower($field) === 'price' && $desc !== '') {
+                $priceStr = preg_replace('/[^0-9.]/', '', $desc);
+                if ($priceStr !== '' && is_numeric($priceStr)) {
+                    $usd = (float)$priceStr;
+                    $eur = convertUSDtoEUR($usd);
+                    if ($eur !== null) {
+                        $description = $desc . ' / €' . number_format($eur, 2);
+                    }
+                }
+            }
+
+            $rows[] = [
+                'field' => $field,
+                'description' => $description
+            ];
+        } else {
+            // Empty field = continuation of previous field
+            if (!empty($rows)) {
+                $lastRow = &$rows[count($rows) - 1];
+                if ($desc !== '') {
+                    $lastRow['description'] .= "\n" . $desc;
+                }
+            }
+        }
+    }
+
+    return $rows;
+}
+
+// Helper: render a section from JSON stored as TEXT in DB (legacy, for backwards compatibility)
+function renderJsonSection($jsonValue, $sectionName = '', $truncateFunc = null)
 {
     if (!isset($jsonValue) || $jsonValue === '' || $jsonValue === null) return null;
     $decoded = json_decode($jsonValue, true);
@@ -720,9 +780,10 @@ function renderJsonSection($jsonValue, $sectionName = '')
         $desc = isset($row['description']) ? trim((string)$row['description']) : '';
         if ($field === '' && $desc === '') continue;
         if ($field !== '') {
-            $line = '<strong>' . htmlspecialchars($field) . '</strong>';
+            $line = '' . htmlspecialchars($field) . '';
             if ($desc !== '') {
-                $line .= ' ' . htmlspecialchars($desc);
+                // Truncate description to 60 characters with expand functionality
+                $line .= ' ' . $truncateFunc($desc, 60);
 
                 // If this is the GENERAL INFO -> Price row, append EUR conversion like device.php
                 if ($sectionName === 'GENERAL INFO' && strtolower($field) === 'price') {
@@ -745,8 +806,8 @@ function renderJsonSection($jsonValue, $sectionName = '')
     return implode('<br>', $parts);
 }
 
-// Build specs array from grouped JSON columns
-function formatDeviceSpecsJson($device)
+// Build specs array from grouped JSON columns (returns HTML string per section - legacy)
+function formatDeviceSpecsJson($device, $truncateFunc = null)
 {
     $specs = [];
     $jsonSections = [
@@ -766,9 +827,38 @@ function formatDeviceSpecsJson($device)
     ];
 
     foreach ($jsonSections as $label => $raw) {
-        $html = renderJsonSection($raw, $label);
+        $html = renderJsonSection($raw, $label, $truncateFunc);
         if ($html && trim($html) !== '') {
             $specs[$label] = $html;
+        }
+    }
+    return $specs;
+}
+
+// Build specs array with structured field/description pairs (for 2-column comparison layout)
+function formatDeviceSpecsStructured($device)
+{
+    $specs = [];
+    $jsonSections = [
+        'NETWORK' => $device['network'] ?? null,
+        'LAUNCH' => $device['launch'] ?? null,
+        'BODY' => $device['body'] ?? null,
+        'DISPLAY' => $device['display'] ?? null,
+        'HARDWARE' => $device['hardware'] ?? null,
+        'MEMORY' => $device['memory'] ?? null,
+        'MAIN CAMERA' => $device['main_camera'] ?? null,
+        'SELFIE CAMERA' => $device['selfie_camera'] ?? null,
+        'MULTIMEDIA' => $device['multimedia'] ?? null,
+        'CONNECTIVITY' => $device['connectivity'] ?? null,
+        'FEATURES' => $device['features'] ?? null,
+        'BATTERY' => $device['battery'] ?? null,
+        'GENERAL INFO' => $device['general_info'] ?? null,
+    ];
+
+    foreach ($jsonSections as $label => $raw) {
+        $rows = parseJsonSectionStructured($raw, $label);
+        if (!empty($rows)) {
+            $specs[$label] = $rows;
         }
     }
     return $specs;
@@ -869,126 +959,7 @@ function formatDeviceSpecsJson($device)
 
 <body style="background-color: #EFEBE9;">
     <!-- Desktop Navbar of Gsmarecn -->
-    <div class="main-wrapper">
-        <!-- Top Navbar -->
-        <nav class="navbar navbar-dark  d-lg-inline d-none" id="navbar">
-            <div class="container const d-flex align-items-center justify-content-between">
-                <button class="navbar-toggler mb-2" type="button" onclick="toggleMenu()">
-                    <img style="height: 40px;"
-                        src="https://cdn.prod.website-files.com/67f21c9d62aa4c4c685a7277/684091b39228b431a556d811_download-removebg-preview.png"
-                        alt="">
-                </button>
-
-                <a class="navbar-brand d-flex align-items-center" href="#">
-                    <img src="imges/download.png" alt="GSMArena Logo" />
-                </a>
-
-                <div class="controvecy mb-2">
-                    <div class="icon-container">
-                        <button type="button" class="btn border-right" data-bs-toggle="tooltip" data-bs-placement="left"
-                            title="YouTube">
-                            <img src="iccons/youtube-color-svgrepo-com.svg" alt="YouTube" width="30px">
-                        </button>
-
-                        <button type="button" class="btn" data-bs-toggle="tooltip" data-bs-placement="left"
-                            title="Instagram">
-                            <img src="iccons/instagram-color-svgrepo-com.svg" alt="Instagram" width="22px">
-                        </button>
-
-
-
-
-
-
-                    </div>
-                </div>
-
-                <form action="" class="central d-flex align-items-center">
-                    <input type="text" class="no-focus-border" placeholder="Search">
-                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" height="24" width="24" class="ms-2">
-                        <path fill="#ffffff"
-                            d="M416 208c0 45.9-14.9 88.3-40 122.7L502.6 457.4c12.5 12.5 12.5 32.8 0 45.3s-32.8 12.5-45.3 0L330.7 376c-34.4 25.2-76.8 40-122.7 40C93.1 416 0 322.9 0 208S93.1 0 208 0S416 93.1 416 208zM208 352a144 144 0 1 0 0-288 144 144 0 1 0 0 288z" />
-                    </svg>
-                </form>
-
-
-            </div>
-        </nav>
-
-    </div>
-    <!-- Mobile Navbar of Gsmarecn -->
-    <nav id="navbar" class="mobile-navbar d-lg-none d-flex justify-content-between  align-items-center">
-
-        <button class="navbar-toggler text-white" type="button" data-bs-toggle="collapse" data-bs-target="#mobileMenu"
-            aria-controls="mobileMenu" aria-expanded="false" aria-label="Toggle navigation">
-            <img style="height: 40px;"
-                src="https://cdn.prod.website-files.com/67f21c9d62aa4c4c685a7277/684091b39228b431a556d811_download-removebg-preview.png"
-                alt="">
-        </button>
-        <a class="navbar-brand d-flex align-items-center" href="#">
-            <a class="logo text-white " href="#">GSMArena</a>
-        </a>
-        <div class="d-flex justify-content-end">
-            <button type="button" class="btn float-end ml-5" data-bs-toggle="tooltip" data-bs-placement="left">
-                <i class="fa-solid fa-right-to-bracket fa-lg" style="color: #ffffff;"></i>
-            </button>
-            <button type="button" class="btn float-end " data-bs-toggle="tooltip" data-bs-placement="left">
-                <i class="fa-solid fa-user-plus fa-lg" style="color: #ffffff;"></i>
-            </button>
-        </div>
-    </nav>
-    <!-- Mobile Collapse of Gsmarecn -->
-    <div class="collapse mobile-menu d-lg-none" id="mobileMenu">
-        <div class="menu-icons">
-            <i class="fas fa-home"></i>
-            <i class="fab fa-facebook-f"></i>
-            <i class="fab fa-instagram"></i>
-            <i class="fab fa-tiktok"></i>
-            <i class="fas fa-share-alt"></i>
-        </div>
-        <div class="column">
-            <a href="index.php">Home</a>
-            <a href="reviews.php">Reviews</a>
-            <a href="#">Videos</a>
-            <a href="featured.php">Featured</a>
-            <a href="phonefinder.php">Phone Finder</a>
-            <a href="compare.php">Compare</a>
-            <a href="#">Contact Us</a>
-        </div>
-        <div class="brand-grid">
-            <?php
-            $brandChunks = array_chunk($brands, 1); // Create chunks of 1 brand per row
-            foreach ($brandChunks as $brandRow):
-                foreach ($brandRow as $brand): ?>
-                    <a href="#" class="brand-cell" data-brand-id="<?php echo $brand['id']; ?>"><?php echo htmlspecialchars($brand['name']); ?></a>
-            <?php endforeach;
-            endforeach; ?>
-            <a href="#" onclick="showBrandsModal(); return false;" style="cursor: pointer;">[...]</a>
-        </div>
-        <div class="menu-buttons d-flex justify-content-center ">
-            <button class="btn btn-danger w-50">📱 Phone Finder</button>
-            <button class="btn btn-primary w-50">📲 My Phone</button>
-        </div>
-    </div>
-    <!-- Display Menu of Gsmarecn -->
-    <div id="leftMenu" class="container show">
-        <div class="row">
-            <div class="col-12 d-flex align-items-center   colums-gap">
-                <a href="index.php" class="nav-link navbar-bold">Home</a>
-                <a href="compare.php" class="nav-link navbar-bold">Compare</a>
-                <a href="#" class="nav-link navbar-bold">Videos</a>
-                <a href="reviews.php" class="nav-link navbar-bold">Reviews</a>
-                <a href="featured.php" class="nav-link d-lg-block d-none navbar-bold">Featured</a>
-                <a href="phonefinder.php" class="nav-link d-lg-block d-none navbar-bold">Phone Finder</a>
-                <a href="#" class="nav-link d-lg-block d-none navbar-bold">Contact</a>
-                <div style="background-color: #d50000; border-radius: 7px;" class="d-lg-none py-2"><svg
-                        xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" height="16" width="16" class="mx-3">
-                        <path fill="#ffffff"
-                            d="M416 208c0 45.9-14.9 88.3-40 122.7L502.6 457.4c12.5 12.5 12.5 32.8 0 45.3s-32.8 12.5-45.3 0L330.7 376c-34.4 25.2-76.8 40-122.7 40C93.1 416 0 322.9 0 208S93.1 0 208 0S416 93.1 416 208zM208 352a144 144 0 1 0 0-288 144 144 0 1 0 0 288z" />
-                    </svg></div>
-            </div>
-        </div>
-    </div>
+    <?php include 'includes/gsmheader.php'; ?>
     <div class="container support content-wrapper" id="Top">
         <div class="row">
             <div class="col-md-8 col-5  d-lg-inline d-none ">
@@ -1035,7 +1006,7 @@ function formatDeviceSpecsJson($device)
                 <div class="compare-checkbox">
                     <label>
                         Compare
-                        <select id="phone1-select"   name="phone1" class="bg-white mx-2 text-center-auto border phone-search-select" onchange="updateComparison(1, this.value)">
+                        <select id="phone1-select" name="phone1" class="bg-white text-center-auto border phone-search-select" onchange="updateComparison(1, this.value)">
                             <option value="">Select Phone 1</option>
                             <?php foreach ($phones as $phone): ?>
                                 <option value="<?php echo $phone['id']; ?>" data-image="<?php echo htmlspecialchars(getPhoneImage($phone)); ?>" data-name="<?php echo htmlspecialchars(getPhoneName($phone)); ?>" <?php echo ($phone1 && $phone1['id'] == $phone['id']) ? 'selected' : ''; ?>>
@@ -1073,7 +1044,7 @@ function formatDeviceSpecsJson($device)
                 <div class="compare-checkbox">
                     <label>
                         Compare
-                        <select id="phone2-select" name="phone2" class="bg-white w-100 mx-2 text-center-auto border phone-search-select" onchange="updateComparison(2, this.value)">
+                        <select id="phone2-select" name="phone2" class="bg-white text-center-auto border phone-search-select" onchange="updateComparison(2, this.value)">
                             <option value="">Select Phone 2</option>
                             <?php foreach ($phones as $phone): ?>
                                 <option value="<?php echo $phone['id']; ?>" data-image="<?php echo htmlspecialchars(getPhoneImage($phone)); ?>" data-name="<?php echo htmlspecialchars(getPhoneName($phone)); ?>" <?php echo ($phone2 && $phone2['id'] == $phone['id']) ? 'selected' : ''; ?>>
@@ -1113,7 +1084,7 @@ function formatDeviceSpecsJson($device)
                 <div class="compare-checkbox">
                     <label>
                         Compare
-                        <select id="phone3-select" name="phone3" class="bg-white w-100 mx-2 text-center-auto border phone-search-select" onchange="updateComparison(3, this.value)">
+                        <select id="phone3-select" name="phone3" class="bg-white text-center-auto border phone-search-select" onchange="updateComparison(3, this.value)">
                             <option value="">Select Phone 3</option>
                             <?php foreach ($phones as $phone): ?>
                                 <option value="<?php echo $phone['id']; ?>" data-image="<?php echo htmlspecialchars(getPhoneImage($phone)); ?>" data-name="<?php echo htmlspecialchars(getPhoneName($phone)); ?>" <?php echo ($phone3 && $phone3['id'] == $phone['id']) ? 'selected' : ''; ?>>
@@ -1150,229 +1121,231 @@ function formatDeviceSpecsJson($device)
                 </div>
             </div>
         </div>
- <div  class="comparison-wrapper">
-    <style>
-
-/* Wrapper that allows horizontal scroll */
-.comparison-wrapper {
-    width: 100%;
-    overflow-x: auto;
-    overflow-y: hidden;
-    -webkit-overflow-scrolling: touch;
-    border: 1px solid #e5e5e5;
-    border-radius: 10px;
-}
-
-/* Table full width but no wrap issues */
-.comparison-table {
-    width: 100%;
-    border-collapse: collapse;
-    min-width: 900px; /* enough for 3 phones */
-    table-layout: fixed;
-}
-
-.comparison-table th,
-.comparison-table td {
-    border: 1px solid #ddd;
-    padding: 12px;
-    vertical-align: top;
-    text-align: left;
-    word-wrap: break-word;
-    font-size: 15px;
-}
-
-/* Section headings */
-.comparison-table td[colspan="3"] {
-    background: #f7f7f7;
-    font-weight: 700;
-    color: #e63946;
-    font-size: 16px;
-    text-transform: uppercase;
-}
-
-/* Mobile: enable TRUE GSMArena style scroll */
-@media(max-width: 768px) {
-
-    .comparison-wrapper {
-        overflow-x: scroll;
-        white-space: nowrap;
-    }
-
-    .comparison-table {
-        min-width: 800px; /* Adjust for smooth scroll */
-    }
-
-    .comparison-table th,
-    .comparison-table td {
-        white-space: normal; /* readable text */
-        font-size: 14px;
-    }
-}
-
-    </style>
-        <table class="comparison-table">
-            <thead>
-                <tr>
-                    <th><?php echo $phone1 ? getPhoneName($phone1) : 'Select Phone 1'; ?></th>
-                    <th><?php echo $phone2 ? getPhoneName($phone2) : 'Select Phone 2'; ?></th>
-                    <th><?php echo $phone3 ? getPhoneName($phone3) : 'Select Phone 3'; ?></th>
-                </tr>
-            </thead>
-            <tbody>
-                <?php
-                // Build spec arrays from JSON for each phone (if phone selected)
-                $specs1 = $phone1 ? formatDeviceSpecsJson($phone1) : [];
-                $specs2 = $phone2 ? formatDeviceSpecsJson($phone2) : [];
-                $specs3 = $phone3 ? formatDeviceSpecsJson($phone3) : [];
-
-                // Ordered sections (match device page logical order)
-                $orderedSections = [
-                    'NETWORK',
-                    'LAUNCH',
-                    'BODY',
-                    'DISPLAY',
-                    'HARDWARE',
-                    'MEMORY',
-                    'MAIN CAMERA',
-                    'SELFIE CAMERA',
-                    'MULTIMEDIA',
-                    'CONNECTIVITY',
-                    'FEATURES',
-                    'BATTERY',
-                    'GENERAL INFO'
-                ];
-
-                // Fallback legacy mapping for key sections if JSON absent
-                $legacyFallback = function ($label, $phone) {
-                    if (!$phone) return 'N/A';
-                    switch ($label) {
-                        case 'NETWORK':
-                            return displayNetworkCapabilities($phone);
-                        case 'LAUNCH':
-                            // combine announcement + availability + price if present
-                            $parts = [];
-                            if (!empty($phone['release_date'])) {
-                                $parts[] = formatAnnouncementDate($phone);
-                            }
-                            if (!empty($phone['availability'])) {
-                                $parts[] = 'Status: ' . htmlspecialchars($phone['availability']);
-                            }
-                            // Prefer extracting price from general_info JSON if available
-                            $usdPrice = null;
-                            if (!empty($phone['general_info'])) {
-                                $usdPrice = extractPriceFromMisc($phone['general_info']);
-                            }
-                            if ($usdPrice === null && !empty($phone['price']) && is_numeric($phone['price'])) {
-                                $usdPrice = (float)$phone['price'];
-                            }
-                            if ($usdPrice !== null) {
-                                $priceLine = 'Price: $' . number_format($usdPrice, 2);
-                                $eur = convertUSDtoEUR($usdPrice);
-                                if ($eur !== null) {
-                                    $priceLine .= ' / €' . number_format($eur, 2);
-                                }
-                                $parts[] = $priceLine;
-                            }
-                            return !empty($parts) ? implode('<br>', $parts) : 'N/A';
-                        case 'BODY':
-                            $body = [];
-                            $dims = formatDimensions($phone);
-                            if ($dims && strpos($dims, 'Not specified') === false) $body[] = '<strong>Dimensions</strong> ' . $dims;
-                            if (!empty($phone['weight'])) $body[] = '<strong>Weight</strong> ' . htmlspecialchars($phone['weight']) . ' g';
-                            return !empty($body) ? implode('<br>', $body) : 'N/A';
-                        case 'DISPLAY':
-                            return formatDisplay($phone);
-                        case 'HARDWARE':
-                            $plat = [];
-                            if (!empty($phone['os'])) $plat[] = '<strong>OS</strong> ' . htmlspecialchars($phone['os']);
-                            if (!empty($phone['chipset_name'])) $plat[] = '<strong>System Chip</strong> ' . htmlspecialchars($phone['chipset_name']);
-                            return !empty($plat) ? implode('<br>', $plat) : 'N/A';
-                        case 'MEMORY':
-                            return formatMemory($phone);
-                        case 'MAIN CAMERA':
-                            return formatMainCamera($phone);
-                        case 'SELFIE CAMERA':
-                            return formatSelfieCamera($phone);
-                        case 'MULTIMEDIA':
-                            return formatSound($phone);
-                        case 'CONNECTIVITY':
-                            return formatCommunications($phone);
-                        case 'FEATURES':
-                            return formatFeatures($phone);
-                        case 'BATTERY':
-                            return formatBattery($phone);
-                        case 'GENERAL INFO':
-                            // Price & colors if available
-                            $miscParts = [];
-                            $colors = formatColors($phone);
-                            if ($colors && strpos($colors, 'Not specified') === false) $miscParts[] = '<strong>Colors</strong> ' . $colors;
-                            // Remove direct price display here to avoid duplication (now shown in LAUNCH)
-                            return !empty($miscParts) ? implode('<br>', $miscParts) : 'N/A';
-                        default:
-                            return 'N/A';
-                    }
-                };
-
-                foreach ($orderedSections as $section) {
-                    $val1 = isset($specs1[$section]) ? $specs1[$section] : $legacyFallback($section, $phone1);
-                    $val2 = isset($specs2[$section]) ? $specs2[$section] : $legacyFallback($section, $phone2);
-                    $val3 = isset($specs3[$section]) ? $specs3[$section] : $legacyFallback($section, $phone3);
-                    echo '<tr><td colspan="3" style="color:#f14d4d;font-size:16px;background:#f9f9f9;font-weight:600;">' . htmlspecialchars($section) . '</td></tr>';
-                    echo '<tr>';
-                    echo '<td>' . ($val1 !== '' ? $val1 : 'N/A') . '</td>';
-                    echo '<td>' . ($val2 !== '' ? $val2 : 'N/A') . '</td>';
-                    echo '<td>' . ($val3 !== '' ? $val3 : 'N/A') . '</td>';
-                    echo '</tr>';
+        <div class="comparison-wrapper">
+            <style>
+                /* Wrapper that allows horizontal scroll */
+                .comparison-wrapper {
+                    width: 100%;
+                    overflow-x: auto;
+                    overflow-y: hidden;
+                    -webkit-overflow-scrolling: touch;
+                    border: 1px solid #e5e5e5;
+                    border-radius: 10px;
                 }
-                ?>
-            </tbody>
-        </table>
 
- </div>
+                /* Table full width but no wrap issues */
+                .comparison-table {
+                    width: 100%;
+                    border-collapse: collapse;
+                    min-width: 900px;
+                    /* enough for 3 phones */
+                    table-layout: fixed;
+                }
 
-    </div>
-    <!-- Newsletter Section -->
-    <div class="container mt-4 mb-4" style="max-width: 1034px;">
-        <div class="row">
-            <div class="col-12">
-                <div id="newsletter_message_container"></div>
-                <form id="newsletter_form" method="POST" action="" style="background-color: #EFEBE9; padding: 20px; border-radius: 4px; text-align: center;">
-                    <p style="margin-bottom: 12px; color: #5D4037; font-weight: 500;">Subscribe to our newsletter</p>
-                    <div style="display: flex; gap: 8px; justify-content: center; flex-wrap: wrap;">
-                        <input type="email" id="newsletter_email" name="newsletter_email" placeholder="Enter your email" required style="padding: 10px 12px; border: 1px solid #8D6E63; border-radius: 4px; font-size: 14px; flex: 1; min-width: 200px; max-width: 300px; background-color: white;">
-                        <style>
-                            input::placeholder {
-                                color: #8D6E63;
-                                opacity: 0.7;
+                .comparison-table th,
+                .comparison-table td {
+                    border: 1px solid #ddd;
+                    padding: 12px;
+                    vertical-align: top;
+                    text-align: left;
+                    word-wrap: break-word;
+                    font-size: 15px;
+                }
+
+                /* Section headings */
+                .comparison-table td[colspan="3"] {
+                    background: #f7f7f7;
+                    font-weight: 700;
+                    color: #e63946;
+                    font-size: 16px;
+                    text-transform: uppercase;
+                }
+
+                /* Mobile: enable TRUE GSMArena style scroll */
+                @media(max-width: 768px) {
+
+                    .comparison-wrapper {
+                        overflow-x: scroll;
+                        white-space: nowrap;
+                    }
+
+                    .comparison-table {
+                        min-width: 800px;
+                        /* Adjust for smooth scroll */
+                    }
+
+                    .comparison-table th,
+                    .comparison-table td {
+                        white-space: normal;
+                        /* readable text */
+                        font-size: 14px;
+                    }
+                }
+            </style>
+            <table class="comparison-table">
+                <thead>
+                    <tr>
+                        <th style="font-weight: 700;"><?php echo $phone1 ? getPhoneName($phone1) : 'Select Phone 1'; ?></th>
+                        <th style="font-weight: 700;"><?php echo $phone2 ? getPhoneName($phone2) : 'Select Phone 2'; ?></th>
+                        <th style="font-weight: 700;"><?php echo $phone3 ? getPhoneName($phone3) : 'Select Phone 3'; ?></th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <?php
+                    // Build spec arrays from structured JSON for each phone (if phone selected)
+                    $specs1 = $phone1 ? formatDeviceSpecsStructured($phone1) : [];
+                    $specs2 = $phone2 ? formatDeviceSpecsStructured($phone2) : [];
+                    $specs3 = $phone3 ? formatDeviceSpecsStructured($phone3) : [];
+
+                    // Ordered sections (match device page logical order)
+                    $orderedSections = [
+                        'NETWORK',
+                        'LAUNCH',
+                        'BODY',
+                        'DISPLAY',
+                        'HARDWARE',
+                        'MEMORY',
+                        'MAIN CAMERA',
+                        'SELFIE CAMERA',
+                        'MULTIMEDIA',
+                        'CONNECTIVITY',
+                        'FEATURES',
+                        'BATTERY',
+                        'GENERAL INFO'
+                    ];
+
+                    // Fallback legacy mapping for key sections if JSON absent
+                    $legacyFallback = function ($label, $phone) {
+                        if (!$phone) return 'N/A';
+                        switch ($label) {
+                            case 'NETWORK':
+                                return displayNetworkCapabilities($phone);
+                            case 'LAUNCH':
+                                // combine announcement + availability + price if present
+                                $parts = [];
+                                if (!empty($phone['release_date'])) {
+                                    $parts[] = formatAnnouncementDate($phone);
+                                }
+                                if (!empty($phone['availability'])) {
+                                    $parts[] = 'Status: ' . htmlspecialchars($phone['availability']);
+                                }
+                                // Prefer extracting price from general_info JSON if available
+                                $usdPrice = null;
+                                if (!empty($phone['general_info'])) {
+                                    $usdPrice = extractPriceFromMisc($phone['general_info']);
+                                }
+                                if ($usdPrice === null && !empty($phone['price']) && is_numeric($phone['price'])) {
+                                    $usdPrice = (float)$phone['price'];
+                                }
+                                if ($usdPrice !== null) {
+                                    $priceLine = 'Price: $' . number_format($usdPrice, 2);
+                                    $eur = convertUSDtoEUR($usdPrice);
+                                    if ($eur !== null) {
+                                        $priceLine .= ' / €' . number_format($eur, 2);
+                                    }
+                                    $parts[] = $priceLine;
+                                }
+                                return !empty($parts) ? implode('<br>', $parts) : 'N/A';
+                            case 'BODY':
+                                $body = [];
+                                $dims = formatDimensions($phone);
+                                if ($dims && strpos($dims, 'Not specified') === false) $body[] = 'Dimensions ' . $dims;
+                                if (!empty($phone['weight'])) $body[] = 'Weight ' . htmlspecialchars($phone['weight']) . ' g';
+                                return !empty($body) ? implode('<br>', $body) : 'N/A';
+                            case 'DISPLAY':
+                                return formatDisplay($phone);
+                            case 'HARDWARE':
+                                $plat = [];
+                                if (!empty($phone['os'])) $plat[] = 'OS ' . htmlspecialchars($phone['os']);
+                                if (!empty($phone['chipset_name'])) $plat[] = 'System Chip ' . htmlspecialchars($phone['chipset_name']);
+                                return !empty($plat) ? implode('<br>', $plat) : 'N/A';
+                            case 'MEMORY':
+                                return formatMemory($phone);
+                            case 'MAIN CAMERA':
+                                return formatMainCamera($phone);
+                            case 'SELFIE CAMERA':
+                                return formatSelfieCamera($phone);
+                            case 'MULTIMEDIA':
+                                return formatSound($phone);
+                            case 'CONNECTIVITY':
+                                return formatCommunications($phone);
+                            case 'FEATURES':
+                                return formatFeatures($phone);
+                            case 'BATTERY':
+                                return formatBattery($phone);
+                            case 'GENERAL INFO':
+                                // Price & colors if available
+                                $miscParts = [];
+                                $colors = formatColors($phone);
+                                if ($colors && strpos($colors, 'Not specified') === false) $miscParts[] = 'Colors ' . $colors;
+                                // Remove direct price display here to avoid duplication (now shown in LAUNCH)
+                                return !empty($miscParts) ? implode('<br>', $miscParts) : 'N/A';
+                            default:
+                                return 'N/A';
+                        }
+                    };
+
+                    foreach ($orderedSections as $section) {
+                        // Get structured spec rows for this section from each phone
+                        $rows1 = isset($specs1[$section]) ? $specs1[$section] : [];
+                        $rows2 = isset($specs2[$section]) ? $specs2[$section] : [];
+                        $rows3 = isset($specs3[$section]) ? $specs3[$section] : [];
+
+                        // Determine max number of rows for this section
+                        $maxRows = max(count($rows1), count($rows2), count($rows3), 1);
+
+                        // If no structured data, fall back to legacy rendering
+                        if ($maxRows === 1 && empty($rows1) && empty($rows2) && empty($rows3)) {
+                            $val1 = $legacyFallback($section, $phone1);
+                            $val2 = $legacyFallback($section, $phone2);
+                            $val3 = $legacyFallback($section, $phone3);
+                            echo '<tr><td colspan="3" style="color:#f14d4d;font-size:16px;background:#f9f9f9;font-weight:700;">' . htmlspecialchars($section) . '</td></tr>';
+                            echo '<tr>';
+                            echo '<td>' . ($val1 !== '' ? $val1 : 'N/A') . '</td>';
+                            echo '<td>' . ($val2 !== '' ? $val2 : 'N/A') . '</td>';
+                            echo '<td>' . ($val3 !== '' ? $val3 : 'N/A') . '</td>';
+                            echo '</tr>';
+                        } else {
+                            // Section header row
+                            echo '<tr><td colspan="3" style="color:#f14d4d;font-size:16px;background:#f9f9f9;font-weight:700;">' . htmlspecialchars($section) . '</td></tr>';
+
+                            // Render each field/description pair as a 2-column row per phone
+                            for ($i = 0; $i < $maxRows; $i++) {
+                                echo '<tr>';
+
+                                // Phone 1
+                                if (isset($rows1[$i])) {
+                                    echo '<td style="padding:12px 10px;vertical-align:top;"><div style="display:grid;grid-template-columns:140px 1fr;gap:8px;align-items:start;"><div style="font-weight:600;word-break:break-word;">' . htmlspecialchars($rows1[$i]['field']) . '</div><div style="word-break:break-word;white-space:normal;line-height:1.5;">' . nl2br(htmlspecialchars($rows1[$i]['description'])) . '</div></div></td>';
+                                } else {
+                                    echo '<td style="padding:12px 10px;color:#999;">N/A</td>';
+                                }
+
+                                // Phone 2
+                                if (isset($rows2[$i])) {
+                                    echo '<td style="padding:12px 10px;vertical-align:top;"><div style="display:grid;grid-template-columns:140px 1fr;gap:8px;align-items:start;"><div style="font-weight:600;word-break:break-word;">' . htmlspecialchars($rows2[$i]['field']) . '</div><div style="word-break:break-word;white-space:normal;line-height:1.5;">' . nl2br(htmlspecialchars($rows2[$i]['description'])) . '</div></div></td>';
+                                } else {
+                                    echo '<td style="padding:12px 10px;color:#999;">N/A</td>';
+                                }
+
+                                // Phone 3
+                                if (isset($rows3[$i])) {
+                                    echo '<td style="padding:12px 10px;vertical-align:top;"><div style="display:grid;grid-template-columns:140px 1fr;gap:8px;align-items:start;"><div style="font-weight:600;word-break:break-word;">' . htmlspecialchars($rows3[$i]['field']) . '</div><div style="word-break:break-word;white-space:normal;line-height:1.5;">' . nl2br(htmlspecialchars($rows3[$i]['description'])) . '</div></div></td>';
+                                } else {
+                                    echo '<td style="padding:12px 10px;color:#999;">N/A</td>';
+                                }
+
+                                echo '</tr>';
                             }
-                        </style>
-                        <button type="submit" id="newsletter_btn" style="padding: 10px 24px; background-color: #D50000; color: white; border: none; border-radius: 4px; cursor: pointer; font-size: 14px; white-space: nowrap; font-weight: 500;">Subscribe</button>
-                    </div>
-                </form>
-            </div>
+                        }
+                    }
+                    ?>
+                </tbody>
+            </table>
+
         </div>
+
     </div>
-    <div id="bottom" class="container d-flex mt-3" style="max-width: 1034px;">
-        <div class="row align-items-center">
-            <div class="col-md-2 m-auto col-4 d-flex justify-content-center align-items-center "> <img
-                    src="https://fdn2.gsmarena.com/w/css/logo-gsmarena-com.png" alt="">
-            </div>
-            <div class="col-10 nav-wrap m-auto text-center ">
-                <div class="nav-container">
-                    <a href="#">Home</a>
-                    <a href="reviews.php">Reviews</a>
-                    <a href="compare.php">Compare</a>
-                    <a href="#"> <i class="fa-solid fa-wifi fa-sm"></i> RSS</a>
-                    <a href="#"> <i class="fa-brands fa-youtube fa-sm"></i> YouTube</a>
-                    <a href="#"> <i class="fa-brands fa-instagram fa-sm"></i> Instagram</a>
-                    <a href="#"> <i class="fa-brands fa-tiktok fa-sm"></i>TikTok</a>
-                    <a href="#"> <i class="fa-brands fa-facebook-f fa-sm"></i> Facebook</a>
-                    <a href="#"> <i class="fa-brands fa-twitter fa-sm"></i>Twitter</a>
-                    <a href="#">© 2000-2025 GSMArena.com</a>
-                </div>
-            </div>
-        </div>
-    </div>
+    <?php include 'includes/gsmfooter.php'; ?>
     <!-- Brands Modal -->
     <div class="modal fade" id="brandsModal" tabindex="-1" aria-labelledby="brandsModalLabel" aria-hidden="true">
         <div class="modal-dialog modal-lg modal-dialog-centered modal-dialog-scrollable">
@@ -1686,7 +1659,37 @@ function formatDeviceSpecsJson($device)
             align-items: center;
             gap: 8px;
         }
+
+        .select2-container {
+            width: min-content;
+        }
     </style>
+    <script>
+        // Handle expandable text for truncated descriptions
+        document.addEventListener('click', function(e) {
+            if (e.target.classList.contains('expand-dots')) {
+                const fullText = e.target.getAttribute('data-full');
+                if (fullText) {
+                    // Decode HTML entities
+                    const temp = document.createElement('div');
+                    temp.innerHTML = fullText;
+                    const decodedText = temp.textContent || temp.innerText || '';
+
+                    // Get the text node that contains the truncated text (should be before the expand-dots span)
+                    const dotsSpan = e.target;
+                    const prevNode = dotsSpan.previousSibling;
+
+                    if (prevNode && prevNode.nodeType === Node.TEXT_NODE) {
+                        // Replace the text node with the full text
+                        prevNode.textContent = decodedText;
+                    }
+
+                    // Remove the expand-dots span
+                    dotsSpan.remove();
+                }
+            }
+        });
+    </script>
 </body>
 
 </html>
