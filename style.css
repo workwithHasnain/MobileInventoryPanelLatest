@@ -671,12 +671,13 @@ input:focus {
 .mobiles-button {
     color: #5f5b5b;
     font-weight: 700;
+    display: flex;
+    align-items: center;
     border: none;
-    padding: 0px 12px 24px 9px;
+    padding: 0px 12px 0px 9px;
     margin-left: 5px;
     background-color: #DEDBD4;
     font-size: 13px;
-    height: 22px;
     border-radius: 4px;
     cursor: pointer;
 }
@@ -694,6 +695,8 @@ input:focus {
 .comon {
     position: absolute;
     bottom: 7px;
+    gap: 5px;
+    display: flex;
 }
 
 .common {
