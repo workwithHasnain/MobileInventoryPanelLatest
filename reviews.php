@@ -369,7 +369,7 @@ $brands = $brands_stmt->fetchAll();
             <div class="col-md-8 col-5  d-md-inline col-12 ">
                 <div class="comfort-life-zone d-none d-lg-block position-absolute">
                     <img src="imges/Screenshot (160).png" alt="">
-                    <div class="position-absolute d-flex mt-1" style="top: 0;">
+                    <div class="position-absolute d-flex mt-1"  style="top: 0; flex-wrap: wrap; gap: 8px;">
                         <label class="text-white whitening ">Popular Tags</label>
                         <?php if (!empty($popularTags)): ?>
                             <?php foreach ($popularTags as $tag => $count): ?>
