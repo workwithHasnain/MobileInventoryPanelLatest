@@ -314,43 +314,42 @@ function formatDeviceSpecs($device)
     return htmlspecialchars($text);
   };
 
-  // Helper: render a section from JSON stored as TEXT in DB
-  $renderJsonSection = function ($jsonValue, $sectionName = '') use ($truncateText) {
-    if (!isset($jsonValue) || $jsonValue === '' || $jsonValue === null) return null;
+  // Helper: parse a section from JSON and return structured data (not concatenated HTML)
+  $parseJsonSection = function ($jsonValue, $sectionName = '') {
+    if (!isset($jsonValue) || $jsonValue === '' || $jsonValue === null) return [];
     $decoded = json_decode($jsonValue, true);
     if (json_last_error() !== JSON_ERROR_NONE || !is_array($decoded)) {
-      // If it's not valid JSON but has text, just return as-is (escaped)
-      return htmlspecialchars((string)$jsonValue);
+      return [];
     }
-    $parts = [];
+
+    $rows = [];
+    $currentField = null;
+
     foreach ($decoded as $row) {
       $field = isset($row['field']) ? trim((string)$row['field']) : '';
       $desc = isset($row['description']) ? trim((string)$row['description']) : '';
-      if ($field === '' && $desc === '') continue;
-      if ($field !== '') {
-        $line = '<strong>' . htmlspecialchars($field) . '</strong>';
-        if ($desc !== '') {
-          // Truncate description to 60 characters
-          $line .= ' ' . $truncateText($desc, 60);
 
-          // Add EUR conversion for price field in GENERAL INFO section
-          if ($sectionName === 'GENERAL INFO' && strtolower($field) === 'price') {
-            $priceStr = preg_replace('/[^0-9.]/', '', $desc);
-            if ($priceStr !== '' && is_numeric($priceStr)) {
-              $priceUsd = (float)$priceStr;
-              $priceEur = convertUSDtoEUR($priceUsd);
-              if ($priceEur !== null) {
-                $line .= ' / €' . number_format($priceEur, 2);
-              }
-            }
+      if ($field === '' && $desc === '') continue;
+
+      // Each field becomes a separate row: field is subtitle, desc is description
+      if ($field !== '') {
+        $rows[] = [
+          'field' => $field,
+          'description' => $desc,
+          'sectionName' => $sectionName
+        ];
+      } else {
+        // Empty field = continuation of previous field's description
+        if (!empty($rows)) {
+          $lastRow = &$rows[count($rows) - 1];
+          if ($desc !== '') {
+            $lastRow['description'] .= "\n" . $desc;
           }
         }
-        $parts[] = $line;
-      } else {
-        $parts[] = htmlspecialchars($desc);
       }
     }
-    return implode('<br>', $parts);
+
+    return $rows;
   };
 
   // Prefer new grouped JSON columns when present; otherwise fall back to legacy fields
@@ -371,9 +370,9 @@ function formatDeviceSpecs($device)
   ];
 
   foreach ($jsonSections as $label => $raw) {
-    $html = $renderJsonSection($raw, $label);
-    if ($html) {
-      $specs[$label] = $html;
+    $rows = $parseJsonSection($raw, $label);
+    if (!empty($rows)) {
+      $specs[$label] = $rows;
     }
   }
 
@@ -1191,7 +1190,7 @@ if ($_POST && isset($_POST['submit_comment'])) {
     .spec-label {
       width: 120px;
       color: #d50000;
-      font-weight: 400;
+      font-weight: 700;
       text-transform: uppercase;
     }
 
@@ -1340,6 +1339,9 @@ if ($_POST && isset($_POST['submit_comment'])) {
 
     #devicesModal .modal-dialog-scrollable {
       max-height: 80vh;
+    }
+    .pad{
+      font-weight: 700;
     }
   </style>
   <div class="d-lg-none d-block">
@@ -1628,23 +1630,23 @@ if ($_POST && isset($_POST['submit_comment'])) {
               <div class="d-flex justify-content-end">
                 <div class="d-flex flexiable ">
                   <img src="/imges/download-removebg-preview.png" alt="">
-                  <h5 style="font-family:system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue' ; font-size: 16px; cursor:pointer;" class="mt-2" onclick="document.getElementById('comments').scrollIntoView({behavior:'smooth', block:'start'});">OPINIONS</h5>
+                  <h5 style="font-family:system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue' ; font-size: 16px; cursor:pointer; font-weight: 700;" class="mt-2" onclick="document.getElementById('comments').scrollIntoView({behavior:'smooth', block:'start'});">OPINIONS</h5>
                 </div>
                 <div class="d-flex flexiable ">
                   <img src="/imges/download-removebg-preview.png" alt="">
-                  <h5 style="font-family:system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue' ; font-size: 16px; cursor: pointer;" class="mt-2" onclick="showPicturesModal()">PICTURES</h5>
+                  <h5 style="font-family:system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue' ; font-size: 16px; cursor: pointer; font-weight: 700;" class="mt-2" onclick="showPicturesModal()">PICTURES</h5>
                 </div>
                 <div class="d-flex flexiable ">
                   <img src="/imges/download-removebg-preview.png" alt="">
-                  <h5 style="font-family:system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue' ; font-size: 16px;" class="mt-2" onclick="window.location.href='compare.php?phone1=<?php echo $device['id']; ?>'">COMPARE </h5>
+                  <h5 style="font-family:system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue' ; font-size: 16px; font-weight: 700;" class="mt-2" onclick="window.location.href='compare.php?phone1=<?php echo $device['id']; ?>'">COMPARE </h5>
                 </div>
                 <div class="d-flex flexiable ">
                   <img src="/imges/download-removebg-preview.png" alt="">
-                  <h5 style="font-family:system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue' ; font-size: 16px;" class="mt-2"> </h5>
+                  <h5 style="font-family:system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue' ; font-size: 16px; font-weight: 700;" class="mt-2"> </h5>
                 </div>
                 <div class="d-flex flexiable ">
                   <img src="/imges/download-removebg-preview.png" alt="">
-                  <h5 style="font-family:system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue' ; font-size: 16 px;" class="mt-2"></h5>
+                  <h5 style="font-family:system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue' ; font-size: 16 px; font-weight: 700;" class="mt-2"></h5>
                 </div>
               </div>
             </div>
@@ -1695,22 +1697,34 @@ if ($_POST && isset($_POST['submit_comment'])) {
           <table class="table forat">
             <tbody>
               <?php if (!empty($deviceSpecs)): ?>
-                <?php foreach ($deviceSpecs as $category => $details): ?>
-                  <tr>
-                    <th class="spec-label"><?php echo strtoupper($category); ?></th>
-                    <td><?php echo $details; ?></td>
-                  </tr>
+                <?php $firstRowInSection = true; ?>
+                <?php foreach ($deviceSpecs as $category => $rows): ?>
+                  <?php if (is_array($rows) && !empty($rows)): ?>
+                    <?php foreach ($rows as $rowIndex => $rowData): ?>
+                      <tr>
+                        <?php if ($rowIndex === 0): ?>
+                          <th class="spec-label" rowspan="<?php echo count($rows); ?>"><?php echo htmlspecialchars($category); ?></th>
+                        <?php endif; ?>
+                        <td class="spec-subtitle"><strong><?php echo htmlspecialchars($rowData['field']); ?></strong></td>
+                        <td class="spec-description"><?php echo htmlspecialchars($rowData['description']); ?></td>
+                      </tr>
+                    <?php endforeach; ?>
+                  <?php endif; ?>
                 <?php endforeach; ?>
               <?php else: ?>
                 <!-- Fallback if no database specs available -->
                 <tr>
                   <th class="spec-label">DEVICE</th>
-                  <td><strong>Name</strong> <?php echo htmlspecialchars($device['name'] ?? 'Unknown Device'); ?><br>
-                    <?php if (isset($device['brand_name'])): ?>
-                      <strong>Brand</strong> <?php echo htmlspecialchars($device['brand_name']); ?>
-                    <?php endif; ?>
-                  </td>
+                  <td class="spec-subtitle"><strong>Name</strong></td>
+                  <td class="spec-description"><?php echo htmlspecialchars($device['name'] ?? 'Unknown Device'); ?></td>
                 </tr>
+                <?php if (isset($device['brand_name'])): ?>
+                  <tr>
+                    <th class="spec-label" style="border-top: none;"></th>
+                    <td class="spec-subtitle"><strong>Brand</strong></td>
+                    <td class="spec-description"><?php echo htmlspecialchars($device['brand_name']); ?></td>
+                  </tr>
+                <?php endif; ?>
               <?php endif; ?>
             </tbody>
           </table>
@@ -1720,8 +1734,8 @@ if ($_POST && isset($_POST['submit_comment'])) {
     padding: 6px 19px;"> <strong>Disclaimer:</strong>We can not guarantee that the information on this page is 100%
             correct.</p>
 
-          <div class="d-block d-lg-flex"> <button
-              class="pad" onclick="window.location.href='compare.php?phone1=<?php echo $device['id']; ?>'">COMPARE</button>
+          <div class="d-block d-lg-flex">
+            <button class="pad" onclick="window.location.href='compare.php?phone1=<?php echo $device['id']; ?>'">COMPARE</button>
             <button class="pad" onclick="document.getElementById('comments').scrollIntoView({behavior:'smooth', block:'start'});">OPINIONS</button>
             <button class="pad" onclick="showPicturesModal()">PICTURES</button>
           </div>

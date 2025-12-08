@@ -715,7 +715,57 @@ $truncateText = function ($text, $maxLength = 60) {
 };
 
 // ---- New JSON specs rendering (align with device.php) ----
-// Helper: render a section from JSON stored as TEXT in DB
+// Helper: parse JSON section and return structured array of field+description pairs (for 2-column layout in comparison)
+function parseJsonSectionStructured($jsonValue, $sectionName = '', $truncateFunc = null)
+{
+    if (!isset($jsonValue) || $jsonValue === '' || $jsonValue === null) return [];
+    $decoded = json_decode($jsonValue, true);
+    if (json_last_error() !== JSON_ERROR_NONE || !is_array($decoded)) {
+        return [];
+    }
+
+    $rows = [];
+    foreach ($decoded as $row) {
+        $field = isset($row['field']) ? trim((string)$row['field']) : '';
+        $desc = isset($row['description']) ? trim((string)$row['description']) : '';
+
+        if ($field === '' && $desc === '') continue;
+
+        if ($field !== '') {
+            // New field entry
+            $description = $desc;
+
+            // Add EUR conversion for price if applicable
+            if ($sectionName === 'GENERAL INFO' && strtolower($field) === 'price' && $desc !== '') {
+                $priceStr = preg_replace('/[^0-9.]/', '', $desc);
+                if ($priceStr !== '' && is_numeric($priceStr)) {
+                    $usd = (float)$priceStr;
+                    $eur = convertUSDtoEUR($usd);
+                    if ($eur !== null) {
+                        $description = $desc . ' / €' . number_format($eur, 2);
+                    }
+                }
+            }
+
+            $rows[] = [
+                'field' => $field,
+                'description' => $description
+            ];
+        } else {
+            // Empty field = continuation of previous field
+            if (!empty($rows)) {
+                $lastRow = &$rows[count($rows) - 1];
+                if ($desc !== '') {
+                    $lastRow['description'] .= "\n" . $desc;
+                }
+            }
+        }
+    }
+
+    return $rows;
+}
+
+// Helper: render a section from JSON stored as TEXT in DB (legacy, for backwards compatibility)
 function renderJsonSection($jsonValue, $sectionName = '', $truncateFunc = null)
 {
     if (!isset($jsonValue) || $jsonValue === '' || $jsonValue === null) return null;
@@ -730,7 +780,7 @@ function renderJsonSection($jsonValue, $sectionName = '', $truncateFunc = null)
         $desc = isset($row['description']) ? trim((string)$row['description']) : '';
         if ($field === '' && $desc === '') continue;
         if ($field !== '') {
-            $line = '<strong>' . htmlspecialchars($field) . '</strong>';
+            $line = '' . htmlspecialchars($field) . '';
             if ($desc !== '') {
                 // Truncate description to 60 characters with expand functionality
                 $line .= ' ' . $truncateFunc($desc, 60);
@@ -756,7 +806,7 @@ function renderJsonSection($jsonValue, $sectionName = '', $truncateFunc = null)
     return implode('<br>', $parts);
 }
 
-// Build specs array from grouped JSON columns
+// Build specs array from grouped JSON columns (returns HTML string per section - legacy)
 function formatDeviceSpecsJson($device, $truncateFunc = null)
 {
     $specs = [];
@@ -780,6 +830,35 @@ function formatDeviceSpecsJson($device, $truncateFunc = null)
         $html = renderJsonSection($raw, $label, $truncateFunc);
         if ($html && trim($html) !== '') {
             $specs[$label] = $html;
+        }
+    }
+    return $specs;
+}
+
+// Build specs array with structured field/description pairs (for 2-column comparison layout)
+function formatDeviceSpecsStructured($device)
+{
+    $specs = [];
+    $jsonSections = [
+        'NETWORK' => $device['network'] ?? null,
+        'LAUNCH' => $device['launch'] ?? null,
+        'BODY' => $device['body'] ?? null,
+        'DISPLAY' => $device['display'] ?? null,
+        'HARDWARE' => $device['hardware'] ?? null,
+        'MEMORY' => $device['memory'] ?? null,
+        'MAIN CAMERA' => $device['main_camera'] ?? null,
+        'SELFIE CAMERA' => $device['selfie_camera'] ?? null,
+        'MULTIMEDIA' => $device['multimedia'] ?? null,
+        'CONNECTIVITY' => $device['connectivity'] ?? null,
+        'FEATURES' => $device['features'] ?? null,
+        'BATTERY' => $device['battery'] ?? null,
+        'GENERAL INFO' => $device['general_info'] ?? null,
+    ];
+
+    foreach ($jsonSections as $label => $raw) {
+        $rows = parseJsonSectionStructured($raw, $label);
+        if (!empty($rows)) {
+            $specs[$label] = $rows;
         }
     }
     return $specs;
@@ -1106,17 +1185,17 @@ function formatDeviceSpecsJson($device, $truncateFunc = null)
             <table class="comparison-table">
                 <thead>
                     <tr>
-                        <th><?php echo $phone1 ? getPhoneName($phone1) : 'Select Phone 1'; ?></th>
-                        <th><?php echo $phone2 ? getPhoneName($phone2) : 'Select Phone 2'; ?></th>
-                        <th><?php echo $phone3 ? getPhoneName($phone3) : 'Select Phone 3'; ?></th>
+                        <th style="font-weight: 700;"><?php echo $phone1 ? getPhoneName($phone1) : 'Select Phone 1'; ?></th>
+                        <th style="font-weight: 700;"><?php echo $phone2 ? getPhoneName($phone2) : 'Select Phone 2'; ?></th>
+                        <th style="font-weight: 700;"><?php echo $phone3 ? getPhoneName($phone3) : 'Select Phone 3'; ?></th>
                     </tr>
                 </thead>
                 <tbody>
                     <?php
-                    // Build spec arrays from JSON for each phone (if phone selected)
-                    $specs1 = $phone1 ? formatDeviceSpecsJson($phone1, $truncateText) : [];
-                    $specs2 = $phone2 ? formatDeviceSpecsJson($phone2, $truncateText) : [];
-                    $specs3 = $phone3 ? formatDeviceSpecsJson($phone3, $truncateText) : [];
+                    // Build spec arrays from structured JSON for each phone (if phone selected)
+                    $specs1 = $phone1 ? formatDeviceSpecsStructured($phone1) : [];
+                    $specs2 = $phone2 ? formatDeviceSpecsStructured($phone2) : [];
+                    $specs3 = $phone3 ? formatDeviceSpecsStructured($phone3) : [];
 
                     // Ordered sections (match device page logical order)
                     $orderedSections = [
@@ -1170,15 +1249,15 @@ function formatDeviceSpecsJson($device, $truncateFunc = null)
                             case 'BODY':
                                 $body = [];
                                 $dims = formatDimensions($phone);
-                                if ($dims && strpos($dims, 'Not specified') === false) $body[] = '<strong>Dimensions</strong> ' . $dims;
-                                if (!empty($phone['weight'])) $body[] = '<strong>Weight</strong> ' . htmlspecialchars($phone['weight']) . ' g';
+                                if ($dims && strpos($dims, 'Not specified') === false) $body[] = 'Dimensions ' . $dims;
+                                if (!empty($phone['weight'])) $body[] = 'Weight ' . htmlspecialchars($phone['weight']) . ' g';
                                 return !empty($body) ? implode('<br>', $body) : 'N/A';
                             case 'DISPLAY':
                                 return formatDisplay($phone);
                             case 'HARDWARE':
                                 $plat = [];
-                                if (!empty($phone['os'])) $plat[] = '<strong>OS</strong> ' . htmlspecialchars($phone['os']);
-                                if (!empty($phone['chipset_name'])) $plat[] = '<strong>System Chip</strong> ' . htmlspecialchars($phone['chipset_name']);
+                                if (!empty($phone['os'])) $plat[] = 'OS ' . htmlspecialchars($phone['os']);
+                                if (!empty($phone['chipset_name'])) $plat[] = 'System Chip ' . htmlspecialchars($phone['chipset_name']);
                                 return !empty($plat) ? implode('<br>', $plat) : 'N/A';
                             case 'MEMORY':
                                 return formatMemory($phone);
@@ -1198,7 +1277,7 @@ function formatDeviceSpecsJson($device, $truncateFunc = null)
                                 // Price & colors if available
                                 $miscParts = [];
                                 $colors = formatColors($phone);
-                                if ($colors && strpos($colors, 'Not specified') === false) $miscParts[] = '<strong>Colors</strong> ' . $colors;
+                                if ($colors && strpos($colors, 'Not specified') === false) $miscParts[] = 'Colors ' . $colors;
                                 // Remove direct price display here to avoid duplication (now shown in LAUNCH)
                                 return !empty($miscParts) ? implode('<br>', $miscParts) : 'N/A';
                             default:
@@ -1207,15 +1286,57 @@ function formatDeviceSpecsJson($device, $truncateFunc = null)
                     };
 
                     foreach ($orderedSections as $section) {
-                        $val1 = isset($specs1[$section]) ? $specs1[$section] : $legacyFallback($section, $phone1);
-                        $val2 = isset($specs2[$section]) ? $specs2[$section] : $legacyFallback($section, $phone2);
-                        $val3 = isset($specs3[$section]) ? $specs3[$section] : $legacyFallback($section, $phone3);
-                        echo '<tr><td colspan="3" style="color:#f14d4d;font-size:16px;background:#f9f9f9;font-weight:600;">' . htmlspecialchars($section) . '</td></tr>';
-                        echo '<tr>';
-                        echo '<td>' . ($val1 !== '' ? $val1 : 'N/A') . '</td>';
-                        echo '<td>' . ($val2 !== '' ? $val2 : 'N/A') . '</td>';
-                        echo '<td>' . ($val3 !== '' ? $val3 : 'N/A') . '</td>';
-                        echo '</tr>';
+                        // Get structured spec rows for this section from each phone
+                        $rows1 = isset($specs1[$section]) ? $specs1[$section] : [];
+                        $rows2 = isset($specs2[$section]) ? $specs2[$section] : [];
+                        $rows3 = isset($specs3[$section]) ? $specs3[$section] : [];
+
+                        // Determine max number of rows for this section
+                        $maxRows = max(count($rows1), count($rows2), count($rows3), 1);
+
+                        // If no structured data, fall back to legacy rendering
+                        if ($maxRows === 1 && empty($rows1) && empty($rows2) && empty($rows3)) {
+                            $val1 = $legacyFallback($section, $phone1);
+                            $val2 = $legacyFallback($section, $phone2);
+                            $val3 = $legacyFallback($section, $phone3);
+                            echo '<tr><td colspan="3" style="color:#f14d4d;font-size:16px;background:#f9f9f9;font-weight:700;">' . htmlspecialchars($section) . '</td></tr>';
+                            echo '<tr>';
+                            echo '<td>' . ($val1 !== '' ? $val1 : 'N/A') . '</td>';
+                            echo '<td>' . ($val2 !== '' ? $val2 : 'N/A') . '</td>';
+                            echo '<td>' . ($val3 !== '' ? $val3 : 'N/A') . '</td>';
+                            echo '</tr>';
+                        } else {
+                            // Section header row
+                            echo '<tr><td colspan="3" style="color:#f14d4d;font-size:16px;background:#f9f9f9;font-weight:700;">' . htmlspecialchars($section) . '</td></tr>';
+
+                            // Render each field/description pair as a 2-column row per phone
+                            for ($i = 0; $i < $maxRows; $i++) {
+                                echo '<tr>';
+
+                                // Phone 1
+                                if (isset($rows1[$i])) {
+                                    echo '<td style="padding:12px 10px;vertical-align:top;"><div style="display:grid;grid-template-columns:140px 1fr;gap:8px;align-items:start;"><div style="font-weight:600;word-break:break-word;">' . htmlspecialchars($rows1[$i]['field']) . '</div><div style="word-break:break-word;white-space:normal;line-height:1.5;">' . nl2br(htmlspecialchars($rows1[$i]['description'])) . '</div></div></td>';
+                                } else {
+                                    echo '<td style="padding:12px 10px;color:#999;">N/A</td>';
+                                }
+
+                                // Phone 2
+                                if (isset($rows2[$i])) {
+                                    echo '<td style="padding:12px 10px;vertical-align:top;"><div style="display:grid;grid-template-columns:140px 1fr;gap:8px;align-items:start;"><div style="font-weight:600;word-break:break-word;">' . htmlspecialchars($rows2[$i]['field']) . '</div><div style="word-break:break-word;white-space:normal;line-height:1.5;">' . nl2br(htmlspecialchars($rows2[$i]['description'])) . '</div></div></td>';
+                                } else {
+                                    echo '<td style="padding:12px 10px;color:#999;">N/A</td>';
+                                }
+
+                                // Phone 3
+                                if (isset($rows3[$i])) {
+                                    echo '<td style="padding:12px 10px;vertical-align:top;"><div style="display:grid;grid-template-columns:140px 1fr;gap:8px;align-items:start;"><div style="font-weight:600;word-break:break-word;">' . htmlspecialchars($rows3[$i]['field']) . '</div><div style="word-break:break-word;white-space:normal;line-height:1.5;">' . nl2br(htmlspecialchars($rows3[$i]['description'])) . '</div></div></td>';
+                                } else {
+                                    echo '<td style="padding:12px 10px;color:#999;">N/A</td>';
+                                }
+
+                                echo '</tr>';
+                            }
+                        }
                     }
                     ?>
                 </tbody>
