@@ -1544,14 +1544,6 @@ if ($_POST && isset($_POST['submit_comment'])) {
       font-size: 11px;
       color: #666;
     }
-    .row>* {
-    flex-shrink: 0;
-    width: 100%;
-    max-width: 100%;
-    padding-right: 0;
-    padding-left: calc(var(--bs-gutter-x) * .5);
-    margin-top: var(--bs-gutter-y);
-}
   </style>
   <div class="container  d-lg-block d-none support content-wrapper" id="Top"
     style=" margin-top: 4rem; padding-left: 0;">
