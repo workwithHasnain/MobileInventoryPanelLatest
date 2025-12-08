@@ -212,7 +212,7 @@
             </div>
         </div>
     </div>
-    <div class="container support content-wrapper" id="Top">
+    <div class="container support content-wrapper" id="Top" style="padding: 0px;">
         <div class="row">
             <div class="col-lg-4 col-6 conjection-froud  bobile">
                 <div class="review-column-list-item review-column-list-item-secondary ">
@@ -434,115 +434,115 @@
                     </div>
                 </div>
             </div>
-            <div class="col-lg-4  col-12  bg-white " style="margin-top: 18px;"> 
+            <div class="col-lg-4  col-12  bg-white " style="margin-top: 18px;">
                 <h4 class="section-heading ">In stores now</h4>
                 <div class="d-none d-lg-flex" style="overflow: hidden;overflow-y: auto;max-height: 390px;width: 320px;flex-wrap: wrap;">
                     <a href="#" class="module-phones-link">
                         <img
                             src="https://fdn2.gsmarena.com/vv/bigpic/oneplus-ace-6t.jpg">
-                            <br>
-                            OnePlus Ace 6T
+                        <br>
+                        OnePlus Ace 6T
                     </a>
                 </div>
-            <div id="instores-container"
-                class=" d-block d-lg-none swiper-container material-card swiper-container-horizontal">
-                <div class="scroller-phones swiper-wrapper">
-                    <div class="swiper-slide swiper-slide-active">
-                        <div class="swiper-half-slide">
-                            <a href="">
-                                <span>
-                                    <img src="https://fdn2.gsmarena.com/vv/bigpic/oneplus-ace-6t.jpg" alt="OnePlus Ace 6T 5G">
-                                </span>
-                                <strong>OnePlus Ace 6T 5G</strong>
-                            </a>
+                <div id="instores-container"
+                    class=" d-block d-lg-none swiper-container material-card swiper-container-horizontal">
+                    <div class="scroller-phones swiper-wrapper">
+                        <div class="swiper-slide swiper-slide-active">
+                            <div class="swiper-half-slide">
+                                <a href="">
+                                    <span>
+                                        <img src="https://fdn2.gsmarena.com/vv/bigpic/oneplus-ace-6t.jpg" alt="OnePlus Ace 6T 5G">
+                                    </span>
+                                    <strong>OnePlus Ace 6T 5G</strong>
+                                </a>
+                            </div>
+                            <div class="swiper-half-slide">
+                                <a href="">
+                                    <span>
+                                        <img src="https://fdn2.gsmarena.com/vv/bigpic/xiaomi-poco-f8-ultra-.jpg" alt="Xiaomi Poco F8 Ultra 5G">
+                                    </span>
+                                    <strong>Xiaomi Poco F8 Ultra 5G</strong>
+                                </a>
+                            </div>
                         </div>
-                        <div class="swiper-half-slide">
-                            <a href="">
-                                <span>
-                                    <img src="https://fdn2.gsmarena.com/vv/bigpic/xiaomi-poco-f8-ultra-.jpg" alt="Xiaomi Poco F8 Ultra 5G">
-                                </span>
-                                <strong>Xiaomi Poco F8 Ultra 5G</strong>
-                            </a>
+                        <div class="swiper-slide swiper-slide-next">
+                            <div class="swiper-half-slide">
+                                <a href="">
+                                    <span>
+                                        <img src="https://fdn2.gsmarena.com/vv/bigpic/oneplus-ace-6t.jpg" alt="OnePlus Ace 6T 5G">
+                                    </span>
+                                    <strong>OnePlus Ace 6T 5G</strong>
+                                </a>
+                            </div>
+                            <div class="swiper-half-slide">
+                                <a href="">
+                                    <span>
+                                        <img src="https://fdn2.gsmarena.com/vv/bigpic/xiaomi-poco-f8-ultra-.jpg" alt="Xiaomi Poco F8 Ultra 5G">
+                                    </span>
+                                    <strong>Xiaomi Poco F8 Ultra 5G</strong>
+                                </a>
+                            </div>
+                        </div>
+                        <div class="swiper-slide">
+                            <div class="swiper-half-slide">
+                                <a href="">
+                                    <span>
+                                        <img src="https://fdn2.gsmarena.com/vv/bigpic/oneplus-ace-6t.jpg" alt="OnePlus Ace 6T 5G">
+                                    </span>
+                                    <strong>OnePlus Ace 6T 5G</strong>
+                                </a>
+                            </div>
+                            <div class="swiper-half-slide">
+                                <a href="">
+                                    <span>
+                                        <img src="https://fdn2.gsmarena.com/vv/bigpic/xiaomi-poco-f8-ultra-.jpg" alt="Xiaomi Poco F8 Ultra 5G">
+                                    </span>
+                                    <strong>Xiaomi Poco F8 Ultra 5G</strong>
+                                </a>
+                            </div>
                         </div>
                     </div>
-                    <div class="swiper-slide swiper-slide-next">
-                        <div class="swiper-half-slide">
-                            <a href="">
-                                <span>
-                                    <img src="https://fdn2.gsmarena.com/vv/bigpic/oneplus-ace-6t.jpg" alt="OnePlus Ace 6T 5G">
-                                </span>
-                                <strong>OnePlus Ace 6T 5G</strong>
-                            </a>
-                        </div>
-                        <div class="swiper-half-slide">
-                            <a href="">
-                                <span>
-                                    <img src="https://fdn2.gsmarena.com/vv/bigpic/xiaomi-poco-f8-ultra-.jpg" alt="Xiaomi Poco F8 Ultra 5G">
-                                </span>
-                                <strong>Xiaomi Poco F8 Ultra 5G</strong>
-                            </a>
-                        </div>
-                    </div>
-                    <div class="swiper-slide">
-                        <div class="swiper-half-slide">
-                            <a href="">
-                                <span>
-                                    <img src="https://fdn2.gsmarena.com/vv/bigpic/oneplus-ace-6t.jpg" alt="OnePlus Ace 6T 5G">
-                                </span>
-                                <strong>OnePlus Ace 6T 5G</strong>
-                            </a>
-                        </div>
-                        <div class="swiper-half-slide">
-                            <a href="">
-                                <span>
-                                    <img src="https://fdn2.gsmarena.com/vv/bigpic/xiaomi-poco-f8-ultra-.jpg" alt="Xiaomi Poco F8 Ultra 5G">
-                                </span>
-                                <strong>Xiaomi Poco F8 Ultra 5G</strong>
-                            </a>
-                        </div>
+                    <div class="swiper-scrollbar" style="opacity: 0;">
+                        <div class="swiper-scrollbar-drag" style="width: 1051.88px;"></div>
                     </div>
                 </div>
-                <div class="swiper-scrollbar" style="opacity: 0;">
-                    <div class="swiper-scrollbar-drag" style="width: 1051.88px;"></div>
-                </div>
-            </div>
-            <h6 style="border-left: solid 5px grey ; color: #090E21; text-transform: uppercase; font-weight: 900; margin-top: 12px;"
-                class="px-3">Popular comparisons</h6>
-            <div class="sentizer bg-white mt-2 p-3 rounded shadow-sm" style="    text-transform: Uppercase;
+                <h6 style="border-left: solid 5px grey ; color: #090E21; text-transform: uppercase; font-weight: 900; margin-top: 12px;"
+                    class="px-3">Popular comparisons</h6>
+                <div class="sentizer bg-white mt-2 p-3 rounded shadow-sm" style="    text-transform: Uppercase;
                                             font-size: 13px;
                                             font-weight: 700;">
-                <div class="row">
-                    <div class="col-12">
-                        <p class="mb-2" style="background-color: #ffe6f0; color: #090E21; text-transform: capitalize;">
-                            Samsung
-                            Galaxy A55 vs.
-                            Galaxy A56</p>
-                        <p class="mb-2" style=" text-transform: capitalize;">Apple iPhone 16 Pro Max vs. Galaxy S25
-                            Ultra</p>
-                        <p class="mb-2" style="background-color: #ffe6f0; text-transform: capitalize; ">Samsung
-                            Galaxy S24 Ultra vs. Galaxy S25
-                            Ultra</p>
-                        <p class="mb-2" style=" text-transform: capitalize;">Samsung Galaxy A36 vs. Galaxy A56</p>
-                        <p class="mb-2" style="background-color: #ffe6f0; text-transform: capitalize;">Samsung
-                            Galaxy S24 FE vs. Galaxy A56</p>
-                        <p class="mb-2" style=" text-transform: capitalize;">Apple iPhone 13 vs. Apple iPhone 14</p>
-                        <p class="mb-2" style="background-color: #ffe6f0;text-transform: capitalize;">Samsung Galaxy
-                            S23 Ultra vs. Galaxy S24
-                            Ultra</p>
-                        <p class="mb-2" style=" text-transform: capitalize;">Samsung Galaxy S24 vs. Galaxy S24 FE
-                        </p>
-                        <p class="mb-2" style="background-color: #ffe6f0;text-transform: capitalize;">Xiaomi Redmi
-                            Note 14 Pro+ vs.
-                            Redmi 14 Pro </p>
-                        <p class="mb-2" style=" text-transform: capitalize;">Apple iPhone 16 Pro Max vs. iPhone 16
-                            Pro</p>
-                        <p class="mb-0" style="background-color: #ffe6f0;text-transform: capitalize;">Samsung Galaxy
-                            S24 vs. Galaxy S25</p>
+                    <div class="row">
+                        <div class="col-12">
+                            <p class="mb-2" style="background-color: #ffe6f0; color: #090E21; text-transform: capitalize;">
+                                Samsung
+                                Galaxy A55 vs.
+                                Galaxy A56</p>
+                            <p class="mb-2" style=" text-transform: capitalize;">Apple iPhone 16 Pro Max vs. Galaxy S25
+                                Ultra</p>
+                            <p class="mb-2" style="background-color: #ffe6f0; text-transform: capitalize; ">Samsung
+                                Galaxy S24 Ultra vs. Galaxy S25
+                                Ultra</p>
+                            <p class="mb-2" style=" text-transform: capitalize;">Samsung Galaxy A36 vs. Galaxy A56</p>
+                            <p class="mb-2" style="background-color: #ffe6f0; text-transform: capitalize;">Samsung
+                                Galaxy S24 FE vs. Galaxy A56</p>
+                            <p class="mb-2" style=" text-transform: capitalize;">Apple iPhone 13 vs. Apple iPhone 14</p>
+                            <p class="mb-2" style="background-color: #ffe6f0;text-transform: capitalize;">Samsung Galaxy
+                                S23 Ultra vs. Galaxy S24
+                                Ultra</p>
+                            <p class="mb-2" style=" text-transform: capitalize;">Samsung Galaxy S24 vs. Galaxy S24 FE
+                            </p>
+                            <p class="mb-2" style="background-color: #ffe6f0;text-transform: capitalize;">Xiaomi Redmi
+                                Note 14 Pro+ vs.
+                                Redmi 14 Pro </p>
+                            <p class="mb-2" style=" text-transform: capitalize;">Apple iPhone 16 Pro Max vs. iPhone 16
+                                Pro</p>
+                            <p class="mb-0" style="background-color: #ffe6f0;text-transform: capitalize;">Samsung Galaxy
+                                S24 vs. Galaxy S25</p>
+                        </div>
                     </div>
                 </div>
             </div>
         </div>
-    </div>
     </div>
     <div class="container mt-0 war ">
         <div class="row">

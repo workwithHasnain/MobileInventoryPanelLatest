@@ -472,7 +472,7 @@ if ($_POST && isset($_POST['action'])) {
             <img style="height: 100%; width: -webkit-fill-available;" src="<?php echo htmlspecialchars($post['featured_image']); ?>" alt="<?php echo htmlspecialchars($post['title']); ?>">
         <?php endif; ?>
     </div>
-    <div class="container support content-wrapper" id="Top">
+    <div class="container support content-wrapper" id="Top" style="padding: 0px;">
         <div class="row">
 
             <div class="col-md-8 col-5 d-md-inline  " style="border: 1px solid #e0e0e0;">
@@ -725,396 +725,396 @@ if ($_POST && isset($_POST['action'])) {
             </div>
         </div>
     </div>
-        <?php include 'includes/gsmfooter.php'; ?>
-        <!-- Brands Modal -->
-        <div class="modal fade" id="brandsModal" tabindex="-1" aria-labelledby="brandsModalLabel" aria-hidden="true">
-            <div class="modal-dialog modal-lg modal-dialog-centered modal-dialog-scrollable">
-                <div class="modal-content" style="background-color: #EFEBE9; border: 2px solid #8D6E63;">
-                    <div class="modal-header" style="border-bottom: 1px solid #8D6E63; background-color: #D7CCC8;">
-                        <h5 class="modal-title" id="brandsModalLabel" style="font-family:system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue'; color: #5D4037;">
-                            <i class="fas fa-industry me-2"></i>All Brands
-                        </h5>
-                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                    </div>
-                    <div class="modal-body">
-                        <div class="row">
-                            <?php if (!empty($brands)): ?>
-                                <?php foreach ($brands as $brand): ?>
-                                    <div class="col-lg-4 col-md-6 col-sm-6 mb-3">
-                                        <button class="brand-cell-modal btn w-100 py-2 px-3" style="background-color: #fff; border: 1px solid #c5b6b0; color: #5D4037; font-weight: 500; transition: all 0.3s ease; cursor: pointer;" data-brand-id="<?php echo $brand['id']; ?>" onclick="selectBrandFromModal(<?php echo $brand['id']; ?>)">
-                                            <?php echo htmlspecialchars($brand['name']); ?>
-                                        </button>
-                                    </div>
-                                <?php endforeach; ?>
-                            <?php else: ?>
-                                <div class="col-12">
-                                    <div class="text-center py-5">
-                                        <i class="fas fa-industry fa-3x text-muted mb-3"></i>
-                                        <h6 class="text-muted">No brands available</h6>
-                                    </div>
+    <?php include 'includes/gsmfooter.php'; ?>
+    <!-- Brands Modal -->
+    <div class="modal fade" id="brandsModal" tabindex="-1" aria-labelledby="brandsModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-lg modal-dialog-centered modal-dialog-scrollable">
+            <div class="modal-content" style="background-color: #EFEBE9; border: 2px solid #8D6E63;">
+                <div class="modal-header" style="border-bottom: 1px solid #8D6E63; background-color: #D7CCC8;">
+                    <h5 class="modal-title" id="brandsModalLabel" style="font-family:system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue'; color: #5D4037;">
+                        <i class="fas fa-industry me-2"></i>All Brands
+                    </h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="row">
+                        <?php if (!empty($brands)): ?>
+                            <?php foreach ($brands as $brand): ?>
+                                <div class="col-lg-4 col-md-6 col-sm-6 mb-3">
+                                    <button class="brand-cell-modal btn w-100 py-2 px-3" style="background-color: #fff; border: 1px solid #c5b6b0; color: #5D4037; font-weight: 500; transition: all 0.3s ease; cursor: pointer;" data-brand-id="<?php echo $brand['id']; ?>" onclick="selectBrandFromModal(<?php echo $brand['id']; ?>)">
+                                        <?php echo htmlspecialchars($brand['name']); ?>
+                                    </button>
                                 </div>
-                            <?php endif; ?>
-                        </div>
+                            <?php endforeach; ?>
+                        <?php else: ?>
+                            <div class="col-12">
+                                <div class="text-center py-5">
+                                    <i class="fas fa-industry fa-3x text-muted mb-3"></i>
+                                    <h6 class="text-muted">No brands available</h6>
+                                </div>
+                            </div>
+                        <?php endif; ?>
                     </div>
                 </div>
             </div>
         </div>
+    </div>
 
-        <!-- Devices Modal (Phones by Brand) -->
-        <div class="modal fade" id="devicesModal" tabindex="-1" aria-labelledby="deviceModalLabel" aria-hidden="true">
-            <div class="modal-dialog modal-lg modal-dialog-centered modal-dialog-scrollable">
-                <div class="modal-content" style="background-color: #EFEBE9; border: 2px solid #8D6E63;">
-                    <div class="modal-header" style="border-bottom: 1px solid #8D6E63; background-color: #D7CCC8;">
-                        <h5 class="modal-title" id="deviceModalTitle" style="font-family:system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue'; color: #5D4037;">
-                            Devices
-                        </h5>
-                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                    </div>
-                    <div class="modal-body" id="deviceModalBody">
-                        <div class="text-center py-5">
-                            <i class="fas fa-spinner fa-spin fa-2x text-muted"></i>
-                        </div>
+    <!-- Devices Modal (Phones by Brand) -->
+    <div class="modal fade" id="devicesModal" tabindex="-1" aria-labelledby="deviceModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-lg modal-dialog-centered modal-dialog-scrollable">
+            <div class="modal-content" style="background-color: #EFEBE9; border: 2px solid #8D6E63;">
+                <div class="modal-header" style="border-bottom: 1px solid #8D6E63; background-color: #D7CCC8;">
+                    <h5 class="modal-title" id="deviceModalTitle" style="font-family:system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue'; color: #5D4037;">
+                        Devices
+                    </h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body" id="deviceModalBody">
+                    <div class="text-center py-5">
+                        <i class="fas fa-spinner fa-spin fa-2x text-muted"></i>
                     </div>
                 </div>
             </div>
         </div>
-        <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
+    </div>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
 
-        <script>
-            // Build a dynamic dropdown of all H3 headings and enable jump-to-section behavior
-            window.addEventListener('load', function() {
-                try {
-                    const container = document.querySelector('.document-section');
-                    const dropdown = document.getElementById('headingDropdown');
-                    if (!container || !dropdown) return;
+    <script>
+        // Build a dynamic dropdown of all H3 headings and enable jump-to-section behavior
+        window.addEventListener('load', function() {
+            try {
+                const container = document.querySelector('.document-section');
+                const dropdown = document.getElementById('headingDropdown');
+                if (!container || !dropdown) return;
 
-                    const headings = container.querySelectorAll('h3');
-                    if (!headings.length) return;
+                const headings = container.querySelectorAll('h3');
+                if (!headings.length) return;
 
-                    // Prepare dropdown
-                    dropdown.innerHTML = '';
-                    const placeholder = document.createElement('option');
-                    placeholder.value = '';
-                    placeholder.textContent = 'Jump to section…';
-                    placeholder.disabled = true;
-                    placeholder.selected = true;
-                    dropdown.appendChild(placeholder);
+                // Prepare dropdown
+                dropdown.innerHTML = '';
+                const placeholder = document.createElement('option');
+                placeholder.value = '';
+                placeholder.textContent = 'Jump to section…';
+                placeholder.disabled = true;
+                placeholder.selected = true;
+                dropdown.appendChild(placeholder);
 
-                    const usedIds = new Set();
-                    const makeSlug = (str) => {
-                        return str
-                            .toLowerCase()
-                            .replace(/[^a-z0-9\s-]/g, '')
-                            .replace(/\s+/g, '-')
-                            .replace(/-+/g, '-')
-                            .replace(/^-+|-+$/g, '');
-                    };
+                const usedIds = new Set();
+                const makeSlug = (str) => {
+                    return str
+                        .toLowerCase()
+                        .replace(/[^a-z0-9\s-]/g, '')
+                        .replace(/\s+/g, '-')
+                        .replace(/-+/g, '-')
+                        .replace(/^-+|-+$/g, '');
+                };
 
-                    headings.forEach((h3, idx) => {
-                        let text = (h3.textContent || '').trim().replace(/\s+/g, ' ');
-                        if (!text) text = `Section ${idx + 1}`;
+                headings.forEach((h3, idx) => {
+                    let text = (h3.textContent || '').trim().replace(/\s+/g, ' ');
+                    if (!text) text = `Section ${idx + 1}`;
 
-                        // Ensure heading has a unique id
-                        let slug = h3.id || makeSlug(text) || `section-${idx + 1}`;
-                        let base = slug;
-                        let counter = 2;
-                        while (usedIds.has(slug) || document.getElementById(slug)) {
-                            slug = `${base}-${counter++}`;
-                        }
-                        if (!h3.id) {
-                            h3.id = slug;
-                        }
-                        usedIds.add(slug);
+                    // Ensure heading has a unique id
+                    let slug = h3.id || makeSlug(text) || `section-${idx + 1}`;
+                    let base = slug;
+                    let counter = 2;
+                    while (usedIds.has(slug) || document.getElementById(slug)) {
+                        slug = `${base}-${counter++}`;
+                    }
+                    if (!h3.id) {
+                        h3.id = slug;
+                    }
+                    usedIds.add(slug);
 
-                        // Add option
-                        const opt = document.createElement('option');
-                        opt.value = `#${slug}`;
-                        opt.textContent = text.length > 80 ? text.slice(0, 77) + '…' : text;
-                        dropdown.appendChild(opt);
+                    // Add option
+                    const opt = document.createElement('option');
+                    opt.value = `#${slug}`;
+                    opt.textContent = text.length > 80 ? text.slice(0, 77) + '…' : text;
+                    dropdown.appendChild(opt);
+                });
+
+                // Show dropdown and arrow buttons now that they have content
+                dropdown.style.display = 'inline-block';
+                const prevBtn = document.getElementById('headingPrev');
+                const nextBtn = document.getElementById('headingNext');
+                const headingEls = Array.from(headings);
+                let activeIdx = -1; // 0-based index into headingEls; -1 means none selected yet
+
+                const fixed = document.querySelector('#navbar');
+                const getOffsetTop = (el) => {
+                    const offset = (fixed ? fixed.offsetHeight : 0) + 12;
+                    return el.getBoundingClientRect().top + window.pageYOffset - offset;
+                };
+                const scrollToEl = (el) => {
+                    window.scrollTo({
+                        top: getOffsetTop(el),
+                        behavior: 'smooth'
                     });
+                };
+                const updateButtons = () => {
+                    if (!prevBtn || !nextBtn) return;
+                    prevBtn.disabled = activeIdx <= 0;
+                    // When nothing selected, allow Next to go to first
+                    nextBtn.disabled = (activeIdx >= headingEls.length - 1) && activeIdx !== -1;
+                };
 
-                    // Show dropdown and arrow buttons now that they have content
-                    dropdown.style.display = 'inline-block';
-                    const prevBtn = document.getElementById('headingPrev');
-                    const nextBtn = document.getElementById('headingNext');
-                    const headingEls = Array.from(headings);
-                    let activeIdx = -1; // 0-based index into headingEls; -1 means none selected yet
-
-                    const fixed = document.querySelector('#navbar');
-                    const getOffsetTop = (el) => {
-                        const offset = (fixed ? fixed.offsetHeight : 0) + 12;
-                        return el.getBoundingClientRect().top + window.pageYOffset - offset;
-                    };
-                    const scrollToEl = (el) => {
-                        window.scrollTo({
-                            top: getOffsetTop(el),
-                            behavior: 'smooth'
-                        });
-                    };
-                    const updateButtons = () => {
-                        if (!prevBtn || !nextBtn) return;
-                        prevBtn.disabled = activeIdx <= 0;
-                        // When nothing selected, allow Next to go to first
-                        nextBtn.disabled = (activeIdx >= headingEls.length - 1) && activeIdx !== -1;
-                    };
-
-                    if (prevBtn && nextBtn && headingEls.length) {
-                        prevBtn.style.display = 'inline-flex';
-                        nextBtn.style.display = 'inline-flex';
-                        updateButtons();
-                    }
-
-                    const setActiveByIndex = (idx) => {
-                        if (idx < 0 || idx >= headingEls.length) return;
-                        activeIdx = idx;
-                        // sync dropdown (account for placeholder at 0)
-                        dropdown.selectedIndex = idx + 1;
-                        updateButtons();
-                        scrollToEl(headingEls[idx]);
-                    };
-
-                    // Smooth-scroll to target with offset for fixed navbar
-                    dropdown.addEventListener('change', function() {
-                        const selIndex = dropdown.selectedIndex;
-                        const idx = selIndex - 1; // account for placeholder
-                        if (idx >= 0 && idx < headingEls.length) {
-                            setActiveByIndex(idx);
-                        }
-                    });
-
-                    if (prevBtn) {
-                        prevBtn.addEventListener('click', function() {
-                            if (activeIdx === -1) {
-                                setActiveByIndex(0);
-                            } else if (activeIdx > 0) {
-                                setActiveByIndex(activeIdx - 1);
-                            }
-                        });
-                    }
-                    if (nextBtn) {
-                        nextBtn.addEventListener('click', function() {
-                            if (activeIdx === -1) {
-                                setActiveByIndex(0);
-                            } else if (activeIdx < headingEls.length - 1) {
-                                setActiveByIndex(activeIdx + 1);
-                            }
-                        });
-                    }
-                } catch (e) {
-                    // Fail silently to avoid breaking the page
-                    console.error('Heading dropdown init failed:', e);
+                if (prevBtn && nextBtn && headingEls.length) {
+                    prevBtn.style.display = 'inline-flex';
+                    nextBtn.style.display = 'inline-flex';
+                    updateButtons();
                 }
-            });
-            document.addEventListener('DOMContentLoaded', function() {
-                const commentForm = document.getElementById('main-comment-form');
-                const originalFormParent = commentForm.parentNode;
-                const parentIdInput = commentForm.querySelector('input[name="parent_id"]');
-                const formTitle = commentForm.querySelector('h5');
-                const submitButton = commentForm.querySelector('button[type="submit"]');
-                const cancelButton = commentForm.querySelector('.cancel-reply');
 
-                // Handle reply button clicks
-                document.addEventListener('click', function(e) {
-                    if (e.target.classList.contains('reply-btn') || e.target.closest('.reply-btn')) {
-                        e.preventDefault();
-                        const button = e.target.closest('.reply-btn');
-                        const commentId = button.getAttribute('data-comment-id');
-                        const commentAuthor = button.getAttribute('data-comment-author');
-                        const placeholder = document.querySelector(`.reply-form-placeholder[data-comment-id="${commentId}"]`);
+                const setActiveByIndex = (idx) => {
+                    if (idx < 0 || idx >= headingEls.length) return;
+                    activeIdx = idx;
+                    // sync dropdown (account for placeholder at 0)
+                    dropdown.selectedIndex = idx + 1;
+                    updateButtons();
+                    scrollToEl(headingEls[idx]);
+                };
 
-                        // Move form to reply position
-                        placeholder.appendChild(commentForm);
-
-                        // Update form for reply
-                        parentIdInput.value = commentId;
-                        formTitle.textContent = `Reply to ${commentAuthor}`;
-                        submitButton.innerHTML = '<i class="fas fa-paper-plane me-2"></i>Submit Reply';
-                        cancelButton.style.display = 'inline-block';
-
-                        // Clear form fields
-                        commentForm.querySelector('#name').value = '';
-                        commentForm.querySelector('#email').value = '';
-                        commentForm.querySelector('#comment').value = '';
-
-                        // Focus on name field
-                        commentForm.querySelector('#name').focus();
+                // Smooth-scroll to target with offset for fixed navbar
+                dropdown.addEventListener('change', function() {
+                    const selIndex = dropdown.selectedIndex;
+                    const idx = selIndex - 1; // account for placeholder
+                    if (idx >= 0 && idx < headingEls.length) {
+                        setActiveByIndex(idx);
                     }
                 });
 
-                // Handle cancel reply
-                cancelButton.addEventListener('click', function(e) {
+                if (prevBtn) {
+                    prevBtn.addEventListener('click', function() {
+                        if (activeIdx === -1) {
+                            setActiveByIndex(0);
+                        } else if (activeIdx > 0) {
+                            setActiveByIndex(activeIdx - 1);
+                        }
+                    });
+                }
+                if (nextBtn) {
+                    nextBtn.addEventListener('click', function() {
+                        if (activeIdx === -1) {
+                            setActiveByIndex(0);
+                        } else if (activeIdx < headingEls.length - 1) {
+                            setActiveByIndex(activeIdx + 1);
+                        }
+                    });
+                }
+            } catch (e) {
+                // Fail silently to avoid breaking the page
+                console.error('Heading dropdown init failed:', e);
+            }
+        });
+        document.addEventListener('DOMContentLoaded', function() {
+            const commentForm = document.getElementById('main-comment-form');
+            const originalFormParent = commentForm.parentNode;
+            const parentIdInput = commentForm.querySelector('input[name="parent_id"]');
+            const formTitle = commentForm.querySelector('h5');
+            const submitButton = commentForm.querySelector('button[type="submit"]');
+            const cancelButton = commentForm.querySelector('.cancel-reply');
+
+            // Handle reply button clicks
+            document.addEventListener('click', function(e) {
+                if (e.target.classList.contains('reply-btn') || e.target.closest('.reply-btn')) {
                     e.preventDefault();
+                    const button = e.target.closest('.reply-btn');
+                    const commentId = button.getAttribute('data-comment-id');
+                    const commentAuthor = button.getAttribute('data-comment-author');
+                    const placeholder = document.querySelector(`.reply-form-placeholder[data-comment-id="${commentId}"]`);
 
-                    // Move form back to original position
-                    originalFormParent.appendChild(commentForm);
+                    // Move form to reply position
+                    placeholder.appendChild(commentForm);
 
-                    // Reset form
-                    parentIdInput.value = '';
-                    formTitle.textContent = 'Leave a Comment';
-                    submitButton.innerHTML = '<i class="fas fa-paper-plane me-2"></i>Submit Comment';
-                    cancelButton.style.display = 'none';
+                    // Update form for reply
+                    parentIdInput.value = commentId;
+                    formTitle.textContent = `Reply to ${commentAuthor}`;
+                    submitButton.innerHTML = '<i class="fas fa-paper-plane me-2"></i>Submit Reply';
+                    cancelButton.style.display = 'inline-block';
 
                     // Clear form fields
                     commentForm.querySelector('#name').value = '';
                     commentForm.querySelector('#email').value = '';
                     commentForm.querySelector('#comment').value = '';
-                });
-            });
-            // Handle clickable table rows for devices
-            document.addEventListener('DOMContentLoaded', function() {
-                // Handle device row clicks (for views and reviews tables)
-                document.querySelectorAll('.clickable-row').forEach(function(row) {
-                    row.addEventListener('click', function() {
-                        const deviceId = this.getAttribute('data-device-id');
-                        if (deviceId) {
-                            // Track the view
-                            fetch('track_device_view.php', {
-                                method: 'POST',
-                                headers: {
-                                    'Content-Type': 'application/x-www-form-urlencoded',
-                                },
-                                body: 'device_id=' + encodeURIComponent(deviceId)
-                            });
 
-                            // Show device details modal
-                            showDeviceDetails(deviceId);
-                        }
-                    });
-                });
-
-                // Handle device card clicks (for latest devices grid)
-                document.querySelectorAll('.device-card').forEach(function(card) {
-                    card.addEventListener('click', function() {
-                        const deviceId = this.getAttribute('data-device-id');
-                        if (deviceId) {
-                            // Track the view
-                            fetch('track_device_view.php', {
-                                method: 'POST',
-                                headers: {
-                                    'Content-Type': 'application/x-www-form-urlencoded',
-                                },
-                                body: 'device_id=' + encodeURIComponent(deviceId)
-                            });
-
-                            // Show device details modal
-                            showDeviceDetails(deviceId);
-                        }
-                    });
-                });
-
-                // Handle brand cell clicks (from sidebar and mobile menu - open devices modal directly)
-                document.querySelectorAll('.brand-cell').forEach(function(cell) {
-                    cell.addEventListener('click', function(e) {
-                        e.preventDefault();
-                        const brandId = this.getAttribute('data-brand-id');
-                        if (brandId) {
-                            // Directly open devices modal for this brand
-                            selectBrandFromModal(brandId);
-                        }
-                    });
-                });
-
-                // Handle comparison row clicks
-                document.querySelectorAll('.clickable-comparison').forEach(function(row) {
-                    row.addEventListener('click', function() {
-                        const device1Id = this.getAttribute('data-device1-id');
-                        const device2Id = this.getAttribute('data-device2-id');
-                        if (device1Id && device2Id) {
-                            // Track the comparison
-                            fetch('track_device_comparison.php', {
-                                method: 'POST',
-                                headers: {
-                                    'Content-Type': 'application/x-www-form-urlencoded',
-                                },
-                                body: 'device1_id=' + encodeURIComponent(device1Id) + '&device2_id=' + encodeURIComponent(device2Id)
-                            });
-
-                            // Redirect to comparison page
-                            window.location.href = `compare.php?phone1=${device1Id}&phone2=${device2Id}`;
-                        }
-                    });
-                });
-            });
-
-            // Show post details in modal
-            function showPostDetails(postId) {
-                fetch(`get_post_details.php?id=${postId}`)
-                    .then(response => response.text())
-                    .then(data => {
-                        window.location.href = `post.php?id=${postId}`;
-                    })
-                    .catch(error => {
-                        console.error('Error:', error);
-                        alert('Failed to load post details');
-                    });
-            }
-
-            // Show device details in modal
-            function showDeviceDetails(deviceId) {
-                fetch(`get_device_details.php?id=${deviceId}`)
-                    .then(response => response.text())
-                    .then(data => {
-                        window.location.href = `device.php?id=${deviceId}`;
-                    })
-                    .catch(error => {
-                        console.error('Error:', error);
-                        alert('Failed to load device details');
-                    });
-            }
-
-
-
-            // Auto-dismiss alerts after 5 seconds
-            setTimeout(function() {
-                var alerts = document.querySelectorAll('.alert');
-                alerts.forEach(function(alert) {
-                    var bsAlert = new bootstrap.Alert(alert);
-                    bsAlert.close();
-                });
-            }, 5000);
-
-            // Show brands modal
-            function showBrandsModal() {
-                const modal = new bootstrap.Modal(document.getElementById('brandsModal'));
-                modal.show();
-            }
-
-            // Handle brand selection from modal
-            function selectBrandFromModal(brandId) {
-                // Close the brands modal
-                const brandsModal = bootstrap.Modal.getInstance(document.getElementById('brandsModal'));
-                if (brandsModal) {
-                    brandsModal.hide();
+                    // Focus on name field
+                    commentForm.querySelector('#name').focus();
                 }
+            });
 
-                // Fetch phones for this brand
-                fetch(`get_phones_by_brand.php?brand_id=${brandId}`)
-                    .then(response => response.json())
-                    .then(data => {
-                        // Populate the devices modal with phones
-                        displayPhonesModal(data, brandId);
-                    })
-                    .catch(error => {
-                        console.error('Error fetching phones:', error);
-                        alert('Failed to load phones');
-                    });
+            // Handle cancel reply
+            cancelButton.addEventListener('click', function(e) {
+                e.preventDefault();
+
+                // Move form back to original position
+                originalFormParent.appendChild(commentForm);
+
+                // Reset form
+                parentIdInput.value = '';
+                formTitle.textContent = 'Leave a Comment';
+                submitButton.innerHTML = '<i class="fas fa-paper-plane me-2"></i>Submit Comment';
+                cancelButton.style.display = 'none';
+
+                // Clear form fields
+                commentForm.querySelector('#name').value = '';
+                commentForm.querySelector('#email').value = '';
+                commentForm.querySelector('#comment').value = '';
+            });
+        });
+        // Handle clickable table rows for devices
+        document.addEventListener('DOMContentLoaded', function() {
+            // Handle device row clicks (for views and reviews tables)
+            document.querySelectorAll('.clickable-row').forEach(function(row) {
+                row.addEventListener('click', function() {
+                    const deviceId = this.getAttribute('data-device-id');
+                    if (deviceId) {
+                        // Track the view
+                        fetch('track_device_view.php', {
+                            method: 'POST',
+                            headers: {
+                                'Content-Type': 'application/x-www-form-urlencoded',
+                            },
+                            body: 'device_id=' + encodeURIComponent(deviceId)
+                        });
+
+                        // Show device details modal
+                        showDeviceDetails(deviceId);
+                    }
+                });
+            });
+
+            // Handle device card clicks (for latest devices grid)
+            document.querySelectorAll('.device-card').forEach(function(card) {
+                card.addEventListener('click', function() {
+                    const deviceId = this.getAttribute('data-device-id');
+                    if (deviceId) {
+                        // Track the view
+                        fetch('track_device_view.php', {
+                            method: 'POST',
+                            headers: {
+                                'Content-Type': 'application/x-www-form-urlencoded',
+                            },
+                            body: 'device_id=' + encodeURIComponent(deviceId)
+                        });
+
+                        // Show device details modal
+                        showDeviceDetails(deviceId);
+                    }
+                });
+            });
+
+            // Handle brand cell clicks (from sidebar and mobile menu - open devices modal directly)
+            document.querySelectorAll('.brand-cell').forEach(function(cell) {
+                cell.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    const brandId = this.getAttribute('data-brand-id');
+                    if (brandId) {
+                        // Directly open devices modal for this brand
+                        selectBrandFromModal(brandId);
+                    }
+                });
+            });
+
+            // Handle comparison row clicks
+            document.querySelectorAll('.clickable-comparison').forEach(function(row) {
+                row.addEventListener('click', function() {
+                    const device1Id = this.getAttribute('data-device1-id');
+                    const device2Id = this.getAttribute('data-device2-id');
+                    if (device1Id && device2Id) {
+                        // Track the comparison
+                        fetch('track_device_comparison.php', {
+                            method: 'POST',
+                            headers: {
+                                'Content-Type': 'application/x-www-form-urlencoded',
+                            },
+                            body: 'device1_id=' + encodeURIComponent(device1Id) + '&device2_id=' + encodeURIComponent(device2Id)
+                        });
+
+                        // Redirect to comparison page
+                        window.location.href = `compare.php?phone1=${device1Id}&phone2=${device2Id}`;
+                    }
+                });
+            });
+        });
+
+        // Show post details in modal
+        function showPostDetails(postId) {
+            fetch(`get_post_details.php?id=${postId}`)
+                .then(response => response.text())
+                .then(data => {
+                    window.location.href = `post.php?id=${postId}`;
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                    alert('Failed to load post details');
+                });
+        }
+
+        // Show device details in modal
+        function showDeviceDetails(deviceId) {
+            fetch(`get_device_details.php?id=${deviceId}`)
+                .then(response => response.text())
+                .then(data => {
+                    window.location.href = `device.php?id=${deviceId}`;
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                    alert('Failed to load device details');
+                });
+        }
+
+
+
+        // Auto-dismiss alerts after 5 seconds
+        setTimeout(function() {
+            var alerts = document.querySelectorAll('.alert');
+            alerts.forEach(function(alert) {
+                var bsAlert = new bootstrap.Alert(alert);
+                bsAlert.close();
+            });
+        }, 5000);
+
+        // Show brands modal
+        function showBrandsModal() {
+            const modal = new bootstrap.Modal(document.getElementById('brandsModal'));
+            modal.show();
+        }
+
+        // Handle brand selection from modal
+        function selectBrandFromModal(brandId) {
+            // Close the brands modal
+            const brandsModal = bootstrap.Modal.getInstance(document.getElementById('brandsModal'));
+            if (brandsModal) {
+                brandsModal.hide();
             }
 
-            // Display phones in modal
-            function displayPhonesModal(phones, brandId) {
-                const container = document.getElementById('deviceModalBody');
-                const titleElement = document.getElementById('deviceModalTitle');
+            // Fetch phones for this brand
+            fetch(`get_phones_by_brand.php?brand_id=${brandId}`)
+                .then(response => response.json())
+                .then(data => {
+                    // Populate the devices modal with phones
+                    displayPhonesModal(data, brandId);
+                })
+                .catch(error => {
+                    console.error('Error fetching phones:', error);
+                    alert('Failed to load phones');
+                });
+        }
 
-                // Update title with brand name
-                const brandButton = document.querySelector(`[data-brand-id="${brandId}"]`);
-                const brandName = brandButton ? brandButton.textContent.trim() : 'Brand';
-                titleElement.innerHTML = `<i class="fas fa-mobile-alt me-2"></i>${brandName} - Devices`;
+        // Display phones in modal
+        function displayPhonesModal(phones, brandId) {
+            const container = document.getElementById('deviceModalBody');
+            const titleElement = document.getElementById('deviceModalTitle');
 
-                if (phones && phones.length > 0) {
-                    let html = '<div class="row">';
-                    phones.forEach(phone => {
-                        const phoneImage = phone.image ? `<img src="${phone.image}" alt="${phone.name}" style="width: 100%; height: 120px; object-fit: contain; margin-bottom: 8px;" onerror="this.style.display='none';">` : '';
-                        html += `
+            // Update title with brand name
+            const brandButton = document.querySelector(`[data-brand-id="${brandId}"]`);
+            const brandName = brandButton ? brandButton.textContent.trim() : 'Brand';
+            titleElement.innerHTML = `<i class="fas fa-mobile-alt me-2"></i>${brandName} - Devices`;
+
+            if (phones && phones.length > 0) {
+                let html = '<div class="row">';
+                phones.forEach(phone => {
+                    const phoneImage = phone.image ? `<img src="${phone.image}" alt="${phone.name}" style="width: 100%; height: 120px; object-fit: contain; margin-bottom: 8px;" onerror="this.style.display='none';">` : '';
+                    html += `
           <div class="col-lg-4 col-md-6 col-sm-6 mb-3">
             <button class="device-cell-modal btn w-100 p-0" style="background-color: #fff; border: 1px solid #c5b6b0; color: #5D4037; font-weight: 500; transition: all 0.3s ease; cursor: pointer; display: flex; flex-direction: column; align-items: center; overflow: hidden;" onclick="goToDevice(${phone.id})">
               ${phoneImage}
@@ -1122,97 +1122,97 @@ if ($_POST && isset($_POST['action'])) {
             </button>
           </div>
         `;
-                    });
-                    html += '</div>';
-                    container.innerHTML = html;
-                } else {
-                    container.innerHTML = `
+                });
+                html += '</div>';
+                container.innerHTML = html;
+            } else {
+                container.innerHTML = `
         <div class="text-center py-5">
           <i class="fas fa-mobile-alt fa-3x text-muted mb-3"></i>
           <h6 class="text-muted">No devices available for this brand</h6>
         </div>
       `;
-                }
-
-                // Show devices modal
-                const devicesModal = new bootstrap.Modal(document.getElementById('devicesModal'));
-                devicesModal.show();
             }
 
-            // Navigate to device page
-            function goToDevice(deviceId) {
-                window.location.href = `device.php?id=${deviceId}`;
-            }
+            // Show devices modal
+            const devicesModal = new bootstrap.Modal(document.getElementById('devicesModal'));
+            devicesModal.show();
+        }
 
-            // Newsletter form AJAX handler
-            document.addEventListener('DOMContentLoaded', function() {
-                const form = document.getElementById('newsletter_form');
-                const messageContainer = document.getElementById('newsletter_message_container');
-                const emailInput = document.getElementById('newsletter_email');
-                const submitBtn = document.getElementById('newsletter_btn');
+        // Navigate to device page
+        function goToDevice(deviceId) {
+            window.location.href = `device.php?id=${deviceId}`;
+        }
 
-                if (form) {
-                    form.addEventListener('submit', function(e) {
-                        e.preventDefault();
+        // Newsletter form AJAX handler
+        document.addEventListener('DOMContentLoaded', function() {
+            const form = document.getElementById('newsletter_form');
+            const messageContainer = document.getElementById('newsletter_message_container');
+            const emailInput = document.getElementById('newsletter_email');
+            const submitBtn = document.getElementById('newsletter_btn');
 
-                        const email = emailInput.value.trim();
-                        const originalBtnText = submitBtn.textContent;
+            if (form) {
+                form.addEventListener('submit', function(e) {
+                    e.preventDefault();
 
-                        if (!email) {
-                            showMessage('Please enter an email address.', 'error');
-                            return;
-                        }
+                    const email = emailInput.value.trim();
+                    const originalBtnText = submitBtn.textContent;
 
-                        // Disable button and show loading state
-                        submitBtn.disabled = true;
-                        submitBtn.textContent = 'Subscribing...';
+                    if (!email) {
+                        showMessage('Please enter an email address.', 'error');
+                        return;
+                    }
 
-                        // Send AJAX request
-                        fetch('handle_newsletter.php', {
-                                method: 'POST',
-                                headers: {
-                                    'Content-Type': 'application/x-www-form-urlencoded'
-                                },
-                                body: 'newsletter_email=' + encodeURIComponent(email)
-                            })
-                            .then(response => response.json())
-                            .then(data => {
-                                if (data.success) {
-                                    showMessage(data.message, 'success');
-                                    emailInput.value = '';
-                                    // Auto-clear message after 5 seconds
-                                    setTimeout(() => {
-                                        messageContainer.innerHTML = '';
-                                    }, 5000);
-                                } else {
-                                    showMessage(data.message, 'error');
-                                }
-                                submitBtn.disabled = false;
-                                submitBtn.textContent = originalBtnText;
-                            })
-                            .catch(error => {
-                                showMessage('An error occurred. Please try again.', 'error');
-                                submitBtn.disabled = false;
-                                submitBtn.textContent = originalBtnText;
-                            });
-                    });
+                    // Disable button and show loading state
+                    submitBtn.disabled = true;
+                    submitBtn.textContent = 'Subscribing...';
 
-                    function showMessage(message, type) {
-                        const bgColor = type === 'success' ? '#4CAF50' : '#f44336';
-                        messageContainer.innerHTML = '<div style="background-color: ' + bgColor + '; color: white; padding: 12px; border-radius: 4px; margin-bottom: 12px; text-align: center; animation: slideIn 0.3s ease-in-out;">' + message + '</div>';
+                    // Send AJAX request
+                    fetch('handle_newsletter.php', {
+                            method: 'POST',
+                            headers: {
+                                'Content-Type': 'application/x-www-form-urlencoded'
+                            },
+                            body: 'newsletter_email=' + encodeURIComponent(email)
+                        })
+                        .then(response => response.json())
+                        .then(data => {
+                            if (data.success) {
+                                showMessage(data.message, 'success');
+                                emailInput.value = '';
+                                // Auto-clear message after 5 seconds
+                                setTimeout(() => {
+                                    messageContainer.innerHTML = '';
+                                }, 5000);
+                            } else {
+                                showMessage(data.message, 'error');
+                            }
+                            submitBtn.disabled = false;
+                            submitBtn.textContent = originalBtnText;
+                        })
+                        .catch(error => {
+                            showMessage('An error occurred. Please try again.', 'error');
+                            submitBtn.disabled = false;
+                            submitBtn.textContent = originalBtnText;
+                        });
+                });
 
-                        // Add animation style
-                        if (!document.querySelector('style[data-newsletter]')) {
-                            const style = document.createElement('style');
-                            style.setAttribute('data-newsletter', 'true');
-                            style.textContent = '@keyframes slideIn { from { opacity: 0; transform: translateY(-10px); } to { opacity: 1; transform: translateY(0); } }';
-                            document.head.appendChild(style);
-                        }
+                function showMessage(message, type) {
+                    const bgColor = type === 'success' ? '#4CAF50' : '#f44336';
+                    messageContainer.innerHTML = '<div style="background-color: ' + bgColor + '; color: white; padding: 12px; border-radius: 4px; margin-bottom: 12px; text-align: center; animation: slideIn 0.3s ease-in-out;">' + message + '</div>';
+
+                    // Add animation style
+                    if (!document.querySelector('style[data-newsletter]')) {
+                        const style = document.createElement('style');
+                        style.setAttribute('data-newsletter', 'true');
+                        style.textContent = '@keyframes slideIn { from { opacity: 0; transform: translateY(-10px); } to { opacity: 1; transform: translateY(0); } }';
+                        document.head.appendChild(style);
                     }
                 }
-            });
-        </script>
-        <script src="script.js"></script>
+            }
+        });
+    </script>
+    <script src="script.js"></script>
 </body>
 
 </html>

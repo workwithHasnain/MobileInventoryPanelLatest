@@ -24,7 +24,7 @@
 </head>
 
 <body style="background-color: #EFEBE9;">
-      <!-- Desktop Navbar of Gsmarecn -->
+    <!-- Desktop Navbar of Gsmarecn -->
     <div class="main-wrapper">
         <!-- Top Navbar -->
         <nav class="navbar navbar-dark  d-lg-inline d-none" id="navbar">
@@ -173,7 +173,7 @@
             </div>
         </div>
     </div>
-    <div class="container support content-wrapper" id="Top">
+    <div class="container support content-wrapper" id="Top" style="padding: 0px;">
         <div class="row">
 
             <div class="col-md-8 col-5  d-md-inline col-12 ">
@@ -200,7 +200,7 @@
 
             </div>
 
-           <div class="col-md-4 col-5 d-none d-lg-block" style="position: relative; left: 25px;">
+            <div class="col-md-4 col-5 d-none d-lg-block" style="position: relative; left: 25px;">
                 <button class="solid w-100 py-2">
                     <i class="fa-solid fa-mobile fa-sm mx-2" style="color: white;"></i>
                     Phone Finder</button>
@@ -609,8 +609,8 @@
                         </div>
                     </div>
                 </div>
-                <h6 style="border-left: solid 5px grey ;text-transform: uppercase;" class=" fw-bold px-3 text-secondary mt-3" >Popular comparisons</h6>
-                 <div class="sentizer bg-white mt-2 p-3 rounded shadow-sm" style="    text-transform: Uppercase;
+                <h6 style="border-left: solid 5px grey ;text-transform: uppercase;" class=" fw-bold px-3 text-secondary mt-3">Popular comparisons</h6>
+                <div class="sentizer bg-white mt-2 p-3 rounded shadow-sm" style="    text-transform: Uppercase;
                                             font-size: 13px;
                                             font-weight: 700;">
                     <div class="row">
@@ -715,8 +715,8 @@
 
                     <table class="table table-sm custom-table">
                         <thead>
-                            
-                               <tr class="text-white" style="background-color: #14222D;">
+
+                            <tr class="text-white" style="background-color: #14222D;">
                                 <th style="color: white;  font-size: 15px;  ">#</th>
                                 <th style="color: white;  font-size: 15px;">Device</th>
                                 <th style="color: white;  font-size: 15px;">Favorites</th>
@@ -778,9 +778,9 @@
                 </div>
                 <h6 style="border-left: 7px solid #EFEBE9 ; text-transform: uppercase;" class=" fw-bold px-2 text-secondary mt-2 d-inline mt-4">In Storeies
                     Now</h6>
-                
+
                 <div class="cent mb-4">
-                
+
                     <div class="d-flex">
                         <div class="canel">
                             <img class="shrink" src="https://fdn2.gsmarena.com/vv/bigpic/nothing-cmf-phone-2-pro.jpg" alt="">
@@ -824,7 +824,7 @@
                         </div>
                     </div>
                 </div>
-  
+
                 <div style="position: sticky; top: 10px;">
                     <img src="https://fdn.gsmarena.com/imgroot/static/banners/self/review-pixel-9-pro-300x250.jpg"
                         class=" d-block mx-auto" style="width: 300px;">

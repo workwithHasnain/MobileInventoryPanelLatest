@@ -22,7 +22,7 @@
 </head>
 
 <body style="background-color: #EFEBE9;">
-       <!-- Desktop Navbar of Gsmarecn -->
+    <!-- Desktop Navbar of Gsmarecn -->
     <div class="main-wrapper">
         <!-- Top Navbar -->
         <nav class="navbar navbar-dark  d-lg-inline d-none" id="navbar">
@@ -171,7 +171,7 @@
             </div>
         </div>
     </div>
-    <div class="container support content-wrapper" id="Top">
+    <div class="container support content-wrapper" id="Top" style="padding: 0px;">
         <div class="row">
 
             <div class="col-md-8 col-5  d-md-inline d-none col-12 ">
@@ -198,7 +198,7 @@
                 </div>
 
             </div>
-             <div class="col-md-4 col-5 d-none d-lg-block" style="position: relative; left: 25px;">
+            <div class="col-md-4 col-5 d-none d-lg-block" style="position: relative; left: 25px;">
                 <button class="solid w-100 py-2">
                     <i class="fa-solid fa-mobile fa-sm mx-2" style="color: white;"></i>
                     Phone Finder</button>
