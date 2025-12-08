@@ -250,8 +250,8 @@ $brands = $brands_stmt->fetchAll();
                 <div class="comfort-life position-absolute">
                     <img class="w-100 h-100" src="imges/Screenshot (160).png"
                         style="background-repeat: no-repeat; background-size: cover;" alt="">
-                    <div class="position-absolute d-flex mt-1"  style="top: 0; flex-wrap: wrap; gap: 8px;">
-                        <label class="text-white whitening ">Popular Tags</label>
+                    <div class="position-absolute d-flex mt-1 ml-2"  style="top: 0; flex-wrap: wrap; gap: 8px;">
+                        <label class="text-white whitening px-2">Popular Tags</label>
                         <?php if (!empty($popularTags)): ?>
                             <?php foreach ($popularTags as $tag => $count): ?>
                                 <a href="reviews.php?tag=<?php echo urlencode($tag); ?>"><button class="mobiles-button"><?php echo htmlspecialchars($tag); ?></button></a>
