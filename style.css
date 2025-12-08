@@ -1504,9 +1504,11 @@ table tr:hover {
     opacity: .85;
     font-weight: 500;
 }
-
 .gap-portion {
+    overflow: hidden;
     margin: 0 30px 15px;
+    display: flex;
+    flex-wrap: wrap;
 }
 
 .portion-headline {
