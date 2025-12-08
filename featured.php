@@ -253,7 +253,7 @@ $latestDevices = array_slice(array_reverse($latestDevices), 0, 9);
     <div class="container support content-wrapper" id="Top">
         <div class="row">
 
-            <div class="col-md-8 col-5  d-lg-inline d-none col-12 ">
+            <div class="col-md-8 col-5  d-lg-inline d-none col-12 " style="position: relative;left:0; padding-left: 0px;">
                 <div class="comfort-life position-absolute">
                     <img class="w-100 h-100" src="imges/Screenshot (163).png"
                         style="background-repeat: no-repeat; background-size: cover;" alt="">
@@ -275,7 +275,7 @@ $latestDevices = array_slice(array_reverse($latestDevices), 0, 9);
                 </div>
             </div>
 
-            <div class="col-md-4 col-5 d-none d-lg-block" style="position: relative; left: 12px;">
+            <div class="col-md-4 col-5 d-none d-lg-block" style="position: relative; left: 0; padding: 0px;">
                 <button class="solid w-100 py-2">
                     <i class="fa-solid fa-mobile fa-sm mx-2" style="color: white;"></i>
                     Phone Finder</button>
