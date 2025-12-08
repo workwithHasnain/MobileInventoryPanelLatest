@@ -15,6 +15,11 @@
             style="overflow-y: auto; max-height:390px; width:320px; flex-wrap:wrap; overflow-x:hidden;">
 
             <?php foreach ($devices as $device): ?>
+                <a href="device.php?id=<?php echo $device['id']; ?>" class="module-phones-link" style="    display: flex;
+    align-items: center;
+    justify-content: flex-start;" >
+                    <img style="position:relative;left:0;" src="<?php echo htmlspecialchars($device['image']); ?>" alt="">
+                    <?php echo htmlspecialchars($device['name']); ?>
                 <a href="device.php?id=<?php echo $device['id']; ?>" class="module-phones-link">
                     <img src="<?php echo htmlspecialchars($device['image']); ?>" alt="">
                     <br><?php echo htmlspecialchars($device['name']); ?>
@@ -40,6 +45,10 @@
                             <div class="swiper-half-slide">
                                 <a href="device.php?id=<?php echo $device['id']; ?>">
                                     <span>
+                                        <img style="height:119px" src="<?php echo htmlspecialchars($device['image']); ?>"
+                                             alt="<?php echo htmlspecialchars($device['name']); ?>">
+                                    </span>
+                                    <strong style="margin:0px"><?php echo htmlspecialchars($device['name']); ?></strong>
                                         <img src="<?php echo htmlspecialchars($device['image']); ?>"
                                              alt="<?php echo htmlspecialchars($device['name']); ?>">
                                     </span>

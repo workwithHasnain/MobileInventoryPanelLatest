@@ -480,6 +480,7 @@ input:focus {
     font-weight: 700;
     vertical-align: middle;
     padding: 2px 8px;
+    white-space: nowrap;
 }
 
 
@@ -627,7 +628,7 @@ input:focus {
 }
 
 .comfort-life {
-    width: 720px;
+    width: 712px;
     height: 340px;
     overflow-y: auto;
     /* Corrected background image URL with encoded spaces and commas */
@@ -740,10 +741,6 @@ input:focus {
 
 .review-card-body {
     padding: 16px 20px;
-    display: flex;
-    flex-direction: column;
-    flex-grow: 1;
-    justify-content: space-between;
 }
 
 .review-card-title {
@@ -760,6 +757,7 @@ input:focus {
 }
 
 .review-card-meta {
+    font-size: 0.9rem;
     font-size: 0.8rem;
     color: #666;
     display: flex;
@@ -1156,6 +1154,14 @@ a.module-phones-link {
     justify-content: space-around;
 }
 
+.module-phones-link {
+    display: flex;
+    flex-direction: column;
+    gap: 0;
+    align-items: center;
+    justify-content: center;
+}
+
 
 .module-latest .module-phones-link {
     margin: 0 7px;
@@ -1196,6 +1202,7 @@ a.module-phones-link {
 }
 
 .module-phones-link img {
+    height: 119px;
     /* width: 115%; */
     height: 119px;
     left: -5px;
