@@ -246,7 +246,7 @@ $brands = $brands_stmt->fetchAll();
     <?php include 'includes/gsmheader.php'; ?>
     <div class="container support content-wrapper" id="Top">
         <div class="row">
-            <div class="col-md-8 col-5  d-lg-inline d-none col-12 ">
+            <div class="col-md-8 col-5  d-lg-inline d-none col-12 " style="padding: 0px; position: relative;">
                 <div class="comfort-life position-absolute">
                     <img class="w-100 h-100" src="imges/Screenshot (160).png"
                         style="background-repeat: no-repeat; background-size: cover;" alt="">
