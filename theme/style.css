@@ -304,7 +304,7 @@ input:focus {
     bottom: 72px;
     left: 25px;
     margin: 0;
-    height: 20px;
+    height: 17px;
     color: white;
     font-size: 1.5rem;
     font-weight: bold;
@@ -604,7 +604,7 @@ input:focus {
 }
 
 .comfort-life {
-    width: 720px;
+    width: 710px;
     height: 370px;
     overflow-y: auto;
     /* Corrected background image URL with encoded spaces and commas */
@@ -614,14 +614,13 @@ input:focus {
     z-index: 0;
     display: flex;
     flex-direction: column;
-    margin-left: -12px;
     color: white;
     box-sizing: border-box;
     font-family: Arial, sans-serif;
 }
 
 .comfort-life-23 {
-    width: 720px;
+    width: 710px;
     height: 370px;
     overflow-y: auto;
     /* Corrected background image URL with encoded spaces and commas */
@@ -639,7 +638,7 @@ input:focus {
 
 .comfort-life-zone img {
     height: 362px;
-    width: 720px;
+    width: 710px;
     margin-left: -12px;
     background-size: cover;
     z-index: 0;

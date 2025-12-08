@@ -1782,7 +1782,9 @@ $title = $device['brand_name']
 
 
       </div>
-      <div class="col-md-4 col-5 d-none d-lg-block" style="position: relative; left: 12px;">
+      <div class="col-md-4 col-5 d-none d-lg-block" style="    position: relative;
+    /* left: 12px; */
+    padding: 0;">
         <button class="solid w-100 py-2">
           <i class="fa-solid fa-mobile fa-sm mx-2" style="color: white;"></i>
           Phone Finder</button>
