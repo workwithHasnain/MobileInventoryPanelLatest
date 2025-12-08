@@ -480,7 +480,6 @@ input:focus {
     font-weight: 700;
     vertical-align: middle;
     padding: 2px 8px;
-    white-space: nowrap;
 }
 
 
@@ -628,7 +627,7 @@ input:focus {
 }
 
 .comfort-life {
-    width: 712px;
+    width: 720px;
     height: 340px;
     overflow-y: auto;
     /* Corrected background image URL with encoded spaces and commas */
@@ -720,9 +719,11 @@ input:focus {
     background-color: #fff;
     overflow: hidden;
     transition: transform 0.3s ease;
-    /* margin-bottom: 14px; */
     margin-top: 12px;
-    width: 340px;
+    width: 100%;
+    height: 355px;
+    display: flex;
+    flex-direction: column;
 }
 
 .review-card:hover {
@@ -731,32 +732,54 @@ input:focus {
 
 .review-card img {
     width: 100%;
-    height: 180px;
+    height: 220px;
+    object-fit: cover;
     display: block;
+    flex-shrink: 0;
 }
 
 .review-card-body {
     padding: 16px 20px;
+    display: flex;
+    flex-direction: column;
+    flex-grow: 1;
+    justify-content: space-between;
 }
 
 .review-card-title {
-    font-size: 1.2rem;
+    font-size: 1rem;
     font-weight: 600;
     margin-bottom: 8px;
     color: #222;
+    line-height: 1.4;
+    display: -webkit-box;
+    -webkit-line-clamp: 3;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+    flex-grow: 1;
 }
 
 .review-card-meta {
-    font-size: 0.9rem;
+    font-size: 0.8rem;
     color: #666;
     display: flex;
     justify-content: space-between;
     align-items: center;
+    flex-shrink: 0;
 }
 
 .review-card-meta i {
     color: #ff4d4d;
     margin-right: 5px;
+}
+
+.sentizer-erx {
+    display: flex;
+    flex-direction: column;
+}
+
+.sentizer-erx .review-card {
+    height: 355px !important;
 }
 
 .filter-container {
@@ -1133,14 +1156,6 @@ a.module-phones-link {
     justify-content: space-around;
 }
 
-.module-phones-link {
-    display: flex;
-    flex-direction: column;
-    gap: 0;
-    align-items: center;
-    justify-content: center;
-}
-
 
 .module-latest .module-phones-link {
     margin: 0 7px;
@@ -1181,7 +1196,10 @@ a.module-phones-link {
 }
 
 .module-phones-link img {
+    /* width: 115%; */
     height: 119px;
+    left: -5px;
+    /* position: relative; */
     padding: 5px;
     z-index: 1;
     opacity: .953;
