@@ -192,3 +192,164 @@ document.addEventListener('DOMContentLoaded', function () {
         }
     });
 });
+
+// Mobile Search Modal Logic
+let mobileSearchDebounceTimer = null;
+let mobileSearchController = null;
+
+function openMobileSearch(event) {
+    event.preventDefault();
+    const modal = document.getElementById('mobileSearchModal');
+    const input = document.getElementById('mobileSearchInput');
+
+    modal.style.display = 'flex';
+    modal.classList.add('open');
+
+    // Lock body scroll
+    document.body.style.overflow = 'hidden';
+
+    // Focus input
+    input.focus();
+
+    // Clear previous results
+    document.getElementById('mobileSearchResults').innerHTML = '';
+}
+
+function closeMobileSearch() {
+    const modal = document.getElementById('mobileSearchModal');
+    modal.style.display = 'none';
+    modal.classList.remove('open');
+
+    // Unlock body scroll
+    document.body.style.overflow = '';
+
+    // Clear results
+    document.getElementById('mobileSearchResults').innerHTML = '';
+    document.getElementById('mobileSearchInput').value = '';
+
+    // Abort any pending requests
+    if (mobileSearchController) {
+        mobileSearchController.abort();
+        mobileSearchController = null;
+    }
+}
+
+function performMobileSearch(query) {
+    const resultsContainer = document.getElementById('mobileSearchResults');
+
+    if (!query.trim()) {
+        resultsContainer.innerHTML = '';
+        return;
+    }
+
+    // Cancel previous request
+    if (mobileSearchController) {
+        mobileSearchController.abort();
+    }
+
+    mobileSearchController = new AbortController();
+
+    fetch(`search.php?q=${encodeURIComponent(query)}&limit=15`, {
+        signal: mobileSearchController.signal
+    })
+        .then(response => response.json())
+        .then(data => {
+            renderMobileSearchResults(data.results || []);
+        })
+        .catch(err => {
+            if (err.name !== 'AbortError') {
+                console.error('Search error:', err);
+            }
+        });
+}
+
+function renderMobileSearchResults(items) {
+    const resultsContainer = document.getElementById('mobileSearchResults');
+
+    if (!items || items.length === 0) {
+        resultsContainer.innerHTML = '<div class="mobile-search-empty">No results found</div>';
+        return;
+    }
+
+    resultsContainer.innerHTML = '';
+
+    items.forEach(item => {
+        const link = document.createElement('a');
+        link.href = item.url;
+        link.className = 'mobile-search-result-item';
+
+        const hasImage = item.image && item.image.trim();
+
+        if (hasImage) {
+            const img = document.createElement('img');
+            img.src = item.image;
+            img.alt = item.title;
+            img.className = 'mobile-search-result-image';
+            img.onerror = function () {
+                this.style.display = 'none';
+            };
+            link.appendChild(img);
+        } else {
+            const placeholder = document.createElement('div');
+            placeholder.className = 'mobile-search-result-image';
+            placeholder.style.background = '#e0e0e0';
+            link.appendChild(placeholder);
+        }
+
+        const content = document.createElement('div');
+        content.className = 'mobile-search-result-content';
+
+        const title = document.createElement('p');
+        title.className = 'mobile-search-result-title';
+        title.textContent = item.title;
+        content.appendChild(title);
+
+        const type = document.createElement('p');
+        type.className = 'mobile-search-result-type';
+        type.textContent = item.type === 'post' ? 'Article' : 'Device';
+        content.appendChild(type);
+
+        link.appendChild(content);
+        resultsContainer.appendChild(link);
+    });
+}
+
+// Mobile search event listeners
+document.addEventListener('DOMContentLoaded', function () {
+    const modal = document.getElementById('mobileSearchModal');
+    const input = document.getElementById('mobileSearchInput');
+    const closeBtn = document.getElementById('mobileSearchClose');
+    const backdrop = document.querySelector('.mobile-search-backdrop');
+
+    if (!modal || !input || !closeBtn) return;
+
+    // Close button
+    closeBtn.addEventListener('click', closeMobileSearch);
+
+    // Close on backdrop click
+    backdrop.addEventListener('click', closeMobileSearch);
+
+    // Search input with debounce
+    input.addEventListener('input', function () {
+        clearTimeout(mobileSearchDebounceTimer);
+        const query = this.value.trim();
+
+        mobileSearchDebounceTimer = setTimeout(() => {
+            performMobileSearch(query);
+        }, 200);
+    });
+
+    // Close on Escape
+    input.addEventListener('keydown', function (e) {
+        if (e.key === 'Escape') {
+            closeMobileSearch();
+        }
+    });
+
+    // Prevent closing when clicking inside the container
+    document.querySelector('.mobile-search-container').addEventListener('click', function (e) {
+        if (e.target === this) {
+            closeMobileSearch();
+        }
+    });
+});
