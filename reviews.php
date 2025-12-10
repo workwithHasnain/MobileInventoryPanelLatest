@@ -252,14 +252,19 @@ $brands = $brands_stmt->fetchAll();
                         style="background-repeat: no-repeat; background-size: cover;" alt="">
                     <div class="position-absolute d-flex mt-1 ml-2"  style="top: 0; flex-wrap: wrap; gap: 8px;">
                         <label class="text-white whitening px-2">Popular Tags</label>
-                        <?php if (!empty($popularTags)): ?>
-                            <?php foreach ($popularTags as $tag => $count): ?>
-                                <a href="reviews.php?tag=<?php echo urlencode($tag); ?>"><button class="mobiles-button"><?php echo htmlspecialchars($tag); ?></button></a>
-                            <?php endforeach; ?>
-                        <?php else: ?>
-                            <span class="text-white">No tags available</span>
-                        <?php endif; ?>
-                    </div>
+                       <?php if (!empty($popularTags)): ?>
+    <?php foreach ($popularTags as $tag => $count): ?>
+        <a href="reviews.php?tag=<?php echo urlencode($tag); ?>">
+            <button class="mobiles-button"><?php echo htmlspecialchars($tag); ?></button>
+        </a>
+    <?php endforeach; ?>
+<?php else: ?>
+    <div class="no-tags">
+        <span>No tags availble</span>
+    </div>
+<?php endif; ?>
+</div>
+
                     <form method="get" action="reviews.php" class="comon">
                         <label for="hero-search-reviews" class="text-white whitening ">Search For</label>
                         <input id="hero-search-reviews" name="q" type="text" class="bg-white" placeholder="Search posts..." value="<?php echo htmlspecialchars($q ?? ''); ?>">
@@ -299,7 +304,7 @@ $brands = $brands_stmt->fetchAll();
 
         </div>
     </div>
-    <div class="container margin-top-4rem">
+    <div class="container margin-top-4rem" style="border-left:1px solid #00000012;" >
         <div class="row">
             <?php
             if (empty($posts)):
@@ -323,7 +328,7 @@ $brands = $brands_stmt->fetchAll();
                 $postChunks = array_chunk($displayPosts, $columns);
                 foreach ($postChunks as $colIndex => $colPosts):
                 ?>
-                    <div class="col-lg-4 col-md-6 col-12 sentizer-erx" style="background-color: #EEEEEE; margin-top: 18px;">
+                    <div class="col-lg-4 col-md-6 col-12 sentizer-erx" style="background-color: #EEEEEE; margin-top: 4px;">
                         <?php foreach ($colPosts as $post): ?>
                             <a href="post.php?slug=<?php echo urlencode($post['slug']); ?>">
                                 <div class="review-card mb-4" style="cursor:pointer;" onclick="window.location.href='post.php?slug=<?php echo urlencode($post['slug']); ?>'">

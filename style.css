@@ -477,6 +477,7 @@ input:focus {
     font-weight: 700;
     vertical-align: middle;
     padding: 2px 8px;
+    white-space: nowrap;
 }
 
 
@@ -684,7 +685,6 @@ input:focus {
 
 .whitening {
     font-size: 15px;
-    margin-left: 15px;
 }
 
 .mobiles-button:hover {
@@ -1016,15 +1016,13 @@ input:hover {
 }
 
 .phone-card {
-    border: 1px solid #ccc;
     padding: 15px;
     box-sizing: border-box;
     border-radius: 5px;
-    box-shadow: 0 0 5px rgb(0 0 0 / 0.1);
     background-color: white;
     margin-bottom: 20px;
     text-align: left;
-    /* Align text to the left */
+    border-right: 1px solid #f2f2f2;
 }
 
 .phone-card img {
@@ -1153,6 +1151,14 @@ a.module-phones-link {
     justify-content: space-around;
 }
 
+.module-phones-link {
+    display: flex;
+    flex-direction: column;
+    gap: 0;
+    align-items: center;
+    justify-content: center;
+}
+
 
 .module-latest .module-phones-link {
     margin: 0 7px;
@@ -1193,10 +1199,7 @@ a.module-phones-link {
 }
 
 .module-phones-link img {
-    /* width: 115%; */
     height: 119px;
-    left: -5px;
-    /* position: relative; */
     padding: 5px;
     z-index: 1;
     opacity: .953;
@@ -1330,18 +1333,13 @@ a.module-phones-link {
 
 .compare-checkbox label {
     font-weight: bold;
-    width: 100%;
-    display: block;
 }
 
-.compare-checkbox input,
-.compare-checkbox select {
+.compare-checkbox input {
     /* margin-left: 5px; */
     font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue';
-    width: 100%;
-    max-width: 100%;
+    width: 152%;
     display: block;
-    box-sizing: border-box;
 }
 
 .phone-card img:nth-child(2) {
@@ -2155,11 +2153,8 @@ td {
         border-bottom: none;
     }
 
-    .compare-checkbox input,
-    .compare-checkbox select,
-    .compare-checkbox .select2-container {
-        width: 100% !important;
-        max-width: 100%;
+    .compare-checkbox input {
+        width: 138%;
     }
 }
 
@@ -2438,7 +2433,7 @@ td {
 
     .center {
         /* width: 300px; */
-        /* height: 364px; */
+        height: 364px;
         overflow-y: scroll;
     }
 

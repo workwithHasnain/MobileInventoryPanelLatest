@@ -244,6 +244,27 @@ $latestDevices = array_slice(array_reverse($latestDevices), 0, 9);
         #devicesModal .modal-dialog-scrollable {
             max-height: 80vh;
         }
+        .grid-colums{
+                background-color: #EEEEEE;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    grid-template-rows: max-content;
+        height: max-content;
+        }
+        .anchor-card{
+            height: 300px;
+        }
+
+
+        @media (max-width:786px) {
+             .grid-colums{
+                background-color: #EEEEEE;
+    display: block;
+    grid-template-columns: 1fr ;
+   
+        }
+        
+        }
     </style>
 </head>
 
@@ -257,8 +278,8 @@ $latestDevices = array_slice(array_reverse($latestDevices), 0, 9);
                 <div class="comfort-life position-absolute">
                     <img class="w-100 h-100" src="imges/Screenshot (163).png"
                         style="background-repeat: no-repeat; background-size: cover;" alt="">
-                    <div class="position-absolute d-flex mt-1 ml-2" style="top: 0; flex-wrap: wrap; gap: 8px;">
-                        <label class="text-white whitening px-2">Popular Tags</label>
+                    <div class="position-absolute d-flex mt-1 ml-2" style="top: 0; flex-wrap: wrap; gap: 8px;    padding: 7px 12px;">
+                        <label class="text-white whitening">Popular Tags</label>
                         <?php if (!empty($popularTags)): ?>
                             <?php foreach ($popularTags as $tag => $count): ?>
                                 <a href="featured.php?tag=<?php echo urlencode($tag); ?>"><button class="mobiles-button"><?php echo htmlspecialchars($tag); ?></button></a>
@@ -307,7 +328,7 @@ $latestDevices = array_slice(array_reverse($latestDevices), 0, 9);
 
         </div>
     </div>
-    <div class="container  margin-top-4rem">
+    <div class="container  margin-top-4rem" style="border-left:1px solid #00000012;">
         <div class="row">
             <?php
             if (empty($posts)):
@@ -324,35 +345,55 @@ $latestDevices = array_slice(array_reverse($latestDevices), 0, 9);
                     </div>
                 </div>
                 <?php
-            else:
+          
+        
+        else:
                 $maxPosts = count($posts);
                 $displayPosts = array_slice($posts, 0, $maxPosts);
-                $columns = max(1, ceil($maxPosts / 2));
+                $columns = max(1, ceil($maxPosts / 1));
                 $postChunks = array_chunk($displayPosts, $columns);
                 foreach ($postChunks as $colIndex => $colPosts):
                 ?>
-                    <div class="col-lg-4 col-md-6 col-12 sentizer-erx" style="background-color: #EEEEEE;">
-                        <?php foreach ($colPosts as $post): ?>
-                            <a href="post.php?slug=<?php echo urlencode($post['slug']); ?>">
-                                <div class="review-card" style="cursor:pointer;" onclick="window.location.href='post.php?slug=<?php echo urlencode($post['slug']); ?>'">
-                                    <?php if (isset($post['featured_image']) && !empty($post['featured_image'])): ?>
-                                        <img style="cursor:pointer;" onclick="window.location.href='post.php?slug=<?php echo urlencode($post['slug']); ?>'" src="<?php echo htmlspecialchars($post['featured_image']); ?>" alt="<?php echo htmlspecialchars($post['title']); ?>">
-                                    <?php endif; ?>
-                                    <div class="review-card-body">
-                                        <div style="cursor:pointer;" onclick="window.location.href='post.php?slug=<?php echo urlencode($post['slug']); ?>'" class="review-card-title"><?php echo htmlspecialchars($post['title']); ?></div>
-                                        <div class="review-card-meta">
-                                            <span><?php echo date('M j, Y', strtotime($post['created_at'])); ?></span>
-                                            <span><i class="bi bi-chat-dots-fill"></i><?php echo $post['comment_count']; ?> comments</span>
-                                        </div>
-                                    </div>
-                                </div>
-                            </a>
-                        <?php endforeach; ?>
+    <div class="col-lg-8 col-md-6 col-12 sentizer-erx grid-colums" style="background-color: #EEEEEE;">
+                    <?php foreach ($colPosts as $post): ?>
+
+        <a class="anchor-card" href="post.php?slug=<?php echo urlencode($post["slug"]); ?>">
+            <div class="review-card" style="cursor:pointer;">
+
+                <?php if (!empty($post["featured_image"])): ?>
+                    <img 
+                        src="<?php echo htmlspecialchars($post["featured_image"]); ?>" 
+                        alt="<?php echo htmlspecialchars($post["title"]); ?>"
+                        style="cursor:pointer;"
+                    >
+                <?php endif; ?>
+
+                <div class="review-card-body">
+
+                    <div class="review-card-title" style="cursor:pointer;">
+                        <?php echo htmlspecialchars($post["title"]); ?>
                     </div>
+
+                    <div class="review-card-meta">
+                        <span><?php echo date("M j, Y", strtotime($post["created_at"])); ?></span>
+                        <span>
+                            <i class="bi bi-chat-dots-fill"></i>
+                            <?php echo $post["comment_count"]; ?> comments
+                        </span>
+                    </div>
+
+                </div>
+
+            </div>
+        </a>
+
+        <?php endforeach; ?>
+    </div>
+
             <?php endforeach;
             endif; ?>
 
-            <div class="col-lg-4 col-12 bg-white" style="margin-top: 18px;">
+            <div class="col-lg-4 col-12 bg-white" style="margin-top: 12px;">
                 <?php include 'includes/latest-devices.php'; ?>
                 <?php include 'includes/comparisons-devices.php'; ?>
                 <?php include 'includes/topviewed-devices.php'; ?>
