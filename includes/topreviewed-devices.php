@@ -22,13 +22,13 @@
                                             if (($index + 1) % 2 != 0): ?>
                                                 <tr class="clickable-row" data-device-id="<?php echo $device['id']; ?>" style="cursor: pointer;">
                                                     <th scope="row"><?php echo $index + 1; ?></th>
-                                                    <td class="text-start" style="white-space: nowrap; overflow: hidden; text-overflow: ellipsis;"><?php $text = htmlspecialchars($device['brand_name'] . ' ' . $device['name']); echo $text; ?></td>
+                                                    <td class="text-start" style="white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 200px;"><?php $text = htmlspecialchars($device['brand_name'] . ' ' . $device['name']); echo $text; ?></td>
                                                     <td class="text-end"><?php echo $device['review_count']; ?></td>
                                                 </tr>
                                             <?php else: ?>
                                                 <tr class="highlight-12 clickable-row" data-device-id="<?php echo $device['id']; ?>" style="cursor: pointer;">
                                                     <th scope="row" class="text-white"><?php echo $index + 1; ?></th>
-                                                    <td class="text-start" style="white-space: nowrap; overflow: hidden; text-overflow: ellipsis;"><?php $text = htmlspecialchars($device['brand_name'] . ' ' . $device['name']); echo $text; ?></td>
+                                                    <td class="text-start" style="white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 200px;"><?php $text = htmlspecialchars($device['brand_name'] . ' ' . $device['name']); echo $text; ?></td>
                                                     <td class="text-end"><?php echo $device['review_count']; ?></td>
                                                 </tr>
                                     <?php
