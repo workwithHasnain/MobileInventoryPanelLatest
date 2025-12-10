@@ -71,6 +71,9 @@ if (isset($_SESSION['success_message'])) {
             <a href="add_device.php" class="btn btn-success ms-2">
                 <i class="fas fa-plus"></i> Add New Device
             </a>
+            <button type="button" class="btn btn-danger ms-2" data-bs-toggle="modal" data-bs-target="#reviewsModal">
+                <i class="fas fa-star"></i> Reviews
+            </button>
             <button type="button" class="btn btn-info ms-2" data-bs-toggle="modal" data-bs-target="#newsletterModal">
                 <i class="fas fa-envelope"></i> Newsletter Subscribers
             </button>
@@ -334,6 +337,72 @@ if (isset($_SESSION['success_message'])) {
     <?php endif; ?>
 </div>
 
+<!-- Reviews Modal -->
+<div class="modal fade" id="reviewsModal" tabindex="-1" aria-labelledby="reviewsLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg modal-dialog-scrollable">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="reviewsLabel">
+                    <i class="fas fa-star me-2"></i>Phone Reviews
+                </h5>
+                <div class="ms-auto">
+                    <button type="button" class="btn btn-sm btn-success" data-bs-toggle="modal" data-bs-target="#addReviewModal">
+                        <i class="fas fa-plus me-1"></i>Add Review
+                    </button>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+            </div>
+            <div class="modal-body">
+                <div id="reviews_message" style="display: none;"></div>
+                <div id="reviews_list_container">
+                    <div class="text-center py-4">
+                        <div class="spinner-border" role="status">
+                            <span class="visually-hidden">Loading...</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Add Review Modal -->
+<div class="modal fade" id="addReviewModal" tabindex="-1" aria-labelledby="addReviewLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="addReviewLabel">
+                    <i class="fas fa-plus me-2"></i>Create New Review
+                </h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <div id="add_review_message" style="display: none;"></div>
+                <form id="addReviewForm">
+                    <div class="mb-3">
+                        <label for="phoneSelect" class="form-label">Select Phone</label>
+                        <select id="phoneSelect" class="form-control" style="width: 100%;">
+                            <option></option>
+                        </select>
+                    </div>
+                    <div class="mb-3">
+                        <label for="postSelect" class="form-label">Select Post</label>
+                        <select id="postSelect" class="form-control" style="width: 100%;">
+                            <option></option>
+                        </select>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                <button type="button" class="btn btn-primary" id="submitReviewBtn">
+                    <i class="fas fa-save me-1"></i>Create Review
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
 <!-- Newsletter Subscribers Modal -->
 <div class="modal fade" id="newsletterModal" tabindex="-1" aria-labelledby="newsletterLabel" aria-hidden="true">
     <div class="modal-dialog modal-lg modal-dialog-scrollable">
@@ -485,6 +554,236 @@ if (isset($_SESSION['success_message'])) {
 
 <script>
     document.addEventListener('DOMContentLoaded', function() {
+        // ===== REVIEWS MANAGEMENT =====
+        const reviewsModal = document.getElementById('reviewsModal');
+        const addReviewModal = document.getElementById('addReviewModal');
+        const submitReviewBtn = document.getElementById('submitReviewBtn');
+
+        if (reviewsModal) {
+            reviewsModal.addEventListener('show.bs.modal', function() {
+                loadReviews();
+            });
+        }
+
+        if (addReviewModal) {
+            addReviewModal.addEventListener('show.bs.modal', function() {
+                initSelect2();
+            });
+        }
+
+        if (submitReviewBtn) {
+            submitReviewBtn.addEventListener('click', submitReview);
+        }
+
+        function initSelect2() {
+            // Initialize Select2 for phones
+            $('#phoneSelect').select2({
+                placeholder: 'Search phones...',
+                allowClear: true,
+                ajax: {
+                    url: 'manage_reviews.php',
+                    dataType: 'json',
+                    delay: 250,
+                    data: function(params) {
+                        return {
+                            action: 'search_phones',
+                            term: params.term
+                        };
+                    },
+                    processResults: function(data) {
+                        return {
+                            results: data.data
+                        };
+                    }
+                },
+                templateResult: function(data) {
+                    if (!data.id) return data.text;
+                    return $('<span><img src="' + data.image + '" style="width: 30px; height: 30px; margin-right: 10px; vertical-align: middle;"/> ' + data.text + '</span>');
+                },
+                templateSelection: function(data) {
+                    if (!data.id) return data.text;
+                    return $('<span><img src="' + data.image + '" style="width: 20px; height: 20px; margin-right: 8px; vertical-align: middle;"/> ' + data.text + '</span>');
+                }
+            });
+
+            // Initialize Select2 for posts
+            $('#postSelect').select2({
+                placeholder: 'Search posts...',
+                allowClear: true,
+                ajax: {
+                    url: 'manage_reviews.php',
+                    dataType: 'json',
+                    delay: 250,
+                    data: function(params) {
+                        return {
+                            action: 'search_posts',
+                            term: params.term
+                        };
+                    },
+                    processResults: function(data) {
+                        return {
+                            results: data.data
+                        };
+                    }
+                },
+                templateResult: function(data) {
+                    if (!data.id) return data.text;
+                    return $('<span><img src="' + data.image + '" style="width: 30px; height: 30px; margin-right: 10px; vertical-align: middle;"/> ' + data.text + '</span>');
+                },
+                templateSelection: function(data) {
+                    if (!data.id) return data.text;
+                    return $('<span><img src="' + data.image + '" style="width: 20px; height: 20px; margin-right: 8px; vertical-align: middle;"/> ' + data.text + '</span>');
+                }
+            });
+        }
+
+        function loadReviews() {
+            const container = document.getElementById('reviews_list_container');
+
+            fetch('manage_reviews.php', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/x-www-form-urlencoded'
+                    },
+                    body: 'action=list'
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        renderReviewsList(data.reviews);
+                    } else {
+                        container.innerHTML = '<div class="alert alert-danger">Error loading reviews</div>';
+                    }
+                })
+                .catch(error => {
+                    container.innerHTML = '<div class="alert alert-danger">Error: ' + error + '</div>';
+                });
+        }
+
+        function renderReviewsList(reviews) {
+            const container = document.getElementById('reviews_list_container');
+
+            if (reviews.length === 0) {
+                container.innerHTML = '<div class="alert alert-info text-center">No reviews yet</div>';
+                return;
+            }
+
+            let html = '<div class="row">';
+
+            reviews.forEach(review => {
+                html += `
+                    <div class="col-lg-6 mb-3">
+                        <div class="card h-100">
+                            <div class="row g-0">
+                                <div class="col-md-4">
+                                    <img src="${escapeHtml(review.phone_image)}" class="img-fluid rounded-start" alt="${escapeHtml(review.phone_name)}" style="height: 150px; object-fit: cover;">
+                                </div>
+                                <div class="col-md-8">
+                                    <div class="card-body pb-2">
+                                        <h6 class="card-title mb-1"><i class="fas fa-mobile-alt me-2"></i>${escapeHtml(review.phone_name)}</h6>
+                                        <p class="card-text small mb-2"><strong>Post:</strong> ${escapeHtml(review.post_title)}</p>
+                                        ${review.post_image ? `<img src="${escapeHtml(review.post_image)}" class="img-thumbnail" alt="${escapeHtml(review.post_title)}" style="max-width: 80px; max-height: 60px; object-fit: cover; margin-bottom: 10px;">` : ''}
+                                        <div>
+                                            <button class="btn btn-sm btn-danger" onclick="deleteReview(${review.id})">
+                                                <i class="fas fa-trash"></i> Delete
+                                            </button>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                `;
+            });
+
+            html += '</div>';
+            container.innerHTML = html;
+        }
+
+        window.deleteReview = function(id) {
+            if (!confirm('Are you sure you want to delete this review?')) {
+                return;
+            }
+
+            fetch('manage_reviews.php', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/x-www-form-urlencoded'
+                    },
+                    body: 'action=delete&id=' + id
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        showReviewMessage(data.message, 'success');
+                        loadReviews();
+                    } else {
+                        showReviewMessage(data.message, 'danger');
+                    }
+                })
+                .catch(error => {
+                    showReviewMessage('Error: ' + error, 'danger');
+                });
+        };
+
+        function submitReview() {
+            const phoneId = $('#phoneSelect').val();
+            const postId = $('#postSelect').val();
+
+            if (!phoneId || !postId) {
+                showAddReviewMessage('Please select both phone and post', 'warning');
+                return;
+            }
+
+            submitReviewBtn.disabled = true;
+            submitReviewBtn.innerHTML = '<i class="fas fa-spinner fa-spin me-1"></i>Creating...';
+
+            fetch('manage_reviews.php', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/x-www-form-urlencoded'
+                    },
+                    body: 'action=add&phone_id=' + phoneId + '&post_id=' + postId
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        showAddReviewMessage(data.message, 'success');
+                        document.getElementById('addReviewForm').reset();
+                        $('#phoneSelect').val(null).trigger('change');
+                        $('#postSelect').val(null).trigger('change');
+                        loadReviews();
+                        setTimeout(() => {
+                            bootstrap.Modal.getInstance(document.getElementById('addReviewModal')).hide();
+                            document.getElementById('add_review_message').style.display = 'none';
+                        }, 1500);
+                    } else {
+                        showAddReviewMessage(data.message, 'danger');
+                    }
+                    submitReviewBtn.disabled = false;
+                    submitReviewBtn.innerHTML = '<i class="fas fa-save me-1"></i>Create Review';
+                })
+                .catch(error => {
+                    showAddReviewMessage('Error: ' + error, 'danger');
+                    submitReviewBtn.disabled = false;
+                    submitReviewBtn.innerHTML = '<i class="fas fa-save me-1"></i>Create Review';
+                });
+        }
+
+        function showReviewMessage(message, type) {
+            const messageDiv = document.getElementById('reviews_message');
+            messageDiv.className = 'alert alert-' + type + ' alert-dismissible fade show';
+            messageDiv.innerHTML = message + '<button type="button" class="btn-close" data-bs-dismiss="alert"></button>';
+            messageDiv.style.display = 'block';
+        }
+
+        function showAddReviewMessage(message, type) {
+            const messageDiv = document.getElementById('add_review_message');
+            messageDiv.className = 'alert alert-' + type + ' alert-dismissible fade show';
+            messageDiv.innerHTML = message + '<button type="button" class="btn-close" data-bs-dismiss="alert"></button>';
+            messageDiv.style.display = 'block';
+        }
+
         const filterModal = document.getElementById('filterSettingsModal');
         const filterContent = document.getElementById('filterSettingsContent');
         const saveBtn = document.getElementById('saveFilterSettingsBtn');
@@ -519,7 +818,7 @@ if (isset($_SESSION['success_message'])) {
         // Collect all form data from the filter settings modal
         const filterContent = document.getElementById('filterSettingsContent');
         const form = filterContent.querySelector('form');
-        
+
         if (form) {
             const formEntries = new FormData(form);
             for (let [key, value] of formEntries) {
@@ -1033,6 +1332,18 @@ if (isset($_SESSION['success_message'])) {
         messageDiv.style.display = 'block';
     }
 </script>
+
+<style>
+    /* Fix Select2 dropdown appearing behind modal */
+    .select2-dropdown {
+        z-index: 2000 !important;
+    }
+
+    .select2-container--open {
+        z-index: 2000 !important;
+    }
+</style>
+
 </div>
 
 <?php include 'includes/footer.php'; ?>

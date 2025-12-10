@@ -209,6 +209,13 @@ CREATE TABLE IF NOT EXISTS content_views (
     UNIQUE(content_type, content_id, ip_address)
 );
 
+-- Reviews association table - One-to-one optional association between posts and phones
+CREATE TABLE IF NOT EXISTS reviews (
+    id SERIAL PRIMARY KEY,
+    phone_id INTEGER REFERENCES phones(id) ON DELETE CASCADE UNIQUE,
+    post_id INTEGER REFERENCES posts(id) ON DELETE CASCADE UNIQUE
+);
+
 -- =====================================================
 -- INDEXES FOR PERFORMANCE
 -- =====================================================
@@ -250,4 +257,8 @@ CREATE INDEX IF NOT EXISTS idx_device_views_device_id ON device_views(device_id)
 CREATE INDEX IF NOT EXISTS idx_device_views_date ON device_views(view_date);
 CREATE INDEX IF NOT EXISTS idx_device_comparisons_devices ON device_comparisons(device1_id, device2_id);
 CREATE INDEX IF NOT EXISTS idx_content_views_content ON content_views(content_type, content_id);
+
+-- Reviews indexes
+CREATE INDEX IF NOT EXISTS idx_reviews_phone_id ON reviews(phone_id);
+CREATE INDEX IF NOT EXISTS idx_reviews_post_id ON reviews(post_id);
 

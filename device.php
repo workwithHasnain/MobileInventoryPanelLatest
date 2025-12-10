@@ -906,6 +906,22 @@ if (!$device) {
   exit();
 }
 
+// Get review for this device (if exists)
+$review_post = null;
+try {
+  $review_stmt = $pdo->prepare("
+    SELECT po.id, po.title, po.slug
+    FROM reviews r
+    INNER JOIN posts po ON r.post_id = po.id
+    WHERE r.phone_id = ?
+    LIMIT 1
+  ");
+  $review_stmt->execute([$device_id]);
+  $review_post = $review_stmt->fetch(PDO::FETCH_ASSOC);
+} catch (Exception $e) {
+  error_log("Review fetch error: " . $e->getMessage());
+}
+
 // Get all available images for this device
 $deviceImages = getDeviceImages($device);
 
@@ -1626,6 +1642,14 @@ if ($_POST && isset($_POST['submit_comment'])) {
               <div class="d-flex justify-content-end">
                 <div class="d-flex flexiable ">
                   <img src="/imges/download-removebg-preview.png" alt="">
+                  <?php if ($review_post): ?>
+                    <h5 style="font-family:system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue' ; font-size: 16px; cursor:pointer; font-weight: 700;" class="mt-2" onclick="window.location.href='post.php?slug=<?php echo urlencode($review_post['slug']); ?>'">REVIEW</h5>
+                  <?php else: ?>
+                    <h5 style="font-family:system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue' ; font-size: 16px; cursor:pointer; font-weight: 700; opacity: 0.5;" class="mt-2" title="No review available">REVIEW</h5>
+                  <?php endif; ?>
+                </div>
+                <div class="d-flex flexiable ">
+                  <img src="/imges/download-removebg-preview.png" alt="">
                   <h5 style="font-family:system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue' ; font-size: 16px; cursor:pointer; font-weight: 700;" class="mt-2" onclick="document.getElementById('comments').scrollIntoView({behavior:'smooth', block:'start'});">OPINIONS</h5>
                 </div>
                 <div class="d-flex flexiable ">
@@ -1635,10 +1659,6 @@ if ($_POST && isset($_POST['submit_comment'])) {
                 <div class="d-flex flexiable ">
                   <img src="/imges/download-removebg-preview.png" alt="">
                   <h5 style="font-family:system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue' ; font-size: 16px; font-weight: 700;" class="mt-2" onclick="window.location.href='compare.php?phone1=<?php echo $device['id']; ?>'">COMPARE </h5>
-                </div>
-                <div class="d-flex flexiable ">
-                  <img src="/imges/download-removebg-preview.png" alt="">
-                  <h5 style="font-family:system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue' ; font-size: 16px; font-weight: 700;" class="mt-2"> </h5>
                 </div>
                 <div class="d-flex flexiable ">
                   <img src="/imges/download-removebg-preview.png" alt="">
@@ -1735,6 +1755,11 @@ if ($_POST && isset($_POST['submit_comment'])) {
           <p style="font-size: 13px; text-transform: capitalize; padding: 6px 19px;"> <strong>Disclaimer:</strong>We can not guarantee that the information on this page is 100%
             correct.</p>
           <div class="d-block d-lg-flex">
+            <?php if ($review_post): ?>
+              <button class="pad" onclick="window.location.href='post.php?slug=<?php echo urlencode($review_post['slug']); ?>'">REVIEW</button>
+            <?php else: ?>
+              <button class="pad" disabled style="opacity: 0.5; cursor: default;" title="No review available">REVIEW</button>
+            <?php endif; ?>
             <button class="pad" onclick="window.location.href='compare.php?phone1=<?php echo $device['id']; ?>'">COMPARE</button>
             <button class="pad" onclick="document.getElementById('comments').scrollIntoView({behavior:'smooth', block:'start'});">OPINIONS</button>
             <button class="pad" onclick="showPicturesModal()">PICTURES</button>
