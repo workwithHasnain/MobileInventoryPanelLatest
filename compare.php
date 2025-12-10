@@ -898,7 +898,7 @@ function formatDeviceSpecsStructured($device)
         .select2-container .select2-selection--single {
             height: auto !important;
             min-height: 38px;
-            border: 1px solid #ced4da;
+            /* border: 1px solid #ced4da; */
             border-radius: 4px;
             background-color: #fff;
         }
@@ -906,7 +906,6 @@ function formatDeviceSpecsStructured($device)
         .select2-container .select2-selection--single .select2-selection__rendered {
             padding: 6px 12px;
             line-height: 1.5;
-            color: #5D4037;
             font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue';
         }
 
@@ -917,9 +916,9 @@ function formatDeviceSpecsStructured($device)
 
         /* Dropdown styling */
         .select2-dropdown {
-            border: 1px solid #8D6E63;
+            border: 1px solid black;
             border-radius: 4px;
-            background-color: #EFEBE9;
+            /* background-color: #EFEBE9; */
             max-width: 100% !important;
         }
 
@@ -929,13 +928,12 @@ function formatDeviceSpecsStructured($device)
         }
 
         .select2-container--default .select2-results__option--highlighted[aria-selected] {
-            background-color: #D7CCC8 !important;
-            color: #3E2723;
+            background-color: #dadadaff !important;
+            color: black;
         }
 
         .select2-container--default .select2-results__option[aria-selected=true] {
-            background-color: #8D6E63;
-            color: white;
+            background-color: #b6b6b6ff !important;
         }
 
         /* Custom option template with image */
@@ -963,7 +961,7 @@ function formatDeviceSpecsStructured($device)
 
         /* Search box styling */
         .select2-search--dropdown .select2-search__field {
-            border: 1px solid #8D6E63;
+            border: 1px solid black;
             border-radius: 4px;
             padding: 6px 12px;
         }
@@ -983,7 +981,7 @@ function formatDeviceSpecsStructured($device)
         .brand-cell-modal {
             background-color: #fff;
             border: 1px solid #c5b6b0;
-            color: #5D4037;
+            color: black;
             font-weight: 500;
             transition: all 0.3s ease;
             cursor: pointer;
@@ -991,11 +989,11 @@ function formatDeviceSpecsStructured($device)
         }
 
         .brand-cell-modal:hover {
-            background-color: #D7CCC8 !important;
-            border-color: #8D6E63;
+            background-color: #d7c8c8ff !important;
+            border-color: black;
             transform: translateY(-2px);
             box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
-            color: #3E2723;
+            color: black;
         }
 
         .brand-cell-modal:active {
@@ -1015,8 +1013,8 @@ function formatDeviceSpecsStructured($device)
         /* Device Cell Modal Styling */
         .device-cell-modal {
             background-color: #fff;
-            border: 1px solid #c5b6b0;
-            color: #5D4037;
+            border: 1px solid black;
+            color: black;
             font-weight: 500;
             transition: all 0.3s ease;
             cursor: pointer;
@@ -1024,11 +1022,11 @@ function formatDeviceSpecsStructured($device)
         }
 
         .device-cell-modal:hover {
-            background-color: #D7CCC8 !important;
+            background-color: #e26565ff !important;
             border-color: #8D6E63;
             transform: translateY(-2px);
             box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
-            color: #3E2723;
+            color: black;
         }
 
         .device-cell-modal:active {
@@ -1538,7 +1536,7 @@ function formatDeviceSpecsStructured($device)
 
                         $select.select2({
                             placeholder: 'Select Phone ' + phoneNumber,
-                            allowClear: true,
+                            allowClear: false,
                             width: '100%',
                             dropdownAutoWidth: false,
                             templateResult: formatPhoneOption,
