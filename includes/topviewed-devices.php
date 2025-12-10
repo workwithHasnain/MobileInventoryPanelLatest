@@ -7,7 +7,7 @@
                                     <tr style="background-color: #4c7273; color: white;">
                                         <th style="color: white;">#</th>
                                         <th style="color: white;">Devices</th>
-                                        <th style="white-space: nowrap; color: white;">Daily Hits</th>
+                                        <th style="color: white;">Daily Hits</th>
                                     </tr>
                                 </thead>
                                 <tbody>
@@ -22,13 +22,13 @@
                                             if (($index + 1) % 2 != 0): ?>
                                                 <tr class="clickable-row" data-device-id="<?php echo $device['id']; ?>" style="cursor: pointer;">
                                                     <th scope="row"><?php echo $index + 1; ?></th>
-                                                    <td class="text-start" style="white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 200px;"><?php $text = htmlspecialchars($device['brand_name'] . ' ' . $device['name']); echo $text; ?></td>
+                                                    <td class="text-start"><?php $text = htmlspecialchars($device['brand_name'] . ' ' . $device['name']); echo strlen($text) > 35 ? substr($text, 0, 35) . '...' : $text; ?></td>
                                                     <td class="text-end"><?php echo $device['view_count']; ?></td>
                                                 </tr>
                                             <?php else: ?>
                                                 <tr class="highlight clickable-row" data-device-id="<?php echo $device['id']; ?>" style="cursor: pointer;">
                                                     <th scope="row" class="text-white"><?php echo $index + 1; ?></th>
-                                                    <td class="text-start" style="white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 200px;"><?php $text = htmlspecialchars($device['brand_name'] . ' ' . $device['name']); echo $text; ?></td>
+                                                    <td class="text-start"><?php $text = htmlspecialchars($device['brand_name'] . ' ' . $device['name']); echo strlen($text) > 35 ? substr($text, 0, 35) . '...' : $text; ?></td>
                                                     <td class="text-end"><?php echo $device['view_count']; ?></td>
                                                 </tr>
                                     <?php

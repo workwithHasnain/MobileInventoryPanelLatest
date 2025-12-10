@@ -906,22 +906,6 @@ if (!$device) {
   exit();
 }
 
-// Get review for this device (if exists)
-$review_post = null;
-try {
-  $review_stmt = $pdo->prepare("
-    SELECT po.id, po.title, po.slug
-    FROM reviews r
-    INNER JOIN posts po ON r.post_id = po.id
-    WHERE r.phone_id = ?
-    LIMIT 1
-  ");
-  $review_stmt->execute([$device_id]);
-  $review_post = $review_stmt->fetch(PDO::FETCH_ASSOC);
-} catch (Exception $e) {
-  error_log("Review fetch error: " . $e->getMessage());
-}
-
 // Get all available images for this device
 $deviceImages = getDeviceImages($device);
 
@@ -987,6 +971,9 @@ if ($_POST && isset($_POST['submit_comment'])) {
   <!-- Font Awesome (for icons) -->
   <script src="https://kit.fontawesome.com/your-kit-code.js" crossorigin="anonymous"></script>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" />
+  <script>
+
+  </script>
 
   <link rel="stylesheet" href="style.css">
 </head>
@@ -1116,6 +1103,7 @@ if ($_POST && isset($_POST['submit_comment'])) {
       right: 0;
       bottom: 0;
       background: inherit;
+      /* same background lega */
       filter: blur(5px);
       z-index: 1;
     }
@@ -1123,6 +1111,7 @@ if ($_POST && isset($_POST['submit_comment'])) {
     .card-header * {
       position: relative;
       z-index: 2;
+      /* content clear dikhayega */
     }
 
     .vr-hide {
@@ -1351,8 +1340,7 @@ if ($_POST && isset($_POST['submit_comment'])) {
     #devicesModal .modal-dialog-scrollable {
       max-height: 80vh;
     }
-
-    .pad {
+    .pad{
       font-weight: 700;
     }
   </style>
@@ -1642,14 +1630,6 @@ if ($_POST && isset($_POST['submit_comment'])) {
               <div class="d-flex justify-content-end">
                 <div class="d-flex flexiable ">
                   <img src="/imges/download-removebg-preview.png" alt="">
-                  <?php if ($review_post): ?>
-                    <h5 style="font-family:system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue' ; font-size: 16px; cursor:pointer; font-weight: 700;" class="mt-2" onclick="window.location.href='post.php?slug=<?php echo urlencode($review_post['slug']); ?>'">REVIEW</h5>
-                  <?php else: ?>
-                    <h5 style="font-family:system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue' ; font-size: 16px; cursor:pointer; font-weight: 700; opacity: 0.5;" class="mt-2" title="No review available">REVIEW</h5>
-                  <?php endif; ?>
-                </div>
-                <div class="d-flex flexiable ">
-                  <img src="/imges/download-removebg-preview.png" alt="">
                   <h5 style="font-family:system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue' ; font-size: 16px; cursor:pointer; font-weight: 700;" class="mt-2" onclick="document.getElementById('comments').scrollIntoView({behavior:'smooth', block:'start'});">OPINIONS</h5>
                 </div>
                 <div class="d-flex flexiable ">
@@ -1659,6 +1639,10 @@ if ($_POST && isset($_POST['submit_comment'])) {
                 <div class="d-flex flexiable ">
                   <img src="/imges/download-removebg-preview.png" alt="">
                   <h5 style="font-family:system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue' ; font-size: 16px; font-weight: 700;" class="mt-2" onclick="window.location.href='compare.php?phone1=<?php echo $device['id']; ?>'">COMPARE </h5>
+                </div>
+                <div class="d-flex flexiable ">
+                  <img src="/imges/download-removebg-preview.png" alt="">
+                  <h5 style="font-family:system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue' ; font-size: 16px; font-weight: 700;" class="mt-2"> </h5>
                 </div>
                 <div class="d-flex flexiable ">
                   <img src="/imges/download-removebg-preview.png" alt="">
@@ -1708,7 +1692,7 @@ if ($_POST && isset($_POST['submit_comment'])) {
     padding-left: 0;
     padding-right: -2px;">
     <div class="row">
-      <div class="col-lg-8 col-md-7 order-1" style="padding-right: 0;">
+      <div class="col-lg-8 col-md-7 order-2 order-md-1">
         <div class="bg-white">
           <table class="table forat">
             <tbody>
@@ -1716,17 +1700,10 @@ if ($_POST && isset($_POST['submit_comment'])) {
                 <?php $firstRowInSection = true; ?>
                 <?php foreach ($deviceSpecs as $category => $rows): ?>
                   <?php if (is_array($rows) && !empty($rows)): ?>
-                    <!-- Mobile: Section title as separate row -->
-                    <tr class="d-lg-none">
-                      <th class="spec-label" colspan="2"><?php echo htmlspecialchars($category); ?></th>
-                    </tr>
-
-                    <!-- Desktop + Mobile spec rows -->
                     <?php foreach ($rows as $rowIndex => $rowData): ?>
                       <tr>
-                        <!-- Desktop only: rowspan on first row -->
                         <?php if ($rowIndex === 0): ?>
-                          <th class="spec-label d-none d-lg-table-cell" rowspan="<?php echo count($rows); ?>"><?php echo htmlspecialchars($category); ?></th>
+                          <th class="spec-label" rowspan="<?php echo count($rows); ?>"><?php echo htmlspecialchars($category); ?></th>
                         <?php endif; ?>
                         <td class="spec-subtitle"><strong><?php echo htmlspecialchars($rowData['field']); ?></strong></td>
                         <td class="spec-description"><?php echo htmlspecialchars($rowData['description']); ?></td>
@@ -1752,18 +1729,17 @@ if ($_POST && isset($_POST['submit_comment'])) {
             </tbody>
           </table>
 
-          <p style="font-size: 13px; text-transform: capitalize; padding: 6px 19px;"> <strong>Disclaimer:</strong>We can not guarantee that the information on this page is 100%
+          <p style="font-size: 13px;
+    text-transform: capitalize;
+    padding: 6px 19px;"> <strong>Disclaimer:</strong>We can not guarantee that the information on this page is 100%
             correct.</p>
+
           <div class="d-block d-lg-flex">
-            <?php if ($review_post): ?>
-              <button class="pad" onclick="window.location.href='post.php?slug=<?php echo urlencode($review_post['slug']); ?>'">REVIEW</button>
-            <?php else: ?>
-              <button class="pad" disabled style="opacity: 0.5; cursor: default;" title="No review available">REVIEW</button>
-            <?php endif; ?>
             <button class="pad" onclick="window.location.href='compare.php?phone1=<?php echo $device['id']; ?>'">COMPARE</button>
             <button class="pad" onclick="document.getElementById('comments').scrollIntoView({behavior:'smooth', block:'start'});">OPINIONS</button>
             <button class="pad" onclick="showPicturesModal()">PICTURES</button>
           </div>
+
           <div class="comments" id="comments">
             <h5 class="border-bottom reader py-3 mx-2"><?php echo htmlspecialchars(($device['brand_name'] ?? '') . ' ' . ($device['name'] ?? 'Device')); ?> - user opinions and reviews</h5>
 
@@ -1843,7 +1819,7 @@ if ($_POST && isset($_POST['submit_comment'])) {
         </div>
       </div>
       <!-- Left Section -->
-      <div class="col-lg-4 bg-white col-md-5 order-2" style="padding-right: 0;">
+      <div class="col-lg-4 bg-white col-md-5 order-1 order-md-2" style="margin-top:14px">
         <div class="mb-4">
           <?php include 'includes/latest-devices.php'; ?>
           <?php include 'includes/comparisons-devices.php'; ?>

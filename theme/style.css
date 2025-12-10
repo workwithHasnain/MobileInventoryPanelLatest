@@ -292,13 +292,13 @@ input:focus {
 .rounded {
     width: -webkit-fill-available;
 }
-
+/* 
 .col-lg-4.conjection-froud img {
     width: 363px;
     margin-left: 11px;
     height: 172px;
     border-radius: 6px;
-}
+} */
 
 .col-lg-4.conjection-froud h1,
 .froud h1 {
@@ -666,7 +666,6 @@ input:focus {
 
 .whitening {
     font-size: 15px;
-    margin-left: 12px;
 }
 
 .mobiles-button:hover {
@@ -972,14 +971,13 @@ input:hover {
 }
 
 .phone-card {
-    border: 1px solid #ccc;
     padding: 15px;
     box-sizing: border-box;
     border-radius: 5px;
-    box-shadow: 0 0 5px rgb(0 0 0 / 0.1);
     background-color: white;
     margin-bottom: 20px;
     text-align: left;
+    border-right: 1px solid #f2f2f2;
     /* Align text to the left */
 }
 
@@ -1142,10 +1140,7 @@ cubic-bezier(0.26, 0.695, 0.375, 0.965);
     }
 }
 .module-phones-link img {
-    width: 115%;
     height: 119px;
-    left: -5px;
-    position: relative;
     padding: 5px;
     z-index: 1;
     opacity: .953;

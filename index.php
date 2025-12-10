@@ -332,11 +332,12 @@ if ($_POST && isset($_POST['action'])) {
                         <?php foreach ($colPosts as $post): ?>
                             <div class="card-wrap">
                             <?php if (!empty($post['featured_image'])): ?>
-                                <img class="review-list-item-image" src="<?php echo htmlspecialchars($post['featured_image']); ?>" alt="<?php echo htmlspecialchars($post['title']); ?>" style="cursor:pointer;" onclick="window.location.href='post.php?slug=<?php echo urlencode($post['slug']); ?>'">
+                                
+                                <img class="review-list-item-image" src="<?php echo htmlspecialchars($post['featured_image']); ?>" alt="<?
+                                
+                                php echo htmlspecialchars($post['title']); ?>" style="cursor:pointer;" onclick="window.location.href='post.php?slug=<?php echo urlencode($post['slug']); ?>'">
                             <?php endif; ?>
-                           <div class="card-text">
-                            <h1 style="cursor:pointer; overflow-wrap: break-word;" onclick="window.location.href='post.php?slug=<?php echo urlencode($post['slug']); ?>'"><?php echo htmlspecialchars($post['title']); ?></h1>
-                        </div>
+                           <div class="card-text"> <h1 style="cursor:pointer;" onclick="window.location.href='post.php?slug=<?php echo urlencode($post['slug']); ?>'"><?php echo htmlspecialchars($post['title']); ?></h1></div>
 
                             </div>
                         <?php endforeach; ?>
@@ -385,7 +386,7 @@ if ($_POST && isset($_POST['action'])) {
                 </h1>
                 <p class="d-none d-md-inline">The Cheat Sheet To The Best Phones to Get Right Now</p>
             </div>
-            <div class="container mt-0 war ">
+            <div class="container mt-0 war "style="border-left:1px solid #00000012;" >
                 <div class="row">
                     <?php
                     $maxPosts = count($posts);
@@ -393,7 +394,7 @@ if ($_POST && isset($_POST['action'])) {
                     $postChunks = !empty($posts) ? array_chunk(array_slice($posts, 0, $maxPosts), $chunkSize) : [];
                     foreach ($postChunks as $colIndex => $colPosts):
                     ?>
-                        <div class="col-lg-4 col-md-6 col-12 sentizer-erx" style="background-color: #EEEEEE;">
+                        <div class="col-lg-4 col-md-6 col-12 sentizer-erx"  style="background-color: #EEEEEE; margin-top: 4px;">
                             <?php foreach ($colPosts as $post): ?>
                                 <a href="post.php?slug=<?php echo urlencode($post['slug']); ?>">
                                     <div class="review-card mb-4" style="cursor:pointer;" onclick="window.location.href='post.php?slug=<?php echo urlencode($post['slug']); ?>'">
