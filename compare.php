@@ -873,7 +873,7 @@ function formatDeviceSpecsStructured($device)
     <title>GSMArena</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/css/bootstrap.min.css" rel="stylesheet"
         integrity="sha384-rbsA2VBKQhggwzxH7pPCaAqO46MgnOM80zW1RWuH61DGLwZJEdK2Kadq2F9CUG65" crossorigin="anonymous">
-    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.6/dist/umd/popper.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/js/bootstrap.bundle.min.js"
         integrity="sha384-kenU1KFdBIe4zVF0s0G1M5b4hcpxyD9F7jL+jjXkk+Q2h455rYXK/7HAuoJl+0I4"
@@ -889,6 +889,96 @@ function formatDeviceSpecsStructured($device)
 
     <link rel="stylesheet" href="style.css">
     <style>
+        /* Select2 Custom Styling for Phone Comparison */
+        .select2-container {
+            width: 100% !important;
+            max-width: 100% !important;
+        }
+
+        .select2-container .select2-selection--single {
+            height: auto !important;
+            min-height: 38px;
+            border: 1px solid #ced4da;
+            border-radius: 4px;
+            background-color: #fff;
+        }
+
+        .select2-container .select2-selection--single .select2-selection__rendered {
+            padding: 6px 12px;
+            line-height: 1.5;
+            color: #5D4037;
+            font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue';
+        }
+
+        .select2-container--default .select2-selection--single .select2-selection__arrow {
+            height: 100%;
+            right: 8px;
+        }
+
+        /* Dropdown styling */
+        .select2-dropdown {
+            border: 1px solid #8D6E63;
+            border-radius: 4px;
+            background-color: #EFEBE9;
+            max-width: 100% !important;
+        }
+
+        .select2-container--default .select2-results__option {
+            padding: 8px 12px;
+            font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue';
+        }
+
+        .select2-container--default .select2-results__option--highlighted[aria-selected] {
+            background-color: #D7CCC8 !important;
+            color: #3E2723;
+        }
+
+        .select2-container--default .select2-results__option[aria-selected=true] {
+            background-color: #8D6E63;
+            color: white;
+        }
+
+        /* Custom option template with image */
+        .select2-phone-option {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            overflow: hidden;
+        }
+
+        .select2-phone-option img {
+            width: 40px;
+            height: 40px;
+            object-fit: contain;
+            flex-shrink: 0;
+        }
+
+        .select2-phone-option-text {
+            flex: 1;
+            overflow: hidden;
+            word-wrap: break-word;
+            white-space: normal;
+            line-height: 1.4;
+        }
+
+        /* Search box styling */
+        .select2-search--dropdown .select2-search__field {
+            border: 1px solid #8D6E63;
+            border-radius: 4px;
+            padding: 6px 12px;
+        }
+
+        /* Ensure dropdown doesn't overflow container */
+        .compare-checkbox {
+            position: relative;
+            overflow: visible !important;
+        }
+
+        .compare-checkbox .select2-container {
+            display: block;
+            width: 100% !important;
+        }
+
         /* Brand Modal Styling */
         .brand-cell-modal {
             background-color: #fff;
@@ -1004,11 +1094,11 @@ function formatDeviceSpecsStructured($device)
     </div>
     <div class="comparison-container container bg-white margin-top-4rem">
         <div class="row">
-            <div class="phone-card col-lg-4">
+            <div class="phone-card col-lg-4" style="display: flex; flex-direction: column; justify-content: space-between;">
                 <div class="compare-checkbox">
                     <label>
                         Compare
-                        <select id="phone1-select" name="phone1" class="bg-white text-center-auto border phone-search-select" onchange="updateComparison(1, this.value)">
+                        <select id="phone1-select" name="phone1" class="phone-select-dropdown" data-phone-number="1">
                             <option value="">Select Phone 1</option>
                             <?php foreach ($phones as $phone): ?>
                                 <option value="<?php echo $phone['id']; ?>" data-image="<?php echo htmlspecialchars(getPhoneImage($phone)); ?>" data-name="<?php echo htmlspecialchars(getPhoneName($phone)); ?>" <?php echo ($phone1 && $phone1['id'] == $phone['id']) ? 'selected' : ''; ?>>
@@ -1019,7 +1109,7 @@ function formatDeviceSpecsStructured($device)
                     </label>
                 </div>
                 <?php if ($phone1): ?>
-                    <div class="phone-name"><?php echo getPhoneName($phone1); ?></div>
+                    <div class="phone-name" style="flex-grow: 1;"><?php echo getPhoneName($phone1); ?></div>
                     <div class="d-flex">
                         <img src="<?php echo getPhoneImage($phone1); ?>" alt="<?php echo getPhoneName($phone1); ?>">
                         <div class="buttons">
@@ -1042,11 +1132,11 @@ function formatDeviceSpecsStructured($device)
                     </div>
                 <?php endif; ?>
             </div>
-            <div class="phone-card col-lg-4">
+            <div class="phone-card col-lg-4" style="display: flex; flex-direction: column; justify-content: space-between;">
                 <div class="compare-checkbox">
                     <label>
                         Compare
-                        <select id="phone2-select" name="phone2" class="bg-white text-center-auto border phone-search-select" onchange="updateComparison(2, this.value)">
+                        <select id="phone2-select" name="phone2" class="phone-select-dropdown" data-phone-number="2">
                             <option value="">Select Phone 2</option>
                             <?php foreach ($phones as $phone): ?>
                                 <option value="<?php echo $phone['id']; ?>" data-image="<?php echo htmlspecialchars(getPhoneImage($phone)); ?>" data-name="<?php echo htmlspecialchars(getPhoneName($phone)); ?>" <?php echo ($phone2 && $phone2['id'] == $phone['id']) ? 'selected' : ''; ?>>
@@ -1057,7 +1147,7 @@ function formatDeviceSpecsStructured($device)
                     </label>
                 </div>
                 <?php if ($phone2): ?>
-                    <div class="phone-name"><?php echo getPhoneName($phone2); ?></div>
+                    <div class="phone-name" style="flex-grow: 1;"><?php echo getPhoneName($phone2); ?></div>
                     <div class="d-flex">
                         <img src="<?php echo getPhoneImage($phone2); ?>" alt="<?php echo getPhoneName($phone2); ?>">
                         <div class="buttons">
@@ -1082,11 +1172,11 @@ function formatDeviceSpecsStructured($device)
                 <div class="align-items-center m-auto">
                 </div>
             </div>
-            <div class="phone-card col-lg-4">
+            <div class="phone-card col-lg-4" style="display: flex; flex-direction: column; justify-content: space-between;">
                 <div class="compare-checkbox">
                     <label>
                         Compare
-                        <select id="phone3-select" name="phone3" class="bg-white text-center-auto border phone-search-select" onchange="updateComparison(3, this.value)">
+                        <select id="phone3-select" name="phone3" class="phone-select-dropdown" data-phone-number="3">
                             <option value="">Select Phone 3</option>
                             <?php foreach ($phones as $phone): ?>
                                 <option value="<?php echo $phone['id']; ?>" data-image="<?php echo htmlspecialchars(getPhoneImage($phone)); ?>" data-name="<?php echo htmlspecialchars(getPhoneName($phone)); ?>" <?php echo ($phone3 && $phone3['id'] == $phone['id']) ? 'selected' : ''; ?>>
@@ -1097,7 +1187,7 @@ function formatDeviceSpecsStructured($device)
                     </label>
                 </div>
                 <?php if ($phone3): ?>
-                    <div class="phone-name"><?php echo getPhoneName($phone3); ?></div>
+                    <div class="phone-name" style="flex-grow: 1;"><?php echo getPhoneName($phone3); ?></div>
                     <div class="d-flex">
                         <img src="<?php echo getPhoneImage($phone3); ?>" alt="<?php echo getPhoneName($phone3); ?>">
                         <div class="buttons">
@@ -1402,6 +1492,86 @@ function formatDeviceSpecsStructured($device)
     </div>
     <script src="script.js"></script>
     <script>
+        // Initialize Select2 immediately to prevent flash of default select
+        (function() {
+            // Custom template function for displaying options with images
+            function formatPhoneOption(option) {
+                if (!option.id) {
+                    return option.text;
+                }
+
+                var $option = $(option.element);
+                var imageUrl = $option.data('image');
+                var phoneName = $option.data('name') || option.text;
+
+                if (!imageUrl) {
+                    return $('<span>' + phoneName + '</span>');
+                }
+
+                var $container = $(
+                    '<div class="select2-phone-option">' +
+                    '<img src="' + imageUrl + '" onerror="this.style.display=\'none\'" />' +
+                    '<span class="select2-phone-option-text">' + phoneName + '</span>' +
+                    '</div>'
+                );
+
+                return $container;
+            }
+
+            // Custom template for selected option (simpler, no image in selection box)
+            function formatPhoneSelection(option) {
+                if (!option.id) {
+                    return option.text;
+                }
+                var $option = $(option.element);
+                var phoneName = $option.data('name') || option.text;
+                return phoneName;
+            }
+
+            // Wait for DOM and Select2 to be ready
+            if (typeof jQuery !== 'undefined' && typeof jQuery.fn.select2 !== 'undefined') {
+                jQuery(document).ready(function($) {
+                    // Initialize all three phone dropdowns
+                    $('.phone-select-dropdown').each(function() {
+                        var $select = $(this);
+                        var phoneNumber = $select.data('phone-number');
+
+                        $select.select2({
+                            placeholder: 'Select Phone ' + phoneNumber,
+                            allowClear: true,
+                            width: '100%',
+                            dropdownAutoWidth: false,
+                            templateResult: formatPhoneOption,
+                            templateSelection: formatPhoneSelection,
+                            matcher: function(params, data) {
+                                // If there are no search terms, return all data
+                                if ($.trim(params.term) === '') {
+                                    return data;
+                                }
+
+                                // Custom search: search in phone name
+                                var $option = $(data.element);
+                                var phoneName = ($option.data('name') || data.text || '').toLowerCase();
+                                var searchTerm = params.term.toLowerCase();
+
+                                if (phoneName.indexOf(searchTerm) > -1) {
+                                    return data;
+                                }
+
+                                return null;
+                            }
+                        });
+
+                        // Handle change event
+                        $select.on('select2:select select2:clear', function(e) {
+                            var phoneId = $(this).val() || '';
+                            updateComparison(phoneNumber, phoneId);
+                        });
+                    });
+                });
+            }
+        })();
+
         document.addEventListener('DOMContentLoaded', function() {
             // Handle brand cell clicks (from sidebar and mobile menu - open devices modal directly)
             document.querySelectorAll('.brand-cell').forEach(function(cell) {
