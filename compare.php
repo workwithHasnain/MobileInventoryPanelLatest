@@ -1415,52 +1415,6 @@ function formatDeviceSpecsStructured($device)
                 });
             });
         });
-        $(document).ready(function() {
-            // Initialize Select2 for searchable dropdowns
-            function formatPhoneOption(state) {
-                if (!state.id) {
-                    return state.text;
-                }
-                var $option = $(state.element);
-                var img = $option.data('image');
-                var name = $option.data('name') || state.text;
-                var $container = $(
-                    '<span class="phone-option">' +
-                    (img ? '<img class="phone-thumb" src="' + img + '" alt="">' : '') +
-                    '<span class="phone-label"></span>' +
-                    '</span>'
-                );
-                $container.find('.phone-label').text(name);
-                return $container;
-            }
-
-            function formatPhoneSelection(state) {
-                // Show only the text for the selected value to avoid duplication/overlap
-                return state.text || '';
-            }
-
-            $('.phone-search-select').select2({
-                placeholder: 'Search and select a phone...',
-                allowClear: true,
-                width: '100%',
-                theme: 'default',
-                dropdownAutoWidth: true,
-                containerCssClass: 'phone-select-container',
-                dropdownCssClass: 'phone-select-dropdown',
-                templateResult: formatPhoneOption,
-                templateSelection: formatPhoneSelection,
-                escapeMarkup: function(markup) {
-                    return markup;
-                }
-            });
-
-            // Custom onChange handler for Select2
-            $('.phone-search-select').on('select2:select select2:clear', function(e) {
-                const phoneNumber = this.id.replace('phone', '').replace('-select', '');
-                const phoneId = $(this).val() || '';
-                updateComparison(phoneNumber, phoneId);
-            });
-        });
 
         function updateComparison(phoneNumber, phoneId) {
             // Build new URL with updated phone parameter
@@ -1615,58 +1569,6 @@ function formatDeviceSpecsStructured($device)
                 }
             }
         });
-    </script>
-    <style>
-        /* Custom styles for Select2 phone selection */
-        .phone-select-container .select2-selection--single {
-            height: 38px;
-            border: 1px solid #dee2e6;
-            border-radius: 4px;
-        }
-
-        .phone-select-container .select2-selection__rendered {
-            line-height: 36px;
-            padding-left: 8px;
-        }
-
-        .phone-select-container .select2-selection__arrow {
-            height: 36px;
-        }
-
-        .phone-select-dropdown {
-            z-index: 9999;
-        }
-
-        .phone-select-dropdown .select2-results__option {
-            padding: 8px 12px;
-        }
-
-        .phone-select-dropdown .select2-results__option--highlighted {
-            background-color: #007bff;
-            color: white;
-        }
-
-        /* Phone image + label layout */
-        .phone-thumb {
-            width: 24px;
-            height: 24px;
-            object-fit: contain;
-            margin-right: 8px;
-            vertical-align: middle;
-        }
-
-        .phone-option,
-        .phone-selection {
-            display: inline-flex;
-            align-items: center;
-            gap: 8px;
-        }
-
-        .select2-container {
-            width: min-content;
-        }
-    </style>
-    <script>
         // Handle expandable text for truncated descriptions
         document.addEventListener('click', function(e) {
             if (e.target.classList.contains('expand-dots')) {
