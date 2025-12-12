@@ -350,7 +350,7 @@ $latestDevices = array_slice(array_reverse($latestDevices), 0, 9);
             else:
                 $maxPosts = count($posts);
                 $displayPosts = array_slice($posts, 0, $maxPosts);
-                $columns = max(1, ceil($maxPosts / 2));
+                $columns = max(1, ceil($maxPosts / 1));
                 $postChunks = array_chunk($displayPosts, $columns);
                 foreach ($postChunks as $colIndex => $colPosts):
                 ?>
