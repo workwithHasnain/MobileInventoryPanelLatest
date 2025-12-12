@@ -1251,6 +1251,26 @@ function formatDeviceSpecsStructured($device)
                     text-transform: uppercase;
                 }
 
+                .subtitle {
+                    font-weight: 600;
+                    word-break: break-word;
+                    font-size: 13px;
+                }
+
+                .description {
+                    word-break: break-word;
+                    white-space: normal;
+                    line-height: 1.5;
+                    font-size: 13px;
+                }
+
+                .subt-desc-cont {
+                    display: grid;
+                    grid-template-columns: 75px 1fr;
+                    gap: 8px;
+                    align-items: start;
+                }
+
                 /* Mobile: enable TRUE GSMArena style scroll */
                 @media(max-width: 768px) {
 
@@ -1260,15 +1280,50 @@ function formatDeviceSpecsStructured($device)
                     }
 
                     .comparison-table {
-                        min-width: 800px;
-                        /* Adjust for smooth scroll */
+                        min-width: 500px;
+                        /* Reduced to show 2 phones at once */
                     }
 
                     .comparison-table th,
                     .comparison-table td {
                         white-space: normal;
                         /* readable text */
-                        font-size: 14px;
+                        font-size: 11px;
+                        padding: 2px 1px !important;
+                        margin: 0 !important;
+                        max-width: 165px;
+                        /* Limit column width to fit 2 phones on screen */
+                    }
+
+                    .comparison-table th {
+                        font-size: 10px;
+                        padding: 3px 1px !important;
+                    }
+
+                    .subtitle {
+                        font-weight: 600;
+                        word-break: break-word;
+                        font-size: 10px;
+                    }
+
+                    .description {
+                        word-break: break-word;
+                        white-space: normal;
+                        line-height: 1.4;
+                        font-size: 9px;
+                    }
+
+                    .subt-desc-cont {
+                        display: block;
+                        grid-template-columns: 75px 1fr;
+                        gap: 4px;
+                        align-items: start;
+                    }
+
+                    /* Section headings on mobile */
+                    .comparison-table td[colspan="3"] {
+                        font-size: 11px;
+                        padding: 4px 2px !important;
                     }
                 }
             </style>
@@ -1405,21 +1460,21 @@ function formatDeviceSpecsStructured($device)
 
                                 // Phone 1
                                 if (isset($rows1[$i])) {
-                                    echo '<td style="padding:12px 10px;vertical-align:top;"><div style="display:grid;grid-template-columns:140px 1fr;gap:8px;align-items:start;"><div style="font-weight:600;word-break:break-word;">' . htmlspecialchars($rows1[$i]['field']) . '</div><div style="word-break:break-word;white-space:normal;line-height:1.5;">' . nl2br(htmlspecialchars($rows1[$i]['description'])) . '</div></div></td>';
+                                    echo '<td style="padding:12px 10px;vertical-align:top;"><div class="subt-desc-cont"><div class="subtitle">' . htmlspecialchars($rows1[$i]['field']) . '</div><div class="description">' . nl2br(htmlspecialchars($rows1[$i]['description'])) . '</div></div></td>';
                                 } else {
                                     echo '<td style="padding:12px 10px;color:#999;">N/A</td>';
                                 }
 
                                 // Phone 2
                                 if (isset($rows2[$i])) {
-                                    echo '<td style="padding:12px 10px;vertical-align:top;"><div style="display:grid;grid-template-columns:140px 1fr;gap:8px;align-items:start;"><div style="font-weight:600;word-break:break-word;">' . htmlspecialchars($rows2[$i]['field']) . '</div><div style="word-break:break-word;white-space:normal;line-height:1.5;">' . nl2br(htmlspecialchars($rows2[$i]['description'])) . '</div></div></td>';
+                                    echo '<td style="padding:12px 10px;vertical-align:top;"><div class="subt-desc-cont"><div class="subtitle">' . htmlspecialchars($rows2[$i]['field']) . '</div><div class="description">' . nl2br(htmlspecialchars($rows2[$i]['description'])) . '</div></div></td>';
                                 } else {
                                     echo '<td style="padding:12px 10px;color:#999;">N/A</td>';
                                 }
 
                                 // Phone 3
                                 if (isset($rows3[$i])) {
-                                    echo '<td style="padding:12px 10px;vertical-align:top;"><div style="display:grid;grid-template-columns:140px 1fr;gap:8px;align-items:start;"><div style="font-weight:600;word-break:break-word;">' . htmlspecialchars($rows3[$i]['field']) . '</div><div style="word-break:break-word;white-space:normal;line-height:1.5;">' . nl2br(htmlspecialchars($rows3[$i]['description'])) . '</div></div></td>';
+                                    echo '<td style="padding:12px 10px;vertical-align:top;"><div class="subt-desc-cont"><div class="subtitle">' . htmlspecialchars($rows3[$i]['field']) . '</div><div class="description">' . nl2br(htmlspecialchars($rows3[$i]['description'])) . '</div></div></td>';
                                 } else {
                                     echo '<td style="padding:12px 10px;color:#999;">N/A</td>';
                                 }
