@@ -238,6 +238,28 @@ $brands = $brands_stmt->fetchAll();
         #devicesModal .modal-dialog-scrollable {
             max-height: 80vh;
         }
+        .grid-colums{
+                background-color: #EEEEEE;
+                    gap: 21px;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    grid-template-rows: max-content;
+        height: max-content;
+        }
+        .anchor-card{
+            height: 300px;
+        }
+
+
+        @media (max-width:786px) {
+             .grid-colums{
+                background-color: #EEEEEE;
+    display: block;
+    grid-template-columns: 1fr ;
+   
+        }
+        
+        }
     </style>
 </head>
 
@@ -323,9 +345,9 @@ $brands = $brands_stmt->fetchAll();
                 $postChunks = array_chunk($displayPosts, $columns);
                 foreach ($postChunks as $colIndex => $colPosts):
                 ?>
-                    <div class="col-lg-4 col-md-6 col-12 sentizer-erx" style="background-color: #EEEEEE; margin-top: 18px;">
+                    <div class="col-lg-8 col-md-6 col-12 sentizer-erx grid-colums" style="background-color: #EEEEEE; margin-top: 18px;">
                         <?php foreach ($colPosts as $post): ?>
-                            <a href="post.php?slug=<?php echo urlencode($post['slug']); ?>">
+                            <a class="anchor-card" href="post.php?slug=<?php echo urlencode($post['slug']); ?>">
                                 <div class="review-card mb-4" style="cursor:pointer;" onclick="window.location.href='post.php?slug=<?php echo urlencode($post['slug']); ?>'">
                                     <?php if (isset($post['featured_image']) && !empty($post['featured_image'])): ?>
                                         <img style="cursor:pointer;" onclick="window.location.href='post.php?slug=<?php echo urlencode($post['slug']); ?>'" src="<?php echo htmlspecialchars($post['featured_image']); ?>" alt="<?php echo htmlspecialchars($post['title']); ?>">
