@@ -121,7 +121,7 @@ if (!$filterConfig) {
 
             <div class="col-md-8 col-5  d-md-inline  " style="padding:0px;">
                 <div class="comfort-life position-absolute d-lg-block d-none ">
-                    <img class="w-100 h-100" src="imges/magnifient sectton.jpeg"
+                    <img class="w-100 h-100" src="hero-images/phonefinder-hero.png"
                         style="background-repeat: no-repeat; background-size: cover;" alt="">
                 </div>
             </div>
