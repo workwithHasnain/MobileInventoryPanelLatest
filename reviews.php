@@ -239,13 +239,13 @@ $brands = $brands_stmt->fetchAll();
             max-height: 80vh;
         }
 
-        .grid-colums {
-            background-color: #EEEEEE;
-            gap: 21px;
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            grid-template-rows: max-content;
-            height: max-content;
+         .grid-colums{
+                background-color: #EEEEEE;
+                    gap: 21px;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    grid-template-rows: max-content;
+        height: max-content;
         }
 
         .anchor-card {
@@ -274,16 +274,21 @@ $brands = $brands_stmt->fetchAll();
                 <div class="comfort-life position-absolute">
                     <img class="w-100 h-100" src="hero-images/reviews-hero.png"
                         style="background-repeat: no-repeat; background-size: cover;" alt="">
-                    <div class="position-absolute d-flex mt-1 ml-2" style="top: 0; flex-wrap: wrap; gap: 8px;">
-                        <label class="text-white whitening px-2">Popular Tags</label>
-                        <?php if (!empty($popularTags)): ?>
-                            <?php foreach ($popularTags as $tag => $count): ?>
-                                <a href="reviews.php?tag=<?php echo urlencode($tag); ?>"><button class="mobiles-button"><?php echo htmlspecialchars($tag); ?></button></a>
-                            <?php endforeach; ?>
-                        <?php else: ?>
-                            <span class="text-white">No tags available</span>
-                        <?php endif; ?>
-                    </div>
+                    <div class="position-absolute d-flex mt-1 ml-2"  style="top: 0; flex-wrap: wrap; gap: 8px;">
+                        <label class="text-white whitening">Popular Tags</label>
+                       <?php if (!empty($popularTags)): ?>
+    <?php foreach ($popularTags as $tag => $count): ?>
+        <a href="reviews.php?tag=<?php echo urlencode($tag); ?>">
+            <button class="mobiles-button"><?php echo htmlspecialchars($tag); ?></button>
+        </a>
+    <?php endforeach; ?>
+<?php else: ?>
+    <div class="no-tags">
+        <span>No tags availble</span>
+    </div>
+<?php endif; ?>
+</div>
+
                     <form method="get" action="reviews.php" class="comon">
                         <label for="hero-search-reviews" class="text-white whitening ">Search For</label>
                         <input id="hero-search-reviews" name="q" type="text" class="bg-white" placeholder="Search posts..." value="<?php echo htmlspecialchars($q ?? ''); ?>">
@@ -323,7 +328,7 @@ $brands = $brands_stmt->fetchAll();
 
         </div>
     </div>
-    <div class="container margin-top-4rem">
+    <div class="container margin-top-4rem" style="border-left:1px solid #00000012;" >
         <div class="row">
             <?php
             if (empty($posts)):
@@ -343,11 +348,11 @@ $brands = $brands_stmt->fetchAll();
             else:
                 $maxPosts = count($posts);
                 $displayPosts = array_slice($posts, 0, $maxPosts);
-                $columns = max(1, ceil($maxPosts / 2));
+                $columns = max(1, ceil($maxPosts / 1));
                 $postChunks = array_chunk($displayPosts, $columns);
                 foreach ($postChunks as $colIndex => $colPosts):
                 ?>
-                    <div class="col-lg-8 col-md-6 col-12 sentizer-erx grid-colums" style="background-color: #EEEEEE; margin-top: 18px;">
+                    <div class="col-lg-8 col-md-6 col-12 sentizer-erx grid-colums" style="background-color: #EEEEEE; margin-top: 4px;">
                         <?php foreach ($colPosts as $post): ?>
                             <a class="anchor-card" href="post.php?slug=<?php echo urlencode($post['slug']); ?>">
                                 <div class="review-card mb-4" style="cursor:pointer;" onclick="window.location.href='post.php?slug=<?php echo urlencode($post['slug']); ?>'">
