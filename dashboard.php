@@ -83,6 +83,9 @@ if (isset($_SESSION['success_message'])) {
             <button type="button" class="btn btn-secondary ms-2" data-bs-toggle="modal" data-bs-target="#filterSettingsModal">
                 <i class="fas fa-sliders-h"></i> Filter Settings
             </button>
+            <button type="button" class="btn btn-dark ms-2" data-bs-toggle="modal" data-bs-target="#heroImagesModal">
+                <i class="fas fa-image"></i> Header Images
+            </button>
         </div>
     </div>
 
@@ -547,6 +550,78 @@ if (isset($_SESSION['success_message'])) {
                         </div>
                     </div>
                 </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Hero Images Modal -->
+<div class="modal fade" id="heroImagesModal" tabindex="-1" aria-labelledby="heroImagesLabel" aria-hidden="true">
+    <div class="modal-dialog modal-xl modal-dialog-scrollable">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="heroImagesLabel">
+                    <i class="fas fa-image me-2"></i>Header Hero Images Management
+                </h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <div id="hero_images_message" style="display: none;"></div>
+                <p class="text-muted mb-4">
+                    <i class="fas fa-info-circle me-1"></i>
+                    Standard size: 712 x 340 pixels | Format: PNG only
+                </p>
+
+                <div class="row" id="hero_images_container">
+                    <div class="text-center py-4">
+                        <div class="spinner-border" role="status">
+                            <span class="visually-hidden">Loading...</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Upload Hero Image Modal -->
+<div class="modal fade" id="uploadHeroImageModal" tabindex="-1" aria-labelledby="uploadHeroImageLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="uploadHeroImageLabel">
+                    <i class="fas fa-upload me-2"></i>Upload Hero Image
+                </h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <div id="upload_hero_message" style="display: none;"></div>
+                <input type="hidden" id="hero_page_name">
+                <div class="alert alert-info">
+                    <strong>Requirements:</strong>
+                    <ul class="mb-0">
+                        <li>File format: PNG only</li>
+                        <li>Dimensions: 712 x 340 pixels</li>
+                        <li>Maximum file size: 5MB</li>
+                    </ul>
+                </div>
+                <div class="mb-3">
+                    <label for="hero_image_file" class="form-label">Select Image File</label>
+                    <input type="file" class="form-control" id="hero_image_file" accept=".png,image/png">
+                </div>
+                <div id="image_preview_container" style="display: none;">
+                    <label class="form-label">Preview:</label>
+                    <div class="border rounded p-2 bg-light">
+                        <img id="image_preview" src="" alt="Preview" class="img-fluid" style="max-width: 100%;">
+                    </div>
+                    <div id="image_dimensions" class="text-muted small mt-2"></div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                <button type="button" class="btn btn-primary" id="upload_hero_btn" disabled>
+                    <i class="fas fa-upload me-1"></i>Upload Image
+                </button>
             </div>
         </div>
     </div>
@@ -1330,6 +1405,217 @@ if (isset($_SESSION['success_message'])) {
         messageDiv.className = 'alert alert-' + type + ' alert-dismissible fade show';
         messageDiv.innerHTML = message + '<button type="button" class="btn-close" data-bs-dismiss="alert"></button>';
         messageDiv.style.display = 'block';
+    }
+
+    // ===== HERO IMAGES MANAGEMENT =====
+    const heroImagesModal = document.getElementById('heroImagesModal');
+    const uploadHeroImageModal = document.getElementById('uploadHeroImageModal');
+    const heroImageFileInput = document.getElementById('hero_image_file');
+    const uploadHeroBtn = document.getElementById('upload_hero_btn');
+
+    if (heroImagesModal) {
+        heroImagesModal.addEventListener('show.bs.modal', function() {
+            loadHeroImages();
+        });
+    }
+
+    if (heroImageFileInput) {
+        heroImageFileInput.addEventListener('change', function(e) {
+            const file = e.target.files[0];
+            if (file) {
+                validateAndPreviewImage(file);
+            }
+        });
+    }
+
+    if (uploadHeroBtn) {
+        uploadHeroBtn.addEventListener('click', uploadHeroImage);
+    }
+
+    function loadHeroImages() {
+        const container = document.getElementById('hero_images_container');
+
+        fetch('manage_hero_images.php?action=list')
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    renderHeroImagesList(data.pages);
+                } else {
+                    container.innerHTML = '<div class="alert alert-danger">Error loading hero images</div>';
+                }
+            })
+            .catch(error => {
+                container.innerHTML = '<div class="alert alert-danger">Error: ' + error + '</div>';
+            });
+    }
+
+    function renderHeroImagesList(pages) {
+        const container = document.getElementById('hero_images_container');
+        let html = '';
+
+        pages.forEach(page => {
+            const imageExists = page.exists;
+            const imagePath = page.path;
+            const displayName = page.display_name;
+            const pageName = page.name;
+
+            html += `
+                <div class="col-md-6 col-lg-4 mb-4">
+                    <div class="card h-100">
+                        <div class="card-header bg-primary text-white">
+                            <h6 class="mb-0"><i class="fas fa-file-alt me-2"></i>${escapeHtml(displayName)}</h6>
+                        </div>
+                        <div class="card-body">
+                            ${imageExists ? 
+                                `<img src="${imagePath}?t=${Date.now()}" class="img-fluid rounded mb-3" alt="${escapeHtml(displayName)}" style="width: 100%; height: 170px; object-fit: cover;">` :
+                                `<div class="bg-light rounded d-flex align-items-center justify-content-center mb-3" style="width: 100%; height: 170px;">
+                                    <div class="text-center text-muted">
+                                        <i class="fas fa-image fa-3x mb-2"></i>
+                                        <p class="mb-0 small">No image uploaded</p>
+                                    </div>
+                                </div>`
+                            }
+                            <p class="small text-muted mb-2">
+                                <strong>File:</strong> ${pageName}-hero.png<br>
+                                <strong>Size:</strong> 712 x 340 px
+                            </p>
+                        </div>
+                        <div class="card-footer">
+                            <button class="btn btn-sm btn-primary w-100" onclick="openUploadModal('${pageName}', '${escapeHtml(displayName)}')">
+                                <i class="fas fa-upload me-1"></i>${imageExists ? 'Change' : 'Upload'} Image
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            `;
+        });
+
+        container.innerHTML = html;
+    }
+
+    function openUploadModal(pageName, displayName) {
+        document.getElementById('hero_page_name').value = pageName;
+        document.getElementById('uploadHeroImageLabel').innerHTML = `<i class="fas fa-upload me-2"></i>Upload Hero Image for ${displayName}`;
+        document.getElementById('hero_image_file').value = '';
+        document.getElementById('image_preview_container').style.display = 'none';
+        document.getElementById('upload_hero_btn').disabled = true;
+        document.getElementById('upload_hero_message').style.display = 'none';
+
+        const uploadModal = new bootstrap.Modal(document.getElementById('uploadHeroImageModal'));
+        uploadModal.show();
+    }
+
+    function validateAndPreviewImage(file) {
+        const uploadBtn = document.getElementById('upload_hero_btn');
+        const previewContainer = document.getElementById('image_preview_container');
+        const preview = document.getElementById('image_preview');
+        const dimensionsDiv = document.getElementById('image_dimensions');
+
+        // Check file type
+        if (file.type !== 'image/png') {
+            showUploadHeroMessage('Please select a PNG image file only.', 'danger');
+            uploadBtn.disabled = true;
+            previewContainer.style.display = 'none';
+            return;
+        }
+
+        // Check file size (5MB max)
+        if (file.size > 5 * 1024 * 1024) {
+            showUploadHeroMessage('File size must be less than 5MB.', 'danger');
+            uploadBtn.disabled = true;
+            previewContainer.style.display = 'none';
+            return;
+        }
+
+        // Preview image and check dimensions
+        const reader = new FileReader();
+        reader.onload = function(e) {
+            const img = new Image();
+            img.onload = function() {
+                const width = this.width;
+                const height = this.height;
+
+                preview.src = e.target.result;
+                previewContainer.style.display = 'block';
+                dimensionsDiv.textContent = `Dimensions: ${width} x ${height} pixels`;
+
+                // Check if dimensions match exactly
+                if (width === 712 && height === 340) {
+                    dimensionsDiv.className = 'text-success small mt-2';
+                    dimensionsDiv.innerHTML = `<i class="fas fa-check-circle me-1"></i>Dimensions: ${width} x ${height} pixels (Perfect!)`;
+                    uploadBtn.disabled = false;
+                    showUploadHeroMessage('Image is ready to upload!', 'success');
+                } else {
+                    dimensionsDiv.className = 'text-danger small mt-2';
+                    dimensionsDiv.innerHTML = `<i class="fas fa-exclamation-triangle me-1"></i>Dimensions: ${width} x ${height} pixels (Required: 712 x 340)`;
+                    uploadBtn.disabled = true;
+                    showUploadHeroMessage('Image dimensions must be exactly 712 x 340 pixels.', 'danger');
+                }
+            };
+            img.src = e.target.result;
+        };
+        reader.readAsDataURL(file);
+    }
+
+    function uploadHeroImage() {
+        const pageName = document.getElementById('hero_page_name').value;
+        const fileInput = document.getElementById('hero_image_file');
+        const file = fileInput.files[0];
+
+        if (!file) {
+            showUploadHeroMessage('Please select a file.', 'danger');
+            return;
+        }
+
+        const formData = new FormData();
+        formData.append('action', 'upload');
+        formData.append('page_name', pageName);
+        formData.append('hero_image', file);
+
+        uploadHeroBtn.disabled = true;
+        uploadHeroBtn.innerHTML = '<i class="fas fa-spinner fa-spin me-1"></i>Uploading...';
+
+        fetch('manage_hero_images.php', {
+                method: 'POST',
+                body: formData
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    showUploadHeroMessage(data.message, 'success');
+                    setTimeout(() => {
+                        bootstrap.Modal.getInstance(document.getElementById('uploadHeroImageModal')).hide();
+                        loadHeroImages(); // Reload the list
+                        showHeroImagesMessage('Hero image updated successfully!', 'success');
+                    }, 1500);
+                } else {
+                    showUploadHeroMessage(data.message, 'danger');
+                }
+                uploadHeroBtn.disabled = false;
+                uploadHeroBtn.innerHTML = '<i class="fas fa-upload me-1"></i>Upload Image';
+            })
+            .catch(error => {
+                showUploadHeroMessage('Error: ' + error, 'danger');
+                uploadHeroBtn.disabled = false;
+                uploadHeroBtn.innerHTML = '<i class="fas fa-upload me-1"></i>Upload Image';
+            });
+    }
+
+    function showUploadHeroMessage(message, type) {
+        const messageDiv = document.getElementById('upload_hero_message');
+        messageDiv.className = 'alert alert-' + type + ' alert-dismissible fade show';
+        messageDiv.innerHTML = message + '<button type="button" class="btn-close" data-bs-dismiss="alert"></button>';
+        messageDiv.style.display = 'block';
+    }
+
+    function showHeroImagesMessage(message, type) {
+        const messageDiv = document.getElementById('hero_images_message');
+        messageDiv.className = 'alert alert-' + type + ' alert-dismissible fade show';
+        messageDiv.innerHTML = message + '<button type="button" class="btn-close" data-bs-dismiss="alert"></button>';
+        messageDiv.style.display = 'block';
+        setTimeout(() => {
+            messageDiv.style.display = 'none';
+        }, 5000);
     }
 </script>
 

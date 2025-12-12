@@ -1052,7 +1052,7 @@ function formatDeviceSpecsStructured($device)
         <div class="row">
             <div class="col-md-8 col-5  d-lg-inline d-none " style="padding: 0; position: relative;">
                 <div class="comfort-life position-absolute">
-                    <img class="w-100 h-100" src="imges/magnifient sectton.jpeg"
+                    <img class="w-100 h-100" src="hero-images/compare-hero.png"
                         style="background-repeat: no-repeat; background-size: cover;" alt="">
                 </div>
             </div>
