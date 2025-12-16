@@ -69,7 +69,7 @@
             <?php foreach ($devices as $device): ?>
                 <a href="device.php?id=<?php echo $device['id']; ?>" class="module-phones-link" style="    display: flex;
     align-items: center;
-    justify-content: flex-start;" >
+    justify-content: flex-start;    flex-direction: column;" >
                     <img style="position:relative;left:0;" src="<?php echo htmlspecialchars($device['image']); ?>" alt="">
                     <?php echo htmlspecialchars($device['name']); ?>
                 </a>
@@ -85,8 +85,7 @@
             <div class="swiper-half-slide swiper-slide" style="width:auto;">
                 <div class="scroller-phones">
         <a href="device.php?id=<?php echo $device['id']; ?>" 
-           class="module-phones-link" 
-           style="display:flex; align-items:center;">
+           class="module-phones-link">
 
             <img style="width:100%;" src="<?php echo htmlspecialchars($device['image']); ?>" alt="">
             <span style="width:75%;"><?php echo htmlspecialchars($device['name']); ?></span>
