@@ -256,6 +256,7 @@ $latestDevices = array_slice(array_reverse($latestDevices), 0, 9);
 
         .anchor-card {
             height: 300px;
+            margin-bottom: 40px;
         }
 
 

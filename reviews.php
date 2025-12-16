@@ -250,6 +250,7 @@ $brands = $brands_stmt->fetchAll();
 
         .anchor-card {
             height: 300px;
+            margin-bottom: 40px;
         }
 
 
