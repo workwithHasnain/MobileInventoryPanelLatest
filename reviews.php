@@ -250,10 +250,12 @@ $brands = $brands_stmt->fetchAll();
 
         .anchor-card {
             height: 300px;
-            margin-bottom: 40px;
+            /* margin-bottom: 40px; */
         }
 
-
+        .review-card {
+            margin-top: 14px;
+        }
         @media (max-width:786px) {
             .grid-colums {
                 background-color: #EEEEEE;
@@ -355,7 +357,7 @@ $brands = $brands_stmt->fetchAll();
                 ?>
                     <div class="col-lg-8 col-md-6 col-12 sentizer-erx grid-colums" style="background-color: #EEEEEE; margin-top: 4px;">
                         <?php foreach ($colPosts as $post): ?>
-                            <a class="anchor-card" href="post.php?slug=<?php echo urlencode($post['slug']); ?>">
+                            <a href="post.php?slug=<?php echo urlencode($post['slug']); ?>">
                                 <div class="review-card mb-4" style="cursor:pointer;" onclick="window.location.href='post.php?slug=<?php echo urlencode($post['slug']); ?>'">
                                     <?php if (isset($post['featured_image']) && !empty($post['featured_image'])): ?>
                                         <img style="cursor:pointer;" onclick="window.location.href='post.php?slug=<?php echo urlencode($post['slug']); ?>'" src="<?php echo htmlspecialchars($post['featured_image']); ?>" alt="<?php echo htmlspecialchars($post['title']); ?>">
