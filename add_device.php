@@ -9,7 +9,6 @@ require_once 'simple_device_insert.php'; // Add our new simple insertion script
 
 // Require login for this page
 requireLogin();
-
 $errors = [];
 $success = false;
 
