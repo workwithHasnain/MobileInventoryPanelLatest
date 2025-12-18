@@ -141,11 +141,6 @@ require_once 'includes/header.php';
                 <i class="fas fa-tags"></i> Brands Management
             </button>
         </li>
-        <li class="nav-item" role="presentation">
-            <button class="nav-link" id="chipsets-tab" data-bs-toggle="tab" data-bs-target="#chipsets" type="button" role="tab">
-                <i class="fas fa-microchip"></i> Chipsets Management
-            </button>
-        </li>
     </ul>
     
     <div class="tab-content" id="dataManagementTabContent">

@@ -256,9 +256,12 @@ $latestDevices = array_slice(array_reverse($latestDevices), 0, 9);
 
         .anchor-card {
             height: 300px;
+            /* margin-bottom: 40px; */
         }
 
-
+        .review-card {
+            margin-top: 18px;
+        }
         @media (max-width:786px) {
             .grid-colums {
                 background-color: #EEEEEE;
@@ -357,8 +360,8 @@ $latestDevices = array_slice(array_reverse($latestDevices), 0, 9);
                 ?>
                     <div class="col-lg-8 col-md-6 col-12 sentizer-erx grid-colums " style="background-color: #EEEEEE;">
                         <?php foreach ($colPosts as $post): ?>
-                            <a class="anchor-card" href="post.php?slug=<?php echo urlencode($post['slug']); ?>">
-                                <div class="review-card" style="cursor:pointer;" onclick="window.location.href='post.php?slug=<?php echo urlencode($post['slug']); ?>'">
+                            <a href="post.php?slug=<?php echo urlencode($post['slug']); ?>">
+                                <div class="review-card mb-4" style="cursor:pointer;" onclick="window.location.href='post.php?slug=<?php echo urlencode($post['slug']); ?>'">
                                     <?php if (isset($post['featured_image']) && !empty($post['featured_image'])): ?>
                                         <img style="cursor:pointer;" onclick="window.location.href='post.php?slug=<?php echo urlencode($post['slug']); ?>'" src="<?php echo htmlspecialchars($post['featured_image']); ?>" alt="<?php echo htmlspecialchars($post['title']); ?>">
                                     <?php endif; ?>

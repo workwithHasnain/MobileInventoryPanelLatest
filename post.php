@@ -679,28 +679,20 @@ if ($_POST && isset($_POST['action'])) {
                         <div class="comment-form mt-4 mx-2 mb-3">
                             <h6 class="mb-3">Share Your Opinion</h6>
 
-                            <?php if (!empty($comment_success)): ?>
-                                <div class="alert alert-success"><?php echo htmlspecialchars($comment_success); ?></div>
-                            <?php endif; ?>
-
-                            <?php if (!empty($comment_error)): ?>
-                                <div class="alert alert-danger"><?php echo htmlspecialchars($comment_error); ?></div>
-                            <?php endif; ?>
-
-                            <form method="POST" action="">
+                            <form id="post-comment-form" method="POST">
                                 <input type="hidden" name="action" value="comment_post">
                                 <input type="hidden" name="post_id" value="<?php echo $post['id']; ?>">
 
                                 <div class="row">
                                     <div class="col-md-6 mb-3">
-                                        <input type="text" class="form-control" name="name" placeholder="Your Name" required value="<?php echo htmlspecialchars($_POST['name'] ?? ''); ?>">
+                                        <input type="text" class="form-control" name="name" placeholder="Your Name" required>
                                     </div>
                                     <div class="col-md-6 mb-3">
-                                        <input type="email" class="form-control" name="email" placeholder="Your Email" required value="<?php echo htmlspecialchars($_POST['email'] ?? ''); ?>">
+                                        <input type="email" class="form-control" name="email" placeholder="Your Email" required>
                                     </div>
                                 </div>
                                 <div class="mb-3">
-                                    <textarea class="form-control" name="comment" rows="4" placeholder="Share your thoughts about this article..." required><?php echo htmlspecialchars($_POST['comment'] ?? ''); ?></textarea>
+                                    <textarea class="form-control" name="comment" rows="4" placeholder="Share your thoughts about this article..." required></textarea>
                                 </div>
                                 <div class="d-flex justify-content-between align-items-center">
                                     <button type="submit" class="button-links">Post Your Comment</button>
@@ -1213,6 +1205,7 @@ if ($_POST && isset($_POST['action'])) {
             });
         </script>
         <script src="script.js"></script>
+        <script src="js/comment-ajax.js"></script>
 </body>
 
 </html>

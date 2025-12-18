@@ -1,4 +1,5 @@
 <?php
+ob_start();
 require_once 'auth.php';
 
 // Require login for this page

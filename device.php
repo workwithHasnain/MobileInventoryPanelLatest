@@ -942,32 +942,7 @@ $comments = getDeviceComments($pdo, $device_id);
 // Get comment count
 $commentCount = getDeviceCommentCount($pdo, $device_id);
 
-// Handle comment submission
-if ($_POST && isset($_POST['submit_comment'])) {
-  $name = trim($_POST['name'] ?? '');
-  $email = trim($_POST['email'] ?? '');
-  $comment = trim($_POST['comment'] ?? '');
-
-  if (!empty($name) && !empty($comment)) {
-    try {
-      $stmt = $pdo->prepare("
-                INSERT INTO device_comments (device_id, name, email, comment, status, created_at) 
-                VALUES (?, ?, ?, ?, 'pending', NOW())
-            ");
-      $stmt->execute([$device_id, $name, $email, $comment]);
-
-      $success_message = "Thank you! Your comment has been submitted and is awaiting approval.";
-
-      // Refresh comments and count after submission
-      $comments = getDeviceComments($pdo, $device_id);
-      $commentCount = getDeviceCommentCount($pdo, $device_id);
-    } catch (PDOException $e) {
-      $error_message = "Error submitting comment. Please try again.";
-    }
-  } else {
-    $error_message = "Please fill in all required fields.";
-  }
-}
+// Note: Comment submission now handled via AJAX (see ajax_comment_handler.php)
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -1723,13 +1698,18 @@ if ($_POST && isset($_POST['submit_comment'])) {
 
                     <!-- Desktop + Mobile spec rows -->
                     <?php foreach ($rows as $rowIndex => $rowData): ?>
-                      <tr>
+                      <tr <?php echo ($category === 'NETWORK' && $rowIndex > 0) ? 'class="network-row"' : ''; ?>>
                         <!-- Desktop only: rowspan on first row -->
                         <?php if ($rowIndex === 0): ?>
                           <th class="spec-label d-none d-lg-table-cell" rowspan="<?php echo count($rows); ?>"><?php echo htmlspecialchars($category); ?></th>
                         <?php endif; ?>
                         <td class="spec-subtitle"><strong><?php echo htmlspecialchars($rowData['field']); ?></strong></td>
-                        <td class="spec-description"><?php echo htmlspecialchars($rowData['description']); ?></td>
+                        <td class="spec-description" style="<?php echo ($category === 'NETWORK' && $rowIndex === 0) ? 'position: relative;' : ''; ?>">
+                          <?php echo htmlspecialchars($rowData['description']); ?>
+                          <?php if ($category === 'NETWORK' && $rowIndex === 0): ?>
+                            <button class="expand-btn" onclick="toggleExpandBtn(this)" style="position: absolute; right: 10px; top: 50%; transform: translateY(-50%); background: none; border: none; color: #666; font-size: 11px; cursor: pointer; text-transform: uppercase; font-weight: 500;">EXPAND ▼</button>
+                          <?php endif; ?>
+                        </td>
                       </tr>
                     <?php endforeach; ?>
                   <?php endif; ?>
@@ -1766,14 +1746,6 @@ if ($_POST && isset($_POST['submit_comment'])) {
           </div>
           <div class="comments" id="comments">
             <h5 class="border-bottom reader py-3 mx-2"><?php echo htmlspecialchars(($device['brand_name'] ?? '') . ' ' . ($device['name'] ?? 'Device')); ?> - user opinions and reviews</h5>
-
-            <?php if (isset($success_message)): ?>
-              <div class="alert alert-success mx-2"><?php echo htmlspecialchars($success_message); ?></div>
-            <?php endif; ?>
-
-            <?php if (isset($error_message)): ?>
-              <div class="alert alert-danger mx-2"><?php echo htmlspecialchars($error_message); ?></div>
-            <?php endif; ?>
 
             <div class="first-user" style="background-color: #EDEEEE;">
 
@@ -1813,20 +1785,22 @@ if ($_POST && isset($_POST['submit_comment'])) {
               <!-- Comment Form -->
               <div class="comment-form mt-4 mx-2 mb-3">
                 <h6 class="mb-3">Share Your Opinion</h6>
-                <form method="POST" action="">
+                <form id="device-comment-form" method="POST">
+                  <input type="hidden" name="action" value="comment_device">
+                  <input type="hidden" name="device_id" value="<?php echo htmlspecialchars($device_id); ?>">
                   <div class="row">
                     <div class="col-md-6 mb-3">
-                      <input type="text" class="form-control" name="name" placeholder="Your Name" required value="<?php echo htmlspecialchars($_POST['name'] ?? ''); ?>">
+                      <input type="text" class="form-control" name="name" placeholder="Your Name" required>
                     </div>
                     <div class="col-md-6 mb-3">
-                      <input type="email" class="form-control" name="email" placeholder="Your Email (optional)" value="<?php echo htmlspecialchars($_POST['email'] ?? ''); ?>">
+                      <input type="email" class="form-control" name="email" placeholder="Your Email (optional)">
                     </div>
                   </div>
                   <div class="mb-3">
-                    <textarea class="form-control" name="comment" rows="4" placeholder="Share your thoughts about this device..." required><?php echo htmlspecialchars($_POST['comment'] ?? ''); ?></textarea>
+                    <textarea class="form-control" name="comment" rows="4" placeholder="Share your thoughts about this device..." required></textarea>
                   </div>
                   <div class="d-flex justify-content-between align-items-center">
-                    <button type="submit" name="submit_comment" class="button-links">Post Your Opinion</button>
+                    <button type="submit" class="button-links">Post Your Opinion</button>
                     <small class="text-muted">Comments are moderated and will appear after approval.</small>
                   </div>
                 </form>
@@ -2012,6 +1986,7 @@ if ($_POST && isset($_POST['submit_comment'])) {
 </script>
 
 <script src="script.js"></script>
+<script src="js/comment-ajax.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
 
 <script>
@@ -2383,6 +2358,23 @@ if ($_POST && isset($_POST['submit_comment'])) {
       }
     }
   });
+
+  // Toggle expand/collapse button
+  function toggleExpandBtn(btn) {
+    const networkRows = document.querySelectorAll('.network-row');
+    const networkLabel = document.querySelector('.spec-label[rowspan]');
+    const originalRowspan = networkRows.length + 1; // +1 for the first row
+
+    if (btn.textContent.includes('EXPAND')) {
+      btn.textContent = 'COLLAPSE ▲';
+      networkRows.forEach(row => row.style.display = 'none');
+      if (networkLabel) networkLabel.setAttribute('rowspan', '1');
+    } else {
+      btn.textContent = 'EXPAND ▼';
+      networkRows.forEach(row => row.style.display = '');
+      if (networkLabel) networkLabel.setAttribute('rowspan', originalRowspan);
+    }
+  }
 </script>
 
 </body>
