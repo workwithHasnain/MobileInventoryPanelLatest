@@ -898,9 +898,10 @@ function formatDeviceSpecsStructured($device)
             .comparison-container.container {
                 padding: 0 !important;
                 overflow-x: hidden;
-                max-width: 100vw;
+                max-width: 100vw !important;
                 margin-left: 0 !important;
                 margin-right: 0 !important;
+                width: 100% !important;
             }
 
             .phone-cards-scroll-wrapper {
@@ -1177,7 +1178,7 @@ function formatDeviceSpecsStructured($device)
         </div>
 
     </div>
-    <div class="comparison-container container bg-white margin-top-4rem" style="max-width: 100%; margin: 0 auto;">
+    <div class="comparison-container container bg-white margin-top-4rem">
         <div class="phone-cards-scroll-wrapper">
             <div class="row">
                 <div class="phone-card col-lg-4" style="display: flex; flex-direction: column; justify-content: space-between;">
@@ -1369,7 +1370,7 @@ function formatDeviceSpecsStructured($device)
                     }
 
                     .comparison-table {
-                        min-width: 550px;
+                        min-width: 580px;
                         /* Reduced to show 2 phones at once */
                     }
 
