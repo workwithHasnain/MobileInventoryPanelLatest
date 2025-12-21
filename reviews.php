@@ -51,8 +51,7 @@ if ($isTagFiltering) {
         (SELECT COUNT(*) FROM post_comments pc WHERE pc.post_id = p.id AND pc.status = 'approved') as comment_count
         FROM posts p 
         WHERE p.status ILIKE 'published'
-        ORDER BY p.created_at DESC 
-        LIMIT 6
+        ORDER BY p.created_at DESC
     ");
     $posts_stmt->execute();
     $posts = $posts_stmt->fetchAll();
@@ -239,13 +238,13 @@ $brands = $brands_stmt->fetchAll();
             max-height: 80vh;
         }
 
-         .grid-colums{
-                background-color: #EEEEEE;
-                    gap: 21px;
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    grid-template-rows: max-content;
-        height: max-content;
+        .grid-colums {
+            background-color: #EEEEEE;
+            gap: 21px;
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            grid-template-rows: max-content;
+            height: max-content;
         }
 
         .anchor-card {
@@ -256,6 +255,7 @@ $brands = $brands_stmt->fetchAll();
         .review-card {
             margin-top: 14px;
         }
+
         @media (max-width:786px) {
             .grid-colums {
                 background-color: #EEEEEE;
@@ -277,20 +277,20 @@ $brands = $brands_stmt->fetchAll();
                 <div class="comfort-life position-absolute">
                     <img class="w-100 h-100" src="hero-images/reviews-hero.png"
                         style="background-repeat: no-repeat; background-size: cover;" alt="">
-                    <div class="position-absolute d-flex mt-1 ml-2"  style="top: 0; flex-wrap: wrap; gap: 8px;">
+                    <div class="position-absolute d-flex mt-1 ml-2" style="top: 0; flex-wrap: wrap; gap: 8px;">
                         <label class="text-white whitening">Popular Tags</label>
-                       <?php if (!empty($popularTags)): ?>
-    <?php foreach ($popularTags as $tag => $count): ?>
-        <a href="reviews.php?tag=<?php echo urlencode($tag); ?>">
-            <button class="mobiles-button"><?php echo htmlspecialchars($tag); ?></button>
-        </a>
-    <?php endforeach; ?>
-<?php else: ?>
-    <div class="no-tags">
-        <span>No tags availble</span>
-    </div>
-<?php endif; ?>
-</div>
+                        <?php if (!empty($popularTags)): ?>
+                            <?php foreach ($popularTags as $tag => $count): ?>
+                                <a href="reviews.php?tag=<?php echo urlencode($tag); ?>">
+                                    <button class="mobiles-button"><?php echo htmlspecialchars($tag); ?></button>
+                                </a>
+                            <?php endforeach; ?>
+                        <?php else: ?>
+                            <div class="no-tags">
+                                <span>No tags availble</span>
+                            </div>
+                        <?php endif; ?>
+                    </div>
 
                     <form method="get" action="reviews.php" class="comon">
                         <label for="hero-search-reviews" class="text-white whitening ">Search For</label>
@@ -331,7 +331,7 @@ $brands = $brands_stmt->fetchAll();
 
         </div>
     </div>
-    <div class="container margin-top-4rem" style="border-left:1px solid #00000012;" >
+    <div class="container margin-top-4rem" style="border-left:1px solid #00000012;">
         <div class="row">
             <?php
             if (empty($posts)):
