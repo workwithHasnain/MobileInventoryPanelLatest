@@ -977,6 +977,16 @@ function formatDeviceSpecsStructured($device)
             }
         }
 
+        /* Prevent body overflow when Select2 is open */
+        body.select2-dropdown-open {
+            overflow: hidden !important;
+        }
+
+        /* Prevent body overflow when Select2 is open */
+        body.select2-dropdown-open {
+            overflow: hidden !important;
+        }
+
         /* Select2 Custom Styling for Phone Comparison */
         .select2-container {
             width: 100% !important;
@@ -1045,6 +1055,7 @@ function formatDeviceSpecsStructured($device)
             word-wrap: break-word;
             white-space: normal;
             line-height: 1.4;
+            font-size: 10px;
         }
 
         /* Search box styling */
@@ -1684,6 +1695,7 @@ function formatDeviceSpecsStructured($device)
                             allowClear: false,
                             width: '100%',
                             dropdownAutoWidth: false,
+                            dropdownParent: $('body'),
                             templateResult: formatPhoneOption,
                             templateSelection: formatPhoneSelection,
                             matcher: function(params, data) {
@@ -1709,6 +1721,16 @@ function formatDeviceSpecsStructured($device)
                         $select.on('select2:select select2:clear', function(e) {
                             var phoneId = $(this).val() || '';
                             updateComparison(phoneNumber, phoneId);
+                        });
+
+                        // Add body class when dropdown opens to prevent overflow
+                        $select.on('select2:open', function(e) {
+                            $('body').addClass('select2-dropdown-open');
+                        });
+
+                        // Remove body class when dropdown closes
+                        $select.on('select2:close', function(e) {
+                            $('body').removeClass('select2-dropdown-open');
                         });
                     });
                 });
