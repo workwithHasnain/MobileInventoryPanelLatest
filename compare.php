@@ -889,6 +889,93 @@ function formatDeviceSpecsStructured($device)
 
     <link rel="stylesheet" href="style.css">
     <style>
+        /* Mobile Horizontal Scroll Wrapper for Phone Cards */
+        @media(max-width: 768px) {
+            body {
+                overflow-x: hidden !important;
+            }
+
+            .comparison-container.container {
+                padding: 0 !important;
+                overflow-x: hidden;
+                max-width: 100vw;
+                margin-left: 0 !important;
+                margin-right: 0 !important;
+            }
+
+            .phone-cards-scroll-wrapper {
+                width: 100%;
+                overflow-x: auto;
+                overflow-y: hidden;
+                -webkit-overflow-scrolling: touch;
+            }
+
+            .comparison-container .row {
+                display: flex;
+                flex-wrap: nowrap;
+                width: auto;
+                margin: 0;
+                padding: 15px 5px;
+            }
+
+            .comparison-container .phone-card {
+                flex: 0 0 calc(50vw - 5px);
+                max-width: calc(50vw - 5px);
+                min-width: calc(50vw - 5px);
+                margin-bottom: 10px;
+                min-height: auto;
+            }
+
+            .phone-card .d-flex {
+                flex-direction: column;
+                align-items: center;
+            }
+
+            .phone-card .d-flex img {
+                width: 100%;
+                height: 220px;
+                object-fit: contain;
+                margin-bottom: 10px;
+            }
+
+            .phone-card .buttons {
+                width: 100%;
+                display: flex;
+                flex-direction: column;
+                gap: 5px;
+                align-items: center;
+            }
+
+            .phone-card .buttons button {
+                background: #EEEEEE;
+                color: black;
+                border: none;
+                padding: 8px 10px;
+                border-radius: 4px;
+                font-size: 12px;
+                font-weight: 600;
+                cursor: pointer;
+                width: 100%;
+                text-align: center;
+            }
+
+            .phone-card .buttons button:disabled {
+                opacity: 0.5;
+                cursor: not-allowed;
+            }
+
+            .phone-card .compare-checkbox {
+                margin-bottom: 10px;
+            }
+
+            .phone-card .compare-checkbox label {
+                font-size: 12px;
+                color: #666;
+                display: block;
+                margin-bottom: 5px;
+            }
+        }
+
         /* Select2 Custom Styling for Phone Comparison */
         .select2-container {
             width: 100% !important;
@@ -1090,124 +1177,126 @@ function formatDeviceSpecsStructured($device)
         </div>
 
     </div>
-    <div class="comparison-container container bg-white margin-top-4rem">
-        <div class="row">
-            <div class="phone-card col-lg-4" style="display: flex; flex-direction: column; justify-content: space-between;">
-                <div class="compare-checkbox">
-                    <label>
-                        Compare
-                        <select id="phone1-select" name="phone1" class="phone-select-dropdown" data-phone-number="1">
-                            <option value="">Select Phone 1</option>
-                            <?php foreach ($phones as $phone): ?>
-                                <option value="<?php echo $phone['id']; ?>" data-image="<?php echo htmlspecialchars(getPhoneImage($phone)); ?>" data-name="<?php echo htmlspecialchars(getPhoneName($phone)); ?>" <?php echo ($phone1 && $phone1['id'] == $phone['id']) ? 'selected' : ''; ?>>
-                                    <?php echo getPhoneName($phone); ?>
-                                </option>
-                            <?php endforeach; ?>
-                        </select>
-                    </label>
+    <div class="comparison-container container bg-white margin-top-4rem" style="max-width: 100%; margin: 0 auto;">
+        <div class="phone-cards-scroll-wrapper">
+            <div class="row">
+                <div class="phone-card col-lg-4" style="display: flex; flex-direction: column; justify-content: space-between;">
+                    <div class="compare-checkbox">
+                        <label>
+                            Compare
+                            <select id="phone1-select" name="phone1" class="phone-select-dropdown" data-phone-number="1">
+                                <option value="">Select Phone 1</option>
+                                <?php foreach ($phones as $phone): ?>
+                                    <option value="<?php echo $phone['id']; ?>" data-image="<?php echo htmlspecialchars(getPhoneImage($phone)); ?>" data-name="<?php echo htmlspecialchars(getPhoneName($phone)); ?>" <?php echo ($phone1 && $phone1['id'] == $phone['id']) ? 'selected' : ''; ?>>
+                                        <?php echo getPhoneName($phone); ?>
+                                    </option>
+                                <?php endforeach; ?>
+                            </select>
+                        </label>
+                    </div>
+                    <?php if ($phone1): ?>
+                        <div class="phone-name" style="flex-grow: 1;"><?php echo getPhoneName($phone1); ?></div>
+                        <div class="d-flex">
+                            <img src="<?php echo getPhoneImage($phone1); ?>" alt="<?php echo getPhoneName($phone1); ?>">
+                            <div class="buttons">
+                                <button onclick="window.location.href='device.php?id=<?php echo $phone1['id']; ?>'">REVIEW</button>
+                                <button onclick="window.location.href='device.php?id=<?php echo $phone1['id']; ?>'">SPECIFICATIONS</button>
+                                <button onclick="window.location.href='device.php?id=<?php echo $phone1['id']; ?>#comments'">READ OPINIONS</button>
+                                <button onclick="window.location.href='device.php?id=<?php echo $phone1['id']; ?>'">PICTURES</button>
+                            </div>
+                        </div>
+                    <?php else: ?>
+                        <div class="phone-name">Select a device to compare</div>
+                        <div class="d-flex">
+                            <img src="imges/phone-placeholder.png" alt="No phone selected">
+                            <div class="buttons">
+                                <button disabled>REVIEW</button>
+                                <button disabled>SPECIFICATIONS</button>
+                                <button disabled>READ OPINIONS</button>
+                                <button disabled>PICTURES</button>
+                            </div>
+                        </div>
+                    <?php endif; ?>
                 </div>
-                <?php if ($phone1): ?>
-                    <div class="phone-name" style="flex-grow: 1;"><?php echo getPhoneName($phone1); ?></div>
-                    <div class="d-flex">
-                        <img src="<?php echo getPhoneImage($phone1); ?>" alt="<?php echo getPhoneName($phone1); ?>">
-                        <div class="buttons">
-                            <button onclick="window.location.href='device.php?id=<?php echo $phone1['id']; ?>'">REVIEW</button>
-                            <button onclick="window.location.href='device.php?id=<?php echo $phone1['id']; ?>'">SPECIFICATIONS</button>
-                            <button onclick="window.location.href='device.php?id=<?php echo $phone1['id']; ?>#comments'">READ OPINIONS</button>
-                            <button onclick="window.location.href='device.php?id=<?php echo $phone1['id']; ?>'">PICTURES</button>
-                        </div>
+                <div class="phone-card col-lg-4" style="display: flex; flex-direction: column; justify-content: space-between;">
+                    <div class="compare-checkbox">
+                        <label>
+                            Compare
+                            <select id="phone2-select" name="phone2" class="phone-select-dropdown" data-phone-number="2">
+                                <option value="">Select Phone 2</option>
+                                <?php foreach ($phones as $phone): ?>
+                                    <option value="<?php echo $phone['id']; ?>" data-image="<?php echo htmlspecialchars(getPhoneImage($phone)); ?>" data-name="<?php echo htmlspecialchars(getPhoneName($phone)); ?>" <?php echo ($phone2 && $phone2['id'] == $phone['id']) ? 'selected' : ''; ?>>
+                                        <?php echo getPhoneName($phone); ?>
+                                    </option>
+                                <?php endforeach; ?>
+                            </select>
+                        </label>
                     </div>
-                <?php else: ?>
-                    <div class="phone-name">Select a device to compare</div>
-                    <div class="d-flex">
-                        <img src="imges/phone-placeholder.png" alt="No phone selected">
-                        <div class="buttons">
-                            <button disabled>REVIEW</button>
-                            <button disabled>SPECIFICATIONS</button>
-                            <button disabled>READ OPINIONS</button>
-                            <button disabled>PICTURES</button>
+                    <?php if ($phone2): ?>
+                        <div class="phone-name" style="flex-grow: 1;"><?php echo getPhoneName($phone2); ?></div>
+                        <div class="d-flex">
+                            <img src="<?php echo getPhoneImage($phone2); ?>" alt="<?php echo getPhoneName($phone2); ?>">
+                            <div class="buttons">
+                                <button onclick="window.location.href='device.php?id=<?php echo $phone2['id']; ?>'">REVIEW</button>
+                                <button onclick="window.location.href='device.php?id=<?php echo $phone2['id']; ?>'">SPECIFICATIONS</button>
+                                <button onclick="window.location.href='device.php?id=<?php echo $phone2['id']; ?>#comments'">READ OPINIONS</button>
+                                <button onclick="window.location.href='device.php?id=<?php echo $phone2['id']; ?>'">PICTURES</button>
+                            </div>
                         </div>
+                    <?php else: ?>
+                        <div class="phone-name">Select a device to compare</div>
+                        <div class="d-flex">
+                            <img src="imges/phone-placeholder.png" alt="No phone selected">
+                            <div class="buttons">
+                                <button disabled>REVIEW</button>
+                                <button disabled>SPECIFICATIONS</button>
+                                <button disabled>READ OPINIONS</button>
+                                <button disabled>PICTURES</button>
+                            </div>
+                        </div>
+                    <?php endif; ?>
+                    <div class="align-items-center m-auto">
                     </div>
-                <?php endif; ?>
-            </div>
-            <div class="phone-card col-lg-4" style="display: flex; flex-direction: column; justify-content: space-between;">
-                <div class="compare-checkbox">
-                    <label>
-                        Compare
-                        <select id="phone2-select" name="phone2" class="phone-select-dropdown" data-phone-number="2">
-                            <option value="">Select Phone 2</option>
-                            <?php foreach ($phones as $phone): ?>
-                                <option value="<?php echo $phone['id']; ?>" data-image="<?php echo htmlspecialchars(getPhoneImage($phone)); ?>" data-name="<?php echo htmlspecialchars(getPhoneName($phone)); ?>" <?php echo ($phone2 && $phone2['id'] == $phone['id']) ? 'selected' : ''; ?>>
-                                    <?php echo getPhoneName($phone); ?>
-                                </option>
-                            <?php endforeach; ?>
-                        </select>
-                    </label>
                 </div>
-                <?php if ($phone2): ?>
-                    <div class="phone-name" style="flex-grow: 1;"><?php echo getPhoneName($phone2); ?></div>
-                    <div class="d-flex">
-                        <img src="<?php echo getPhoneImage($phone2); ?>" alt="<?php echo getPhoneName($phone2); ?>">
-                        <div class="buttons">
-                            <button onclick="window.location.href='device.php?id=<?php echo $phone2['id']; ?>'">REVIEW</button>
-                            <button onclick="window.location.href='device.php?id=<?php echo $phone2['id']; ?>'">SPECIFICATIONS</button>
-                            <button onclick="window.location.href='device.php?id=<?php echo $phone2['id']; ?>#comments'">READ OPINIONS</button>
-                            <button onclick="window.location.href='device.php?id=<?php echo $phone2['id']; ?>'">PICTURES</button>
-                        </div>
+                <div class="phone-card col-lg-4" style="display: flex; flex-direction: column; justify-content: space-between;">
+                    <div class="compare-checkbox">
+                        <label>
+                            Compare
+                            <select id="phone3-select" name="phone3" class="phone-select-dropdown" data-phone-number="3">
+                                <option value="">Select Phone 3</option>
+                                <?php foreach ($phones as $phone): ?>
+                                    <option value="<?php echo $phone['id']; ?>" data-image="<?php echo htmlspecialchars(getPhoneImage($phone)); ?>" data-name="<?php echo htmlspecialchars(getPhoneName($phone)); ?>" <?php echo ($phone3 && $phone3['id'] == $phone['id']) ? 'selected' : ''; ?>>
+                                        <?php echo getPhoneName($phone); ?>
+                                    </option>
+                                <?php endforeach; ?>
+                            </select>
+                        </label>
                     </div>
-                <?php else: ?>
-                    <div class="phone-name">Select a device to compare</div>
-                    <div class="d-flex">
-                        <img src="imges/phone-placeholder.png" alt="No phone selected">
-                        <div class="buttons">
-                            <button disabled>REVIEW</button>
-                            <button disabled>SPECIFICATIONS</button>
-                            <button disabled>READ OPINIONS</button>
-                            <button disabled>PICTURES</button>
+                    <?php if ($phone3): ?>
+                        <div class="phone-name" style="flex-grow: 1;"><?php echo getPhoneName($phone3); ?></div>
+                        <div class="d-flex">
+                            <img src="<?php echo getPhoneImage($phone3); ?>" alt="<?php echo getPhoneName($phone3); ?>">
+                            <div class="buttons">
+                                <button onclick="window.location.href='device.php?id=<?php echo $phone3['id']; ?>'">REVIEW</button>
+                                <button onclick="window.location.href='device.php?id=<?php echo $phone3['id']; ?>'">SPECIFICATIONS</button>
+                                <button onclick="window.location.href='device.php?id=<?php echo $phone3['id']; ?>#comments'">READ OPINIONS</button>
+                                <button onclick="window.location.href='device.php?id=<?php echo $phone3['id']; ?>'">PICTURES</button>
+                            </div>
                         </div>
-                    </div>
-                <?php endif; ?>
-                <div class="align-items-center m-auto">
-                </div>
-            </div>
-            <div class="phone-card col-lg-4" style="display: flex; flex-direction: column; justify-content: space-between;">
-                <div class="compare-checkbox">
-                    <label>
-                        Compare
-                        <select id="phone3-select" name="phone3" class="phone-select-dropdown" data-phone-number="3">
-                            <option value="">Select Phone 3</option>
-                            <?php foreach ($phones as $phone): ?>
-                                <option value="<?php echo $phone['id']; ?>" data-image="<?php echo htmlspecialchars(getPhoneImage($phone)); ?>" data-name="<?php echo htmlspecialchars(getPhoneName($phone)); ?>" <?php echo ($phone3 && $phone3['id'] == $phone['id']) ? 'selected' : ''; ?>>
-                                    <?php echo getPhoneName($phone); ?>
-                                </option>
-                            <?php endforeach; ?>
-                        </select>
-                    </label>
-                </div>
-                <?php if ($phone3): ?>
-                    <div class="phone-name" style="flex-grow: 1;"><?php echo getPhoneName($phone3); ?></div>
-                    <div class="d-flex">
-                        <img src="<?php echo getPhoneImage($phone3); ?>" alt="<?php echo getPhoneName($phone3); ?>">
-                        <div class="buttons">
-                            <button onclick="window.location.href='device.php?id=<?php echo $phone3['id']; ?>'">REVIEW</button>
-                            <button onclick="window.location.href='device.php?id=<?php echo $phone3['id']; ?>'">SPECIFICATIONS</button>
-                            <button onclick="window.location.href='device.php?id=<?php echo $phone3['id']; ?>#comments'">READ OPINIONS</button>
-                            <button onclick="window.location.href='device.php?id=<?php echo $phone3['id']; ?>'">PICTURES</button>
+                    <?php else: ?>
+                        <div class="phone-name">Select a device to compare</div>
+                        <div class="d-flex">
+                            <img src="imges/phone-placeholder.png" alt="No phone selected">
+                            <div class="buttons">
+                                <button disabled>REVIEW</button>
+                                <button disabled>SPECIFICATIONS</button>
+                                <button disabled>READ OPINIONS</button>
+                                <button disabled>PICTURES</button>
+                            </div>
                         </div>
+                    <?php endif; ?>
+                    <div class="align-items-center m-auto">
                     </div>
-                <?php else: ?>
-                    <div class="phone-name">Select a device to compare</div>
-                    <div class="d-flex">
-                        <img src="imges/phone-placeholder.png" alt="No phone selected">
-                        <div class="buttons">
-                            <button disabled>REVIEW</button>
-                            <button disabled>SPECIFICATIONS</button>
-                            <button disabled>READ OPINIONS</button>
-                            <button disabled>PICTURES</button>
-                        </div>
-                    </div>
-                <?php endif; ?>
-                <div class="align-items-center m-auto">
                 </div>
             </div>
         </div>
@@ -1280,7 +1369,7 @@ function formatDeviceSpecsStructured($device)
                     }
 
                     .comparison-table {
-                        min-width: 500px;
+                        min-width: 550px;
                         /* Reduced to show 2 phones at once */
                     }
 
