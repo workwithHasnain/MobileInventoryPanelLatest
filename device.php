@@ -1707,7 +1707,7 @@ $commentCount = getDeviceCommentCount($pdo, $device_id);
                         <td class="spec-description" style="<?php echo ($category === 'NETWORK' && $rowIndex === 0) ? 'position: relative;' : ''; ?>">
                           <?php echo htmlspecialchars($rowData['description']); ?>
                           <?php if ($category === 'NETWORK' && $rowIndex === 0): ?>
-                            <button class="expand-btn" onclick="toggleExpandBtn(this)" style="position: absolute; right: 10px; top: 50%; transform: translateY(-50%); background: none; border: none; color: #666; font-size: 11px; cursor: pointer; text-transform: uppercase; font-weight: 500;">EXPAND ▼</button>
+                            <button class="expand-btn" onclick="toggleExpandBtn(this)" style="position: absolute; right: 10px; top: 50%; transform: translateY(-50%); background: none; border: none; color: #666; font-size: 11px; cursor: pointer; text-transform: uppercase; font-weight: 500;">COLLAPSE ▲</button>
                           <?php endif; ?>
                         </td>
                       </tr>
@@ -2365,12 +2365,12 @@ $commentCount = getDeviceCommentCount($pdo, $device_id);
     const networkLabel = document.querySelector('.spec-label[rowspan]');
     const originalRowspan = networkRows.length + 1; // +1 for the first row
 
-    if (btn.textContent.includes('EXPAND')) {
-      btn.textContent = 'COLLAPSE ▲';
+    if (btn.textContent.includes('COLLAPSE')) {
+      btn.textContent = 'EXPAND ▼';
       networkRows.forEach(row => row.style.display = 'none');
       if (networkLabel) networkLabel.setAttribute('rowspan', '1');
     } else {
-      btn.textContent = 'EXPAND ▼';
+      btn.textContent = 'COLLAPSE ▲';
       networkRows.forEach(row => row.style.display = '');
       if (networkLabel) networkLabel.setAttribute('rowspan', originalRowspan);
     }
