@@ -14,14 +14,20 @@
 
         <div class="controvecy mb-2">
             <div class="icon-container">
-                <button type="button" class="btn border-right" data-bs-toggle="tooltip" data-bs-placement="left"
-                    title="YouTube">
-                    <img src="iccons/youtube-color-svgrepo-com.svg" alt="YouTube" width="30px">
+                <button type="button" class="btn border-right" data-bs-toggle="tooltip" data-bs-placement="left" title="YouTube" aria-label="YouTube">
+                    <i class="fab fa-youtube" style="font-size:24px;color:#FF0000"></i>
                 </button>
-
-                <button type="button" class="btn" data-bs-toggle="tooltip" data-bs-placement="left"
-                    title="Instagram">
-                    <img src="iccons/instagram-color-svgrepo-com.svg" alt="Instagram" width="22px">
+                <button type="button" class="btn" data-bs-toggle="tooltip" data-bs-placement="left" title="Instagram" aria-label="Instagram">
+                    <i class="fab fa-instagram" style="font-size:20px;color:#E4405F"></i>
+                </button>
+                <button type="button" class="btn" data-bs-toggle="tooltip" data-bs-placement="left" title="Facebook" aria-label="Facebook">
+                    <i class="fab fa-facebook-f" style="font-size:20px;color:#1877F2"></i>
+                </button>
+                <button type="button" class="btn" data-bs-toggle="tooltip" data-bs-placement="left" title="Twitter" aria-label="Twitter">
+                    <i class="fab fa-twitter" style="font-size:20px;color:#1DA1F2"></i>
+                </button>
+                <button type="button" class="btn" data-bs-toggle="tooltip" data-bs-placement="left" title="TikTok" aria-label="TikTok">
+                    <i class="fab fa-tiktok" style="font-size:20px;color:#ffffff"></i>
                 </button>
             </div>
         </div>
