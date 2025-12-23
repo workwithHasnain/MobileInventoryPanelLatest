@@ -9,7 +9,7 @@
         </button>
 
         <a class="navbar-brand d-flex align-items-center" href="#">
-            <img src="imges/download.png" alt="GSMArena Logo" />
+            <img src="imges/download.png" alt="DevicesArena Logo" />
         </a>
 
         <div class="controvecy mb-2">
@@ -43,7 +43,7 @@
             alt="">
     </button>
     <a class="navbar-brand d-flex align-items-center" href="#">
-        <a class="logo text-white " href="#">GSMArena</a>
+        <a class="logo text-white " href="#">DevicesArena</a>
     </a>
 </nav>
 
@@ -70,19 +70,19 @@
 <!-- Mobile Collapse of Gsmarecn -->
 <div class="collapse mobile-menu d-lg-none" id="mobileMenu">
     <div class="menu-icons">
-        <i class="fas fa-home"></i>
-        <i class="fab fa-facebook-f"></i>
+        <i class="fab fa-youtube"></i>
         <i class="fab fa-instagram"></i>
+        <i class="fab fa-facebook-f"></i>
+        <i class="fab fa-twitter"></i>
         <i class="fab fa-tiktok"></i>
-        <i class="fas fa-share-alt"></i>
     </div>
     <div class="column">
         <a href="index.php">Home</a>
         <a href="reviews.php">Reviews</a>
-        <a href="#">Videos</a>
         <a href="featured.php">Featured</a>
         <a href="phonefinder.php">Phone Finder</a>
         <a href="compare.php">Compare</a>
+        <a href="#">Videos</a>
         <a href="#">Contact Us</a>
     </div>
     <div class="brand-grid">
