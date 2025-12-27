@@ -1545,7 +1545,12 @@ function formatDeviceSpecsStructured($device)
                             $val1 = $legacyFallback($section, $phone1);
                             $val2 = $legacyFallback($section, $phone2);
                             $val3 = $legacyFallback($section, $phone3);
-                            echo '<tr><td colspan="3" style="color:#f14d4d;font-size:16px;background:#f9f9f9;font-weight:700;">' . htmlspecialchars($section) . '</td></tr>';
+                            $headerCell = '<td colspan="3" style="color:#f14d4d;font-size:16px;background:#f9f9f9;font-weight:700;position:relative;">' . htmlspecialchars($section);
+                            if ($section === 'NETWORK') {
+                                $headerCell .= '<button class="compare-expand-btn" onclick="toggleCompareNetworkRows(this)" style="position:absolute;right:10px;top:50%;transform:translateY(-50%);background:none;border:none;color:#666;font-size:11px;cursor:pointer;text-transform:uppercase;font-weight:500;">COLLAPSE ▲</button>';
+                            }
+                            $headerCell .= '</td>';
+                            echo '<tr>' . $headerCell . '</tr>';
                             echo '<tr>';
                             echo '<td>' . ($val1 !== '' ? $val1 : 'N/A') . '</td>';
                             echo '<td>' . ($val2 !== '' ? $val2 : 'N/A') . '</td>';
@@ -1553,11 +1558,17 @@ function formatDeviceSpecsStructured($device)
                             echo '</tr>';
                         } else {
                             // Section header row
-                            echo '<tr><td colspan="3" style="color:#f14d4d;font-size:16px;background:#f9f9f9;font-weight:700;">' . htmlspecialchars($section) . '</td></tr>';
+                            $headerCell = '<td colspan="3" style="color:#f14d4d;font-size:16px;background:#f9f9f9;font-weight:700;position:relative;">' . htmlspecialchars($section);
+                            if ($section === 'NETWORK') {
+                                $headerCell .= '<button class="compare-expand-btn" onclick="toggleCompareNetworkRows(this)" style="position:absolute;right:10px;top:50%;transform:translateY(-50%);background:none;border:none;color:#666;font-size:11px;cursor:pointer;text-transform:uppercase;font-weight:500;">COLLAPSE ▲</button>';
+                            }
+                            $headerCell .= '</td>';
+                            echo '<tr>' . $headerCell . '</tr>';
 
                             // Render each field/description pair as a 2-column row per phone
                             for ($i = 0; $i < $maxRows; $i++) {
-                                echo '<tr>';
+                                $rowClass = ($section === 'NETWORK' && $i > 0) ? ' class="compare-network-row"' : '';
+                                echo '<tr' . $rowClass . '>';
 
                                 // Phone 1
                                 if (isset($rows1[$i])) {
@@ -1928,6 +1939,19 @@ function formatDeviceSpecsStructured($device)
                 }
             }
         });
+
+        // Toggle expand/collapse for NETWORK section in comparison table
+        function toggleCompareNetworkRows(btn) {
+            const networkRows = document.querySelectorAll('.compare-network-row');
+
+            if (btn.textContent.includes('COLLAPSE')) {
+                btn.textContent = 'EXPAND \u25bc';
+                networkRows.forEach(row => row.style.display = 'none');
+            } else {
+                btn.textContent = 'COLLAPSE \u25b2';
+                networkRows.forEach(row => row.style.display = '');
+            }
+        }
     </script>
 </body>
 
