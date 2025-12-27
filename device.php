@@ -1132,6 +1132,12 @@ $commentCount = getDeviceCommentCount($pdo, $device_id);
         background: transparent;
         z-index: 1;
       }
+      .spec-subtitle{
+        font-size: 10px;
+      }
+      .spec-description{
+        font-size: 09px;
+      }
     }
 
     <?php
@@ -1330,6 +1336,9 @@ $commentCount = getDeviceCommentCount($pdo, $device_id);
     .pad {
       font-weight: 700;
     }
+      .spec-description{
+        font-size: 12px;
+      }
   </style>
   <div class="d-lg-none d-block">
 
