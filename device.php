@@ -1132,10 +1132,12 @@ $commentCount = getDeviceCommentCount($pdo, $device_id);
         background: transparent;
         z-index: 1;
       }
-      .spec-subtitle{
+
+      .spec-subtitle {
         font-size: 10px;
       }
-      .spec-description{
+
+      .spec-description {
         font-size: 09px;
       }
     }
@@ -1336,9 +1338,10 @@ $commentCount = getDeviceCommentCount($pdo, $device_id);
     .pad {
       font-weight: 700;
     }
-      .spec-description{
-        font-size: 12px;
-      }
+
+    .spec-description {
+      font-size: 12px;
+    }
   </style>
   <div class="d-lg-none d-block">
 
@@ -1693,6 +1696,17 @@ $commentCount = getDeviceCommentCount($pdo, $device_id);
     padding-right: -2px;">
     <div class="row">
       <div class="col-lg-8 col-md-7 order-1" style="padding-right: 0;">
+        <div class="d-block d-lg-flex">
+          <?php if ($review_post): ?>
+            <button class="pad" onclick="window.location.href='post.php?slug=<?php echo urlencode($review_post['slug']); ?>'">REVIEW</button>
+          <?php else: ?>
+            <button class="pad" disabled style="opacity: 0.5; cursor: default;" title="No review available">REVIEW</button>
+          <?php endif; ?>
+          <button class="pad" onclick="window.location.href='compare.php?phone1=<?php echo $device['id']; ?>'">COMPARE</button>
+          <button class="pad" onclick="document.getElementById('comments').scrollIntoView({behavior:'smooth', block:'start'});">OPINIONS</button>
+          <button class="pad" onclick="showPicturesModal()">PICTURES</button>
+          <button class="pad" onclick="showRelatedPhonesModal()">RELATED PHONES</button>
+        </div>
         <div class="bg-white">
           <table class="table forat">
             <tbody>
@@ -1752,6 +1766,7 @@ $commentCount = getDeviceCommentCount($pdo, $device_id);
             <button class="pad" onclick="window.location.href='compare.php?phone1=<?php echo $device['id']; ?>'">COMPARE</button>
             <button class="pad" onclick="document.getElementById('comments').scrollIntoView({behavior:'smooth', block:'start'});">OPINIONS</button>
             <button class="pad" onclick="showPicturesModal()">PICTURES</button>
+            <button class="pad" onclick="showRelatedPhonesModal()">RELATED PHONES</button>
           </div>
           <div class="comments" id="comments">
             <h5 class="border-bottom reader py-3 mx-2"><?php echo htmlspecialchars(($device['brand_name'] ?? '') . ' ' . ($device['name'] ?? 'Device')); ?> - user opinions and reviews</h5>
@@ -1978,6 +1993,25 @@ $commentCount = getDeviceCommentCount($pdo, $device_id);
     </div>
   </div>
 
+  <!-- Related Phones Modal -->
+  <div class="modal fade" id="relatedPhonesModal" tabindex="-1" aria-labelledby="relatedPhonesModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg modal-dialog-centered modal-dialog-scrollable">
+      <div class="modal-content" style="background-color: #EFEBE9; border: 2px solid #8D6E63;">
+        <div class="modal-header" style="border-bottom: 1px solid #8D6E63; background-color: #D7CCC8;">
+          <h5 class="modal-title" id="relatedPhonesModalLabel" style="font-family:system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue'; color: #5D4037;">
+            <i class="fas fa-mobile-alt me-2"></i>Related Phones
+          </h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <div class="modal-body" id="relatedPhonesModalBody">
+          <div class="text-center py-5">
+            <i class="fas fa-spinner fa-spin fa-2x text-muted"></i>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 
@@ -2144,6 +2178,84 @@ $commentCount = getDeviceCommentCount($pdo, $device_id);
   // Navigate to device page
   function goToDevice(deviceId) {
     window.location.href = `device.php?id=${deviceId}`;
+  }
+
+  // Show related phones modal
+  function showRelatedPhonesModal() {
+    const container = document.getElementById('relatedPhonesModalBody');
+
+    // Show loading spinner
+    container.innerHTML = '<div class="text-center py-5"><i class="fas fa-spinner fa-spin fa-2x text-muted"></i></div>';
+
+    // Get current device's brand from page (you can also pass it as parameter)
+    const currentBrandId = <?php echo json_encode($device['brand_id'] ?? null); ?>;
+
+    if (!currentBrandId) {
+      container.innerHTML = `
+        <div class="text-center py-5">
+          <i class="fas fa-mobile-alt fa-3x text-muted mb-3"></i>
+          <h6 class="text-muted">No brand information available</h6>
+        </div>
+      `;
+      const modal = new bootstrap.Modal(document.getElementById('relatedPhonesModal'));
+      modal.show();
+      return;
+    }
+
+    // Fetch phones for same brand
+    fetch(`get_phones_by_brand.php?brand_id=${currentBrandId}`)
+      .then(response => response.json())
+      .then(data => {
+        // Filter out current device
+        const currentDeviceId = <?php echo json_encode($device['id'] ?? null); ?>;
+        const relatedPhones = data.filter(phone => phone.id != currentDeviceId);
+
+        displayRelatedPhonesModal(relatedPhones);
+      })
+      .catch(error => {
+        console.error('Error fetching related phones:', error);
+        container.innerHTML = `
+          <div class="text-center py-5">
+            <i class="fas fa-exclamation-triangle fa-3x text-muted mb-3"></i>
+            <h6 class="text-muted">Failed to load related phones</h6>
+          </div>
+        `;
+        const modal = new bootstrap.Modal(document.getElementById('relatedPhonesModal'));
+        modal.show();
+      });
+  }
+
+  // Display related phones in modal
+  function displayRelatedPhonesModal(phones) {
+    const container = document.getElementById('relatedPhonesModalBody');
+
+    if (phones && phones.length > 0) {
+      let html = '<div class="row">';
+      phones.forEach(phone => {
+        const phoneImage = phone.image ? `<img src="${phone.image}" alt="${phone.name}" style="width: 100%; height: 120px; object-fit: contain; margin-bottom: 8px;" onerror="this.style.display='none';">` : '';
+        html += `
+          <div class="col-lg-4 col-md-6 col-sm-6 mb-3">
+            <button class="device-cell-modal btn w-100 p-0" style="background-color: #fff; border: 1px solid #c5b6b0; color: #5D4037; font-weight: 500; transition: all 0.3s ease; cursor: pointer; display: flex; flex-direction: column; align-items: center; overflow: hidden;" onclick="goToDevice(${phone.id})">
+              ${phoneImage}
+              <span style="padding: 8px 10px; width: 100%; text-align: center; font-size: 0.95rem;">${phone.name}</span>
+            </button>
+          </div>
+        `;
+      });
+      html += '</div>';
+      container.innerHTML = html;
+    } else {
+      container.innerHTML = `
+        <div class="text-center py-5">
+          <i class="fas fa-mobile-alt fa-3x text-muted mb-3"></i>
+          <h6 class="text-muted">No related phones available for this device at this moment, please come back later</h6>
+        </div>
+      `;
+    }
+
+    // Show modal
+    const modal = new bootstrap.Modal(document.getElementById('relatedPhonesModal'));
+    modal.show();
   }
 
   // Show post details in modal
