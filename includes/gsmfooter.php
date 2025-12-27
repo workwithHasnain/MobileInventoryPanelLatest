@@ -24,7 +24,7 @@
             </div>
             <div class="col-10 nav-wrap m-auto text-center ">
                 <div class="nav-container">
-                    <a href="#" style="color: white;">Home</a>
+                    <a href="index.php" style="color: white;">Home</a>
                     <a href="reviews.php" style="color: white;">Reviews</a>
                     <a href="compare.php" style="color: white;">Compare</a>
                     <a href="phonefinder.php" style="color: white;">Phone Finder</a>
