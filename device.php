@@ -1397,13 +1397,29 @@ $commentCount = getDeviceCommentCount($pdo, $device_id);
       </div>
 
       <!-- BOTTOM SECTION -->
-      <!-- <div class="bottom-section">
-
-        <button class="review-btn">
-          READ OUR REVIEW
+      <div class="bottom-section">
+        <?php if ($review_post): ?>
+        <button class="review-btn" onclick="window.location.href='post.php?slug=<?php echo urlencode($review_post['slug']); ?>'">
+          REVIEW
         </button>
-
-        <div style="display: flex; gap: 22px;">
+        <?php else: ?>
+          <button class="review-btn" disabled style="opacity: 0.5; cursor: default;" title="No review available">
+          REVIEW
+        </button>
+          <?php endif; ?>
+        <button class="review-btn" onclick="window.location.href='compare.php?phone1=<?php echo $device['id']; ?>'">
+          COMPARE
+        </button>
+        <button class="review-btn" onclick="document.getElementById('comments').scrollIntoView({behavior:'smooth', block:'start'});">
+          OPINIONS
+        </button>
+        <button class="review-btn" onclick="showPicturesModal()">
+          PICTURES
+        </button>
+        <button class="review-btn" onclick="showRelatedPhonesModal()">
+          RELATED PHONES
+        </button>
+        <!-- <div style="display: flex; gap: 22px;">
 
           <div class="stat-box">
             <img src="/imges/stat-down.png" alt="">
@@ -1421,9 +1437,9 @@ $commentCount = getDeviceCommentCount($pdo, $device_id);
             </p>
           </div>
 
-        </div>
+        </div> -->
 
-      </div> -->
+      </div>
 
     </div>
 
@@ -1507,21 +1523,23 @@ $commentCount = getDeviceCommentCount($pdo, $device_id);
 
     /* REVIEW BUTTON */
     .review-btn {
-      background: #d50000;
+      background: #bbb;
       border: none;
       color: #fff;
       padding: 10px 22px;
       border-radius: 5px;
       font-size: 15px;
       font-weight: 700;
+      width: 100%;
+      /* margin-bottom: 10px; */
     }
 
     /* BOTTOM ROW */
     .bottom-section {
       margin-top: 16px;
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
+      /* display: flex; */
+      /* justify-content: space-between; */
+      /* align-items: center; */
     }
 
     /* STATS */
@@ -1696,17 +1714,6 @@ $commentCount = getDeviceCommentCount($pdo, $device_id);
     padding-right: -2px;">
     <div class="row">
       <div class="col-lg-8 col-md-7 order-1" style="padding-right: 0;">
-        <div class="d-block d-lg-flex">
-          <?php if ($review_post): ?>
-            <button class="pad" onclick="window.location.href='post.php?slug=<?php echo urlencode($review_post['slug']); ?>'">REVIEW</button>
-          <?php else: ?>
-            <button class="pad" disabled style="opacity: 0.5; cursor: default;" title="No review available">REVIEW</button>
-          <?php endif; ?>
-          <button class="pad" onclick="window.location.href='compare.php?phone1=<?php echo $device['id']; ?>'">COMPARE</button>
-          <button class="pad" onclick="document.getElementById('comments').scrollIntoView({behavior:'smooth', block:'start'});">OPINIONS</button>
-          <button class="pad" onclick="showPicturesModal()">PICTURES</button>
-          <button class="pad" onclick="showRelatedPhonesModal()">RELATED PHONES</button>
-        </div>
         <div class="bg-white">
           <table class="table forat">
             <tbody>
