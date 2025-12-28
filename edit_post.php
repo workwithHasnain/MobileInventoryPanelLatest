@@ -410,29 +410,28 @@ include 'includes/header.php';
                 <!-- Categorization -->
                 <div class="card mb-4">
                     <div class="card-header">
-                        <h5 class="mb-0"><i class="fas fa-tags"></i> Categorization</h5>
+                        <h5 class="mb-0"><i class="fas fa-tags"></i> Keywords</h5>
                     </div>
                     <div class="card-body">
                         <div class="row">
-                            <div class="col-md-6">
+                            <!-- <div class="col-md-6">
                                 <div class="mb-3">
                                     <label class="form-label">Categories</label>
-                                    <?php foreach ($categories as $category): ?>
+                                    <?php //foreach ($categories as $category): ?>
                                         <div class="form-check">
                                             <input class="form-check-input" type="checkbox"
-                                                name="categories[]" value="<?php echo htmlspecialchars($category['name']); ?>"
-                                                id="cat_<?php echo $category['id']; ?>"
-                                                <?php echo (isset($_POST['categories']) ?
-                                                    (in_array($category['name'], $_POST['categories'])) : (in_array($category['name'], $post_categories))) ? 'checked' : ''; ?>>
-                                            <label class="form-check-label" for="cat_<?php echo $category['id']; ?>">
-                                                <?php echo htmlspecialchars($category['name']); ?>
+                                                name="categories[]" value="<?php //echo htmlspecialchars($category['name']); ?>"
+                                                id="cat_<?php //echo $category['id']; ?>"
+                                                <?php //echo (isset($_POST['categories']) ? (in_array($category['name'], $_POST['categories'])) : (in_array($category['name'], $post_categories))) ? 'checked' : ''; ?>>
+                                            <label class="form-check-label" for="cat_<?php //echo $category['id']; ?>">
+                                                <?php //echo htmlspecialchars($category['name']); ?>
                                             </label>
                                         </div>
-                                    <?php endforeach; ?>
+                                    <?php //endforeach; ?>
                                 </div>
-                            </div>
-                            <div class="col-md-6">
-                                <div class="mb-3">
+                            </div> -->
+                            <div class="col-md-12">
+                                <div class="mb-6">
                                     <label for="tags" class="form-label">Tags/Keywords</label>
                                     <input type="text" class="form-control" id="tags" name="tags"
                                         value="<?php echo htmlspecialchars(isset($_POST['tags']) ? $_POST['tags'] : implode(', ', $post_tags)); ?>"
