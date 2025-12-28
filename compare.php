@@ -1383,6 +1383,7 @@ function formatDeviceSpecsStructured($device)
                     grid-template-columns: 75px 1fr;
                     gap: 8px;
                     align-items: start;
+                    padding: 0px 8px;
                 }
 
                 /* Mobile: enable TRUE GSMArena style scroll */
@@ -1437,7 +1438,7 @@ function formatDeviceSpecsStructured($device)
                     /* Section headings on mobile */
                     .comparison-table td[colspan="3"] {
                         font-size: 11px;
-                        padding: 4px 2px !important;
+                        padding: 4px 8px !important;
                     }
                 }
             </style>
