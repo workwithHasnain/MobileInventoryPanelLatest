@@ -964,6 +964,46 @@ $commentCount = getDeviceCommentCount($pdo, $device_id);
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title><?php echo htmlspecialchars(($device['brand_name'] ?? '') . ' ' . ($device['name'] ?? 'Device')); ?> - Specifications & Reviews | DevicesArena</title>
+
+    <!-- Favicon & Icons -->
+    <link rel="icon" type="image/png" sizes="32x32" href="imges/icon-32.png">
+    <link rel="icon" type="image/png" sizes="256x256" href="imges/icon-256.png">
+    <link rel="shortcut icon" href="imges/icon-32.png">
+
+    <!-- Apple Touch Icon (iOS Home Screen) -->
+    <link rel="apple-touch-icon" href="imges/icon-256.png">
+    <link rel="apple-touch-icon" sizes="256x256" href="imges/icon-256.png">
+
+    <!-- Android Chrome Icons -->
+    <link rel="icon" type="image/png" sizes="192x192" href="imges/icon-256.png">
+    <link rel="icon" type="image/png" sizes="512x512" href="imges/icon-256.png">
+
+    <!-- Theme Color (Browser Chrome & Address Bar) -->
+    <meta name="theme-color" content="#8D6E63">
+
+    <!-- Windows Tile Icon -->
+    <meta name="msapplication-TileColor" content="#8D6E63">
+    <meta name="msapplication-TileImage" content="imges/icon-256.png">
+
+    <!-- Open Graph Meta Tags (Social Media Sharing) -->
+    <meta property="og:site_name" content="DevicesArena">
+    <meta property="og:title" content="DevicesArena - Smartphone Reviews & Comparisons">
+    <meta property="og:description" content="Explore the latest smartphones, detailed specifications, reviews, and comparisons on DevicesArena.">
+    <meta property="og:image" content="imges/icon-256.png">
+    <meta property="og:image:type" content="image/png">
+    <meta property="og:image:width" content="256">
+    <meta property="og:image:height" content="256">
+    <meta property="og:type" content="website">
+
+    <!-- Twitter Card Meta Tags -->
+    <meta name="twitter:card" content="summary">
+    <meta name="twitter:title" content="DevicesArena">
+    <meta name="twitter:description" content="Explore the latest smartphones, detailed specifications, reviews, and comparisons.">
+    <meta name="twitter:image" content="imges/icon-256.png">
+
+    <!-- PWA Manifest -->
+    <link rel="manifest" href="manifest.json">
+
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/css/bootstrap.min.css" rel="stylesheet"
     integrity="sha384-rbsA2VBKQhggwzxH7pPCaAqO46MgnOM80zW1RWuH61DGLwZJEdK2Kadq2F9CUG65" crossorigin="anonymous">
   <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
@@ -1736,7 +1776,16 @@ $commentCount = getDeviceCommentCount($pdo, $device_id);
                   <?php if (is_array($rows) && !empty($rows)): ?>
                     <!-- Mobile: Section title as separate row -->
                     <tr class="d-lg-none">
-                      <th class="spec-label" colspan="2"><?php echo htmlspecialchars($category); ?></th>
+                      <th class="spec-label">
+                        <?php echo htmlspecialchars($category); ?>
+                      </th>
+                      <?php if ($category === 'NETWORK'): ?>
+                        <th style="text-align: right; padding: 0.75rem;">
+                          <button class="expand-btn" onclick="toggleExpandBtn(this)" style="background: none; border: none; color: #666; font-size: 11px; cursor: pointer; text-transform: uppercase; font-weight: 500;">COLLAPSE ▲</button>
+                        </th>
+                      <?php else: ?>
+                        <th></th>
+                      <?php endif; ?>
                     </tr>
 
                     <!-- Desktop + Mobile spec rows -->
@@ -1744,13 +1793,15 @@ $commentCount = getDeviceCommentCount($pdo, $device_id);
                       <tr <?php echo ($category === 'NETWORK' && $rowIndex > 0) ? 'class="network-row"' : ''; ?>>
                         <!-- Desktop only: rowspan on first row -->
                         <?php if ($rowIndex === 0): ?>
-                          <th class="spec-label d-none d-lg-table-cell" rowspan="<?php echo count($rows); ?>"><?php echo htmlspecialchars($category); ?></th>
+                          <th class="spec-label d-none d-lg-table-cell" rowspan="<?php echo count($rows); ?>">
+                            <?php echo htmlspecialchars($category); ?>
+                          </th>
                         <?php endif; ?>
                         <td class="spec-subtitle"><strong><?php echo htmlspecialchars($rowData['field']); ?></strong></td>
-                        <td class="spec-description" style="<?php echo ($category === 'NETWORK' && $rowIndex === 0) ? 'position: relative;' : ''; ?>">
+                        <td class="spec-description" style="position: relative;">
                           <?php echo htmlspecialchars($rowData['description']); ?>
                           <?php if ($category === 'NETWORK' && $rowIndex === 0): ?>
-                            <button class="expand-btn" onclick="toggleExpandBtn(this)" style="position: absolute; right: 10px; top: 50%; transform: translateY(-50%); background: none; border: none; color: #666; font-size: 11px; cursor: pointer; text-transform: uppercase; font-weight: 500;">COLLAPSE ▲</button>
+                            <button class="expand-btn d-none d-lg-inline" onclick="toggleExpandBtn(this)" style="position: absolute; right: 10px; top: 50%; transform: translateY(-50%); background: none; border: none; color: #666; font-size: 11px; cursor: pointer; text-transform: uppercase; font-weight: 500;">COLLAPSE ▲</button>
                           <?php endif; ?>
                         </td>
                       </tr>
@@ -1929,7 +1980,7 @@ $commentCount = getDeviceCommentCount($pdo, $device_id);
 
   <!-- Pictures Modal -->
   <div class="modal fade" id="picturesModal" tabindex="-1" aria-labelledby="picturesModalLabel" aria-hidden="true">
-    <div class="modal-dialog modal-lg modal-dialog-centered">
+    <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable" style="max-width: 90vw; margin: auto;">
       <div class="modal-content" style="background-color: #EFEBE9; border: 2px solid #8D6E63;">
         <div class="modal-header" style="border-bottom: 1px solid #8D6E63; background-color: #D7CCC8;">
           <h5 class="modal-title" id="picturesModalLabel" style="font-family:system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue'; color: #5D4037;">
@@ -1954,13 +2005,13 @@ $commentCount = getDeviceCommentCount($pdo, $device_id);
               <div class="carousel-inner">
                 <?php foreach ($deviceImages as $index => $image): ?>
                   <div class="carousel-item <?php if ($index === 0): ?>active<?php endif; ?>">
-                    <div class="d-flex justify-content-center" style="background-color: #F5F5F5; min-height: 400px;">
+                    <div class="d-flex justify-content-center align-items-center" style="background-color: #F5F5F5; min-height: 300px; max-height: 80vh;">
                       <!-- Debug output -->
                       <div style="display: none;">Image path: <?php echo htmlspecialchars($image); ?></div>
 
                       <img src="<?php echo htmlspecialchars($image); ?>"
                         class="d-block img-fluid"
-                        style="max-height: 500px; max-width: 100%; object-fit: contain; padding: 20px;"
+                        style="max-height: 70vh; max-width: 100%; height: auto; object-fit: contain; padding: 20px;"
                         alt="<?php echo htmlspecialchars(($device['brand_name'] ?? '') . ' ' . ($device['name'] ?? 'Device')); ?> - Image <?php echo $index + 1; ?>"
                         onerror="this.style.display='none';">
                     </div>
