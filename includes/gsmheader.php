@@ -9,24 +9,24 @@
         </button>
 
         <a class="navbar-brand d-flex align-items-center" href="#">
-            <img src="imges/download.png" alt="DevicesArena Logo" />
+            <img src="imges/logo-wide.png" alt="DevicesArena Logo" />
         </a>
 
         <div class="controvecy mb-2">
             <div class="icon-container">
-                <button type="button" class="btn border-right" data-bs-toggle="tooltip" data-bs-placement="left" title="YouTube" aria-label="YouTube">
+                <button type="button" class="btn border-right" data-bs-toggle="tooltip" data-bs-placement="left" title="YouTube" aria-label="YouTube" onclick="window.open('https://www.youtube.com/', '_blank')">
                     <i class="fab fa-youtube" style="font-size:24px;color:#FF0000"></i>
                 </button>
-                <button type="button" class="btn" data-bs-toggle="tooltip" data-bs-placement="left" title="Instagram" aria-label="Instagram">
+                <button type="button" class="btn" data-bs-toggle="tooltip" data-bs-placement="left" title="Instagram" aria-label="Instagram" onclick="window.open('https://www.instagram.com/devicesarenaofficial', '_blank')">
                     <i class="fab fa-instagram" style="font-size:20px;color:#E4405F"></i>
                 </button>
-                <button type="button" class="btn" data-bs-toggle="tooltip" data-bs-placement="left" title="Facebook" aria-label="Facebook">
+                <button type="button" class="btn" data-bs-toggle="tooltip" data-bs-placement="left" title="Facebook" aria-label="Facebook" onclick="window.open('https://www.facebook.com/', '_blank')">
                     <i class="fab fa-facebook-f" style="font-size:20px;color:#1877F2"></i>
                 </button>
-                <button type="button" class="btn" data-bs-toggle="tooltip" data-bs-placement="left" title="Twitter" aria-label="Twitter">
+                <button type="button" class="btn" data-bs-toggle="tooltip" data-bs-placement="left" title="Twitter" aria-label="Twitter" onclick="window.open('https://twitter.com/', '_blank')">
                     <i class="fab fa-twitter" style="font-size:20px;color:#1DA1F2"></i>
                 </button>
-                <button type="button" class="btn" data-bs-toggle="tooltip" data-bs-placement="left" title="TikTok" aria-label="TikTok">
+                <button type="button" class="btn" data-bs-toggle="tooltip" data-bs-placement="left" title="TikTok" aria-label="TikTok" onclick="window.open('https://www.tiktok.com/', '_blank')">
                     <i class="fab fa-tiktok" style="font-size:20px;color:#ffffff"></i>
                 </button>
             </div>
@@ -76,11 +76,11 @@
 <!-- Mobile Collapse of Gsmarecn -->
 <div class="collapse mobile-menu d-lg-none" id="mobileMenu">
     <div class="menu-icons">
-        <i class="fab fa-youtube"></i>
-        <i class="fab fa-instagram"></i>
-        <i class="fab fa-facebook-f"></i>
-        <i class="fab fa-twitter"></i>
-        <i class="fab fa-tiktok"></i>
+        <i class="fab fa-youtube" onclick="window.open('https://www.youtube.com/', '_blank')"></i>
+        <i class="fab fa-instagram" onclick="window.open('https://www.instagram.com/devicesarenaofficial/', '_blank')"></i>
+        <i class="fab fa-facebook-f" onclick="window.open('https://www.facebook.com/', '_blank')"></i>
+        <i class="fab fa-twitter" onclick="window.open('https://twitter.com/', '_blank')"></i>
+        <i class="fab fa-tiktok" onclick="window.open('https://www.tiktok.com/', '_blank')"></i>
     </div>
     <div class="column">
         <a href="index.php">Home</a>

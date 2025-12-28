@@ -1,0 +1,53 @@
+{
+  "name": "DevicesArena",
+  "short_name": "DevicesArena",
+  "description": "Explore the latest smartphones, detailed specifications, reviews, and comparisons on DevicesArena.",
+  "start_url": "/",
+  "scope": "/",
+  "display": "standalone",
+  "orientation": "portrait-primary",
+  "theme_color": "#8D6E63",
+  "background_color": "#EFEBE9",
+  "icons": [
+    {
+      "src": "imges/icon-32.png",
+      "sizes": "32x32",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "imges/icon-256.png",
+      "sizes": "256x256",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "imges/icon-256.png",
+      "sizes": "256x256",
+      "type": "image/png",
+      "purpose": "maskable"
+    }
+  ],
+  "screenshots": [
+    {
+      "src": "imges/icon-256.png",
+      "sizes": "256x256",
+      "type": "image/png"
+    }
+  ],
+  "categories": ["productivity", "utilities"],
+  "shortcuts": [
+    {
+      "name": "Phone Finder",
+      "short_name": "Find Phones",
+      "description": "Find the perfect smartphone for you",
+      "url": "/?shortcut=phonefinder",
+      "icons": [
+        {
+          "src": "imges/icon-256.png",
+          "sizes": "256x256"
+        }
+      ]
+    }
+  ]
+}

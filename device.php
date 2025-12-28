@@ -964,6 +964,46 @@ $commentCount = getDeviceCommentCount($pdo, $device_id);
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title><?php echo htmlspecialchars(($device['brand_name'] ?? '') . ' ' . ($device['name'] ?? 'Device')); ?> - Specifications & Reviews | DevicesArena</title>
+
+    <!-- Favicon & Icons -->
+    <link rel="icon" type="image/png" sizes="32x32" href="imges/icon-32.png">
+    <link rel="icon" type="image/png" sizes="256x256" href="imges/icon-256.png">
+    <link rel="shortcut icon" href="imges/icon-32.png">
+
+    <!-- Apple Touch Icon (iOS Home Screen) -->
+    <link rel="apple-touch-icon" href="imges/icon-256.png">
+    <link rel="apple-touch-icon" sizes="256x256" href="imges/icon-256.png">
+
+    <!-- Android Chrome Icons -->
+    <link rel="icon" type="image/png" sizes="192x192" href="imges/icon-256.png">
+    <link rel="icon" type="image/png" sizes="512x512" href="imges/icon-256.png">
+
+    <!-- Theme Color (Browser Chrome & Address Bar) -->
+    <meta name="theme-color" content="#8D6E63">
+
+    <!-- Windows Tile Icon -->
+    <meta name="msapplication-TileColor" content="#8D6E63">
+    <meta name="msapplication-TileImage" content="imges/icon-256.png">
+
+    <!-- Open Graph Meta Tags (Social Media Sharing) -->
+    <meta property="og:site_name" content="DevicesArena">
+    <meta property="og:title" content="DevicesArena - Smartphone Reviews & Comparisons">
+    <meta property="og:description" content="Explore the latest smartphones, detailed specifications, reviews, and comparisons on DevicesArena.">
+    <meta property="og:image" content="imges/icon-256.png">
+    <meta property="og:image:type" content="image/png">
+    <meta property="og:image:width" content="256">
+    <meta property="og:image:height" content="256">
+    <meta property="og:type" content="website">
+
+    <!-- Twitter Card Meta Tags -->
+    <meta name="twitter:card" content="summary">
+    <meta name="twitter:title" content="DevicesArena">
+    <meta name="twitter:description" content="Explore the latest smartphones, detailed specifications, reviews, and comparisons.">
+    <meta name="twitter:image" content="imges/icon-256.png">
+
+    <!-- PWA Manifest -->
+    <link rel="manifest" href="manifest.json">
+
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/css/bootstrap.min.css" rel="stylesheet"
     integrity="sha384-rbsA2VBKQhggwzxH7pPCaAqO46MgnOM80zW1RWuH61DGLwZJEdK2Kadq2F9CUG65" crossorigin="anonymous">
   <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>

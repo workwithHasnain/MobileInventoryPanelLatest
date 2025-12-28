@@ -20,7 +20,7 @@
         </div>
         <div class="row align-items-center">
             <div class="col-md-2 m-auto col-4 d-flex justify-content-center align-items-center bg-white rounded" style="width: max-content;">
-                <img src="https://fdn2.gsmarena.com/w/css/logo-gsmarena-com.png" alt="">
+                <img src="imges/logo-wide.png" alt="devices arena logo for footer">
             </div>
             <div class="col-10 nav-wrap m-auto text-center ">
                 <div class="nav-container">
@@ -30,11 +30,11 @@
                     <a href="phonefinder.php" style="color: white;">Phone Finder</a>
                     <a href="featured.php" style="color: white;">Featured</a>
                     <br>
-                    <a href="#" style="color: white;"> <i class="fa-brands fa-youtube fa-sm"></i> YouTube</a>
-                    <a href="#" style="color: white;"> <i class="fa-brands fa-instagram fa-sm"></i> Instagram</a>
-                    <a href="#" style="color: white;"> <i class="fa-brands fa-tiktok fa-sm"></i>TikTok</a>
-                    <a href="#" style="color: white;"> <i class="fa-brands fa-facebook-f fa-sm"></i> Facebook</a>
-                    <a href="#" style="color: white;"> <i class="fa-brands fa-twitter fa-sm"></i>Twitter</a>
+                    <a href="https://www.youtube.com/" style="color: white;"> <i class="fa-brands fa-youtube fa-sm"></i> YouTube</a>
+                    <a href="https://www.instagram.com/devicesarenaofficial/" style="color: white;"> <i class="fa-brands fa-instagram fa-sm"></i> Instagram</a>
+                    <a href="https://www.tiktok.com/" style="color: white;"> <i class="fa-brands fa-tiktok fa-sm"></i>TikTok</a>
+                    <a href="https://www.facebook.com/" style="color: white;"> <i class="fa-brands fa-facebook-f fa-sm"></i> Facebook</a>
+                    <a href="https://www.twitter.com/" style="color: white;"> <i class="fa-brands fa-twitter fa-sm"></i>Twitter</a>
                     <br>
                     <a href="#" style="color: white;">© 2000-2025 DevicesArena.com</a>
                 </div>
