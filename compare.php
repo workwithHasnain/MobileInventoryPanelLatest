@@ -1443,13 +1443,6 @@ function formatDeviceSpecsStructured($device)
                 }
             </style>
             <table class="comparison-table">
-                <thead>
-                    <tr>
-                        <th style="font-weight: 700;"><?php echo $phone1 ? getPhoneName($phone1) : 'Select Phone 1'; ?></th>
-                        <th style="font-weight: 700;"><?php echo $phone2 ? getPhoneName($phone2) : 'Select Phone 2'; ?></th>
-                        <th style="font-weight: 700;"><?php echo $phone3 ? getPhoneName($phone3) : 'Select Phone 3'; ?></th>
-                    </tr>
-                </thead>
                 <tbody>
                     <?php
                     // Build spec arrays from structured JSON for each phone (if phone selected)
