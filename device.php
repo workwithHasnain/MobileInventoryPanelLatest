@@ -1736,7 +1736,16 @@ $commentCount = getDeviceCommentCount($pdo, $device_id);
                   <?php if (is_array($rows) && !empty($rows)): ?>
                     <!-- Mobile: Section title as separate row -->
                     <tr class="d-lg-none">
-                      <th class="spec-label" colspan="2"><?php echo htmlspecialchars($category); ?></th>
+                      <th class="spec-label">
+                        <?php echo htmlspecialchars($category); ?>
+                      </th>
+                      <?php if ($category === 'NETWORK'): ?>
+                        <th style="text-align: right; padding: 0.75rem;">
+                          <button class="expand-btn" onclick="toggleExpandBtn(this)" style="background: none; border: none; color: #666; font-size: 11px; cursor: pointer; text-transform: uppercase; font-weight: 500;">COLLAPSE ▲</button>
+                        </th>
+                      <?php else: ?>
+                        <th></th>
+                      <?php endif; ?>
                     </tr>
 
                     <!-- Desktop + Mobile spec rows -->
@@ -1744,13 +1753,15 @@ $commentCount = getDeviceCommentCount($pdo, $device_id);
                       <tr <?php echo ($category === 'NETWORK' && $rowIndex > 0) ? 'class="network-row"' : ''; ?>>
                         <!-- Desktop only: rowspan on first row -->
                         <?php if ($rowIndex === 0): ?>
-                          <th class="spec-label d-none d-lg-table-cell" rowspan="<?php echo count($rows); ?>"><?php echo htmlspecialchars($category); ?></th>
+                          <th class="spec-label d-none d-lg-table-cell" rowspan="<?php echo count($rows); ?>">
+                            <?php echo htmlspecialchars($category); ?>
+                          </th>
                         <?php endif; ?>
                         <td class="spec-subtitle"><strong><?php echo htmlspecialchars($rowData['field']); ?></strong></td>
-                        <td class="spec-description" style="<?php echo ($category === 'NETWORK' && $rowIndex === 0) ? 'position: relative;' : ''; ?>">
+                        <td class="spec-description" style="position: relative;">
                           <?php echo htmlspecialchars($rowData['description']); ?>
                           <?php if ($category === 'NETWORK' && $rowIndex === 0): ?>
-                            <button class="expand-btn" onclick="toggleExpandBtn(this)" style="position: absolute; right: 10px; top: 50%; transform: translateY(-50%); background: none; border: none; color: #666; font-size: 11px; cursor: pointer; text-transform: uppercase; font-weight: 500;">COLLAPSE ▲</button>
+                            <button class="expand-btn d-none d-lg-inline" onclick="toggleExpandBtn(this)" style="position: absolute; right: 10px; top: 50%; transform: translateY(-50%); background: none; border: none; color: #666; font-size: 11px; cursor: pointer; text-transform: uppercase; font-weight: 500;">COLLAPSE ▲</button>
                           <?php endif; ?>
                         </td>
                       </tr>
@@ -1929,7 +1940,7 @@ $commentCount = getDeviceCommentCount($pdo, $device_id);
 
   <!-- Pictures Modal -->
   <div class="modal fade" id="picturesModal" tabindex="-1" aria-labelledby="picturesModalLabel" aria-hidden="true">
-    <div class="modal-dialog modal-lg modal-dialog-centered">
+    <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable" style="max-width: 90vw; margin: auto;">
       <div class="modal-content" style="background-color: #EFEBE9; border: 2px solid #8D6E63;">
         <div class="modal-header" style="border-bottom: 1px solid #8D6E63; background-color: #D7CCC8;">
           <h5 class="modal-title" id="picturesModalLabel" style="font-family:system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue'; color: #5D4037;">
@@ -1954,13 +1965,13 @@ $commentCount = getDeviceCommentCount($pdo, $device_id);
               <div class="carousel-inner">
                 <?php foreach ($deviceImages as $index => $image): ?>
                   <div class="carousel-item <?php if ($index === 0): ?>active<?php endif; ?>">
-                    <div class="d-flex justify-content-center" style="background-color: #F5F5F5; min-height: 400px;">
+                    <div class="d-flex justify-content-center align-items-center" style="background-color: #F5F5F5; min-height: 300px; max-height: 80vh;">
                       <!-- Debug output -->
                       <div style="display: none;">Image path: <?php echo htmlspecialchars($image); ?></div>
 
                       <img src="<?php echo htmlspecialchars($image); ?>"
                         class="d-block img-fluid"
-                        style="max-height: 500px; max-width: 100%; object-fit: contain; padding: 20px;"
+                        style="max-height: 70vh; max-width: 100%; height: auto; object-fit: contain; padding: 20px;"
                         alt="<?php echo htmlspecialchars(($device['brand_name'] ?? '') . ' ' . ($device['name'] ?? 'Device')); ?> - Image <?php echo $index + 1; ?>"
                         onerror="this.style.display='none';">
                     </div>
