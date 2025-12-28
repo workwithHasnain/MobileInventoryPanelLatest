@@ -166,14 +166,14 @@ span {
     transition: background-color 0.3s ease, transform 0.3s ease;
 }
 
-.btn:hover i {
+/* .btn:hover i {
     background-color: #D50000;
     transform: translateY(3px);
     padding: 3px 3px 3px 3px;
     padding-top: 17px;
     width: 32px;
     height: 30px;
-}
+} */
 
 .central {
     max-width: 340px;
