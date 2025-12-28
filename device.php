@@ -1544,7 +1544,7 @@ $commentCount = getDeviceCommentCount($pdo, $device_id);
       font-size: 15px;
       font-weight: 700;
       width: 100%;
-      /* margin-bottom: 10px; */
+      margin-bottom: 10px;
     }
 
     /* BOTTOM ROW */
