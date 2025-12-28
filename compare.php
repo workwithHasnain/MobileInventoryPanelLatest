@@ -1055,14 +1055,29 @@ function formatDeviceSpecsStructured($device)
         }
 
         .select2-container .select2-selection--single .select2-selection__rendered {
-            padding: 6px 12px;
+            padding: 6px 42px 6px 12px;
             line-height: 1.5;
             font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue';
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
         }
 
         .select2-container--default .select2-selection--single .select2-selection__arrow {
-            height: 100%;
-            right: 8px;
+            position: absolute;
+            top: 50%;
+            transform: translateY(-50%);
+            right: 12px;
+            width: 20px;
+            height: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .select2-container--default .select2-selection--single .select2-selection__arrow b {
+            top: 50% !important;
+            transform: translateY(-50%) !important;
         }
 
         /* Dropdown styling */
@@ -1273,7 +1288,7 @@ function formatDeviceSpecsStructured($device)
                     <?php else: ?>
                         <div class="phone-name">Select a device to compare</div>
                         <div class="d-flex">
-                            <img src="imges/phone-placeholder.png" alt="No phone selected">
+                            <i class="fas fa-mobile-alt" style="font-size: 120px; color: #ccc; display: flex; align-items: center; justify-content: center; width: 100%; height: 220px;"></i>
                             <div class="buttons">
                                 <button disabled>REVIEW</button>
                                 <button disabled>SPECIFICATIONS</button>
@@ -1311,7 +1326,7 @@ function formatDeviceSpecsStructured($device)
                     <?php else: ?>
                         <div class="phone-name">Select a device to compare</div>
                         <div class="d-flex">
-                            <img src="imges/phone-placeholder.png" alt="No phone selected">
+                            <i class="fas fa-mobile-alt" style="font-size: 120px; color: #ccc; display: flex; align-items: center; justify-content: center; width: 100%; height: 220px;"></i>
                             <div class="buttons">
                                 <button disabled>REVIEW</button>
                                 <button disabled>SPECIFICATIONS</button>
@@ -1351,7 +1366,7 @@ function formatDeviceSpecsStructured($device)
                     <?php else: ?>
                         <div class="phone-name">Select a device to compare</div>
                         <div class="d-flex">
-                            <img src="imges/phone-placeholder.png" alt="No phone selected">
+                            <i class="fas fa-mobile-alt" style="font-size: 120px; color: #ccc; display: flex; align-items: center; justify-content: center; width: 100%; height: 220px;"></i>
                             <div class="buttons">
                                 <button disabled>REVIEW</button>
                                 <button disabled>SPECIFICATIONS</button>
