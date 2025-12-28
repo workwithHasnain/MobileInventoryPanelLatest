@@ -143,13 +143,26 @@ try {
 $latestDevices = getAllPhones();
 $latestDevices = array_slice(array_reverse($latestDevices), 0, 9); // Get latest 9 devices
 
-// Get only brands that have devices for the brands table
+// Get top 36 brands ordered by device count (highest first) then alphabetically - for sidebar
 $brands_stmt = $pdo->prepare("
-    SELECT * FROM brands
-    ORDER BY name ASC
+    SELECT b.*, COUNT(p.id) as device_count
+    FROM brands b
+    LEFT JOIN phones p ON b.id = p.brand_id
+    GROUP BY b.id, b.name, b.description, b.logo_url, b.website, b.created_at, b.updated_at
+    ORDER BY COUNT(p.id) DESC, b.name ASC
+    LIMIT 36
 ");
 $brands_stmt->execute();
 $brands = $brands_stmt->fetchAll();
+
+// Get all brands alphabetically ordered - for modal
+$all_brands_stmt = $pdo->prepare("
+    SELECT * FROM brands
+    ORDER BY name ASC
+");
+$all_brands_stmt->execute();
+$allBrandsModal = $all_brands_stmt->fetchAll();
+
 
 // Get device ID from URL
 $device_id = $_GET['id'] ?? '';
@@ -1399,14 +1412,14 @@ $commentCount = getDeviceCommentCount($pdo, $device_id);
       <!-- BOTTOM SECTION -->
       <div class="bottom-section">
         <?php if ($review_post): ?>
-        <button class="review-btn" onclick="window.location.href='post.php?slug=<?php echo urlencode($review_post['slug']); ?>'">
-          REVIEW
-        </button>
+          <button class="review-btn" onclick="window.location.href='post.php?slug=<?php echo urlencode($review_post['slug']); ?>'">
+            REVIEW
+          </button>
         <?php else: ?>
           <button class="review-btn" disabled style="opacity: 0.5; cursor: default;" title="No review available">
-          REVIEW
-        </button>
-          <?php endif; ?>
+            REVIEW
+          </button>
+        <?php endif; ?>
         <button class="review-btn" onclick="window.location.href='compare.php?phone1=<?php echo $device['id']; ?>'">
           COMPARE
         </button>
@@ -1873,8 +1886,8 @@ $commentCount = getDeviceCommentCount($pdo, $device_id);
         </div>
         <div class="modal-body">
           <div class="row">
-            <?php if (!empty($brands)): ?>
-              <?php foreach ($brands as $brand): ?>
+            <?php if (!empty($allBrandsModal)): ?>
+              <?php foreach ($allBrandsModal as $brand): ?>
                 <div class="col-lg-4 col-md-6 col-sm-6 mb-3">
                   <button class="brand-cell-modal btn w-100 py-2 px-3" style="background-color: #fff; border: 1px solid #c5b6b0; color: #5D4037; font-weight: 500; transition: all 0.3s ease; cursor: pointer;" data-brand-id="<?php echo $brand['id']; ?>" onclick="selectBrandFromModal(<?php echo $brand['id']; ?>)">
                     <?php echo htmlspecialchars($brand['name']); ?>
@@ -2194,14 +2207,14 @@ $commentCount = getDeviceCommentCount($pdo, $device_id);
     // Show loading spinner
     container.innerHTML = '<div class="text-center py-5"><i class="fas fa-spinner fa-spin fa-2x text-muted"></i></div>';
 
-    // Get current device's brand from page (you can also pass it as parameter)
-    const currentBrandId = <?php echo json_encode($device['brand_id'] ?? null); ?>;
+    // Get current device ID
+    const currentDeviceId = <?php echo json_encode($device['id'] ?? null); ?>;
 
-    if (!currentBrandId) {
+    if (!currentDeviceId) {
       container.innerHTML = `
         <div class="text-center py-5">
           <i class="fas fa-mobile-alt fa-3x text-muted mb-3"></i>
-          <h6 class="text-muted">No brand information available</h6>
+          <h6 class="text-muted">Device information unavailable</h6>
         </div>
       `;
       const modal = new bootstrap.Modal(document.getElementById('relatedPhonesModal'));
@@ -2209,15 +2222,11 @@ $commentCount = getDeviceCommentCount($pdo, $device_id);
       return;
     }
 
-    // Fetch phones for same brand
-    fetch(`get_phones_by_brand.php?brand_id=${currentBrandId}`)
+    // Fetch related phones based on price bracket, year, and view count
+    fetch(`get_related_phones.php?device_id=${currentDeviceId}`)
       .then(response => response.json())
       .then(data => {
-        // Filter out current device
-        const currentDeviceId = <?php echo json_encode($device['id'] ?? null); ?>;
-        const relatedPhones = data.filter(phone => phone.id != currentDeviceId);
-
-        displayRelatedPhonesModal(relatedPhones);
+        displayRelatedPhonesModal(data);
       })
       .catch(error => {
         console.error('Error fetching related phones:', error);
