@@ -9,19 +9,25 @@
         </button>
 
         <a class="navbar-brand d-flex align-items-center" href="#">
-            <img src="imges/download.png" alt="GSMArena Logo" />
+            <img src="imges/download.png" alt="DevicesArena Logo" />
         </a>
 
         <div class="controvecy mb-2">
             <div class="icon-container">
-                <button type="button" class="btn border-right" data-bs-toggle="tooltip" data-bs-placement="left"
-                    title="YouTube">
-                    <img src="iccons/youtube-color-svgrepo-com.svg" alt="YouTube" width="30px">
+                <button type="button" class="btn border-right" data-bs-toggle="tooltip" data-bs-placement="left" title="YouTube" aria-label="YouTube">
+                    <i class="fab fa-youtube" style="font-size:24px;color:#FF0000"></i>
                 </button>
-
-                <button type="button" class="btn" data-bs-toggle="tooltip" data-bs-placement="left"
-                    title="Instagram">
-                    <img src="iccons/instagram-color-svgrepo-com.svg" alt="Instagram" width="22px">
+                <button type="button" class="btn" data-bs-toggle="tooltip" data-bs-placement="left" title="Instagram" aria-label="Instagram">
+                    <i class="fab fa-instagram" style="font-size:20px;color:#E4405F"></i>
+                </button>
+                <button type="button" class="btn" data-bs-toggle="tooltip" data-bs-placement="left" title="Facebook" aria-label="Facebook">
+                    <i class="fab fa-facebook-f" style="font-size:20px;color:#1877F2"></i>
+                </button>
+                <button type="button" class="btn" data-bs-toggle="tooltip" data-bs-placement="left" title="Twitter" aria-label="Twitter">
+                    <i class="fab fa-twitter" style="font-size:20px;color:#1DA1F2"></i>
+                </button>
+                <button type="button" class="btn" data-bs-toggle="tooltip" data-bs-placement="left" title="TikTok" aria-label="TikTok">
+                    <i class="fab fa-tiktok" style="font-size:20px;color:#ffffff"></i>
                 </button>
             </div>
         </div>
@@ -43,7 +49,7 @@
             alt="">
     </button>
     <a class="navbar-brand d-flex align-items-center" href="#">
-        <a class="logo text-white " href="#">GSMArena</a>
+        <a class="logo text-white " href="#">DevicesArena</a>
     </a>
 </nav>
 
@@ -70,19 +76,19 @@
 <!-- Mobile Collapse of Gsmarecn -->
 <div class="collapse mobile-menu d-lg-none" id="mobileMenu">
     <div class="menu-icons">
-        <i class="fas fa-home"></i>
-        <i class="fab fa-facebook-f"></i>
+        <i class="fab fa-youtube"></i>
         <i class="fab fa-instagram"></i>
+        <i class="fab fa-facebook-f"></i>
+        <i class="fab fa-twitter"></i>
         <i class="fab fa-tiktok"></i>
-        <i class="fas fa-share-alt"></i>
     </div>
     <div class="column">
         <a href="index.php">Home</a>
         <a href="reviews.php">Reviews</a>
-        <a href="#">Videos</a>
         <a href="featured.php">Featured</a>
         <a href="phonefinder.php">Phone Finder</a>
         <a href="compare.php">Compare</a>
+        <a href="#">Videos</a>
         <a href="#">Contact Us</a>
     </div>
     <div class="brand-grid">
@@ -119,3 +125,18 @@
         </div>
     </div>
 </div>
+
+<script>
+    // Initialize Bootstrap collapse for mobile menu after DOM is loaded
+    document.addEventListener('DOMContentLoaded', function() {
+        var mobileMenuButton = document.querySelector('.mobile-navbar .navbar-toggler');
+        var mobileMenu = document.getElementById('mobileMenu');
+
+        if (mobileMenuButton && mobileMenu && typeof bootstrap !== 'undefined') {
+            // Manually initialize Bootstrap collapse
+            new bootstrap.Collapse(mobileMenu, {
+                toggle: false
+            });
+        }
+    });
+</script>

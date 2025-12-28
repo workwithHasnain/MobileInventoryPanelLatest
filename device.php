@@ -143,13 +143,26 @@ try {
 $latestDevices = getAllPhones();
 $latestDevices = array_slice(array_reverse($latestDevices), 0, 9); // Get latest 9 devices
 
-// Get only brands that have devices for the brands table
+// Get top 36 brands ordered by device count (highest first) then alphabetically - for sidebar
 $brands_stmt = $pdo->prepare("
-    SELECT * FROM brands
-    ORDER BY name ASC
+    SELECT b.*, COUNT(p.id) as device_count
+    FROM brands b
+    LEFT JOIN phones p ON b.id = p.brand_id
+    GROUP BY b.id, b.name, b.description, b.logo_url, b.website, b.created_at, b.updated_at
+    ORDER BY COUNT(p.id) DESC, b.name ASC
+    LIMIT 36
 ");
 $brands_stmt->execute();
 $brands = $brands_stmt->fetchAll();
+
+// Get all brands alphabetically ordered - for modal
+$all_brands_stmt = $pdo->prepare("
+    SELECT * FROM brands
+    ORDER BY name ASC
+");
+$all_brands_stmt->execute();
+$allBrandsModal = $all_brands_stmt->fetchAll();
+
 
 // Get device ID from URL
 $device_id = $_GET['id'] ?? '';
@@ -950,7 +963,7 @@ $commentCount = getDeviceCommentCount($pdo, $device_id);
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title><?php echo htmlspecialchars(($device['brand_name'] ?? '') . ' ' . ($device['name'] ?? 'Device')); ?> - Specifications & Reviews | GSMArena</title>
+  <title><?php echo htmlspecialchars(($device['brand_name'] ?? '') . ' ' . ($device['name'] ?? 'Device')); ?> - Specifications & Reviews | DevicesArena</title>
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/css/bootstrap.min.css" rel="stylesheet"
     integrity="sha384-rbsA2VBKQhggwzxH7pPCaAqO46MgnOM80zW1RWuH61DGLwZJEdK2Kadq2F9CUG65" crossorigin="anonymous">
   <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
@@ -1131,6 +1144,14 @@ $commentCount = getDeviceCommentCount($pdo, $device_id);
         height: 100%;
         background: transparent;
         z-index: 1;
+      }
+
+      .spec-subtitle {
+        font-size: 10px;
+      }
+
+      .spec-description {
+        font-size: 09px;
       }
     }
 
@@ -1330,6 +1351,10 @@ $commentCount = getDeviceCommentCount($pdo, $device_id);
     .pad {
       font-weight: 700;
     }
+
+    .spec-description {
+      font-size: 12px;
+    }
   </style>
   <div class="d-lg-none d-block">
 
@@ -1385,13 +1410,29 @@ $commentCount = getDeviceCommentCount($pdo, $device_id);
       </div>
 
       <!-- BOTTOM SECTION -->
-      <!-- <div class="bottom-section">
-
-        <button class="review-btn">
-          READ OUR REVIEW
+      <div class="bottom-section">
+        <?php if ($review_post): ?>
+          <button class="review-btn" onclick="window.location.href='post.php?slug=<?php echo urlencode($review_post['slug']); ?>'">
+            REVIEW
+          </button>
+        <?php else: ?>
+          <button class="review-btn" disabled style="opacity: 0.5; cursor: default;" title="No review available">
+            REVIEW
+          </button>
+        <?php endif; ?>
+        <button class="review-btn" onclick="window.location.href='compare.php?phone1=<?php echo $device['id']; ?>'">
+          COMPARE
         </button>
-
-        <div style="display: flex; gap: 22px;">
+        <button class="review-btn" onclick="document.getElementById('comments').scrollIntoView({behavior:'smooth', block:'start'});">
+          OPINIONS
+        </button>
+        <button class="review-btn" onclick="showPicturesModal()">
+          PICTURES
+        </button>
+        <button class="review-btn" onclick="showRelatedPhonesModal()">
+          RELATED PHONES
+        </button>
+        <!-- <div style="display: flex; gap: 22px;">
 
           <div class="stat-box">
             <img src="/imges/stat-down.png" alt="">
@@ -1409,9 +1450,9 @@ $commentCount = getDeviceCommentCount($pdo, $device_id);
             </p>
           </div>
 
-        </div>
+        </div> -->
 
-      </div> -->
+      </div>
 
     </div>
 
@@ -1495,21 +1536,23 @@ $commentCount = getDeviceCommentCount($pdo, $device_id);
 
     /* REVIEW BUTTON */
     .review-btn {
-      background: #d50000;
+      background: #bbb;
       border: none;
       color: #fff;
       padding: 10px 22px;
       border-radius: 5px;
       font-size: 15px;
       font-weight: 700;
+      width: 100%;
+      /* margin-bottom: 10px; */
     }
 
     /* BOTTOM ROW */
     .bottom-section {
       margin-top: 16px;
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
+      /* display: flex; */
+      /* justify-content: space-between; */
+      /* align-items: center; */
     }
 
     /* STATS */
@@ -1707,7 +1750,7 @@ $commentCount = getDeviceCommentCount($pdo, $device_id);
                         <td class="spec-description" style="<?php echo ($category === 'NETWORK' && $rowIndex === 0) ? 'position: relative;' : ''; ?>">
                           <?php echo htmlspecialchars($rowData['description']); ?>
                           <?php if ($category === 'NETWORK' && $rowIndex === 0): ?>
-                            <button class="expand-btn" onclick="toggleExpandBtn(this)" style="position: absolute; right: 10px; top: 50%; transform: translateY(-50%); background: none; border: none; color: #666; font-size: 11px; cursor: pointer; text-transform: uppercase; font-weight: 500;">EXPAND ▼</button>
+                            <button class="expand-btn" onclick="toggleExpandBtn(this)" style="position: absolute; right: 10px; top: 50%; transform: translateY(-50%); background: none; border: none; color: #666; font-size: 11px; cursor: pointer; text-transform: uppercase; font-weight: 500;">COLLAPSE ▲</button>
                           <?php endif; ?>
                         </td>
                       </tr>
@@ -1743,6 +1786,7 @@ $commentCount = getDeviceCommentCount($pdo, $device_id);
             <button class="pad" onclick="window.location.href='compare.php?phone1=<?php echo $device['id']; ?>'">COMPARE</button>
             <button class="pad" onclick="document.getElementById('comments').scrollIntoView({behavior:'smooth', block:'start'});">OPINIONS</button>
             <button class="pad" onclick="showPicturesModal()">PICTURES</button>
+            <button class="pad" onclick="showRelatedPhonesModal()">RELATED PHONES</button>
           </div>
           <div class="comments" id="comments">
             <h5 class="border-bottom reader py-3 mx-2"><?php echo htmlspecialchars(($device['brand_name'] ?? '') . ' ' . ($device['name'] ?? 'Device')); ?> - user opinions and reviews</h5>
@@ -1842,8 +1886,8 @@ $commentCount = getDeviceCommentCount($pdo, $device_id);
         </div>
         <div class="modal-body">
           <div class="row">
-            <?php if (!empty($brands)): ?>
-              <?php foreach ($brands as $brand): ?>
+            <?php if (!empty($allBrandsModal)): ?>
+              <?php foreach ($allBrandsModal as $brand): ?>
                 <div class="col-lg-4 col-md-6 col-sm-6 mb-3">
                   <button class="brand-cell-modal btn w-100 py-2 px-3" style="background-color: #fff; border: 1px solid #c5b6b0; color: #5D4037; font-weight: 500; transition: all 0.3s ease; cursor: pointer;" data-brand-id="<?php echo $brand['id']; ?>" onclick="selectBrandFromModal(<?php echo $brand['id']; ?>)">
                     <?php echo htmlspecialchars($brand['name']); ?>
@@ -1964,6 +2008,25 @@ $commentCount = getDeviceCommentCount($pdo, $device_id);
               <p class="text-muted small">Pictures will be added soon</p>
             </div>
           <?php endif; ?>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Related Phones Modal -->
+  <div class="modal fade" id="relatedPhonesModal" tabindex="-1" aria-labelledby="relatedPhonesModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg modal-dialog-centered modal-dialog-scrollable">
+      <div class="modal-content" style="background-color: #EFEBE9; border: 2px solid #8D6E63;">
+        <div class="modal-header" style="border-bottom: 1px solid #8D6E63; background-color: #D7CCC8;">
+          <h5 class="modal-title" id="relatedPhonesModalLabel" style="font-family:system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue'; color: #5D4037;">
+            <i class="fas fa-mobile-alt me-2"></i>Related Phones
+          </h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <div class="modal-body" id="relatedPhonesModalBody">
+          <div class="text-center py-5">
+            <i class="fas fa-spinner fa-spin fa-2x text-muted"></i>
+          </div>
         </div>
       </div>
     </div>
@@ -2135,6 +2198,80 @@ $commentCount = getDeviceCommentCount($pdo, $device_id);
   // Navigate to device page
   function goToDevice(deviceId) {
     window.location.href = `device.php?id=${deviceId}`;
+  }
+
+  // Show related phones modal
+  function showRelatedPhonesModal() {
+    const container = document.getElementById('relatedPhonesModalBody');
+
+    // Show loading spinner
+    container.innerHTML = '<div class="text-center py-5"><i class="fas fa-spinner fa-spin fa-2x text-muted"></i></div>';
+
+    // Get current device ID
+    const currentDeviceId = <?php echo json_encode($device['id'] ?? null); ?>;
+
+    if (!currentDeviceId) {
+      container.innerHTML = `
+        <div class="text-center py-5">
+          <i class="fas fa-mobile-alt fa-3x text-muted mb-3"></i>
+          <h6 class="text-muted">Device information unavailable</h6>
+        </div>
+      `;
+      const modal = new bootstrap.Modal(document.getElementById('relatedPhonesModal'));
+      modal.show();
+      return;
+    }
+
+    // Fetch related phones based on price bracket, year, and view count
+    fetch(`get_related_phones.php?device_id=${currentDeviceId}`)
+      .then(response => response.json())
+      .then(data => {
+        displayRelatedPhonesModal(data);
+      })
+      .catch(error => {
+        console.error('Error fetching related phones:', error);
+        container.innerHTML = `
+          <div class="text-center py-5">
+            <i class="fas fa-exclamation-triangle fa-3x text-muted mb-3"></i>
+            <h6 class="text-muted">Failed to load related phones</h6>
+          </div>
+        `;
+        const modal = new bootstrap.Modal(document.getElementById('relatedPhonesModal'));
+        modal.show();
+      });
+  }
+
+  // Display related phones in modal
+  function displayRelatedPhonesModal(phones) {
+    const container = document.getElementById('relatedPhonesModalBody');
+
+    if (phones && phones.length > 0) {
+      let html = '<div class="row">';
+      phones.forEach(phone => {
+        const phoneImage = phone.image ? `<img src="${phone.image}" alt="${phone.name}" style="width: 100%; height: 120px; object-fit: contain; margin-bottom: 8px;" onerror="this.style.display='none';">` : '';
+        html += `
+          <div class="col-lg-4 col-md-6 col-sm-6 mb-3">
+            <button class="device-cell-modal btn w-100 p-0" style="background-color: #fff; border: 1px solid #c5b6b0; color: #5D4037; font-weight: 500; transition: all 0.3s ease; cursor: pointer; display: flex; flex-direction: column; align-items: center; overflow: hidden;" onclick="goToDevice(${phone.id})">
+              ${phoneImage}
+              <span style="padding: 8px 10px; width: 100%; text-align: center; font-size: 0.95rem;">${phone.name}</span>
+            </button>
+          </div>
+        `;
+      });
+      html += '</div>';
+      container.innerHTML = html;
+    } else {
+      container.innerHTML = `
+        <div class="text-center py-5">
+          <i class="fas fa-mobile-alt fa-3x text-muted mb-3"></i>
+          <h6 class="text-muted">No related phones available for this device at this moment, please come back later</h6>
+        </div>
+      `;
+    }
+
+    // Show modal
+    const modal = new bootstrap.Modal(document.getElementById('relatedPhonesModal'));
+    modal.show();
   }
 
   // Show post details in modal
@@ -2365,12 +2502,12 @@ $commentCount = getDeviceCommentCount($pdo, $device_id);
     const networkLabel = document.querySelector('.spec-label[rowspan]');
     const originalRowspan = networkRows.length + 1; // +1 for the first row
 
-    if (btn.textContent.includes('EXPAND')) {
-      btn.textContent = 'COLLAPSE ▲';
+    if (btn.textContent.includes('COLLAPSE')) {
+      btn.textContent = 'EXPAND ▼';
       networkRows.forEach(row => row.style.display = 'none');
       if (networkLabel) networkLabel.setAttribute('rowspan', '1');
     } else {
-      btn.textContent = 'EXPAND ▼';
+      btn.textContent = 'COLLAPSE ▲';
       networkRows.forEach(row => row.style.display = '');
       if (networkLabel) networkLabel.setAttribute('rowspan', originalRowspan);
     }

@@ -80,11 +80,24 @@ $latestDevices = array_slice(array_reverse($latestDevices), 0, 9); // Get latest
 
 // Get only brands that have devices for the brands table
 $brands_stmt = $pdo->prepare("
-    SELECT * FROM brands
-    ORDER BY name ASC
+    SELECT b.*, COUNT(p.id) as device_count
+    FROM brands b
+    LEFT JOIN phones p ON b.id = p.brand_id
+    GROUP BY b.id, b.name, b.description, b.logo_url, b.website, b.created_at, b.updated_at
+    ORDER BY COUNT(p.id) DESC, b.name ASC
+    LIMIT 36
 ");
 $brands_stmt->execute();
 $brands = $brands_stmt->fetchAll();
+
+// Get all brands alphabetically ordered - for modal
+$all_brands_stmt = $pdo->prepare("
+    SELECT * FROM brands
+    ORDER BY name ASC
+");
+$all_brands_stmt->execute();
+$allBrandsModal = $all_brands_stmt->fetchAll();
+
 
 // Get comments for posts
 function getPostComments($post_id)
@@ -870,7 +883,7 @@ function formatDeviceSpecsStructured($device)
 <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>GSMArena</title>
+    <title>DevicesArena</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/css/bootstrap.min.css" rel="stylesheet"
         integrity="sha384-rbsA2VBKQhggwzxH7pPCaAqO46MgnOM80zW1RWuH61DGLwZJEdK2Kadq2F9CUG65" crossorigin="anonymous">
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
@@ -977,6 +990,16 @@ function formatDeviceSpecsStructured($device)
             }
         }
 
+        /* Prevent body overflow when Select2 is open */
+        body.select2-dropdown-open {
+            overflow: hidden !important;
+        }
+
+        /* Prevent body overflow when Select2 is open */
+        body.select2-dropdown-open {
+            overflow: hidden !important;
+        }
+
         /* Select2 Custom Styling for Phone Comparison */
         .select2-container {
             width: 100% !important;
@@ -1045,6 +1068,7 @@ function formatDeviceSpecsStructured($device)
             word-wrap: break-word;
             white-space: normal;
             line-height: 1.4;
+            font-size: 10px;
         }
 
         /* Search box styling */
@@ -1534,7 +1558,12 @@ function formatDeviceSpecsStructured($device)
                             $val1 = $legacyFallback($section, $phone1);
                             $val2 = $legacyFallback($section, $phone2);
                             $val3 = $legacyFallback($section, $phone3);
-                            echo '<tr><td colspan="3" style="color:#f14d4d;font-size:16px;background:#f9f9f9;font-weight:700;">' . htmlspecialchars($section) . '</td></tr>';
+                            $headerCell = '<td colspan="3" style="color:#f14d4d;font-size:16px;background:#f9f9f9;font-weight:700;position:relative;">' . htmlspecialchars($section);
+                            if ($section === 'NETWORK') {
+                                $headerCell .= '<button class="compare-expand-btn" onclick="toggleCompareNetworkRows(this)" style="position:absolute;right:10px;top:50%;transform:translateY(-50%);background:none;border:none;color:#666;font-size:11px;cursor:pointer;text-transform:uppercase;font-weight:500;">COLLAPSE ▲</button>';
+                            }
+                            $headerCell .= '</td>';
+                            echo '<tr>' . $headerCell . '</tr>';
                             echo '<tr>';
                             echo '<td>' . ($val1 !== '' ? $val1 : 'N/A') . '</td>';
                             echo '<td>' . ($val2 !== '' ? $val2 : 'N/A') . '</td>';
@@ -1542,11 +1571,17 @@ function formatDeviceSpecsStructured($device)
                             echo '</tr>';
                         } else {
                             // Section header row
-                            echo '<tr><td colspan="3" style="color:#f14d4d;font-size:16px;background:#f9f9f9;font-weight:700;">' . htmlspecialchars($section) . '</td></tr>';
+                            $headerCell = '<td colspan="3" style="color:#f14d4d;font-size:16px;background:#f9f9f9;font-weight:700;position:relative;">' . htmlspecialchars($section);
+                            if ($section === 'NETWORK') {
+                                $headerCell .= '<button class="compare-expand-btn" onclick="toggleCompareNetworkRows(this)" style="position:absolute;right:10px;top:50%;transform:translateY(-50%);background:none;border:none;color:#666;font-size:11px;cursor:pointer;text-transform:uppercase;font-weight:500;">COLLAPSE ▲</button>';
+                            }
+                            $headerCell .= '</td>';
+                            echo '<tr>' . $headerCell . '</tr>';
 
                             // Render each field/description pair as a 2-column row per phone
                             for ($i = 0; $i < $maxRows; $i++) {
-                                echo '<tr>';
+                                $rowClass = ($section === 'NETWORK' && $i > 0) ? ' class="compare-network-row"' : '';
+                                echo '<tr' . $rowClass . '>';
 
                                 // Phone 1
                                 if (isset($rows1[$i])) {
@@ -1593,8 +1628,8 @@ function formatDeviceSpecsStructured($device)
                 </div>
                 <div class="modal-body">
                     <div class="row">
-                        <?php if (!empty($brands)): ?>
-                            <?php foreach ($brands as $brand): ?>
+                        <?php if (!empty($allBrandsModal)): ?>
+                            <?php foreach ($allBrandsModal as $brand): ?>
                                 <div class="col-lg-4 col-md-6 col-sm-6 mb-3">
                                     <button class="brand-cell-modal btn w-100 py-2 px-3" style="background-color: #fff; border: 1px solid #c5b6b0; color: #5D4037; font-weight: 500; transition: all 0.3s ease; cursor: pointer;" data-brand-id="<?php echo $brand['id']; ?>" onclick="selectBrandFromModal(<?php echo $brand['id']; ?>)">
                                         <?php echo htmlspecialchars($brand['name']); ?>
@@ -1684,6 +1719,7 @@ function formatDeviceSpecsStructured($device)
                             allowClear: false,
                             width: '100%',
                             dropdownAutoWidth: false,
+                            dropdownParent: $('body'),
                             templateResult: formatPhoneOption,
                             templateSelection: formatPhoneSelection,
                             matcher: function(params, data) {
@@ -1709,6 +1745,16 @@ function formatDeviceSpecsStructured($device)
                         $select.on('select2:select select2:clear', function(e) {
                             var phoneId = $(this).val() || '';
                             updateComparison(phoneNumber, phoneId);
+                        });
+
+                        // Add body class when dropdown opens to prevent overflow
+                        $select.on('select2:open', function(e) {
+                            $('body').addClass('select2-dropdown-open');
+                        });
+
+                        // Remove body class when dropdown closes
+                        $select.on('select2:close', function(e) {
+                            $('body').removeClass('select2-dropdown-open');
                         });
                     });
                 });
@@ -1906,6 +1952,19 @@ function formatDeviceSpecsStructured($device)
                 }
             }
         });
+
+        // Toggle expand/collapse for NETWORK section in comparison table
+        function toggleCompareNetworkRows(btn) {
+            const networkRows = document.querySelectorAll('.compare-network-row');
+
+            if (btn.textContent.includes('COLLAPSE')) {
+                btn.textContent = 'EXPAND \u25bc';
+                networkRows.forEach(row => row.style.display = 'none');
+            } else {
+                btn.textContent = 'COLLAPSE \u25b2';
+                networkRows.forEach(row => row.style.display = '');
+            }
+        }
     </script>
 </body>
 

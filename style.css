@@ -2532,10 +2532,14 @@ td {
         border: none;
     }
 
-    .table th,
+    .table th{
+        border: none;
+        /* padding: 4px 3px; */
+    }
     .table td {
         border: none;
         /* padding: 4px 3px; */
+        font-size: 10px;
     }
 
     .center-img {

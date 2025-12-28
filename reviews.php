@@ -51,8 +51,7 @@ if ($isTagFiltering) {
         (SELECT COUNT(*) FROM post_comments pc WHERE pc.post_id = p.id AND pc.status = 'approved') as comment_count
         FROM posts p 
         WHERE p.status ILIKE 'published'
-        ORDER BY p.created_at DESC 
-        LIMIT 6
+        ORDER BY p.created_at DESC
     ");
     $posts_stmt->execute();
     $posts = $posts_stmt->fetchAll();
@@ -142,11 +141,24 @@ try {
     $topReviewedDevices = [];
 }
 $brands_stmt = $pdo->prepare("
-    SELECT * FROM brands
-    ORDER BY name ASC
+    SELECT b.*, COUNT(p.id) as device_count
+    FROM brands b
+    LEFT JOIN phones p ON b.id = p.brand_id
+    GROUP BY b.id, b.name, b.description, b.logo_url, b.website, b.created_at, b.updated_at
+    ORDER BY COUNT(p.id) DESC, b.name ASC
+    LIMIT 36
 ");
 $brands_stmt->execute();
 $brands = $brands_stmt->fetchAll();
+
+// Get all brands alphabetically ordered - for modal
+$all_brands_stmt = $pdo->prepare("
+    SELECT * FROM brands
+    ORDER BY name ASC
+");
+$all_brands_stmt->execute();
+$allBrandsModal = $all_brands_stmt->fetchAll();
+
 
 
 
@@ -157,7 +169,7 @@ $brands = $brands_stmt->fetchAll();
 <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>GSMArena New Page</title>
+    <title>DevicesArena New Page</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/css/bootstrap.min.css" rel="stylesheet"
         integrity="sha384-rbsA2VBKQhggwzxH7pPCaAqO46MgnOM80zW1RWuH61DGLwZJEdK2Kadq2F9CUG65" crossorigin="anonymous">
     <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
@@ -239,13 +251,13 @@ $brands = $brands_stmt->fetchAll();
             max-height: 80vh;
         }
 
-         .grid-colums{
-                background-color: #EEEEEE;
-                    gap: 21px;
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    grid-template-rows: max-content;
-        height: max-content;
+        .grid-colums {
+            background-color: #EEEEEE;
+            gap: 21px;
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            grid-template-rows: max-content;
+            height: max-content;
         }
 
         .anchor-card {
@@ -256,6 +268,7 @@ $brands = $brands_stmt->fetchAll();
         .review-card {
             margin-top: 14px;
         }
+
         @media (max-width:786px) {
             .grid-colums {
                 background-color: #EEEEEE;
@@ -277,20 +290,20 @@ $brands = $brands_stmt->fetchAll();
                 <div class="comfort-life position-absolute">
                     <img class="w-100 h-100" src="hero-images/reviews-hero.png"
                         style="background-repeat: no-repeat; background-size: cover;" alt="">
-                    <div class="position-absolute d-flex mt-1 ml-2"  style="top: 0; flex-wrap: wrap; gap: 8px;">
+                    <div class="position-absolute d-flex mt-1 ml-2" style="top: 0; flex-wrap: wrap; gap: 8px;">
                         <label class="text-white whitening">Popular Tags</label>
-                       <?php if (!empty($popularTags)): ?>
-    <?php foreach ($popularTags as $tag => $count): ?>
-        <a href="reviews.php?tag=<?php echo urlencode($tag); ?>">
-            <button class="mobiles-button"><?php echo htmlspecialchars($tag); ?></button>
-        </a>
-    <?php endforeach; ?>
-<?php else: ?>
-    <div class="no-tags">
-        <span>No tags availble</span>
-    </div>
-<?php endif; ?>
-</div>
+                        <?php if (!empty($popularTags)): ?>
+                            <?php foreach ($popularTags as $tag => $count): ?>
+                                <a href="reviews.php?tag=<?php echo urlencode($tag); ?>">
+                                    <button class="mobiles-button"><?php echo htmlspecialchars($tag); ?></button>
+                                </a>
+                            <?php endforeach; ?>
+                        <?php else: ?>
+                            <div class="no-tags">
+                                <span>No tags availble</span>
+                            </div>
+                        <?php endif; ?>
+                    </div>
 
                     <form method="get" action="reviews.php" class="comon">
                         <label for="hero-search-reviews" class="text-white whitening ">Search For</label>
@@ -331,7 +344,7 @@ $brands = $brands_stmt->fetchAll();
 
         </div>
     </div>
-    <div class="container margin-top-4rem" style="border-left:1px solid #00000012;" >
+    <div class="container margin-top-4rem" style="border-left:1px solid #00000012;">
         <div class="row">
             <?php
             if (empty($posts)):
@@ -398,8 +411,8 @@ $brands = $brands_stmt->fetchAll();
                 </div>
                 <div class="modal-body">
                     <div class="row">
-                        <?php if (!empty($brands)): ?>
-                            <?php foreach ($brands as $brand): ?>
+                        <?php if (!empty($allBrandsModal)): ?>
+                            <?php foreach ($allBrandsModal as $brand): ?>
                                 <div class="col-lg-4 col-md-6 col-sm-6 mb-3">
                                     <button class="brand-cell-modal btn w-100 py-2 px-3" style="background-color: #fff; border: 1px solid #c5b6b0; color: #5D4037; font-weight: 500; transition: all 0.3s ease; cursor: pointer;" data-brand-id="<?php echo $brand['id']; ?>" onclick="selectBrandFromModal(<?php echo $brand['id']; ?>)">
                                         <?php echo htmlspecialchars($brand['name']); ?>

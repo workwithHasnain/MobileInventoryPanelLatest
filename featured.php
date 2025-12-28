@@ -144,11 +144,24 @@ try {
 
 // Get only brands that have devices for the brands table
 $brands_stmt = $pdo->prepare("
-    SELECT * FROM brands
-    ORDER BY name ASC
+    SELECT b.*, COUNT(p.id) as device_count
+    FROM brands b
+    LEFT JOIN phones p ON b.id = p.brand_id
+    GROUP BY b.id, b.name, b.description, b.logo_url, b.website, b.created_at, b.updated_at
+    ORDER BY COUNT(p.id) DESC, b.name ASC
+    LIMIT 36
 ");
 $brands_stmt->execute();
 $brands = $brands_stmt->fetchAll();
+
+// Get all brands alphabetically ordered - for modal
+$all_brands_stmt = $pdo->prepare("
+    SELECT * FROM brands
+    ORDER BY name ASC
+");
+$all_brands_stmt->execute();
+$allBrandsModal = $all_brands_stmt->fetchAll();
+
 
 // Get latest 9 devices for the "In Stores Now" section
 $latestDevices = getAllPhones();
@@ -163,7 +176,7 @@ $latestDevices = array_slice(array_reverse($latestDevices), 0, 9);
 <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>GSMArena New Page</title>
+    <title>DevicesArena New Page</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/css/bootstrap.min.css" rel="stylesheet"
         integrity="sha384-rbsA2VBKQhggwzxH7pPCaAqO46MgnOM80zW1RWuH61DGLwZJEdK2Kadq2F9CUG65" crossorigin="anonymous">
     <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
@@ -262,6 +275,7 @@ $latestDevices = array_slice(array_reverse($latestDevices), 0, 9);
         .review-card {
             margin-top: 18px;
         }
+
         @media (max-width:786px) {
             .grid-colums {
                 background-color: #EEEEEE;
@@ -401,8 +415,8 @@ $latestDevices = array_slice(array_reverse($latestDevices), 0, 9);
                 </div>
                 <div class="modal-body">
                     <div class="row">
-                        <?php if (!empty($brands)): ?>
-                            <?php foreach ($brands as $brand): ?>
+                        <?php if (!empty($allBrandsModal)): ?>
+                            <?php foreach ($allBrandsModal as $brand): ?>
                                 <div class="col-lg-4 col-md-6 col-sm-6 mb-3">
                                     <button class="brand-cell-modal btn w-100 py-2 px-3" style="background-color: #fff; border: 1px solid #c5b6b0; color: #5D4037; font-weight: 500; transition: all 0.3s ease; cursor: pointer;" data-brand-id="<?php echo $brand['id']; ?>" onclick="selectBrandFromModal(<?php echo $brand['id']; ?>)">
                                         <?php echo htmlspecialchars($brand['name']); ?>

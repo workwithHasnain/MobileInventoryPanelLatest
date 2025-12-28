@@ -24,17 +24,19 @@
             </div>
             <div class="col-10 nav-wrap m-auto text-center ">
                 <div class="nav-container">
-                    <a href="#" style="color: white;">Home</a>
+                    <a href="index.php" style="color: white;">Home</a>
                     <a href="reviews.php" style="color: white;">Reviews</a>
                     <a href="compare.php" style="color: white;">Compare</a>
-                    <a href="#" style="color: white;"> <i class="fa-solid fa-wifi fa-sm"></i> RSS</a>
+                    <a href="phonefinder.php" style="color: white;">Phone Finder</a>
+                    <a href="featured.php" style="color: white;">Featured</a>
+                    <br>
                     <a href="#" style="color: white;"> <i class="fa-brands fa-youtube fa-sm"></i> YouTube</a>
                     <a href="#" style="color: white;"> <i class="fa-brands fa-instagram fa-sm"></i> Instagram</a>
                     <a href="#" style="color: white;"> <i class="fa-brands fa-tiktok fa-sm"></i>TikTok</a>
                     <a href="#" style="color: white;"> <i class="fa-brands fa-facebook-f fa-sm"></i> Facebook</a>
                     <a href="#" style="color: white;"> <i class="fa-brands fa-twitter fa-sm"></i>Twitter</a>
                     <br>
-                    <a href="#" style="color: white;">© 2000-2025 GSMArena.com</a>
+                    <a href="#" style="color: white;">© 2000-2025 DevicesArena.com</a>
                 </div>
             </div>
         </div>
