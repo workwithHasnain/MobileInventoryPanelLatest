@@ -29,7 +29,7 @@ $mobile_brands = $mobile_brands_stmt->fetchAll();
         <div class="d-flex align-items-center gap-3 ms-auto">
             <div class="controvecy d-flex align-items-center">
                 <div class="icon-container d-flex align-items-center" style="margin-right: 20px;">
-                    <button type="button" class="btn border-right d-flex align-items-center justify-content-center" data-bs-toggle="tooltip" data-bs-placement="left" title="YouTube" aria-label="YouTube" onclick="window.open('https://www.youtube.com/', '_blank')">
+                    <button type="button" class="btn border-right d-flex align-items-center justify-content-center" data-bs-toggle="tooltip" data-bs-placement="left" title="YouTube" aria-label="YouTube" onclick="window.open('https://youtube.com/@devicesarena', '_blank')">
                         <i class="fab fa-youtube" style="font-size:24px;color:#FF0000"></i>
                     </button>
                     <button type="button" class="btn d-flex align-items-center justify-content-center" data-bs-toggle="tooltip" data-bs-placement="left" title="Instagram" aria-label="Instagram" onclick="window.open('https://www.instagram.com/devicesarenaofficial', '_blank')">
@@ -91,7 +91,7 @@ $mobile_brands = $mobile_brands_stmt->fetchAll();
 <!-- Mobile Collapse of Gsmarecn -->
 <div class="collapse mobile-menu d-lg-none" id="mobileMenu">
     <div class="menu-icons">
-        <i class="fab fa-youtube" onclick="window.open('https://www.youtube.com/', '_blank')"></i>
+        <i class="fab fa-youtube" onclick="window.open('https://youtube.com/@devicesarena', '_blank')"></i>
         <i class="fab fa-instagram" onclick="window.open('https://www.instagram.com/devicesarenaofficial/', '_blank')"></i>
         <i class="fab fa-facebook-f" onclick="window.open('https://www.facebook.com/', '_blank')"></i>
         <i class="fab fa-twitter" onclick="window.open('https://twitter.com/', '_blank')"></i>

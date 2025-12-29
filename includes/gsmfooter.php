@@ -30,7 +30,7 @@
                     <a href="phonefinder.php" style="color: white;">Phone Finder</a>
                     <a href="featured.php" style="color: white;">Featured</a>
                     <br>
-                    <a href="https://www.youtube.com/" style="color: white;"> <i class="fa-brands fa-youtube fa-sm"></i> YouTube</a>
+                    <a href="https://youtube.com/@devicesarena" style="color: white;"> <i class="fa-brands fa-youtube fa-sm"></i> YouTube</a>
                     <a href="https://www.instagram.com/devicesarenaofficial/" style="color: white;"> <i class="fa-brands fa-instagram fa-sm"></i> Instagram</a>
                     <a href="https://www.tiktok.com/" style="color: white;"> <i class="fa-brands fa-tiktok fa-sm"></i>TikTok</a>
                     <a href="https://www.facebook.com/" style="color: white;"> <i class="fa-brands fa-facebook-f fa-sm"></i> Facebook</a>
