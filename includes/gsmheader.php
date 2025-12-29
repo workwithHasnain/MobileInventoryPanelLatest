@@ -20,25 +20,25 @@ $mobile_brands = $mobile_brands_stmt->fetchAll();
                 alt="">
         </button>
 
-        <a class="navbar-brand d-flex align-items-center" href="#">
-            <img src="imges/logo-wide.png" alt="DevicesArena Logo" />
+        <a class="navbar-brand d-flex align-items-center ms-n5" href="#">
+            <img src="imges/logo-wide.png" alt="DevicesArena Logo" style="height: min-content; width: min-content; max-height: 50px; max-width: 200px;" />
         </a>
 
-        <div class="controvecy mb-2">
-            <div class="icon-container">
-                <button type="button" class="btn border-right" data-bs-toggle="tooltip" data-bs-placement="left" title="YouTube" aria-label="YouTube" onclick="window.open('https://www.youtube.com/', '_blank')">
+        <div class="controvecy d-flex align-items-center">
+            <div class="icon-container d-flex align-items-center">
+                <button type="button" class="btn border-right d-flex align-items-center justify-content-center" data-bs-toggle="tooltip" data-bs-placement="left" title="YouTube" aria-label="YouTube" onclick="window.open('https://www.youtube.com/', '_blank')">
                     <i class="fab fa-youtube" style="font-size:24px;color:#FF0000"></i>
                 </button>
-                <button type="button" class="btn" data-bs-toggle="tooltip" data-bs-placement="left" title="Instagram" aria-label="Instagram" onclick="window.open('https://www.instagram.com/devicesarenaofficial', '_blank')">
+                <button type="button" class="btn d-flex align-items-center justify-content-center" data-bs-toggle="tooltip" data-bs-placement="left" title="Instagram" aria-label="Instagram" onclick="window.open('https://www.instagram.com/devicesarenaofficial', '_blank')">
                     <i class="fab fa-instagram" style="font-size:20px;color:#E4405F"></i>
                 </button>
-                <button type="button" class="btn" data-bs-toggle="tooltip" data-bs-placement="left" title="Facebook" aria-label="Facebook" onclick="window.open('https://www.facebook.com/', '_blank')">
+                <button type="button" class="btn d-flex align-items-center justify-content-center" data-bs-toggle="tooltip" data-bs-placement="left" title="Facebook" aria-label="Facebook" onclick="window.open('https://www.facebook.com/', '_blank')">
                     <i class="fab fa-facebook-f" style="font-size:20px;color:#1877F2"></i>
                 </button>
-                <button type="button" class="btn" data-bs-toggle="tooltip" data-bs-placement="left" title="Twitter" aria-label="Twitter" onclick="window.open('https://twitter.com/', '_blank')">
+                <button type="button" class="btn d-flex align-items-center justify-content-center" data-bs-toggle="tooltip" data-bs-placement="left" title="Twitter" aria-label="Twitter" onclick="window.open('https://twitter.com/', '_blank')">
                     <i class="fab fa-twitter" style="font-size:20px;color:#1DA1F2"></i>
                 </button>
-                <button type="button" class="btn" data-bs-toggle="tooltip" data-bs-placement="left" title="TikTok" aria-label="TikTok" onclick="window.open('https://www.tiktok.com/', '_blank')">
+                <button type="button" class="btn d-flex align-items-center justify-content-center" data-bs-toggle="tooltip" data-bs-placement="left" title="TikTok" aria-label="TikTok" onclick="window.open('https://www.tiktok.com/', '_blank')">
                     <i class="fab fa-tiktok" style="font-size:20px;color:#ffffff"></i>
                 </button>
             </div>
