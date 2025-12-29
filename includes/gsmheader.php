@@ -35,7 +35,7 @@ $mobile_brands = $mobile_brands_stmt->fetchAll();
                     <button type="button" class="btn d-flex align-items-center justify-content-center" data-bs-toggle="tooltip" data-bs-placement="left" title="Instagram" aria-label="Instagram" onclick="window.open('https://www.instagram.com/devicesarenaofficial', '_blank')">
                         <i class="fab fa-instagram" style="font-size:20px;color:#E4405F"></i>
                     </button>
-                    <button type="button" class="btn d-flex align-items-center justify-content-center" data-bs-toggle="tooltip" data-bs-placement="left" title="Facebook" aria-label="Facebook" onclick="window.open('https://www.facebook.com/', '_blank')">
+                    <button type="button" class="btn d-flex align-items-center justify-content-center" data-bs-toggle="tooltip" data-bs-placement="left" title="Facebook" aria-label="Facebook" onclick="window.open('https://www.facebook.com/profile.php?id=61585936163841', '_blank')">
                         <i class="fab fa-facebook-f" style="font-size:20px;color:#1877F2"></i>
                     </button>
                     <button type="button" class="btn d-flex align-items-center justify-content-center" data-bs-toggle="tooltip" data-bs-placement="left" title="Twitter" aria-label="Twitter" onclick="window.open('https://twitter.com/', '_blank')">
@@ -93,7 +93,7 @@ $mobile_brands = $mobile_brands_stmt->fetchAll();
     <div class="menu-icons">
         <i class="fab fa-youtube" onclick="window.open('https://youtube.com/@devicesarena', '_blank')"></i>
         <i class="fab fa-instagram" onclick="window.open('https://www.instagram.com/devicesarenaofficial/', '_blank')"></i>
-        <i class="fab fa-facebook-f" onclick="window.open('https://www.facebook.com/', '_blank')"></i>
+        <i class="fab fa-facebook-f" onclick="window.open('https://www.facebook.com/profile.php?id=61585936163841', '_blank')"></i>
         <i class="fab fa-twitter" onclick="window.open('https://twitter.com/', '_blank')"></i>
         <i class="fab fa-tiktok" onclick="window.open('https://www.tiktok.com/', '_blank')"></i>
     </div>

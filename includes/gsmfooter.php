@@ -33,7 +33,7 @@
                     <a href="https://youtube.com/@devicesarena" style="color: white;"> <i class="fa-brands fa-youtube fa-sm"></i> YouTube</a>
                     <a href="https://www.instagram.com/devicesarenaofficial/" style="color: white;"> <i class="fa-brands fa-instagram fa-sm"></i> Instagram</a>
                     <a href="https://www.tiktok.com/" style="color: white;"> <i class="fa-brands fa-tiktok fa-sm"></i>TikTok</a>
-                    <a href="https://www.facebook.com/" style="color: white;"> <i class="fa-brands fa-facebook-f fa-sm"></i> Facebook</a>
+                    <a href="https://www.facebook.com/profile.php?id=61585936163841" style="color: white;"> <i class="fa-brands fa-facebook-f fa-sm"></i> Facebook</a>
                     <a href="https://www.twitter.com/" style="color: white;"> <i class="fa-brands fa-twitter fa-sm"></i>Twitter</a>
                     <br>
                     <a href="#" style="color: white;">© 2000-2025 DevicesArena.com</a>
