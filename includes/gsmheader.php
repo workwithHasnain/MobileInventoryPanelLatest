@@ -14,43 +14,46 @@ $mobile_brands = $mobile_brands_stmt->fetchAll();
 <!-- Top Navbar -->
 <nav class="navbar navbar-dark  d-lg-inline d-none" id="navbar">
     <div class="container const d-flex align-items-center justify-content-between">
-        <button class="navbar-toggler mb-2" type="button" onclick="toggleMenu()">
-            <img style="height: 40px;"
-                src="https://cdn.prod.website-files.com/67f21c9d62aa4c4c685a7277/684091b39228b431a556d811_download-removebg-preview.png"
-                alt="">
-        </button>
+        <div class="d-flex align-items-center">
+            <button class="navbar-toggler d-flex align-items-center justify-content-center" type="button" onclick="toggleMenu()">
+                <img style="height: 40px;"
+                    src="https://cdn.prod.website-files.com/67f21c9d62aa4c4c685a7277/684091b39228b431a556d811_download-removebg-preview.png"
+                    alt="">
+            </button>
 
-        <a class="navbar-brand d-flex align-items-center ms-n5" href="#">
-            <img src="imges/logo-wide.png" alt="DevicesArena Logo" style="height: min-content; width: min-content; max-height: 50px; max-width: 200px;" />
-        </a>
+            <a class="navbar-brand d-flex align-items-center" href="#">
+                <img src="imges/logo-wide.png" alt="DevicesArena Logo" style="height: min-content; width: min-content; max-height: 50px; max-width: 200px;" />
+            </a>
+        </div>
 
-        <div class="controvecy d-flex align-items-center">
-            <div class="icon-container d-flex align-items-center">
-                <button type="button" class="btn border-right d-flex align-items-center justify-content-center" data-bs-toggle="tooltip" data-bs-placement="left" title="YouTube" aria-label="YouTube" onclick="window.open('https://www.youtube.com/', '_blank')">
-                    <i class="fab fa-youtube" style="font-size:24px;color:#FF0000"></i>
-                </button>
-                <button type="button" class="btn d-flex align-items-center justify-content-center" data-bs-toggle="tooltip" data-bs-placement="left" title="Instagram" aria-label="Instagram" onclick="window.open('https://www.instagram.com/devicesarenaofficial', '_blank')">
-                    <i class="fab fa-instagram" style="font-size:20px;color:#E4405F"></i>
-                </button>
-                <button type="button" class="btn d-flex align-items-center justify-content-center" data-bs-toggle="tooltip" data-bs-placement="left" title="Facebook" aria-label="Facebook" onclick="window.open('https://www.facebook.com/', '_blank')">
-                    <i class="fab fa-facebook-f" style="font-size:20px;color:#1877F2"></i>
-                </button>
-                <button type="button" class="btn d-flex align-items-center justify-content-center" data-bs-toggle="tooltip" data-bs-placement="left" title="Twitter" aria-label="Twitter" onclick="window.open('https://twitter.com/', '_blank')">
-                    <i class="fab fa-twitter" style="font-size:20px;color:#1DA1F2"></i>
-                </button>
-                <button type="button" class="btn d-flex align-items-center justify-content-center" data-bs-toggle="tooltip" data-bs-placement="left" title="TikTok" aria-label="TikTok" onclick="window.open('https://www.tiktok.com/', '_blank')">
-                    <i class="fab fa-tiktok" style="font-size:20px;color:#ffffff"></i>
-                </button>
+        <div class="d-flex align-items-center gap-3 ms-auto">
+            <div class="controvecy d-flex align-items-center">
+                <div class="icon-container d-flex align-items-center" style="margin-right: 20px;">
+                    <button type="button" class="btn border-right d-flex align-items-center justify-content-center" data-bs-toggle="tooltip" data-bs-placement="left" title="YouTube" aria-label="YouTube" onclick="window.open('https://www.youtube.com/', '_blank')">
+                        <i class="fab fa-youtube" style="font-size:24px;color:#FF0000"></i>
+                    </button>
+                    <button type="button" class="btn d-flex align-items-center justify-content-center" data-bs-toggle="tooltip" data-bs-placement="left" title="Instagram" aria-label="Instagram" onclick="window.open('https://www.instagram.com/devicesarenaofficial', '_blank')">
+                        <i class="fab fa-instagram" style="font-size:20px;color:#E4405F"></i>
+                    </button>
+                    <button type="button" class="btn d-flex align-items-center justify-content-center" data-bs-toggle="tooltip" data-bs-placement="left" title="Facebook" aria-label="Facebook" onclick="window.open('https://www.facebook.com/', '_blank')">
+                        <i class="fab fa-facebook-f" style="font-size:20px;color:#1877F2"></i>
+                    </button>
+                    <button type="button" class="btn d-flex align-items-center justify-content-center" data-bs-toggle="tooltip" data-bs-placement="left" title="Twitter" aria-label="Twitter" onclick="window.open('https://twitter.com/', '_blank')">
+                        <i class="fab fa-twitter" style="font-size:20px;color:#1DA1F2"></i>
+                    </button>
+                    <button type="button" class="btn d-flex align-items-center justify-content-center" data-bs-toggle="tooltip" data-bs-placement="left" title="TikTok" aria-label="TikTok" onclick="window.open('https://www.tiktok.com/', '_blank')">
+                        <i class="fab fa-tiktok" style="font-size:20px;color:#ffffff"></i>
+                    </button>
+                </div>
+                <form action="" class="central d-flex align-items-center justify-content-center">
+                    <input type="text" class="no-focus-border" placeholder="Search">
+                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" height="24" width="24" class="ms-2 d-flex align-items-center justify-content-center">
+                        <path fill="#ffffff"
+                            d="M416 208c0 45.9-14.9 88.3-40 122.7L502.6 457.4c12.5 12.5 12.5 32.8 0 45.3s-32.8 12.5-45.3 0L330.7 376c-34.4 25.2-76.8 40-122.7 40C93.1 416 0 322.9 0 208S93.1 0 208 0S416 93.1 416 208zM208 352a144 144 0 1 0 0-288 144 144 0 1 0 0 288z" />
+                    </svg>
+                </form>
             </div>
         </div>
-        <form action="" class="central d-flex align-items-center">
-            <input type="text" class="no-focus-border" placeholder="Search">
-            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" height="24" width="24" class="ms-2">
-                <path fill="#ffffff"
-                    d="M416 208c0 45.9-14.9 88.3-40 122.7L502.6 457.4c12.5 12.5 12.5 32.8 0 45.3s-32.8 12.5-45.3 0L330.7 376c-34.4 25.2-76.8 40-122.7 40C93.1 416 0 322.9 0 208S93.1 0 208 0S416 93.1 416 208zM208 352a144 144 0 1 0 0-288 144 144 0 1 0 0 288z" />
-            </svg>
-        </form>
-    </div>
 </nav>
 <!-- Mobile Navbar of Gsmarecn -->
 <nav id="navbar" class="mobile-navbar d-lg-none d-flex justify-content-between  align-items-center">
