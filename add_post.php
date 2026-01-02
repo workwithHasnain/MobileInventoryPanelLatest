@@ -265,6 +265,9 @@ include 'includes/header.php';
                             <input type="file" class="form-control" id="featured_image" name="featured_image"
                                 accept="image/*" required>
                             <div class="form-text">Upload a featured image for your post (JPG, PNG, GIF, WebP)</div>
+
+                            <!-- Image Guidance Feedback Area -->
+                            <div id="image-guidance" class="mt-3" style="display: none;"></div>
                         </div>
 
                         <div class="mb-3">
@@ -353,17 +356,24 @@ include 'includes/header.php';
                             <!-- <div class="col-md-6">
                                 <div class="mb-3">
                                     <label class="form-label">Categories</label>
-                                    <?php //foreach ($categories as $category): ?>
+                                    <?php //foreach ($categories as $category): 
+                                    ?>
                                         <div class="form-check">
                                             <input class="form-check-input" type="checkbox"
-                                                name="categories[]" value="<?php //echo htmlspecialchars($category['name']); ?>"
-                                                id="cat_<?php //echo $category['id']; ?>"
-                                                <?php //echo (isset($_POST['categories']) && in_array($category['name'], $_POST['categories'])) ? 'checked' : ''; ?>>
-                                            <label class="form-check-label" for="cat_<?php //echo $category['id']; ?>">
-                                                <?php //echo htmlspecialchars($category['name']); ?>
+                                                name="categories[]" value="<?php //echo htmlspecialchars($category['name']); 
+                                                                            ?>"
+                                                id="cat_<?php //echo $category['id']; 
+                                                        ?>"
+                                                <?php //echo (isset($_POST['categories']) && in_array($category['name'], $_POST['categories'])) ? 'checked' : ''; 
+                                                ?>>
+                                            <label class="form-check-label" for="cat_<?php //echo $category['id']; 
+                                                                                        ?>">
+                                                <?php //echo htmlspecialchars($category['name']); 
+                                                ?>
                                             </label>
                                         </div>
-                                    <?php //endforeach; ?>
+                                    <?php //endforeach; 
+                                    ?>
                                 </div>
                             </div> -->
                             <div class="col-md-12">
@@ -443,6 +453,112 @@ include 'includes/header.php';
 </div>
 
 <script>
+    // Image Upload Guidance System
+    // =============================
+    // Required aspect ratio constant: 1.532:1 (width:height)
+    const REQUIRED_ASPECT_RATIO = 1.532;
+    const RATIO_TOLERANCE = 0.01; // Allow ±0.01 variation
+    const OPTIMAL_WIDTH = 1000;
+    const OPTIMAL_HEIGHT = 653;
+
+    // Handle featured image file selection
+    document.getElementById('featured_image').addEventListener('change', function(e) {
+        const file = e.target.files[0];
+        const guidanceDiv = document.getElementById('image-guidance');
+
+        if (!file) {
+            guidanceDiv.style.display = 'none';
+            return;
+        }
+
+        // Read the image file to get dimensions
+        const reader = new FileReader();
+        reader.onload = function(event) {
+            const img = new Image();
+            img.onload = function() {
+                const uploadedWidth = img.naturalWidth;
+                const uploadedHeight = img.naturalHeight;
+
+                // Calculate the uploaded image's aspect ratio (3 decimal places)
+                const uploadedRatio = parseFloat((uploadedWidth / uploadedHeight).toFixed(3));
+
+                // Check if ratio matches required ratio (within tolerance)
+                const ratioMin = REQUIRED_ASPECT_RATIO - RATIO_TOLERANCE;
+                const ratioMax = REQUIRED_ASPECT_RATIO + RATIO_TOLERANCE;
+                const isRatioValid = uploadedRatio >= ratioMin && uploadedRatio <= ratioMax;
+
+                // Generate guidance message
+                let guidanceHTML = buildGuidanceMessage(
+                    uploadedWidth,
+                    uploadedHeight,
+                    uploadedRatio,
+                    isRatioValid
+                );
+
+                guidanceDiv.innerHTML = guidanceHTML;
+                guidanceDiv.style.display = 'block';
+            };
+            img.src = event.target.result;
+        };
+        reader.readAsDataURL(file);
+    });
+
+    /**
+     * Build the guidance message based on image dimensions
+     * @param {number} width - Uploaded image width in pixels
+     * @param {number} height - Uploaded image height in pixels
+     * @param {number} ratio - Calculated aspect ratio
+     * @param {boolean} isValid - Whether ratio is within tolerance
+     * @returns {string} HTML guidance message
+     */
+    function buildGuidanceMessage(width, height, ratio, isValid) {
+        let html = '';
+
+        // Display current image info
+        html += '<div class="card border-info">';
+        html += '<div class="card-body">';
+        html += '<h6 class="card-title mb-2"><i class="fas fa-image"></i> Image Details</h6>';
+        html += `<p class="mb-2"><strong>Your image resolution:</strong> ${width} × ${height} px</p>`;
+        html += `<p class="mb-3"><strong>Your aspect ratio:</strong> ${ratio}:1</p>`;
+
+        if (isValid) {
+            // Success state: ratio matches
+            html += '<div class="alert alert-success mb-2" role="alert">';
+            html += '<i class="fas fa-check-circle"></i> <strong>Perfect!</strong> Your image has the correct aspect ratio.';
+            html += '</div>';
+        } else {
+            // Guidance state: ratio doesn't match
+            // Calculate nearest correct widths and heights
+            const correctWidthFromHeight = Math.round(height * REQUIRED_ASPECT_RATIO);
+            const correctHeightFromWidth = Math.round(width / REQUIRED_ASPECT_RATIO);
+
+            html += '<div class="alert alert-warning mb-3" role="alert">';
+            html += '<i class="fas fa-exclamation-triangle"></i> <strong>Aspect ratio mismatch detected.</strong>';
+            html += '<p class="mb-0 mt-2">Your image doesn\'t match the recommended shape, but you can still upload it.</p>';
+            html += '</div>';
+
+            html += '<div class="bg-light p-3 rounded mb-3">';
+            html += '<p class="mb-2"><strong>Here are your options to match the correct ratio:</strong></p>';
+            html += '<ul class="mb-0">';
+            html += `<li><strong>Keep your height (${height} px):</strong> Adjust width to <strong>${correctWidthFromHeight} × ${height} px</strong></li>`;
+            html += `<li><strong>Keep your width (${width} px):</strong> Adjust height to <strong>${width} × ${correctHeightFromWidth} px</strong></li>`;
+            html += '</ul>';
+            html += '</div>';
+        }
+
+        // Optimal recommendation (always shown)
+        html += '<div class="bg-light p-3 rounded">';
+        html += '<p class="mb-2"><strong><i class="fas fa-lightbulb"></i> Recommended upload size:</strong></p>';
+        html += `<p class="mb-1"><strong>${OPTIMAL_WIDTH} × ${OPTIMAL_HEIGHT} px</strong> (best quality)</p>`;
+        html += '<p class="text-muted small mb-0">Larger images with the same ratio (${REQUIRED_ASPECT_RATIO}:1) also work great!</p>';
+        html += '</div>';
+
+        html += '</div>';
+        html += '</div>';
+
+        return html;
+    }
+
     // Generate slug from title
     function generateSlugFromTitle() {
         const title = document.getElementById('title').value;
