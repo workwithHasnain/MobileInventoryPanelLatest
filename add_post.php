@@ -532,6 +532,10 @@ include 'includes/header.php';
             const correctWidthFromHeight = Math.round(height * REQUIRED_ASPECT_RATIO);
             const correctHeightFromWidth = Math.round(width / REQUIRED_ASPECT_RATIO);
 
+            // Calculate balanced option: average of both adjustments while maintaining correct ratio
+            const balancedWidth = Math.round((correctWidthFromHeight + width) / 2);
+            const balancedHeight = Math.round((height + correctHeightFromWidth) / 2);
+
             html += '<div class="alert alert-warning mb-3" role="alert">';
             html += '<i class="fas fa-exclamation-triangle"></i> <strong>Aspect ratio mismatch detected.</strong>';
             html += '<p class="mb-0 mt-2">Your image doesn\'t match the recommended shape, but you can still upload it.</p>';
@@ -542,6 +546,7 @@ include 'includes/header.php';
             html += '<ul class="mb-0">';
             html += `<li><strong>Keep your height (${height} px):</strong> Adjust width to <strong>${correctWidthFromHeight} × ${height} px</strong></li>`;
             html += `<li><strong>Keep your width (${width} px):</strong> Adjust height to <strong>${width} × ${correctHeightFromWidth} px</strong></li>`;
+            html += `<li><strong>Balanced adjustment:</strong> Resize to <strong>${balancedWidth} × ${balancedHeight} px</strong> (minimizes changes to both dimensions)</li>`;
             html += '</ul>';
             html += '</div>';
         }
