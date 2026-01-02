@@ -20,7 +20,7 @@
         </div>
         <div class="row align-items-center">
             <div class="m-auto col-2 d-flex justify-content-center align-items-center" style="width: max-content;">
-                <img src="imges/logo-wide.png" alt="devices arena logo for footer" style=" width: 185px;">
+                <img src="imges/logo-wide.svg" alt="devices arena logo for footer" style=" width: 185px;">
             </div>
             <div class="col-10 nav-wrap m-auto text-center ">
                 <div class="nav-container">
