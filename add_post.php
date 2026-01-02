@@ -550,7 +550,7 @@ include 'includes/header.php';
         html += '<div class="bg-light p-3 rounded">';
         html += '<p class="mb-2"><strong><i class="fas fa-lightbulb"></i> Recommended upload size:</strong></p>';
         html += `<p class="mb-1"><strong>${OPTIMAL_WIDTH} × ${OPTIMAL_HEIGHT} px</strong> (best quality)</p>`;
-        html += '<p class="text-muted small mb-0">Larger images with the same ratio (${REQUIRED_ASPECT_RATIO}:1) also work great!</p>';
+        html += `<p class="text-muted small mb-0">Larger images with the same ratio ( ${REQUIRED_ASPECT_RATIO}:1 ) also work great!</p>`;
         html += '</div>';
 
         html += '</div>';
