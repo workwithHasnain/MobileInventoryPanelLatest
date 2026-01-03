@@ -1,3 +1,15 @@
+<?php
+$mobile_brands_stmt = $pdo->prepare("
+    SELECT b.*, COUNT(p.id) as device_count
+    FROM brands b
+    LEFT JOIN phones p ON b.id = p.brand_id
+    GROUP BY b.id, b.name, b.description, b.logo_url, b.website, b.created_at, b.updated_at
+    ORDER BY COUNT(p.id) DESC, b.name ASC
+    LIMIT 11
+");
+$mobile_brands_stmt->execute();
+$mobile_brands = $mobile_brands_stmt->fetchAll();
+?>
 <!-- Desktop Navbar of Gsmarecn -->
 <!-- Top Navbar -->
 <nav class="navbar navbar-dark  d-lg-inline d-none" id="navbar">
@@ -9,24 +21,24 @@
         </button>
 
         <a class="navbar-brand d-flex align-items-center" href="#">
-            <img src="imges/download.png" alt="DevicesArena Logo" />
+            <img src="imges/logo-wide.png" alt="DevicesArena Logo" />
         </a>
 
         <div class="controvecy mb-2">
             <div class="icon-container">
-                <button type="button" class="btn border-right" data-bs-toggle="tooltip" data-bs-placement="left" title="YouTube" aria-label="YouTube">
+                <button type="button" class="btn border-right" data-bs-toggle="tooltip" data-bs-placement="left" title="YouTube" aria-label="YouTube" onclick="window.open('https://www.youtube.com/', '_blank')">
                     <i class="fab fa-youtube" style="font-size:24px;color:#FF0000"></i>
                 </button>
-                <button type="button" class="btn" data-bs-toggle="tooltip" data-bs-placement="left" title="Instagram" aria-label="Instagram">
+                <button type="button" class="btn" data-bs-toggle="tooltip" data-bs-placement="left" title="Instagram" aria-label="Instagram" onclick="window.open('https://www.instagram.com/devicesarenaofficial', '_blank')">
                     <i class="fab fa-instagram" style="font-size:20px;color:#E4405F"></i>
                 </button>
-                <button type="button" class="btn" data-bs-toggle="tooltip" data-bs-placement="left" title="Facebook" aria-label="Facebook">
+                <button type="button" class="btn" data-bs-toggle="tooltip" data-bs-placement="left" title="Facebook" aria-label="Facebook" onclick="window.open('https://www.facebook.com/', '_blank')">
                     <i class="fab fa-facebook-f" style="font-size:20px;color:#1877F2"></i>
                 </button>
-                <button type="button" class="btn" data-bs-toggle="tooltip" data-bs-placement="left" title="Twitter" aria-label="Twitter">
+                <button type="button" class="btn" data-bs-toggle="tooltip" data-bs-placement="left" title="Twitter" aria-label="Twitter" onclick="window.open('https://twitter.com/', '_blank')">
                     <i class="fab fa-twitter" style="font-size:20px;color:#1DA1F2"></i>
                 </button>
-                <button type="button" class="btn" data-bs-toggle="tooltip" data-bs-placement="left" title="TikTok" aria-label="TikTok">
+                <button type="button" class="btn" data-bs-toggle="tooltip" data-bs-placement="left" title="TikTok" aria-label="TikTok" onclick="window.open('https://www.tiktok.com/', '_blank')">
                     <i class="fab fa-tiktok" style="font-size:20px;color:#ffffff"></i>
                 </button>
             </div>
@@ -48,8 +60,8 @@
             src="https://cdn.prod.website-files.com/67f21c9d62aa4c4c685a7277/684091b39228b431a556d811_download-removebg-preview.png"
             alt="">
     </button>
-    <a class="navbar-brand d-flex align-items-center" href="#">
-        <a class="logo text-white " href="#">DevicesArena</a>
+    <a class="navbar-brand d-flex align-items-center" href="index.php">
+        <img src="imges/logo-wide.png" alt="DevicesArena Logo" style="height: min-content; width: min-content; max-height: 30px; max-width: 150px;" />
     </a>
 </nav>
 
@@ -76,11 +88,11 @@
 <!-- Mobile Collapse of Gsmarecn -->
 <div class="collapse mobile-menu d-lg-none" id="mobileMenu">
     <div class="menu-icons">
-        <i class="fab fa-youtube"></i>
-        <i class="fab fa-instagram"></i>
-        <i class="fab fa-facebook-f"></i>
-        <i class="fab fa-twitter"></i>
-        <i class="fab fa-tiktok"></i>
+        <i class="fab fa-youtube" onclick="window.open('https://www.youtube.com/', '_blank')"></i>
+        <i class="fab fa-instagram" onclick="window.open('https://www.instagram.com/devicesarenaofficial/', '_blank')"></i>
+        <i class="fab fa-facebook-f" onclick="window.open('https://www.facebook.com/', '_blank')"></i>
+        <i class="fab fa-twitter" onclick="window.open('https://twitter.com/', '_blank')"></i>
+        <i class="fab fa-tiktok" onclick="window.open('https://www.tiktok.com/', '_blank')"></i>
     </div>
     <div class="column">
         <a href="index.php">Home</a>
@@ -93,17 +105,17 @@
     </div>
     <div class="brand-grid">
         <?php
-        $brandChunks = array_chunk($brands, 1); // Create chunks of 1 brand per row
-        foreach ($brandChunks as $brandRow):
-            foreach ($brandRow as $brand): ?>
-                <a href="#" class="brand-cell brand-item-bold" data-brand-id="<?php echo $brand['id']; ?>"><?php echo htmlspecialchars($brand['name']); ?></a>
+        $mobile_brandChunks = array_chunk($mobile_brands, 1); // Create chunks of 1 brand per row
+        foreach ($mobile_brandChunks as $mobile_brandRow):
+            foreach ($mobile_brandRow as $mobile_brand): ?>
+                <a href="#" class="brand-cell brand-item-bold" data-brand-id="<?php echo $mobile_brand['id']; ?>"><?php echo htmlspecialchars($mobile_brand['name']); ?></a>
         <?php endforeach;
         endforeach; ?>
         <a href="#" onclick="showBrandsModal(); return false;" style="cursor: pointer;">[...]</a>
     </div>
     <div class="menu-buttons d-flex justify-content-center ">
-        <button class="btn btn-primary w-50 text-white">📱 Phone Finder</button>
-        <button class="btn btn-primary w-50 text-white">📲 My Phone</button>
+        <button class="btn bg-white w-50 text-black" onclick="window.open('phonefinder.php')">Phone Finder</button>
+        <button class="btn bg-white w-50 text-black">My Phone</button>
     </div>
 </div>
 <!-- Display Menu of Gsmarecn -->
