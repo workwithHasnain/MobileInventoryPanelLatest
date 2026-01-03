@@ -328,7 +328,7 @@ if ($_POST && isset($_POST['action'])) {
                 <?php foreach ($posts as $post): ?>
                     <div class="div-block" style="cursor:pointer;" onclick="window.location.href='post.php?slug=<?php echo urlencode($post['slug']); ?>'">
                         <?php if (!empty($post['featured_image'])): ?>
-                            <img src="<?php echo htmlspecialchars($post['featured_image']); ?>" alt="Featured Image" style="height: 111px; width: 189px; cursor:pointer;" onclick="window.location.href='post.php?slug=<?php echo urlencode($post['slug']); ?>'">
+                            <img src="<?php echo htmlspecialchars($post['featured_image']); ?>" alt="Featured Image" style="height: 150px; width: 189px; cursor:pointer;" onclick="window.location.href='post.php?slug=<?php echo urlencode($post['slug']); ?>'">
                         <?php endif; ?>
                         <h3 class="sony-tv" style="cursor:pointer;" onclick="window.location.href='post.php?slug=<?php echo urlencode($post['slug']); ?>'"><?php echo htmlspecialchars($post['title']); ?></h3>
                     </div>
