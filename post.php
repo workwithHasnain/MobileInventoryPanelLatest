@@ -367,6 +367,18 @@ if ($_POST && isset($_POST['action'])) {
             text-transform: none;
         }
 
+        .document-section .gap-portion span {
+            text-transform: none !important;
+        }
+
+        .document-section .gap-portion div {
+            text-transform: none !important;
+        }
+
+        .document-section .gap-portion p {
+            text-transform: none !important;
+        }
+
         .media-gallery img {
             max-width: 100%;
             height: auto;
