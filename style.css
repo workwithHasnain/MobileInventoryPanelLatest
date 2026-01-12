@@ -1549,6 +1549,7 @@ table tr:hover {
     margin: 0 30px 15px;
     display: flex;
     flex-wrap: wrap;
+    text-transform: none;
 }
 
 .portion-headline {
