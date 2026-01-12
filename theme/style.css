@@ -1046,7 +1046,9 @@ a {
     padding: 0;
     margin-bottom: 30px;
 }
-.module, a.module-phones-link {
+
+.module,
+a.module-phones-link {
     position: relative;
 }
 
@@ -1056,6 +1058,7 @@ a {
     width: calc(100% + 10px);
     background: #fff;
 }
+
 .section-heading {
     border-bottom: none;
     border-left: 10px solid;
@@ -1095,6 +1098,7 @@ a {
 .module-phones>h4~div {
     padding-top: 5px;
 }
+
 .module-latest div {
     scrollbar-width: thin;
     display: -ms-flexbox;
@@ -1103,20 +1107,23 @@ a {
     flex-wrap: wrap;
     -ms-flex-pack: distribute;
     justify-content: space-around;
-}   
+}
 
 
 .module-latest .module-phones-link {
     margin: 0 7px;
 }
 
-.module, a.module-phones-link {
+.module,
+a.module-phones-link {
     position: relative;
 }
+
 .module a {
     font: 700 13px / 18px Arimo, Arial, sans-serif;
     color: #444;
 }
+
 .module-phones-link {
     float: left;
     display: block;
@@ -1132,8 +1139,7 @@ a {
 
 
 .module a img {
-    transition: transform 1s 
-cubic-bezier(0.26, 0.695, 0.375, 0.965);
+    transition: transform 1s cubic-bezier(0.26, 0.695, 0.375, 0.965);
 }
 
 @supports (filter:brightness(0.953)) {
@@ -1141,6 +1147,7 @@ cubic-bezier(0.26, 0.695, 0.375, 0.965);
         filter: brightness(0.953);
     }
 }
+
 .module-phones-link img {
     width: 115%;
     height: 119px;
@@ -1163,14 +1170,17 @@ cubic-bezier(0.26, 0.695, 0.375, 0.965);
     padding-top: 15px;
 }
 
-.material-card, .top-shadow {
+.material-card,
+.top-shadow {
     /* box-shadow: 0px 2px 4px var(--color-card-shadow, #cfcfcf); */
     background-color: var(--color-card-background);
     padding: 15px 0px;
     margin: 10px 0px;
 
 }
-.swiper-container-android .swiper-slide, .swiper-wrapper {
+
+.swiper-container-android .swiper-slide,
+.swiper-wrapper {
     -ms-transform: translateZ(0);
     transform: translateZ(0);
 }
@@ -1193,11 +1203,13 @@ cubic-bezier(0.26, 0.695, 0.375, 0.965);
     background: none;
     margin-top: 5px;
 }
+
 @media (orientation: landscape) {
     .swiper-slide {
         width: 42%;
     }
 }
+
 .swiper-slide {
     -ms-flex: 1 0 auto;
     flex: 1 0 auto;
@@ -1269,7 +1281,7 @@ cubic-bezier(0.26, 0.695, 0.375, 0.965);
     background-color: #F3F3F3;
     padding: 5px;
     overflow: hidden;
- 
+
 }
 
 .compare-checkbox label {
@@ -1278,7 +1290,7 @@ cubic-bezier(0.26, 0.695, 0.375, 0.965);
 
 .compare-checkbox input {
     /* margin-left: 5px; */
-       font-family: sans-serif;
+    font-family: sans-serif;
     width: 152%;
     display: block;
 }
@@ -2089,9 +2101,10 @@ td {
     .spec-item:last-child {
         border-bottom: none;
     }
+
     .compare-checkbox input {
-    width: 138%;
-}
+        width: 138%;
+    }
 }
 
 @media (min-width: 810px) and (max-width: 1024px) {
