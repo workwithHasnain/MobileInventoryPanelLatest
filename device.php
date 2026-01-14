@@ -2564,20 +2564,6 @@ $commentCount = getDeviceCommentCount($pdo, $device_id);
     }
   }
 </script>
-<script>
-    // Initialize Bootstrap collapse for mobile menu after DOM is loaded
-    document.addEventListener('DOMContentLoaded', function() {
-        var mobileMenuButton = document.querySelector('.mobile-navbar .navbar-toggler');
-        var mobileMenu = document.getElementById('mobileMenu');
-
-        if (mobileMenuButton && mobileMenu && typeof bootstrap !== 'undefined') {
-            // Manually initialize Bootstrap collapse
-            new bootstrap.Collapse(mobileMenu, {
-                toggle: false
-            });
-        }
-    });
-</script>
 </body>
 
 </html>

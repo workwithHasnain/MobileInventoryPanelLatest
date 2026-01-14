@@ -57,7 +57,7 @@ $mobile_brands = $mobile_brands_stmt->fetchAll();
 </nav>
 <!-- Mobile Navbar of Gsmarecn -->
 <nav id="navbar" class="mobile-navbar d-lg-none d-flex justify-content-between  align-items-center">
-    <button class="navbar-toggler text-white" type="button" data-bs-toggle="collapse" data-bs-target="#mobileMenu"
+    <button class="navbar-toggler text-white" type="button" data-bs-toggle="collapse" data-bs-target="#mobileMenu" data-bs-auto-close="outside"
         aria-controls="mobileMenu" aria-expanded="false" aria-label="Toggle navigation">
         <img style="height: 40px;"
             src="https://cdn.prod.website-files.com/67f21c9d62aa4c4c685a7277/684091b39228b431a556d811_download-removebg-preview.png"
@@ -153,5 +153,34 @@ $mobile_brands = $mobile_brands_stmt->fetchAll();
                 toggle: false
             });
         }
+
+        // Close menu when clicking on links inside mobileMenu
+        var mobileMenuLinks = mobileMenu.querySelectorAll('a');
+        mobileMenuLinks.forEach(function(link) {
+            link.addEventListener('click', function() {
+                // Only close if it's a valid link (not javascript:void(0) or onclick with return false)
+                var href = this.getAttribute('href');
+                if (href && href !== '#' && !href.includes('javascript:')) {
+                    // Close the collapse menu
+                    var collapse = bootstrap.Collapse.getInstance(mobileMenu);
+                    if (collapse) {
+                        collapse.hide();
+                    }
+                }
+            });
+        });
+
+        // Close menu when clicking menu buttons
+        var menuButtons = mobileMenu.querySelectorAll('.menu-buttons button');
+        menuButtons.forEach(function(btn) {
+            btn.addEventListener('click', function(e) {
+                e.stopPropagation();
+                // Close the collapse menu
+                var collapse = bootstrap.Collapse.getInstance(mobileMenu);
+                if (collapse) {
+                    collapse.hide();
+                }
+            });
+        });
     });
 </script>
