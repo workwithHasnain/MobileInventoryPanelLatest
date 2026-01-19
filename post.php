@@ -495,14 +495,14 @@ if ($_POST && isset($_POST['action'])) {
             height: auto !important;
         }
 
-        .comfort-life-23 .article-info {
-            height: auto !important;
+        .post-image {
+            height: 340px !important;
             width: 100% !important;
             min-height: auto !important;
         }
 
-        .comfort-life-23 .article-info .bg-blur {
-            height: auto !important;
+        .post-inside {
+            height: 100% !important;
             overflow: visible !important;
         }
 
@@ -511,6 +511,8 @@ if ($_POST && isset($_POST['action'])) {
             /* height: auto !important; */
             display: block !important;
             max-width: 100% !important;
+            object-fit:cover;
+            height:100%;
         }
     </style>
 </head>
@@ -529,9 +531,9 @@ if ($_POST && isset($_POST['action'])) {
         <div class="row">
 
             <div class="col-md-8 col-5 d-md-inline  " style="border: 1px solid #e0e0e0;">
-                <div class="comfort-life-23 position-absolute d-flex justify-content-between  ">
-                    <div class="article-info">
-                        <div class="bg-blur">
+                <div class="comfort-life-23 position-absolute d-flex justify-content-between">
+                    <div class="article-info post-image">
+                        <div class="bg-blur post-inside">
                             <?php if (!empty($post['featured_image'])): ?>
                                 <img class="center-img" src="<?php echo htmlspecialchars($post['featured_image']); ?>" alt="<?php echo htmlspecialchars($post['title']); ?>">
                             <?php endif; ?>
@@ -540,7 +542,7 @@ if ($_POST && isset($_POST['action'])) {
                     <div style="display: flex;  flex-direction: column;">
                         <h1 class="article-info-name" style="color: #D50000; text-shadow: none;"><?php echo htmlspecialchars($post['title']); ?></h1>
                         <div class="article-info">
-                            <div class="bg-blur" style="background-color: #D50000;">
+                            <div class="bg-blur w-50 m-auto" style="background-color: #D50000;">
                                 <div class="d-flex justify-content-end">
                                     <div class="d-flex flexiable ">
                                         <img src="/imges/download-removebg-preview.png" alt="">
