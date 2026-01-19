@@ -19,8 +19,8 @@
             </div>
         </div>
         <div class="row align-items-center">
-            <div class="col-md-2 m-auto col-4 d-flex justify-content-center align-items-center bg-white rounded" style="width: max-content;">
-                <img src="imges/logo-wide.png" alt="devices arena logo for footer">
+            <div class="m-auto col-2 d-flex justify-content-center align-items-center" style="width: max-content;">
+                <img src="imges/logo-wide.svg" alt="devices arena logo for footer" style=" width: 185px;">
             </div>
             <div class="col-10 nav-wrap m-auto text-center ">
                 <div class="nav-container">
@@ -30,10 +30,10 @@
                     <a href="phonefinder.php" style="color: white;">Phone Finder</a>
                     <a href="featured.php" style="color: white;">Featured</a>
                     <br>
-                    <a href="https://www.youtube.com/" style="color: white;"> <i class="fa-brands fa-youtube fa-sm"></i> YouTube</a>
+                    <a href="https://youtube.com/@devicesarena" style="color: white;"> <i class="fa-brands fa-youtube fa-sm"></i> YouTube</a>
                     <a href="https://www.instagram.com/devicesarenaofficial/" style="color: white;"> <i class="fa-brands fa-instagram fa-sm"></i> Instagram</a>
                     <a href="https://www.tiktok.com/" style="color: white;"> <i class="fa-brands fa-tiktok fa-sm"></i>TikTok</a>
-                    <a href="https://www.facebook.com/" style="color: white;"> <i class="fa-brands fa-facebook-f fa-sm"></i> Facebook</a>
+                    <a href="https://www.facebook.com/profile.php?id=61585936163841" style="color: white;"> <i class="fa-brands fa-facebook-f fa-sm"></i> Facebook</a>
                     <a href="https://www.twitter.com/" style="color: white;"> <i class="fa-brands fa-twitter fa-sm"></i>Twitter</a>
                     <br>
                     <a href="#" style="color: white;">© 2000-2025 DevicesArena.com</a>
