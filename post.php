@@ -278,7 +278,7 @@ if ($_POST && isset($_POST['action'])) {
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <meta name="description" content="<?php echo htmlspecialchars($post['meta_description'] ?? $post['short_description'] ?? substr($post['content_body'], 0, 160) . '...'); ?>" />
     <title><?php echo htmlspecialchars($post['meta_title'] ?? $post['title']); ?> - DevicesArena</title>
-    
+
     <!-- Favicon & Icons -->
     <link rel="icon" type="image/png" sizes="32x32" href="imges/icon-32.png">
     <link rel="icon" type="image/png" sizes="256x256" href="imges/icon-256.png">
@@ -360,6 +360,23 @@ if ($_POST && isset($_POST['action'])) {
         .document-section .classy {
             color: #333;
             line-height: 1.6;
+            text-transform: none;
+        }
+
+        .document-section .gap-portion {
+            text-transform: none;
+        }
+
+        .document-section .gap-portion span {
+            text-transform: none !important;
+        }
+
+        .document-section .gap-portion div {
+            text-transform: none !important;
+        }
+
+        .document-section .gap-portion p {
+            text-transform: none !important;
         }
 
         .media-gallery img {
