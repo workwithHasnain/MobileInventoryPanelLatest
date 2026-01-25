@@ -319,6 +319,8 @@ $allBrandsModal = $all_brands_stmt->fetchAll();
 
         }
     </style>
+    <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-4554952734894265"
+     crossorigin="anonymous"></script>
 </head>
 
 <body style="background-color: #EFEBE9;">
