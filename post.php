@@ -559,7 +559,7 @@ if ($_POST && isset($_POST['action'])) {
                     <div style="display: flex;  flex-direction: column;">
                         <h1 class="article-info-name" style="color: #D50000; text-shadow: none;"><?php echo htmlspecialchars($post['title']); ?></h1>
                         <div class="article-info">
-                            <div class="bg-blur w-50 m-auto" style="background-color: #D50000;">
+                            <div class="bg-blur  m-auto" style="background-color: #D50000;">
                                 <div class="d-flex justify-content-end">
                                     <div class="d-flex flexiable ">
                                         <img src="/imges/download-removebg-preview.png" alt="">
