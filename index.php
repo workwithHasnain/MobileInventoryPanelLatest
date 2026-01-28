@@ -310,6 +310,8 @@ if ($_POST && isset($_POST['action'])) {
             max-height: 80vh;
         }
     </style>
+    <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-4554952734894265"
+     crossorigin="anonymous"></script>
 </head>
 
 <body style="background-color: #EFEBE9;">

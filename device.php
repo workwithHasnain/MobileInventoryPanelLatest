@@ -1017,6 +1017,8 @@ $commentCount = getDeviceCommentCount($pdo, $device_id);
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" />
 
   <link rel="stylesheet" href="style.css">
+  <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-4554952734894265"
+     crossorigin="anonymous"></script>
 </head>
 
 <body style="background-color: #EFEBE9; overflow-x: hidden;">
