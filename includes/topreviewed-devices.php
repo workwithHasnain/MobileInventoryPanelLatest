@@ -1,3 +1,19 @@
+<style>
+.text-start{
+    
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    max-width: 200px;
+}
+    @media (max-width: 720px) {
+        .text-start{
+            font-size:13px;
+        }
+    }
+</style>
+
+
 <h6 style="border-left: 7px solid #EFEBE9; text-transform: uppercase;"
                             class=" px-2 mt-2 d-inline mt-4 section-heading">Top 10 by
                             Fans</h6>
@@ -22,7 +38,7 @@
                                             if (($index + 1) % 2 != 0): ?>
                                                 <tr class="clickable-row" data-device-id="<?php echo $device['id']; ?>" style="cursor: pointer;">
                                                     <th scope="row"><?php echo $index + 1; ?></th>
-                                                    <td class="text-start" style="white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 200px;"><?php $text = htmlspecialchars($device['brand_name'] . ' ' . $device['name']); echo $text; ?></td>
+                                                    <td class="text-start"><?php $text = htmlspecialchars($device['brand_name'] . ' ' . $device['name']); echo $text; ?></td>
                                                     <td class="text-end"><?php echo $device['review_count']; ?></td>
                                                 </tr>
                                             <?php else: ?>
