@@ -56,7 +56,7 @@ $mobile_brands = $mobile_brands_stmt->fetchAll();
         </div>
 </nav>
 <!-- Mobile Navbar of Gsmarecn -->
-<nav id="navbar" class="mobile-navbar d-lg-none d-flex justify-content-between  align-items-center">
+<nav id="navbar" class="mobile-navbar d-lg-none d-flex align-items-center">
     <button class="navbar-toggler text-white" type="button" data-bs-toggle="collapse" data-bs-target="#mobileMenu" data-bs-auto-close="outside"
         aria-controls="mobileMenu" aria-expanded="false" aria-label="Toggle navigation">
         <img style="height: 40px;"
