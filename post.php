@@ -729,7 +729,7 @@ if ($_POST && isset($_POST['action'])) {
                     ?>
                     <!-- <img class="center-img my-2" src="<?php //echo htmlspecialchars(trim($media)); 
                                                             ?>" alt="Media from <?php //echo htmlspecialchars($post['title']); 
-                                                                                                                            ?>"> -->
+                                                                                ?>"> -->
                     <?php //endforeach; 
                     ?>
                     <!-- </div> -->
@@ -878,14 +878,14 @@ if ($_POST && isset($_POST['action'])) {
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
 
     <script>
-        // Build a dynamic dropdown of all H3 headings and enable jump-to-section behavior
+        // Build a dynamic dropdown of all H1, H2, H3 headings and enable jump-to-section behavior
         window.addEventListener('load', function() {
             try {
                 const container = document.querySelector('.document-section');
                 const dropdown = document.getElementById('headingDropdown');
                 if (!container || !dropdown) return;
 
-                const headings = container.querySelectorAll('h3');
+                const headings = container.querySelectorAll('h1, h2, h3');
                 if (!headings.length) return;
 
                 // Prepare dropdown
