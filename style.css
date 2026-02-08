@@ -1962,7 +1962,7 @@ table tr:hover {
 b,
 strong {
     font-weight: bolder;
-    margin-right: 19px;
+    /* margin-right: 19px; */
     font-size: 16px;
     color: #555;
 }
@@ -2540,7 +2540,7 @@ td {
     .table td {
         border: none;
         /* padding: 4px 3px; */
-        font-size: 10px;
+        font-size: 13px;
     }
 
     .center-img {
