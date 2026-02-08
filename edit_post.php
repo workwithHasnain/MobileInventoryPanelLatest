@@ -83,12 +83,23 @@ if ($_POST) {
         $errors[] = "Content body is required.";
     }
 
-    // Clean and validate HTML content from TinyMCE
+    // Clean and validate HTML content from editor
     $content_body = trim($content_body);
     if (!empty($content_body)) {
-        // Basic HTML sanitization - remove potentially dangerous tags
-        $allowed_tags = '<p><br><strong><b><em><i><u><h1><h2><h3><h4><h5><h6><ul><ol><li><blockquote><a><img><span><div>';
+        // Sanitization - only allow semantic tags (no divs/spans)
+        $allowed_tags = '<p><br><strong><em><u><h1><h2><h3><h4><h5><h6><ul><ol><li><blockquote><a><img>';
         $content_body = strip_tags($content_body, $allowed_tags);
+
+        // Remove all inline style attributes and class attributes
+        $content_body = preg_replace('/ style="[^"]*"/', '', $content_body);
+        $content_body = preg_replace('/ class="[^"]*"/', '', $content_body);
+        $content_body = preg_replace('/ id="[^"]*"/', '', $content_body);
+        $content_body = preg_replace('/ width="[^"]*"/', '', $content_body);
+        $content_body = preg_replace('/ height="[^"]*"/', '', $content_body);
+
+        // Convert <b> to <strong> and <i> to <em> for semantic HTML
+        $content_body = str_replace(['<b>', '</b>', '<b/>', '<b />'], ['<strong>', '</strong>', '<strong />', '<strong />'], $content_body);
+        $content_body = str_replace(['<i>', '</i>', '<i/>', '<i />'], ['<em>', '</em>', '<em />', '<em />'], $content_body);
     }
 
     // Handle featured image upload (optional for edit)
@@ -387,26 +398,32 @@ include 'includes/header.php';
                             <div class="form-text">Full content of your post with rich text formatting</div>
                         </div>
 
-                        <div class="mb-3">
+                        <!-- <div class="mb-3">
                             <label for="media_gallery" class="form-label">Media Gallery</label>
-                            <?php if (!empty($post_media_gallery)): ?>
+                            <?php //if (!empty($post_media_gallery)): 
+                            ?>
                                 <div class="mb-2">
                                     <div class="row">
-                                        <?php foreach ($post_media_gallery as $index => $image): ?>
+                                        <?php //foreach ($post_media_gallery as $index => $image): 
+                                        ?>
                                             <div class="col-md-2 mb-2">
-                                                <img src="<?php echo htmlspecialchars($image); ?>"
-                                                    alt="Gallery image <?php echo $index + 1; ?>"
+                                                <img src="<?php //echo htmlspecialchars($image); 
+                                                            ?>"
+                                                    alt="Gallery image <?php //echo $index + 1; 
+                                                                        ?>"
                                                     class="img-thumbnail" style="width: 100%; height: 100px; object-fit: cover;">
                                             </div>
-                                        <?php endforeach; ?>
+                                        <?php //endforeach; 
+                                        ?>
                                     </div>
                                     <p class="text-muted small mt-1">Current gallery images</p>
                                 </div>
-                            <?php endif; ?>
+                            <?php //endif; 
+                            ?>
                             <input type="file" class="form-control" id="media_gallery" name="media_gallery[]"
                                 accept="image/*" multiple>
                             <div class="form-text">Add more images to your post gallery (will be added to existing images)</div>
-                        </div>
+                        </div> -->
                     </div>
                 </div>
 
@@ -420,17 +437,24 @@ include 'includes/header.php';
                             <!-- <div class="col-md-6">
                                 <div class="mb-3">
                                     <label class="form-label">Categories</label>
-                                    <?php //foreach ($categories as $category): ?>
+                                    <?php //foreach ($categories as $category): 
+                                    ?>
                                         <div class="form-check">
                                             <input class="form-check-input" type="checkbox"
-                                                name="categories[]" value="<?php //echo htmlspecialchars($category['name']); ?>"
-                                                id="cat_<?php //echo $category['id']; ?>"
-                                                <?php //echo (isset($_POST['categories']) ? (in_array($category['name'], $_POST['categories'])) : (in_array($category['name'], $post_categories))) ? 'checked' : ''; ?>>
-                                            <label class="form-check-label" for="cat_<?php //echo $category['id']; ?>">
-                                                <?php //echo htmlspecialchars($category['name']); ?>
+                                                name="categories[]" value="<?php //echo htmlspecialchars($category['name']); 
+                                                                            ?>"
+                                                id="cat_<?php //echo $category['id']; 
+                                                        ?>"
+                                                <?php //echo (isset($_POST['categories']) ? (in_array($category['name'], $_POST['categories'])) : (in_array($category['name'], $post_categories))) ? 'checked' : ''; 
+                                                ?>>
+                                            <label class="form-check-label" for="cat_<?php //echo $category['id']; 
+                                                                                        ?>">
+                                                <?php //echo htmlspecialchars($category['name']); 
+                                                ?>
                                             </label>
                                         </div>
-                                    <?php //endforeach; ?>
+                                    <?php //endforeach; 
+                                    ?>
                                 </div>
                             </div> -->
                             <div class="col-md-12">
@@ -664,10 +688,99 @@ include 'includes/header.php';
         updateHiddenTextarea();
     }
 
+    function cleanHTML(html) {
+        // Create a temporary div to parse HTML
+        const temp = document.createElement('div');
+        temp.innerHTML = html;
+
+        // Remove all style attributes, classes, and IDs
+        temp.querySelectorAll('*').forEach(el => {
+            el.removeAttribute('style');
+            el.removeAttribute('class');
+            el.removeAttribute('id');
+
+            // Replace <b> with <strong> and <i> with <em>
+            if (el.tagName === 'B') {
+                const strong = document.createElement('strong');
+                strong.innerHTML = el.innerHTML;
+                el.parentNode.replaceChild(strong, el);
+            } else if (el.tagName === 'I') {
+                const em = document.createElement('em');
+                em.innerHTML = el.innerHTML;
+                el.parentNode.replaceChild(em, el);
+            }
+        });
+
+        // Remove divs and spans, keep their content
+        temp.querySelectorAll('div, span').forEach(el => {
+            const parent = el.parentNode;
+            while (el.firstChild) {
+                parent.insertBefore(el.firstChild, el);
+            }
+            parent.removeChild(el);
+        });
+
+        return temp.innerHTML;
+    }
+
     function updateHiddenTextarea() {
-        const editorContent = document.getElementById('editor-content').innerHTML;
+        let editorContent = document.getElementById('editor-content').innerHTML;
+        // Clean the HTML before saving
+        editorContent = cleanHTML(editorContent);
         document.getElementById('content_body').value = editorContent;
     }
+
+    // Handle paste events - strip formatting but allow images
+    document.getElementById('editor-content').addEventListener('paste', function(e) {
+        e.preventDefault();
+
+        // Try to get HTML content first (for images)
+        const html = (e.clipboardData || window.clipboardData).getData('text/html');
+
+        if (html) {
+            // Parse HTML to extract images and clean content
+            const temp = document.createElement('div');
+            temp.innerHTML = html;
+
+            // Find all images and clean them
+            const images = temp.querySelectorAll('img');
+            images.forEach(img => {
+                // Keep only src and alt attributes
+                const src = img.getAttribute('src');
+                const alt = img.getAttribute('alt') || '';
+
+                // Remove all attributes
+                while (img.attributes.length > 0) {
+                    img.removeAttribute(img.attributes[0].name);
+                }
+
+                // Re-add only src and alt (no height, width, style, class, etc.)
+                if (src) {
+                    img.setAttribute('src', src);
+                    img.setAttribute('alt', alt);
+                }
+            });
+
+            // Get plain text and images combined
+            let cleanContent = '';
+            temp.childNodes.forEach(node => {
+                if (node.nodeName === 'IMG') {
+                    cleanContent += node.outerHTML;
+                } else {
+                    cleanContent += node.textContent || '';
+                }
+            });
+
+            // Insert the cleaned content
+            document.execCommand('insertHTML', false, cleanContent);
+        } else {
+            // Fallback to plain text if no HTML
+            const text = (e.clipboardData || window.clipboardData).getData('text/plain');
+            document.execCommand('insertText', false, text);
+        }
+
+        updateHiddenTextarea();
+    });
 
     // Update hidden textarea when content changes
     document.getElementById('editor-content').addEventListener('input', updateHiddenTextarea);

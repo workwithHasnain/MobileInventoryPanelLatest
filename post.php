@@ -367,16 +367,49 @@ if ($_POST && isset($_POST['action'])) {
             text-transform: none;
         }
 
-        .document-section .gap-portion span {
+        /* Reset all potential external styles in content */
+        .document-section .gap-portion * {
             text-transform: none !important;
+            font-family: inherit !important;
+            background: none !important;
+            border: none !important;
+            margin: revert !important;
+            padding: revert !important;
         }
 
-        .document-section .gap-portion div {
-            text-transform: none !important;
+        /* Allow only specific formatting */
+        .document-section .gap-portion strong {
+            font-weight: 700;
         }
 
-        .document-section .gap-portion p {
-            text-transform: none !important;
+        .document-section .gap-portion em {
+            font-style: italic;
+        }
+
+        .document-section .gap-portion u {
+            text-decoration: underline;
+        }
+
+        .document-section .gap-portion h1,
+        .document-section .gap-portion h2,
+        .document-section .gap-portion h3,
+        .document-section .gap-portion h4,
+        .document-section .gap-portion h5,
+        .document-section .gap-portion h6 {
+            font-weight: 600;
+            margin-top: 1.5rem;
+            margin-bottom: 1rem;
+        }
+
+        .document-section .gap-portion ul,
+        .document-section .gap-portion ol {
+            margin-left: 1.5rem;
+            margin-bottom: 1rem;
+        }
+
+        .document-section .gap-portion img {
+            max-width: 100%;
+            height: auto;
         }
 
         .media-gallery img {
@@ -528,12 +561,12 @@ if ($_POST && isset($_POST['action'])) {
             /* height: auto !important; */
             display: block !important;
             max-width: 100% !important;
-            object-fit:cover;
-            height:100%;
+            object-fit: cover;
+            height: 100%;
         }
     </style>
     <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-4554952734894265"
-     crossorigin="anonymous"></script>
+        crossorigin="anonymous"></script>
 </head>
 
 <body style="background-color: #EFEBE9; overflow-x: hidden;">
@@ -661,14 +694,6 @@ if ($_POST && isset($_POST['action'])) {
                     </div>
                 </div>
                 <div class="document-section">
-                    <?php if (!empty($post['short_description'])): ?>
-                        <p class="classy gap-portion"><?php echo nl2br(htmlspecialchars($post['short_description'])); ?></p>
-                    <?php endif; ?>
-
-                    <?php if (!empty($post['featured_image'])): ?>
-                        <img class="center-img" src="<?php echo htmlspecialchars($post['featured_image']); ?>" alt="<?php echo htmlspecialchars($post['title']); ?>">
-                    <?php endif; ?>
-
                     <?php if (!empty($post['content_body'])): ?>
                         <div class="gap-portion">
                             <?php
@@ -689,23 +714,29 @@ if ($_POST && isset($_POST['action'])) {
                     <?php endif; ?>
 
                     <?php
-                    $media_gallery = $post['media_gallery'];
-                    if (!empty($media_gallery)):
-                        // Handle PostgreSQL array format
-                        if (is_string($media_gallery)) {
-                            // Parse PostgreSQL array string
-                            $media_gallery = trim($media_gallery, '{}');
-                            $media_gallery = explode(',', $media_gallery);
-                        }
-                        if (is_array($media_gallery)):
+                    //$media_gallery = $post['media_gallery'];
+                    //if (!empty($media_gallery)):
+                    // Handle PostgreSQL array format
+                    //if (is_string($media_gallery)) {
+                    // Parse PostgreSQL array string
+                    //  $media_gallery = trim($media_gallery, '{}');
+                    //$media_gallery = explode(',', $media_gallery);
+                    //}
+                    //if (is_array($media_gallery)):
                     ?>
-                            <div class="media-gallery mt-4">
-                                <?php foreach ($media_gallery as $media): ?>
-                                    <img class="center-img my-2" src="<?php echo htmlspecialchars(trim($media)); ?>" alt="Media from <?php echo htmlspecialchars($post['title']); ?>">
-                                <?php endforeach; ?>
-                            </div>
-                        <?php endif; ?>
-                    <?php endif; ?>
+                    <!-- <div class="media-gallery mt-4"> -->
+                    <?php //foreach ($media_gallery as $media): 
+                    ?>
+                    <!-- <img class="center-img my-2" src="<?php //echo htmlspecialchars(trim($media)); 
+                                                            ?>" alt="Media from <?php //echo htmlspecialchars($post['title']); 
+                                                                                                                            ?>"> -->
+                    <?php //endforeach; 
+                    ?>
+                    <!-- </div> -->
+                    <?php //endif; 
+                    ?>
+                    <?php //endif; 
+                    ?>
                 </div>
 
                 <div class="comments">
