@@ -965,44 +965,44 @@ $commentCount = getDeviceCommentCount($pdo, $device_id);
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title><?php echo htmlspecialchars(($device['brand_name'] ?? '') . ' ' . ($device['name'] ?? 'Device')); ?> - Specifications & Reviews | DevicesArena</title>
 
-    <!-- Favicon & Icons -->
-    <link rel="icon" type="image/png" sizes="32x32" href="imges/icon-32.png">
-    <link rel="icon" type="image/png" sizes="256x256" href="imges/icon-256.png">
-    <link rel="shortcut icon" href="imges/icon-32.png">
+  <!-- Favicon & Icons -->
+  <link rel="icon" type="image/png" sizes="32x32" href="imges/icon-32.png">
+  <link rel="icon" type="image/png" sizes="256x256" href="imges/icon-256.png">
+  <link rel="shortcut icon" href="imges/icon-32.png">
 
-    <!-- Apple Touch Icon (iOS Home Screen) -->
-    <link rel="apple-touch-icon" href="imges/icon-256.png">
-    <link rel="apple-touch-icon" sizes="256x256" href="imges/icon-256.png">
+  <!-- Apple Touch Icon (iOS Home Screen) -->
+  <link rel="apple-touch-icon" href="imges/icon-256.png">
+  <link rel="apple-touch-icon" sizes="256x256" href="imges/icon-256.png">
 
-    <!-- Android Chrome Icons -->
-    <link rel="icon" type="image/png" sizes="192x192" href="imges/icon-256.png">
-    <link rel="icon" type="image/png" sizes="512x512" href="imges/icon-256.png">
+  <!-- Android Chrome Icons -->
+  <link rel="icon" type="image/png" sizes="192x192" href="imges/icon-256.png">
+  <link rel="icon" type="image/png" sizes="512x512" href="imges/icon-256.png">
 
-    <!-- Theme Color (Browser Chrome & Address Bar) -->
-    <meta name="theme-color" content="#8D6E63">
+  <!-- Theme Color (Browser Chrome & Address Bar) -->
+  <meta name="theme-color" content="#8D6E63">
 
-    <!-- Windows Tile Icon -->
-    <meta name="msapplication-TileColor" content="#8D6E63">
-    <meta name="msapplication-TileImage" content="imges/icon-256.png">
+  <!-- Windows Tile Icon -->
+  <meta name="msapplication-TileColor" content="#8D6E63">
+  <meta name="msapplication-TileImage" content="imges/icon-256.png">
 
-    <!-- Open Graph Meta Tags (Social Media Sharing) -->
-    <meta property="og:site_name" content="DevicesArena">
-    <meta property="og:title" content="DevicesArena - Smartphone Reviews & Comparisons">
-    <meta property="og:description" content="Explore the latest smartphones, detailed specifications, reviews, and comparisons on DevicesArena.">
-    <meta property="og:image" content="imges/icon-256.png">
-    <meta property="og:image:type" content="image/png">
-    <meta property="og:image:width" content="256">
-    <meta property="og:image:height" content="256">
-    <meta property="og:type" content="website">
+  <!-- Open Graph Meta Tags (Social Media Sharing) -->
+  <meta property="og:site_name" content="DevicesArena">
+  <meta property="og:title" content="DevicesArena - Smartphone Reviews & Comparisons">
+  <meta property="og:description" content="Explore the latest smartphones, detailed specifications, reviews, and comparisons on DevicesArena.">
+  <meta property="og:image" content="imges/icon-256.png">
+  <meta property="og:image:type" content="image/png">
+  <meta property="og:image:width" content="256">
+  <meta property="og:image:height" content="256">
+  <meta property="og:type" content="website">
 
-    <!-- Twitter Card Meta Tags -->
-    <meta name="twitter:card" content="summary">
-    <meta name="twitter:title" content="DevicesArena">
-    <meta name="twitter:description" content="Explore the latest smartphones, detailed specifications, reviews, and comparisons.">
-    <meta name="twitter:image" content="imges/icon-256.png">
+  <!-- Twitter Card Meta Tags -->
+  <meta name="twitter:card" content="summary">
+  <meta name="twitter:title" content="DevicesArena">
+  <meta name="twitter:description" content="Explore the latest smartphones, detailed specifications, reviews, and comparisons.">
+  <meta name="twitter:image" content="imges/icon-256.png">
 
-    <!-- PWA Manifest -->
-    <link rel="manifest" href="manifest.json">
+  <!-- PWA Manifest -->
+  <link rel="manifest" href="manifest.json">
 
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/css/bootstrap.min.css" rel="stylesheet"
     integrity="sha384-rbsA2VBKQhggwzxH7pPCaAqO46MgnOM80zW1RWuH61DGLwZJEdK2Kadq2F9CUG65" crossorigin="anonymous">
@@ -1018,7 +1018,7 @@ $commentCount = getDeviceCommentCount($pdo, $device_id);
 
   <link rel="stylesheet" href="style.css">
   <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-4554952734894265"
-     crossorigin="anonymous"></script>
+    crossorigin="anonymous"></script>
 </head>
 
 <body style="background-color: #EFEBE9; overflow-x: hidden;">
@@ -1986,7 +1986,7 @@ $commentCount = getDeviceCommentCount($pdo, $device_id);
       <div class="modal-content" style="background-color: #EFEBE9; border: 2px solid #8D6E63;">
         <div class="modal-header" style="border-bottom: 1px solid #8D6E63; background-color: #D7CCC8;">
           <h5 class="modal-title" id="picturesModalLabel" style="font-family:system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue'; color: #5D4037;">
-            <i class="fas fa-images me-2"></i><?php echo htmlspecialchars(($device['brand_name'] ?? '') . ' ' . ($device['name'] ?? 'Device')); ?> - Pictures
+            <i class="fas fa-images me-2"></i><span id="picturesDeviceNameTitle"><?php echo htmlspecialchars(($device['brand_name'] ?? '') . ' ' . ($device['name'] ?? 'Device')); ?></span> - Pictures
           </h5>
           <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
         </div>
@@ -2359,6 +2359,9 @@ $commentCount = getDeviceCommentCount($pdo, $device_id);
     });
   }, 5000);
 
+  // Store the current device name in a global variable for use in modals
+  const currentDeviceName = <?php echo json_encode(htmlspecialchars(($device['brand_name'] ?? '') . ' ' . ($device['name'] ?? 'Device'))); ?>;
+
   function openImageModal(imageSrc) {
     document.getElementById('modalImage').src = imageSrc;
     new bootstrap.Modal(document.getElementById('imageModal')).show();
@@ -2370,6 +2373,15 @@ $commentCount = getDeviceCommentCount($pdo, $device_id);
 
   // Pictures Modal Functions
   function showPicturesModal() {
+    // Get the device name from the page's heading
+    const phoneTitle = document.querySelector('.phone-title');
+    const deviceNameSpan = document.getElementById('picturesDeviceNameTitle');
+
+    if (deviceNameSpan && phoneTitle) {
+      // Extract device name from the phone-title heading
+      deviceNameSpan.textContent = phoneTitle.textContent.trim();
+    }
+
     const modal = new bootstrap.Modal(document.getElementById('picturesModal'));
     modal.show();
 
