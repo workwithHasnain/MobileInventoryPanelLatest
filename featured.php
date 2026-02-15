@@ -1,7 +1,17 @@
 <?php
 // Public home page - no authentication required
+require_once 'config.php';
 require_once 'database_functions.php';
 require_once 'phone_data.php';
+
+// Helper function to convert relative image paths to absolute
+function getAbsoluteImagePath($imagePath, $base)
+{
+    if (empty($imagePath)) return '';
+    if (filter_var($imagePath, FILTER_VALIDATE_URL)) return $imagePath;
+    if (strpos($imagePath, '/') === 0) return $imagePath;
+    return $base . ltrim($imagePath, '/');
+}
 
 // Get posts and devices for display (case-insensitive status check) with comment counts
 $pdo = getConnection();
@@ -179,30 +189,30 @@ $latestDevices = array_slice(array_reverse($latestDevices), 0, 9);
     <title>DevicesArena</title>
 
     <!-- Favicon & Icons -->
-    <link rel="icon" type="image/png" sizes="32x32" href="imges/icon-32.png">
-    <link rel="icon" type="image/png" sizes="256x256" href="imges/icon-256.png">
-    <link rel="shortcut icon" href="imges/icon-32.png">
+    <link rel="icon" type="image/png" sizes="32x32" href="<?php echo $base; ?>imges/icon-32.png">
+    <link rel="icon" type="image/png" sizes="256x256" href="<?php echo $base; ?>imges/icon-256.png">
+    <link rel="shortcut icon" href="<?php echo $base; ?>imges/icon-32.png">
 
     <!-- Apple Touch Icon (iOS Home Screen) -->
-    <link rel="apple-touch-icon" href="imges/icon-256.png">
-    <link rel="apple-touch-icon" sizes="256x256" href="imges/icon-256.png">
+    <link rel="apple-touch-icon" href="<?php echo $base; ?>imges/icon-256.png">
+    <link rel="apple-touch-icon" sizes="256x256" href="<?php echo $base; ?>imges/icon-256.png">
 
     <!-- Android Chrome Icons -->
-    <link rel="icon" type="image/png" sizes="192x192" href="imges/icon-256.png">
-    <link rel="icon" type="image/png" sizes="512x512" href="imges/icon-256.png">
+    <link rel="icon" type="image/png" sizes="192x192" href="<?php echo $base; ?>imges/icon-256.png">
+    <link rel="icon" type="image/png" sizes="512x512" href="<?php echo $base; ?>imges/icon-256.png">
 
     <!-- Theme Color (Browser Chrome & Address Bar) -->
     <meta name="theme-color" content="#8D6E63">
 
     <!-- Windows Tile Icon -->
     <meta name="msapplication-TileColor" content="#8D6E63">
-    <meta name="msapplication-TileImage" content="imges/icon-256.png">
+    <meta name="msapplication-TileImage" content="<?php echo $base; ?>imges/icon-256.png">
 
     <!-- Open Graph Meta Tags (Social Media Sharing) -->
     <meta property="og:site_name" content="DevicesArena">
     <meta property="og:title" content="DevicesArena - Smartphone Reviews & Comparisons">
     <meta property="og:description" content="Explore the latest smartphones, detailed specifications, reviews, and comparisons on DevicesArena.">
-    <meta property="og:image" content="imges/icon-256.png">
+    <meta property="og:image" content="<?php echo $base; ?>imges/icon-256.png">
     <meta property="og:image:type" content="image/png">
     <meta property="og:image:width" content="256">
     <meta property="og:image:height" content="256">
@@ -212,10 +222,10 @@ $latestDevices = array_slice(array_reverse($latestDevices), 0, 9);
     <meta name="twitter:card" content="summary">
     <meta name="twitter:title" content="DevicesArena">
     <meta name="twitter:description" content="Explore the latest smartphones, detailed specifications, reviews, and comparisons.">
-    <meta name="twitter:image" content="imges/icon-256.png">
+    <meta name="twitter:image" content="<?php echo $base; ?>imges/icon-256.png">
 
     <!-- PWA Manifest -->
-    <link rel="manifest" href="manifest.json">
+    <link rel="manifest" href="<?php echo $base; ?>manifest.json">
 
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/css/bootstrap.min.css" rel="stylesheet"
         integrity="sha384-rbsA2VBKQhggwzxH7pPCaAqO46MgnOM80zW1RWuH61DGLwZJEdK2Kadq2F9CUG65" crossorigin="anonymous">
@@ -230,7 +240,7 @@ $latestDevices = array_slice(array_reverse($latestDevices), 0, 9);
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" />
 
 
-    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="<?php echo $base; ?>style.css">
     <style>
         /* Brand Modal Styling */
         .brand-cell-modal {
@@ -338,13 +348,13 @@ $latestDevices = array_slice(array_reverse($latestDevices), 0, 9);
 
             <div class="col-md-8 col-5  d-lg-inline d-none col-12 " style="position: relative;left:0; padding-left: 0px;">
                 <div class="comfort-life position-absolute">
-                    <img class="w-100 h-100" src="hero-images/featured-hero.png"
+                    <img class="w-100 h-100" src="<?php echo $base; ?>hero-images/featured-hero.png"
                         style="background-repeat: no-repeat; background-size: cover;" alt="">
                     <div class="position-absolute d-flex mt-1 ml-2" style="top: 0; flex-wrap: wrap; gap: 8px;">
                         <label class="text-white whitening px-2">Popular Tags</label>
                         <?php if (!empty($popularTags)): ?>
                             <?php foreach ($popularTags as $tag => $count): ?>
-                                <a href="featured.php?tag=<?php echo urlencode($tag); ?>"><button class="mobiles-button"><?php echo htmlspecialchars($tag); ?></button></a>
+                                <a href="<?php echo $base; ?>featured?tag=<?php echo urlencode($tag); ?>"><button class="mobiles-button"><?php echo htmlspecialchars($tag); ?></button></a>
                             <?php endforeach; ?>
                         <?php else: ?>
                             <span class="text-white">No tags available</span>
@@ -416,13 +426,13 @@ $latestDevices = array_slice(array_reverse($latestDevices), 0, 9);
                 ?>
                     <div class="col-lg-8 col-md-6 col-12 sentizer-erx grid-colums " style="background-color: #EEEEEE;">
                         <?php foreach ($colPosts as $post): ?>
-                            <a href="post.php?slug=<?php echo urlencode($post['slug']); ?>">
-                                <div class="review-card mb-4" style="cursor:pointer;" onclick="window.location.href='post.php?slug=<?php echo urlencode($post['slug']); ?>'">
+                            <a href="<?php echo $base; ?>post/<?php echo urlencode($post['slug']); ?>">
+                                <div class="review-card mb-4" style="cursor:pointer;" onclick="window.location.href='<?php echo $base; ?>post/<?php echo urlencode($post['slug']); ?>'">
                                     <?php if (isset($post['featured_image']) && !empty($post['featured_image'])): ?>
-                                        <img style="cursor:pointer;" onclick="window.location.href='post.php?slug=<?php echo urlencode($post['slug']); ?>'" src="<?php echo htmlspecialchars($post['featured_image']); ?>" alt="<?php echo htmlspecialchars($post['title']); ?>">
+                                        <img style="cursor:pointer;" onclick="window.location.href='<?php echo $base; ?>post/<?php echo urlencode($post['slug']); ?>'" src="<?php echo htmlspecialchars(getAbsoluteImagePath($post['featured_image'], $base)); ?>" alt="<?php echo htmlspecialchars($post['title']); ?>">
                                     <?php endif; ?>
                                     <div class="review-card-body">
-                                        <div style="cursor:pointer;" onclick="window.location.href='post.php?slug=<?php echo urlencode($post['slug']); ?>'" class="review-card-title"><?php echo htmlspecialchars($post['title']); ?></div>
+                                        <div style="cursor:pointer;" onclick="window.location.href='<?php echo $base; ?>post/<?php echo urlencode($post['slug']); ?>'" class="review-card-title"><?php echo htmlspecialchars($post['title']); ?></div>
                                         <div class="review-card-meta">
                                             <span><?php echo date('M j, Y', strtotime($post['created_at'])); ?></span>
                                             <span><i class="bi bi-chat-dots-fill"></i><?php echo $post['comment_count']; ?> comments</span>
@@ -558,7 +568,7 @@ $latestDevices = array_slice(array_reverse($latestDevices), 0, 9);
             fetch(`get_post_details.php?id=${postId}`)
                 .then(response => response.text())
                 .then(data => {
-                    window.location.href = `post.php?id=${postId}`;
+                    window.location.href = `<?php echo $base; ?>post.php?id=${postId}`;
                 })
                 .catch(error => {
                     console.error('Error:', error);
@@ -728,7 +738,7 @@ $latestDevices = array_slice(array_reverse($latestDevices), 0, 9);
             }
         });
     </script>
-    <script src="script.js"></script>
+    <script src="<?php echo $base; ?>script.js"></script>
 </body>
 
 </html>

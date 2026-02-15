@@ -20,15 +20,15 @@
         </div>
         <div class="row align-items-center">
             <div class="m-auto col-2 d-flex justify-content-center align-items-center" style="width: max-content;">
-                <img src="imges/logo-wide.svg" alt="devices arena logo for footer" style=" width: 185px;">
+                <img src="<?php echo $base; ?>imges/logo-wide.svg" alt="devices arena logo for footer" style=" width: 185px;">
             </div>
             <div class="col-10 nav-wrap m-auto text-center ">
                 <div class="nav-container">
-                    <a href="index.php" style="color: white;">Home</a>
-                    <a href="reviews.php" style="color: white;">Reviews</a>
-                    <a href="compare.php" style="color: white;">Compare</a>
-                    <a href="phonefinder.php" style="color: white;">Phone Finder</a>
-                    <a href="featured.php" style="color: white;">Featured</a>
+                    <a href="<?php echo $base; ?>" style="color: white;">Home</a>
+                    <a href="<?php echo $base; ?>/reviews" style="color: white;">Reviews</a>
+                    <a href="<?php echo $base; ?>/compare" style="color: white;">Compare</a>
+                    <a href="<?php echo $base; ?>/phonefinder" style="color: white;">Phone Finder</a>
+                    <a href="<?php echo $base; ?>/featured" style="color: white;">Featured</a>
                     <br>
                     <a href="https://youtube.com/@devicesarena" style="color: white;"> <i class="fa-brands fa-youtube fa-sm"></i></a>
                     <a href="https://www.instagram.com/devicesarenaofficial/" style="color: white;"> <i class="fa-brands fa-instagram fa-sm"></i></a>
@@ -36,7 +36,7 @@
                     <a href="https://www.facebook.com/profile.php?id=61585936163841" style="color: white;"> <i class="fa-brands fa-facebook-f fa-sm"></i></a>
                     <a href="https://www.twitter.com/" style="color: white;"> <i class="fa-brands fa-twitter fa-sm"></i></a>
                     <br>
-                    <a href="#" style="color: white;">© 2000-2025 DevicesArena.com</a>
+                    <a href="#" style="color: white;">© 2000-2026 DevicesArena.com</a>
                 </div>
             </div>
         </div>

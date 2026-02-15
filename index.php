@@ -1,7 +1,17 @@
 <?php
 // Public home page - no authentication required
+require_once 'config.php';
 require_once 'database_functions.php';
 require_once 'phone_data.php';
+
+// Helper function to convert relative image paths to absolute
+function getAbsoluteImagePath($imagePath, $base)
+{
+    if (empty($imagePath)) return '';
+    if (filter_var($imagePath, FILTER_VALIDATE_URL)) return $imagePath;
+    if (strpos($imagePath, '/') === 0) return $imagePath;
+    return $base . ltrim($imagePath, '/');
+}
 
 // Get posts and devices for display (case-insensitive status check) with comment counts
 $pdo = getConnection();
@@ -192,30 +202,30 @@ if ($_POST && isset($_POST['action'])) {
     <title>DevicesArena</title>
 
     <!-- Favicon & Icons -->
-    <link rel="icon" type="image/png" sizes="32x32" href="imges/icon-32.png">
-    <link rel="icon" type="image/png" sizes="256x256" href="imges/icon-256.png">
-    <link rel="shortcut icon" href="imges/icon-32.png">
+    <link rel="icon" type="image/png" sizes="32x32" href="<?php echo $base; ?>imges/icon-32.png">
+    <link rel="icon" type="image/png" sizes="256x256" href="<?php echo $base; ?>imges/icon-256.png">
+    <link rel="shortcut icon" href="<?php echo $base; ?>imges/icon-32.png">
 
     <!-- Apple Touch Icon (iOS Home Screen) -->
-    <link rel="apple-touch-icon" href="imges/icon-256.png">
-    <link rel="apple-touch-icon" sizes="256x256" href="imges/icon-256.png">
+    <link rel="apple-touch-icon" href="<?php echo $base; ?>imges/icon-256.png">
+    <link rel="apple-touch-icon" sizes="256x256" href="<?php echo $base; ?>imges/icon-256.png">
 
     <!-- Android Chrome Icons -->
-    <link rel="icon" type="image/png" sizes="192x192" href="imges/icon-256.png">
-    <link rel="icon" type="image/png" sizes="512x512" href="imges/icon-256.png">
+    <link rel="icon" type="image/png" sizes="192x192" href="<?php echo $base; ?>imges/icon-256.png">
+    <link rel="icon" type="image/png" sizes="512x512" href="<?php echo $base; ?>imges/icon-256.png">
 
     <!-- Theme Color (Browser Chrome & Address Bar) -->
     <meta name="theme-color" content="#8D6E63">
 
     <!-- Windows Tile Icon -->
     <meta name="msapplication-TileColor" content="#8D6E63">
-    <meta name="msapplication-TileImage" content="imges/icon-256.png">
+    <meta name="msapplication-TileImage" content="<?php echo $base; ?>imges/icon-256.png">
 
     <!-- Open Graph Meta Tags (Social Media Sharing) -->
     <meta property="og:site_name" content="DevicesArena">
     <meta property="og:title" content="DevicesArena - Smartphone Reviews & Comparisons">
     <meta property="og:description" content="Explore the latest smartphones, detailed specifications, reviews, and comparisons on DevicesArena.">
-    <meta property="og:image" content="imges/icon-256.png">
+    <meta property="og:image" content="<?php echo $base; ?>imges/icon-256.png">
     <meta property="og:image:type" content="image/png">
     <meta property="og:image:width" content="256">
     <meta property="og:image:height" content="256">
@@ -225,10 +235,10 @@ if ($_POST && isset($_POST['action'])) {
     <meta name="twitter:card" content="summary">
     <meta name="twitter:title" content="DevicesArena">
     <meta name="twitter:description" content="Explore the latest smartphones, detailed specifications, reviews, and comparisons.">
-    <meta name="twitter:image" content="imges/icon-256.png">
+    <meta name="twitter:image" content="<?php echo $base; ?>imges/icon-256.png">
 
     <!-- PWA Manifest -->
-    <link rel="manifest" href="manifest.json">
+    <link rel="manifest" href="<?php echo $base; ?>manifest.json">
 
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/css/bootstrap.min.css" rel="stylesheet"
         integrity="sha384-rbsA2VBKQhggwzxH7pPCaAqO46MgnOM80zW1RWuH61DGLwZJEdK2Kadq2F9CUG65" crossorigin="anonymous">
@@ -242,7 +252,7 @@ if ($_POST && isset($_POST['action'])) {
     <script src="https://kit.fontawesome.com/your-kit-code.js" crossorigin="anonymous"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" />
 
-    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="<?php echo $base; ?>style.css">
     <style>
         /* Brand Modal Styling */
         .brand-cell-modal {
@@ -328,7 +338,7 @@ if ($_POST && isset($_POST['action'])) {
                 </div>
             <?php else: ?>
                 <?php foreach ($posts as $post): ?>
-                    <div class="div-block" style="cursor:pointer;" onclick="window.location.href='post.php?slug=<?php echo urlencode($post['slug']); ?>'">
+                    <div class="div-block" style="cursor:pointer;" onclick="window.location.href='<?php echo $base; ?>post/<?php echo urlencode($post['slug']); ?>'">
                         <?php if (!empty($post['featured_image'])): ?>
                             <div style="
     height: 160px;
@@ -337,15 +347,15 @@ if ($_POST && isset($_POST['action'])) {
     object-fit: initial;
 ">
 
-                                <img src="<?php echo htmlspecialchars($post['featured_image']); ?>" alt="Featured Image" style="
+                                <img src="<?php echo htmlspecialchars(getAbsoluteImagePath($post['featured_image'], $base)); ?>" alt="Featured Image" style="
                             height: 100%;
     width: 100%;
     cursor: pointer;
     object-fit: cover;
-                            " onclick="window.location.href='post.php?slug=<?php echo urlencode($post['slug']); ?>'">
+                            " onclick="window.location.href='<?php echo $base; ?>post/<?php echo urlencode($post['slug']); ?>'">
                             </div>
                         <?php endif; ?>
-                        <h3 class="sony-tv" style="cursor:pointer;" onclick="window.location.href='post.php?slug=<?php echo urlencode($post['slug']); ?>'"><?php echo htmlspecialchars($post['title']); ?></h3>
+                        <h3 class="sony-tv" style="cursor:pointer;" onclick="window.location.href='<?php echo $base; ?>post/<?php echo urlencode($post['slug']); ?>'"><?php echo htmlspecialchars($post['title']); ?></h3>
                     </div>
                 <?php endforeach; ?>
             <?php endif; ?>
@@ -402,10 +412,10 @@ if ($_POST && isset($_POST['action'])) {
                         <?php foreach ($colPosts as $post): ?>
                             <div class="card-wrap">
                                 <?php if (!empty($post['featured_image'])): ?>
-                                    <img class="review-list-item-image" src="<?php echo htmlspecialchars($post['featured_image']); ?>" alt="<?php echo htmlspecialchars($post['title']); ?>" style="cursor:pointer;" onclick="window.location.href='post.php?slug=<?php echo urlencode($post['slug']); ?>'">
+                                    <img class="review-list-item-image" src="<?php echo htmlspecialchars(getAbsoluteImagePath($post['featured_image'], $base)); ?>" alt="<?php echo htmlspecialchars($post['title']); ?>" style="cursor:pointer;" onclick="window.location.href='<?php echo $base; ?>post/<?php echo urlencode($post['slug']); ?>'">
                                 <?php endif; ?>
                                 <div class="card-text">
-                                    <h1 style="cursor:pointer; overflow-wrap: break-word;" onclick="window.location.href='post.php?slug=<?php echo urlencode($post['slug']); ?>'"><?php echo htmlspecialchars($post['title']); ?></h1>
+                                    <h1 style="cursor:pointer; overflow-wrap: break-word;" onclick="window.location.href='<?php echo $base; ?>post/<?php echo urlencode($post['slug']); ?>'"><?php echo htmlspecialchars($post['title']); ?></h1>
                                 </div>
 
                             </div>
@@ -465,13 +475,13 @@ if ($_POST && isset($_POST['action'])) {
                     ?>
                         <div class="col-lg-4 col-md-6 col-12 sentizer-erx" style="background-color: #EEEEEE;">
                             <?php foreach ($colPosts as $post): ?>
-                                <a href="post.php?slug=<?php echo urlencode($post['slug']); ?>">
-                                    <div class="review-card mb-4" style="cursor:pointer;" onclick="window.location.href='post.php?slug=<?php echo urlencode($post['slug']); ?>'">
+                                <a href="<?php echo $base; ?>post/<?php echo urlencode($post['slug']); ?>">
+                                    <div class="review-card mb-4" style="cursor:pointer;" onclick="window.location.href='<?php echo $base; ?>post/<?php echo urlencode($post['slug']); ?>'">
                                         <?php if (isset($post['featured_image']) && !empty($post['featured_image'])): ?>
-                                            <img style="cursor:pointer;" onclick="window.location.href='post.php?slug=<?php echo urlencode($post['slug']); ?>'" src="<?php echo htmlspecialchars($post['featured_image']); ?>" alt="<?php echo htmlspecialchars($post['title']); ?>">
+                                            <img style="cursor:pointer;" onclick="window.location.href='<?php echo $base; ?>post/<?php echo urlencode($post['slug']); ?>'" src="<?php echo htmlspecialchars(getAbsoluteImagePath($post['featured_image'], $base)); ?>" alt="<?php echo htmlspecialchars($post['title']); ?>">
                                         <?php endif; ?>
                                         <div class="review-card-body">
-                                            <div style="cursor:pointer;" onclick="window.location.href='post.php?slug=<?php echo urlencode($post['slug']); ?>'" class="review-card-title"><?php echo htmlspecialchars($post['title']); ?></div>
+                                            <div style="cursor:pointer;" onclick="window.location.href='<?php echo $base; ?>post/<?php echo urlencode($post['slug']); ?>'" class="review-card-title"><?php echo htmlspecialchars($post['title']); ?></div>
                                             <div class="review-card-meta">
                                                 <span><?php echo date('M j, Y', strtotime($post['created_at'])); ?></span>
                                                 <span><i class="bi bi-chat-dots-fill"></i><?php echo $post['comment_count']; ?> comments</span>
@@ -629,7 +639,7 @@ if ($_POST && isset($_POST['action'])) {
             fetch(`get_post_details.php?id=${postId}`)
                 .then(response => response.text())
                 .then(data => {
-                    window.location.href = `post.php?id=${postId}`;
+                    window.location.href = `<?php echo $base; ?>post.php?id=${postId}`;
                 })
                 .catch(error => {
                     console.error('Error:', error);
@@ -643,7 +653,7 @@ if ($_POST && isset($_POST['action'])) {
                 .then(response => response.text())
                 .then(data => {
                     // Redirect using device ID - will be redirected to slug URL by device.php
-                    window.location.href = `device.php?id=${deviceId}`;
+                    window.location.href = `<?php echo $base; ?>device/${deviceId}`;
                 })
                 .catch(error => {
                     console.error('Error:', error);
@@ -731,9 +741,9 @@ if ($_POST && isset($_POST['action'])) {
         function goToDevice(deviceSlugOrId) {
             // Check if it's a slug or ID
             if (typeof deviceSlugOrId === 'string' && /[a-z-]/.test(deviceSlugOrId)) {
-                window.location.href = `device.php?slug=${encodeURIComponent(deviceSlugOrId)}`;
+                window.location.href = `<?php echo $base; ?>device/${encodeURIComponent(deviceSlugOrId)}`;
             } else {
-                window.location.href = `device.php?id=${deviceSlugOrId}`;
+                window.location.href = `<?php echo $base; ?>device/${deviceSlugOrId}`;
             }
         }
 
@@ -805,7 +815,7 @@ if ($_POST && isset($_POST['action'])) {
             }
         });
     </script>
-    <script src="script.js"></script>
+    <script src="<?php echo $base; ?>script.js"></script>
 
 
 </body>

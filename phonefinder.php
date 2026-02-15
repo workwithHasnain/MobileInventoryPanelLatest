@@ -1,7 +1,17 @@
 <?php
 // Public home page - no authentication required
+require_once 'config.php';
 require_once 'database_functions.php';
 require_once 'phone_data.php';
+
+// Helper function to convert relative image paths to absolute
+function getAbsoluteImagePath($imagePath, $base)
+{
+    if (empty($imagePath)) return '';
+    if (filter_var($imagePath, FILTER_VALIDATE_URL)) return $imagePath;
+    if (strpos($imagePath, '/') === 0) return $imagePath;
+    return $base . ltrim($imagePath, '/');
+}
 
 $pdo = getConnection();
 $brands_stmt = $pdo->prepare("
@@ -41,30 +51,30 @@ if (!$filterConfig) {
     <title>DevicesArena</title>
 
     <!-- Favicon & Icons -->
-    <link rel="icon" type="image/png" sizes="32x32" href="imges/icon-32.png">
-    <link rel="icon" type="image/png" sizes="256x256" href="imges/icon-256.png">
-    <link rel="shortcut icon" href="imges/icon-32.png">
+    <link rel="icon" type="image/png" sizes="32x32" href="<?php echo $base; ?>imges/icon-32.png">
+    <link rel="icon" type="image/png" sizes="256x256" href="<?php echo $base; ?>imges/icon-256.png">
+    <link rel="shortcut icon" href="<?php echo $base; ?>imges/icon-32.png">
 
     <!-- Apple Touch Icon (iOS Home Screen) -->
-    <link rel="apple-touch-icon" href="imges/icon-256.png">
-    <link rel="apple-touch-icon" sizes="256x256" href="imges/icon-256.png">
+    <link rel="apple-touch-icon" href="<?php echo $base; ?>imges/icon-256.png">
+    <link rel="apple-touch-icon" sizes="256x256" href="<?php echo $base; ?>imges/icon-256.png">
 
     <!-- Android Chrome Icons -->
-    <link rel="icon" type="image/png" sizes="192x192" href="imges/icon-256.png">
-    <link rel="icon" type="image/png" sizes="512x512" href="imges/icon-256.png">
+    <link rel="icon" type="image/png" sizes="192x192" href="<?php echo $base; ?>imges/icon-256.png">
+    <link rel="icon" type="image/png" sizes="512x512" href="<?php echo $base; ?>imges/icon-256.png">
 
     <!-- Theme Color (Browser Chrome & Address Bar) -->
     <meta name="theme-color" content="#8D6E63">
 
     <!-- Windows Tile Icon -->
     <meta name="msapplication-TileColor" content="#8D6E63">
-    <meta name="msapplication-TileImage" content="imges/icon-256.png">
+    <meta name="msapplication-TileImage" content="<?php echo $base; ?>imges/icon-256.png">
 
     <!-- Open Graph Meta Tags (Social Media Sharing) -->
     <meta property="og:site_name" content="DevicesArena">
     <meta property="og:title" content="DevicesArena - Smartphone Reviews & Comparisons">
     <meta property="og:description" content="Explore the latest smartphones, detailed specifications, reviews, and comparisons on DevicesArena.">
-    <meta property="og:image" content="imges/icon-256.png">
+    <meta property="og:image" content="<?php echo $base; ?>imges/icon-256.png">
     <meta property="og:image:type" content="image/png">
     <meta property="og:image:width" content="256">
     <meta property="og:image:height" content="256">
@@ -74,10 +84,10 @@ if (!$filterConfig) {
     <meta name="twitter:card" content="summary">
     <meta name="twitter:title" content="DevicesArena">
     <meta name="twitter:description" content="Explore the latest smartphones, detailed specifications, reviews, and comparisons.">
-    <meta name="twitter:image" content="imges/icon-256.png">
+    <meta name="twitter:image" content="<?php echo $base; ?>imges/icon-256.png">
 
     <!-- PWA Manifest -->
-    <link rel="manifest" href="manifest.json">
+    <link rel="manifest" href="<?php echo $base; ?>manifest.json">
 
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/css/bootstrap.min.css" rel="stylesheet"
         integrity="sha384-rbsA2VBKQhggwzxH7pPCaAqO46MgnOM80zW1RWuH61DGLwZJEdK2Kadq2F9CUG65" crossorigin="anonymous">
@@ -92,7 +102,7 @@ if (!$filterConfig) {
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" />
 
 
-    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="<?php echo $base; ?>style.css">
     <style>
         .filter-header {
             font-weight: bold;
@@ -176,7 +186,7 @@ if (!$filterConfig) {
 
             <div class="col-md-8 col-5  d-md-inline  " style="padding:0px;">
                 <div class="comfort-life position-absolute d-lg-block d-none ">
-                    <img class="w-100 h-100" src="hero-images/phonefinder-hero.png"
+                    <img class="w-100 h-100" src="<?php echo $base; ?>hero-images/phonefinder-hero.png"
                         style="background-repeat: no-repeat; background-size: cover;" alt="">
                 </div>
             </div>
@@ -1989,7 +1999,7 @@ if (!$filterConfig) {
                 return `
                 <div class="col-lg-3 col-md-4 col-sm-6 mb-4">
                     <div class="card h-100 shadow-sm">
-                        <a href="device.php?slug=${encodeURIComponent(device.slug || device.id)}" class="text-decoration-none">
+                        <a href="<?php echo $base; ?>device/${encodeURIComponent(device.slug || device.id)}" class="text-decoration-none">
                             <img src="${device.thumbnail}" class="card-img-top" alt="${device.name}" style="height: 200px; object-fit: contain; padding: 10px;">
                             <div class="card-body">
                                 <h6 class="card-title text-dark fw-bold">${device.name}</h6>
@@ -2074,9 +2084,9 @@ if (!$filterConfig) {
         // Navigate to device page
         function goToDevice(deviceSlugOrId) {
             if (typeof deviceSlugOrId === 'string' && /[a-z-]/.test(deviceSlugOrId)) {
-                window.location.href = `device.php?slug=${encodeURIComponent(deviceSlugOrId)}`;
+                window.location.href = `<?php echo $base; ?>device/${encodeURIComponent(deviceSlugOrId)}`;
             } else {
-                window.location.href = `device.php?id=${deviceSlugOrId}`;
+                window.location.href = `<?php echo $base; ?>device/${deviceSlugOrId}`;
             }
         }
     </script>
@@ -2204,7 +2214,7 @@ if (!$filterConfig) {
             }
         });
     </script>
-    <script src="script.js"></script>
+    <script src="<?php echo $base; ?>script.js"></script>
 </body>
 
 </html>

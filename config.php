@@ -1,29 +1,31 @@
 <?php
+
 /**
  * Configuration loader for the Mobile Phone Management System
  */
 
 // Load environment variables from .env file
-function loadEnv($path) {
+function loadEnv($path)
+{
     if (!file_exists($path)) {
         return false;
     }
-    
+
     $lines = file($path, FILE_IGNORE_NEW_LINES | FILE_SKIP_EMPTY_LINES);
     foreach ($lines as $line) {
         if (strpos(trim($line), '#') === 0) {
             continue; // Skip comments
         }
-        
+
         list($name, $value) = explode('=', $line, 2);
         $name = trim($name);
         $value = trim($value);
-        
+
         // Remove quotes if present
         if (preg_match('/^(["\'])(.*)\1$/', $value, $matches)) {
             $value = $matches[2];
         }
-        
+
         if (!array_key_exists($name, $_ENV)) {
             $_ENV[$name] = $value;
             putenv("$name=$value");
@@ -50,3 +52,8 @@ if (file_exists($envFile)) {
 $_ENV['APP_NAME'] = $_ENV['APP_NAME'] ?? 'Mobile Phone Management System';
 $_ENV['APP_ENV'] = $_ENV['APP_ENV'] ?? 'development';
 $_ENV['APP_DEBUG'] = $_ENV['APP_DEBUG'] ?? 'true';
+
+// Base URL configuration - Change based on environment
+// Localhost: /MobileInventoryPanelLatest/
+// Production: /
+$base = '/'; // Adjust this if deploying to production or a different subdirectory

@@ -1,7 +1,24 @@
 <?php
 // Public home page - no authentication required
+require_once 'config.php';
 require_once 'database_functions.php';
 require_once 'phone_data.php';
+
+// New clean URL format: domain/post/slug (instead of domain/post.php?slug=xyz)
+// The .htaccess file rewrites clean URLs to this page and passes slug as query parameter
+// Base path variable is now defined in config.php
+
+// Helper function to make image paths absolute
+function getAbsoluteImagePath($imagePath, $base)
+{
+    if (empty($imagePath)) return '';
+    // Already an absolute URL
+    if (filter_var($imagePath, FILTER_VALIDATE_URL)) return $imagePath;
+    // Already an absolute path starting with /
+    if (strpos($imagePath, '/') === 0) return $imagePath;
+    // Relative path - prepend base
+    return $base . ltrim($imagePath, '/');
+}
 
 // Get posts and devices for display (case-insensitive status check) with comment counts
 $pdo = getConnection();
@@ -98,6 +115,7 @@ $allBrandsModal = $all_brands_stmt->fetchAll();
 
 
 // Get post by slug or ID
+// New way: slug comes from clean URL (domain/post/slug) rewritten by .htaccess
 $slug = $_GET['slug'] ?? $_GET['id'] ?? null;
 
 if (!$slug) {
@@ -280,30 +298,30 @@ if ($_POST && isset($_POST['action'])) {
     <title><?php echo htmlspecialchars($post['meta_title'] ?? $post['title']); ?> - DevicesArena</title>
 
     <!-- Favicon & Icons -->
-    <link rel="icon" type="image/png" sizes="32x32" href="imges/icon-32.png">
-    <link rel="icon" type="image/png" sizes="256x256" href="imges/icon-256.png">
-    <link rel="shortcut icon" href="imges/icon-32.png">
+    <link rel="icon" type="image/png" sizes="32x32" href="<?php echo $base; ?>imges/icon-32.png">
+    <link rel="icon" type="image/png" sizes="256x256" href="<?php echo $base; ?>imges/icon-256.png">
+    <link rel="shortcut icon" href="<?php echo $base; ?>imges/icon-32.png">
 
     <!-- Apple Touch Icon (iOS Home Screen) -->
-    <link rel="apple-touch-icon" href="imges/icon-256.png">
-    <link rel="apple-touch-icon" sizes="256x256" href="imges/icon-256.png">
+    <link rel="apple-touch-icon" href="<?php echo $base; ?>imges/icon-256.png">
+    <link rel="apple-touch-icon" sizes="256x256" href="<?php echo $base; ?>imges/icon-256.png">
 
     <!-- Android Chrome Icons -->
-    <link rel="icon" type="image/png" sizes="192x192" href="imges/icon-256.png">
-    <link rel="icon" type="image/png" sizes="512x512" href="imges/icon-256.png">
+    <link rel="icon" type="image/png" sizes="192x192" href="<?php echo $base; ?>imges/icon-256.png">
+    <link rel="icon" type="image/png" sizes="512x512" href="<?php echo $base; ?>imges/icon-256.png">
 
     <!-- Theme Color (Browser Chrome & Address Bar) -->
     <meta name="theme-color" content="#8D6E63">
 
     <!-- Windows Tile Icon -->
     <meta name="msapplication-TileColor" content="#8D6E63">
-    <meta name="msapplication-TileImage" content="imges/icon-256.png">
+    <meta name="msapplication-TileImage" content="<?php echo $base; ?>imges/icon-256.png">
 
     <!-- Open Graph Meta Tags (Social Media Sharing) -->
     <meta property="og:site_name" content="DevicesArena">
     <meta property="og:title" content="DevicesArena - Smartphone Reviews & Comparisons">
     <meta property="og:description" content="Explore the latest smartphones, detailed specifications, reviews, and comparisons on DevicesArena.">
-    <meta property="og:image" content="imges/icon-256.png">
+    <meta property="og:image" content="<?php echo $base; ?>imges/icon-256.png">
     <meta property="og:image:type" content="image/png">
     <meta property="og:image:width" content="256">
     <meta property="og:image:height" content="256">
@@ -313,10 +331,10 @@ if ($_POST && isset($_POST['action'])) {
     <meta name="twitter:card" content="summary">
     <meta name="twitter:title" content="DevicesArena">
     <meta name="twitter:description" content="Explore the latest smartphones, detailed specifications, reviews, and comparisons.">
-    <meta name="twitter:image" content="imges/icon-256.png">
+    <meta name="twitter:image" content="<?php echo $base; ?>imges/icon-256.png">
 
     <!-- PWA Manifest -->
-    <link rel="manifest" href="manifest.json">
+    <link rel="manifest" href="<?php echo $base; ?>manifest.json">
 
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/css/bootstrap.min.css" rel="stylesheet"
         integrity="sha384-rbsA2VBKQhggwzxH7pPCaAqO46MgnOM80zW1RWuH61DGLwZJEdK2Kadq2F9CUG65" crossorigin="anonymous">
@@ -333,7 +351,7 @@ if ($_POST && isset($_POST['action'])) {
 
     </script>
 
-    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="<?php echo $base; ?>style.css">
 
     <style>
         /* Avatar and Comment Styles */
@@ -576,7 +594,7 @@ if ($_POST && isset($_POST['action'])) {
         <h3 style="font-size: 23px;
         font-weight: 600; font-family: 'system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif';" class="mx-3 my-5"><?php echo htmlspecialchars($post['title']); ?></h3>
         <?php if (!empty($post['featured_image'])): ?>
-            <img style="height: 100%; width: -webkit-fill-available;" src="<?php echo htmlspecialchars($post['featured_image']); ?>" alt="<?php echo htmlspecialchars($post['title']); ?>">
+            <img style="height: 100%; width: -webkit-fill-available;" src="<?php echo htmlspecialchars(getAbsoluteImagePath($post['featured_image'], $base)); ?>" alt="<?php echo htmlspecialchars($post['title']); ?>">
         <?php endif; ?>
     </div>
     <div class="container support content-wrapper" id="Top">
@@ -587,7 +605,7 @@ if ($_POST && isset($_POST['action'])) {
                     <div class="article-info post-image">
                         <div class="bg-blur post-inside">
                             <?php if (!empty($post['featured_image'])): ?>
-                                <img class="center-img" src="<?php echo htmlspecialchars($post['featured_image']); ?>" alt="<?php echo htmlspecialchars($post['title']); ?>">
+                                <img class="center-img" src="<?php echo htmlspecialchars(getAbsoluteImagePath($post['featured_image'], $base)); ?>" alt="<?php echo htmlspecialchars($post['title']); ?>">
                             <?php endif; ?>
                         </div>
                     </div>
@@ -1309,8 +1327,8 @@ if ($_POST && isset($_POST['action'])) {
             }
         });
     </script>
-    <script src="script.js"></script>
-    <script src="js/comment-ajax.js"></script>
+    <script src="<?php echo $base; ?>script.js"></script>
+    <script src="<?php echo $base; ?>js/comment-ajax.js"></script>
 </body>
 
 </html>

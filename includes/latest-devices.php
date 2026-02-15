@@ -15,8 +15,8 @@
         style="overflow-y: auto; max-height:390px; width:100%; justify-content: center; flex-wrap:wrap; overflow-x:hidden; gap: 15px; padding: 0; margin: 0;">
 
         <?php foreach ($devices as $device): ?>
-            <a href="device.php?id=<?php echo $device['id']; ?>" class="module-phones-link">
-                <img src="<?php echo htmlspecialchars($device['image']); ?>" alt="">
+            <a href="<?php echo $base; ?>device/<?php echo urlencode($device['slug']); ?>" class="module-phones-link">
+                <img src="<?php echo htmlspecialchars(getAbsoluteImagePath($device['image'], $base)); ?>" alt="">
                 <br><?php echo htmlspecialchars($device['name']); ?>
             </a>
         <?php endforeach; ?>
@@ -38,9 +38,9 @@
                 <div class="swiper-slide">
                     <?php foreach ($chunk as $device): ?>
                         <div class="swiper-half-slide">
-                            <a href="device.php?id=<?php echo $device['id']; ?>">
+                            <a href="<?php echo $base; ?>device/<?php echo urlencode($device['slug']); ?>">
                                 <span>
-                                    <img src="<?php echo htmlspecialchars($device['image']); ?>"
+                                    <img src="<?php echo htmlspecialchars(getAbsoluteImagePath($device['image'], $base)); ?>"
                                         alt="<?php echo htmlspecialchars($device['name']); ?>">
                                 </span>
                                 <strong><?php echo htmlspecialchars($device['name']); ?></strong>

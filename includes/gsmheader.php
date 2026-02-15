@@ -21,8 +21,8 @@ $mobile_brands = $mobile_brands_stmt->fetchAll();
                     alt="">
             </button>
 
-            <a class="navbar-brand d-flex align-items-center" href="#">
-                <img src="imges/logo-wide.svg" alt="DevicesArena Logo" style="height: min-content; width: min-content; max-height: 50px; max-width: 200px;" />
+            <a class="navbar-brand d-flex align-items-center" href="<?php echo $base; ?>index.php">
+                <img src="<?php echo $base; ?>imges/logo-wide.svg" alt="DevicesArena Logo" style="height: min-content; width: min-content; max-height: 50px; max-width: 200px;" />
             </a>
         </div>
 
@@ -63,8 +63,8 @@ $mobile_brands = $mobile_brands_stmt->fetchAll();
             src="https://cdn.prod.website-files.com/67f21c9d62aa4c4c685a7277/684091b39228b431a556d811_download-removebg-preview.png"
             alt="">
     </button>
-    <a class="navbar-brand d-flex align-items-center" href="index.php">
-        <img src="imges/logo-wide.svg" alt="DevicesArena Logo" style="height: min-content; width: min-content; max-height: 30px; max-width: 150px;" />
+    <a class="navbar-brand d-flex align-items-center" href="<?php echo $base; ?>index.php">
+        <img src="<?php echo $base; ?>imges/logo-wide.svg" alt="DevicesArena Logo" style="height: min-content; width: min-content; max-height: 30px; max-width: 150px;" />
     </a>
 </nav>
 
@@ -98,11 +98,11 @@ $mobile_brands = $mobile_brands_stmt->fetchAll();
         <i class="fab fa-tiktok" onclick="window.open('https://www.tiktok.com/', '_blank')"></i>
     </div>
     <div class="column">
-        <a href="index.php">Home</a>
-        <a href="reviews.php">Reviews</a>
-        <a href="featured.php">Featured</a>
-        <a href="phonefinder.php">Phone Finder</a>
-        <a href="compare.php">Compare</a>
+        <a href="<?php echo $base; ?>">Home</a>
+        <a href="<?php echo $base; ?>reviews">Reviews</a>
+        <a href="<?php echo $base; ?>featured">Featured</a>
+        <a href="<?php echo $base; ?>phonefinder">Phone Finder</a>
+        <a href="<?php echo $base; ?>compare">Compare</a>
         <a href="#">Videos</a>
         <a href="#">Contact Us</a>
     </div>
@@ -117,7 +117,7 @@ $mobile_brands = $mobile_brands_stmt->fetchAll();
         <a href="#" onclick="showBrandsModal(); return false;" style="cursor: pointer;">[...]</a>
     </div>
     <div class="menu-buttons d-flex justify-content-center ">
-        <button class="btn bg-white w-50 text-black" onclick="window.open('phonefinder.php')">Phone Finder</button>
+        <button class="btn bg-white w-50 text-black" onclick="window.open('<?php echo $base; ?>phonefinder')">Phone Finder</button>
         <button class="btn bg-white w-50 text-black">My Phone</button>
     </div>
 </div>
@@ -125,12 +125,12 @@ $mobile_brands = $mobile_brands_stmt->fetchAll();
 <div id="leftMenu" class="container show">
     <div class="row">
         <div class="col-12 d-flex align-items-center   colums-gap">
-            <a href="index.php" class="nav-link navbar-bold">Home</a>
-            <a href="compare.php" class="nav-link navbar-bold">Compare</a>
+            <a href="<?php echo $base; ?>" class="nav-link navbar-bold">Home</a>
+            <a href="<?php echo $base; ?>compare" class="nav-link navbar-bold">Compare</a>
             <a href="#" class="nav-link navbar-bold">Videos</a>
-            <a href="reviews.php" class="nav-link navbar-bold">Reviews</a>
-            <a href="featured.php" class="nav-link d-lg-block d-none navbar-bold">Featured</a>
-            <a href="phonefinder.php" class="nav-link d-lg-block d-none navbar-bold">Phone Finder</a>
+            <a href="<?php echo $base; ?>reviews" class="nav-link navbar-bold">Reviews</a>
+            <a href="<?php echo $base; ?>featured" class="nav-link d-lg-block d-none navbar-bold">Featured</a>
+            <a href="<?php echo $base; ?>phonefinder" class="nav-link d-lg-block d-none navbar-bold">Phone Finder</a>
             <a href="#" class="nav-link d-lg-block d-none navbar-bold">Contact</a>
             <div style="background-color: #d50000; border-radius: 7px;" class="d-lg-none py-2" id="mobileSearchTrigger" onclick="openMobileSearch(event)">
                 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" height="16" width="16" class="mx-3">

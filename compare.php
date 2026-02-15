@@ -1,9 +1,26 @@
 <?php
 error_reporting(E_ALL);
 ini_set('display_errors', 1);
+require_once 'config.php';
 require_once 'phone_data.php';
 require_once 'database_functions.php';
 require_once 'includes/database_functions.php';
+
+// New clean URL format: domain/compare/slug1VSslug2VSslug3
+// The .htaccess file rewrites clean URLs to this page and passes slugs as query parameter
+// Base path variable is now defined in config.php
+
+// Helper function to make image paths absolute
+function getAbsoluteImagePath($imagePath, $base)
+{
+    if (empty($imagePath)) return '';
+    // Already an absolute URL
+    if (filter_var($imagePath, FILTER_VALIDATE_URL)) return $imagePath;
+    // Already an absolute path starting with /
+    if (strpos($imagePath, '/') === 0) return $imagePath;
+    // Relative path - prepend base
+    return $base . ltrim($imagePath, '/');
+}
 // Get posts and devices for display (case-insensitive status check) with comment counts
 $pdo = getConnection();
 $posts_stmt = $pdo->prepare("
@@ -189,13 +206,24 @@ if ($_POST && isset($_POST['action'])) {
 // Get all phones from database
 $phones = getAllPhones();
 
-// Get selected phone IDs from URL parameters
-$phone1_id = isset($_GET['phone1']) ? $_GET['phone1'] : '';
-$phone2_id = isset($_GET['phone2']) ? $_GET['phone2'] : '';
-$phone3_id = isset($_GET['phone3']) ? $_GET['phone3'] : '';
+// Get selected phone slugs from URL parameters
+// New way: slugs come from clean URL (domain/compare/slug1VSslug2VSslug3) rewritten by .htaccess
+// Parse multiple slugs from single query parameter if using new URL format
+if (isset($_GET['slugs'])) {
+    // New format: domain/compare/slug1VSslug2VSslug3
+    $slugParts = explode('VS', $_GET['slugs']);
+    $phone1_slug = isset($slugParts[0]) ? trim($slugParts[0]) : '';
+    $phone2_slug = isset($slugParts[1]) ? trim($slugParts[1]) : '';
+    $phone3_slug = isset($slugParts[2]) ? trim($slugParts[2]) : '';
+} else {
+    // Old format: domain/compare.php?phone1=x&phone2=y&phone3=z (for backward compatibility)
+    $phone1_slug = isset($_GET['phone1']) ? $_GET['phone1'] : '';
+    $phone2_slug = isset($_GET['phone2']) ? $_GET['phone2'] : '';
+    $phone3_slug = isset($_GET['phone3']) ? $_GET['phone3'] : '';
+}
 
 // Handle device pre-selection from device page (device1, brand1 parameters)
-if (isset($_GET['device1']) && ($phone1_id === '' || $phone1_id === null)) {
+if (isset($_GET['device1']) && ($phone1_slug === '' || $phone1_slug === null)) {
     $device_name = urldecode($_GET['device1']);
     $device_brand = isset($_GET['brand1']) ? urldecode($_GET['brand1']) : '';
 
@@ -205,49 +233,43 @@ if (isset($_GET['device1']) && ($phone1_id === '' || $phone1_id === null)) {
         $brand_match = empty($device_brand) || (isset($phone['brand']) && strtolower(trim($phone['brand'])) === strtolower(trim($device_brand)));
 
         if ($name_match && $brand_match) {
-            $phone1_id = $phone['id'];
+            $phone1_slug = $phone['slug'] ?? $phone['id'];
             break;
         }
     }
 
     // If still not found and brand is empty, try searching by name only
-    if (!$phone1_id && empty($device_brand)) {
+    if (!$phone1_slug && empty($device_brand)) {
         foreach ($phones as $phone) {
             if (isset($phone['name']) && strtolower(trim($phone['name'])) === strtolower(trim($device_name))) {
-                $phone1_id = $phone['id'];
+                $phone1_slug = $phone['slug'] ?? $phone['id'];
                 break;
             }
         }
     }
 }
 
-// Helper function to find phone by ID
-function findPhoneById($phones, $phoneId)
+// Helper function to find phone by slug
+function findPhoneBySlug($phones, $phoneSlug)
 {
-    if ($phoneId === '' || $phoneId === null || $phoneId === 'undefined' || $phoneId === '-1') {
+    if ($phoneSlug === '' || $phoneSlug === null || $phoneSlug === 'undefined') {
         return null;
     }
 
-    // First try to find by database ID
+    // Find by slug
     foreach ($phones as $phone) {
-        if (isset($phone['id']) && $phone['id'] == $phoneId) {
+        if (isset($phone['slug']) && $phone['slug'] === $phoneSlug) {
             return $phone;
         }
-    }
-
-    // Fallback: try to find by array index for backward compatibility
-    if (is_numeric($phoneId)) {
-        $index = (int)$phoneId;
-        return (isset($phones[$index])) ? $phones[$index] : null;
     }
 
     return null;
 }
 
 // Get selected phones data
-$phone1 = findPhoneById($phones, $phone1_id);
-$phone2 = findPhoneById($phones, $phone2_id);
-$phone3 = findPhoneById($phones, $phone3_id);
+$phone1 = findPhoneBySlug($phones, $phone1_slug);
+$phone2 = findPhoneBySlug($phones, $phone2_slug);
+$phone3 = findPhoneBySlug($phones, $phone3_slug);
 
 // Track device comparison if both phones are selected
 if ($phone1 && $phone2) {
@@ -886,30 +908,30 @@ function formatDeviceSpecsStructured($device)
     <title>DevicesArena</title>
 
     <!-- Favicon & Icons -->
-    <link rel="icon" type="image/png" sizes="32x32" href="imges/icon-32.png">
-    <link rel="icon" type="image/png" sizes="256x256" href="imges/icon-256.png">
-    <link rel="shortcut icon" href="imges/icon-32.png">
+    <link rel="icon" type="image/png" sizes="32x32" href="<?php echo $base; ?>imges/icon-32.png">
+    <link rel="icon" type="image/png" sizes="256x256" href="<?php echo $base; ?>imges/icon-256.png">
+    <link rel="shortcut icon" href="<?php echo $base; ?>imges/icon-32.png">
 
     <!-- Apple Touch Icon (iOS Home Screen) -->
-    <link rel="apple-touch-icon" href="imges/icon-256.png">
-    <link rel="apple-touch-icon" sizes="256x256" href="imges/icon-256.png">
+    <link rel="apple-touch-icon" href="<?php echo $base; ?>imges/icon-256.png">
+    <link rel="apple-touch-icon" sizes="256x256" href="<?php echo $base; ?>imges/icon-256.png">
 
     <!-- Android Chrome Icons -->
-    <link rel="icon" type="image/png" sizes="192x192" href="imges/icon-256.png">
-    <link rel="icon" type="image/png" sizes="512x512" href="imges/icon-256.png">
+    <link rel="icon" type="image/png" sizes="192x192" href="<?php echo $base; ?>imges/icon-256.png">
+    <link rel="icon" type="image/png" sizes="512x512" href="<?php echo $base; ?>imges/icon-256.png">
 
     <!-- Theme Color (Browser Chrome & Address Bar) -->
     <meta name="theme-color" content="#8D6E63">
 
     <!-- Windows Tile Icon -->
     <meta name="msapplication-TileColor" content="#8D6E63">
-    <meta name="msapplication-TileImage" content="imges/icon-256.png">
+    <meta name="msapplication-TileImage" content="<?php echo $base; ?>imges/icon-256.png">
 
     <!-- Open Graph Meta Tags (Social Media Sharing) -->
     <meta property="og:site_name" content="DevicesArena">
     <meta property="og:title" content="DevicesArena - Smartphone Reviews & Comparisons">
     <meta property="og:description" content="Explore the latest smartphones, detailed specifications, reviews, and comparisons on DevicesArena.">
-    <meta property="og:image" content="imges/icon-256.png">
+    <meta property="og:image" content="<?php echo $base; ?>imges/icon-256.png">
     <meta property="og:image:type" content="image/png">
     <meta property="og:image:width" content="256">
     <meta property="og:image:height" content="256">
@@ -919,10 +941,10 @@ function formatDeviceSpecsStructured($device)
     <meta name="twitter:card" content="summary">
     <meta name="twitter:title" content="DevicesArena">
     <meta name="twitter:description" content="Explore the latest smartphones, detailed specifications, reviews, and comparisons.">
-    <meta name="twitter:image" content="imges/icon-256.png">
+    <meta name="twitter:image" content="<?php echo $base; ?>imges/icon-256.png">
 
     <!-- PWA Manifest -->
-    <link rel="manifest" href="manifest.json">
+    <link rel="manifest" href="<?php echo $base; ?>manifest.json">
 
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/css/bootstrap.min.css" rel="stylesheet"
         integrity="sha384-rbsA2VBKQhggwzxH7pPCaAqO46MgnOM80zW1RWuH61DGLwZJEdK2Kadq2F9CUG65" crossorigin="anonymous">
@@ -940,7 +962,7 @@ function formatDeviceSpecsStructured($device)
     <link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
     <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
 
-    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="<?php echo $base; ?>style.css">
     <style>
         /* Mobile Horizontal Scroll Wrapper for Phone Cards */
         @media(max-width: 768px) {
@@ -1270,7 +1292,7 @@ function formatDeviceSpecsStructured($device)
                             <select id="phone1-select" name="phone1" class="phone-select-dropdown" data-phone-number="1">
                                 <option value="">Select Phone 1</option>
                                 <?php foreach ($phones as $phone): ?>
-                                    <option value="<?php echo $phone['id']; ?>" data-image="<?php echo htmlspecialchars(getPhoneImage($phone)); ?>" data-name="<?php echo htmlspecialchars(getPhoneName($phone)); ?>" <?php echo ($phone1 && $phone1['id'] == $phone['id']) ? 'selected' : ''; ?>>
+                                    <option value="<?php echo $phone['slug']; ?>" data-image="<?php echo htmlspecialchars(getPhoneImage($phone)); ?>" data-name="<?php echo htmlspecialchars(getPhoneName($phone)); ?>" <?php echo ($phone1 && $phone1['slug'] == $phone['slug']) ? 'selected' : ''; ?>>
                                         <?php echo getPhoneName($phone); ?>
                                     </option>
                                 <?php endforeach; ?>
@@ -1308,7 +1330,7 @@ function formatDeviceSpecsStructured($device)
                             <select id="phone2-select" name="phone2" class="phone-select-dropdown" data-phone-number="2">
                                 <option value="">Select Phone 2</option>
                                 <?php foreach ($phones as $phone): ?>
-                                    <option value="<?php echo $phone['id']; ?>" data-image="<?php echo htmlspecialchars(getPhoneImage($phone)); ?>" data-name="<?php echo htmlspecialchars(getPhoneName($phone)); ?>" <?php echo ($phone2 && $phone2['id'] == $phone['id']) ? 'selected' : ''; ?>>
+                                    <option value="<?php echo $phone['slug']; ?>" data-image="<?php echo htmlspecialchars(getPhoneImage($phone)); ?>" data-name="<?php echo htmlspecialchars(getPhoneName($phone)); ?>" <?php echo ($phone2 && $phone2['slug'] == $phone['slug']) ? 'selected' : ''; ?>>
                                         <?php echo getPhoneName($phone); ?>
                                     </option>
                                 <?php endforeach; ?>
@@ -1348,7 +1370,7 @@ function formatDeviceSpecsStructured($device)
                             <select id="phone3-select" name="phone3" class="phone-select-dropdown" data-phone-number="3">
                                 <option value="">Select Phone 3</option>
                                 <?php foreach ($phones as $phone): ?>
-                                    <option value="<?php echo $phone['id']; ?>" data-image="<?php echo htmlspecialchars(getPhoneImage($phone)); ?>" data-name="<?php echo htmlspecialchars(getPhoneName($phone)); ?>" <?php echo ($phone3 && $phone3['id'] == $phone['id']) ? 'selected' : ''; ?>>
+                                    <option value="<?php echo $phone['slug']; ?>" data-image="<?php echo htmlspecialchars(getPhoneImage($phone)); ?>" data-name="<?php echo htmlspecialchars(getPhoneName($phone)); ?>" <?php echo ($phone3 && $phone3['slug'] == $phone['slug']) ? 'selected' : ''; ?>>
                                         <?php echo getPhoneName($phone); ?>
                                     </option>
                                 <?php endforeach; ?>
@@ -1720,7 +1742,7 @@ function formatDeviceSpecsStructured($device)
             </div>
         </div>
     </div>
-    <script src="script.js"></script>
+    <script src="<?php echo $base; ?>script.js"></script>
     <script>
         // Initialize Select2 immediately to prevent flash of default select
         (function() {

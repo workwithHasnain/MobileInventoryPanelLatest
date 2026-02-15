@@ -229,9 +229,11 @@ function getPopularComparisons($limit = 10)
                 dc.device2_id,
                 COUNT(*) as comparison_count,
                 p1.name as device1_name,
+                p1.slug as device1_slug,
                 p1.image as device1_image,
                 b1.name as device1_brand,
                 p2.name as device2_name,
+                p2.slug as device2_slug,
                 p2.image as device2_image,
                 b2.name as device2_brand
             FROM device_comparisons dc
@@ -240,7 +242,7 @@ function getPopularComparisons($limit = 10)
             LEFT JOIN brands b1 ON p1.brand_id = b1.id
             LEFT JOIN brands b2 ON p2.brand_id = b2.id
             WHERE p1.id IS NOT NULL AND p2.id IS NOT NULL
-            GROUP BY dc.device1_id, dc.device2_id, p1.name, p1.image, b1.name, p2.name, p2.image, b2.name
+            GROUP BY dc.device1_id, dc.device2_id, p1.name, p1.slug, p1.image, b1.name, p2.name, p2.slug, p2.image, b2.name
             ORDER BY comparison_count DESC
             LIMIT ?
         ";
@@ -257,7 +259,9 @@ function getPopularComparisons($limit = 10)
                 'device2_id' => $row['device2_id'],
                 'comparison_count' => (int)$row['comparison_count'],
                 'device1_name' => $row['device1_name'],
+                'device1_slug' => $row['device1_slug'] ?? '',
                 'device2_name' => $row['device2_name'],
+                'device2_slug' => $row['device2_slug'] ?? '',
                 'device1_image' => $row['device1_image'] ?? '',
                 'device2_image' => $row['device2_image'] ?? '',
                 'device1_brand' => $row['device1_brand'] ?? '',

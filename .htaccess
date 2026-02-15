@@ -1,0 +1,41 @@
+# Enable mod_rewrite
+<IfModule mod_rewrite.c>
+    RewriteEngine On
+    RewriteBase /
+    
+    # Redirect to www
+    RewriteCond %{HTTP_HOST} ^devicesarena\.com$ [NC]
+    RewriteRule ^(.*)$ https://www.devicesarena.com/$1 [R=301,L]
+    RewriteCond %{HTTP_HOST} ^(?!www\.).*$ [NC]
+    RewriteCond %{HTTPS} off
+    RewriteRule ^(.*)$ https://www.%{HTTP_HOST}/$1 [R=301,L]
+
+    # Don't rewrite if it's a real file or directory
+    RewriteCond %{REQUEST_FILENAME} !-f
+    RewriteCond %{REQUEST_FILENAME} !-d
+
+    # Route for compare.php: /compare/slug1VSslug2VSslug3
+    RewriteRule ^compare/(.+)/?$ compare.php?slugs=$1 [L,QSA]
+
+    # Route for device.php: /device/slug
+    RewriteRule ^device/([a-z0-9\-]+)/?$ device.php?slug=$1 [L,QSA]
+
+    # Route for post.php: /post/slug
+    RewriteRule ^post/([a-z0-9\-]+)/?$ post.php?slug=$1 [L,QSA]
+
+    # Route for featured.php: /featured
+    RewriteRule ^featured/?$ featured.php [L,QSA]
+
+    # Route for reviews.php: /reviews
+    RewriteRule ^reviews/?$ reviews.php [L,QSA]
+
+    # Route for phonefinder.php: /phonefinder
+    RewriteRule ^phonefinder/?$ phonefinder.php [L,QSA]
+
+    # Route for index.php: /home
+    RewriteRule ^home/?$ index.php [L,QSA]
+
+    # Route domain root to /home
+    RewriteRule ^/?$ home/ [R=301,L]
+
+</IfModule>

@@ -45,7 +45,7 @@ try {
 
     // Search phones (include brand for label)
     $phoneSql = "
-        SELECT p.id, p.name, p.image, b.name AS brand_name
+        SELECT p.id, p.name, p.slug, p.image, b.name AS brand_name
         FROM phones p
         LEFT JOIN brands b ON p.brand_id = b.id
         WHERE p.name ILIKE ? OR COALESCE(b.name, '') ILIKE ?
@@ -79,9 +79,9 @@ try {
             'type' => 'device',
             'id' => (string)$ph['id'],
             'title' => $label,
-            'slug' => null,
+            'slug' => $ph['slug'],
             'image' => $ph['image'] ?? '',
-            'url' => 'device.php?slug=' . urlencode($ph['slug'] ?? $ph['id'])
+            'url' => 'device.php?slug=' . rawurlencode($ph['slug'])
         ];
     }
 
