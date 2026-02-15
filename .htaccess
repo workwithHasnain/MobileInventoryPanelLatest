@@ -14,6 +14,9 @@
     RewriteCond %{REQUEST_FILENAME} !-f
     RewriteCond %{REQUEST_FILENAME} !-d
 
+    # Route for compare.php: /compare
+    RewriteRule ^compare/?$ compare.php [L,QSA]
+
     # Route for compare.php: /compare/slug1VSslug2VSslug3
     RewriteRule ^compare/(.+)/?$ compare.php?slugs=$1 [L,QSA]
 
