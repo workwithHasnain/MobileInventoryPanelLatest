@@ -121,7 +121,11 @@ CREATE TABLE IF NOT EXISTS phones (
     chipset_name VARCHAR(100),
     battery_capacity VARCHAR(50),
     wired_charging VARCHAR(100),
-    wireless_charging VARCHAR(100)
+    wireless_charging VARCHAR(100),
+    -- SEO fields
+    slug VARCHAR(255) UNIQUE,
+    meta_title VARCHAR(255),
+    meta_desc TEXT
 );
 
 -- =====================================================

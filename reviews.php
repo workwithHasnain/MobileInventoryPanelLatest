@@ -170,7 +170,7 @@ $allBrandsModal = $all_brands_stmt->fetchAll();
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>DevicesArena</title>
-    
+
     <!-- Favicon & Icons -->
     <link rel="icon" type="image/png" sizes="32x32" href="imges/icon-32.png">
     <link rel="icon" type="image/png" sizes="256x256" href="imges/icon-256.png">
@@ -320,7 +320,7 @@ $allBrandsModal = $all_brands_stmt->fetchAll();
         }
     </style>
     <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-4554952734894265"
-     crossorigin="anonymous"></script>
+        crossorigin="anonymous"></script>
 </head>
 
 <body style="background-color: #EFEBE9;">
@@ -567,7 +567,7 @@ $allBrandsModal = $all_brands_stmt->fetchAll();
             fetch(`get_device_details.php?id=${deviceId}`)
                 .then(response => response.text())
                 .then(data => {
-                    window.location.href = `device.php?id=${deviceId}`;
+                    window.location.href = `device.php?id=${deviceId}`; // Will redirect to slug
                 })
                 .catch(error => {
                     console.error('Error:', error);

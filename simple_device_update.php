@@ -96,6 +96,9 @@ function simpleUpdateDevice($id, $phone)
                 battery_capacity = :battery_capacity,
                 wired_charging = :wired_charging,
                 wireless_charging = :wireless_charging,
+                slug = :slug,
+                meta_title = :meta_title,
+                meta_desc = :meta_desc,
                 updated_at = CURRENT_TIMESTAMP
             WHERE id = :id
         ";
@@ -158,6 +161,11 @@ function simpleUpdateDevice($id, $phone)
             ':battery_capacity' => $nullIfEmpty($phone['battery_capacity'] ?? $existing['battery_capacity'] ?? null),
             ':wired_charging' => $nullIfEmpty($phone['wired_charging'] ?? $existing['wired_charging'] ?? null),
             ':wireless_charging' => $nullIfEmpty($phone['wireless_charging'] ?? $existing['wireless_charging'] ?? null),
+
+            // SEO fields
+            ':slug' => $nullIfEmpty($phone['slug'] ?? $existing['slug'] ?? null),
+            ':meta_title' => $nullIfEmpty($phone['meta_title'] ?? $existing['meta_title'] ?? null),
+            ':meta_desc' => $nullIfEmpty($phone['meta_desc'] ?? $existing['meta_desc'] ?? null),
         ];
 
         $stmt = $pdo->prepare($sql);

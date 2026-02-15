@@ -61,14 +61,16 @@ function simpleAddDevice($phone)
                 main_camera, selfie_camera, multimedia, connectivity, features, battery, general_info,
                 weight, thickness, os, storage, card_slot,
                 display_size, display_resolution, main_camera_resolution, main_camera_video,
-                ram, chipset_name, battery_capacity, wired_charging, wireless_charging
+                ram, chipset_name, battery_capacity, wired_charging, wireless_charging,
+                slug, meta_title, meta_desc
             ) VALUES (
                 :release_date, :name, :brand_id, :brand, :year, :availability, :price, :device_page_color, :image, :images,
                 :network, :launch, :body, :display, :hardware, :memory,
                 :main_camera, :selfie_camera, :multimedia, :connectivity, :features, :battery, :general_info,
                 :weight, :thickness, :os, :storage, :card_slot,
                 :display_size, :display_resolution, :main_camera_resolution, :main_camera_video,
-                :ram, :chipset_name, :battery_capacity, :wired_charging, :wireless_charging
+                :ram, :chipset_name, :battery_capacity, :wired_charging, :wireless_charging,
+                :slug, :meta_title, :meta_desc
             )
         ";
 
@@ -125,6 +127,11 @@ function simpleAddDevice($phone)
             ':battery_capacity' => $nullIfEmpty($phone['battery_capacity'] ?? null),
             ':wired_charging' => $nullIfEmpty($phone['wired_charging'] ?? null),
             ':wireless_charging' => $nullIfEmpty($phone['wireless_charging'] ?? null),
+
+            // SEO fields
+            ':slug' => $nullIfEmpty($phone['slug'] ?? null),
+            ':meta_title' => $nullIfEmpty($phone['meta_title'] ?? null),
+            ':meta_desc' => $nullIfEmpty($phone['meta_desc'] ?? null),
         ];
 
         $result = $stmt->execute($params);

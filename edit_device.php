@@ -152,6 +152,37 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         // Reindex final images array to remove gaps
         $finalImages = array_values($finalImages);
 
+        // Handle slug - validate and ensure uniqueness
+        $slug = isset($_POST['slug']) ? trim($_POST['slug']) : '';
+        if ($slug === '') {
+            // Auto-generate slug if empty
+            $slug = strtolower(trim($brand)) . '-' . strtolower(trim($name));
+            $slug = preg_replace('/[^a-z0-9]+/', '-', $slug);
+            $slug = trim($slug, '-');
+        } else {
+            // Validate and sanitize provided slug
+            $slug = strtolower(trim($slug));
+            $slug = preg_replace('/[^a-z0-9-]/', '', $slug);
+            $slug = preg_replace('/-+/', '-', $slug);
+            $slug = trim($slug, '-');
+        }
+
+        // Ensure slug is unique (excluding current device)
+        require_once 'database_functions.php';
+        $pdo = getConnection();
+        $slugCheck = $pdo->prepare("SELECT COUNT(*) FROM phones WHERE slug = ? AND id != ?");
+        $slugCheck->execute([$slug, $id]);
+        if ($slugCheck->fetchColumn() > 0) {
+            // Slug exists, append a number
+            $baseSlug = $slug;
+            $counter = 1;
+            do {
+                $slug = $baseSlug . '-' . $counter;
+                $slugCheck->execute([$slug, $id]);
+                $counter++;
+            } while ($slugCheck->fetchColumn() > 0);
+        }
+
         // Prepare update payload
         $updated_phone = [
             // Launch
@@ -197,6 +228,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             'features' => isset($_POST['features']) ? $_POST['features'] : null,
             'battery' => isset($_POST['battery']) ? $_POST['battery'] : null,
             'general_info' => isset($_POST['general_info']) ? $_POST['general_info'] : null,
+
+            // SEO fields
+            'slug' => $slug,
+            'meta_title' => !empty($_POST['meta_title']) ? trim($_POST['meta_title']) : null,
+            'meta_desc' => !empty($_POST['meta_desc']) ? trim($_POST['meta_desc']) : null,
         ];
 
         // ALWAYS include merged images in the update (finalImages has existing + new uploads merged)
@@ -241,6 +277,11 @@ $pref_chipset_name = $device['chipset_name'] ?? '';
 $pref_battery_capacity = $device['battery_capacity'] ?? '';
 $pref_wired_charging = $device['wired_charging'] ?? '';
 $pref_wireless_charging = $device['wireless_charging'] ?? '';
+
+// SEO fields
+$pref_slug = $device['slug'] ?? '';
+$pref_meta_title = $device['meta_title'] ?? '';
+$pref_meta_desc = $device['meta_desc'] ?? '';
 ?>
 
 <?php include 'includes/header.php'; ?>
@@ -564,6 +605,57 @@ $pref_wireless_charging = $device['wireless_charging'] ?? '';
                                 </div>
                             </div>
 
+                            <!-- SEO Section -->
+                            <div class="accordion-item">
+                                <h2 class="accordion-header" id="seoHeader">
+                                    <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#seoCollapse" aria-expanded="false" aria-controls="seoCollapse">
+                                        <i class="fas fa-search me-2"></i> SEO Settings
+                                    </button>
+                                </h2>
+                                <div id="seoCollapse" class="accordion-collapse collapse" aria-labelledby="seoHeader">
+                                    <div class="accordion-body">
+                                        <div class="alert alert-info">
+                                            <i class="fas fa-info-circle me-2"></i>
+                                            <strong>SEO Fields:</strong> These fields help optimize the device page for search engines. The slug is auto-generated but can be customized.
+                                        </div>
+                                        <div class="row">
+                                            <div class="col-md-12 mb-3">
+                                                <label for="slug" class="form-label">URL Slug *</label>
+                                                <input type="text" class="form-control <?php echo isset($errors['slug']) ? 'is-invalid' : ''; ?>"
+                                                    id="slug" name="slug" placeholder="e.g., apple-iphone-15-pro"
+                                                    value="<?php echo isset($_POST['slug']) ? htmlspecialchars($_POST['slug']) : htmlspecialchars($pref_slug); ?>">
+                                                <small class="form-text text-muted">
+                                                    URL-friendly identifier (auto-generated from brand + name). Must be unique. Only lowercase letters, numbers, and hyphens allowed.
+                                                </small>
+                                                <?php if (isset($errors['slug'])): ?>
+                                                    <div class="invalid-feedback"><?php echo htmlspecialchars($errors['slug']); ?></div>
+                                                <?php endif; ?>
+                                            </div>
+
+                                            <div class="col-md-12 mb-3">
+                                                <label for="meta_title" class="form-label">Meta Title</label>
+                                                <input type="text" class="form-control" id="meta_title" name="meta_title"
+                                                    placeholder="Custom title for search engines (leave empty to auto-generate)"
+                                                    maxlength="255"
+                                                    value="<?php echo isset($_POST['meta_title']) ? htmlspecialchars($_POST['meta_title']) : htmlspecialchars($pref_meta_title); ?>">
+                                                <small class="form-text text-muted">
+                                                    Appears in search engine results. Recommended: 50-60 characters. Leave empty to use: "[Brand] [Name] - Specifications & Reviews"
+                                                </small>
+                                            </div>
+
+                                            <div class="col-md-12 mb-3">
+                                                <label for="meta_desc" class="form-label">Meta Description</label>
+                                                <textarea class="form-control" id="meta_desc" name="meta_desc" rows="3"
+                                                    placeholder="Brief description for search engines (leave empty to auto-generate)"
+                                                    maxlength="500"><?php echo isset($_POST['meta_desc']) ? htmlspecialchars($_POST['meta_desc']) : htmlspecialchars($pref_meta_desc); ?></textarea>
+                                                <small class="form-text text-muted">
+                                                    Appears in search engine results. Recommended: 150-160 characters. Leave empty to auto-generate from device specs.
+                                                </small>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
 
                         </div>
 
@@ -876,6 +968,41 @@ $pref_wireless_charging = $device['wireless_charging'] ?? '';
                     // Replace "other" with the custom brand name
                     brandSelect.value = customBrandInput.value.trim();
                 }
+            });
+        }
+
+        // Auto-generate slug from brand and name (but respect existing slug)
+        const nameInput = document.getElementById('name');
+        const slugInput = document.getElementById('slug');
+        let slugManuallyEdited = (slugInput && slugInput.value !== ''); // If there's existing slug, consider it manually set
+
+        // Function to generate slug
+        function generateSlug() {
+            if (slugManuallyEdited) return; // Don't auto-generate if user manually edited or existing slug present
+
+            const brand = brandSelect.value === 'other' ? customBrandInput.value : brandSelect.value;
+            const name = nameInput.value;
+
+            if (brand && name) {
+                let slug = (brand + '-' + name).toLowerCase();
+                slug = slug.replace(/[^a-z0-9]+/g, '-'); // Replace non-alphanumeric with hyphens
+                slug = slug.replace(/-+/g, '-'); // Remove duplicate hyphens
+                slug = slug.replace(/^-|-$/g, ''); // Remove leading/trailing hyphens
+                slugInput.value = slug;
+            }
+        }
+
+        // Listen to brand and name changes
+        if (brandSelect && nameInput && slugInput) {
+            brandSelect.addEventListener('change', generateSlug);
+            nameInput.addEventListener('input', generateSlug);
+            if (customBrandInput) {
+                customBrandInput.addEventListener('input', generateSlug);
+            }
+
+            // Mark slug as manually edited if user changes it
+            slugInput.addEventListener('input', function() {
+                slugManuallyEdited = true;
             });
         }
 

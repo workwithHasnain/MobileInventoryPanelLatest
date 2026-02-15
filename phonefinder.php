@@ -165,7 +165,7 @@ if (!$filterConfig) {
         }
     </style>
     <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-4554952734894265"
-     crossorigin="anonymous"></script>
+        crossorigin="anonymous"></script>
 </head>
 
 <body style="background-color: #EFEBE9;">
@@ -1989,7 +1989,7 @@ if (!$filterConfig) {
                 return `
                 <div class="col-lg-3 col-md-4 col-sm-6 mb-4">
                     <div class="card h-100 shadow-sm">
-                        <a href="device.php?id=${device.id}" class="text-decoration-none">
+                        <a href="device.php?slug=${encodeURIComponent(device.slug || device.id)}" class="text-decoration-none">
                             <img src="${device.thumbnail}" class="card-img-top" alt="${device.name}" style="height: 200px; object-fit: contain; padding: 10px;">
                             <div class="card-body">
                                 <h6 class="card-title text-dark fw-bold">${device.name}</h6>
@@ -2072,8 +2072,12 @@ if (!$filterConfig) {
         }
 
         // Navigate to device page
-        function goToDevice(deviceId) {
-            window.location.href = `device.php?id=${deviceId}`;
+        function goToDevice(deviceSlugOrId) {
+            if (typeof deviceSlugOrId === 'string' && /[a-z-]/.test(deviceSlugOrId)) {
+                window.location.href = `device.php?slug=${encodeURIComponent(deviceSlugOrId)}`;
+            } else {
+                window.location.href = `device.php?id=${deviceSlugOrId}`;
+            }
         }
     </script>
     <?php

@@ -164,10 +164,10 @@ $all_brands_stmt->execute();
 $allBrandsModal = $all_brands_stmt->fetchAll();
 
 
-// Get device ID from URL
-$device_id = $_GET['id'] ?? '';
+// Get device slug from URL
+$device_slug = $_GET['slug'] ?? '';
 
-if (!isset($_GET['id']) || $_GET['id'] === '') {
+if (!isset($_GET['slug']) || $_GET['slug'] === '') {
   header("Location: index.php");
   exit();
 }
@@ -250,7 +250,7 @@ function getDeviceImages($device)
 }
 
 // Function to get device details
-function getDeviceDetails($pdo, $device_id)
+function getDeviceDetails($pdo, $device_slug)
 {
   // Try database first (comprehensive data source)
   try {
@@ -258,9 +258,9 @@ function getDeviceDetails($pdo, $device_id)
             SELECT p.*, b.name as brand_name
             FROM phones p 
             LEFT JOIN brands b ON p.brand_id = b.id 
-            WHERE p.id = ?
+            WHERE p.slug = ?
         ");
-    $stmt->execute([$device_id]);
+    $stmt->execute([$device_slug]);
     $device = $stmt->fetch(PDO::FETCH_ASSOC);
 
     if ($device) {
@@ -280,31 +280,32 @@ function getDeviceDetails($pdo, $device_id)
   if (file_exists($phones_json)) {
     $phones_data = json_decode(file_get_contents($phones_json), true);
 
-    // JSON stores as array, so search by index
+    // JSON stores as array, so search by slug
     if (is_array($phones_data)) {
-      // Use numeric index as device ID
-      // Convert string ID to integer for array access
-      $numeric_id = is_numeric($device_id) ? (int)$device_id : $device_id;
-      if (isset($phones_data[$numeric_id])) {
-        $device = $phones_data[$numeric_id];
-
-        // Add computed fields for compatibility
-        $device['id'] = $device_id;
-        $device['image_1'] = $device['image'] ?? '';
-
-        // Fix image paths
-        if (isset($device['image'])) {
-          $device['image_1'] = str_replace('\\', '/', $device['image']);
-        }
-
-        // Handle multiple images
-        if (!empty($device['images'])) {
-          for ($i = 0; $i < count($device['images']) && $i < 5; $i++) {
-            $device['image_' . ($i + 1)] = str_replace('\\', '/', $device['images'][$i]);
+      // Search by slug in JSON data
+      foreach ($phones_data as $index => $phone_data) {
+        if (isset($phone_data['slug']) && $phone_data['slug'] === $device_slug) {
+          $device = $phone_data;
+          // Add computed fields for compatibility
+          if (!isset($device['id'])) {
+            $device['id'] = $index;
           }
-        }
+          $device['image_1'] = $device['image'] ?? '';
 
-        return $device;
+          // Fix image paths
+          if (isset($device['image'])) {
+            $device['image_1'] = str_replace('\\', '/', $device['image']);
+          }
+
+          // Handle multiple images
+          if (!empty($device['images'])) {
+            for ($i = 0; $i < count($device['images']) && $i < 5; $i++) {
+              $device['image_' . ($i + 1)] = str_replace('\\', '/', $device['images'][$i]);
+            }
+          }
+
+          return $device;
+        }
       }
     }
   }
@@ -912,7 +913,10 @@ function trackDeviceView($pdo, $device_id, $ip_address)
 }
 
 // Get device details
-$device = getDeviceDetails($pdo, $device_id);
+$device = getDeviceDetails($pdo, $device_slug);
+
+// Extract numeric device ID for internal use (comments, tracking, etc.)
+$device_id = $device['id'] ?? null;
 
 if (!$device) {
   header("Location: 404.php");
@@ -963,7 +967,36 @@ $commentCount = getDeviceCommentCount($pdo, $device_id);
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title><?php echo htmlspecialchars(($device['brand_name'] ?? '') . ' ' . ($device['name'] ?? 'Device')); ?> - Specifications & Reviews | DevicesArena</title>
+  <?php
+  // Generate SEO meta tags dynamically
+  $brand_name = $device['brand_name'] ?? $device['brand'] ?? '';
+  $device_name = $device['name'] ?? 'Device';
+
+  // Use custom meta title if available, otherwise auto-generate
+  if (!empty($device['meta_title'])) {
+    $page_title = htmlspecialchars($device['meta_title']);
+  } else {
+    $page_title = htmlspecialchars($brand_name . ' ' . $device_name) . ' - Specifications & Reviews | DevicesArena';
+  }
+
+  // Use custom meta description if available, otherwise auto-generate from specs
+  if (!empty($device['meta_desc'])) {
+    $meta_description = htmlspecialchars($device['meta_desc']);
+  } else {
+    // Auto-generate description from device specs
+    $desc_parts = [];
+    if (!empty($device['display_size'])) $desc_parts[] = $device['display_size'] . '" display';
+    if (!empty($device['main_camera_resolution'])) $desc_parts[] = $device['main_camera_resolution'] . ' camera';
+    if (!empty($device['battery_capacity'])) $desc_parts[] = $device['battery_capacity'] . ' battery';
+    if (!empty($device['ram'])) $desc_parts[] = $device['ram'] . ' RAM';
+    if (!empty($device['storage'])) $desc_parts[] = $device['storage'] . ' storage';
+
+    $specs_text = !empty($desc_parts) ? implode(', ', $desc_parts) : 'full specifications';
+    $meta_description = htmlspecialchars("Explore detailed specifications, reviews, and features of the {$brand_name} {$device_name}. {$specs_text} and more on DevicesArena.");
+  }
+  ?>
+  <title><?php echo $page_title; ?></title>
+  <meta name="description" content="<?php echo $meta_description; ?>">
 
   <!-- Favicon & Icons -->
   <link rel="icon" type="image/png" sizes="32x32" href="imges/icon-32.png">
@@ -986,20 +1019,28 @@ $commentCount = getDeviceCommentCount($pdo, $device_id);
   <meta name="msapplication-TileImage" content="imges/icon-256.png">
 
   <!-- Open Graph Meta Tags (Social Media Sharing) -->
+  <?php
+  // Use device image if available, otherwise use site logo
+  $og_image = !empty($device['image']) ? htmlspecialchars($device['image']) : 'imges/icon-256.png';
+  // Remove 'data:image' base64 if present, use default instead
+  if (strpos($og_image, 'data:image') === 0) {
+    $og_image = 'imges/icon-256.png';
+  }
+  ?>
   <meta property="og:site_name" content="DevicesArena">
-  <meta property="og:title" content="DevicesArena - Smartphone Reviews & Comparisons">
-  <meta property="og:description" content="Explore the latest smartphones, detailed specifications, reviews, and comparisons on DevicesArena.">
-  <meta property="og:image" content="imges/icon-256.png">
+  <meta property="og:title" content="<?php echo $page_title; ?>">
+  <meta property="og:description" content="<?php echo $meta_description; ?>">
+  <meta property="og:image" content="<?php echo $og_image; ?>">
   <meta property="og:image:type" content="image/png">
   <meta property="og:image:width" content="256">
   <meta property="og:image:height" content="256">
   <meta property="og:type" content="website">
 
   <!-- Twitter Card Meta Tags -->
-  <meta name="twitter:card" content="summary">
-  <meta name="twitter:title" content="DevicesArena">
-  <meta name="twitter:description" content="Explore the latest smartphones, detailed specifications, reviews, and comparisons.">
-  <meta name="twitter:image" content="imges/icon-256.png">
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="<?php echo $page_title; ?>">
+  <meta name="twitter:description" content="<?php echo $meta_description; ?>">
+  <meta name="twitter:image" content="<?php echo $og_image; ?>">
 
   <!-- PWA Manifest -->
   <link rel="manifest" href="manifest.json">
@@ -1884,7 +1925,7 @@ $commentCount = getDeviceCommentCount($pdo, $device_id);
                 <h6 class="mb-3">Share Your Opinion</h6>
                 <form id="device-comment-form" method="POST">
                   <input type="hidden" name="action" value="comment_device">
-                  <input type="hidden" name="device_id" value="<?php echo htmlspecialchars($device_id); ?>">
+                  <input type="hidden" name="device_id" value="<?php echo htmlspecialchars($device['id']); ?>">
                   <div class="row">
                     <div class="col-md-6 mb-3">
                       <input type="text" class="form-control" name="name" placeholder="Your Name" required>

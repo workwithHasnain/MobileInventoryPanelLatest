@@ -311,7 +311,7 @@ if ($_POST && isset($_POST['action'])) {
         }
     </style>
     <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-4554952734894265"
-     crossorigin="anonymous"></script>
+        crossorigin="anonymous"></script>
 </head>
 
 <body style="background-color: #EFEBE9;">
@@ -337,7 +337,7 @@ if ($_POST && isset($_POST['action'])) {
     object-fit: initial;
 ">
 
-                            <img src="<?php echo htmlspecialchars($post['featured_image']); ?>" alt="Featured Image" style="
+                                <img src="<?php echo htmlspecialchars($post['featured_image']); ?>" alt="Featured Image" style="
                             height: 100%;
     width: 100%;
     cursor: pointer;
@@ -642,6 +642,7 @@ if ($_POST && isset($_POST['action'])) {
             fetch(`get_device_details.php?id=${deviceId}`)
                 .then(response => response.text())
                 .then(data => {
+                    // Redirect using device ID - will be redirected to slug URL by device.php
                     window.location.href = `device.php?id=${deviceId}`;
                 })
                 .catch(error => {
@@ -727,8 +728,13 @@ if ($_POST && isset($_POST['action'])) {
         }
 
         // Navigate to device page
-        function goToDevice(deviceId) {
-            window.location.href = `device.php?id=${deviceId}`;
+        function goToDevice(deviceSlugOrId) {
+            // Check if it's a slug or ID
+            if (typeof deviceSlugOrId === 'string' && /[a-z-]/.test(deviceSlugOrId)) {
+                window.location.href = `device.php?slug=${encodeURIComponent(deviceSlugOrId)}`;
+            } else {
+                window.location.href = `device.php?id=${deviceSlugOrId}`;
+            }
         }
 
         // Newsletter form AJAX handler

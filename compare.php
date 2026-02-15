@@ -1211,7 +1211,7 @@ function formatDeviceSpecsStructured($device)
         }
     </style>
     <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-4554952734894265"
-     crossorigin="anonymous">
+        crossorigin="anonymous">
     </script>
 </head>
 
@@ -1282,10 +1282,10 @@ function formatDeviceSpecsStructured($device)
                         <div class="d-flex">
                             <img src="<?php echo getPhoneImage($phone1); ?>" alt="<?php echo getPhoneName($phone1); ?>">
                             <div class="buttons">
-                                <button onclick="window.location.href='device.php?id=<?php echo $phone1['id']; ?>'">REVIEW</button>
-                                <button onclick="window.location.href='device.php?id=<?php echo $phone1['id']; ?>'">SPECIFICATIONS</button>
-                                <button onclick="window.location.href='device.php?id=<?php echo $phone1['id']; ?>#comments'">READ OPINIONS</button>
-                                <button onclick="window.location.href='device.php?id=<?php echo $phone1['id']; ?>'">PICTURES</button>
+                                <button onclick="window.location.href='device.php?slug=<?php echo urlencode($phone1['slug'] ?? $phone1['id']); ?>'">REVIEW</button>
+                                <button onclick="window.location.href='device.php?slug=<?php echo urlencode($phone1['slug'] ?? $phone1['id']); ?>'">SPECIFICATIONS</button>
+                                <button onclick="window.location.href='device.php?slug=<?php echo urlencode($phone1['slug'] ?? $phone1['id']); ?>#comments'">READ OPINIONS</button>
+                                <button onclick="window.location.href='device.php?slug=<?php echo urlencode($phone1['slug'] ?? $phone1['id']); ?>'">PICTURES</button>
                             </div>
                         </div>
                     <?php else: ?>
@@ -1320,10 +1320,10 @@ function formatDeviceSpecsStructured($device)
                         <div class="d-flex">
                             <img src="<?php echo getPhoneImage($phone2); ?>" alt="<?php echo getPhoneName($phone2); ?>">
                             <div class="buttons">
-                                <button onclick="window.location.href='device.php?id=<?php echo $phone2['id']; ?>'">REVIEW</button>
-                                <button onclick="window.location.href='device.php?id=<?php echo $phone2['id']; ?>'">SPECIFICATIONS</button>
-                                <button onclick="window.location.href='device.php?id=<?php echo $phone2['id']; ?>#comments'">READ OPINIONS</button>
-                                <button onclick="window.location.href='device.php?id=<?php echo $phone2['id']; ?>'">PICTURES</button>
+                                <button onclick="window.location.href='device.php?slug=<?php echo urlencode($phone2['slug'] ?? $phone2['id']); ?>'">REVIEW</button>
+                                <button onclick="window.location.href='device.php?slug=<?php echo urlencode($phone2['slug'] ?? $phone2['id']); ?>'">SPECIFICATIONS</button>
+                                <button onclick="window.location.href='device.php?slug=<?php echo urlencode($phone2['slug'] ?? $phone2['id']); ?>#comments'">READ OPINIONS</button>
+                                <button onclick="window.location.href='device.php?slug=<?php echo urlencode($phone2['slug'] ?? $phone2['id']); ?>'">PICTURES</button>
                             </div>
                         </div>
                     <?php else: ?>
@@ -1360,10 +1360,10 @@ function formatDeviceSpecsStructured($device)
                         <div class="d-flex">
                             <img src="<?php echo getPhoneImage($phone3); ?>" alt="<?php echo getPhoneName($phone3); ?>">
                             <div class="buttons">
-                                <button onclick="window.location.href='device.php?id=<?php echo $phone3['id']; ?>'">REVIEW</button>
-                                <button onclick="window.location.href='device.php?id=<?php echo $phone3['id']; ?>'">SPECIFICATIONS</button>
-                                <button onclick="window.location.href='device.php?id=<?php echo $phone3['id']; ?>#comments'">READ OPINIONS</button>
-                                <button onclick="window.location.href='device.php?id=<?php echo $phone3['id']; ?>'">PICTURES</button>
+                                <button onclick="window.location.href='device.php?slug=<?php echo urlencode($phone3['slug'] ?? $phone3['id']); ?>'">REVIEW</button>
+                                <button onclick="window.location.href='device.php?slug=<?php echo urlencode($phone3['slug'] ?? $phone3['id']); ?>'">SPECIFICATIONS</button>
+                                <button onclick="window.location.href='device.php?slug=<?php echo urlencode($phone3['slug'] ?? $phone3['id']); ?>#comments'">READ OPINIONS</button>
+                                <button onclick="window.location.href='device.php?slug=<?php echo urlencode($phone3['slug'] ?? $phone3['id']); ?>'">PICTURES</button>
                             </div>
                         </div>
                     <?php else: ?>
@@ -1910,7 +1910,7 @@ function formatDeviceSpecsStructured($device)
 
         // Navigate to device page
         function goToDevice(deviceId) {
-            window.location.href = `device.php?id=${deviceId}`;
+            window.location.href = `device.php?slug=${deviceId}`; // Will redirect to slug
         }
 
         // Newsletter form AJAX handler

@@ -143,7 +143,7 @@ document.addEventListener('DOMContentLoaded', function () {
                 } else if (item.type === 'post' && item.slug) {
                     window.location.href = 'post.php?slug=' + encodeURIComponent(item.slug);
                 } else if (item.type === 'device' && item.id) {
-                    window.location.href = 'device.php?id=' + encodeURIComponent(item.id);
+                    window.location.href = 'device.php?id=' + encodeURIComponent(item.id); // Will redirect to slug
                 }
             });
 

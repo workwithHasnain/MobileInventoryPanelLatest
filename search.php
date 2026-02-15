@@ -81,7 +81,7 @@ try {
             'title' => $label,
             'slug' => null,
             'image' => $ph['image'] ?? '',
-            'url' => 'device.php?id=' . rawurlencode((string)$ph['id'])
+            'url' => 'device.php?slug=' . urlencode($ph['slug'] ?? $ph['id'])
         ];
     }
 
@@ -90,5 +90,3 @@ try {
     http_response_code(500);
     echo json_encode(['error' => 'Search failed']);
 }
-
-
