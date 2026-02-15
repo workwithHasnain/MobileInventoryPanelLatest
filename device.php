@@ -257,6 +257,10 @@ function getDeviceImages($device)
     if (!empty($image)) {
       // Clean up the path
       $image = str_replace('\\', '/', $image);
+      // Ensure absolute path
+      if (strpos($image, '/') !== 0 && !filter_var($image, FILTER_VALIDATE_URL)) {
+        $image = '/' . ltrim($image, '/');
+      }
       // Add to valid images if not already included
       if (!in_array($image, $validImages)) {
         $validImages[] = $image;
@@ -939,6 +943,13 @@ $device_id = $device['id'] ?? null;
 if (!$device) {
   header("Location: 404.php");
   exit();
+}
+
+// Ensure device image path is absolute
+if (!empty($device['image'])) {
+  if (strpos($device['image'], '/') !== 0 && !filter_var($device['image'], FILTER_VALIDATE_URL)) {
+    $device['image'] = '/' . ltrim($device['image'], '/');
+  }
 }
 
 // Get review for this device (if exists)
@@ -1777,7 +1788,7 @@ $commentCount = getDeviceCommentCount($pdo, $device_id);
                 </div>
                 <div class="d-flex flexiable ">
                   <img src="/imges/download-removebg-preview.png" alt="">
-                  <h5 style="font-family:system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue' ; font-size: 16px; font-weight: 700;" class="mt-2" onclick="window.location.href='compare.php?phone1=<?php echo $device['id']; ?>'">COMPARE </h5>
+                  <h5 style="font-family:system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue' ; font-size: 16px; font-weight: 700;" class="mt-2" onclick="window.location.href='/compare'">COMPARE </h5>
                 </div>
                 <div class="d-flex flexiable ">
                   <img src="/imges/download-removebg-preview.png" alt="">
@@ -1895,7 +1906,7 @@ $commentCount = getDeviceCommentCount($pdo, $device_id);
             <?php else: ?>
               <button class="pad" disabled style="opacity: 0.5; cursor: default;" title="No review available">REVIEW</button>
             <?php endif; ?>
-            <button class="pad" onclick="window.location.href='compare.php?phone1=<?php echo $device['id']; ?>'">COMPARE</button>
+            <button class="pad" onclick="window.location.href='/compare'">COMPARE</button>
             <button class="pad" onclick="document.getElementById('comments').scrollIntoView({behavior:'smooth', block:'start'});">OPINIONS</button>
             <button class="pad" onclick="showPicturesModal()">PICTURES</button>
             <button class="pad" onclick="showRelatedPhonesModal()">RELATED PHONES</button>

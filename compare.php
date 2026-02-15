@@ -557,10 +557,15 @@ function extractPriceFromMisc($miscJson)
 function getPhoneImage($phone)
 {
     if (isset($phone['image']) && !empty($phone['image'])) {
-        return htmlspecialchars($phone['image']);
+        $image = $phone['image'];
+        // Ensure absolute path
+        if (strpos($image, '/') !== 0 && !filter_var($image, FILTER_VALIDATE_URL)) {
+            $image = '/' . ltrim($image, '/');
+        }
+        return htmlspecialchars($image);
     }
     // Default fallback image
-    return 'imges/phone-placeholder.png';
+    return '/imges/phone-placeholder.png';
 }
 
 // Helper function to get phone name with brand
@@ -1304,10 +1309,10 @@ function formatDeviceSpecsStructured($device)
                         <div class="d-flex">
                             <img src="<?php echo getPhoneImage($phone1); ?>" alt="<?php echo getPhoneName($phone1); ?>">
                             <div class="buttons">
-                                <button onclick="window.location.href='device.php?slug=<?php echo urlencode($phone1['slug'] ?? $phone1['id']); ?>'">REVIEW</button>
-                                <button onclick="window.location.href='device.php?slug=<?php echo urlencode($phone1['slug'] ?? $phone1['id']); ?>'">SPECIFICATIONS</button>
-                                <button onclick="window.location.href='device.php?slug=<?php echo urlencode($phone1['slug'] ?? $phone1['id']); ?>#comments'">READ OPINIONS</button>
-                                <button onclick="window.location.href='device.php?slug=<?php echo urlencode($phone1['slug'] ?? $phone1['id']); ?>'">PICTURES</button>
+                                <button onclick="window.location.href='/device/<?php echo urlencode($phone1['slug'] ?? $phone1['id']); ?>'">REVIEW</button>
+                                <button onclick="window.location.href='/device/<?php echo urlencode($phone1['slug'] ?? $phone1['id']); ?>'">SPECIFICATIONS</button>
+                                <button onclick="window.location.href='/device/<?php echo urlencode($phone1['slug'] ?? $phone1['id']); ?>#comments'">READ OPINIONS</button>
+                                <button onclick="window.location.href='/device/<?php echo urlencode($phone1['slug'] ?? $phone1['id']); ?>'">PICTURES</button>
                             </div>
                         </div>
                     <?php else: ?>
@@ -1342,10 +1347,10 @@ function formatDeviceSpecsStructured($device)
                         <div class="d-flex">
                             <img src="<?php echo getPhoneImage($phone2); ?>" alt="<?php echo getPhoneName($phone2); ?>">
                             <div class="buttons">
-                                <button onclick="window.location.href='device.php?slug=<?php echo urlencode($phone2['slug'] ?? $phone2['id']); ?>'">REVIEW</button>
-                                <button onclick="window.location.href='device.php?slug=<?php echo urlencode($phone2['slug'] ?? $phone2['id']); ?>'">SPECIFICATIONS</button>
-                                <button onclick="window.location.href='device.php?slug=<?php echo urlencode($phone2['slug'] ?? $phone2['id']); ?>#comments'">READ OPINIONS</button>
-                                <button onclick="window.location.href='device.php?slug=<?php echo urlencode($phone2['slug'] ?? $phone2['id']); ?>'">PICTURES</button>
+                                <button onclick="window.location.href='/device/<?php echo urlencode($phone2['slug'] ?? $phone2['id']); ?>'">REVIEW</button>
+                                <button onclick="window.location.href='/device/<?php echo urlencode($phone2['slug'] ?? $phone2['id']); ?>'">SPECIFICATIONS</button>
+                                <button onclick="window.location.href='/device/<?php echo urlencode($phone2['slug'] ?? $phone2['id']); ?>#comments'">READ OPINIONS</button>
+                                <button onclick="window.location.href='/device/<?php echo urlencode($phone2['slug'] ?? $phone2['id']); ?>'">PICTURES</button>
                             </div>
                         </div>
                     <?php else: ?>
@@ -1382,10 +1387,10 @@ function formatDeviceSpecsStructured($device)
                         <div class="d-flex">
                             <img src="<?php echo getPhoneImage($phone3); ?>" alt="<?php echo getPhoneName($phone3); ?>">
                             <div class="buttons">
-                                <button onclick="window.location.href='device.php?slug=<?php echo urlencode($phone3['slug'] ?? $phone3['id']); ?>'">REVIEW</button>
-                                <button onclick="window.location.href='device.php?slug=<?php echo urlencode($phone3['slug'] ?? $phone3['id']); ?>'">SPECIFICATIONS</button>
-                                <button onclick="window.location.href='device.php?slug=<?php echo urlencode($phone3['slug'] ?? $phone3['id']); ?>#comments'">READ OPINIONS</button>
-                                <button onclick="window.location.href='device.php?slug=<?php echo urlencode($phone3['slug'] ?? $phone3['id']); ?>'">PICTURES</button>
+                                <button onclick="window.location.href='/device/<?php echo urlencode($phone3['slug'] ?? $phone3['id']); ?>'">REVIEW</button>
+                                <button onclick="window.location.href='/device/<?php echo urlencode($phone3['slug'] ?? $phone3['id']); ?>'">SPECIFICATIONS</button>
+                                <button onclick="window.location.href='/device/<?php echo urlencode($phone3['slug'] ?? $phone3['id']); ?>#comments'">READ OPINIONS</button>
+                                <button onclick="window.location.href='/device/<?php echo urlencode($phone3['slug'] ?? $phone3['id']); ?>'">PICTURES</button>
                             </div>
                         </div>
                     <?php else: ?>
@@ -1850,19 +1855,23 @@ function formatDeviceSpecsStructured($device)
         });
 
         function updateComparison(phoneNumber, phoneId) {
-            // Build new URL with updated phone parameter
-            const url = new URL(window.location);
+            // Get all three selected phone slugs
+            const phone1 = document.getElementById('phone1-select')?.value || '';
+            const phone2 = document.getElementById('phone2-select')?.value || '';
+            const phone3 = document.getElementById('phone3-select')?.value || '';
 
-            if (phoneId === '') {
-                // Remove the parameter if no phone selected
-                url.searchParams.delete('phone' + phoneNumber);
-            } else {
-                // Set or update the parameter
-                url.searchParams.set('phone' + phoneNumber, phoneId);
+            // Build clean URL format: /compare/slug1VSslug2VSslug3
+            // Only include selected phones in the URL
+            const slugs = [phone1, phone2, phone3].filter(slug => slug !== '');
+
+            if (slugs.length > 0) {
+                const compareUrl = '/compare/' + slugs.join('VS');
+                window.location.href = compareUrl;
             }
-
-            // Redirect to the new URL
-            window.location.href = url.toString();
+            // If no phones selected, stay on current page or redirect to /compare
+            else {
+                window.location.href = '/compare';
+            }
         }
         // Show brands modal
         function showBrandsModal() {

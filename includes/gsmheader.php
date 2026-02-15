@@ -21,7 +21,7 @@ $mobile_brands = $mobile_brands_stmt->fetchAll();
                     alt="">
             </button>
 
-            <a class="navbar-brand d-flex align-items-center" href="<?php echo $base; ?>index.php">
+            <a class="navbar-brand d-flex align-items-center" href="<?php echo $base; ?>home">
                 <img src="<?php echo $base; ?>imges/logo-wide.svg" alt="DevicesArena Logo" style="height: min-content; width: min-content; max-height: 50px; max-width: 200px;" />
             </a>
         </div>
@@ -63,7 +63,7 @@ $mobile_brands = $mobile_brands_stmt->fetchAll();
             src="https://cdn.prod.website-files.com/67f21c9d62aa4c4c685a7277/684091b39228b431a556d811_download-removebg-preview.png"
             alt="">
     </button>
-    <a class="navbar-brand d-flex align-items-center" href="<?php echo $base; ?>index.php">
+    <a class="navbar-brand d-flex align-items-center" href="<?php echo $base; ?>home">
         <img src="<?php echo $base; ?>imges/logo-wide.svg" alt="DevicesArena Logo" style="height: min-content; width: min-content; max-height: 30px; max-width: 150px;" />
     </a>
 </nav>

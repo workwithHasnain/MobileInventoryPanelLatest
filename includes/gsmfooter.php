@@ -25,10 +25,10 @@
             <div class="col-10 nav-wrap m-auto text-center ">
                 <div class="nav-container">
                     <a href="<?php echo $base; ?>" style="color: white;">Home</a>
-                    <a href="<?php echo $base; ?>/reviews" style="color: white;">Reviews</a>
-                    <a href="<?php echo $base; ?>/compare" style="color: white;">Compare</a>
-                    <a href="<?php echo $base; ?>/phonefinder" style="color: white;">Phone Finder</a>
-                    <a href="<?php echo $base; ?>/featured" style="color: white;">Featured</a>
+                    <a href="<?php echo $base; ?>reviews" style="color: white;">Reviews</a>
+                    <a href="<?php echo $base; ?>compare" style="color: white;">Compare</a>
+                    <a href="<?php echo $base; ?>phonefinder" style="color: white;">Phone Finder</a>
+                    <a href="<?php echo $base; ?>featured" style="color: white;">Featured</a>
                     <br>
                     <a href="https://youtube.com/@devicesarena" style="color: white;"> <i class="fa-brands fa-youtube fa-sm"></i></a>
                     <a href="https://www.instagram.com/devicesarenaofficial/" style="color: white;"> <i class="fa-brands fa-instagram fa-sm"></i></a>
