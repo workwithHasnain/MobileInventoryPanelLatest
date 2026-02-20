@@ -4,9 +4,11 @@
     # RewriteBase /MobileInventoryPanelLatest/
     RewriteBase /
     
-    # Redirect to www (comment out for localhost development)
+    # Redirect to www (only on production, not localhost)
     RewriteCond %{HTTP_HOST} ^devicesarena\.com$ [NC]
     RewriteRule ^(.*)$ https://www.devicesarena.com/$1 [R=301,L]
+    RewriteCond %{HTTP_HOST} !^localhost [NC]
+    RewriteCond %{HTTP_HOST} !^127\.0\.0\.1 [NC]
     RewriteCond %{HTTP_HOST} ^(?!www\.).*$ [NC]
     RewriteCond %{HTTPS} off
     RewriteRule ^(.*)$ https://www.%{HTTP_HOST}/$1 [R=301,L]

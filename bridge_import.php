@@ -91,7 +91,7 @@ curl_setopt_array($ch, [
         'X-API-Key: ' . $apiKey,
     ],
     CURLOPT_SSL_VERIFYPEER => true,
-    CURLOPT_FOLLOWLOCATION => true,
+    CURLOPT_FOLLOWLOCATION => false, // Don't follow redirects — they strip custom headers
 ]);
 
 $response = curl_exec($ch);
@@ -110,6 +110,17 @@ if ($curlErrno !== 0) {
         'success' => false,
         'error' => "Connection to remote server failed: {$curlError} (code {$curlErrno})",
         'remote_url' => $remoteUrl
+    ]);
+    exit;
+}
+
+// Handle redirects (301/302) — the server is redirecting, give user the correct URL
+if ($httpCode >= 300 && $httpCode < 400) {
+    $redirectUrl = curl_getinfo($ch, CURLINFO_REDIRECT_URL);
+    echo json_encode([
+        'success' => false,
+        'error' => "Server returned a redirect (HTTP {$httpCode}). Update your Remote Server URL to: " . rtrim($redirectUrl, '/import_device.php'),
+        'redirect_url' => $redirectUrl
     ]);
     exit;
 }
