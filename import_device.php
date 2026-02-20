@@ -39,24 +39,29 @@ $API_KEY = 'devicearena-import-2026'; // Change this to your own secret key
 // ====================================================================
 $contentType = $_SERVER['CONTENT_TYPE'] ?? ($_SERVER['HTTP_CONTENT_TYPE'] ?? '');
 
+// The X-API-Key header is the definitive signal that this request is from the extension.
+// The web form never sends this header. Check multiple ways since servers vary.
+$hasApiKey = !empty($_SERVER['HTTP_X_API_KEY']) 
+          || !empty($_SERVER['HTTP_X_Api_Key'])
+          || !empty(getallheaders()['X-API-Key'] ?? '');
+
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-    // Check if this is a multipart request from the extension
-    // Detect multipart even if PHP failed to parse the body (e.g. post_max_size exceeded)
-    $isMultipart = stripos($contentType, 'multipart/form-data') !== false;
-    $hasApiKey = !empty($_SERVER['HTTP_X_API_KEY']);
 
     if (stripos($contentType, 'application/json') !== false) {
         handleJsonImport($API_KEY);
-    } elseif ($isMultipart && $hasApiKey) {
-        // Extension multipart request — check if PHP actually parsed it
+    } elseif ($hasApiKey) {
+        // ANY POST with X-API-Key header = extension request (multipart with files)
         if (empty($_POST) && empty($_FILES)) {
-            // PHP silently discarded the body — post_max_size or upload_max_filesize exceeded
+            // PHP didn't parse the body — log diagnostics
             header('Content-Type: application/json');
             $postMax = ini_get('post_max_size');
             $uploadMax = ini_get('upload_max_filesize');
             echo json_encode([
                 'success' => false,
-                'error' => "Upload too large. Server limits: post_max_size={$postMax}, upload_max_filesize={$uploadMax}. Reduce image sizes or ask your host to increase these PHP limits."
+                'error' => "Server received the request but couldn't parse the uploaded data. "
+                         . "post_max_size={$postMax}, upload_max_filesize={$uploadMax}. "
+                         . "Content-Type: " . ($contentType ?: 'NOT SET') . ". "
+                         . "Try reducing image file sizes or contact your host to increase PHP upload limits."
             ]);
             exit;
         }
