@@ -1,0 +1,13 @@
+User-agent: *
+Allow: /
+
+# Sitemap location
+Sitemap: https://www.devicesarena.com/sitemap.xml
+
+# Crawl delay (optional, to be respectful to servers)
+# Crawl-delay: 1
+
+# Disallow sensitive areas
+Disallow: /admin/
+Disallow: /includes/
+Disallow: /uploads/

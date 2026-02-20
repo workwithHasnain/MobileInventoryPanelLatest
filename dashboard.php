@@ -89,6 +89,9 @@ if (isset($_SESSION['success_message'])) {
             <button type="button" class="btn btn-outline-primary ms-2" data-bs-toggle="modal" data-bs-target="#canonicalBaseModal">
                 <i class="fas fa-link"></i> Canonical Base
             </button>
+            <button type="button" class="btn btn-outline-success ms-2" data-bs-toggle="modal" data-bs-target="#sitemapModal">
+                <i class="fas fa-sitemap"></i> Sitemap
+            </button>
         </div>
     </div>
 
@@ -658,6 +661,73 @@ if (isset($_SESSION['success_message'])) {
             <div class="modal-footer">
                 <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
                 <button type="button" class="btn btn-primary" id="saveCanonicalBaseBtn">
+                    <i class="fas fa-save me-1"></i>Save Changes
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Sitemap Modal -->
+<div class="modal fade" id="sitemapModal" tabindex="-1" aria-labelledby="sitemapLabel" aria-hidden="true">
+    <div class="modal-dialog modal-xl modal-dialog-scrollable">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="sitemapLabel">
+                    <i class="fas fa-sitemap me-2"></i>Sitemap Management
+                </h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <div id="sitemap_message" style="display: none;"></div>
+
+                <!-- Stats Card -->
+                <div class="card mb-4 bg-light">
+                    <div class="card-body">
+                        <div class="row">
+                            <div class="col-md-4">
+                                <div class="text-center">
+                                    <h6 class="text-muted">Posts</h6>
+                                    <h3 id="sitemap_post_count">-</h3>
+                                </div>
+                            </div>
+                            <div class="col-md-4">
+                                <div class="text-center">
+                                    <h6 class="text-muted">Devices</h6>
+                                    <h3 id="sitemap_device_count">-</h3>
+                                </div>
+                            </div>
+                            <div class="col-md-4">
+                                <div class="text-center">
+                                    <h6 class="text-muted">Total URLs</h6>
+                                    <h3 id="sitemap_total_count">-</h3>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="text-center mt-3">
+                            <p class="text-muted mb-0">
+                                <small>Last Modified: <strong id="sitemap_last_modified">-</strong></small>
+                            </p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Sitemap Content -->
+                <div class="form-group">
+                    <label for="sitemapContent" class="form-label">Sitemap Content (XML)</label>
+                    <textarea class="form-control" id="sitemapContent" rows="15" style="font-family: monospace; font-size: 12px;"></textarea>
+                    <small class="text-muted d-block mt-2">
+                        <i class="fas fa-info-circle me-1"></i>
+                        You can edit the sitemap directly or use the sync button to regenerate it from your database.
+                    </small>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-warning" id="syncSitemapBtn">
+                    <i class="fas fa-sync me-1"></i>Sync from Database
+                </button>
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                <button type="button" class="btn btn-primary" id="saveSitemapBtn">
                     <i class="fas fa-save me-1"></i>Save Changes
                 </button>
             </div>
@@ -1537,6 +1607,142 @@ if (isset($_SESSION['success_message'])) {
 
     function showCanonicalMessage(message, type) {
         const messageDiv = document.getElementById('canonical_message');
+        messageDiv.className = 'alert alert-' + type + ' alert-dismissible fade show';
+        messageDiv.innerHTML = message + '<button type="button" class="btn-close" data-bs-dismiss="alert"></button>';
+        messageDiv.style.display = 'block';
+    }
+
+    // ===== SITEMAP MANAGEMENT =====
+    const sitemapModal = document.getElementById('sitemapModal');
+    const sitemapContent = document.getElementById('sitemapContent');
+    const syncSitemapBtn = document.getElementById('syncSitemapBtn');
+    const saveSitemapBtn = document.getElementById('saveSitemapBtn');
+
+    if (sitemapModal) {
+        sitemapModal.addEventListener('show.bs.modal', function() {
+            loadSitemap();
+        });
+    }
+
+    if (syncSitemapBtn) {
+        syncSitemapBtn.addEventListener('click', syncSitemap);
+    }
+
+    if (saveSitemapBtn) {
+        saveSitemapBtn.addEventListener('click', saveSitemap);
+    }
+
+    function loadSitemap() {
+        fetch('manage_sitemap.php', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/x-www-form-urlencoded'
+                },
+                body: 'action=get'
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    sitemapContent.value = data.content;
+                    const lastMod = new Date(data.lastModified);
+                    document.getElementById('sitemap_last_modified').textContent = lastMod.toLocaleString();
+
+                    // Count URLs in sitemap
+                    const parser = new DOMParser();
+                    const xmlDoc = parser.parseFromString(data.content, 'text/xml');
+                    const urlCount = xmlDoc.getElementsByTagName('url').length;
+                    document.getElementById('sitemap_total_count').textContent = urlCount;
+                } else {
+                    showSitemapMessage(data.message, 'warning');
+                    sitemapContent.value = '';
+                }
+            })
+            .catch(error => {
+                showSitemapMessage('Error loading sitemap: ' + error, 'danger');
+            });
+    }
+
+    function syncSitemap() {
+        if (!confirm('This will regenerate the sitemap from your database. Continue?')) {
+            return;
+        }
+
+        syncSitemapBtn.disabled = true;
+        syncSitemapBtn.innerHTML = '<i class="fas fa-spinner fa-spin me-1"></i>Syncing...';
+
+        fetch('manage_sitemap.php', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/x-www-form-urlencoded'
+                },
+                body: 'action=sync'
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    showSitemapMessage(data.message, 'success');
+
+                    // Update stats
+                    document.getElementById('sitemap_post_count').textContent = data.stats.posts;
+                    document.getElementById('sitemap_device_count').textContent = data.stats.devices;
+                    document.getElementById('sitemap_total_count').textContent = data.stats.total_urls;
+                    document.getElementById('sitemap_last_modified').textContent = new Date().toLocaleString();
+
+                    // Reload content
+                    setTimeout(() => {
+                        loadSitemap();
+                    }, 1000);
+                } else {
+                    showSitemapMessage(data.message, 'danger');
+                }
+                syncSitemapBtn.disabled = false;
+                syncSitemapBtn.innerHTML = '<i class="fas fa-sync me-1"></i>Sync from Database';
+            })
+            .catch(error => {
+                showSitemapMessage('Error syncing sitemap: ' + error, 'danger');
+                syncSitemapBtn.disabled = false;
+                syncSitemapBtn.innerHTML = '<i class="fas fa-sync me-1"></i>Sync from Database';
+            });
+    }
+
+    function saveSitemap() {
+        const content = sitemapContent.value.trim();
+
+        if (!content) {
+            showSitemapMessage('Sitemap content cannot be empty', 'warning');
+            return;
+        }
+
+        saveSitemapBtn.disabled = true;
+        saveSitemapBtn.innerHTML = '<i class="fas fa-spinner fa-spin me-1"></i>Saving...';
+
+        fetch('manage_sitemap.php', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/x-www-form-urlencoded'
+                },
+                body: 'action=save&content=' + encodeURIComponent(content)
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    showSitemapMessage(data.message, 'success');
+                    document.getElementById('sitemap_last_modified').textContent = new Date().toLocaleString();
+                } else {
+                    showSitemapMessage(data.message, 'danger');
+                }
+                saveSitemapBtn.disabled = false;
+                saveSitemapBtn.innerHTML = '<i class="fas fa-save me-1"></i>Save Changes';
+            })
+            .catch(error => {
+                showSitemapMessage('Error saving sitemap: ' + error, 'danger');
+                saveSitemapBtn.disabled = false;
+                saveSitemapBtn.innerHTML = '<i class="fas fa-save me-1"></i>Save Changes';
+            });
+    }
+
+    function showSitemapMessage(message, type) {
+        const messageDiv = document.getElementById('sitemap_message');
         messageDiv.className = 'alert alert-' + type + ' alert-dismissible fade show';
         messageDiv.innerHTML = message + '<button type="button" class="btn-close" data-bs-dismiss="alert"></button>';
         messageDiv.style.display = 'block';
