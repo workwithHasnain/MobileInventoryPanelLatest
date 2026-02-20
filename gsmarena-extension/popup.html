@@ -158,9 +158,13 @@
                 <h3 class="section-title" data-toggle="config-body">⚙️ Server Config</h3>
                 <div id="config-body" class="section-body">
                     <div class="field-row">
-                        <label for="bridge-url">Bridge URL</label>
+                        <label for="bridge-url">Local Bridge URL</label>
                         <input type="text" id="bridge-url"
-                            value="https://www.devicesarena.com/gsmarena-extension/bridge_import.php" />
+                            value="http://localhost/gsmarena-extension/bridge_import.php" />
+                    </div>
+                    <div class="field-row">
+                        <label for="server-url">Remote Server URL</label>
+                        <input type="text" id="server-url" value="https://www.devicesarena.com" />
                     </div>
                     <div class="field-row">
                         <label for="api-key">API Key</label>

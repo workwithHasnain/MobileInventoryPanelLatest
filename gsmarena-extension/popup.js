@@ -633,8 +633,9 @@ function updateImagePreviews() {
 document.addEventListener('DOMContentLoaded', async () => {
     // --- Load saved settings ---
     try {
-        const saved = await chrome.storage.local.get(['bridgeUrl', 'apiKey']);
+        const saved = await chrome.storage.local.get(['bridgeUrl', 'serverUrl', 'apiKey']);
         if (saved.bridgeUrl) document.getElementById('bridge-url').value = saved.bridgeUrl;
+        if (saved.serverUrl) document.getElementById('server-url').value = saved.serverUrl;
         if (saved.apiKey) document.getElementById('api-key').value = saved.apiKey;
     } catch (e) { /* ignore */ }
 
@@ -702,9 +703,11 @@ document.addEventListener('DOMContentLoaded', async () => {
         syncFieldsToData();
 
         const bridgeUrl = document.getElementById('bridge-url').value.trim().replace(/\/+$/, '');
+        const serverUrl = document.getElementById('server-url').value.trim().replace(/\/+$/, '');
         const apiKey = document.getElementById('api-key').value.trim();
 
-        if (!bridgeUrl) { showResult('Please set the Bridge URL.', 'error'); return; }
+        if (!bridgeUrl) { showResult('Please set the local bridge URL.', 'error'); return; }
+        if (!serverUrl) { showResult('Please set the remote server URL.', 'error'); return; }
 
         const imageFiles = getImageFiles();
         if (imageFiles.length === 0) {
@@ -714,7 +717,7 @@ document.addEventListener('DOMContentLoaded', async () => {
 
         // Save settings
         try {
-            await chrome.storage.local.set({ bridgeUrl, apiKey });
+            await chrome.storage.local.set({ bridgeUrl, serverUrl, apiKey });
         } catch (e) { /* ignore */ }
 
         // Build FormData with files + JSON device data
@@ -731,15 +734,18 @@ document.addEventListener('DOMContentLoaded', async () => {
 
         const importBtn = document.getElementById('btn-import');
         importBtn.disabled = true;
-        importBtn.textContent = '⏳ Uploading & Importing...';
+        importBtn.textContent = '⏳ Uploading via Bridge...';
 
         try {
+            // Send to LOCAL bridge, which forwards to remote server
             console.log('[DeviceArena] Sending to bridge:', bridgeUrl);
+            console.log('[DeviceArena] Remote target:', serverUrl);
 
             const resp = await fetch(bridgeUrl, {
                 method: 'POST',
                 headers: {
-                    'X-API-Key': apiKey
+                    'X-API-Key': apiKey,
+                    'X-Remote-URL': serverUrl
                 },
                 body: formData
             });
@@ -764,7 +770,7 @@ document.addEventListener('DOMContentLoaded', async () => {
             }
         } catch (err) {
             console.error('[DeviceArena] Bridge error:', err);
-            showResult('❌ Cannot reach bridge: ' + err.message, 'error');
+            showResult('❌ Cannot reach local bridge: ' + err.message + '\n\nMake sure XAMPP/Apache is running.', 'error');
         } finally {
             importBtn.disabled = false;
             importBtn.textContent = '🚀 Import to DeviceArena';
