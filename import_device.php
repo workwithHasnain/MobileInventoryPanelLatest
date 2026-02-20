@@ -37,13 +37,32 @@ $API_KEY = 'devicearena-import-2026'; // Change this to your own secret key
 // ====================================================================
 // Route the request
 // ====================================================================
-$contentType = $_SERVER['CONTENT_TYPE'] ?? '';
+$contentType = $_SERVER['CONTENT_TYPE'] ?? ($_SERVER['HTTP_CONTENT_TYPE'] ?? '');
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+    // Check if this is a multipart request from the extension
+    // Detect multipart even if PHP failed to parse the body (e.g. post_max_size exceeded)
+    $isMultipart = stripos($contentType, 'multipart/form-data') !== false;
+    $hasApiKey = !empty($_SERVER['HTTP_X_API_KEY']);
+
     if (stripos($contentType, 'application/json') !== false) {
         handleJsonImport($API_KEY);
+    } elseif ($isMultipart && $hasApiKey) {
+        // Extension multipart request — check if PHP actually parsed it
+        if (empty($_POST) && empty($_FILES)) {
+            // PHP silently discarded the body — post_max_size or upload_max_filesize exceeded
+            header('Content-Type: application/json');
+            $postMax = ini_get('post_max_size');
+            $uploadMax = ini_get('upload_max_filesize');
+            echo json_encode([
+                'success' => false,
+                'error' => "Upload too large. Server limits: post_max_size={$postMax}, upload_max_filesize={$uploadMax}. Reduce image sizes or ask your host to increase these PHP limits."
+            ]);
+            exit;
+        }
+        handleMultipartImport($API_KEY);
     } elseif (isset($_POST['device_data']) || isset($_FILES['images'])) {
-        // Multipart form-data from browser extension (with file uploads)
+        // Fallback multipart detection
         handleMultipartImport($API_KEY);
     } else {
         handleSqlImport();
