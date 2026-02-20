@@ -633,7 +633,8 @@ function updateImagePreviews() {
 document.addEventListener('DOMContentLoaded', async () => {
     // --- Load saved settings ---
     try {
-        const saved = await chrome.storage.local.get(['serverUrl', 'apiKey']);
+        const saved = await chrome.storage.local.get(['bridgeUrl', 'serverUrl', 'apiKey']);
+        if (saved.bridgeUrl) document.getElementById('bridge-url').value = saved.bridgeUrl;
         if (saved.serverUrl) document.getElementById('server-url').value = saved.serverUrl;
         if (saved.apiKey) document.getElementById('api-key').value = saved.apiKey;
     } catch (e) { /* ignore */ }
@@ -701,10 +702,12 @@ document.addEventListener('DOMContentLoaded', async () => {
         if (!currentDeviceData) { showResult('No device data scraped yet.', 'error'); return; }
         syncFieldsToData();
 
+        const bridgeUrl = document.getElementById('bridge-url').value.trim().replace(/\/+$/, '');
         const serverUrl = document.getElementById('server-url').value.trim().replace(/\/+$/, '');
         const apiKey = document.getElementById('api-key').value.trim();
 
-        if (!serverUrl) { showResult('Please set the server URL.', 'error'); return; }
+        if (!bridgeUrl) { showResult('Please set the local bridge URL.', 'error'); return; }
+        if (!serverUrl) { showResult('Please set the remote server URL.', 'error'); return; }
 
         const imageFiles = getImageFiles();
         if (imageFiles.length === 0) {
@@ -714,7 +717,7 @@ document.addEventListener('DOMContentLoaded', async () => {
 
         // Save settings
         try {
-            await chrome.storage.local.set({ serverUrl, apiKey });
+            await chrome.storage.local.set({ bridgeUrl, serverUrl, apiKey });
         } catch (e) { /* ignore */ }
 
         // Build FormData with files + JSON device data
@@ -731,43 +734,43 @@ document.addEventListener('DOMContentLoaded', async () => {
 
         const importBtn = document.getElementById('btn-import');
         importBtn.disabled = true;
-        importBtn.textContent = '⏳ Uploading & Importing...';
+        importBtn.textContent = '⏳ Uploading via Bridge...';
 
         try {
-            const importUrl = `${serverUrl}/import_device.php`;
-            console.log('[DeviceArena] Importing to:', importUrl);
-            console.log('[DeviceArena] FormData entries:', [...formData.entries()].map(e => e[0] + (e[1] instanceof File ? ` (File: ${e[1].name}, ${e[1].size}b)` : '')));
+            // Send to LOCAL bridge, which forwards to remote server
+            console.log('[DeviceArena] Sending to bridge:', bridgeUrl);
+            console.log('[DeviceArena] Remote target:', serverUrl);
 
-            const resp = await fetch(importUrl, {
+            const resp = await fetch(bridgeUrl, {
                 method: 'POST',
-                mode: 'cors',
                 headers: {
-                    'X-API-Key': apiKey
+                    'X-API-Key': apiKey,
+                    'X-Remote-URL': serverUrl
                 },
                 body: formData
             });
 
-            console.log('[DeviceArena] Response status:', resp.status, resp.statusText);
-
             const text = await resp.text();
-            console.log('[DeviceArena] Response body:', text);
+            console.log('[DeviceArena] Bridge response:', text);
 
             let result;
             try {
                 result = JSON.parse(text);
             } catch (parseErr) {
-                showResult('❌ Server returned invalid JSON. Response: ' + text.substring(0, 300), 'error');
+                showResult('❌ Bridge returned invalid response: ' + text.substring(0, 300), 'error');
                 return;
             }
 
             if (result.success) {
                 showResult('✅ ' + (result.message || 'Device imported successfully!'), 'success');
             } else {
-                showResult('❌ ' + (result.error || 'Import failed.'), 'error');
+                let errMsg = result.error || 'Import failed.';
+                if (result.details) errMsg += '\n\nDetails: ' + result.details.substring(0, 200);
+                showResult('❌ ' + errMsg, 'error');
             }
         } catch (err) {
-            console.error('[DeviceArena] Fetch error:', err);
-            showResult('❌ Network error: ' + err.message + '\n\nTips:\n• Reload extension after manifest changes (chrome://extensions)\n• Check if ' + serverUrl + '/import_device.php is accessible\n• Check browser console (F12) for details', 'error');
+            console.error('[DeviceArena] Bridge error:', err);
+            showResult('❌ Cannot reach local bridge: ' + err.message + '\n\nMake sure XAMPP/Apache is running.', 'error');
         } finally {
             importBtn.disabled = false;
             importBtn.textContent = '🚀 Import to DeviceArena';
