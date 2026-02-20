@@ -158,8 +158,7 @@ try {
             $totalUrls = count($staticPages) + $postCount + $deviceCount;
             echo json_encode([
                 'success' => true,
-                'message' => "Sitemap synced successfully. Total URLs: {$totalUrls} (5 static pages, {$postCount} posts, {$deviceCount} devices)",
-                'content' => $xml
+                'message' => "Sitemap synced successfully. Total URLs: {$totalUrls} (5 static pages, {$postCount} posts, {$deviceCount} devices)"
             ]);
             exit;
         } catch (Exception $e) {
@@ -172,4 +171,5 @@ try {
     }
 } catch (Exception $e) {
     echo json_encode(['success' => false, 'message' => 'Error: ' . $e->getMessage()]);
+    exit;
 }
