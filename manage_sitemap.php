@@ -1,4 +1,5 @@
 <?php
+ob_start();
 require_once 'auth.php';
 require_once 'config.php';
 require_once 'database_functions.php';
@@ -6,6 +7,8 @@ require_once 'database_functions.php';
 // Require login
 requireLogin();
 
+// Clear any stray output from includes
+ob_end_clean();
 header('Content-Type: application/json');
 
 $sitemap_file = __DIR__ . '/sitemap.xml';

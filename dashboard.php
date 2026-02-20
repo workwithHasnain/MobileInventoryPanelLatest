@@ -1637,8 +1637,13 @@ if (isset($_SESSION['success_message'])) {
                 method: 'POST',
                 body: content
             })
-            .then(response => response.json())
-            .then(data => {
+            .then(response => {
+                if (!response.ok) throw new Error('Server returned ' + response.status);
+                return response.text();
+            })
+            .then(text => {
+                if (!text) throw new Error('Empty response from server');
+                const data = JSON.parse(text);
                 if (data.success) {
                     showSitemapMessage(data.message, 'success');
                 } else {
