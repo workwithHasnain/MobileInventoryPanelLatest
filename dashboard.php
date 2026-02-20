@@ -1636,9 +1636,9 @@ if (isset($_SESSION['success_message'])) {
         fetch('manage_sitemap.php', {
                 method: 'POST',
                 headers: {
-                    'Content-Type': 'application/x-www-form-urlencoded'
+                    'Content-Type': 'application/json'
                 },
-                body: 'action=save&content=' + encodeURIComponent(content)
+                body: JSON.stringify({ action: 'save', content: content })
             })
             .then(response => response.json())
             .then(data => {
