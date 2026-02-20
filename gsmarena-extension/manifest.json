@@ -10,6 +10,8 @@
   ],
   "host_permissions": [
     "https://www.gsmarena.com/*",
+    "https://devicesarena.com/*",
+    "https://www.devicesarena.com/*",
     "http://localhost/*",
     "http://127.0.0.1/*"
   ],

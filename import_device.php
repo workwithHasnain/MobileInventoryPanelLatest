@@ -373,6 +373,77 @@ function handleMultipartImport($apiKey)
 }
 
 // ====================================================================
+// Helper: Split SQL into statements, respecting quoted strings
+// ====================================================================
+function splitSqlStatements($sql)
+{
+    $statements = [];
+    $current = '';
+    $inSingleQuote = false;
+    $inDoubleQuote = false;
+    $len = strlen($sql);
+
+    for ($i = 0; $i < $len; $i++) {
+        $ch = $sql[$i];
+
+        // Handle escape sequences inside quotes ('' in SQL or \')
+        if ($inSingleQuote) {
+            if ($ch === "'" && $i + 1 < $len && $sql[$i + 1] === "'") {
+                // Escaped single quote ('') — skip both
+                $current .= "''";
+                $i++;
+                continue;
+            }
+            if ($ch === '\\' && $i + 1 < $len) {
+                // Backslash escape — skip next char
+                $current .= $ch . $sql[$i + 1];
+                $i++;
+                continue;
+            }
+            if ($ch === "'") {
+                $inSingleQuote = false;
+            }
+            $current .= $ch;
+            continue;
+        }
+
+        if ($inDoubleQuote) {
+            if ($ch === '"') {
+                $inDoubleQuote = false;
+            }
+            $current .= $ch;
+            continue;
+        }
+
+        // Outside of quotes
+        if ($ch === "'") {
+            $inSingleQuote = true;
+            $current .= $ch;
+        } elseif ($ch === '"') {
+            $inDoubleQuote = true;
+            $current .= $ch;
+        } elseif ($ch === ';') {
+            // Statement terminator outside of any quotes
+            $trimmed = trim($current);
+            if (!empty($trimmed)) {
+                $statements[] = $trimmed;
+            }
+            $current = '';
+        } else {
+            $current .= $ch;
+        }
+    }
+
+    // Last statement (may not end with ;)
+    $trimmed = trim($current);
+    if (!empty($trimmed)) {
+        $statements[] = $trimmed;
+    }
+
+    return $statements;
+}
+
+// ====================================================================
 // SQL Form Handler (paste & execute SQL manually)
 // ====================================================================
 function handleSqlImport()
@@ -395,8 +466,9 @@ function handleSqlImport()
     $sqlClean = preg_replace('/--.*$/m', '', $sql);
     $sqlClean = trim($sqlClean);
 
-    // Check that the SQL only contains INSERT statements
-    $statements = array_filter(array_map('trim', preg_split('/;\s*/', $sqlClean)));
+    // Split SQL into statements safely, respecting quoted strings
+    // We can't just split on ";" because values contain semicolons
+    $statements = splitSqlStatements($sqlClean);
     foreach ($statements as $stmt) {
         if (empty($stmt)) continue;
         if (!preg_match('/^INSERT\s+INTO\s+/i', $stmt)) {

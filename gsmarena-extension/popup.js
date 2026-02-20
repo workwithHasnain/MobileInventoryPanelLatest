@@ -734,15 +734,31 @@ document.addEventListener('DOMContentLoaded', async () => {
         importBtn.textContent = '⏳ Uploading & Importing...';
 
         try {
-            const resp = await fetch(`${serverUrl}/import_device.php`, {
+            const importUrl = `${serverUrl}/import_device.php`;
+            console.log('[DeviceArena] Importing to:', importUrl);
+            console.log('[DeviceArena] FormData entries:', [...formData.entries()].map(e => e[0] + (e[1] instanceof File ? ` (File: ${e[1].name}, ${e[1].size}b)` : '')));
+
+            const resp = await fetch(importUrl, {
                 method: 'POST',
+                mode: 'cors',
                 headers: {
                     'X-API-Key': apiKey
                 },
                 body: formData
             });
 
-            const result = await resp.json();
+            console.log('[DeviceArena] Response status:', resp.status, resp.statusText);
+
+            const text = await resp.text();
+            console.log('[DeviceArena] Response body:', text);
+
+            let result;
+            try {
+                result = JSON.parse(text);
+            } catch (parseErr) {
+                showResult('❌ Server returned invalid JSON. Response: ' + text.substring(0, 300), 'error');
+                return;
+            }
 
             if (result.success) {
                 showResult('✅ ' + (result.message || 'Device imported successfully!'), 'success');
@@ -750,7 +766,8 @@ document.addEventListener('DOMContentLoaded', async () => {
                 showResult('❌ ' + (result.error || 'Import failed.'), 'error');
             }
         } catch (err) {
-            showResult('❌ Network error: ' + err.message, 'error');
+            console.error('[DeviceArena] Fetch error:', err);
+            showResult('❌ Network error: ' + err.message + '\n\nTips:\n• Reload extension after manifest changes (chrome://extensions)\n• Check if ' + serverUrl + '/import_device.php is accessible\n• Check browser console (F12) for details', 'error');
         } finally {
             importBtn.disabled = false;
             importBtn.textContent = '🚀 Import to DeviceArena';
