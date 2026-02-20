@@ -9,15 +9,7 @@ requireLogin();
 header('Content-Type: application/json');
 
 $sitemap_file = __DIR__ . '/sitemap.xml';
-
-// Read JSON body if content type is JSON
-$jsonInput = null;
-$contentType = $_SERVER['CONTENT_TYPE'] ?? '';
-if (strpos($contentType, 'application/json') !== false) {
-    $jsonInput = json_decode(file_get_contents('php://input'), true);
-}
-
-$action = $jsonInput['action'] ?? $_POST['action'] ?? $_GET['action'] ?? '';
+$action = $_POST['action'] ?? $_GET['action'] ?? '';
 
 if ($action === 'get') {
     // Return sitemap contents
@@ -35,8 +27,8 @@ if ($action === 'get') {
         exit;
     }
 
-    $content = $jsonInput['content'] ?? $_POST['content'] ?? '';
-    if (empty($content)) {
+    $content = file_get_contents('php://input');
+    if (empty(trim($content))) {
         echo json_encode(['success' => false, 'message' => 'Sitemap content cannot be empty']);
         exit;
     }

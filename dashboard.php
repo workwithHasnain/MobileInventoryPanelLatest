@@ -1633,15 +1633,9 @@ if (isset($_SESSION['success_message'])) {
         saveSitemapBtn.disabled = true;
         saveSitemapBtn.innerHTML = '<i class="fas fa-spinner fa-spin me-1"></i>Saving...';
 
-        fetch('manage_sitemap.php', {
+        fetch('manage_sitemap.php?action=save', {
                 method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json'
-                },
-                body: JSON.stringify({
-                    action: 'save',
-                    content: content
-                })
+                body: content
             })
             .then(response => response.json())
             .then(data => {
