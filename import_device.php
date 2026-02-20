@@ -12,7 +12,7 @@
  */
 
 error_reporting(E_ALL);
-ini_set('display_errors', 1);
+ini_set('display_errors', 0); // Don't leak HTML errors into JSON responses
 
 // CORS headers for browser extension
 header('Access-Control-Allow-Origin: *');
@@ -41,33 +41,48 @@ $contentType = $_SERVER['CONTENT_TYPE'] ?? ($_SERVER['HTTP_CONTENT_TYPE'] ?? '')
 
 // The X-API-Key header is the definitive signal that this request is from the extension.
 // The web form never sends this header. Check multiple ways since servers vary.
-$hasApiKey = !empty($_SERVER['HTTP_X_API_KEY']) 
-          || !empty($_SERVER['HTTP_X_Api_Key'])
-          || !empty(getallheaders()['X-API-Key'] ?? '');
+$allHeaders = function_exists('getallheaders') ? getallheaders() : [];
+$apiKeyFromHeader = $_SERVER['HTTP_X_API_KEY']
+    ?? $_SERVER['HTTP_X_Api_Key']
+    ?? $allHeaders['X-API-Key']
+    ?? $allHeaders['X-Api-Key']
+    ?? $allHeaders['x-api-key']
+    ?? '';
+$hasApiKey = !empty($apiKeyFromHeader);
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
-    if (stripos($contentType, 'application/json') !== false) {
-        handleJsonImport($API_KEY);
-    } elseif ($hasApiKey) {
-        // ANY POST with X-API-Key header = extension request (multipart with files)
-        if (empty($_POST) && empty($_FILES)) {
-            // PHP didn't parse the body — log diagnostics
-            header('Content-Type: application/json');
-            $postMax = ini_get('post_max_size');
-            $uploadMax = ini_get('upload_max_filesize');
+    if ($hasApiKey) {
+        // ---- EXTENSION REQUEST ----
+        // Always return JSON, never HTML. Wrap in try/catch.
+        header('Content-Type: application/json');
+        try {
+            if (stripos($contentType, 'application/json') !== false) {
+                handleJsonImport($API_KEY);
+            } elseif (empty($_POST) && empty($_FILES)) {
+                $postMax = ini_get('post_max_size');
+                $uploadMax = ini_get('upload_max_filesize');
+                echo json_encode([
+                    'success' => false,
+                    'error' => "Server couldn't parse upload. post_max_size={$postMax}, upload_max_filesize={$uploadMax}. Try smaller images."
+                ]);
+                exit;
+            } else {
+                handleMultipartImport($API_KEY);
+            }
+        } catch (Throwable $e) {
             echo json_encode([
                 'success' => false,
-                'error' => "Server received the request but couldn't parse the uploaded data. "
-                         . "post_max_size={$postMax}, upload_max_filesize={$uploadMax}. "
-                         . "Content-Type: " . ($contentType ?: 'NOT SET') . ". "
-                         . "Try reducing image file sizes or contact your host to increase PHP upload limits."
+                'error' => 'Server error: ' . $e->getMessage()
             ]);
             exit;
         }
-        handleMultipartImport($API_KEY);
+    } elseif (stripos($contentType, 'application/json') !== false) {
+        handleJsonImport($API_KEY);
+    } elseif (isset($_POST['sql'])) {
+        // Web form SQL paste (with optional image uploads)
+        handleSqlImport();
     } elseif (isset($_POST['device_data']) || isset($_FILES['images'])) {
-        // Fallback multipart detection
         handleMultipartImport($API_KEY);
     } else {
         handleSqlImport();
@@ -491,7 +506,6 @@ function handleSqlImport()
     $sqlClean = trim($sqlClean);
 
     // Split SQL into statements safely, respecting quoted strings
-    // We can't just split on ";" because values contain semicolons
     $statements = splitSqlStatements($sqlClean);
     foreach ($statements as $stmt) {
         if (empty($stmt)) continue;
@@ -503,16 +517,88 @@ function handleSqlImport()
         }
     }
 
+    // Handle image uploads (up to 5 files)
+    $uploaded_paths = [];
+    if (isset($_FILES['images']) && is_array($_FILES['images']['name'])) {
+        $allowed_types = ['image/jpeg', 'image/png', 'image/gif', 'image/webp'];
+        $max_size = 5 * 1024 * 1024; // 5MB
+
+        if (!file_exists(__DIR__ . '/uploads')) {
+            mkdir(__DIR__ . '/uploads', 0777, true);
+        }
+
+        for ($i = 0; $i < min(count($_FILES['images']['name']), 5); $i++) {
+            if (!empty($_FILES['images']['name'][$i]) && $_FILES['images']['error'][$i] === UPLOAD_ERR_OK) {
+                $file_type = $_FILES['images']['type'][$i];
+                $file_size = $_FILES['images']['size'][$i];
+
+                if (!in_array($file_type, $allowed_types)) {
+                    $message = 'Image ' . ($i + 1) . ': Only JPG, PNG, GIF, and WebP are allowed.';
+                    $messageType = 'error';
+                    showImportForm($message, $messageType, $sql);
+                    return;
+                }
+                if ($file_size > $max_size) {
+                    $message = 'Image ' . ($i + 1) . ': File size must not exceed 5MB.';
+                    $messageType = 'error';
+                    showImportForm($message, $messageType, $sql);
+                    return;
+                }
+
+                $ext = pathinfo($_FILES['images']['name'][$i], PATHINFO_EXTENSION);
+                $filename = 'device_' . time() . '_' . uniqid() . '_' . ($i + 1) . '.' . $ext;
+                $upload_path = 'uploads/' . $filename;
+                $full_path = __DIR__ . '/' . $upload_path;
+
+                if (move_uploaded_file($_FILES['images']['tmp_name'][$i], $full_path)) {
+                    $uploaded_paths[] = $upload_path;
+                } else {
+                    $message = 'Failed to upload image ' . ($i + 1) . '.';
+                    $messageType = 'error';
+                    showImportForm($message, $messageType, $sql);
+                    return;
+                }
+            }
+        }
+    }
+
+    // Replace placeholder image paths in SQL with actual uploaded paths
+    if (!empty($uploaded_paths)) {
+        // Replace the main image placeholder
+        $sql = preg_replace("/uploads\/device_PENDING_1_[^']+/", $uploaded_paths[0], $sql);
+
+        // Replace additional image placeholders
+        for ($i = 1; $i < count($uploaded_paths); $i++) {
+            $num = $i + 1;
+            $sql = preg_replace("/uploads\/device_PENDING_{$num}_[^']+/", $uploaded_paths[$i], $sql);
+        }
+
+        // Also rebuild the ARRAY[] for images column if present
+        $arrayItems = array_map(function ($p) {
+            return "'" . str_replace("'", "''", $p) . "'";
+        }, $uploaded_paths);
+        $newArray = 'ARRAY[' . implode(', ', $arrayItems) . ']::TEXT[]';
+        $sql = preg_replace("/ARRAY\[.*?\]::TEXT\[\]/s", $newArray, $sql);
+    }
+
     try {
         $pdo = getConnection();
         $pdo->beginTransaction();
         $pdo->exec($sql);
         $pdo->commit();
         $message = 'SQL executed successfully! Device imported.';
+        if (!empty($uploaded_paths)) {
+            $message .= ' ' . count($uploaded_paths) . ' image(s) uploaded.';
+        }
         $messageType = 'success';
     } catch (Exception $e) {
         if (isset($pdo) && $pdo->inTransaction()) {
             $pdo->rollBack();
+        }
+        // Clean up uploaded files on failure
+        foreach ($uploaded_paths as $path) {
+            $fullPath = __DIR__ . '/' . $path;
+            if (file_exists($fullPath)) unlink($fullPath);
         }
         $message = 'SQL Error: ' . $e->getMessage();
         $messageType = 'error';
@@ -603,7 +689,31 @@ function showImportForm($message = '', $messageType = '', $lastSql = '')
                         </div>
                     </div>
 
-                    <form method="POST" action="import_device.php">
+                    <form method="POST" action="import_device.php" enctype="multipart/form-data">
+                        <!-- Image Upload Section -->
+                        <div class="mb-3">
+                            <label class="form-label fw-bold">
+                                <i class="fas fa-images me-1"></i>Upload Device Images (up to 5)
+                            </label>
+                            <div class="row g-2">
+                                <?php for ($i = 1; $i <= 5; $i++): ?>
+                                    <div class="col-md-4 col-6">
+                                        <div class="border rounded p-2 text-center position-relative" style="min-height: 100px; background: #fafafa; cursor: pointer;" onclick="this.querySelector('input').click()">
+                                            <input type="file" name="images[]" accept="image/jpeg,image/png,image/gif,image/webp" class="d-none img-input" onchange="previewImg(this)">
+                                            <div class="img-preview-wrap">
+                                                <i class="fas fa-plus-circle fa-2x text-muted mb-1"></i>
+                                                <div class="small text-muted">Image <?php echo $i; ?></div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                <?php endfor; ?>
+                            </div>
+                            <small class="text-muted">JPG, PNG, GIF, WebP. Max 5MB each. These replace placeholder paths in the SQL.</small>
+                        </div>
+
+                        <hr>
+
+                        <!-- SQL Paste Section -->
                         <div class="mb-3">
                             <label for="sql" class="form-label fw-bold">
                                 <i class="fas fa-code me-1"></i>Paste Generated SQL
@@ -616,10 +726,23 @@ function showImportForm($message = '', $messageType = '', $lastSql = '')
                                 <i class="fas fa-eraser me-1"></i> Clear
                             </button>
                             <button type="submit" class="btn btn-primary">
-                                <i class="fas fa-play me-1"></i> Execute SQL
+                                <i class="fas fa-play me-1"></i> Upload Images & Execute SQL
                             </button>
                         </div>
                     </form>
+
+                    <script>
+                        function previewImg(input) {
+                            const wrap = input.closest('.position-relative').querySelector('.img-preview-wrap');
+                            if (input.files && input.files[0]) {
+                                const reader = new FileReader();
+                                reader.onload = function(e) {
+                                    wrap.innerHTML = '<img src="' + e.target.result + '" style="max-height:80px;max-width:100%;object-fit:contain;"><div class="small text-success mt-1"><i class="fas fa-check"></i> ' + input.files[0].name.substring(0, 20) + '</div>';
+                                };
+                                reader.readAsDataURL(input.files[0]);
+                            }
+                        }
+                    </script>
                 </div>
             </div>
         </div>
