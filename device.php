@@ -1315,8 +1315,7 @@ $commentCount = getDeviceCommentCount($pdo, $device_id);
 
     td strong {
       display: inline-block;
-
-      width: 90px;
+      width: 100%;
       font-weight: 600;
     }
 

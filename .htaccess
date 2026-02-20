@@ -1,9 +1,10 @@
 # Enable mod_rewrite
 <IfModule mod_rewrite.c>
     RewriteEngine On
+    # RewriteBase /MobileInventoryPanelLatest/
     RewriteBase /
     
-    # Redirect to www
+    # Redirect to www (comment out for localhost development)
     RewriteCond %{HTTP_HOST} ^devicesarena\.com$ [NC]
     RewriteRule ^(.*)$ https://www.devicesarena.com/$1 [R=301,L]
     RewriteCond %{HTTP_HOST} ^(?!www\.).*$ [NC]
@@ -38,7 +39,10 @@
     # Route for index.php: /home
     RewriteRule ^home/?$ index.php [L,QSA]
 
-    # Route domain root to /home
+    # Route domain root to dashboard for logged in users, else home (keep commented out for production, uncomment for localhost development)
+    # RewriteRule ^/?$ index.php [L,QSA]
+
+    # Route domain root to /home (comment out for localhost development)
     RewriteRule ^/?$ home/ [R=301,L]
 
 </IfModule>

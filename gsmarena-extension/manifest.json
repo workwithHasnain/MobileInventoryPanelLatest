@@ -1,0 +1,20 @@
+{
+  "manifest_version": 3,
+  "name": "GSMArena to DeviceArena Importer",
+  "version": "1.0.0",
+  "description": "Scrape device specs from GSMArena pages and import them into DeviceArena database",
+  "permissions": [
+    "activeTab",
+    "scripting",
+    "storage"
+  ],
+  "host_permissions": [
+    "https://www.gsmarena.com/*",
+    "http://localhost/*",
+    "http://127.0.0.1/*"
+  ],
+  "action": {
+    "default_popup": "popup.html",
+    "default_title": "GSMArena → DeviceArena"
+  }
+}

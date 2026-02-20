@@ -1,0 +1,192 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>GSMArena → DeviceArena</title>
+    <link rel="stylesheet" href="styles.css" />
+</head>
+
+<body>
+    <div id="app">
+        <!-- Header -->
+        <header>
+            <h1>GSMArena → DeviceArena</h1>
+            <div id="status" class="status info">Initializing...</div>
+        </header>
+
+        <!-- Not on GSMArena warning -->
+        <div id="not-gsmarena" class="section" style="display:none;">
+            <p class="error-msg">⚠️ Please navigate to a GSMArena device page first.</p>
+            <p class="hint">Example: https://www.gsmarena.com/samsung_galaxy_s25-13211.php</p>
+        </div>
+
+        <!-- Main content (hidden until scrape completes) -->
+        <div id="main-content" style="display:none;">
+
+            <!-- Device Info Section -->
+            <div class="section">
+                <h3 class="section-title" data-toggle="device-info-body">📱 Device Info</h3>
+                <div id="device-info-body" class="section-body">
+                    <div class="field-grid">
+                        <div class="field-row">
+                            <label for="field-brand">Brand</label>
+                            <input type="text" id="field-brand" />
+                        </div>
+                        <div class="field-row">
+                            <label for="field-name">Model Name</label>
+                            <input type="text" id="field-name" />
+                        </div>
+                        <div class="field-row">
+                            <label for="field-year">Year</label>
+                            <input type="number" id="field-year" min="2000" max="2030" />
+                        </div>
+                        <div class="field-row">
+                            <label for="field-availability">Availability</label>
+                            <select id="field-availability">
+                                <option value="">-- Select --</option>
+                                <option value="Available">Available</option>
+                                <option value="Coming Soon">Coming Soon</option>
+                                <option value="Discontinued">Discontinued</option>
+                                <option value="Rumored">Rumored</option>
+                            </select>
+                        </div>
+                        <div class="field-row">
+                            <label for="field-price">Price</label>
+                            <input type="number" id="field-price" step="0.01" min="0" />
+                            <span id="price-note" class="hint"></span>
+                        </div>
+                        <div class="field-row">
+                            <label for="field-release-date">Release Date</label>
+                            <input type="date" id="field-release-date" />
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Quick Stats -->
+            <div class="section">
+                <h3 class="section-title" data-toggle="stats-body">📊 Extracted Stats</h3>
+                <div id="stats-body" class="section-body">
+                    <div class="stats-grid">
+                        <div class="stat-item">
+                            <span class="stat-label">Display</span>
+                            <span class="stat-value" id="stat-display">—</span>
+                        </div>
+                        <div class="stat-item">
+                            <span class="stat-label">Camera</span>
+                            <span class="stat-value" id="stat-camera">—</span>
+                        </div>
+                        <div class="stat-item">
+                            <span class="stat-label">RAM</span>
+                            <span class="stat-value" id="stat-ram">—</span>
+                        </div>
+                        <div class="stat-item">
+                            <span class="stat-label">Battery</span>
+                            <span class="stat-value" id="stat-battery">—</span>
+                        </div>
+                        <div class="stat-item">
+                            <span class="stat-label">Chipset</span>
+                            <span class="stat-value" id="stat-chipset">—</span>
+                        </div>
+                        <div class="stat-item">
+                            <span class="stat-label">OS</span>
+                            <span class="stat-value" id="stat-os">—</span>
+                        </div>
+                        <div class="stat-item">
+                            <span class="stat-label">Weight</span>
+                            <span class="stat-value" id="stat-weight">—</span>
+                        </div>
+                        <div class="stat-item">
+                            <span class="stat-label">Charging</span>
+                            <span class="stat-value" id="stat-charging">—</span>
+                        </div>
+                    </div>
+                    <div class="hint" style="margin-top:6px;">Sections scraped: <span id="sections-count">0</span></div>
+                </div>
+            </div>
+
+            <!-- Images Section -->
+            <div class="section">
+                <h3 class="section-title" data-toggle="images-body">🖼️ Images (Upload Files)</h3>
+                <div id="images-body" class="section-body">
+                    <div id="main-image-preview">
+                        <img id="main-img" src="" alt="Main device image" style="display:none;" />
+                        <span id="no-img-msg">GSMArena image preview (not uploaded)</span>
+                    </div>
+                    <div class="hint" style="margin-bottom:8px;">Download images from GSMArena first, then select local
+                        files below (up to 5). First image = main image.</div>
+                    <div id="image-file-list">
+                        <div class="image-file-row">
+                            <label class="file-label">Image 1 (Main)</label>
+                            <input type="file" class="image-file-input"
+                                accept="image/jpeg,image/png,image/gif,image/webp" />
+                            <span class="file-name">No file chosen</span>
+                        </div>
+                        <div class="image-file-row">
+                            <label class="file-label">Image 2</label>
+                            <input type="file" class="image-file-input"
+                                accept="image/jpeg,image/png,image/gif,image/webp" />
+                            <span class="file-name">No file chosen</span>
+                        </div>
+                        <div class="image-file-row">
+                            <label class="file-label">Image 3</label>
+                            <input type="file" class="image-file-input"
+                                accept="image/jpeg,image/png,image/gif,image/webp" />
+                            <span class="file-name">No file chosen</span>
+                        </div>
+                        <div class="image-file-row">
+                            <label class="file-label">Image 4</label>
+                            <input type="file" class="image-file-input"
+                                accept="image/jpeg,image/png,image/gif,image/webp" />
+                            <span class="file-name">No file chosen</span>
+                        </div>
+                        <div class="image-file-row">
+                            <label class="file-label">Image 5</label>
+                            <input type="file" class="image-file-input"
+                                accept="image/jpeg,image/png,image/gif,image/webp" />
+                            <span class="file-name">No file chosen</span>
+                        </div>
+                    </div>
+                    <div id="image-previews" class="image-preview-grid"></div>
+                </div>
+            </div>
+
+            <!-- Server Config -->
+            <div class="section">
+                <h3 class="section-title" data-toggle="config-body">⚙️ Server Config</h3>
+                <div id="config-body" class="section-body">
+                    <div class="field-row">
+                        <label for="server-url">Server URL</label>
+                        <input type="text" id="server-url" value="https://devicesarena.com" />
+                    </div>
+                    <div class="field-row">
+                        <label for="api-key">API Key</label>
+                        <input type="text" id="api-key" value="devicearena-import-2026" />
+                    </div>
+                </div>
+            </div>
+
+            <!-- Action Buttons -->
+            <div class="actions">
+                <button id="btn-generate-sql" class="btn btn-primary">📋 Generate SQL & Copy</button>
+                <button id="btn-import" class="btn btn-success">🚀 Import to DeviceArena</button>
+            </div>
+
+            <!-- SQL Output -->
+            <div id="sql-section" class="section" style="display:none;">
+                <h3 class="section-title">📄 Generated SQL</h3>
+                <textarea id="sql-output" readonly rows="12"></textarea>
+                <button id="btn-copy-sql" class="btn btn-small">📋 Copy SQL</button>
+            </div>
+
+            <!-- Result Message -->
+            <div id="result-message" style="display:none;"></div>
+        </div>
+    </div>
+
+    <script src="popup.js"></script>
+</body>
+
+</html>
