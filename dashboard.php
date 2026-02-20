@@ -647,7 +647,7 @@ if (isset($_SESSION['success_message'])) {
                     <input type="url" class="form-control" id="canonicalBaseInput" placeholder="https://www.example.com" required>
                     <small class="text-muted d-block mt-2">
                         <i class="fas fa-info-circle me-1"></i>
-                        This is the primary domain used for SEO canonical URLs. Use https:// protocol without trailing slash.
+                        The primary domain URL for all canonical links (e.g., https://www.example.com)
                     </small>
                 </div>
                 <div class="alert alert-info small">
