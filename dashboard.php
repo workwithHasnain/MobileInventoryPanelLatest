@@ -7,6 +7,10 @@ require_once 'filter_config.php';
 // Require login for this page
 requireLogin();
 
+// Read sitemap directly for inline display (no AJAX needed for initial load)
+$sitemap_file = __DIR__ . '/sitemap.xml';
+$sitemap_content = file_exists($sitemap_file) ? file_get_contents($sitemap_file) : '';
+
 // Get all phones and brands
 $phones = getAllPhones();
 $brands = getAllBrands();
@@ -691,7 +695,7 @@ if (isset($_SESSION['success_message'])) {
                         Edit the sitemap XML below or click <strong>Sync Sitemap</strong> to auto-generate from all published posts and devices.
                     </small>
                 </div>
-                <textarea class="form-control font-monospace" id="sitemapContent" rows="20" style="font-size: 13px; tab-size: 2;"></textarea>
+                <textarea class="form-control font-monospace" id="sitemapContent" rows="20" style="font-size: 13px; tab-size: 2;"><?php echo htmlspecialchars($sitemap_content); ?></textarea>
             </div>
             <div class="modal-footer">
                 <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
@@ -1588,7 +1592,7 @@ if (isset($_SESSION['success_message'])) {
 
     if (sitemapModal) {
         sitemapModal.addEventListener('show.bs.modal', function() {
-            loadSitemap();
+            // Sitemap is already loaded inline from PHP, no fetch needed
         });
     }
 
@@ -1601,26 +1605,17 @@ if (isset($_SESSION['success_message'])) {
     }
 
     function loadSitemap() {
-        sitemapContent.value = 'Loading...';
-        fetch('manage_sitemap.php', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/x-www-form-urlencoded'
-                },
-                body: 'action=get'
+        // Refresh sitemap from file (called after sync)
+        fetch('manage_sitemap.php?action=get', {
+                method: 'GET'
             })
             .then(response => response.json())
             .then(data => {
                 if (data.success) {
                     sitemapContent.value = data.content;
-                } else {
-                    showSitemapMessage(data.message, 'danger');
-                    sitemapContent.value = '';
                 }
             })
-            .catch(error => {
-                showSitemapMessage('Error: ' + error, 'danger');
-            });
+            .catch(error => console.log('Auto-refresh skipped:', error));
     }
 
     function saveSitemap() {
@@ -1674,13 +1669,16 @@ if (isset($_SESSION['success_message'])) {
                 },
                 body: 'action=sync'
             })
-            .then(response => response.json())
-            .then(data => {
+            .then(response => {
+                if (!response.ok) throw new Error('Server returned ' + response.status);
+                return response.text();
+            })
+            .then(text => {
+                if (!text) throw new Error('Empty response from server');
+                const data = JSON.parse(text);
                 if (data.success) {
                     showSitemapMessage(data.message, 'success');
-                    if (data.content) {
-                        sitemapContent.value = data.content;
-                    }
+                    loadSitemap();
                 } else {
                     showSitemapMessage(data.message, 'danger');
                 }
