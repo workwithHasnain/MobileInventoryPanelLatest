@@ -1,19 +1,21 @@
 <?php
 
 /**
- * bridge_import.php — Local proxy for the GSMArena extension
+ * bridge_import.php — Server-side proxy for the GSMArena extension
  * 
- * Runs on localhost (XAMPP). Receives multipart data from the browser extension,
- * then forwards it to the remote server (devicesarena.com) using cURL.
- * Returns clean JSON responses — no HTML, no CORS issues.
+ * Sits on the same server as import_device.php. Receives multipart data 
+ * from the browser extension, forwards it to import_device.php via local cURL.
+ * Always returns clean JSON — never HTML, never CORS issues.
  * 
- * Flow: Extension → localhost/bridge_import.php → devicesarena.com/import_device.php
+ * Flow: Extension → bridge_import.php → import_device.php (same server)
+ * 
+ * Staff just need Chrome + the extension installed. No XAMPP needed locally.
  */
 
 header('Content-Type: application/json');
 header('Access-Control-Allow-Origin: *');
 header('Access-Control-Allow-Methods: POST, OPTIONS');
-header('Access-Control-Allow-Headers: Content-Type, X-API-Key, X-Remote-URL');
+header('Access-Control-Allow-Headers: Content-Type, X-API-Key');
 
 if ($_SERVER['REQUEST_METHOD'] === 'OPTIONS') {
     http_response_code(200);
@@ -26,21 +28,15 @@ if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
 }
 
 // ====================================================================
-// Get the remote server URL from the header
+// Get API key from header
 // ====================================================================
-$remoteUrl = $_SERVER['HTTP_X_REMOTE_URL'] ?? '';
-if (empty($remoteUrl)) {
-    echo json_encode(['success' => false, 'error' => 'Missing X-Remote-URL header. Set your remote server URL.']);
-    exit;
-}
+$allHeaders = function_exists('getallheaders') ? getallheaders() : [];
+$apiKey = $_SERVER['HTTP_X_API_KEY'] 
+    ?? $allHeaders['X-API-Key'] 
+    ?? $allHeaders['X-Api-Key'] 
+    ?? $allHeaders['x-api-key'] 
+    ?? '';
 
-// Ensure it ends with /import_device.php
-$remoteUrl = rtrim($remoteUrl, '/');
-if (!str_ends_with($remoteUrl, '/import_device.php')) {
-    $remoteUrl .= '/import_device.php';
-}
-
-$apiKey = $_SERVER['HTTP_X_API_KEY'] ?? '';
 if (empty($apiKey)) {
     echo json_encode(['success' => false, 'error' => 'Missing X-API-Key header']);
     exit;
@@ -56,7 +52,16 @@ if (empty($deviceData)) {
 }
 
 // ====================================================================
-// Build cURL multipart request to remote server
+// Build the local URL to import_device.php (same server)
+// ====================================================================
+$scheme = (!empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off') ? 'https' : 'http';
+$host = $_SERVER['HTTP_HOST'] ?? 'localhost';
+$scriptDir = dirname($_SERVER['SCRIPT_NAME']); // e.g. /gsmarena-extension
+$parentDir = dirname($scriptDir);               // e.g. / (root)
+$importUrl = $scheme . '://' . $host . rtrim($parentDir, '/') . '/import_device.php';
+
+// ====================================================================
+// Build cURL multipart request
 // ====================================================================
 $postFields = [
     'device_data' => $deviceData
@@ -76,12 +81,12 @@ if (isset($_FILES['images']) && is_array($_FILES['images']['name'])) {
 }
 
 // ====================================================================
-// Send to remote server via cURL
+// Send to import_device.php via cURL (local call, no redirects)
 // ====================================================================
 $ch = curl_init();
 
 curl_setopt_array($ch, [
-    CURLOPT_URL            => $remoteUrl,
+    CURLOPT_URL            => $importUrl,
     CURLOPT_POST           => true,
     CURLOPT_POSTFIELDS     => $postFields,
     CURLOPT_RETURNTRANSFER => true,
@@ -90,8 +95,8 @@ curl_setopt_array($ch, [
     CURLOPT_HTTPHEADER     => [
         'X-API-Key: ' . $apiKey,
     ],
-    CURLOPT_SSL_VERIFYPEER => true,
-    CURLOPT_FOLLOWLOCATION => false, // Don't follow redirects — they strip custom headers
+    CURLOPT_SSL_VERIFYPEER => false, // Same server, skip SSL verification
+    CURLOPT_FOLLOWLOCATION => false,
 ]);
 
 $response = curl_exec($ch);
@@ -104,44 +109,38 @@ curl_close($ch);
 // Handle response
 // ====================================================================
 
-// cURL failed entirely
 if ($curlErrno !== 0) {
     echo json_encode([
         'success' => false,
-        'error' => "Connection to remote server failed: {$curlError} (code {$curlErrno})",
-        'remote_url' => $remoteUrl
+        'error' => "Internal request failed: {$curlError}",
+        'target_url' => $importUrl
     ]);
     exit;
 }
 
-// Handle redirects (301/302) — the server is redirecting, give user the correct URL
 if ($httpCode >= 300 && $httpCode < 400) {
-    $redirectUrl = curl_getinfo($ch, CURLINFO_REDIRECT_URL);
     echo json_encode([
         'success' => false,
-        'error' => "Server returned a redirect (HTTP {$httpCode}). Update your Remote Server URL to: " . rtrim($redirectUrl, '/import_device.php'),
-        'redirect_url' => $redirectUrl
+        'error' => "import_device.php returned a redirect (HTTP {$httpCode}). Check server config.",
+        'target_url' => $importUrl
     ]);
     exit;
 }
 
-// Try to parse remote response as JSON
+// Try to parse response as JSON
 $decoded = json_decode($response, true);
 
 if ($decoded !== null) {
-    // Remote returned valid JSON — pass it through
     echo json_encode($decoded);
 } else {
-    // Remote returned non-JSON (HTML error page, etc.)
-    // Extract useful info and return as clean JSON error
     $snippet = strip_tags($response);
     $snippet = preg_replace('/\s+/', ' ', $snippet);
     $snippet = trim(substr($snippet, 0, 500));
 
     echo json_encode([
         'success' => false,
-        'error' => "Remote server returned HTTP {$httpCode} with non-JSON response",
+        'error' => "import_device.php returned HTTP {$httpCode} with non-JSON response",
         'details' => $snippet,
-        'remote_url' => $remoteUrl
+        'target_url' => $importUrl
     ]);
 }
