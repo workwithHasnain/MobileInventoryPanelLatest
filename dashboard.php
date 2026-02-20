@@ -1638,7 +1638,10 @@ if (isset($_SESSION['success_message'])) {
                 headers: {
                     'Content-Type': 'application/json'
                 },
-                body: JSON.stringify({ action: 'save', content: content })
+                body: JSON.stringify({
+                    action: 'save',
+                    content: content
+                })
             })
             .then(response => response.json())
             .then(data => {
