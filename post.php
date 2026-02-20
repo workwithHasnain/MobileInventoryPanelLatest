@@ -294,6 +294,7 @@ if ($_POST && isset($_POST['action'])) {
 <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link rel="canonical" href="<?php echo $canonicalBase; ?>/post/<?php echo htmlspecialchars($slug); ?>" />
     <meta name="description" content="<?php echo htmlspecialchars($post['meta_description'] ?? $post['short_description'] ?? substr($post['content_body'], 0, 160) . '...'); ?>" />
     <title><?php echo htmlspecialchars($post['meta_title'] ?? $post['title']); ?> - DevicesArena</title>
 

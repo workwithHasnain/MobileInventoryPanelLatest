@@ -910,6 +910,7 @@ function formatDeviceSpecsStructured($device)
 <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link rel="canonical" href="<?php echo $canonicalBase; ?>/compare<?php echo isset($_GET['slugs']) ? '/' . htmlspecialchars($_GET['slugs']) : ''; ?>" />
     <title>DevicesArena</title>
 
     <!-- Favicon & Icons -->

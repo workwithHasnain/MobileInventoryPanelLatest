@@ -996,6 +996,7 @@ $commentCount = getDeviceCommentCount($pdo, $device_id);
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <link rel="canonical" href="<?php echo $canonicalBase; ?>/device/<?php echo htmlspecialchars($device_slug); ?>" />
   <?php
   // Generate SEO meta tags dynamically
   $brand_name = $device['brand_name'] ?? $device['brand'] ?? '';

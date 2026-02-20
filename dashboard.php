@@ -86,6 +86,9 @@ if (isset($_SESSION['success_message'])) {
             <button type="button" class="btn btn-dark ms-2" data-bs-toggle="modal" data-bs-target="#heroImagesModal">
                 <i class="fas fa-image"></i> Header Images
             </button>
+            <button type="button" class="btn btn-outline-primary ms-2" data-bs-toggle="modal" data-bs-target="#canonicalBaseModal">
+                <i class="fas fa-link"></i> Canonical Base
+            </button>
         </div>
     </div>
 
@@ -621,6 +624,41 @@ if (isset($_SESSION['success_message'])) {
                 <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
                 <button type="button" class="btn btn-primary" id="upload_hero_btn" disabled>
                     <i class="fas fa-upload me-1"></i>Upload Image
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Canonical Base Modal -->
+<div class="modal fade" id="canonicalBaseModal" tabindex="-1" aria-labelledby="canonicalBaseLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="canonicalBaseLabel">
+                    <i class="fas fa-link me-2"></i>Canonical Base URL
+                </h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <div id="canonical_message" style="display: none;"></div>
+                <div class="mb-3">
+                    <label for="canonicalBaseInput" class="form-label">Canonical Base URL</label>
+                    <input type="url" class="form-control" id="canonicalBaseInput" placeholder="https://www.example.com" required>
+                    <small class="text-muted d-block mt-2">
+                        <i class="fas fa-info-circle me-1"></i>
+                        This is the primary domain used for SEO canonical URLs. Use https:// protocol without trailing slash.
+                    </small>
+                </div>
+                <div class="alert alert-info small">
+                    <strong>Current value:</strong><br>
+                    <code id="currentCanonicalBase">Loading...</code>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                <button type="button" class="btn btn-primary" id="saveCanonicalBaseBtn">
+                    <i class="fas fa-save me-1"></i>Save Changes
                 </button>
             </div>
         </div>
@@ -1402,6 +1440,103 @@ if (isset($_SESSION['success_message'])) {
 
     function showAuthMessage(message, type) {
         const messageDiv = document.getElementById('auth_message');
+        messageDiv.className = 'alert alert-' + type + ' alert-dismissible fade show';
+        messageDiv.innerHTML = message + '<button type="button" class="btn-close" data-bs-dismiss="alert"></button>';
+        messageDiv.style.display = 'block';
+    }
+
+    // ===== CANONICAL BASE MANAGEMENT =====
+    const canonicalBaseModal = document.getElementById('canonicalBaseModal');
+    const canonicalBaseInput = document.getElementById('canonicalBaseInput');
+    const saveCanonicalBaseBtn = document.getElementById('saveCanonicalBaseBtn');
+    const currentCanonicalBaseSpan = document.getElementById('currentCanonicalBase');
+
+    if (canonicalBaseModal) {
+        canonicalBaseModal.addEventListener('show.bs.modal', function() {
+            loadCanonicalBase();
+        });
+    }
+
+    if (saveCanonicalBaseBtn) {
+        saveCanonicalBaseBtn.addEventListener('click', saveCanonicalBase);
+    }
+
+    function loadCanonicalBase() {
+        fetch('manage_canonical_base.php', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/x-www-form-urlencoded'
+                },
+                body: 'action=get'
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    canonicalBaseInput.value = data.canonicalBase;
+                    currentCanonicalBaseSpan.textContent = data.canonicalBase;
+                } else {
+                    showCanonicalMessage(data.message || 'Error loading canonical base', 'danger');
+                }
+            })
+            .catch(error => {
+                showCanonicalMessage('Error: ' + error, 'danger');
+            });
+    }
+
+    function saveCanonicalBase() {
+        const newValue = canonicalBaseInput.value.trim();
+
+        if (!newValue) {
+            showCanonicalMessage('Canonical base URL cannot be empty', 'warning');
+            return;
+        }
+
+        // Basic URL validation
+        if (!newValue.startsWith('http://') && !newValue.startsWith('https://')) {
+            showCanonicalMessage('URL must start with http:// or https://', 'warning');
+            return;
+        }
+
+        // Check for trailing slash
+        if (newValue.endsWith('/')) {
+            showCanonicalMessage('URL should not have a trailing slash', 'warning');
+            return;
+        }
+
+        saveCanonicalBaseBtn.disabled = true;
+        saveCanonicalBaseBtn.innerHTML = '<i class="fas fa-spinner fa-spin me-1"></i>Saving...';
+
+        fetch('manage_canonical_base.php', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/x-www-form-urlencoded'
+                },
+                body: 'action=save&canonicalBase=' + encodeURIComponent(newValue)
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    showCanonicalMessage(data.message, 'success');
+                    currentCanonicalBaseSpan.textContent = newValue;
+                    setTimeout(() => {
+                        bootstrap.Modal.getInstance(canonicalBaseModal).hide();
+                        document.getElementById('canonical_message').style.display = 'none';
+                    }, 1500);
+                } else {
+                    showCanonicalMessage(data.message || 'Error saving canonical base', 'danger');
+                }
+                saveCanonicalBaseBtn.disabled = false;
+                saveCanonicalBaseBtn.innerHTML = '<i class="fas fa-save me-1"></i>Save Changes';
+            })
+            .catch(error => {
+                showCanonicalMessage('Error: ' + error, 'danger');
+                saveCanonicalBaseBtn.disabled = false;
+                saveCanonicalBaseBtn.innerHTML = '<i class="fas fa-save me-1"></i>Save Changes';
+            });
+    }
+
+    function showCanonicalMessage(message, type) {
+        const messageDiv = document.getElementById('canonical_message');
         messageDiv.className = 'alert alert-' + type + ' alert-dismissible fade show';
         messageDiv.innerHTML = message + '<button type="button" class="btn-close" data-bs-dismiss="alert"></button>';
         messageDiv.style.display = 'block';
