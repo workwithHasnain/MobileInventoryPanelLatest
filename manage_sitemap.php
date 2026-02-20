@@ -1,219 +1,166 @@
 <?php
 require_once 'auth.php';
+require_once 'config.php';
+require_once 'database_functions.php';
 
-// Require login for this page
+// Require login
 requireLogin();
-
-// Require admin role for editing/syncing
-if (isset($_POST['action']) && ($_POST['action'] === 'save' || $_POST['action'] === 'sync')) {
-    if (!isset($_SESSION['role']) || $_SESSION['role'] !== 'admin') {
-        header('Content-Type: application/json');
-        echo json_encode(['success' => false, 'message' => 'Only administrators can modify settings']);
-        exit;
-    }
-}
 
 header('Content-Type: application/json');
 
 $sitemap_file = __DIR__ . '/sitemap.xml';
+$action = $_POST['action'] ?? $_GET['action'] ?? '';
 
-if ($_POST['action'] === 'get') {
-    // Read and return current sitemap
+if ($action === 'get') {
+    // Return sitemap contents
     if (!file_exists($sitemap_file)) {
-        echo json_encode([
-            'success' => false,
-            'message' => 'Sitemap not found. Please generate a new one.',
-            'content' => ''
-        ]);
+        echo json_encode(['success' => false, 'message' => 'Sitemap file not found']);
+        exit;
+    }
+    $content = file_get_contents($sitemap_file);
+    echo json_encode(['success' => true, 'content' => $content]);
+    exit;
+} elseif ($action === 'save') {
+    // Save manually edited sitemap
+    if (!isset($_SESSION['role']) || $_SESSION['role'] !== 'admin') {
+        echo json_encode(['success' => false, 'message' => 'Only administrators can modify the sitemap']);
         exit;
     }
 
-    $content = file_get_contents($sitemap_file);
-    echo json_encode([
-        'success' => true,
-        'content' => $content,
-        'lastModified' => date('Y-m-d H:i:s', filemtime($sitemap_file))
-    ]);
-    exit;
-} elseif ($_POST['action'] === 'sync') {
-    // Regenerate sitemap from database
-    // This calls generate_sitemap.php without auth checks since we already validated
+    $content = $_POST['content'] ?? '';
+    if (empty($content)) {
+        echo json_encode(['success' => false, 'message' => 'Sitemap content cannot be empty']);
+        exit;
+    }
 
-    require_once 'database_functions.php';
-    require_once 'config.php';
-
-    global $canonicalBase;
-
-    $xml = new SimpleXMLElement('<?xml version="1.0" encoding="UTF-8"?><urlset/>');
-    $xml->addAttribute('xmlns', 'http://www.sitemaps.org/schemas/sitemap/0.9');
-    $xml->addAttribute('xmlns:image', 'http://www.google.com/schemas/sitemap-image/1.1');
-
-    function addUrl($xml, $loc, $lastmod = null, $changefreq = 'weekly', $priority = '0.8')
-    {
-        $url = $xml->addChild('url');
-        $url->addChild('loc', htmlspecialchars($loc, ENT_XML1, 'UTF-8'));
-
-        if ($lastmod) {
-            $url->addChild('lastmod', $lastmod);
+    // Validate XML
+    libxml_use_internal_errors(true);
+    $xml = simplexml_load_string($content);
+    if ($xml === false) {
+        $errors = [];
+        foreach (libxml_get_errors() as $error) {
+            $errors[] = trim($error->message);
         }
+        libxml_clear_errors();
+        echo json_encode(['success' => false, 'message' => 'Invalid XML: ' . implode('; ', $errors)]);
+        exit;
+    }
 
-        $url->addChild('changefreq', $changefreq);
-        $url->addChild('priority', $priority);
+    if (!is_writable($sitemap_file) && file_exists($sitemap_file)) {
+        echo json_encode(['success' => false, 'message' => 'Sitemap file is not writable']);
+        exit;
+    }
+
+    if (file_put_contents($sitemap_file, $content) === false) {
+        echo json_encode(['success' => false, 'message' => 'Failed to write sitemap file']);
+        exit;
+    }
+
+    echo json_encode(['success' => true, 'message' => 'Sitemap saved successfully']);
+    exit;
+} elseif ($action === 'sync') {
+    // Sync sitemap: fetch all published posts and devices, rebuild sitemap
+    if (!isset($_SESSION['role']) || $_SESSION['role'] !== 'admin') {
+        echo json_encode(['success' => false, 'message' => 'Only administrators can sync the sitemap']);
+        exit;
     }
 
     try {
-        // Add static pages
-        addUrl($xml, $canonicalBase . '/', date('Y-m-d'), 'daily', '1.0');
-        addUrl($xml, $canonicalBase . '/featured', date('Y-m-d'), 'weekly', '0.9');
-        addUrl($xml, $canonicalBase . '/phonefinder', date('Y-m-d'), 'weekly', '0.9');
-        addUrl($xml, $canonicalBase . '/reviews', date('Y-m-d'), 'weekly', '0.8');
-        addUrl($xml, $canonicalBase . '/compare', date('Y-m-d'), 'monthly', '0.7');
-
         $pdo = getConnection();
 
-        // Get all published posts
-        $posts_stmt = $pdo->prepare("
+        // Read canonical base from config
+        $configContent = file_get_contents(__DIR__ . '/config.php');
+        $sitemapBase = 'https://www.devicesarena.com';
+        if (preg_match('/\$canonicalBase\s*=\s*[\'"]([^\'"]+)[\'"]\s*;/', $configContent, $matches)) {
+            $sitemapBase = $matches[1];
+        }
+
+        $today = date('Y-m-d');
+
+        // Start building sitemap XML
+        $xml = '<?xml version="1.0" encoding="UTF-8"?>' . "\n";
+        $xml .= '<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">' . "\n";
+
+        // Static pages
+        $staticPages = [
+            ['loc' => '/', 'changefreq' => 'daily', 'priority' => '1.0'],
+            ['loc' => '/phonefinder', 'changefreq' => 'weekly', 'priority' => '0.9'],
+            ['loc' => '/compare', 'changefreq' => 'weekly', 'priority' => '0.8'],
+            ['loc' => '/featured', 'changefreq' => 'daily', 'priority' => '0.8'],
+            ['loc' => '/reviews', 'changefreq' => 'daily', 'priority' => '0.8'],
+        ];
+
+        foreach ($staticPages as $page) {
+            $xml .= "  <url>\n";
+            $xml .= "    <loc>" . htmlspecialchars($sitemapBase . $page['loc']) . "</loc>\n";
+            $xml .= "    <changefreq>" . $page['changefreq'] . "</changefreq>\n";
+            $xml .= "    <priority>" . $page['priority'] . "</priority>\n";
+            $xml .= "  </url>\n";
+        }
+
+        // Fetch all published posts with slugs
+        $postCount = 0;
+        $stmt = $pdo->prepare("
             SELECT slug, updated_at, created_at 
             FROM posts 
-            WHERE status ILIKE 'published' 
-            ORDER BY updated_at DESC
+            WHERE status ILIKE 'published' AND slug IS NOT NULL AND slug != ''
+            ORDER BY created_at DESC
         ");
-        $posts_stmt->execute();
-        $posts = $posts_stmt->fetchAll(PDO::FETCH_ASSOC);
+        $stmt->execute();
+        $posts = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
-        $post_count = 0;
         foreach ($posts as $post) {
-            $lastmod = !empty($post['updated_at']) ? substr($post['updated_at'], 0, 10) : substr($post['created_at'], 0, 10);
-            addUrl(
-                $xml,
-                $canonicalBase . '/post/' . urlencode($post['slug']),
-                $lastmod,
-                'monthly',
-                '0.8'
-            );
-            $post_count++;
+            $lastmod = !empty($post['updated_at']) ? date('Y-m-d', strtotime($post['updated_at'])) : (!empty($post['created_at']) ? date('Y-m-d', strtotime($post['created_at'])) : $today);
+            $xml .= "  <url>\n";
+            $xml .= "    <loc>" . htmlspecialchars($sitemapBase . '/post/' . $post['slug']) . "</loc>\n";
+            $xml .= "    <lastmod>" . $lastmod . "</lastmod>\n";
+            $xml .= "    <changefreq>weekly</changefreq>\n";
+            $xml .= "    <priority>0.7</priority>\n";
+            $xml .= "  </url>\n";
+            $postCount++;
         }
 
-        // Get all devices
-        $devices_stmt = $pdo->prepare("
+        // Fetch all devices with slugs
+        $deviceCount = 0;
+        $stmt = $pdo->prepare("
             SELECT slug, updated_at, created_at 
             FROM phones 
-            WHERE slug IS NOT NULL AND slug != '' 
-            ORDER BY updated_at DESC
+            WHERE slug IS NOT NULL AND slug != ''
+            ORDER BY name ASC
         ");
-        $devices_stmt->execute();
-        $devices = $devices_stmt->fetchAll(PDO::FETCH_ASSOC);
+        $stmt->execute();
+        $devices = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
-        $device_count = 0;
         foreach ($devices as $device) {
-            $lastmod = !empty($device['updated_at']) ? substr($device['updated_at'], 0, 10) : substr($device['created_at'], 0, 10);
-            addUrl(
-                $xml,
-                $canonicalBase . '/device/' . urlencode($device['slug']),
-                $lastmod,
-                'monthly',
-                '0.7'
-            );
-            $device_count++;
+            $lastmod = !empty($device['updated_at']) ? date('Y-m-d', strtotime($device['updated_at'])) : (!empty($device['created_at']) ? date('Y-m-d', strtotime($device['created_at'])) : $today);
+            $xml .= "  <url>\n";
+            $xml .= "    <loc>" . htmlspecialchars($sitemapBase . '/device/' . $device['slug']) . "</loc>\n";
+            $xml .= "    <lastmod>" . $lastmod . "</lastmod>\n";
+            $xml .= "    <changefreq>monthly</changefreq>\n";
+            $xml .= "    <priority>0.6</priority>\n";
+            $xml .= "  </url>\n";
+            $deviceCount++;
         }
 
-        // Save with nice formatting
-        $dom = new DOMDocument('1.0', 'UTF-8');
-        $dom->preserveWhiteSpace = false;
-        $dom->formatOutput = true;
-        $dom->loadXML($xml->asXML());
+        $xml .= "</urlset>\n";
 
-        if (!is_writable(dirname($sitemap_file))) {
-            echo json_encode([
-                'success' => false,
-                'message' => 'Sitemap directory is not writable. Check file permissions.'
-            ]);
+        // Write sitemap
+        if (file_put_contents($sitemap_file, $xml) === false) {
+            echo json_encode(['success' => false, 'message' => 'Failed to write sitemap file']);
             exit;
         }
 
-        $saved = $dom->save($sitemap_file);
-
-        if ($saved) {
-            echo json_encode([
-                'success' => true,
-                'message' => 'Sitemap synced successfully!',
-                'stats' => [
-                    'posts' => $post_count,
-                    'devices' => $device_count,
-                    'total_urls' => 5 + $post_count + $device_count
-                ]
-            ]);
-        } else {
-            echo json_encode([
-                'success' => false,
-                'message' => 'Failed to write sitemap file'
-            ]);
-        }
+        $totalUrls = count($staticPages) + $postCount + $deviceCount;
+        echo json_encode([
+            'success' => true,
+            'message' => "Sitemap synced successfully. Total URLs: {$totalUrls} (5 static pages, {$postCount} posts, {$deviceCount} devices)",
+            'content' => $xml
+        ]);
+        exit;
     } catch (Exception $e) {
-        echo json_encode([
-            'success' => false,
-            'message' => 'Error syncing sitemap: ' . $e->getMessage()
-        ]);
-    }
-    exit;
-} elseif ($_POST['action'] === 'save') {
-    // Save edited sitemap
-    if (!isset($_POST['content']) || empty($_POST['content'])) {
-        echo json_encode([
-            'success' => false,
-            'message' => 'Sitemap content cannot be empty'
-        ]);
+        echo json_encode(['success' => false, 'message' => 'Sync failed: ' . $e->getMessage()]);
         exit;
     }
-
-    $content = $_POST['content'];
-
-    // Basic XML validation
-    $xml = @simplexml_load_string($content);
-    if (!$xml) {
-        echo json_encode([
-            'success' => false,
-            'message' => 'Invalid XML format. Please check your sitemap syntax.'
-        ]);
-        exit;
-    }
-
-    // Check if it has required sitemap structure
-    if (!isset($xml->url)) {
-        echo json_encode([
-            'success' => false,
-            'message' => 'Invalid sitemap format. Must contain <url> elements.'
-        ]);
-        exit;
-    }
-
-    // Format XML nicely
-    $dom = new DOMDocument('1.0', 'UTF-8');
-    $dom->preserveWhiteSpace = false;
-    $dom->formatOutput = true;
-    $dom->loadXML($content);
-
-    if (!is_writable(dirname($sitemap_file))) {
-        echo json_encode([
-            'success' => false,
-            'message' => 'Sitemap file is not writable. Check file permissions.'
-        ]);
-        exit;
-    }
-
-    if ($dom->save($sitemap_file) === false) {
-        echo json_encode([
-            'success' => false,
-            'message' => 'Failed to save sitemap file'
-        ]);
-        exit;
-    }
-
-    echo json_encode([
-        'success' => true,
-        'message' => 'Sitemap updated successfully!'
-    ]);
-    exit;
 } else {
     echo json_encode(['success' => false, 'message' => 'Invalid action']);
     exit;

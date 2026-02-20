@@ -676,59 +676,27 @@ if (isset($_SESSION['success_message'])) {
                 <h5 class="modal-title" id="sitemapLabel">
                     <i class="fas fa-sitemap me-2"></i>Sitemap Management
                 </h5>
-                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                <div class="ms-auto d-flex align-items-center gap-2">
+                    <button type="button" class="btn btn-sm btn-success" id="syncSitemapBtn">
+                        <i class="fas fa-sync-alt me-1"></i>Sync Sitemap
+                    </button>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
             </div>
             <div class="modal-body">
                 <div id="sitemap_message" style="display: none;"></div>
-
-                <!-- Stats Card -->
-                <div class="card mb-4 bg-light">
-                    <div class="card-body">
-                        <div class="row">
-                            <div class="col-md-4">
-                                <div class="text-center">
-                                    <h6 class="text-muted">Posts</h6>
-                                    <h3 id="sitemap_post_count">-</h3>
-                                </div>
-                            </div>
-                            <div class="col-md-4">
-                                <div class="text-center">
-                                    <h6 class="text-muted">Devices</h6>
-                                    <h3 id="sitemap_device_count">-</h3>
-                                </div>
-                            </div>
-                            <div class="col-md-4">
-                                <div class="text-center">
-                                    <h6 class="text-muted">Total URLs</h6>
-                                    <h3 id="sitemap_total_count">-</h3>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="text-center mt-3">
-                            <p class="text-muted mb-0">
-                                <small>Last Modified: <strong id="sitemap_last_modified">-</strong></small>
-                            </p>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Sitemap Content -->
-                <div class="form-group">
-                    <label for="sitemapContent" class="form-label">Sitemap Content (XML)</label>
-                    <textarea class="form-control" id="sitemapContent" rows="15" style="font-family: monospace; font-size: 12px;"></textarea>
-                    <small class="text-muted d-block mt-2">
+                <div class="mb-2">
+                    <small class="text-muted">
                         <i class="fas fa-info-circle me-1"></i>
-                        You can edit the sitemap directly or use the sync button to regenerate it from your database.
+                        Edit the sitemap XML below or click <strong>Sync Sitemap</strong> to auto-generate from all published posts and devices.
                     </small>
                 </div>
+                <textarea class="form-control font-monospace" id="sitemapContent" rows="20" style="font-size: 13px; tab-size: 2;"></textarea>
             </div>
             <div class="modal-footer">
-                <button type="button" class="btn btn-warning" id="syncSitemapBtn">
-                    <i class="fas fa-sync me-1"></i>Sync from Database
-                </button>
-                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
                 <button type="button" class="btn btn-primary" id="saveSitemapBtn">
-                    <i class="fas fa-save me-1"></i>Save Changes
+                    <i class="fas fa-save me-1"></i>Save Sitemap
                 </button>
             </div>
         </div>
@@ -1615,8 +1583,8 @@ if (isset($_SESSION['success_message'])) {
     // ===== SITEMAP MANAGEMENT =====
     const sitemapModal = document.getElementById('sitemapModal');
     const sitemapContent = document.getElementById('sitemapContent');
-    const syncSitemapBtn = document.getElementById('syncSitemapBtn');
     const saveSitemapBtn = document.getElementById('saveSitemapBtn');
+    const syncSitemapBtn = document.getElementById('syncSitemapBtn');
 
     if (sitemapModal) {
         sitemapModal.addEventListener('show.bs.modal', function() {
@@ -1624,15 +1592,16 @@ if (isset($_SESSION['success_message'])) {
         });
     }
 
-    if (syncSitemapBtn) {
-        syncSitemapBtn.addEventListener('click', syncSitemap);
-    }
-
     if (saveSitemapBtn) {
         saveSitemapBtn.addEventListener('click', saveSitemap);
     }
 
+    if (syncSitemapBtn) {
+        syncSitemapBtn.addEventListener('click', syncSitemap);
+    }
+
     function loadSitemap() {
+        sitemapContent.value = 'Loading...';
         fetch('manage_sitemap.php', {
                 method: 'POST',
                 headers: {
@@ -1644,70 +1613,18 @@ if (isset($_SESSION['success_message'])) {
             .then(data => {
                 if (data.success) {
                     sitemapContent.value = data.content;
-                    const lastMod = new Date(data.lastModified);
-                    document.getElementById('sitemap_last_modified').textContent = lastMod.toLocaleString();
-
-                    // Count URLs in sitemap
-                    const parser = new DOMParser();
-                    const xmlDoc = parser.parseFromString(data.content, 'text/xml');
-                    const urlCount = xmlDoc.getElementsByTagName('url').length;
-                    document.getElementById('sitemap_total_count').textContent = urlCount;
                 } else {
-                    showSitemapMessage(data.message, 'warning');
+                    showSitemapMessage(data.message, 'danger');
                     sitemapContent.value = '';
                 }
             })
             .catch(error => {
-                showSitemapMessage('Error loading sitemap: ' + error, 'danger');
-            });
-    }
-
-    function syncSitemap() {
-        if (!confirm('This will regenerate the sitemap from your database. Continue?')) {
-            return;
-        }
-
-        syncSitemapBtn.disabled = true;
-        syncSitemapBtn.innerHTML = '<i class="fas fa-spinner fa-spin me-1"></i>Syncing...';
-
-        fetch('manage_sitemap.php', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/x-www-form-urlencoded'
-                },
-                body: 'action=sync'
-            })
-            .then(response => response.json())
-            .then(data => {
-                if (data.success) {
-                    showSitemapMessage(data.message, 'success');
-
-                    // Update stats
-                    document.getElementById('sitemap_post_count').textContent = data.stats.posts;
-                    document.getElementById('sitemap_device_count').textContent = data.stats.devices;
-                    document.getElementById('sitemap_total_count').textContent = data.stats.total_urls;
-                    document.getElementById('sitemap_last_modified').textContent = new Date().toLocaleString();
-
-                    // Reload content
-                    setTimeout(() => {
-                        loadSitemap();
-                    }, 1000);
-                } else {
-                    showSitemapMessage(data.message, 'danger');
-                }
-                syncSitemapBtn.disabled = false;
-                syncSitemapBtn.innerHTML = '<i class="fas fa-sync me-1"></i>Sync from Database';
-            })
-            .catch(error => {
-                showSitemapMessage('Error syncing sitemap: ' + error, 'danger');
-                syncSitemapBtn.disabled = false;
-                syncSitemapBtn.innerHTML = '<i class="fas fa-sync me-1"></i>Sync from Database';
+                showSitemapMessage('Error: ' + error, 'danger');
             });
     }
 
     function saveSitemap() {
         const content = sitemapContent.value.trim();
-
         if (!content) {
             showSitemapMessage('Sitemap content cannot be empty', 'warning');
             return;
@@ -1727,17 +1644,51 @@ if (isset($_SESSION['success_message'])) {
             .then(data => {
                 if (data.success) {
                     showSitemapMessage(data.message, 'success');
-                    document.getElementById('sitemap_last_modified').textContent = new Date().toLocaleString();
                 } else {
                     showSitemapMessage(data.message, 'danger');
                 }
                 saveSitemapBtn.disabled = false;
-                saveSitemapBtn.innerHTML = '<i class="fas fa-save me-1"></i>Save Changes';
+                saveSitemapBtn.innerHTML = '<i class="fas fa-save me-1"></i>Save Sitemap';
             })
             .catch(error => {
-                showSitemapMessage('Error saving sitemap: ' + error, 'danger');
+                showSitemapMessage('Error: ' + error, 'danger');
                 saveSitemapBtn.disabled = false;
-                saveSitemapBtn.innerHTML = '<i class="fas fa-save me-1"></i>Save Changes';
+                saveSitemapBtn.innerHTML = '<i class="fas fa-save me-1"></i>Save Sitemap';
+            });
+    }
+
+    function syncSitemap() {
+        if (!confirm('This will regenerate the sitemap with all static pages, published posts, and devices. Continue?')) {
+            return;
+        }
+
+        syncSitemapBtn.disabled = true;
+        syncSitemapBtn.innerHTML = '<i class="fas fa-spinner fa-spin me-1"></i>Syncing...';
+
+        fetch('manage_sitemap.php', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/x-www-form-urlencoded'
+                },
+                body: 'action=sync'
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    showSitemapMessage(data.message, 'success');
+                    if (data.content) {
+                        sitemapContent.value = data.content;
+                    }
+                } else {
+                    showSitemapMessage(data.message, 'danger');
+                }
+                syncSitemapBtn.disabled = false;
+                syncSitemapBtn.innerHTML = '<i class="fas fa-sync-alt me-1"></i>Sync Sitemap';
+            })
+            .catch(error => {
+                showSitemapMessage('Error: ' + error, 'danger');
+                syncSitemapBtn.disabled = false;
+                syncSitemapBtn.innerHTML = '<i class="fas fa-sync-alt me-1"></i>Sync Sitemap';
             });
     }
 
