@@ -1,66 +1,68 @@
 <?php
-ob_start();
-require_once 'auth.php';
-require_once 'config.php';
-require_once 'database_functions.php';
+error_reporting(E_ALL);
+ini_set('display_errors', 0);
 
-// Require login
-requireLogin();
+try {
+    require_once 'auth.php';
+    require_once 'config.php';
+    require_once 'database_functions.php';
 
-// Clear any stray output from includes
-ob_end_clean();
-header('Content-Type: application/json');
+    // Require login
+    requireLogin();
 
-$sitemap_file = __DIR__ . '/sitemap.xml';
-$action = $_POST['action'] ?? $_GET['action'] ?? '';
+    header('Content-Type: application/json');
 
-if ($action === 'get') {
-    // Return sitemap contents
-    if (!file_exists($sitemap_file)) {
-        echo json_encode(['success' => false, 'message' => 'Sitemap file not found']);
-        exit;
-    }
-    $content = file_get_contents($sitemap_file);
-    echo json_encode(['success' => true, 'content' => $content]);
-    exit;
-} elseif ($action === 'save') {
-    // Save manually edited sitemap
-    if (!isset($_SESSION['role']) || $_SESSION['role'] !== 'admin') {
-        echo json_encode(['success' => false, 'message' => 'Only administrators can modify the sitemap']);
-        exit;
-    }
+    $sitemap_file = __DIR__ . '/sitemap.xml';
+    $action = $_POST['action'] ?? $_GET['action'] ?? '';
 
-    $content = file_get_contents('php://input');
-    if (empty(trim($content))) {
-        echo json_encode(['success' => false, 'message' => 'Sitemap content cannot be empty']);
-        exit;
-    }
-
-    // Validate XML
-    libxml_use_internal_errors(true);
-    $xml = simplexml_load_string($content);
-    if ($xml === false) {
-        $errors = [];
-        foreach (libxml_get_errors() as $error) {
-            $errors[] = trim($error->message);
+    if ($action === 'get') {
+        // Return sitemap contents
+        if (!file_exists($sitemap_file)) {
+            echo json_encode(['success' => false, 'message' => 'Sitemap file not found']);
+            exit;
         }
+        $content = file_get_contents($sitemap_file);
+        echo json_encode(['success' => true, 'content' => $content]);
+        exit;
+    } elseif ($action === 'save') {
+        // Save manually edited sitemap
+        if (!isset($_SESSION['role']) || $_SESSION['role'] !== 'admin') {
+            echo json_encode(['success' => false, 'message' => 'Only administrators can modify the sitemap']);
+            exit;
+        }
+
+        $content = file_get_contents('php://input');
+        if (empty(trim($content))) {
+            echo json_encode(['success' => false, 'message' => 'Sitemap content cannot be empty']);
+            exit;
+        }
+
+        // Validate XML
+        libxml_use_internal_errors(true);
         libxml_clear_errors();
-        echo json_encode(['success' => false, 'message' => 'Invalid XML: ' . implode('; ', $errors)]);
-        exit;
-    }
+        $xml = simplexml_load_string($content);
+        if ($xml === false) {
+            $errors = [];
+            foreach (libxml_get_errors() as $error) {
+                $errors[] = trim($error->message);
+            }
+            libxml_clear_errors();
+            echo json_encode(['success' => false, 'message' => 'Invalid XML: ' . implode('; ', $errors)]);
+            exit;
+        }
 
-    if (!is_writable($sitemap_file) && file_exists($sitemap_file)) {
-        echo json_encode(['success' => false, 'message' => 'Sitemap file is not writable']);
-        exit;
-    }
+        if (!is_writable($sitemap_file)) {
+            echo json_encode(['success' => false, 'message' => 'Sitemap file is not writable. Check file permissions.']);
+            exit;
+        }
 
-    if (file_put_contents($sitemap_file, $content) === false) {
-        echo json_encode(['success' => false, 'message' => 'Failed to write sitemap file']);
-        exit;
-    }
+        if (file_put_contents($sitemap_file, $content) === false) {
+            echo json_encode(['success' => false, 'message' => 'Failed to write sitemap file']);
+            exit;
+        }
 
-    echo json_encode(['success' => true, 'message' => 'Sitemap saved successfully']);
-    exit;
+        echo json_encode(['success' => true, 'message' => 'Sitemap saved successfully']);
+        exit;
 } elseif ($action === 'sync') {
     // Sync sitemap: fetch all published posts and devices, rebuild sitemap
     if (!isset($_SESSION['role']) || $_SESSION['role'] !== 'admin') {
@@ -167,4 +169,7 @@ if ($action === 'get') {
 } else {
     echo json_encode(['success' => false, 'message' => 'Invalid action']);
     exit;
+}
+} catch (Exception $e) {
+    echo json_encode(['success' => false, 'message' => 'Error: ' . $e->getMessage()]);
 }
