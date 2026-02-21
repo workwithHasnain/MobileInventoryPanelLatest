@@ -89,6 +89,9 @@ if (isset($_SESSION['success_message'])) {
             <button type="button" class="btn btn-outline-primary ms-2" data-bs-toggle="modal" data-bs-target="#canonicalBaseModal">
                 <i class="fas fa-link"></i> Canonical Base
             </button>
+            <button type="button" class="btn btn-outline-info ms-2" data-bs-toggle="modal" data-bs-target="#sitemapModal">
+                <i class="fas fa-sitemap"></i> Sitemap
+            </button>
         </div>
     </div>
 
@@ -659,6 +662,37 @@ if (isset($_SESSION['success_message'])) {
                 <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
                 <button type="button" class="btn btn-primary" id="saveCanonicalBaseBtn">
                     <i class="fas fa-save me-1"></i>Save Changes
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Sitemap Modal -->
+<div class="modal fade" id="sitemapModal" tabindex="-1" aria-labelledby="sitemapLabel" aria-hidden="true">
+    <div class="modal-dialog modal-xl modal-dialog-scrollable">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="sitemapLabel">
+                    <i class="fas fa-sitemap me-2"></i>Edit Sitemap
+                </h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <div id="sitemap_message" style="display: none;"></div>
+                <div class="mb-3">
+                    <label for="sitemapContent" class="form-label">Sitemap XML Content</label>
+                    <textarea class="form-control" id="sitemapContent" rows="15" style="font-family: 'Courier New', monospace; font-size: 12px;"></textarea>
+                    <small class="text-muted d-block mt-2">
+                        <i class="fas fa-info-circle me-1"></i>
+                        XML will be validated before saving. Only valid XML will be accepted.
+                    </small>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                <button type="button" class="btn btn-primary" id="saveSitemapBtn">
+                    <i class="fas fa-save me-1"></i>Save Sitemap
                 </button>
             </div>
         </div>
@@ -1537,6 +1571,89 @@ if (isset($_SESSION['success_message'])) {
 
     function showCanonicalMessage(message, type) {
         const messageDiv = document.getElementById('canonical_message');
+        messageDiv.className = 'alert alert-' + type + ' alert-dismissible fade show';
+        messageDiv.innerHTML = message + '<button type="button" class="btn-close" data-bs-dismiss="alert"></button>';
+        messageDiv.style.display = 'block';
+    }
+
+    // ===== SITEMAP MANAGEMENT =====
+    const sitemapModal = document.getElementById('sitemapModal');
+    const sitemapContent = document.getElementById('sitemapContent');
+    const saveSitemapBtn = document.getElementById('saveSitemapBtn');
+
+    if (sitemapModal) {
+        sitemapModal.addEventListener('show.bs.modal', function() {
+            loadSitemap();
+        });
+    }
+
+    if (saveSitemapBtn) {
+        saveSitemapBtn.addEventListener('click', saveSitemap);
+    }
+
+    function loadSitemap() {
+        fetch('manage_sitemap.php', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/x-www-form-urlencoded'
+                },
+                body: 'action=read'
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    sitemapContent.value = data.content;
+                    document.getElementById('sitemap_message').style.display = 'none';
+                } else {
+                    showSitemapMessage(data.message || 'Error loading sitemap', 'danger');
+                }
+            })
+            .catch(error => {
+                showSitemapMessage('Error: ' + error, 'danger');
+            });
+    }
+
+    function saveSitemap() {
+        const content = sitemapContent.value.trim();
+
+        if (!content) {
+            showSitemapMessage('Sitemap content cannot be empty', 'warning');
+            return;
+        }
+
+        saveSitemapBtn.disabled = true;
+        saveSitemapBtn.innerHTML = '<i class="fas fa-spinner fa-spin me-1"></i>Saving...';
+
+        fetch('manage_sitemap.php', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/x-www-form-urlencoded'
+                },
+                body: 'action=save&content=' + encodeURIComponent(content)
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    showSitemapMessage(data.message, 'success');
+                    setTimeout(() => {
+                        bootstrap.Modal.getInstance(sitemapModal).hide();
+                        document.getElementById('sitemap_message').style.display = 'none';
+                    }, 1500);
+                } else {
+                    showSitemapMessage(data.message || 'Error saving sitemap', 'danger');
+                }
+                saveSitemapBtn.disabled = false;
+                saveSitemapBtn.innerHTML = '<i class="fas fa-save me-1"></i>Save Sitemap';
+            })
+            .catch(error => {
+                showSitemapMessage('Error: ' + error, 'danger');
+                saveSitemapBtn.disabled = false;
+                saveSitemapBtn.innerHTML = '<i class="fas fa-save me-1"></i>Save Sitemap';
+            });
+    }
+
+    function showSitemapMessage(message, type) {
+        const messageDiv = document.getElementById('sitemap_message');
         messageDiv.className = 'alert alert-' + type + ' alert-dismissible fade show';
         messageDiv.innerHTML = message + '<button type="button" class="btn-close" data-bs-dismiss="alert"></button>';
         messageDiv.style.display = 'block';
