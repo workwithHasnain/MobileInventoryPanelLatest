@@ -34,3 +34,4 @@ if ($action === 'save') {
 }
 
 die('ERROR: Invalid action');
+?>
