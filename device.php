@@ -1199,7 +1199,7 @@ $commentCount = getDeviceCommentCount($pdo, $device_id);
       color: black;
       word-wrap: break-word;
       overflow-wrap: break-word;
-      word-break: break-word;
+      /* word-break: break-word; */
       max-width: 100%;
     }
 
