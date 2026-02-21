@@ -95,11 +95,15 @@ if (!empty($new_entries)) {
         $new_xml .= "    </url>\n";
     }
     
-    // Insert before closing </urlset>
-    $updated_sitemap = str_replace('</urlset>', $new_xml . '</urlset>', $sitemap_content);
+    // Insert before closing </urlset> - handle whitespace
+    $updated_sitemap = preg_replace('/<\/urlset>\s*$/i', $new_xml . '</urlset>', $sitemap_content);
     
-    if (file_put_contents($sitemap_file, $updated_sitemap) === false) {
-        die('ERROR: Failed to write sitemap file');
+    if ($updated_sitemap === null) {
+        die('ERROR: Regex replacement failed');
+    }
+    
+    if (file_put_contents($sitemap_file, $updated_sitemap, LOCK_EX) === false) {
+        die('ERROR: Failed to write sitemap file - check file permissions (chmod 644 or 666)');
     }
 
     echo 'SUCCESS: Added ' . count($new_entries) . ' new links to sitemap';
