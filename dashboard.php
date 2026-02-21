@@ -691,6 +691,9 @@ if (isset($_SESSION['success_message'])) {
             </div>
             <div class="modal-footer">
                 <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                <button type="button" class="btn btn-info" id="updateSitemapBtn">
+                    <i class="fas fa-sync me-1"></i>Update from Database
+                </button>
                 <button type="button" class="btn btn-primary" id="saveSitemapBtn">
                     <i class="fas fa-save me-1"></i>Save Sitemap
                 </button>
@@ -1580,6 +1583,7 @@ if (isset($_SESSION['success_message'])) {
     const sitemapModal = document.getElementById('sitemapModal');
     const sitemapContent = document.getElementById('sitemapContent');
     const saveSitemapBtn = document.getElementById('saveSitemapBtn');
+    const updateSitemapBtn = document.getElementById('updateSitemapBtn');
 
     if (sitemapModal) {
         sitemapModal.addEventListener('show.bs.modal', function() {
@@ -1589,6 +1593,10 @@ if (isset($_SESSION['success_message'])) {
 
     if (saveSitemapBtn) {
         saveSitemapBtn.addEventListener('click', saveSitemap);
+    }
+
+    if (updateSitemapBtn) {
+        updateSitemapBtn.addEventListener('click', updateSitemap);
     }
 
     function loadSitemap() {
@@ -1649,6 +1657,32 @@ if (isset($_SESSION['success_message'])) {
                 showSitemapMessage('Error: ' + error, 'danger');
                 saveSitemapBtn.disabled = false;
                 saveSitemapBtn.innerHTML = '<i class="fas fa-save me-1"></i>Save Sitemap';
+            });
+    }
+
+    function updateSitemap() {
+        updateSitemapBtn.disabled = true;
+        updateSitemapBtn.innerHTML = '<i class="fas fa-spinner fa-spin me-1"></i>Updating...';
+
+        fetch('generate_sitemap_links.php', {
+                method: 'GET'
+            })
+            .then(response => response.text())
+            .then(data => {
+                // Show the script's response
+                showSitemapMessage(data, data.startsWith('SUCCESS') ? 'success' : 'warning');
+                
+                // Reload sitemap content after 1 second
+                setTimeout(() => {
+                    loadSitemap();
+                }, 1000);
+            })
+            .catch(error => {
+                showSitemapMessage('Error: ' + error, 'danger');
+            })
+            .finally(() => {
+                updateSitemapBtn.disabled = false;
+                updateSitemapBtn.innerHTML = '<i class="fas fa-sync me-1"></i>Update from Database';
             });
     }
 
