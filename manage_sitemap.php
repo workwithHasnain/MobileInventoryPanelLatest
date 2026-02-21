@@ -6,51 +6,39 @@ requireLogin();
 
 // Require admin role for both read and write
 if (!isset($_SESSION['role']) || $_SESSION['role'] !== 'admin') {
-    header('Content-Type: application/json');
-    echo json_encode(['success' => false, 'message' => 'Only administrators can access sitemap settings']);
-    exit;
+    die('ERROR: Only administrators can access sitemap settings');
 }
-
-header('Content-Type: application/json');
 
 $sitemap_file = __DIR__ . '/sitemap.xml';
 
 if ($_POST['action'] === 'read') {
     // Read sitemap.xml content
     if (!file_exists($sitemap_file)) {
-        echo json_encode(['success' => false, 'message' => 'Sitemap file not found']);
-        exit;
+        die('ERROR: Sitemap file not found');
     }
 
     if (!is_readable($sitemap_file)) {
-        echo json_encode(['success' => false, 'message' => 'Sitemap file is not readable']);
-        exit;
+        die('ERROR: Sitemap file is not readable');
     }
 
     $content = file_get_contents($sitemap_file);
 
     if ($content === false) {
-        echo json_encode(['success' => false, 'message' => 'Failed to read sitemap file']);
-        exit;
+        die('ERROR: Failed to read sitemap file');
     }
 
-    echo json_encode([
-        'success' => true,
-        'content' => $content
-    ]);
+    echo $content;
     exit;
 } elseif ($_POST['action'] === 'save') {
     // Save and validate sitemap.xml
     if (!isset($_POST['content'])) {
-        echo json_encode(['success' => false, 'message' => 'Sitemap content is required']);
-        exit;
+        die('ERROR: Sitemap content is required');
     }
 
     $content = trim($_POST['content']);
 
     if (empty($content)) {
-        echo json_encode(['success' => false, 'message' => 'Sitemap content cannot be empty']);
-        exit;
+        die('ERROR: Sitemap content cannot be empty');
     }
 
     // Validate XML using DOMDocument
@@ -77,28 +65,24 @@ if ($_POST['action'] === 'read') {
         }
 
         libxml_clear_errors();
-        echo json_encode(['success' => false, 'message' => $error_msg]);
-        exit;
+        die('ERROR: ' . $error_msg);
     }
 
     // Validate that it's a urlset element (sitemap structure)
     $root = $dom->documentElement;
     if ($root->tagName !== 'urlset') {
-        echo json_encode(['success' => false, 'message' => 'Root element must be "urlset". Invalid sitemap structure.']);
-        exit;
+        die('ERROR: Root element must be "urlset". Invalid sitemap structure.');
     }
 
     // Validate namespace
     $ns = $root->getAttribute('xmlns');
     if ($ns !== 'http://www.sitemaps.org/schemas/sitemap/0.9') {
-        echo json_encode(['success' => false, 'message' => 'Invalid or missing sitemap namespace. Expected: http://www.sitemaps.org/schemas/sitemap/0.9']);
-        exit;
+        die('ERROR: Invalid or missing sitemap namespace. Expected: http://www.sitemaps.org/schemas/sitemap/0.9');
     }
 
     // Check file permissions
     if (!is_writable($sitemap_file)) {
-        echo json_encode(['success' => false, 'message' => 'Sitemap file is not writable. Please check file permissions.']);
-        exit;
+        die('ERROR: Sitemap file is not writable. Please check file permissions.');
     }
 
     // Format XML nicely before saving
@@ -107,16 +91,11 @@ if ($_POST['action'] === 'read') {
 
     // Write to file
     if (file_put_contents($sitemap_file, $formatted_content) === false) {
-        echo json_encode(['success' => false, 'message' => 'Failed to write to sitemap file']);
-        exit;
+        die('ERROR: Failed to write to sitemap file');
     }
 
-    echo json_encode([
-        'success' => true,
-        'message' => 'Sitemap saved successfully and validated'
-    ]);
+    echo 'SUCCESS: Sitemap saved successfully and validated';
     exit;
 } else {
-    echo json_encode(['success' => false, 'message' => 'Invalid action']);
-    exit;
+    die('ERROR: Invalid action');
 }

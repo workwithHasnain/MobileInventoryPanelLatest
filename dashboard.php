@@ -1599,13 +1599,13 @@ if (isset($_SESSION['success_message'])) {
                 },
                 body: 'action=read'
             })
-            .then(response => response.json())
+            .then(response => response.text())
             .then(data => {
-                if (data.success) {
-                    sitemapContent.value = data.content;
-                    document.getElementById('sitemap_message').style.display = 'none';
+                if (data.startsWith('ERROR:')) {
+                    showSitemapMessage(data.replace('ERROR: ', ''), 'danger');
                 } else {
-                    showSitemapMessage(data.message || 'Error loading sitemap', 'danger');
+                    sitemapContent.value = data;
+                    document.getElementById('sitemap_message').style.display = 'none';
                 }
             })
             .catch(error => {
@@ -1631,16 +1631,16 @@ if (isset($_SESSION['success_message'])) {
                 },
                 body: 'action=save&content=' + encodeURIComponent(content)
             })
-            .then(response => response.json())
+            .then(response => response.text())
             .then(data => {
-                if (data.success) {
-                    showSitemapMessage(data.message, 'success');
+                if (data.startsWith('ERROR:')) {
+                    showSitemapMessage(data.replace('ERROR: ', ''), 'danger');
+                } else if (data.startsWith('SUCCESS:')) {
+                    showSitemapMessage(data.replace('SUCCESS: ', ''), 'success');
                     setTimeout(() => {
                         bootstrap.Modal.getInstance(sitemapModal).hide();
                         document.getElementById('sitemap_message').style.display = 'none';
                     }, 1500);
-                } else {
-                    showSitemapMessage(data.message || 'Error saving sitemap', 'danger');
                 }
                 saveSitemapBtn.disabled = false;
                 saveSitemapBtn.innerHTML = '<i class="fas fa-save me-1"></i>Save Sitemap';
