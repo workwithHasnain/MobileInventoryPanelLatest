@@ -7,10 +7,6 @@ require_once 'filter_config.php';
 // Require login for this page
 requireLogin();
 
-// Read sitemap directly for inline display (no AJAX needed for initial load)
-$sitemap_file = __DIR__ . '/sitemap.xml';
-$sitemap_content = file_exists($sitemap_file) ? file_get_contents($sitemap_file) : '';
-
 // Get all phones and brands
 $phones = getAllPhones();
 $brands = getAllBrands();
@@ -92,9 +88,6 @@ if (isset($_SESSION['success_message'])) {
             </button>
             <button type="button" class="btn btn-outline-primary ms-2" data-bs-toggle="modal" data-bs-target="#canonicalBaseModal">
                 <i class="fas fa-link"></i> Canonical Base
-            </button>
-            <button type="button" class="btn btn-outline-success ms-2" data-bs-toggle="modal" data-bs-target="#sitemapModal">
-                <i class="fas fa-sitemap"></i> Sitemap
             </button>
         </div>
     </div>
@@ -666,41 +659,6 @@ if (isset($_SESSION['success_message'])) {
                 <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
                 <button type="button" class="btn btn-primary" id="saveCanonicalBaseBtn">
                     <i class="fas fa-save me-1"></i>Save Changes
-                </button>
-            </div>
-        </div>
-    </div>
-</div>
-
-<!-- Sitemap Modal -->
-<div class="modal fade" id="sitemapModal" tabindex="-1" aria-labelledby="sitemapLabel" aria-hidden="true">
-    <div class="modal-dialog modal-xl modal-dialog-scrollable">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h5 class="modal-title" id="sitemapLabel">
-                    <i class="fas fa-sitemap me-2"></i>Sitemap Management
-                </h5>
-                <div class="ms-auto d-flex align-items-center gap-2">
-                    <button type="button" class="btn btn-sm btn-success" id="syncSitemapBtn">
-                        <i class="fas fa-sync-alt me-1"></i>Sync Sitemap
-                    </button>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                </div>
-            </div>
-            <div class="modal-body">
-                <div id="sitemap_message" style="display: none;"></div>
-                <div class="mb-2">
-                    <small class="text-muted">
-                        <i class="fas fa-info-circle me-1"></i>
-                        Edit the sitemap XML below or click <strong>Sync Sitemap</strong> to auto-generate from all published posts and devices.
-                    </small>
-                </div>
-                <textarea class="form-control font-monospace" id="sitemapContent" rows="20" style="font-size: 13px; tab-size: 2;"><?php echo htmlspecialchars($sitemap_content); ?></textarea>
-            </div>
-            <div class="modal-footer">
-                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
-                <button type="button" class="btn btn-primary" id="saveSitemapBtn">
-                    <i class="fas fa-save me-1"></i>Save Sitemap
                 </button>
             </div>
         </div>
@@ -1579,121 +1537,6 @@ if (isset($_SESSION['success_message'])) {
 
     function showCanonicalMessage(message, type) {
         const messageDiv = document.getElementById('canonical_message');
-        messageDiv.className = 'alert alert-' + type + ' alert-dismissible fade show';
-        messageDiv.innerHTML = message + '<button type="button" class="btn-close" data-bs-dismiss="alert"></button>';
-        messageDiv.style.display = 'block';
-    }
-
-    // ===== SITEMAP MANAGEMENT =====
-    const sitemapModal = document.getElementById('sitemapModal');
-    const sitemapContent = document.getElementById('sitemapContent');
-    const saveSitemapBtn = document.getElementById('saveSitemapBtn');
-    const syncSitemapBtn = document.getElementById('syncSitemapBtn');
-
-    if (sitemapModal) {
-        sitemapModal.addEventListener('show.bs.modal', function() {
-            // Sitemap is already loaded inline from PHP, no fetch needed
-        });
-    }
-
-    if (saveSitemapBtn) {
-        saveSitemapBtn.addEventListener('click', saveSitemap);
-    }
-
-    if (syncSitemapBtn) {
-        syncSitemapBtn.addEventListener('click', syncSitemap);
-    }
-
-    function loadSitemap() {
-        // Refresh sitemap from file (called after sync)
-        fetch('manage_sitemap.php?action=get', {
-                method: 'GET'
-            })
-            .then(response => response.json())
-            .then(data => {
-                if (data.success) {
-                    sitemapContent.value = data.content;
-                }
-            })
-            .catch(error => console.log('Auto-refresh skipped:', error));
-    }
-
-    function saveSitemap() {
-        const content = sitemapContent.value.trim();
-        if (!content) {
-            showSitemapMessage('Sitemap content cannot be empty', 'warning');
-            return;
-        }
-
-        saveSitemapBtn.disabled = true;
-        saveSitemapBtn.innerHTML = '<i class="fas fa-spinner fa-spin me-1"></i>Saving...';
-
-        fetch('manage_sitemap.php?action=save', {
-                method: 'POST',
-                body: content
-            })
-            .then(response => {
-                if (!response.ok) throw new Error('Server returned ' + response.status);
-                return response.text();
-            })
-            .then(text => {
-                if (!text) throw new Error('Empty response from server');
-                const data = JSON.parse(text);
-                if (data.success) {
-                    showSitemapMessage(data.message, 'success');
-                } else {
-                    showSitemapMessage(data.message, 'danger');
-                }
-                saveSitemapBtn.disabled = false;
-                saveSitemapBtn.innerHTML = '<i class="fas fa-save me-1"></i>Save Sitemap';
-            })
-            .catch(error => {
-                showSitemapMessage('Error: ' + error, 'danger');
-                saveSitemapBtn.disabled = false;
-                saveSitemapBtn.innerHTML = '<i class="fas fa-save me-1"></i>Save Sitemap';
-            });
-    }
-
-    function syncSitemap() {
-        if (!confirm('This will regenerate the sitemap with all static pages, published posts, and devices. Continue?')) {
-            return;
-        }
-
-        syncSitemapBtn.disabled = true;
-        syncSitemapBtn.innerHTML = '<i class="fas fa-spinner fa-spin me-1"></i>Syncing...';
-
-        fetch('manage_sitemap.php', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/x-www-form-urlencoded'
-                },
-                body: 'action=sync'
-            })
-            .then(response => {
-                if (!response.ok) throw new Error('Server returned ' + response.status);
-                return response.text();
-            })
-            .then(text => {
-                if (!text) throw new Error('Empty response from server');
-                const data = JSON.parse(text);
-                if (data.success) {
-                    showSitemapMessage(data.message, 'success');
-                    loadSitemap();
-                } else {
-                    showSitemapMessage(data.message, 'danger');
-                }
-                syncSitemapBtn.disabled = false;
-                syncSitemapBtn.innerHTML = '<i class="fas fa-sync-alt me-1"></i>Sync Sitemap';
-            })
-            .catch(error => {
-                showSitemapMessage('Error: ' + error, 'danger');
-                syncSitemapBtn.disabled = false;
-                syncSitemapBtn.innerHTML = '<i class="fas fa-sync-alt me-1"></i>Sync Sitemap';
-            });
-    }
-
-    function showSitemapMessage(message, type) {
-        const messageDiv = document.getElementById('sitemap_message');
         messageDiv.className = 'alert alert-' + type + ' alert-dismissible fade show';
         messageDiv.innerHTML = message + '<button type="button" class="btn-close" data-bs-dismiss="alert"></button>';
         messageDiv.style.display = 'block';

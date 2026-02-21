@@ -1,13 +1,45 @@
 User-agent: *
 Allow: /
 
-# Sitemap location
-Sitemap: https://www.devicesarena.com/sitemap.xml
+# Public static content - explicitly allowed for crawlers
+Allow: /css/
+Allow: /js/
+Allow: /imges/
+Allow: /assets/
+Allow: /attached_assets/
+Allow: /data/
 
-# Crawl delay (optional, to be respectful to servers)
-# Crawl-delay: 1
-
-# Disallow sensitive areas
+# Disallow admin and private areas
 Disallow: /admin/
 Disallow: /includes/
 Disallow: /uploads/
+Disallow: /hero-images/
+Disallow: /dashboard.php
+Disallow: /login.php
+Disallow: /logout.php
+Disallow: /auth.php
+Disallow: /login_handler.php
+Disallow: /auth_management_handler.php
+Disallow: /manage_*.php
+Disallow: /edit_*.php
+Disallow: /add_*.php
+Disallow: /delete_*.php
+Disallow: /handle_*.php
+Disallow: /track_*.php
+Disallow: /ajax_*.php
+Disallow: /*.env
+Disallow: /.git
+
+# Crawl delay for all bots (be respectful)
+Crawl-delay: 1
+
+# Google - No delay
+User-agent: Googlebot
+Crawl-delay: 0
+
+# Bing
+User-agent: Bingbot
+Crawl-delay: 1
+
+# Sitemap location - Critical for SEO crawlers
+Sitemap: https://www.devicesarena.com/sitemap.xml
