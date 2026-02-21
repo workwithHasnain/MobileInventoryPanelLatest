@@ -19,27 +19,21 @@ if (!file_exists($sitemap_file)) {
 $sitemap_content = file_get_contents($sitemap_file);
 
 // Parse existing sitemap to get current URLs
-$dom = new DOMDocument();
-$dom->preserveWhiteSpace = false;
-$dom->load($sitemap_file);
-
 $existing_urls = [];
-$urlset = $dom->getElementsByTagName('urlset')->item(0);
-
-foreach ($dom->getElementsByTagName('loc') as $loc) {
-    $existing_urls[] = $loc->nodeValue;
+preg_match_all('/<loc>(.*?)<\/loc>/i', $sitemap_content, $matches);
+if (!empty($matches[1])) {
+    $existing_urls = $matches[1];
 }
 
 // Get devices from database
 try {
     $pdo = getConnection();
-    
+
     $devices_stmt = $pdo->query("SELECT slug, updated_at FROM phones ORDER BY updated_at DESC");
     $devices = $devices_stmt->fetchAll(PDO::FETCH_ASSOC);
-    
+
     $posts_stmt = $pdo->query("SELECT slug, updated_at FROM posts WHERE status ILIKE 'published' ORDER BY updated_at DESC");
     $posts = $posts_stmt->fetchAll(PDO::FETCH_ASSOC);
-    
 } catch (Exception $e) {
     die('ERROR: Database connection failed - ' . $e->getMessage());
 }
@@ -49,15 +43,15 @@ $new_entries = [];
 // Process devices
 if (!empty($devices)) {
     foreach ($devices as $device) {
-        $device_url = $canonicalBase . '/device/' . htmlspecialchars($device['slug']);
-        
+        $device_url = $canonicalBase . '/device/' . urlencode($device['slug']);
+
         // Check if URL already exists
         if (in_array($device_url, $existing_urls)) {
             continue; // Skip duplicate
         }
-        
+
         $lastmod = date('Y-m-d', strtotime($device['updated_at']));
-        
+
         $new_entries[] = [
             'loc' => $device_url,
             'lastmod' => $lastmod,
@@ -70,15 +64,15 @@ if (!empty($devices)) {
 // Process posts
 if (!empty($posts)) {
     foreach ($posts as $post) {
-        $post_url = $canonicalBase . '/post/' . htmlspecialchars($post['slug']);
-        
+        $post_url = $canonicalBase . '/post/' . urlencode($post['slug']);
+
         // Check if URL already exists
         if (in_array($post_url, $existing_urls)) {
             continue; // Skip duplicate
         }
-        
+
         $lastmod = date('Y-m-d', strtotime($post['updated_at']));
-        
+
         $new_entries[] = [
             'loc' => $post_url,
             'lastmod' => $lastmod,
@@ -90,30 +84,25 @@ if (!empty($posts)) {
 
 // Add new entries to sitemap
 if (!empty($new_entries)) {
+    $new_xml = '';
+    
     foreach ($new_entries as $entry) {
-        $url_element = $dom->createElement('url');
-        
-        $loc = $dom->createElement('loc', $entry['loc']);
-        $url_element->appendChild($loc);
-        
-        $lastmod = $dom->createElement('lastmod', $entry['lastmod']);
-        $url_element->appendChild($lastmod);
-        
-        $changefreq = $dom->createElement('changefreq', $entry['changefreq']);
-        $url_element->appendChild($changefreq);
-        
-        $priority = $dom->createElement('priority', $entry['priority']);
-        $url_element->appendChild($priority);
-        
-        $urlset->appendChild($url_element);
+        $new_xml .= "    <url>\n";
+        $new_xml .= "        <loc>" . htmlspecialchars($entry['loc'], ENT_XML1) . "</loc>\n";
+        $new_xml .= "        <lastmod>" . $entry['lastmod'] . "</lastmod>\n";
+        $new_xml .= "        <changefreq>" . $entry['changefreq'] . "</changefreq>\n";
+        $new_xml .= "        <priority>" . $entry['priority'] . "</priority>\n";
+        $new_xml .= "    </url>\n";
     }
     
-    // Format and save
-    $dom->formatOutput = true;
-    $dom->save($sitemap_file);
+    // Insert before closing </urlset>
+    $updated_sitemap = str_replace('</urlset>', $new_xml . '</urlset>', $sitemap_content);
     
+    if (file_put_contents($sitemap_file, $updated_sitemap) === false) {
+        die('ERROR: Failed to write sitemap file');
+    }
+
     echo 'SUCCESS: Added ' . count($new_entries) . ' new links to sitemap';
 } else {
     echo 'INFO: No new links to add (all existing or duplicates)';
 }
-?>
