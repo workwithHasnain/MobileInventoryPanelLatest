@@ -1084,7 +1084,7 @@ if ($_POST && isset($_POST['action'])) {
                     const deviceId = this.getAttribute('data-device-id');
                     if (deviceId) {
                         // Track the view
-                        fetch('track_device_view.php', {
+                        fetch('/track_device_view.php', {
                             method: 'POST',
                             headers: {
                                 'Content-Type': 'application/x-www-form-urlencoded',
@@ -1104,7 +1104,7 @@ if ($_POST && isset($_POST['action'])) {
                     const deviceId = this.getAttribute('data-device-id');
                     if (deviceId) {
                         // Track the view
-                        fetch('track_device_view.php', {
+                        fetch('/track_device_view.php', {
                             method: 'POST',
                             headers: {
                                 'Content-Type': 'application/x-www-form-urlencoded',
@@ -1137,7 +1137,7 @@ if ($_POST && isset($_POST['action'])) {
                     const device2Id = this.getAttribute('data-device2-id');
                     if (device1Id && device2Id) {
                         // Track the comparison
-                        fetch('track_device_comparison.php', {
+                        fetch('/track_device_comparison.php', {
                             method: 'POST',
                             headers: {
                                 'Content-Type': 'application/x-www-form-urlencoded',
@@ -1284,7 +1284,7 @@ if ($_POST && isset($_POST['action'])) {
                     submitBtn.textContent = 'Subscribing...';
 
                     // Send AJAX request
-                    fetch('handle_newsletter.php', {
+                    fetch('/handle_newsletter.php', {
                             method: 'POST',
                             headers: {
                                 'Content-Type': 'application/x-www-form-urlencoded'

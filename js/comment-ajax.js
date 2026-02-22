@@ -38,7 +38,7 @@ function submitComment(form, type) {
     const formData = new FormData(form);
     
     // Make AJAX request
-    fetch('ajax_comment_handler.php', {
+    fetch('/ajax_comment_handler.php', {
         method: 'POST',
         body: formData
     })

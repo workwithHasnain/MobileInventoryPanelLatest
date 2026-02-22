@@ -2179,7 +2179,7 @@ $commentCount = getDeviceCommentCount($pdo, $device_id);
         const deviceId = this.getAttribute('data-device-id');
         if (deviceId) {
           // Track the view
-          fetch('track_device_view.php', {
+          fetch('/track_device_view.php', {
             method: 'POST',
             headers: {
               'Content-Type': 'application/x-www-form-urlencoded',
@@ -2199,7 +2199,7 @@ $commentCount = getDeviceCommentCount($pdo, $device_id);
         const deviceId = this.getAttribute('data-device-id');
         if (deviceId) {
           // Track the view
-          fetch('track_device_view.php', {
+          fetch('/track_device_view.php', {
             method: 'POST',
             headers: {
               'Content-Type': 'application/x-www-form-urlencoded',
@@ -2232,7 +2232,7 @@ $commentCount = getDeviceCommentCount($pdo, $device_id);
         const device2Id = this.getAttribute('data-device2-id');
         if (device1Id && device2Id) {
           // Track the comparison
-          fetch('track_device_comparison.php', {
+          fetch('/track_device_comparison.php', {
             method: 'POST',
             headers: {
               'Content-Type': 'application/x-www-form-urlencoded',
@@ -2262,7 +2262,7 @@ $commentCount = getDeviceCommentCount($pdo, $device_id);
     }
 
     // Fetch phones for this brand
-    fetch(`get_phones_by_brand.php?brand_id=${brandId}`)
+    fetch(`/get_phones_by_brand.php?brand_id=${brandId}`)
       .then(response => response.json())
       .then(data => {
         // Populate the devices modal with phones
@@ -2341,7 +2341,7 @@ $commentCount = getDeviceCommentCount($pdo, $device_id);
     }
 
     // Fetch related phones based on price bracket, year, and view count
-    fetch(`get_related_phones.php?device_id=${currentDeviceId}`)
+    fetch(`/get_related_phones.php?device_id=${currentDeviceId}`)
       .then(response => response.json())
       .then(data => {
         displayRelatedPhonesModal(data);
@@ -2394,7 +2394,7 @@ $commentCount = getDeviceCommentCount($pdo, $device_id);
 
   // Show post details in modal
   function showPostDetails(postId) {
-    fetch(`get_post_details.php?id=${postId}`)
+    fetch(`/get_post_details.php?id=${postId}`)
       .then(response => response.text())
       .then(data => {
         window.location.href = `post.php?id=${postId}`;
@@ -2407,7 +2407,7 @@ $commentCount = getDeviceCommentCount($pdo, $device_id);
 
   // Show device details in modal
   function showDeviceDetails(deviceId) {
-    fetch(`get_device_details.php?id=${deviceId}`)
+    fetch(`/get_device_details.php?id=${deviceId}`)
       .then(response => response.text())
       .then(data => {
         window.location.href = `device.php?id=${deviceId}`;
@@ -2557,7 +2557,7 @@ $commentCount = getDeviceCommentCount($pdo, $device_id);
         submitBtn.textContent = 'Subscribing...';
 
         // Send AJAX request
-        fetch('handle_newsletter.php', {
+        fetch('/handle_newsletter.php', {
             method: 'POST',
             headers: {
               'Content-Type': 'application/x-www-form-urlencoded'

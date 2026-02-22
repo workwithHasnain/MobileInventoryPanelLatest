@@ -1889,7 +1889,7 @@ function formatDeviceSpecsStructured($device)
             }
 
             // Fetch phones for this brand
-            fetch(`get_phones_by_brand.php?brand_id=${brandId}`)
+            fetch(`/get_phones_by_brand.php?brand_id=${brandId}`)
                 .then(response => response.json())
                 .then(data => {
                     // Populate the devices modal with phones
@@ -1969,7 +1969,7 @@ function formatDeviceSpecsStructured($device)
                     submitBtn.textContent = 'Subscribing...';
 
                     // Send AJAX request
-                    fetch('handle_newsletter.php', {
+                    fetch('/handle_newsletter.php', {
                             method: 'POST',
                             headers: {
                                 'Content-Type': 'application/x-www-form-urlencoded'

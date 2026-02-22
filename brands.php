@@ -370,7 +370,7 @@ if ($selectedBrandId) {
                     const deviceId = this.getAttribute('data-device-id');
                     if (deviceId) {
                         // Track the view
-                        fetch('track_device_view.php', {
+                        fetch('/track_device_view.php', {
                             method: 'POST',
                             headers: {
                                 'Content-Type': 'application/x-www-form-urlencoded',
@@ -387,7 +387,7 @@ if ($selectedBrandId) {
 
         // Show device details in modal
         function showDeviceDetails(deviceId) {
-            fetch(`get_device_details.php?id=${deviceId}`)
+            fetch(`/get_device_details.php?id=${deviceId}`)
                 .then(response => response.text())
                 .then(data => {
                     document.getElementById('deviceModalBody').innerHTML = data;

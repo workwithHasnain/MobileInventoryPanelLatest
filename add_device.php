@@ -6,6 +6,7 @@ require_once 'auth.php';
 require_once 'phone_data.php'; // Keep for getAllPhones function
 require_once 'brand_data.php';
 require_once 'simple_device_insert.php'; // Add our new simple insertion script
+require_once 'image_compression.php'; // Add image compression function
 
 // Require login for this page
 requireLogin();
@@ -57,15 +58,26 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
                 // If no errors, process the upload
                 if (!isset($errors['image' . ($i + 1)])) {
-                    // Generate unique filename
-                    $file_extension = pathinfo($_FILES['images']['name'][$i], PATHINFO_EXTENSION);
-                    $filename = 'device_' . time() . '_' . uniqid() . '_' . ($i + 1) . '.' . $file_extension;
-                    $upload_path = 'uploads/' . $filename;
-
-                    if (move_uploaded_file($_FILES['images']['tmp_name'][$i], $upload_path)) {
-                        $image_paths[] = $upload_path;
+                    // Compress image before saving to reduce file size
+                    $compressedPath = compressImage($_FILES['images']['tmp_name'][$i]);
+                    if (!$compressedPath) {
+                        $errors['image' . ($i + 1)] = 'Failed to compress image ' . ($i + 1) . '. Please try again.';
                     } else {
-                        $errors['image' . ($i + 1)] = 'Failed to upload image ' . ($i + 1) . '. Please try again.';
+                        // Generate unique filename
+                        $file_extension = pathinfo($_FILES['images']['name'][$i], PATHINFO_EXTENSION);
+                        $filename = 'device_' . time() . '_' . uniqid() . '_' . ($i + 1) . '.' . $file_extension;
+                        $upload_path = 'uploads/' . $filename;
+
+                        if (move_uploaded_file($compressedPath, $upload_path)) {
+                            $image_paths[] = $upload_path;
+                        } else {
+                            $errors['image' . ($i + 1)] = 'Failed to upload image ' . ($i + 1) . '. Please try again.';
+                        }
+
+                        // Clean up compressed temp file if it was different from original PHP temp file
+                        if ($compressedPath !== $_FILES['images']['tmp_name'][$i] && file_exists($compressedPath)) {
+                            unlink($compressedPath);
+                        }
                     }
                 }
             }

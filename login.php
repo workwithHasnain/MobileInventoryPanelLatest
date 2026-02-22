@@ -63,7 +63,7 @@ if (isset($_SESSION['logged_in']) && $_SESSION['logged_in'] === true) {
             loginBtn.textContent = 'Logging in...';
 
             try {
-                const response = await fetch('login_handler.php', {
+                const response = await fetch('/login_handler.php', {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/x-www-form-urlencoded',

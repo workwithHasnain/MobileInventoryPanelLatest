@@ -1,6 +1,7 @@
 <?php
 ob_start();
 require_once 'auth.php';
+require_once 'image_compression.php'; // Add image compression function
 
 // Require login for this page
 requireLogin();
@@ -110,25 +111,40 @@ if ($_POST) {
             mkdir($upload_dir, 0755, true);
         }
 
-        $file_info = pathinfo($_FILES['featured_image']['name']);
-        $file_extension = strtolower($file_info['extension']);
-        $allowed_extensions = ['jpg', 'jpeg', 'png', 'gif', 'webp'];
-
-        if (in_array($file_extension, $allowed_extensions)) {
-            $new_filename = 'featured_' . time() . '_' . uniqid() . '.' . $file_extension;
-            $upload_path = $upload_dir . $new_filename;
-
-            if (move_uploaded_file($_FILES['featured_image']['tmp_name'], $upload_path)) {
-                // Delete old featured image if it exists
-                if (!empty($post['featured_image']) && file_exists($post['featured_image'])) {
-                    unlink($post['featured_image']);
-                }
-                $featured_image = $upload_path;
-            } else {
-                $errors[] = "Failed to upload featured image.";
-            }
+        // Compress image before saving
+        $compressedPath = compressImage($_FILES['featured_image']['tmp_name']);
+        if (!$compressedPath) {
+            $errors[] = "Failed to process featured image.";
         } else {
-            $errors[] = "Featured image must be a valid image file (JPG, PNG, GIF, WebP).";
+            $file_info = pathinfo($_FILES['featured_image']['name']);
+            $file_extension = strtolower($file_info['extension']);
+            $allowed_extensions = ['jpg', 'jpeg', 'png', 'gif', 'webp'];
+
+            if (in_array($file_extension, $allowed_extensions)) {
+                $new_filename = 'featured_' . time() . '_' . uniqid() . '.' . $file_extension;
+                $upload_path = $upload_dir . $new_filename;
+
+                if (move_uploaded_file($compressedPath, $upload_path)) {
+                    // Delete old featured image if it exists
+                    if (!empty($post['featured_image']) && file_exists($post['featured_image'])) {
+                        unlink($post['featured_image']);
+                    }
+                    $featured_image = $upload_path;
+                } else {
+                    $errors[] = "Failed to upload featured image.";
+                }
+
+                // Clean up compressed temp file if it was different from original PHP temp file
+                if ($compressedPath !== $_FILES['featured_image']['tmp_name'] && file_exists($compressedPath)) {
+                    unlink($compressedPath);
+                }
+            } else {
+                $errors[] = "Featured image must be a valid image file (JPG, PNG, GIF, WebP).";
+                // Clean up temp file
+                if ($compressedPath !== $_FILES['featured_image']['tmp_name'] && file_exists($compressedPath)) {
+                    unlink($compressedPath);
+                }
+            }
         }
     }
 
@@ -144,16 +160,25 @@ if ($_POST) {
 
         foreach ($_FILES['media_gallery']['tmp_name'] as $key => $tmp_name) {
             if ($_FILES['media_gallery']['error'][$key] === UPLOAD_ERR_OK) {
-                $file_info = pathinfo($_FILES['media_gallery']['name'][$key]);
-                $file_extension = strtolower($file_info['extension']);
-                $allowed_extensions = ['jpg', 'jpeg', 'png', 'gif', 'webp'];
+                // Compress image before saving
+                $compressedPath = compressImage($tmp_name);
+                if ($compressedPath) {
+                    $file_info = pathinfo($_FILES['media_gallery']['name'][$key]);
+                    $file_extension = strtolower($file_info['extension']);
+                    $allowed_extensions = ['jpg', 'jpeg', 'png', 'gif', 'webp'];
 
-                if (in_array($file_extension, $allowed_extensions)) {
-                    $new_filename = 'gallery_' . time() . '_' . uniqid() . '.' . $file_extension;
-                    $upload_path = $upload_dir . $new_filename;
+                    if (in_array($file_extension, $allowed_extensions)) {
+                        $new_filename = 'gallery_' . time() . '_' . uniqid() . '.' . $file_extension;
+                        $upload_path = $upload_dir . $new_filename;
 
-                    if (move_uploaded_file($tmp_name, $upload_path)) {
-                        $media_gallery[] = $upload_path;
+                        if (move_uploaded_file($compressedPath, $upload_path)) {
+                            $media_gallery[] = $upload_path;
+                        }
+
+                        // Clean up compressed temp file if it was different from original PHP temp file
+                        if ($compressedPath !== $tmp_name && file_exists($compressedPath)) {
+                            unlink($compressedPath);
+                        }
                     }
                 }
             }

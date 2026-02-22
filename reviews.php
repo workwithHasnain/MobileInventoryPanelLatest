@@ -513,7 +513,7 @@ $allBrandsModal = $all_brands_stmt->fetchAll();
                     const deviceId = this.getAttribute('data-device-id');
                     if (deviceId) {
                         // Track the view
-                        fetch('track_device_view.php', {
+                        fetch('/track_device_view.php', {
                             method: 'POST',
                             headers: {
                                 'Content-Type': 'application/x-www-form-urlencoded',
@@ -533,7 +533,7 @@ $allBrandsModal = $all_brands_stmt->fetchAll();
                     const deviceId = this.getAttribute('data-device-id');
                     if (deviceId) {
                         // Track the view
-                        fetch('track_device_view.php', {
+                        fetch('/track_device_view.php', {
                             method: 'POST',
                             headers: {
                                 'Content-Type': 'application/x-www-form-urlencoded',
@@ -691,7 +691,7 @@ $allBrandsModal = $all_brands_stmt->fetchAll();
                     submitBtn.textContent = 'Subscribing...';
 
                     // Send AJAX request
-                    fetch('handle_newsletter.php', {
+                    fetch('/handle_newsletter.php', {
                             method: 'POST',
                             headers: {
                                 'Content-Type': 'application/x-www-form-urlencoded'

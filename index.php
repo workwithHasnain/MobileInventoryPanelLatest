@@ -567,7 +567,7 @@ if ($_POST && isset($_POST['action'])) {
                     const deviceId = this.getAttribute('data-device-id');
                     if (deviceId) {
                         // Track the view
-                        fetch('track_device_view.php', {
+                        fetch('/track_device_view.php', {
                             method: 'POST',
                             headers: {
                                 'Content-Type': 'application/x-www-form-urlencoded',
@@ -587,7 +587,7 @@ if ($_POST && isset($_POST['action'])) {
                     const deviceId = this.getAttribute('data-device-id');
                     if (deviceId) {
                         // Track the view
-                        fetch('track_device_view.php', {
+                        fetch('/track_device_view.php', {
                             method: 'POST',
                             headers: {
                                 'Content-Type': 'application/x-www-form-urlencoded',
@@ -620,7 +620,7 @@ if ($_POST && isset($_POST['action'])) {
                     const device2Id = this.getAttribute('data-device2-id');
                     if (device1Id && device2Id) {
                         // Track the comparison
-                        fetch('track_device_comparison.php', {
+                        fetch('/track_device_comparison.php', {
                             method: 'POST',
                             headers: {
                                 'Content-Type': 'application/x-www-form-urlencoded',
@@ -637,7 +637,7 @@ if ($_POST && isset($_POST['action'])) {
 
         // Show post details in modal
         function showPostDetails(postId) {
-            fetch(`get_post_details.php?id=${postId}`)
+            fetch(`/get_post_details.php?id=${postId}`)
                 .then(response => response.text())
                 .then(data => {
                     window.location.href = `<?php echo $base; ?>post.php?id=${postId}`;
@@ -650,7 +650,7 @@ if ($_POST && isset($_POST['action'])) {
 
         // Show device details in modal
         function showDeviceDetails(deviceId) {
-            fetch(`get_device_details.php?id=${deviceId}`)
+            fetch(`/get_device_details.php?id=${deviceId}`)
                 .then(response => response.text())
                 .then(data => {
                     // Redirect using device ID - will be redirected to slug URL by device.php
@@ -687,7 +687,7 @@ if ($_POST && isset($_POST['action'])) {
             }
 
             // Fetch phones for this brand
-            fetch(`get_phones_by_brand.php?brand_id=${brandId}`)
+            fetch(`/get_phones_by_brand.php?brand_id=${brandId}`)
                 .then(response => response.json())
                 .then(data => {
                     // Populate the devices modal with phones
@@ -772,7 +772,7 @@ if ($_POST && isset($_POST['action'])) {
                     submitBtn.textContent = 'Subscribing...';
 
                     // Send AJAX request
-                    fetch('handle_newsletter.php', {
+                    fetch('/handle_newsletter.php', {
                             method: 'POST',
                             headers: {
                                 'Content-Type': 'application/x-www-form-urlencoded'

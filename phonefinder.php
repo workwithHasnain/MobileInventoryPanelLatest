@@ -1938,7 +1938,7 @@ if (!$filterConfig) {
                 [...new Set(fpConds)].forEach(v => formData.append('fingerprint[]', v));
 
                 // Send AJAX request
-                fetch('phonefinder_handler.php', {
+                fetch('/phonefinder_handler.php', {
                         method: 'POST',
                         body: formData
                     })
@@ -2171,7 +2171,7 @@ if (!$filterConfig) {
                     submitBtn.textContent = 'Subscribing...';
 
                     // Send AJAX request
-                    fetch('handle_newsletter.php', {
+                    fetch('/handle_newsletter.php', {
                             method: 'POST',
                             headers: {
                                 'Content-Type': 'application/x-www-form-urlencoded'
