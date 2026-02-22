@@ -35,20 +35,20 @@ const URLDecoder = {
 
     /**
      * Decode slugs from compare.php
-     * Expects URL format: /compare/slugVSslugVSslug
+     * Expects URL format: domain/compare/slug1-vs-slug2-vs-slug3/
      * @returns {object} Object with array of slugs or null if not found
      * Example: { slugs: ['iphone-15', 'samsung-s24', 'pixel-9'], count: 3 }
      */
     getCompareSlugs() {
         const pathname = this.getPathname();
 
-        // Match pattern like /compare/slug1VSslug2VSslug3
+        // Match pattern like /compare/slug1-vs-slug2-vs-slug3
         const match = pathname.match(/\/compare\/([^\/]+)(?:\/)?$/i);
 
         if (match && match[1]) {
-            // Split by "VS" (case-insensitive)
+            // Split by "-vs-" (case-insensitive)
             const slugString = match[1];
-            const slugs = slugString.split(/VS/i).map(slug => decodeURIComponent(slug.trim()));
+            const slugs = slugString.split(/-vs-/i).map(slug => decodeURIComponent(slug.trim()));
 
             // Return slugs if we have at least 2 items, maximum 3 for compare
             if (slugs.length >= 2 && slugs.length <= 3) {

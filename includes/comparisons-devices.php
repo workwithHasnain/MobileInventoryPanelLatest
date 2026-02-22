@@ -17,7 +17,7 @@ if (!isset($base)) {
                     // Build clean URL for compare page using slugs
                     $device1_slug = $comparison['device1_slug'] ?? $comparison['device1_id'] ?? '';
                     $device2_slug = $comparison['device2_slug'] ?? $comparison['device2_id'] ?? '';
-                    $compare_url = $base . 'compare/' . urlencode($device1_slug) . 'VS' . urlencode($device2_slug);
+                    $compare_url = $base . 'compare/' . urlencode($device1_slug) . '-vs-' . urlencode($device2_slug);
                     $comparison_text = htmlspecialchars(($comparison['device1_name'] ?? 'Unknown') . ' vs. ' . ($comparison['device2_name'] ?? 'Unknown'));
                     ?>
                     <!-- if $index is odd -->

@@ -6,7 +6,7 @@ require_once 'phone_data.php';
 require_once 'database_functions.php';
 require_once 'includes/database_functions.php';
 
-// New clean URL format: domain/compare/slug1VSslug2VSslug3
+// New clean URL format: domain/compare/slug1-vs-slug2-vs-slug3
 // The .htaccess file rewrites clean URLs to this page and passes slugs as query parameter
 // Base path variable is now defined in config.php
 
@@ -207,11 +207,11 @@ if ($_POST && isset($_POST['action'])) {
 $phones = getAllPhones();
 
 // Get selected phone slugs from URL parameters
-// New way: slugs come from clean URL (domain/compare/slug1VSslug2VSslug3) rewritten by .htaccess
+// New way: slugs come from clean URL (domain/compare/slug1-vs-slug2-vs-slug3) rewritten by .htaccess
 // Parse multiple slugs from single query parameter if using new URL format
 if (isset($_GET['slugs'])) {
-    // New format: domain/compare/slug1VSslug2VSslug3
-    $slugParts = explode('VS', $_GET['slugs']);
+    // New format: domain/compare/slug1-vs-slug2-vs-slug3
+    $slugParts = explode('-vs-', $_GET['slugs']);
     $phone1_slug = isset($slugParts[0]) ? trim($slugParts[0]) : '';
     $phone2_slug = isset($slugParts[1]) ? trim($slugParts[1]) : '';
     $phone3_slug = isset($slugParts[2]) ? trim($slugParts[2]) : '';
@@ -2179,12 +2179,12 @@ function formatDeviceSpecsStructured($device)
             const phone2 = document.getElementById('phone2-select')?.value || '';
             const phone3 = document.getElementById('phone3-select')?.value || '';
 
-            // Build clean URL format: /compare/slug1VSslug2VSslug3
+            // Build clean URL format: domain/compare/slug1-vs-slug2-vs-slug3
             // Only include selected phones in the URL
             const slugs = [phone1, phone2, phone3].filter(slug => slug !== '');
 
             if (slugs.length > 0) {
-                const compareUrl = '/compare/' + slugs.join('VS');
+                const compareUrl = '/compare/' + slugs.join('-vs-');
                 window.location.href = compareUrl;
             }
             // If no phones selected, stay on current page or redirect to /compare
