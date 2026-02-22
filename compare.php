@@ -1694,6 +1694,20 @@ function formatDeviceSpecsStructured($device)
                 </div>
             </div>
         </div>
+
+        <!-- Specs Toggle Control -->
+        <div style="display: flex; align-items: center; gap: 15px; margin-bottom: 20px; padding: 15px; background: #f9f9f9; border-radius: 8px; border-left: 4px solid #8D6E63;">
+            <span style="font-weight: 600; color: #333;">View Specs:</span>
+            <div style="display: flex; gap: 10px;">
+                <button id="specs-all-btn" class="specs-toggle-btn specs-toggle-active" onclick="toggleSpecsView('all')" style="padding: 8px 16px; border: 1px solid #8D6E63; background: #8D6E63; color: white; border-radius: 4px; cursor: pointer; font-weight: 600; transition: all 0.3s;">
+                    All Specs
+                </button>
+                <button id="specs-diff-btn" class="specs-toggle-btn" onclick="toggleSpecsView('differences')" style="padding: 8px 16px; border: 1px solid #ccc; background: #fff; color: #333; border-radius: 4px; cursor: pointer; font-weight: 600; transition: all 0.3s;">
+                    Show Only Differences
+                </button>
+            </div>
+        </div>
+
         <div class="comparison-wrapper">
             <style>
                 /* Wrapper that allows horizontal scroll */
@@ -1809,6 +1823,37 @@ function formatDeviceSpecsStructured($device)
                         font-size: 11px;
                         padding: 4px 8px !important;
                     }
+                }
+
+                /* Styling for identical specs rows */
+                .comparison-table tr.specs-identical-row {
+                    background-color: #f5f5f5;
+                    opacity: 0.65;
+                    transition: opacity 0.3s ease, background-color 0.3s ease;
+                }
+
+                .comparison-table tr.specs-identical-row td {
+                    color: #999;
+                }
+
+                .comparison-table tr.specs-identical-row .subtitle,
+                .comparison-table tr.specs-identical-row .description {
+                    color: #999;
+                }
+
+                /* When showing all specs, identical rows are normal */
+                .specs-view-all .comparison-table tr.specs-identical-row {
+                    background-color: transparent;
+                    opacity: 1;
+                }
+
+                .specs-view-all .comparison-table tr.specs-identical-row td {
+                    color: inherit;
+                }
+
+                .specs-view-all .comparison-table tr.specs-identical-row .subtitle,
+                .specs-view-all .comparison-table tr.specs-identical-row .description {
+                    color: inherit;
                 }
             </style>
             <table class="comparison-table">
@@ -1943,8 +1988,17 @@ function formatDeviceSpecsStructured($device)
 
                             // Render each field/description pair as a 2-column row per phone
                             for ($i = 0; $i < $maxRows; $i++) {
-                                $rowClass = ($section === 'NETWORK' && $i > 0) ? ' class="compare-network-row"' : '';
-                                echo '<tr' . $rowClass . '>';
+                                // Check if specs are identical across all three phones
+                                $desc1 = isset($rows1[$i]) ? trim($rows1[$i]['description']) : 'N/A';
+                                $desc2 = isset($rows2[$i]) ? trim($rows2[$i]['description']) : 'N/A';
+                                $desc3 = isset($rows3[$i]) ? trim($rows3[$i]['description']) : 'N/A';
+                                
+                                $isIdentical = ($desc1 === $desc2 && $desc2 === $desc3);
+                                
+                                $rowClass = ($section === 'NETWORK' && $i > 0) ? ' compare-network-row' : '';
+                                $rowClass .= $isIdentical ? ' specs-identical-row' : '';
+                                
+                                echo '<tr class="' . trim($rowClass) . '">';
 
                                 // Phone 1
                                 if (isset($rows1[$i])) {
@@ -2393,6 +2447,52 @@ function formatDeviceSpecsStructured($device)
                 networkRows.forEach(row => row.style.display = '');
             }
         }
+
+        // Toggle between "All Specs" and "Show Only Differences" view
+        function toggleSpecsView(viewType) {
+            const comparisonWrapper = document.querySelector('.comparison-wrapper');
+            const allBtn = document.getElementById('specs-all-btn');
+            const diffBtn = document.getElementById('specs-diff-btn');
+
+            if (viewType === 'all') {
+                // Show all specs
+                comparisonWrapper.classList.remove('specs-view-differences');
+                comparisonWrapper.classList.add('specs-view-all');
+                
+                allBtn.style.background = '#8D6E63';
+                allBtn.style.border = '1px solid #8D6E63';
+                allBtn.style.color = 'white';
+                allBtn.classList.add('specs-toggle-active');
+                
+                diffBtn.style.background = '#fff';
+                diffBtn.style.border = '1px solid #ccc';
+                diffBtn.style.color = '#333';
+                diffBtn.classList.remove('specs-toggle-active');
+            } else {
+                // Show only differences (grey out identical rows)
+                comparisonWrapper.classList.remove('specs-view-all');
+                comparisonWrapper.classList.add('specs-view-differences');
+                
+                diffBtn.style.background = '#8D6E63';
+                diffBtn.style.border = '1px solid #8D6E63';
+                diffBtn.style.color = 'white';
+                diffBtn.classList.add('specs-toggle-active');
+                
+                allBtn.style.background = '#fff';
+                allBtn.style.border = '1px solid #ccc';
+                allBtn.style.color = '#333';
+                allBtn.classList.remove('specs-toggle-active');
+            }
+        }
+
+        // Initialize on page load
+        document.addEventListener('DOMContentLoaded', function() {
+            // Set initial state to "All Specs"
+            const comparisonWrapper = document.querySelector('.comparison-wrapper');
+            if (comparisonWrapper) {
+                comparisonWrapper.classList.add('specs-view-all');
+            }
+        });
     </script>
 </body>
 
