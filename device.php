@@ -1042,10 +1042,10 @@ $commentCount = getDeviceCommentCount($pdo, $device_id);
   <link rel="icon" type="image/png" sizes="512x512" href="<?php echo $base; ?>imges/icon-256.png">
 
   <!-- Theme Color (Browser Chrome & Address Bar) -->
-  <meta name="theme-color" content="#8D6E63">
+  <meta name="theme-color" content="#1B2035">
 
   <!-- Windows Tile Icon -->
-  <meta name="msapplication-TileColor" content="#8D6E63">
+  <meta name="msapplication-TileColor" content="#1B2035">
   <meta name="msapplication-TileImage" content="<?php echo $base; ?>imges/icon-256.png">
 
   <!-- Open Graph Meta Tags (Social Media Sharing) -->
@@ -1774,7 +1774,7 @@ $commentCount = getDeviceCommentCount($pdo, $device_id);
 
     .brand-cell-modal:hover {
       background-color: #D7CCC8 !important;
-      border-color: #8D6E63;
+      border-color: #1B2035;
       transform: translateY(-2px);
       box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
       color: #3E2723;
@@ -1807,7 +1807,7 @@ $commentCount = getDeviceCommentCount($pdo, $device_id);
 
     .device-cell-modal:hover {
       background-color: #D7CCC8 !important;
-      border-color: #8D6E63;
+      border-color: #1B2035;
       transform: translateY(-2px);
       box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
       color: #3E2723;
@@ -2367,8 +2367,8 @@ $commentCount = getDeviceCommentCount($pdo, $device_id);
   <!-- Brands Modal -->
   <div class="modal fade" id="brandsModal" tabindex="-1" aria-labelledby="brandsModalLabel" aria-hidden="true">
     <div class="modal-dialog modal-lg modal-dialog-centered modal-dialog-scrollable">
-      <div class="modal-content" style="background-color: #EFEBE9; border: 2px solid #8D6E63;">
-        <div class="modal-header" style="border-bottom: 1px solid #8D6E63; background-color: #D7CCC8;">
+      <div class="modal-content" style="background-color: #EFEBE9; border: 2px solid #1B2035;">
+        <div class="modal-header" style="border-bottom: 1px solid #1B2035; background-color: #D7CCC8;">
           <h5 class="modal-title" id="brandsModalLabel" style="font-family:system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue'; color: #5D4037;">
             <i class="fas fa-industry me-2"></i>All Brands
           </h5>
@@ -2401,8 +2401,8 @@ $commentCount = getDeviceCommentCount($pdo, $device_id);
   <!-- Devices Modal (Phones by Brand) -->
   <div class="modal fade" id="devicesModal" tabindex="-1" aria-labelledby="deviceModalLabel" aria-hidden="true">
     <div class="modal-dialog modal-lg modal-dialog-centered modal-dialog-scrollable">
-      <div class="modal-content" style="background-color: #EFEBE9; border: 2px solid #8D6E63;">
-        <div class="modal-header" style="border-bottom: 1px solid #8D6E63; background-color: #D7CCC8;">
+      <div class="modal-content" style="background-color: #EFEBE9; border: 2px solid #1B2035;">
+        <div class="modal-header" style="border-bottom: 1px solid #1B2035; background-color: #D7CCC8;">
           <h5 class="modal-title" id="deviceModalTitle" style="font-family:system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue'; color: #5D4037;">
             Devices
           </h5>
@@ -2420,8 +2420,8 @@ $commentCount = getDeviceCommentCount($pdo, $device_id);
   <!-- Pictures Modal -->
   <div class="modal fade" id="picturesModal" tabindex="-1" aria-labelledby="picturesModalLabel" aria-hidden="true">
     <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable" style="max-width: 90vw; margin: auto;">
-      <div class="modal-content" style="background-color: #EFEBE9; border: 2px solid #8D6E63;">
-        <div class="modal-header" style="border-bottom: 1px solid #8D6E63; background-color: #D7CCC8;">
+      <div class="modal-content" style="background-color: #EFEBE9; border: 2px solid #1B2035;">
+        <div class="modal-header" style="border-bottom: 1px solid #1B2035; background-color: #D7CCC8;">
           <h5 class="modal-title" id="picturesModalLabel" style="font-family:system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue'; color: #5D4037;">
             <i class="fas fa-images me-2"></i><span id="picturesDeviceNameTitle"><?php echo htmlspecialchars(($device['brand_name'] ?? '') . ' ' . ($device['name'] ?? 'Device')); ?></span> - Pictures
           </h5>
@@ -2476,7 +2476,7 @@ $commentCount = getDeviceCommentCount($pdo, $device_id);
 
             <!-- Thumbnail Navigation -->
             <?php if (count($deviceImages) > 1): ?>
-              <div class="modal-footer" style="border-top: 1px solid #8D6E63; background-color: #D7CCC8; padding: 10px;">
+              <div class="modal-footer" style="border-top: 1px solid #1B2035; background-color: #D7CCC8; padding: 10px;">
                 <div class="d-flex justify-content-center flex-wrap gap-2" style="max-height: 100px; overflow-y: auto;">
                   <?php foreach ($deviceImages as $index => $image): ?>
                     <img src="<?php echo htmlspecialchars($image); ?>"
@@ -2506,8 +2506,8 @@ $commentCount = getDeviceCommentCount($pdo, $device_id);
   <!-- Related Phones Modal -->
   <div class="modal fade" id="relatedPhonesModal" tabindex="-1" aria-labelledby="relatedPhonesModalLabel" aria-hidden="true">
     <div class="modal-dialog modal-lg modal-dialog-centered modal-dialog-scrollable">
-      <div class="modal-content" style="background-color: #EFEBE9; border: 2px solid #8D6E63;">
-        <div class="modal-header" style="border-bottom: 1px solid #8D6E63; background-color: #D7CCC8;">
+      <div class="modal-content" style="background-color: #EFEBE9; border: 2px solid #1B2035;">
+        <div class="modal-header" style="border-bottom: 1px solid #1B2035; background-color: #D7CCC8;">
           <h5 class="modal-title" id="relatedPhonesModalLabel" style="font-family:system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue'; color: #5D4037;">
             <i class="fas fa-mobile-alt me-2"></i>Related Phones
           </h5>

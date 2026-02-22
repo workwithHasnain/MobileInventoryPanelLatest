@@ -927,10 +927,10 @@ function formatDeviceSpecsStructured($device)
     <link rel="icon" type="image/png" sizes="512x512" href="<?php echo $base; ?>imges/icon-256.png">
 
     <!-- Theme Color (Browser Chrome & Address Bar) -->
-    <meta name="theme-color" content="#8D6E63">
+    <meta name="theme-color" content="#1B2035">
 
     <!-- Windows Tile Icon -->
-    <meta name="msapplication-TileColor" content="#8D6E63">
+    <meta name="msapplication-TileColor" content="#1B2035">
     <meta name="msapplication-TileImage" content="<?php echo $base; ?>imges/icon-256.png">
 
     <!-- Open Graph Meta Tags (Social Media Sharing) -->
@@ -1402,7 +1402,7 @@ function formatDeviceSpecsStructured($device)
         }
 
         .phone-search-input:focus {
-            border-color: #8D6E63;
+            border-color: #1B2035;
             box-shadow: 0 0 0 2px rgba(141,110,99,0.15);
         }
 
@@ -1499,7 +1499,7 @@ function formatDeviceSpecsStructured($device)
 
         .brand-cell-modal:focus {
             outline: none;
-            box-shadow: 0 0 0 3px rgba(141, 110, 99, 0.25);
+            box-shadow: 0 0 0 3px #1B2035;
         }
 
         #brandsModal .modal-dialog-scrollable {
@@ -1519,7 +1519,7 @@ function formatDeviceSpecsStructured($device)
 
         .device-cell-modal:hover {
             background-color: #e26565ff !important;
-            border-color: #8D6E63;
+            border-color: #1B2035;
             transform: translateY(-2px);
             box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
             color: black;
@@ -1532,7 +1532,7 @@ function formatDeviceSpecsStructured($device)
 
         .device-cell-modal:focus {
             outline: none;
-            box-shadow: 0 0 0 3px rgba(141, 110, 99, 0.25);
+            box-shadow: 0 0 0 3px #1B2035;
         }
 
         #devicesModal .modal-dialog-scrollable {
@@ -1696,10 +1696,10 @@ function formatDeviceSpecsStructured($device)
         </div>
 
         <!-- Specs Toggle Control -->
-        <div style="display: flex; align-items: center; gap: 15px; margin-bottom: 20px; padding: 15px; background: #f9f9f9; border-radius: 8px; border-left: 4px solid #8D6E63;">
+        <div style="display: flex; align-items: center; gap: 15px; margin-bottom: 20px; padding: 15px; background: #f9f9f9; border-radius: 8px; border-left: 4px solid #1B2035;">
             <span style="font-weight: 600; color: #333;">View Specs:</span>
             <div style="display: flex; gap: 10px;">
-                <button id="specs-all-btn" class="specs-toggle-btn specs-toggle-active" onclick="toggleSpecsView('all')" style="padding: 8px 16px; border: 1px solid #8D6E63; background: #8D6E63; color: white; border-radius: 4px; cursor: pointer; font-weight: 600; transition: all 0.3s;">
+                <button id="specs-all-btn" class="specs-toggle-btn specs-toggle-active" onclick="toggleSpecsView('all')" style="padding: 8px 16px; border: 1px solid #1B2035; background: #1B2035; color: white; border-radius: 4px; cursor: pointer; font-weight: 600; transition: all 0.3s;">
                     All Specs
                 </button>
                 <button id="specs-diff-btn" class="specs-toggle-btn" onclick="toggleSpecsView('differences')" style="padding: 8px 16px; border: 1px solid #ccc; background: #fff; color: #333; border-radius: 4px; cursor: pointer; font-weight: 600; transition: all 0.3s;">
@@ -2075,8 +2075,8 @@ function formatDeviceSpecsStructured($device)
     <!-- Brands Modal -->
     <div class="modal fade" id="brandsModal" tabindex="-1" aria-labelledby="brandsModalLabel" aria-hidden="true">
         <div class="modal-dialog modal-lg modal-dialog-centered modal-dialog-scrollable">
-            <div class="modal-content" style="background-color: #EFEBE9; border: 2px solid #8D6E63;">
-                <div class="modal-header" style="border-bottom: 1px solid #8D6E63; background-color: #D7CCC8;">
+            <div class="modal-content" style="background-color: #EFEBE9; border: 2px solid #1B2035;">
+                <div class="modal-header" style="border-bottom: 1px solid #1B2035; background-color: #D7CCC8;">
                     <h5 class="modal-title" id="brandsModalLabel" style="font-family:system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue'; color: #5D4037;">
                         <i class="fas fa-industry me-2"></i>All Brands
                     </h5>
@@ -2109,8 +2109,8 @@ function formatDeviceSpecsStructured($device)
     <!-- Devices Modal (Phones by Brand) -->
     <div class="modal fade" id="devicesModal" tabindex="-1" aria-labelledby="deviceModalLabel" aria-hidden="true">
         <div class="modal-dialog modal-lg modal-dialog-centered modal-dialog-scrollable">
-            <div class="modal-content" style="background-color: #EFEBE9; border: 2px solid #8D6E63;">
-                <div class="modal-header" style="border-bottom: 1px solid #8D6E63; background-color: #D7CCC8;">
+            <div class="modal-content" style="background-color: #EFEBE9; border: 2px solid #1B2035;">
+                <div class="modal-header" style="border-bottom: 1px solid #1B2035; background-color: #D7CCC8;">
                     <h5 class="modal-title" id="deviceModalTitle" style="font-family:system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue'; color: #5D4037;">
                         Devices
                     </h5>
@@ -2498,8 +2498,8 @@ function formatDeviceSpecsStructured($device)
                 comparisonWrapper.classList.remove('specs-view-differences');
                 comparisonWrapper.classList.add('specs-view-all');
                 
-                allBtn.style.background = '#8D6E63';
-                allBtn.style.border = '1px solid #8D6E63';
+                allBtn.style.background = '#1B2035';
+                allBtn.style.border = '1px solid #1B2035';
                 allBtn.style.color = 'white';
                 allBtn.classList.add('specs-toggle-active');
                 
@@ -2512,8 +2512,8 @@ function formatDeviceSpecsStructured($device)
                 comparisonWrapper.classList.remove('specs-view-all');
                 comparisonWrapper.classList.add('specs-view-differences');
                 
-                diffBtn.style.background = '#8D6E63';
-                diffBtn.style.border = '1px solid #8D6E63';
+                diffBtn.style.background = '#1B2035';
+                diffBtn.style.border = '1px solid #1B2035';
                 diffBtn.style.color = 'white';
                 diffBtn.classList.add('specs-toggle-active');
                 

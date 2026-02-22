@@ -196,10 +196,10 @@ $allBrandsModal = $all_brands_stmt->fetchAll();
     <link rel="icon" type="image/png" sizes="512x512" href="<?php echo $base; ?>imges/icon-256.png">
 
     <!-- Theme Color (Browser Chrome & Address Bar) -->
-    <meta name="theme-color" content="#8D6E63">
+    <meta name="theme-color" content="#1B2035">
 
     <!-- Windows Tile Icon -->
-    <meta name="msapplication-TileColor" content="#8D6E63">
+    <meta name="msapplication-TileColor" content="#1B2035">
     <meta name="msapplication-TileImage" content="<?php echo $base; ?>imges/icon-256.png">
 
     <!-- Open Graph Meta Tags (Social Media Sharing) -->
@@ -401,7 +401,7 @@ $allBrandsModal = $all_brands_stmt->fetchAll();
 
         .brand-cell-modal:hover {
             background-color: #D7CCC8 !important;
-            border-color: #8D6E63;
+            border-color: #1B2035;
             transform: translateY(-2px);
             box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
             color: #3E2723;
@@ -434,7 +434,7 @@ $allBrandsModal = $all_brands_stmt->fetchAll();
 
         .device-cell-modal:hover {
             background-color: #D7CCC8 !important;
-            border-color: #8D6E63;
+            border-color: #1B2035;
             transform: translateY(-2px);
             box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
             color: #3E2723;
@@ -607,8 +607,8 @@ $allBrandsModal = $all_brands_stmt->fetchAll();
     <!-- Brands Modal -->
     <div class="modal fade" id="brandsModal" tabindex="-1" aria-labelledby="brandsModalLabel" aria-hidden="true">
         <div class="modal-dialog modal-lg modal-dialog-centered modal-dialog-scrollable">
-            <div class="modal-content" style="background-color: #EFEBE9; border: 2px solid #8D6E63;">
-                <div class="modal-header" style="border-bottom: 1px solid #8D6E63; background-color: #D7CCC8;">
+            <div class="modal-content" style="background-color: #EFEBE9; border: 2px solid #1B2035;">
+                <div class="modal-header" style="border-bottom: 1px solid #1B2035; background-color: #D7CCC8;">
                     <h5 class="modal-title" id="brandsModalLabel" style="font-family:system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue'; color: #5D4037;">
                         <i class="fas fa-industry me-2"></i>All Brands
                     </h5>
@@ -641,8 +641,8 @@ $allBrandsModal = $all_brands_stmt->fetchAll();
     <!-- Devices Modal (Phones by Brand) -->
     <div class="modal fade" id="devicesModal" tabindex="-1" aria-labelledby="deviceModalLabel" aria-hidden="true">
         <div class="modal-dialog modal-lg modal-dialog-centered modal-dialog-scrollable">
-            <div class="modal-content" style="background-color: #EFEBE9; border: 2px solid #8D6E63;">
-                <div class="modal-header" style="border-bottom: 1px solid #8D6E63; background-color: #D7CCC8;">
+            <div class="modal-content" style="background-color: #EFEBE9; border: 2px solid #1B2035;">
+                <div class="modal-header" style="border-bottom: 1px solid #1B2035; background-color: #D7CCC8;">
                     <h5 class="modal-title" id="deviceModalTitle" style="font-family:system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue'; color: #5D4037;">
                         Devices
                     </h5>
