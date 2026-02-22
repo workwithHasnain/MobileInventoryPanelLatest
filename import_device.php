@@ -590,35 +590,46 @@ function handleSqlImport()
         $sql = preg_replace("/ARRAY\[.*?\]::TEXT\[\]/s", $newArray, $sql);
     }
 
+    // Extract slugs from INSERT statements before execution
+    $slugsToAdd = [];
+    $statements = splitSqlStatements($sql);
+    foreach ($statements as $stmt) {
+        if (empty($stmt) || !preg_match('/^INSERT\s+INTO\s+phones/i', $stmt)) {
+            continue;
+        }
+
+        // Extract slug value from INSERT statement
+        // Pattern: slug, 'value' or slug, "value" or slug, $1, etc.
+        if (preg_match("/slug\s*,\s*'([^']*)'/i", $stmt, $matches)) {
+            $slug = $matches[1];
+            if (!empty($slug)) {
+                $slugsToAdd[] = $slug;
+            }
+        } elseif (preg_match("/slug\s*,\s*\"([^\"]*)\"/i", $stmt, $matches)) {
+            $slug = $matches[1];
+            if (!empty($slug)) {
+                $slugsToAdd[] = $slug;
+            }
+        }
+    }
+
     try {
         $pdo = getConnection();
-        
-        // Track devices before import
-        $stmtBefore = $pdo->prepare("SELECT COALESCE(MAX(id), 0) as max_id FROM phones");
-        $stmtBefore->execute();
-        $maxIdBefore = $stmtBefore->fetch(PDO::FETCH_ASSOC)['max_id'];
-        
         $pdo->beginTransaction();
         $pdo->exec($sql);
         $pdo->commit();
-        
-        // Get newly created devices and add them to sitemap
-        $stmtAfter = $pdo->prepare("SELECT id, slug FROM phones WHERE id > ? AND slug IS NOT NULL ORDER BY id");
-        $stmtAfter->execute([$maxIdBefore]);
-        $newDevices = $stmtAfter->fetchAll(PDO::FETCH_ASSOC);
-        
-        foreach ($newDevices as $device) {
-            if (!empty($device['slug'])) {
-                addDeviceToSitemap($device['slug'], date('Y-m-d'));
-            }
+
+        // Add extracted slugs to sitemap
+        foreach ($slugsToAdd as $slug) {
+            addDeviceToSitemap($slug, date('Y-m-d'));
         }
-        
+
         $message = 'SQL executed successfully! Device imported.';
         if (!empty($uploaded_paths)) {
             $message .= ' ' . count($uploaded_paths) . ' image(s) uploaded.';
         }
-        if (!empty($newDevices)) {
-            $message .= ' ' . count($newDevices) . ' device(s) added to sitemap.';
+        if (!empty($slugsToAdd)) {
+            $message .= ' ' . count($slugsToAdd) . ' device(s) added to sitemap.';
         }
         $messageType = 'success';
     } catch (Exception $e) {
