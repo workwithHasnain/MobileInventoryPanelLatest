@@ -1324,9 +1324,9 @@ if ($_POST && isset($_POST['action'])) {
                         });
 
                         // Redirect to comparison page using slugs (preferred) or IDs (fallback)
-                        const compareUrl = device1Slug && device2Slug 
-                            ? `/compare/${device1Slug}-vs-${device2Slug}`
-                            : `/compare/${device1Id}-vs-${device2Id}`;
+                        const compareUrl = device1Slug && device2Slug ?
+                            `/compare/${device1Slug}-vs-${device2Slug}` :
+                            `/compare/${device1Id}-vs-${device2Id}`;
                         window.location.href = compareUrl;
                     }
                 });
