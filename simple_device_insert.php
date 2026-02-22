@@ -2,6 +2,7 @@
 error_reporting(E_ALL);
 ini_set('display_errors', 1);
 require_once 'database_functions.php';
+require_once 'sitemap_management.php';
 
 /**
  * Simple function to insert a new device into the database
@@ -137,6 +138,11 @@ function simpleAddDevice($phone)
         $result = $stmt->execute($params);
 
         if ($result) {
+            // Add device to sitemap if slug is provided
+            $slug = $phone['slug'] ?? null;
+            if (!empty($slug)) {
+                addDeviceToSitemap($slug, date('Y-m-d'));
+            }
             return true;
         } else {
             $errorInfo = $stmt->errorInfo();

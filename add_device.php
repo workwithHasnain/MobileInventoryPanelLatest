@@ -7,6 +7,7 @@ require_once 'phone_data.php'; // Keep for getAllPhones function
 require_once 'brand_data.php';
 require_once 'simple_device_insert.php'; // Add our new simple insertion script
 require_once 'image_compression.php'; // Add image compression function
+require_once 'sitemap_management.php'; // Add sitemap management functions
 
 // Require login for this page
 requireLogin();
@@ -195,6 +196,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             // Set error from simpleAddDevice function
             $errors['general'] = $result['error'];
         } else if ($result === true) {
+            // Device added successfully, add it to sitemap
+            addDeviceToSitemap($slug, date('Y-m-d'));
+
             // Set success message and redirect to dashboard
             $_SESSION['success_message'] = 'Device added successfully!';
             header('Location: dashboard.php');

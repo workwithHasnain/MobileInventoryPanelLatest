@@ -2,6 +2,7 @@
 error_reporting(E_ALL);
 ini_set('display_errors', 1);
 require_once 'database_functions.php';
+require_once 'sitemap_management.php';
 
 /**
  * Simple function to update an existing device in the database
@@ -172,6 +173,18 @@ function simpleUpdateDevice($id, $phone)
         $result = $stmt->execute($params);
 
         if ($result) {
+            // Handle sitemap updates if device needs sitemap management
+            $old_slug = $existing['slug'] ?? '';
+            $new_slug = $params[':slug'] ?? '';
+            if (!empty($new_slug)) {
+                if (!empty($old_slug) && $old_slug !== $new_slug) {
+                    // Slug changed - update the URL in sitemap
+                    updateDeviceInSitemap($old_slug, $new_slug, date('Y-m-d'));
+                } else {
+                    // No slug change - just update lastmod date
+                    updateDeviceLastmodInSitemap($new_slug, date('Y-m-d'));
+                }
+            }
             return true;
         } else {
             $errorInfo = $stmt->errorInfo();

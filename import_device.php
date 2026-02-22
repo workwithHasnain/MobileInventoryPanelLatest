@@ -28,6 +28,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'OPTIONS') {
 require_once __DIR__ . '/config.php';
 require_once __DIR__ . '/database_functions.php';
 require_once __DIR__ . '/simple_device_insert.php';
+require_once __DIR__ . '/sitemap_management.php';
 
 // ====================================================================
 // Configuration
@@ -206,6 +207,10 @@ function handleJsonImport($apiKey)
     $result = simpleAddDevice($phone);
 
     if ($result === true) {
+        // simpleAddDevice already adds to sitemap, but ensure it's there
+        if (!empty($slug)) {
+            addDeviceToSitemap($slug, date('Y-m-d'));
+        }
         echo json_encode([
             'success' => true,
             'message' => "Device '{$brand} {$name}' imported successfully!",
@@ -387,6 +392,10 @@ function handleMultipartImport($apiKey)
     $result = simpleAddDevice($phone);
 
     if ($result === true) {
+        // simpleAddDevice already adds to sitemap, but ensure it's there
+        if (!empty($slug)) {
+            addDeviceToSitemap($slug, date('Y-m-d'));
+        }
         echo json_encode([
             'success' => true,
             'message' => "Device '{$brand} {$name}' imported with " . count($image_paths) . " image(s) uploaded!",
@@ -583,12 +592,33 @@ function handleSqlImport()
 
     try {
         $pdo = getConnection();
+        
+        // Track devices before import
+        $stmtBefore = $pdo->prepare("SELECT COALESCE(MAX(id), 0) as max_id FROM phones");
+        $stmtBefore->execute();
+        $maxIdBefore = $stmtBefore->fetch(PDO::FETCH_ASSOC)['max_id'];
+        
         $pdo->beginTransaction();
         $pdo->exec($sql);
         $pdo->commit();
+        
+        // Get newly created devices and add them to sitemap
+        $stmtAfter = $pdo->prepare("SELECT id, slug FROM phones WHERE id > ? AND slug IS NOT NULL ORDER BY id");
+        $stmtAfter->execute([$maxIdBefore]);
+        $newDevices = $stmtAfter->fetchAll(PDO::FETCH_ASSOC);
+        
+        foreach ($newDevices as $device) {
+            if (!empty($device['slug'])) {
+                addDeviceToSitemap($device['slug'], date('Y-m-d'));
+            }
+        }
+        
         $message = 'SQL executed successfully! Device imported.';
         if (!empty($uploaded_paths)) {
             $message .= ' ' . count($uploaded_paths) . ' image(s) uploaded.';
+        }
+        if (!empty($newDevices)) {
+            $message .= ' ' . count($newDevices) . ' device(s) added to sitemap.';
         }
         $messageType = 'success';
     } catch (Exception $e) {

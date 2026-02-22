@@ -7,6 +7,7 @@ require_once 'phone_data.php'; // Keep for getAllPhones function
 require_once 'brand_data.php';
 require_once 'simple_device_update.php';
 require_once 'image_compression.php'; // Add image compression function
+require_once 'sitemap_management.php'; // Add sitemap management functions
 // Note: This page is for editing an existing device; insertion/update wiring will be added later.
 
 // Require login for this page
@@ -251,10 +252,25 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $updated_phone['image'] = !empty($finalImages) ? $finalImages[0] : null;
         $updated_phone['images'] = $finalImages;
 
+        // Store old slug before update for sitemap management
+        $old_slug = $device['slug'] ?? '';
+        $new_slug = $updated_phone['slug'] ?? '';
+
         $result = simpleUpdateDevice($id, $updated_phone);
         if (is_array($result) && isset($result['error'])) {
             $errors['general'] = $result['error'];
         } elseif ($result === true) {
+            // Device updated successfully, handle sitemap updates
+            if (!empty($new_slug)) {
+                if (!empty($old_slug) && $old_slug !== $new_slug) {
+                    // Slug changed - update in sitemap
+                    updateDeviceInSitemap($old_slug, $new_slug, date('Y-m-d'));
+                } else {
+                    // Slug unchanged - just update lastmod date
+                    updateDeviceLastmodInSitemap($new_slug, date('Y-m-d'));
+                }
+            }
+
             $_SESSION['success_message'] = 'Device updated successfully!';
             header('Location: device.php?id=' . $id);
             exit();
