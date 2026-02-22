@@ -565,7 +565,7 @@ function getPhoneImage($phone)
         return htmlspecialchars($image);
     }
     // Default fallback image
-    return '/imges/phone-placeholder.png';
+    return '/imges/icon-256.png';
 }
 
 // Helper function to get phone name with brand
@@ -963,10 +963,6 @@ function formatDeviceSpecsStructured($device)
     <!-- Font Awesome (for icons) -->
     <script src="https://kit.fontawesome.com/your-kit-code.js" crossorigin="anonymous"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" />
-
-    <!-- Select2 for searchable dropdowns -->
-    <link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
-    <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
 
     <link rel="stylesheet" href="<?php echo $base; ?>style.css">
 
@@ -1376,118 +1372,105 @@ function formatDeviceSpecsStructured($device)
             }
         }
 
-        /* Prevent body overflow when Select2 is open */
-        body.select2-dropdown-open {
-            overflow: hidden !important;
+        /* Phone Search Input Styling */
+        .compare-label {
+            font-size: 11px;
+            font-weight: 700;
+            color: #888;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            display: block;
+            margin-bottom: 4px;
         }
 
-        /* Prevent body overflow when Select2 is open */
-        body.select2-dropdown-open {
-            overflow: hidden !important;
+        .phone-search-wrapper {
+            position: relative;
+            width: 100%;
         }
 
-        /* Select2 Custom Styling for Phone Comparison */
-        .select2-container {
-            width: 100% !important;
-            max-width: 100% !important;
-        }
-
-        .select2-container .select2-selection--single {
-            height: auto !important;
-            min-height: 38px;
-            /* border: 1px solid #ced4da; */
+        .phone-search-input {
+            width: 100%;
+            padding: 7px 12px;
+            border: 1px solid #ccc;
             border-radius: 4px;
+            font-size: 14px;
+            font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue';
             background-color: #fff;
+            box-sizing: border-box;
+            outline: none;
+            transition: border-color 0.15s ease;
         }
 
-        .select2-container .select2-selection--single .select2-selection__rendered {
-            padding: 6px 42px 6px 12px;
-            line-height: 1.5;
-            font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue';
-            overflow: hidden;
-            text-overflow: ellipsis;
-            white-space: nowrap;
+        .phone-search-input:focus {
+            border-color: #8D6E63;
+            box-shadow: 0 0 0 2px rgba(141,110,99,0.15);
         }
 
-        .select2-container--default .select2-selection--single .select2-selection__arrow {
+        .phone-search-results {
+            display: none;
             position: absolute;
-            top: 50%;
-            transform: translateY(-50%);
-            right: 12px;
-            width: 20px;
-            height: 20px;
+            top: 100%;
+            left: 0;
+            right: 0;
+            background: #fff;
+            border: 1px solid #ccc;
+            border-top: none;
+            border-radius: 0 0 4px 4px;
+            max-height: 280px;
+            overflow-y: auto;
+            z-index: 9999;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.12);
+        }
+
+        .phone-search-results.active {
+            display: block;
+        }
+
+        .phone-search-result-item {
             display: flex;
             align-items: center;
-            justify-content: center;
-        }
-
-        .select2-container--default .select2-selection--single .select2-selection__arrow b {
-            top: 50% !important;
-            transform: translateY(-50%) !important;
-        }
-
-        /* Dropdown styling */
-        .select2-dropdown {
-            border: 1px solid black;
-            border-radius: 4px;
-            /* background-color: #EFEBE9; */
-            max-width: 100% !important;
-        }
-
-        .select2-container--default .select2-results__option {
+            gap: 10px;
             padding: 8px 12px;
-            font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue';
+            cursor: pointer;
+            border-bottom: 1px solid #f0f0f0;
+            transition: background 0.1s;
         }
 
-        .select2-container--default .select2-results__option--highlighted[aria-selected] {
-            background-color: #dadadaff !important;
-            color: black;
+        .phone-search-result-item:last-child {
+            border-bottom: none;
         }
 
-        .select2-container--default .select2-results__option[aria-selected=true] {
-            background-color: #b6b6b6ff !important;
+        .phone-search-result-item:hover,
+        .phone-search-result-item.highlighted {
+            background-color: #f5f0ef;
         }
 
-        /* Custom option template with image */
-        .select2-phone-option {
-            display: flex;
-            align-items: center;
-            gap: 12px;
-            overflow: hidden;
-        }
-
-        .select2-phone-option img {
-            width: 40px;
-            height: 40px;
+        .phone-search-result-item img {
+            width: 38px;
+            height: 38px;
             object-fit: contain;
             flex-shrink: 0;
         }
 
-        .select2-phone-option-text {
-            flex: 1;
-            overflow: hidden;
-            word-wrap: break-word;
-            white-space: normal;
+        .phone-search-result-item span {
+            font-size: 13px;
             line-height: 1.4;
-            font-size: 10px;
+            word-break: break-word;
+            white-space: normal;
+            color: #333;
         }
 
-        /* Search box styling */
-        .select2-search--dropdown .select2-search__field {
-            border: 1px solid black;
-            border-radius: 4px;
-            padding: 6px 12px;
+        .phone-search-no-results {
+            padding: 12px;
+            color: #999;
+            font-size: 13px;
+            text-align: center;
         }
 
-        /* Ensure dropdown doesn't overflow container */
+        /* Ensure dropdown doesn't clip */
         .compare-checkbox {
             position: relative;
             overflow: visible !important;
-        }
-
-        .compare-checkbox .select2-container {
-            display: block;
-            width: 100% !important;
         }
 
         /* Brand Modal Styling */
@@ -1611,17 +1594,11 @@ function formatDeviceSpecsStructured($device)
             <div class="row">
                 <div class="phone-card col-lg-4" style="display: flex; flex-direction: column; justify-content: space-between;">
                     <div class="compare-checkbox">
-                        <label>
-                            Compare
-                            <select id="phone1-select" name="phone1" class="phone-select-dropdown" data-phone-number="1">
-                                <option value="">Select Phone 1</option>
-                                <?php foreach ($phones as $phone): ?>
-                                    <option value="<?php echo $phone['slug']; ?>" data-image="<?php echo htmlspecialchars(getPhoneImage($phone)); ?>" data-name="<?php echo htmlspecialchars(getPhoneName($phone)); ?>" <?php echo ($phone1 && $phone1['slug'] == $phone['slug']) ? 'selected' : ''; ?>>
-                                        <?php echo getPhoneName($phone); ?>
-                                    </option>
-                                <?php endforeach; ?>
-                            </select>
-                        </label>
+                        <label class="compare-label">Compare With</label>
+                        <div class="phone-search-wrapper">
+                            <input type="text" id="phone1-search" class="phone-search-input" placeholder="Search" data-phone-number="1" autocomplete="off">
+                            <div id="phone1-results" class="phone-search-results"></div>
+                        </div>
                     </div>
                     <?php if ($phone1): ?>
                         <div class="phone-name" style="flex-grow: 1;"><?php echo getPhoneName($phone1); ?></div>
@@ -1649,17 +1626,11 @@ function formatDeviceSpecsStructured($device)
                 </div>
                 <div class="phone-card col-lg-4" style="display: flex; flex-direction: column; justify-content: space-between;">
                     <div class="compare-checkbox">
-                        <label>
-                            Compare
-                            <select id="phone2-select" name="phone2" class="phone-select-dropdown" data-phone-number="2">
-                                <option value="">Select Phone 2</option>
-                                <?php foreach ($phones as $phone): ?>
-                                    <option value="<?php echo $phone['slug']; ?>" data-image="<?php echo htmlspecialchars(getPhoneImage($phone)); ?>" data-name="<?php echo htmlspecialchars(getPhoneName($phone)); ?>" <?php echo ($phone2 && $phone2['slug'] == $phone['slug']) ? 'selected' : ''; ?>>
-                                        <?php echo getPhoneName($phone); ?>
-                                    </option>
-                                <?php endforeach; ?>
-                            </select>
-                        </label>
+                        <label class="compare-label">Compare With</label>
+                        <div class="phone-search-wrapper">
+                            <input type="text" id="phone2-search" class="phone-search-input" placeholder="Search" data-phone-number="2" autocomplete="off">
+                            <div id="phone2-results" class="phone-search-results"></div>
+                        </div>
                     </div>
                     <?php if ($phone2): ?>
                         <div class="phone-name" style="flex-grow: 1;"><?php echo getPhoneName($phone2); ?></div>
@@ -1689,17 +1660,11 @@ function formatDeviceSpecsStructured($device)
                 </div>
                 <div class="phone-card col-lg-4" style="display: flex; flex-direction: column; justify-content: space-between;">
                     <div class="compare-checkbox">
-                        <label>
-                            Compare
-                            <select id="phone3-select" name="phone3" class="phone-select-dropdown" data-phone-number="3">
-                                <option value="">Select Phone 3</option>
-                                <?php foreach ($phones as $phone): ?>
-                                    <option value="<?php echo $phone['slug']; ?>" data-image="<?php echo htmlspecialchars(getPhoneImage($phone)); ?>" data-name="<?php echo htmlspecialchars(getPhoneName($phone)); ?>" <?php echo ($phone3 && $phone3['slug'] == $phone['slug']) ? 'selected' : ''; ?>>
-                                        <?php echo getPhoneName($phone); ?>
-                                    </option>
-                                <?php endforeach; ?>
-                            </select>
-                        </label>
+                        <label class="compare-label">Compare With</label>
+                        <div class="phone-search-wrapper">
+                            <input type="text" id="phone3-search" class="phone-search-input" placeholder="Search" data-phone-number="3" autocomplete="off">
+                            <div id="phone3-results" class="phone-search-results"></div>
+                        </div>
                     </div>
                     <?php if ($phone3): ?>
                         <div class="phone-name" style="flex-grow: 1;"><?php echo getPhoneName($phone3); ?></div>
@@ -2068,96 +2033,134 @@ function formatDeviceSpecsStructured($device)
     </div>
     <script src="<?php echo $base; ?>script.js"></script>
     <script>
-        // Initialize Select2 immediately to prevent flash of default select
-        (function() {
-            // Custom template function for displaying options with images
-            function formatPhoneOption(option) {
-                if (!option.id) {
-                    return option.text;
+        // Phone search data - built from PHP phones data
+        const phonesList = <?php
+        global $base;
+        echo json_encode(array_map(function($phone) use ($base) {
+            // Build image path using $base for local uploads
+            $img = '/imges/icon-256.png';
+            if (!empty($phone['image'])) {
+                $raw = $phone['image'];
+                if (filter_var($raw, FILTER_VALIDATE_URL)) {
+                    $img = $raw; // absolute external URL
+                } elseif (strpos($raw, '/') === 0) {
+                    $img = $raw; // already absolute path
+                } else {
+                    $img = rtrim($base, '/') . '/' . ltrim($raw, '/'); // prepend base
                 }
-
-                var $option = $(option.element);
-                var imageUrl = $option.data('image');
-                var phoneName = $option.data('name') || option.text;
-
-                if (!imageUrl) {
-                    return $('<span>' + phoneName + '</span>');
-                }
-
-                var $container = $(
-                    '<div class="select2-phone-option">' +
-                    '<img src="' + imageUrl + '" onerror="this.style.display=\'none\'" />' +
-                    '<span class="select2-phone-option-text">' + phoneName + '</span>' +
-                    '</div>'
-                );
-
-                return $container;
             }
+            // Name with brand for dropdown display
+            $nameOnly = trim((isset($phone['brand_name']) ? $phone['brand_name'] . ' ' : '') . (isset($phone['name']) ? $phone['name'] : ''));
+            $nameOnly = !empty($nameOnly) ? htmlspecialchars($nameOnly) : 'Unknown Device';
+            return [
+                'slug'  => $phone['slug'],
+                'name'  => $nameOnly,
+                'image' => $img
+            ];
+        }, $phones), JSON_HEX_TAG | JSON_HEX_APOS | JSON_HEX_AMP | JSON_UNESCAPED_UNICODE);
+        ?>;
 
-            // Custom template for selected option (simpler, no image in selection box)
-            function formatPhoneSelection(option) {
-                if (!option.id) {
-                    return option.text;
-                }
-                var $option = $(option.element);
-                var phoneName = $option.data('name') || option.text;
-                return phoneName;
-            }
-
-            // Wait for DOM and Select2 to be ready
-            if (typeof jQuery !== 'undefined' && typeof jQuery.fn.select2 !== 'undefined') {
-                jQuery(document).ready(function($) {
-                    // Initialize all three phone dropdowns
-                    $('.phone-select-dropdown').each(function() {
-                        var $select = $(this);
-                        var phoneNumber = $select.data('phone-number');
-
-                        $select.select2({
-                            placeholder: 'Select Phone ' + phoneNumber,
-                            allowClear: false,
-                            width: '100%',
-                            dropdownAutoWidth: false,
-                            dropdownParent: $('body'),
-                            templateResult: formatPhoneOption,
-                            templateSelection: formatPhoneSelection,
-                            matcher: function(params, data) {
-                                // If there are no search terms, return all data
-                                if ($.trim(params.term) === '') {
-                                    return data;
-                                }
-
-                                // Custom search: search in phone name
-                                var $option = $(data.element);
-                                var phoneName = ($option.data('name') || data.text || '').toLowerCase();
-                                var searchTerm = params.term.toLowerCase();
-
-                                if (phoneName.indexOf(searchTerm) > -1) {
-                                    return data;
-                                }
-
-                                return null;
-                            }
-                        });
-
-                        // Handle change event
-                        $select.on('select2:select select2:clear', function(e) {
-                            var phoneId = $(this).val() || '';
-                            updateComparison(phoneNumber, phoneId);
-                        });
-
-                        // Add body class when dropdown opens to prevent overflow
-                        $select.on('select2:open', function(e) {
-                            $('body').addClass('select2-dropdown-open');
-                        });
-
-                        // Remove body class when dropdown closes
-                        $select.on('select2:close', function(e) {
-                            $('body').removeClass('select2-dropdown-open');
-                        });
-                    });
+        // Initialize phone search functionality
+        document.addEventListener('DOMContentLoaded', function() {
+            // Populate search inputs if phones are already selected
+            <?php if ($phone1): ?>
+                document.getElementById('phone1-search').value = '<?php echo addslashes(getPhoneName($phone1)); ?>';
+            <?php endif; ?>
+            <?php if ($phone2): ?>
+                document.getElementById('phone2-search').value = '<?php echo addslashes(getPhoneName($phone2)); ?>';
+            <?php endif; ?>
+            <?php if ($phone3): ?>
+                document.getElementById('phone3-search').value = '<?php echo addslashes(getPhoneName($phone3)); ?>';
+            <?php endif; ?>
+            
+            // Set up search inputs for all three phones
+            const searchInputs = document.querySelectorAll('.phone-search-input');
+            
+            searchInputs.forEach(input => {
+                const phoneNumber = input.getAttribute('data-phone-number');
+                const resultsContainer = document.getElementById(`phone${phoneNumber}-results`);
+                
+                // Show results on focus
+                input.addEventListener('focus', function() {
+                    if (phonesList.length > 0) {
+                        displaySearchResults(phonesList, input, resultsContainer, phoneNumber);
+                        resultsContainer.style.display = 'block';
+                    }
                 });
+                
+                // Filter results on input
+                input.addEventListener('input', function() {
+                    const searchTerm = this.value.toLowerCase();
+                    let filteredPhones = phonesList;
+                    
+                    if (searchTerm.trim()) {
+                        filteredPhones = phonesList.filter(phone => 
+                            phone.name.toLowerCase().includes(searchTerm)
+                        );
+                    }
+                    
+                    displaySearchResults(filteredPhones, input, resultsContainer, phoneNumber);
+                    resultsContainer.style.display = filteredPhones.length > 0 ? 'block' : 'none';
+                });
+                
+                // Hide results on blur
+                input.addEventListener('blur', function() {
+                    setTimeout(() => {
+                        resultsContainer.style.display = 'none';
+                    }, 200);
+                });
+            });
+            
+            // Close results when clicking outside
+            document.addEventListener('click', function(e) {
+                if (!e.target.closest('.compare-checkbox')) {
+                    document.querySelectorAll('.phone-search-results').forEach(el => {
+                        el.style.display = 'none';
+                    });
+                }
+            });
+        });
+        
+        function displaySearchResults(phones, searchInput, resultsContainer, phoneNumber) {
+            if (phones.length === 0) {
+                resultsContainer.innerHTML = '<div style="padding: 12px; text-align: center; color: #999;">No phones found</div>';
+                return;
             }
-        })();
+            
+            let html = '';
+            phones.forEach(phone => {
+                html += `
+                    <div class="phone-result-item" onclick="selectPhone('${phone.slug}', '${phoneNumber}', '${phone.name.replace(/'/g, "\\'")}');" style="display: flex; align-items: center; padding: 8px 12px; cursor: pointer; border-bottom: 1px solid #f0f0f0; transition: background-color 0.2s;">
+                        <img src="${phone.image}" alt="${phone.name}" style="width: 40px; height: 50px; object-fit: contain; margin-right: 10px; flex-shrink: 0;" onerror="this.onerror=null;this.src='/imges/icon-256.png'">
+                        <span style="font-size: 14px; color: #333;">${phone.name}</span>
+                    </div>
+                `;
+            });
+            
+            resultsContainer.innerHTML = html;
+            
+            // Add hover effect
+            resultsContainer.querySelectorAll('.phone-result-item').forEach(item => {
+                item.addEventListener('mouseover', function() {
+                    this.style.backgroundColor = '#f5f5f5';
+                });
+                item.addEventListener('mouseout', function() {
+                    this.style.backgroundColor = 'transparent';
+                });
+            });
+        }
+        
+        function selectPhone(slug, phoneNumber, phoneName) {
+            const searchInput = document.getElementById(`phone${phoneNumber}-search`);
+            const resultsContainer = document.getElementById(`phone${phoneNumber}-results`);
+            
+            // Update search input with selected phone name
+            searchInput.value = phoneName;
+            resultsContainer.style.display = 'none';
+            
+            // Update comparison
+            updateComparison(phoneNumber, slug);
+        }
 
         document.addEventListener('DOMContentLoaded', function() {
             // Handle brand cell clicks (from sidebar and mobile menu - open devices modal directly)
@@ -2174,14 +2177,28 @@ function formatDeviceSpecsStructured($device)
         });
 
         function updateComparison(phoneNumber, phoneId) {
-            // Get all three selected phone slugs
-            const phone1 = document.getElementById('phone1-select')?.value || '';
-            const phone2 = document.getElementById('phone2-select')?.value || '';
-            const phone3 = document.getElementById('phone3-select')?.value || '';
+            // Get all three selected phone slugs from data attributes stored in search inputs
+            const phone1Input = document.getElementById('phone1-search');
+            const phone2Input = document.getElementById('phone2-search');
+            const phone3Input = document.getElementById('phone3-search');
+            
+            // Find the selected phone slug from the phones list
+            let phone1Slug = '';
+            let phone2Slug = '';
+            let phone3Slug = '';
+            
+            const getSlugFromName = (searchInputName) => {
+                const phone = phonesList.find(p => p.name === searchInputName);
+                return phone ? phone.slug : '';
+            };
+            
+            phone1Slug = getSlugFromName(phone1Input.value);
+            phone2Slug = getSlugFromName(phone2Input.value);
+            phone3Slug = getSlugFromName(phone3Input.value);
 
             // Build clean URL format: domain/compare/slug1-vs-slug2-vs-slug3
             // Only include selected phones in the URL
-            const slugs = [phone1, phone2, phone3].filter(slug => slug !== '');
+            const slugs = [phone1Slug, phone2Slug, phone3Slug].filter(slug => slug !== '');
 
             if (slugs.length > 0) {
                 const compareUrl = '/compare/' + slugs.join('-vs-');
@@ -2237,7 +2254,7 @@ function formatDeviceSpecsStructured($device)
                     if (imagePath && !imagePath.startsWith('/') && !imagePath.startsWith('http')) {
                         imagePath = '/' + imagePath;
                     }
-                    const phoneImage = imagePath ? `<img src="${imagePath}" alt="${phone.name}" style="width: 100%; height: 120px; object-fit: contain; margin-bottom: 8px;" onerror="this.style.display='none';">` : '';
+                    const phoneImage = imagePath ? `<img src="${imagePath}" alt="${phone.name}" style="width: 100%; max-width: 100%; height: 120px; object-fit: contain; margin-bottom: 8px; display: block;" onerror="this.style.display='none';">` : '';
                     html += `
           <div class="col-lg-4 col-md-6 col-sm-6 mb-3">
             <button class="device-cell-modal btn w-100 p-0" style="background-color: #fff; border: 1px solid #c5b6b0; color: #5D4037; font-weight: 500; transition: all 0.3s ease; cursor: pointer; display: flex; flex-direction: column; align-items: center; overflow: hidden;" onclick="goToDevice('${phone.slug || phone.id}')">
