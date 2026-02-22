@@ -2000,7 +2000,7 @@ if (!$filterConfig) {
                 return `
                 <div class="col-lg-3 col-md-4 col-sm-6 mb-4">
                     <div class="card h-100 shadow-sm">
-                        <a href="<?php echo $base; ?>device/${encodeURIComponent(device.slug || device.id)}" class="text-decoration-none">
+                        <a href="<?php echo $base; ?>device/${encodeURIComponent(device.slug)}" class="text-decoration-none">
                             <img src="${device.thumbnail}" class="card-img-top" alt="${device.name}" style="height: 200px; object-fit: contain; padding: 10px;">
                             <div class="card-body">
                                 <h6 class="card-title text-dark fw-bold">${device.name}</h6>

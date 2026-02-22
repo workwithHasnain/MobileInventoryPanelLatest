@@ -836,6 +836,7 @@ try {
 
         $results[] = [
             'id' => $device['id'],
+            'slug' => $device['slug'] ?? '',
             'name' => $device['name'],
             'brand' => $device['brand_name'],
             'thumbnail' => $thumbnail,
