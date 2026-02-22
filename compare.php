@@ -1825,35 +1825,24 @@ function formatDeviceSpecsStructured($device)
                     }
                 }
 
-                /* Styling for identical specs rows */
-                .comparison-table tr.specs-identical-row {
-                    background-color: #f5f5f5;
-                    opacity: 0.65;
+                /* Styling for identical specs cells */
+                .comparison-table td.specs-identical-cell {
+                    /* Default: show normally */
+                    background-color: transparent;
+                    opacity: 1;
                     transition: opacity 0.3s ease, background-color 0.3s ease;
                 }
 
-                .comparison-table tr.specs-identical-row td {
+                /* When showing only differences, grey out identical cells */
+                .specs-view-differences .comparison-table td.specs-identical-cell {
+                    background-color: #f5f5f5;
+                    opacity: 0.65;
                     color: #999;
                 }
 
-                .comparison-table tr.specs-identical-row .subtitle,
-                .comparison-table tr.specs-identical-row .description {
+                .specs-view-differences .comparison-table td.specs-identical-cell .subtitle,
+                .specs-view-differences .comparison-table td.specs-identical-cell .description {
                     color: #999;
-                }
-
-                /* When showing all specs, identical rows are normal */
-                .specs-view-all .comparison-table tr.specs-identical-row {
-                    background-color: transparent;
-                    opacity: 1;
-                }
-
-                .specs-view-all .comparison-table tr.specs-identical-row td {
-                    color: inherit;
-                }
-
-                .specs-view-all .comparison-table tr.specs-identical-row .subtitle,
-                .specs-view-all .comparison-table tr.specs-identical-row .description {
-                    color: inherit;
                 }
             </style>
             <table class="comparison-table">
@@ -1988,37 +1977,41 @@ function formatDeviceSpecsStructured($device)
 
                             // Render each field/description pair as a 2-column row per phone
                             for ($i = 0; $i < $maxRows; $i++) {
-                                // Check if specs are identical across all three phones
-                                $desc1 = isset($rows1[$i]) ? trim($rows1[$i]['description']) : 'N/A';
-                                $desc2 = isset($rows2[$i]) ? trim($rows2[$i]['description']) : 'N/A';
-                                $desc3 = isset($rows3[$i]) ? trim($rows3[$i]['description']) : 'N/A';
+                                // Get values for all three phones
+                                $val1 = isset($rows1[$i]) ? trim($rows1[$i]['description']) : 'N/A';
+                                $val2 = isset($rows2[$i]) ? trim($rows2[$i]['description']) : 'N/A';
+                                $val3 = isset($rows3[$i]) ? trim($rows3[$i]['description']) : 'N/A';
                                 
-                                $isIdentical = ($desc1 === $desc2 && $desc2 === $desc3);
+                                // Determine which cells match with others
+                                $cell1Matches = ($val1 === $val2 || $val1 === $val3) && $val1 !== 'N/A';
+                                $cell2Matches = ($val2 === $val1 || $val2 === $val3) && $val2 !== 'N/A';
+                                $cell3Matches = ($val3 === $val1 || $val3 === $val2) && $val3 !== 'N/A';
                                 
                                 $rowClass = ($section === 'NETWORK' && $i > 0) ? ' compare-network-row' : '';
-                                $rowClass .= $isIdentical ? ' specs-identical-row' : '';
-                                
                                 echo '<tr class="' . trim($rowClass) . '">';
 
                                 // Phone 1
+                                $cell1Class = $cell1Matches ? ' specs-identical-cell' : '';
                                 if (isset($rows1[$i])) {
-                                    echo '<td style="padding:12px 10px;vertical-align:top;"><div class="subt-desc-cont"><div class="subtitle">' . htmlspecialchars($rows1[$i]['field']) . '</div><div class="description">' . nl2br(htmlspecialchars($rows1[$i]['description'])) . '</div></div></td>';
+                                    echo '<td class="' . trim($cell1Class) . '" style="padding:12px 10px;vertical-align:top;"><div class="subt-desc-cont"><div class="subtitle">' . htmlspecialchars($rows1[$i]['field']) . '</div><div class="description">' . nl2br(htmlspecialchars($rows1[$i]['description'])) . '</div></div></td>';
                                 } else {
-                                    echo '<td style="padding:12px 10px;color:#999;">N/A</td>';
+                                    echo '<td class="' . trim($cell1Class) . '" style="padding:12px 10px;color:#999;">N/A</td>';
                                 }
 
                                 // Phone 2
+                                $cell2Class = $cell2Matches ? ' specs-identical-cell' : '';
                                 if (isset($rows2[$i])) {
-                                    echo '<td style="padding:12px 10px;vertical-align:top;"><div class="subt-desc-cont"><div class="subtitle">' . htmlspecialchars($rows2[$i]['field']) . '</div><div class="description">' . nl2br(htmlspecialchars($rows2[$i]['description'])) . '</div></div></td>';
+                                    echo '<td class="' . trim($cell2Class) . '" style="padding:12px 10px;vertical-align:top;"><div class="subt-desc-cont"><div class="subtitle">' . htmlspecialchars($rows2[$i]['field']) . '</div><div class="description">' . nl2br(htmlspecialchars($rows2[$i]['description'])) . '</div></div></td>';
                                 } else {
-                                    echo '<td style="padding:12px 10px;color:#999;">N/A</td>';
+                                    echo '<td class="' . trim($cell2Class) . '" style="padding:12px 10px;color:#999;">N/A</td>';
                                 }
 
                                 // Phone 3
+                                $cell3Class = $cell3Matches ? ' specs-identical-cell' : '';
                                 if (isset($rows3[$i])) {
-                                    echo '<td style="padding:12px 10px;vertical-align:top;"><div class="subt-desc-cont"><div class="subtitle">' . htmlspecialchars($rows3[$i]['field']) . '</div><div class="description">' . nl2br(htmlspecialchars($rows3[$i]['description'])) . '</div></div></td>';
+                                    echo '<td class="' . trim($cell3Class) . '" style="padding:12px 10px;vertical-align:top;"><div class="subt-desc-cont"><div class="subtitle">' . htmlspecialchars($rows3[$i]['field']) . '</div><div class="description">' . nl2br(htmlspecialchars($rows3[$i]['description'])) . '</div></div></td>';
                                 } else {
-                                    echo '<td style="padding:12px 10px;color:#999;">N/A</td>';
+                                    echo '<td class="' . trim($cell3Class) . '" style="padding:12px 10px;color:#999;">N/A</td>';
                                 }
 
                                 echo '</tr>';
