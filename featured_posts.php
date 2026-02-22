@@ -342,7 +342,7 @@ $popular_tags = array_slice($all_tags, 0, 10, true);
 
                                 <p class="card-text text-muted flex-grow-1">
                                     <?php
-                                    $content = $post['content'] ?? '';
+                                    $content = $post['content_body'] ?? '';
                                     $excerpt = !empty($post['excerpt']) ? $post['excerpt'] : (!empty($content) ? strip_tags($content) : '');
                                     echo htmlspecialchars(substr($excerpt, 0, 120)) . (strlen($excerpt) > 120 ? '...' : '');
                                     ?>

@@ -291,7 +291,7 @@ $allBrandsModal = $all_brands_stmt->fetchAll();
                             "@type": "BlogPosting",
                             "position": <?php echo $itemCount; ?>,
                             "headline": "<?php echo addslashes(htmlspecialchars($post['title'])); ?>",
-                            "description": "<?php echo addslashes(htmlspecialchars(isset($post['excerpt']) && !empty($post['excerpt']) ? substr($post['excerpt'], 0, 160) : substr(strip_tags($post['content']), 0, 160))); ?>",
+                            "description": "<?php echo addslashes(htmlspecialchars(isset($post['excerpt']) && !empty($post['excerpt']) ? substr($post['excerpt'], 0, 160) : substr(strip_tags($post['content_body'] ?? ''), 0, 160))); ?>",
                             "datePublished": "<?php echo date('Y-m-d', strtotime($post['created_at'])); ?>",
                             "image": "<?php echo isset($post['featured_image']) && !empty($post['featured_image']) ? getAbsoluteImagePath($post['featured_image'], 'https://www.devicesarena.com/') : 'https://www.devicesarena.com/imges/icon-256.png'; ?>",
                             "url": "https://www.devicesarena.com/post/<?php echo htmlspecialchars($post['slug']); ?>"
