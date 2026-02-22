@@ -793,7 +793,7 @@ $allBrandsModal = $all_brands_stmt->fetchAll();
                     if (imagePath && !imagePath.startsWith('/') && !imagePath.startsWith('http')) {
                         imagePath = '/' + imagePath;
                     }
-                    const phoneImage = imagePath ? `<img src="${imagePath}" alt="${phone.name}" style="width: 100%; max-width: 100%; height: 120px; object-fit: contain; margin-bottom: 8px; display: block;" onerror="this.style.display='none';">` : '';
+                    const phoneImage = imagePath ? `<img src="${imagePath}" alt="${phone.name}" style="width: 100%; max-width: 100%; height: 120px; object-fit: contain; margin: 8px; display: block;" onerror="this.style.display='none';">` : '';
                     html += `
           <div class="col-lg-4 col-md-6 col-sm-6 mb-3">
             <button class="device-cell-modal btn w-100 p-0" style="background-color: #fff; border: 1px solid #c5b6b0; color: #5D4037; font-weight: 500; transition: all 0.3s ease; cursor: pointer; display: flex; flex-direction: column; align-items: center; overflow: hidden;" onclick="goToDevice('${phone.slug || phone.id}')">
