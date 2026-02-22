@@ -102,7 +102,7 @@ if ($selectedBrandId) {
                         <a class="nav-link active" href="brands.php">Brands</a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link" href="compare.php">Compare Devices</a>
+                        <a class="nav-link" href="/compare">Compare Devices</a>
                     </li>
                     <li class="nav-item">
                         <a class="nav-link" href="phone_finder.php">Phone Finder</a>
@@ -217,7 +217,7 @@ if ($selectedBrandId) {
                     <a href="phone_finder.php" class="btn btn-success me-2">
                         <i class="fas fa-search me-1"></i>Advanced Search
                     </a>
-                    <a href="compare.php" class="btn btn-outline-success">
+                    <a href="/compare" class="btn btn-outline-success">
                         <i class="fas fa-balance-scale me-1"></i>Compare Devices
                     </a>
                 </div>

@@ -711,9 +711,11 @@ if ($_POST && isset($_POST['action'])) {
             // Handle comparison row clicks
             document.querySelectorAll('.clickable-comparison').forEach(function(row) {
                 row.addEventListener('click', function() {
+                    const device1Slug = this.getAttribute('data-device1-slug');
+                    const device2Slug = this.getAttribute('data-device2-slug');
                     const device1Id = this.getAttribute('data-device1-id');
                     const device2Id = this.getAttribute('data-device2-id');
-                    if (device1Id && device2Id) {
+                    if ((device1Slug && device2Slug) || (device1Id && device2Id)) {
                         // Track the comparison
                         fetch('/track_device_comparison.php', {
                             method: 'POST',
@@ -723,8 +725,11 @@ if ($_POST && isset($_POST['action'])) {
                             body: 'device1_id=' + encodeURIComponent(device1Id) + '&device2_id=' + encodeURIComponent(device2Id)
                         });
 
-                        // Redirect to comparison page
-                        window.location.href = `compare.php?phone1=${device1Id}&phone2=${device2Id}`;
+                        // Redirect to comparison page using slugs (preferred) or IDs (fallback)
+                        const compareUrl = device1Slug && device2Slug ?
+                            `/compare/${device1Slug}-vs-${device2Slug}` :
+                            `/compare/${device1Id}-vs-${device2Id}`;
+                        window.location.href = compareUrl;
                     }
                 });
             });
