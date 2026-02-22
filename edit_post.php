@@ -2,6 +2,7 @@
 ob_start();
 require_once 'auth.php';
 require_once 'image_compression.php'; // Add image compression function
+require_once 'sitemap_management.php'; // Add sitemap management functions
 
 // Require login for this page
 requireLogin();
@@ -197,6 +198,12 @@ if ($_POST) {
     // If no errors, update the post
     if (empty($errors)) {
         try {
+            // Store old status and slug for sitemap management
+            $old_status = $post['status'];
+            $old_slug = $post['slug'];
+            $old_was_published = ($old_status === 'Published');
+            $new_will_be_published = ($status === 'Published');
+
             $stmt = $pdo->prepare("UPDATE posts SET title = ?, slug = ?, author = ?, publish_date = ?, featured_image = ?, short_description = ?, content_body = ?, media_gallery = ?, categories = ?, tags = ?, meta_title = ?, meta_description = ?, status = ?, is_featured = ?, updated_at = CURRENT_TIMESTAMP WHERE id = ?");
 
 
@@ -235,6 +242,21 @@ if ($_POST) {
             ]);
 
             $success = "Post updated successfully!";
+
+            // Handle sitemap updates after successful database update
+            if ($old_was_published && !$new_will_be_published) {
+                // Post was published, now unpublished - remove from sitemap
+                removePostFromSitemap($old_slug);
+            } elseif (!$old_was_published && $new_will_be_published) {
+                // Post was not published, now published - add to sitemap
+                addPostToSitemap($slug, date('Y-m-d', strtotime($publish_date)));
+            } elseif ($new_will_be_published && $old_slug !== $slug) {
+                // Post is published and slug changed - update in sitemap
+                updatePostInSitemap($old_slug, $slug, date('Y-m-d', strtotime($publish_date)));
+            } elseif ($new_will_be_published && $old_slug === $slug) {
+                // Post is published, slug unchanged - just update lastmod date
+                updatePostLastmodInSitemap($slug, date('Y-m-d', strtotime($publish_date)));
+            }
 
             // Redirect to posts list after success
             header("Location: posts.php?success=" . urlencode($success));

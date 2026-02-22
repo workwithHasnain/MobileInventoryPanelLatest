@@ -2,6 +2,7 @@
 ob_start();
 require_once 'auth.php';
 require_once 'image_compression.php'; // Add image compression function
+require_once 'sitemap_management.php'; // Add sitemap management functions
 
 // Require login for this page
 requireLogin();
@@ -214,6 +215,11 @@ if ($_POST) {
             ]);
 
             $success = "Post created successfully!";
+
+            // If post is published, add it to sitemap
+            if ($status === 'Published') {
+                addPostToSitemap($slug, date('Y-m-d', strtotime($publish_date)));
+            }
 
             // Redirect to posts list after success
             header("Location: posts.php?success=" . urlencode($success));
