@@ -1344,6 +1344,60 @@ $commentCount = getDeviceCommentCount($pdo, $device_id);
     </script>
   <?php endif; ?>
 
+  <!-- Generic HowTo Schema (for device research & specification checking) -->
+  <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "HowTo",
+      "name": "How to Research Smartphone Specifications and Features",
+      "description": "Complete guide to understanding and researching smartphone specifications including display, processor, camera, battery, and connectivity features to make informed device purchasing decisions.",
+      "image": "https://www.devicesarena.com/imges/icon-256.png",
+      "step": [{
+          "@type": "HowToStep",
+          "position": 1,
+          "name": "Understand Display Specifications",
+          "text": "Learn about display size, type (AMOLED, LCD, etc.), resolution, refresh rate, and brightness to choose the best screen for your needs."
+        },
+        {
+          "@type": "HowToStep",
+          "position": 2,
+          "name": "Evaluate Processor and Performance",
+          "text": "Check the chipset, CPU cores, GPU, and performance benchmarks to ensure adequate speed for your intended use."
+        },
+        {
+          "@type": "HowToStep",
+          "position": 3,
+          "name": "Check Memory Specifications",
+          "text": "Compare RAM amounts and storage capacity to determine if the device meets your multitasking and storage needs."
+        },
+        {
+          "@type": "HowToStep",
+          "position": 4,
+          "name": "Review Camera Capabilities",
+          "text": "Examine megapixel count, sensor size, aperture, OIS, and video recording capabilities to assess photo and video quality."
+        },
+        {
+          "@type": "HowToStep",
+          "position": 5,
+          "name": "Assess Battery and Charging",
+          "text": "Review battery capacity, battery life claims, and charging speeds (wired and wireless) to ensure it meets your usage patterns."
+        },
+        {
+          "@type": "HowToStep",
+          "position": 6,
+          "name": "Check Connectivity Options",
+          "text": "Verify 5G/4G support, WiFi standards, Bluetooth version, NFC, GPS, and other connectivity features you need."
+        },
+        {
+          "@type": "HowToStep",
+          "position": 7,
+          "name": "Compare Device Variants",
+          "text": "Use our comparison tool to compare devices side-by-side and see which best matches your specific requirements and budget."
+        }
+      ]
+    }
+  </script>
+
   <!-- FAQ Schema for Device Pages -->
   <script type="application/ld+json">
     {
@@ -2600,10 +2654,15 @@ $commentCount = getDeviceCommentCount($pdo, $device_id);
     if (phones && phones.length > 0) {
       let html = '<div class="row">';
       phones.forEach(phone => {
-        const phoneImage = phone.image ? `<img src="${phone.image}" alt="${phone.name}" style="width: 100%; height: 120px; object-fit: contain; margin-bottom: 8px;" onerror="this.style.display='none';">` : '';
+        // Convert relative image paths to absolute
+        let imagePath = phone.image;
+        if (imagePath && !imagePath.startsWith('/') && !imagePath.startsWith('http')) {
+          imagePath = '/' + imagePath;
+        }
+        const phoneImage = imagePath ? `<img src="${imagePath}" alt="${phone.name}" style="width: 100%; height: 120px; object-fit: contain; margin-bottom: 8px;" onerror="this.style.display='none';">` : '';
         html += `
           <div class="col-lg-4 col-md-6 col-sm-6 mb-3">
-            <button class="device-cell-modal btn w-100 p-0" style="background-color: #fff; border: 1px solid #c5b6b0; color: #5D4037; font-weight: 500; transition: all 0.3s ease; cursor: pointer; display: flex; flex-direction: column; align-items: center; overflow: hidden;" onclick="goToDevice(${phone.id})">
+            <button class="device-cell-modal btn w-100 p-0" style="background-color: #fff; border: 1px solid #c5b6b0; color: #5D4037; font-weight: 500; transition: all 0.3s ease; cursor: pointer; display: flex; flex-direction: column; align-items: center; overflow: hidden;" onclick="goToDevice('${phone.slug || phone.id}')">
               ${phoneImage}
               <span style="padding: 8px 10px; width: 100%; text-align: center; font-size: 0.95rem;">${phone.name}</span>
             </button>
@@ -2627,8 +2686,12 @@ $commentCount = getDeviceCommentCount($pdo, $device_id);
   }
 
   // Navigate to device page
-  function goToDevice(deviceId) {
-    window.location.href = `device.php?id=${deviceId}`;
+  function goToDevice(deviceSlugOrId) {
+    if (typeof deviceSlugOrId === 'string' && /[a-z-]/.test(deviceSlugOrId)) {
+      window.location.href = `/device/${encodeURIComponent(deviceSlugOrId)}`;
+    } else {
+      window.location.href = `/device/${deviceSlugOrId}`;
+    }
   }
 
   // Show related phones modal

@@ -16,7 +16,7 @@ try {
 
     // Get phones for the selected brand
     $stmt = $pdo->prepare("
-        SELECT id, name, brand_id, image
+        SELECT id, name, brand_id, image, slug
         FROM phones 
         WHERE brand_id = ? 
         ORDER BY name ASC

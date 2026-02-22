@@ -1158,6 +1158,78 @@ function formatDeviceSpecsStructured($device)
         </script>
     <?php endforeach; ?>
 
+    <!-- Generic HowTo Schema (for device comparison guide) -->
+    <script type="application/ld+json">
+        {
+            "@context": "https://schema.org",
+            "@type": "HowTo",
+            "name": "How to Compare Smartphones and Choose the Best Device for You",
+            "description": "Step-by-step guide to comparing smartphones and tablets side-by-side to make the best purchasing decision based on your needs and budget.",
+            "image": "https://www.devicesarena.com/imges/icon-256.png",
+            "step": [{
+                    "@type": "HowToStep",
+                    "position": 1,
+                    "name": "Identify Your Needs",
+                    "text": "Determine what features are most important to you: camera quality, battery life, processing power, display quality, storage, or specific features like 5G or wireless charging."
+                },
+                {
+                    "@type": "HowToStep",
+                    "position": 2,
+                    "name": "Select Devices to Compare",
+                    "text": "Choose up to 3 devices you're interested in from our extensive catalog of smartphones, tablets, and smartwatches."
+                },
+                {
+                    "@type": "HowToStep",
+                    "position": 3,
+                    "name": "Review Display Specifications",
+                    "text": "Compare screen sizes, display types (AMOLED vs LCD), resolution, refresh rates, and brightness levels to find the best visual experience."
+                },
+                {
+                    "@type": "HowToStep",
+                    "position": 4,
+                    "name": "Compare Performance",
+                    "text": "Check processor types, RAM amounts, benchmark scores, and real-world performance metrics to ensure adequate speed for your use."
+                },
+                {
+                    "@type": "HowToStep",
+                    "position": 5,
+                    "name": "Evaluate Camera Systems",
+                    "text": "Review main and front camera megapixels, sensor quality, aperture, optical image stabilization, and video recording capabilities."
+                },
+                {
+                    "@type": "HowToStep",
+                    "position": 6,
+                    "name": "Check Battery and Charging",
+                    "text": "Compare battery capacity, estimated battery life, charging speeds (wired and wireless), and power efficiency."
+                },
+                {
+                    "@type": "HowToStep",
+                    "position": 7,
+                    "name": "Assess Design and Build",
+                    "text": "Review dimensions, weight, materials, durability ratings, water resistance, and available color options."
+                },
+                {
+                    "@type": "HowToStep",
+                    "position": 8,
+                    "name": "Verify Connectivity",
+                    "text": "Check for 5G/4G support, WiFi standards, Bluetooth versions, NFC capabilities, and other connectivity features you need."
+                },
+                {
+                    "@type": "HowToStep",
+                    "position": 9,
+                    "name": "Compare Pricing",
+                    "text": "Review the price points of compared devices and determine which offers the best value for your budget and requirements."
+                },
+                {
+                    "@type": "HowToStep",
+                    "position": 10,
+                    "name": "Make Your Decision",
+                    "text": "Use the detailed comparison results to make an informed decision about which device best meets your specific needs and budget."
+                }
+            ]
+        }
+    </script>
+
     <!-- FAQ Schema for Comparison Page -->
     <script type="application/ld+json">
         {
@@ -2160,10 +2232,15 @@ function formatDeviceSpecsStructured($device)
             if (phones && phones.length > 0) {
                 let html = '<div class="row">';
                 phones.forEach(phone => {
-                    const phoneImage = phone.image ? `<img src="${phone.image}" alt="${phone.name}" style="width: 100%; height: 120px; object-fit: contain; margin-bottom: 8px;" onerror="this.style.display='none';">` : '';
+                    // Convert relative image paths to absolute
+                    let imagePath = phone.image;
+                    if (imagePath && !imagePath.startsWith('/') && !imagePath.startsWith('http')) {
+                        imagePath = '/' + imagePath;
+                    }
+                    const phoneImage = imagePath ? `<img src="${imagePath}" alt="${phone.name}" style="width: 100%; height: 120px; object-fit: contain; margin-bottom: 8px;" onerror="this.style.display='none';">` : '';
                     html += `
           <div class="col-lg-4 col-md-6 col-sm-6 mb-3">
-            <button class="device-cell-modal btn w-100 p-0" style="background-color: #fff; border: 1px solid #c5b6b0; color: #5D4037; font-weight: 500; transition: all 0.3s ease; cursor: pointer; display: flex; flex-direction: column; align-items: center; overflow: hidden;" onclick="goToDevice(${phone.id})">
+            <button class="device-cell-modal btn w-100 p-0" style="background-color: #fff; border: 1px solid #c5b6b0; color: #5D4037; font-weight: 500; transition: all 0.3s ease; cursor: pointer; display: flex; flex-direction: column; align-items: center; overflow: hidden;" onclick="goToDevice('${phone.slug || phone.id}')">
               ${phoneImage}
               <span style="padding: 8px 10px; width: 100%; text-align: center; font-size: 0.95rem;">${phone.name}</span>
             </button>
@@ -2187,8 +2264,12 @@ function formatDeviceSpecsStructured($device)
         }
 
         // Navigate to device page
-        function goToDevice(deviceId) {
-            window.location.href = `device.php?slug=${deviceId}`; // Will redirect to slug
+        function goToDevice(deviceSlugOrId) {
+            if (typeof deviceSlugOrId === 'string' && /[a-z-]/.test(deviceSlugOrId)) {
+                window.location.href = `/device/${encodeURIComponent(deviceSlugOrId)}`;
+            } else {
+                window.location.href = `/device/${deviceSlugOrId}`;
+            }
         }
 
         // Newsletter form AJAX handler

@@ -449,6 +449,30 @@ if ($_POST && isset($_POST['action'])) {
         }
     </script>
 
+    <!-- Generic Article Schema (for blog/news overview) -->
+    <script type="application/ld+json">
+        {
+            "@context": "https://schema.org",
+            "@type": "NewsArticle",
+            "headline": "Technology News, Reviews, and Device Guides - DevicesArena",
+            "description": "Stay updated with the latest smartphone, tablet, and smartwatch news, expert reviews, buying guides, and technology insights from DevicesArena.",
+            "image": "https://www.devicesarena.com/imges/icon-256.png",
+            "datePublished": "<?php echo date('Y-m-d'); ?>",
+            "publisher": {
+                "@type": "Organization",
+                "name": "DevicesArena",
+                "logo": {
+                    "@type": "ImageObject",
+                    "url": "https://www.devicesarena.com/imges/icon-256.png"
+                }
+            },
+            "author": {
+                "@type": "Organization",
+                "name": "DevicesArena Team"
+            }
+        }
+    </script>
+
     <!-- FAQ Schema for Blog Posts -->
     <script type="application/ld+json">
         {
@@ -1381,10 +1405,15 @@ if ($_POST && isset($_POST['action'])) {
             if (phones && phones.length > 0) {
                 let html = '<div class="row">';
                 phones.forEach(phone => {
-                    const phoneImage = phone.image ? `<img src="${phone.image}" alt="${phone.name}" style="width: 100%; height: 120px; object-fit: contain; margin-bottom: 8px;" onerror="this.style.display='none';">` : '';
+                    // Convert relative image paths to absolute
+                    let imagePath = phone.image;
+                    if (imagePath && !imagePath.startsWith('/') && !imagePath.startsWith('http')) {
+                        imagePath = '/' + imagePath;
+                    }
+                    const phoneImage = imagePath ? `<img src="${imagePath}" alt="${phone.name}" style="width: 100%; height: 120px; object-fit: contain; margin-bottom: 8px;" onerror="this.style.display='none';">` : '';
                     html += `
           <div class="col-lg-4 col-md-6 col-sm-6 mb-3">
-            <button class="device-cell-modal btn w-100 p-0" style="background-color: #fff; border: 1px solid #c5b6b0; color: #5D4037; font-weight: 500; transition: all 0.3s ease; cursor: pointer; display: flex; flex-direction: column; align-items: center; overflow: hidden;" onclick="goToDevice(${phone.id})">
+            <button class="device-cell-modal btn w-100 p-0" style="background-color: #fff; border: 1px solid #c5b6b0; color: #5D4037; font-weight: 500; transition: all 0.3s ease; cursor: pointer; display: flex; flex-direction: column; align-items: center; overflow: hidden;" onclick="goToDevice('${phone.slug || phone.id}')">
               ${phoneImage}
               <span style="padding: 8px 10px; width: 100%; text-align: center; font-size: 0.95rem;">${phone.name}</span>
             </button>
@@ -1408,8 +1437,12 @@ if ($_POST && isset($_POST['action'])) {
         }
 
         // Navigate to device page
-        function goToDevice(deviceId) {
-            window.location.href = `device.php?id=${deviceId}`;
+        function goToDevice(deviceSlugOrId) {
+            if (typeof deviceSlugOrId === 'string' && /[a-z-]/.test(deviceSlugOrId)) {
+                window.location.href = `device/${encodeURIComponent(deviceSlugOrId)}`;
+            } else {
+                window.location.href = `device/${deviceSlugOrId}`;
+            }
         }
 
         // Newsletter form AJAX handler
