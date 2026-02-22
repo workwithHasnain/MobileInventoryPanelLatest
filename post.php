@@ -398,8 +398,8 @@ if ($_POST && isset($_POST['action'])) {
             "@context" => "https://schema.org",
             "@type" => "BlogPosting",
             "headline" => $post['title'],
-            "description" => isset($post['excerpt']) && !empty($post['excerpt']) ? substr($post['excerpt'], 0, 160) : substr(strip_tags($post['content']), 0, 160),
-            "articleBody" => isset($post['content']) ? strip_tags($post['content']) : "",
+            "description" => isset($post['excerpt']) && !empty($post['excerpt']) ? substr($post['excerpt'], 0, 160) : substr(strip_tags($post['content_body'] ?? ''), 0, 160),
+            "articleBody" => isset($post['content_body']) && !empty($post['content_body']) ? strip_tags($post['content_body']) : "",
             "url" => "https://www.devicesarena.com/post/" . htmlspecialchars($post['slug']),
             "datePublished" => isset($post['created_at']) ? date('Y-m-d', strtotime($post['created_at'])) : date('Y-m-d'),
             "dateModified" => isset($post['updated_at']) && !empty($post['updated_at']) ? date('Y-m-d', strtotime($post['updated_at'])) : (isset($post['created_at']) ? date('Y-m-d', strtotime($post['created_at'])) : date('Y-m-d'))
