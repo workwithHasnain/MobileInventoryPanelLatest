@@ -969,6 +969,252 @@ function formatDeviceSpecsStructured($device)
     <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
 
     <link rel="stylesheet" href="<?php echo $base; ?>style.css">
+
+    <!-- Schema.org Structured Data for Comparison Page -->
+    <?php
+    // Build dynamic breadcrumb schema based on selected phones
+    $breadcrumbItems = [
+        [
+            "@type" => "ListItem",
+            "position" => 1,
+            "name" => "Home",
+            "item" => "https://www.devicesarena.com/"
+        ]
+    ];
+
+    if ($phone1 || $phone2 || $phone3) {
+        $breadcrumbItems[] = [
+            "@type" => "ListItem",
+            "position" => 2,
+            "name" => "Compare Devices",
+            "item" => "https://www.devicesarena.com/compare"
+        ];
+
+        $comparisonTitle = "Compare";
+        $phoneCount = 0;
+        if ($phone1) {
+            $comparisonTitle .= " " . (isset($phone1['brand_name']) ? $phone1['brand_name'] . " " : "") . (isset($phone1['name']) ? $phone1['name'] : "Device 1");
+            $phoneCount++;
+        }
+        if ($phone2) {
+            $comparisonTitle .= " vs " . (isset($phone2['brand_name']) ? $phone2['brand_name'] . " " : "") . (isset($phone2['name']) ? $phone2['name'] : "Device 2");
+            $phoneCount++;
+        }
+        if ($phone3) {
+            $comparisonTitle .= " vs " . (isset($phone3['brand_name']) ? $phone3['brand_name'] . " " : "") . (isset($phone3['name']) ? $phone3['name'] : "Device 3");
+            $phoneCount++;
+        }
+
+        $breadcrumbItems[] = [
+            "@type" => "ListItem",
+            "position" => 3,
+            "name" => $comparisonTitle,
+            "item" => "https://www.devicesarena.com" . (isset($_GET['slugs']) ? "/compare/" . htmlspecialchars($_GET['slugs']) : "/compare")
+        ];
+    }
+    ?>
+
+    <!-- Breadcrumb Schema -->
+    <script type="application/ld+json">
+        {
+            "@context": "https://schema.org",
+            "@type": "BreadcrumbList",
+            "itemListElement": <?php echo json_encode($breadcrumbItems, JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE); ?>
+        }
+    </script>
+
+    <?php
+    // Build product schemas for each selected device
+    if ($phone1 || $phone2 || $phone3) {
+        $products = [];
+
+        foreach ([$phone1, $phone2, $phone3] as $phone) {
+            if (!$phone) continue;
+
+            $product = [
+                "@context" => "https://schema.org",
+                "@type" => "Product",
+                "name" => (isset($phone['brand_name']) ? $phone['brand_name'] . " " : "") . (isset($phone['name']) ? $phone['name'] : "Unknown Device"),
+                "description" => "Detailed specifications and features of the " . (isset($phone['brand_name']) ? $phone['brand_name'] . " " : "") . (isset($phone['name']) ? $phone['name'] : "device") . ". View display, processor, camera, battery, and more."
+            ];
+
+            // Add image if available
+            if (isset($phone['image']) && !empty($phone['image'])) {
+                $product["image"] = htmlspecialchars($phone['image']);
+            }
+
+            // Add brand
+            if (isset($phone['brand_name'])) {
+                $product["brand"] = [
+                    "@type" => "Brand",
+                    "name" => $phone['brand_name']
+                ];
+            }
+
+            // Build specifications array
+            $specifications = [];
+
+            if (isset($phone['display_size']) && !empty($phone['display_size'])) {
+                $specifications[] = [
+                    "@type" => "PropertyValue",
+                    "name" => "Screen Size",
+                    "value" => $phone['display_size'] . " inches"
+                ];
+            }
+
+            if (isset($phone['display_type']) && !empty($phone['display_type'])) {
+                $specifications[] = [
+                    "@type" => "PropertyValue",
+                    "name" => "Display Type",
+                    "value" => $phone['display_type']
+                ];
+            }
+
+            if (isset($phone['display_resolution']) && !empty($phone['display_resolution'])) {
+                $specifications[] = [
+                    "@type" => "PropertyValue",
+                    "name" => "Resolution",
+                    "value" => $phone['display_resolution']
+                ];
+            }
+
+            if (isset($phone['ram']) && !empty($phone['ram'])) {
+                $specifications[] = [
+                    "@type" => "PropertyValue",
+                    "name" => "RAM",
+                    "value" => $phone['ram'] . "GB"
+                ];
+            }
+
+            if (isset($phone['storage']) && !empty($phone['storage'])) {
+                $specifications[] = [
+                    "@type" => "PropertyValue",
+                    "name" => "Internal Storage",
+                    "value" => $phone['storage'] . "GB"
+                ];
+            }
+
+            if (isset($phone['chipset_name']) && !empty($phone['chipset_name'])) {
+                $specifications[] = [
+                    "@type" => "PropertyValue",
+                    "name" => "Processor",
+                    "value" => $phone['chipset_name']
+                ];
+            }
+
+            if (isset($phone['main_camera_resolution']) && !empty($phone['main_camera_resolution'])) {
+                $specifications[] = [
+                    "@type" => "PropertyValue",
+                    "name" => "Main Camera",
+                    "value" => $phone['main_camera_resolution'] . "MP"
+                ];
+            }
+
+            if (isset($phone['selfie_camera_resolution']) && !empty($phone['selfie_camera_resolution'])) {
+                $specifications[] = [
+                    "@type" => "PropertyValue",
+                    "name" => "Front Camera",
+                    "value" => $phone['selfie_camera_resolution'] . "MP"
+                ];
+            }
+
+            if (isset($phone['battery_capacity']) && !empty($phone['battery_capacity'])) {
+                $specifications[] = [
+                    "@type" => "PropertyValue",
+                    "name" => "Battery Capacity",
+                    "value" => $phone['battery_capacity'] . "mAh"
+                ];
+            }
+
+            if (isset($phone['os']) && !empty($phone['os'])) {
+                $specifications[] = [
+                    "@type" => "PropertyValue",
+                    "name" => "Operating System",
+                    "value" => $phone['os']
+                ];
+            }
+
+            if (isset($phone['weight']) && !empty($phone['weight'])) {
+                $specifications[] = [
+                    "@type" => "PropertyValue",
+                    "name" => "Weight",
+                    "value" => $phone['weight'] . "g"
+                ];
+            }
+
+            if (!empty($specifications)) {
+                $product["additionalProperty"] = $specifications;
+            }
+
+            $products[] = $product;
+        }
+    }
+    ?>
+
+    <!-- Product Schema (for each device) -->
+    <?php foreach ($products ?? [] as $product): ?>
+        <script type="application/ld+json">
+            <?php echo json_encode($product, JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE | JSON_PRETTY_PRINT); ?>
+        </script>
+    <?php endforeach; ?>
+
+    <!-- FAQ Schema for Comparison Page -->
+    <script type="application/ld+json">
+        {
+            "@context": "https://schema.org",
+            "@type": "FAQPage",
+            "mainEntity": [{
+                    "@type": "Question",
+                    "name": "How do I compare devices on DevicesArena?",
+                    "acceptedAnswer": {
+                        "@type": "Answer",
+                        "text": "Simply select the devices you want to compare from our extensive catalog. You can compare up to 3 devices side-by-side to view their specifications, features, performance metrics, camera capabilities, battery life, and more. Our comparison tool highlights differences to help you make an informed decision."
+                    }
+                },
+                {
+                    "@type": "Question",
+                    "name": "What specifications can I compare?",
+                    "acceptedAnswer": {
+                        "@type": "Answer",
+                        "text": "You can compare comprehensive specifications including screen size and type, processor and performance, RAM and storage, camera quality and megapixels, battery capacity and charging, operating system, weight and dimensions, build materials, display resolution, refresh rate, sensors, connectivity features (5G, WiFi, Bluetooth), and many other technical details."
+                    }
+                },
+                {
+                    "@type": "Question",
+                    "name": "Can I compare devices from different brands?",
+                    "acceptedAnswer": {
+                        "@type": "Answer",
+                        "text": "Yes! You can compare devices from different brands to find the best option for your needs. Our comparison tool allows cross-brand comparisons, making it easy to see how devices from Apple, Samsung, Google Pixel, OnePlus, Xiaomi, and other manufacturers stack up against each other."
+                    }
+                },
+                {
+                    "@type": "Question",
+                    "name": "Is the comparison information up-to-date?",
+                    "acceptedAnswer": {
+                        "@type": "Answer",
+                        "text": "Yes, DevicesArena maintains an extensive and regularly updated database of smartphone, tablet, and smartwatch specifications. We continuously update device information as new models are released and manufacturers provide updated specifications."
+                    }
+                },
+                {
+                    "@type": "Question",
+                    "name": "Can I compare older devices with new ones?",
+                    "acceptedAnswer": {
+                        "@type": "Answer",
+                        "text": "Absolutely! Our database includes both the latest flagship devices and older models. You can compare any devices in our catalog to see how technology has evolved or to compare devices across different price ranges and release years."
+                    }
+                },
+                {
+                    "@type": "Question",
+                    "name": "How helpful are the comparison results?",
+                    "acceptedAnswer": {
+                        "@type": "Answer",
+                        "text": "Our detailed comparisons show side-by-side specifications that make it easy to spot differences in performance, features, and capabilities. Combined with our expert reviews and user comments, the comparison tool helps you understand which device best fits your specific requirements and budget."
+                    }
+                }
+            ]
+        }
+    </script>
+
     <style>
         /* Mobile Horizontal Scroll Wrapper for Phone Cards */
         @media(max-width: 768px) {

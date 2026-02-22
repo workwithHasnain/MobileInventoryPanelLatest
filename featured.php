@@ -242,6 +242,159 @@ $latestDevices = array_slice(array_reverse($latestDevices), 0, 9);
 
 
     <link rel="stylesheet" href="<?php echo $base; ?>style.css">
+
+    <!-- Schema.org Structured Data for Featured Posts Page -->
+    <!-- Breadcrumb Schema -->
+    <script type="application/ld+json">
+        {
+            "@context": "https://schema.org",
+            "@type": "BreadcrumbList",
+            "itemListElement": [{
+                    "@type": "ListItem",
+                    "position": 1,
+                    "name": "Home",
+                    "item": "https://www.devicesarena.com/"
+                },
+                {
+                    "@type": "ListItem",
+                    "position": 2,
+                    "name": "Featured Content",
+                    "item": "https://www.devicesarena.com/featured"
+                }
+                <?php if ($isTagFiltering): ?>, {
+                        "@type": "ListItem",
+                        "position": 3,
+                        "name": "Featured - Tagged: <?php echo htmlspecialchars($tag); ?>",
+                        "item": "https://www.devicesarena.com/featured?tag=<?php echo urlencode($tag); ?>"
+                    }
+                <?php elseif ($isSearching): ?>, {
+                        "@type": "ListItem",
+                        "position": 3,
+                        "name": "Featured - Search: <?php echo htmlspecialchars($q); ?>",
+                        "item": "https://www.devicesarena.com/featured?q=<?php echo urlencode($q); ?>"
+                    }
+                <?php endif; ?>
+            ]
+        }
+    </script>
+
+    <!-- CollectionPage Schema for Featured Posts -->
+    <script type="application/ld+json">
+        {
+            "@context": "https://schema.org",
+            "@type": "CollectionPage",
+            "name": "<?php echo $isTagFiltering ? 'Featured Articles - ' . htmlspecialchars($tag) : ($isSearching ? 'Featured - Search: ' . htmlspecialchars($q) : 'Featured Content'); ?>",
+            "description": "<?php echo $isTagFiltering ? 'Handpicked featured articles tagged with ' . htmlspecialchars($tag) : ($isSearching ? 'Featured articles matching ' . htmlspecialchars($q) : 'Curated collection of top device reviews, expert insights, and featured technology articles from DevicesArena'); ?>",
+            "url": "https://www.devicesarena.com/featured<?php echo $isTagFiltering ? '?tag=' . urlencode($tag) : ($isSearching ? '?q=' . urlencode($q) : ''); ?>",
+            "mainEntity": {
+                "@type": "ItemList",
+                "itemListElement": [
+                    <?php
+                    $itemCount = 0;
+                    foreach ($posts as $post):
+                        if ($itemCount >= 10) break; // Limit to 10 items in schema
+                        $itemCount++;
+                    ?> {
+                            "@type": "BlogPosting",
+                            "position": <?php echo $itemCount; ?>,
+                            "headline": "<?php echo addslashes(htmlspecialchars($post['title'])); ?>",
+                            "description": "<?php echo addslashes(htmlspecialchars(isset($post['excerpt']) && !empty($post['excerpt']) ? substr($post['excerpt'], 0, 160) : substr(strip_tags($post['content']), 0, 160))); ?>",
+                            "datePublished": "<?php echo date('Y-m-d', strtotime($post['created_at'])); ?>",
+                            "isFeatured": true,
+                            "image": "<?php echo isset($post['featured_image']) && !empty($post['featured_image']) ? getAbsoluteImagePath($post['featured_image'], 'https://www.devicesarena.com/') : 'https://www.devicesarena.com/imges/icon-256.png'; ?>",
+                            "url": "https://www.devicesarena.com/post/<?php echo htmlspecialchars($post['slug']); ?>"
+                        }
+                        <?php echo $itemCount < count(array_slice($posts, 0, 10)) ? ',' : ''; ?>
+                    <?php endforeach; ?>
+                ]
+            }
+        }
+    </script>
+
+    <!-- Organization Schema for Featured Content -->
+    <script type="application/ld+json">
+        {
+            "@context": "https://schema.org",
+            "@type": "Organization",
+            "name": "DevicesArena Featured Content",
+            "url": "https://www.devicesarena.com/featured",
+            "description": "Curated featured articles, top device reviews, and expert insights about smartphones, tablets, smartwatches, and mobile technology."
+        }
+    </script>
+
+    <!-- FAQ Schema for Featured Content -->
+    <script type="application/ld+json">
+        {
+            "@context": "https://schema.org",
+            "@type": "FAQPage",
+            "mainEntity": [{
+                    "@type": "Question",
+                    "name": "What is featured content on DevicesArena?",
+                    "acceptedAnswer": {
+                        "@type": "Answer",
+                        "text": "Featured content is our curated collection of top-quality articles, reviews, and insights that we believe are most valuable to our readers. These include in-depth device reviews, technology analysis, buying guides, and breaking tech news that we've specially selected for their quality and relevance."
+                    }
+                },
+                {
+                    "@type": "Question",
+                    "name": "How are articles selected as featured?",
+                    "acceptedAnswer": {
+                        "@type": "Answer",
+                        "text": "Articles are featured based on their depth of analysis, accuracy of information, relevance to current technology trends, reader engagement, and overall quality. We prioritize comprehensive reviews, detailed comparisons, and important tech news that help readers make informed decisions about devices."
+                    }
+                },
+                {
+                    "@type": "Question",
+                    "name": "Are featured articles different from regular reviews?",
+                    "acceptedAnswer": {
+                        "@type": "Answer",
+                        "text": "Featured articles are our handpicked selection of particularly valuable content. While all our articles are high-quality, featured articles represent the best of our work and include our most comprehensive reviews, detailed analysis, and expert insights about devices and technology trends."
+                    }
+                },
+                {
+                    "@type": "Question",
+                    "name": "How often is featured content updated?",
+                    "acceptedAnswer": {
+                        "@type": "Answer",
+                        "text": "We continuously update our featured content to reflect the latest device releases, technology trends, and reader interests. New featured articles are added regularly, ensuring you always have access to the most current and relevant reviews and insights."
+                    }
+                },
+                {
+                    "@type": "Question",
+                    "name": "Can I search within featured content?",
+                    "acceptedAnswer": {
+                        "@type": "Answer",
+                        "text": "Yes! You can use the search functionality to find featured articles about specific devices, brands, or topics. You can also browse by tags to find featured content related to your interests, such as camera performance, battery life, gaming, or flagship devices."
+                    }
+                },
+                {
+                    "@type": "Question",
+                    "name": "Where can I find recommendations for specific devices?",
+                    "acceptedAnswer": {
+                        "@type": "Answer",
+                        "text": "Our featured articles often include device recommendations based on different use cases and budgets. You can also use our Phone Finder tool to search for devices matching your specific requirements, and refer to our comparison tool to see how featured devices stack up against each other."
+                    }
+                },
+                {
+                    "@type": "Question",
+                    "name": "How can I stay updated with new featured articles?",
+                    "acceptedAnswer": {
+                        "@type": "Answer",
+                        "text": "Subscribe to our newsletter to receive notifications about new featured articles and reviews. You can also bookmark this featured content page and visit regularly, or follow our social media channels for announcements about new top articles."
+                    }
+                },
+                {
+                    "@type": "Question",
+                    "name": "Do featured articles include links to compare devices?",
+                    "acceptedAnswer": {
+                        "@type": "Answer",
+                        "text": "Yes! Many featured articles include links to our comparison tool where you can compare featured devices side-by-side. This makes it easy to see how different devices discussed in the articles compare in terms of specifications and features."
+                    }
+                }
+            ]
+        }
+    </script>
+
     <style>
         /* Brand Modal Styling */
         .brand-cell-modal {

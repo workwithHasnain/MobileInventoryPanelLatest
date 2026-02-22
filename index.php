@@ -254,6 +254,101 @@ if ($_POST && isset($_POST['action'])) {
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" />
 
     <link rel="stylesheet" href="<?php echo $base; ?>style.css">
+
+    <!-- Schema.org Structured Data -->
+    <!-- Organization Schema -->
+    <script type="application/ld+json">
+        {
+            "@context": "https://schema.org",
+            "@type": "Organization",
+            "name": "DevicesArena",
+            "url": "https://www.devicesarena.com",
+            "logo": "https://www.devicesarena.com/imges/icon-256.png",
+            "description": "Comprehensive smartphone, tablet, and smartwatch specifications, reviews, comparisons, and buying guides. Find your perfect device using our advanced Phone Finder with extensive filtering options.",
+            "sameAs": [
+                "https://www.facebook.com/devicesarena",
+                "https://www.twitter.com/devicesarena",
+                "https://www.instagram.com/devicesarena"
+            ],
+            "contactPoint": {
+                "@type": "ContactPoint",
+                "contactType": "Customer Service",
+                "email": "support@devicesarena.com"
+            }
+        }
+    </script>
+
+    <!-- Breadcrumb Schema -->
+    <script type="application/ld+json">
+        {
+            "@context": "https://schema.org",
+            "@type": "BreadcrumbList",
+            "itemListElement": [{
+                "@type": "ListItem",
+                "position": 1,
+                "name": "Home",
+                "item": "https://www.devicesarena.com/"
+            }]
+        }
+    </script>
+
+    <!-- FAQ Schema -->
+    <script type="application/ld+json">
+        {
+            "@context": "https://schema.org",
+            "@type": "FAQPage",
+            "mainEntity": [{
+                    "@type": "Question",
+                    "name": "What can I find on DevicesArena?",
+                    "acceptedAnswer": {
+                        "@type": "Answer",
+                        "text": "DevicesArena provides comprehensive information about smartphones, tablets, smartwatches and other mobile devices. You can view detailed specifications, read in-depth reviews, compare devices side-by-side, discover the latest tech news, and use our advanced filters to find devices that match your criteria."
+                    }
+                },
+                {
+                    "@type": "Question",
+                    "name": "How do I use the Phone Finder?",
+                    "acceptedAnswer": {
+                        "@type": "Answer",
+                        "text": "Our Phone Finder tool allows you to search for your perfect device by selecting specific criteria and filters such as price range, screen size, processor, RAM, storage, camera quality, battery life, display type, and more. This helps you narrow down options to find devices that exactly match your needs."
+                    }
+                },
+                {
+                    "@type": "Question",
+                    "name": "Can I compare multiple devices?",
+                    "acceptedAnswer": {
+                        "@type": "Answer",
+                        "text": "Yes! You can compare any two devices side-by-side to view the differences in their specifications, features, performance, camera capabilities, battery life, and more. This makes it easier to make an informed decision about which device is right for you."
+                    }
+                },
+                {
+                    "@type": "Question",
+                    "name": "Where can I read device reviews and articles?",
+                    "acceptedAnswer": {
+                        "@type": "Answer",
+                        "text": "You can read detailed product reviews and technical articles in our Featured Posts section and blog. We cover the latest smartphones, tablets, smartwatches, and provide in-depth analysis of their features, performance, and value."
+                    }
+                },
+                {
+                    "@type": "Question",
+                    "name": "Do you cover all device brands?",
+                    "acceptedAnswer": {
+                        "@type": "Answer",
+                        "text": "We feature a wide range of device brands including Apple, Samsung, Google Pixel, OnePlus, Xiaomi, Motorola, Nothing, and many more. You can browse all available brands using our All Brands section to explore devices from your favorite manufacturers."
+                    }
+                },
+                {
+                    "@type": "Question",
+                    "name": "Can I leave reviews and comments on devices?",
+                    "acceptedAnswer": {
+                        "@type": "Answer",
+                        "text": "Yes! You can share your thoughts and experiences by leaving comments and reviews on device pages and our blog posts. Your feedback helps other users make informed decisions about their next device purchase."
+                    }
+                }
+            ]
+        }
+    </script>
+
     <style>
         /* Brand Modal Styling */
         .brand-cell-modal {

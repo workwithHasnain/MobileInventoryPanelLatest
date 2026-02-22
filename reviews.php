@@ -235,6 +235,158 @@ $allBrandsModal = $all_brands_stmt->fetchAll();
 
 
     <link rel="stylesheet" href="<?php echo $base; ?>style.css">
+
+    <!-- Schema.org Structured Data for Reviews/Articles Page -->
+    <!-- Breadcrumb Schema -->
+    <script type="application/ld+json">
+        {
+            "@context": "https://schema.org",
+            "@type": "BreadcrumbList",
+            "itemListElement": [{
+                    "@type": "ListItem",
+                    "position": 1,
+                    "name": "Home",
+                    "item": "https://www.devicesarena.com/"
+                },
+                {
+                    "@type": "ListItem",
+                    "position": 2,
+                    "name": "Reviews & Articles",
+                    "item": "https://www.devicesarena.com/reviews"
+                }
+                <?php if ($isTagFiltering): ?>, {
+                        "@type": "ListItem",
+                        "position": 3,
+                        "name": "Tagged: <?php echo htmlspecialchars($tag); ?>",
+                        "item": "https://www.devicesarena.com/reviews?tag=<?php echo urlencode($tag); ?>"
+                    }
+                <?php elseif ($isSearching): ?>, {
+                        "@type": "ListItem",
+                        "position": 3,
+                        "name": "Search Results: <?php echo htmlspecialchars($q); ?>",
+                        "item": "https://www.devicesarena.com/reviews?q=<?php echo urlencode($q); ?>"
+                    }
+                <?php endif; ?>
+            ]
+        }
+    </script>
+
+    <!-- CollectionPage Schema for Articles Listing -->
+    <script type="application/ld+json">
+        {
+            "@context": "https://schema.org",
+            "@type": "CollectionPage",
+            "name": "<?php echo $isTagFiltering ? 'Reviews Tagged: ' . htmlspecialchars($tag) : ($isSearching ? 'Search Results: ' . htmlspecialchars($q) : 'Device Reviews & Articles'); ?>",
+            "description": "<?php echo $isTagFiltering ? 'Articles and reviews tagged with ' . htmlspecialchars($tag) : ($isSearching ? 'Search results for ' . htmlspecialchars($q) : 'Comprehensive device reviews, specifications analysis, technology news, and expert insights'); ?>",
+            "url": "https://www.devicesarena.com/reviews<?php echo $isTagFiltering ? '?tag=' . urlencode($tag) : ($isSearching ? '?q=' . urlencode($q) : ''); ?>",
+            "mainEntity": {
+                "@type": "ItemList",
+                "itemListElement": [
+                    <?php
+                    $itemCount = 0;
+                    foreach ($posts as $post):
+                        if ($itemCount >= 10) break; // Limit to 10 items in schema
+                        $itemCount++;
+                    ?> {
+                            "@type": "BlogPosting",
+                            "position": <?php echo $itemCount; ?>,
+                            "headline": "<?php echo addslashes(htmlspecialchars($post['title'])); ?>",
+                            "description": "<?php echo addslashes(htmlspecialchars(isset($post['excerpt']) && !empty($post['excerpt']) ? substr($post['excerpt'], 0, 160) : substr(strip_tags($post['content']), 0, 160))); ?>",
+                            "datePublished": "<?php echo date('Y-m-d', strtotime($post['created_at'])); ?>",
+                            "image": "<?php echo isset($post['featured_image']) && !empty($post['featured_image']) ? getAbsoluteImagePath($post['featured_image'], 'https://www.devicesarena.com/') : 'https://www.devicesarena.com/imges/icon-256.png'; ?>",
+                            "url": "https://www.devicesarena.com/post/<?php echo htmlspecialchars($post['slug']); ?>"
+                        }
+                        <?php echo $itemCount < count(array_slice($posts, 0, 10)) ? ',' : ''; ?>
+                    <?php endforeach; ?>
+                ]
+            }
+        }
+    </script>
+
+    <!-- Organization Schema for Reviews Section -->
+    <script type="application/ld+json">
+        {
+            "@context": "https://schema.org",
+            "@type": "Organization",
+            "name": "DevicesArena Reviews",
+            "url": "https://www.devicesarena.com/reviews",
+            "description": "Expert device reviews, technology analysis, and comprehensive specifications for smartphones, tablets, smartwatches, and other mobile devices."
+        }
+    </script>
+
+    <!-- FAQ Schema for Reviews Pages -->
+    <script type="application/ld+json">
+        {
+            "@context": "https://schema.org",
+            "@type": "FAQPage",
+            "mainEntity": [{
+                    "@type": "Question",
+                    "name": "What types of reviews does DevicesArena provide?",
+                    "acceptedAnswer": {
+                        "@type": "Answer",
+                        "text": "DevicesArena provides comprehensive reviews covering smartphones, tablets, smartwatches, and other mobile devices. Our reviews include detailed specifications analysis, real-world performance testing, camera quality assessment, battery life evaluation, display characteristics, software experience, design and build quality, and overall value for money considerations."
+                    }
+                },
+                {
+                    "@type": "Question",
+                    "name": "How can I search for specific device reviews?",
+                    "acceptedAnswer": {
+                        "@type": "Answer",
+                        "text": "You can use the search bar to find reviews by device name, brand, or specifications. Simply enter keywords related to the device you're interested in, and our search will display all matching reviews and articles from our comprehensive database."
+                    }
+                },
+                {
+                    "@type": "Question",
+                    "name": "What are tags and how do I filter by them?",
+                    "acceptedAnswer": {
+                        "@type": "Answer",
+                        "text": "Tags help organize reviews by topic, device category, or feature. You can click any tag to see all articles related to that topic. Popular tags are displayed on the page, making it easy to explore reviews by specific categories like flagship phones, budget devices, camera performance, or battery life."
+                    }
+                },
+                {
+                    "@type": "Question",
+                    "name": "How are devices reviewed and rated?",
+                    "acceptedAnswer": {
+                        "@type": "Answer",
+                        "text": "Our reviews are based on comprehensive evaluation across multiple criteria including processor performance, display quality, camera capabilities, battery life, design and build, software experience, value for money, and overall rating. We test real-world performance and provide detailed analysis to help you make informed decisions."
+                    }
+                },
+                {
+                    "@type": "Question",
+                    "name": "Can I compare devices mentioned in reviews?",
+                    "acceptedAnswer": {
+                        "@type": "Answer",
+                        "text": "Yes! Many reviews include links to our detailed comparison tool. You can directly compare any devices mentioned in reviews to see their specifications, features, and differences side-by-side."
+                    }
+                },
+                {
+                    "@type": "Question",
+                    "name": "How often are new reviews published?",
+                    "acceptedAnswer": {
+                        "@type": "Answer",
+                        "text": "We regularly publish new reviews covering the latest device releases, technology updates, and market analysis. Subscribe to our newsletter or check back frequently to stay updated with the latest reviews and tech insights."
+                    }
+                },
+                {
+                    "@type": "Question",
+                    "name": "Are there reviews for older device models?",
+                    "acceptedAnswer": {
+                        "@type": "Answer",
+                        "text": "Yes, our review database includes both current flagship models and older devices. This allows you to find reviews for devices you may be purchasing secondhand or comparing across different price ranges and release years."
+                    }
+                },
+                {
+                    "@type": "Question",
+                    "name": "Can I sort reviews by date or popularity?",
+                    "acceptedAnswer": {
+                        "@type": "Answer",
+                        "text": "Reviews are displayed in order of publication (newest first), making it easy to find the latest device reviews. You can also use tags and search functionality to find reviews for specific devices or categories you're interested in."
+                    }
+                }
+            ]
+        }
+    </script>
+
     <style>
         /* Brand Modal Styling */
         .brand-cell-modal {

@@ -104,6 +104,140 @@ if (!$filterConfig) {
 
 
     <link rel="stylesheet" href="<?php echo $base; ?>style.css">
+
+    <!-- Schema.org Structured Data for Phone Finder Tool -->
+    <!-- Breadcrumb Schema -->
+    <script type="application/ld+json">
+        {
+            "@context": "https://schema.org",
+            "@type": "BreadcrumbList",
+            "itemListElement": [{
+                    "@type": "ListItem",
+                    "position": 1,
+                    "name": "Home",
+                    "item": "https://www.devicesarena.com/"
+                },
+                {
+                    "@type": "ListItem",
+                    "position": 2,
+                    "name": "Phone Finder",
+                    "item": "https://www.devicesarena.com/phonefinder"
+                }
+            ]
+        }
+    </script>
+
+    <!-- WebApplication Schema for Phone Finder Tool -->
+    <script type="application/ld+json">
+        {
+            "@context": "https://schema.org",
+            "@type": "WebApplication",
+            "name": "DevicesArena Phone Finder",
+            "description": "Advanced device finder tool to search and filter smartphones, tablets, and smartwatches based on your specific requirements including price range, display size, processor, RAM, storage, camera quality, battery life, and more.",
+            "url": "https://www.devicesarena.com/phonefinder",
+            "applicationCategory": "Productivity",
+            "operatingSystem": "Web Browser",
+            "offers": {
+                "@type": "Offer",
+                "price": "0",
+                "priceCurrency": "USD"
+            },
+            "image": "https://www.devicesarena.com/imges/icon-256.png",
+            "author": {
+                "@type": "Organization",
+                "name": "DevicesArena"
+            },
+            "softwareVersion": "1.0",
+            "releaseNotes": "Advanced filtering tool to find your perfect device from our extensive catalog"
+        }
+    </script>
+
+    <!-- SearchAction Schema for Phone Finder -->
+    <script type="application/ld+json">
+        {
+            "@context": "https://schema.org",
+            "@type": "SearchAction",
+            "target": {
+                "@type": "EntryPoint",
+                "urlTemplate": "https://www.devicesarena.com/phonefinder"
+            },
+            "query-input": "required name=searchTerm"
+        }
+    </script>
+
+    <!-- FAQ Schema for Phone Finder Tool -->
+    <script type="application/ld+json">
+        {
+            "@context": "https://schema.org",
+            "@type": "FAQPage",
+            "mainEntity": [{
+                    "@type": "Question",
+                    "name": "What is the Phone Finder tool and how does it work?",
+                    "acceptedAnswer": {
+                        "@type": "Answer",
+                        "text": "The Phone Finder is an advanced search and filtering tool that helps you discover the perfect device from our extensive catalog. Simply select your preferences - including price range, screen size, processor type, RAM, storage capacity, camera specifications, battery life, display preferences, and other features - and the tool will show you all devices matching your criteria."
+                    }
+                },
+                {
+                    "@type": "Question",
+                    "name": "What filter options are available in Phone Finder?",
+                    "acceptedAnswer": {
+                        "@type": "Answer",
+                        "text": "You can filter devices by numerous specifications including: price range, display size and type, processor and chipset, RAM and storage capacity, main and front camera resolution, battery capacity and charging speed, operating system, brand, release date, network connectivity (5G, 4G), refresh rate, weight, dimensions, color options, and many other technical features."
+                    }
+                },
+                {
+                    "@type": "Question",
+                    "name": "Can I filter by budget and multiple criteria at once?",
+                    "acceptedAnswer": {
+                        "@type": "Answer",
+                        "text": "Absolutely! The Phone Finder allows you to combine multiple filters simultaneously. You can set a budget range and combine it with other requirements like minimum camera quality, battery capacity, RAM, storage, screen size, and processor performance to find devices that meet all your specific needs."
+                    }
+                },
+                {
+                    "@type": "Question",
+                    "name": "How current is the device data in Phone Finder?",
+                    "acceptedAnswer": {
+                        "@type": "Answer",
+                        "text": "DevicesArena maintains an extensive and regularly updated database of devices. All specifications in the Phone Finder are kept current with the latest releases and specification updates from manufacturers, ensuring you have accurate information when making purchasing decisions."
+                    }
+                },
+                {
+                    "@type": "Question",
+                    "name": "Can I compare devices found through Phone Finder?",
+                    "acceptedAnswer": {
+                        "@type": "Answer",
+                        "text": "Yes! Once you've found devices using the Phone Finder filters, you can select any devices you want to compare side-by-side. Our comparison tool will display detailed specifications and differences, helping you make an informed decision about which device best fits your needs."
+                    }
+                },
+                {
+                    "@type": "Question",
+                    "name": "Is the Phone Finder tool free to use?",
+                    "acceptedAnswer": {
+                        "@type": "Answer",
+                        "text": "Yes! The Phone Finder is completely free to use. There are no hidden fees or subscription costs. Simply access the tool, set your preferences, and discover devices that match your requirements at no cost."
+                    }
+                },
+                {
+                    "@type": "Question",
+                    "name": "Can I find devices by brand in addition to specifications?",
+                    "acceptedAnswer": {
+                        "@type": "Answer",
+                        "text": "Yes! You can filter by specific brands including Apple, Samsung, Google Pixel, OnePlus, Xiaomi, Motorola, Nothing, and many others. You can also combine brand selection with other specifications to find devices from your preferred manufacturer that meet your technical requirements."
+                    }
+                },
+                {
+                    "@type": "Question",
+                    "name": "What device types can I search for in Phone Finder?",
+                    "acceptedAnswer": {
+                        "@type": "Answer",
+                        "text": "The Phone Finder tool allows you to search for smartphones, tablets, smartwatches, and other mobile devices. You can filter by device type to focus on the category you're interested in, or search across all device categories to find the perfect match for your needs."
+                    }
+                }
+            ]
+        }
+    </script>
+
     <style>
         .filter-header {
             font-weight: bold;

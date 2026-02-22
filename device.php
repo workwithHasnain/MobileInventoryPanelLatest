@@ -1088,6 +1088,319 @@ $commentCount = getDeviceCommentCount($pdo, $device_id);
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" />
 
   <link rel="stylesheet" href="<?php echo $base; ?>style.css">
+
+  <!-- Schema.org Structured Data for Device Page -->
+  <?php
+  // Build breadcrumb schema based on the device
+  $breadcrumbItems = [
+    [
+      "@type" => "ListItem",
+      "position" => 1,
+      "name" => "Home",
+      "item" => "https://www.devicesarena.com/"
+    ]
+  ];
+
+  if ($device) {
+    // Determine device category
+    $deviceType = "Smartphone";
+    if (isset($device['type'])) {
+      $type_lower = strtolower($device['type']);
+      if (strpos($type_lower, 'tablet') !== false) {
+        $deviceType = "Tablets";
+      } elseif (strpos($type_lower, 'watch') !== false) {
+        $deviceType = "Smartwatches";
+      } else {
+        $deviceType = "Smartphones";
+      }
+    }
+
+    $breadcrumbItems[] = [
+      "@type" => "ListItem",
+      "position" => 2,
+      "name" => $deviceType,
+      "item" => "https://www.devicesarena.com/" . strtolower(str_replace(" ", "", $deviceType))
+    ];
+
+    $breadcrumbItems[] = [
+      "@type" => "ListItem",
+      "position" => 3,
+      "name" => (isset($device['brand_name']) ? $device['brand_name'] . " " : "") . (isset($device['name']) ? $device['name'] : "Device"),
+      "item" => "https://www.devicesarena.com/device/" . htmlspecialchars($device_slug)
+    ];
+  }
+  ?>
+
+  <!-- Breadcrumb Schema -->
+  <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "BreadcrumbList",
+      "itemListElement": <?php echo json_encode($breadcrumbItems, JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE); ?>
+    }
+  </script>
+
+  <?php
+  // Build comprehensive Product schema with all specifications
+  if ($device) {
+    $productSchema = [
+      "@context" => "https://schema.org",
+      "@type" => "Product",
+      "name" => (isset($device['brand_name']) ? $device['brand_name'] . " " : "") . (isset($device['name']) ? $device['name'] : "Unknown Device"),
+      "description" => "Complete specifications of the " . (isset($device['brand_name']) ? $device['brand_name'] . " " : "") . (isset($device['name']) ? $device['name'] : "device") . ". Includes display, processor, camera, battery, performance, design, connectivity, and all technical details.",
+      "url" => "https://www.devicesarena.com/device/" . htmlspecialchars($device_slug)
+    ];
+
+    // Add image
+    if (isset($device['image']) && !empty($device['image'])) {
+      $productSchema["image"] = getAbsoluteImagePath($device['image'], 'https://www.devicesarena.com/');
+    }
+
+    // Add brand
+    if (isset($device['brand_name']) && !empty($device['brand_name'])) {
+      $productSchema["brand"] = [
+        "@type" => "Brand",
+        "name" => $device['brand_name']
+      ];
+    }
+
+    // Add release date if available
+    if (isset($device['release_date']) && !empty($device['release_date'])) {
+      $productSchema["releaseDate"] = $device['release_date'];
+    }
+
+    // Build specifications array
+    $specifications = [];
+
+    // Display specifications
+    if (isset($device['display_size']) && !empty($device['display_size'])) {
+      $specifications[] = [
+        "@type" => "PropertyValue",
+        "name" => "Screen Size",
+        "value" => $device['display_size'] . " inches"
+      ];
+    }
+
+    if (isset($device['display_type']) && !empty($device['display_type'])) {
+      $specifications[] = [
+        "@type" => "PropertyValue",
+        "name" => "Display Type",
+        "value" => $device['display_type']
+      ];
+    }
+
+    if (isset($device['display_resolution']) && !empty($device['display_resolution'])) {
+      $specifications[] = [
+        "@type" => "PropertyValue",
+        "name" => "Display Resolution",
+        "value" => $device['display_resolution']
+      ];
+    }
+
+    if (isset($device['refresh_rate']) && !empty($device['refresh_rate'])) {
+      $specifications[] = [
+        "@type" => "PropertyValue",
+        "name" => "Refresh Rate",
+        "value" => $device['refresh_rate'] . "Hz"
+      ];
+    }
+
+    // Processor and Performance
+    if (isset($device['chipset_name']) && !empty($device['chipset_name'])) {
+      $specifications[] = [
+        "@type" => "PropertyValue",
+        "name" => "Processor",
+        "value" => $device['chipset_name']
+      ];
+    }
+
+    if (isset($device['ram']) && !empty($device['ram'])) {
+      $specifications[] = [
+        "@type" => "PropertyValue",
+        "name" => "RAM Memory",
+        "value" => $device['ram'] . "GB"
+      ];
+    }
+
+    if (isset($device['storage']) && !empty($device['storage'])) {
+      $specifications[] = [
+        "@type" => "PropertyValue",
+        "name" => "Internal Storage",
+        "value" => $device['storage'] . "GB"
+      ];
+    }
+
+    // Camera specifications
+    if (isset($device['main_camera_resolution']) && !empty($device['main_camera_resolution'])) {
+      $specifications[] = [
+        "@type" => "PropertyValue",
+        "name" => "Main Camera Resolution",
+        "value" => $device['main_camera_resolution'] . "MP"
+      ];
+    }
+
+    if (isset($device['selfie_camera_resolution']) && !empty($device['selfie_camera_resolution'])) {
+      $specifications[] = [
+        "@type" => "PropertyValue",
+        "name" => "Front Camera Resolution",
+        "value" => $device['selfie_camera_resolution'] . "MP"
+      ];
+    }
+
+    // Battery
+    if (isset($device['battery_capacity']) && !empty($device['battery_capacity'])) {
+      $specifications[] = [
+        "@type" => "PropertyValue",
+        "name" => "Battery Capacity",
+        "value" => $device['battery_capacity'] . "mAh"
+      ];
+    }
+
+    if (isset($device['wired_charging']) && !empty($device['wired_charging'])) {
+      $specifications[] = [
+        "@type" => "PropertyValue",
+        "name" => "Fast Charging",
+        "value" => $device['wired_charging'] . "W"
+      ];
+    }
+
+    // Design and Build
+    if (isset($device['weight']) && !empty($device['weight'])) {
+      $specifications[] = [
+        "@type" => "PropertyValue",
+        "name" => "Weight",
+        "value" => $device['weight'] . "g"
+      ];
+    }
+
+    if (isset($device['dimensions']) && !empty($device['dimensions'])) {
+      $specifications[] = [
+        "@type" => "PropertyValue",
+        "name" => "Dimensions",
+        "value" => $device['dimensions']
+      ];
+    }
+
+    // Operating System
+    if (isset($device['os']) && !empty($device['os'])) {
+      $specifications[] = [
+        "@type" => "PropertyValue",
+        "name" => "Operating System",
+        "value" => $device['os']
+      ];
+    }
+
+    // Connectivity
+    $networks = [];
+    if (isset($device['network_5g']) && $device['network_5g']) $networks[] = "5G";
+    if (isset($device['network_4g']) && $device['network_4g']) $networks[] = "4G LTE";
+    if (isset($device['network_3g']) && $device['network_3g']) $networks[] = "3G";
+    if (!empty($networks)) {
+      $specifications[] = [
+        "@type" => "PropertyValue",
+        "name" => "Network Support",
+        "value" => implode(", ", $networks)
+      ];
+    }
+
+    if (isset($device['wifi']) && !empty($device['wifi'])) {
+      $wifi_value = is_array($device['wifi']) ? implode(", ", $device['wifi']) : $device['wifi'];
+      $specifications[] = [
+        "@type" => "PropertyValue",
+        "name" => "WiFi",
+        "value" => $wifi_value
+      ];
+    }
+
+    if (isset($device['bluetooth']) && !empty($device['bluetooth'])) {
+      $bluetooth_value = is_array($device['bluetooth']) ? implode(", ", $device['bluetooth']) : $device['bluetooth'];
+      $specifications[] = [
+        "@type" => "PropertyValue",
+        "name" => "Bluetooth",
+        "value" => $bluetooth_value
+      ];
+    }
+
+    if (!empty($specifications)) {
+      $productSchema["additionalProperty"] = $specifications;
+    }
+
+    // Add price if available
+    if (isset($device['price']) && !empty($device['price'])) {
+      $productSchema["offers"] = [
+        "@type" => "Offer",
+        "priceCurrency" => "USD",
+        "price" => $device['price'],
+        "availability" => "https://schema.org/InStock"
+      ];
+    }
+  }
+  ?>
+
+  <!-- Product Schema for Detailed Device Information -->
+  <?php if ($device && isset($productSchema)): ?>
+    <script type="application/ld+json">
+      <?php echo json_encode($productSchema, JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE | JSON_PRETTY_PRINT); ?>
+    </script>
+  <?php endif; ?>
+
+  <!-- FAQ Schema for Device Pages -->
+  <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "FAQPage",
+      "mainEntity": [{
+          "@type": "Question",
+          "name": "What are the main specifications of this device?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "This device features detailed specifications including screen size, display type and resolution, processor type, RAM capacity, internal storage, camera quality, battery capacity, operating system, design dimensions and weight, and comprehensive connectivity options. All specifications are provided in the detailed sections above."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "How does this device compare to other models?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "You can compare this device side-by-side with up to 2 other devices of your choice using our advanced Comparison Tool. Simply select the devices you want to compare and view detailed specifications, features, performance metrics, camera capabilities, battery life, and more to make an informed decision."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "What is the release date of this device?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "The detailed release date and announcement information for this device is available in the Launch section of the specifications. This includes the announcement date and availability timeline."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "What connectivity options are available?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "This device supports various connectivity options including network generations (2G, 3G, 4G LTE, 5G), WiFi standards, Bluetooth versions, GPS, NFC, and USB connectivity. All connectivity specifications are detailed in the relevant sections."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "Can I leave a review or comment?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "Yes! You can share your experiences and opinions by leaving comments and reviews on this device page. Your feedback helps other users make informed decisions about this device and provides valuable insights to the community."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "Where can I find more detailed information?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "Complete technical specifications are organized in detailed sections covering display, hardware, memory, cameras, multimedia, connectivity, features, battery, and more. Scroll through the page to find all available information, or use our Phone Finder tool to explore similar devices."
+          }
+        }
+      ]
+    }
+  </script>
+
   <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-4554952734894265"
     crossorigin="anonymous"></script>
 </head>

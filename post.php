@@ -354,6 +354,158 @@ if ($_POST && isset($_POST['action'])) {
 
     <link rel="stylesheet" href="<?php echo $base; ?>style.css">
 
+    <!-- Schema.org Structured Data for Blog Post Page -->
+    <?php
+    // Build breadcrumb schema for the blog post
+    $breadcrumbItems = [
+        [
+            "@type" => "ListItem",
+            "position" => 1,
+            "name" => "Home",
+            "item" => "https://www.devicesarena.com/"
+        ],
+        [
+            "@type" => "ListItem",
+            "position" => 2,
+            "name" => "Blog",
+            "item" => "https://www.devicesarena.com/posts"
+        ]
+    ];
+
+    if ($post) {
+        $breadcrumbItems[] = [
+            "@type" => "ListItem",
+            "position" => 3,
+            "name" => $post['title'],
+            "item" => "https://www.devicesarena.com/post/" . htmlspecialchars($post['slug'])
+        ];
+    }
+    ?>
+
+    <!-- Breadcrumb Schema -->
+    <script type="application/ld+json">
+        {
+            "@context": "https://schema.org",
+            "@type": "BreadcrumbList",
+            "itemListElement": <?php echo json_encode($breadcrumbItems, JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE); ?>
+        }
+    </script>
+
+    <?php
+    // Build BlogPosting schema with full article details
+    if ($post) {
+        $blogPostingSchema = [
+            "@context" => "https://schema.org",
+            "@type" => "BlogPosting",
+            "headline" => $post['title'],
+            "description" => isset($post['excerpt']) && !empty($post['excerpt']) ? substr($post['excerpt'], 0, 160) : substr(strip_tags($post['content']), 0, 160),
+            "articleBody" => isset($post['content']) ? strip_tags($post['content']) : "",
+            "url" => "https://www.devicesarena.com/post/" . htmlspecialchars($post['slug']),
+            "datePublished" => isset($post['created_at']) ? date('Y-m-d', strtotime($post['created_at'])) : date('Y-m-d'),
+            "dateModified" => isset($post['updated_at']) && !empty($post['updated_at']) ? date('Y-m-d', strtotime($post['updated_at'])) : (isset($post['created_at']) ? date('Y-m-d', strtotime($post['created_at'])) : date('Y-m-d'))
+        ];
+
+        // Add author if available
+        $blogPostingSchema["author"] = [
+            "@type" => "Organization",
+            "name" => "DevicesArena"
+        ];
+
+        // Add featured image if available
+        if (isset($post['featured_image']) && !empty($post['featured_image'])) {
+            $imageUrl = getAbsoluteImagePath($post['featured_image'], 'https://www.devicesarena.com/');
+            $blogPostingSchema["image"] = $imageUrl;
+        } else {
+            $blogPostingSchema["image"] = "https://www.devicesarena.com/imges/icon-256.png";
+        }
+
+        // Add comment count if available
+        if (isset($postCommentCount) && $postCommentCount > 0) {
+            $blogPostingSchema["commentCount"] = $postCommentCount;
+        }
+
+        // Add keywords/article section if available
+        $blogPostingSchema["keywords"] = "smartphones, devices, reviews, specifications, tech news, mobile devices";
+        $blogPostingSchema["articleSection"] = "Technology";
+    }
+    ?>
+
+    <!-- BlogPosting Schema for Detailed Article Information -->
+    <?php if ($post && isset($blogPostingSchema)): ?>
+        <script type="application/ld+json">
+            <?php echo json_encode($blogPostingSchema, JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE | JSON_PRETTY_PRINT); ?>
+        </script>
+    <?php endif; ?>
+
+    <!-- Organization Schema for Author -->
+    <script type="application/ld+json">
+        {
+            "@context": "https://schema.org",
+            "@type": "Organization",
+            "name": "DevicesArena",
+            "url": "https://www.devicesarena.com",
+            "logo": "https://www.devicesarena.com/imges/icon-256.png",
+            "description": "Your source for comprehensive device reviews, specifications, comparisons, and tech industry insights."
+        }
+    </script>
+
+    <!-- FAQ Schema for Blog Posts -->
+    <script type="application/ld+json">
+        {
+            "@context": "https://schema.org",
+            "@type": "FAQPage",
+            "mainEntity": [{
+                    "@type": "Question",
+                    "name": "What kind of content does DevicesArena blog cover?",
+                    "acceptedAnswer": {
+                        "@type": "Answer",
+                        "text": "DevicesArena blog features comprehensive articles about smartphones, tablets, smartwatches, and other mobile devices. Our content includes product reviews, technology news, device comparisons, buying guides, specification analysis, and insights into the latest tech industry trends and innovations."
+                    }
+                },
+                {
+                    "@type": "Question",
+                    "name": "How often is the blog updated with new posts?",
+                    "acceptedAnswer": {
+                        "@type": "Answer",
+                        "text": "We regularly publish new articles covering the latest device releases, tech news, detailed reviews, and buying guides. Check back frequently for fresh content or subscribe to our newsletter to receive notifications about new posts and device reviews."
+                    }
+                },
+                {
+                    "@type": "Question",
+                    "name": "Can I find links to device comparisons in blog posts?",
+                    "acceptedAnswer": {
+                        "@type": "Answer",
+                        "text": "Yes! Many of our blog posts include links to detailed device specifications and comparison tools. You can use these links to directly compare devices discussed in the articles to make informed purchasing decisions."
+                    }
+                },
+                {
+                    "@type": "Question",
+                    "name": "How are reviews and ratings determined?",
+                    "acceptedAnswer": {
+                        "@type": "Answer",
+                        "text": "Our reviews are based on comprehensive testing and analysis of device specifications, real-world performance, camera quality, battery life, display characteristics, software experience, and value for money. We evaluate each device objectively across multiple categories."
+                    }
+                },
+                {
+                    "@type": "Question",
+                    "name": "Can I share articles on social media?",
+                    "acceptedAnswer": {
+                        "@type": "Answer",
+                        "text": "Yes! Each blog post can be easily shared on social media platforms. Use your browser's share functionality or look for social sharing buttons to share interesting articles with your friends and followers."
+                    }
+                },
+                {
+                    "@type": "Question",
+                    "name": "How can I stay updated with new articles?",
+                    "acceptedAnswer": {
+                        "@type": "Answer",
+                        "text": "Subscribe to our newsletter to receive notifications about new blog posts, device reviews, and technology insights. You can also browse our blog section regularly or use our Phone Finder tool to explore specific device categories."
+                    }
+                }
+            ]
+        }
+    </script>
+
     <style>
         /* Avatar and Comment Styles */
         .avatar-box {
