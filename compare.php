@@ -1986,6 +1986,13 @@ function formatDeviceSpecsStructured($device)
                             $headerCell .= '</td>';
                             echo '<tr>' . $headerCell . '</tr>';
 
+                            // Helper function to tokenize content
+                            $tokenizeContent = function($text) {
+                                if ($text === 'N/A') return ['N/A'];
+                                // Split by spaces, keep tokens
+                                return preg_split('/\s+/', trim($text));
+                            };
+
                             // Render each field/description pair as a 2-column row per phone
                             for ($i = 0; $i < $maxRows; $i++) {
                                 // Get values for all three phones
@@ -1993,46 +2000,35 @@ function formatDeviceSpecsStructured($device)
                                 $val2 = isset($rows2[$i]) ? trim($rows2[$i]['description']) : 'N/A';
                                 $val3 = isset($rows3[$i]) ? trim($rows3[$i]['description']) : 'N/A';
                                 
-                                // Function to split content into words/tokens
-                                $tokenizeContent = function($text) {
-                                    if ($text === 'N/A') return ['N/A'];
-                                    // Split by spaces and common separators, but keep them
-                                    $tokens = preg_split('/(\s+)/', $text, -1, PREG_SPLIT_DELIM_CAPTURE);
-                                    return array_filter($tokens, function($token) { return $token !== ''; });
-                                };
-                                
                                 // Get all tokens
                                 $tokens1 = $tokenizeContent($val1);
                                 $tokens2 = $tokenizeContent($val2);
                                 $tokens3 = $tokenizeContent($val3);
                                 
-                                // Function to check if token is common (appears in other cells)
-                                $isTokenCommon = function($token, $otherTokens1, $otherTokens2) {
-                                    // Don't grey out whitespace
-                                    if (trim($token) === '') return false;
-                                    // Don't grey out N/A
-                                    if ($token === 'N/A' && !in_array('N/A', $otherTokens1) && !in_array('N/A', $otherTokens2)) return false;
-                                    
-                                    // Check if token appears in either other cell
-                                    return in_array($token, $otherTokens1) || in_array($token, $otherTokens2);
+                                // Helper to clean tokens (remove empty values)
+                                $cleanTokens = function($arr) {
+                                    $cleaned = array_filter($arr, function($t) { return !empty(trim($t)); });
+                                    return array_values($cleaned);
                                 };
                                 
-                                // Function to render cell with word-level styling
-                                $renderCell = function($label, $tokens, $field, $otherTokens1 = [], $otherTokens2 = []) use ($isTokenCommon) {
-                                    if ($label === 'N/A') {
-                                        return '<td style="padding:12px 10px;color:#999;">N/A</td>';
-                                    }
-                                    
+                                $tokens1 = $cleanTokens($tokens1);
+                                $tokens2 = $cleanTokens($tokens2);
+                                $tokens3 = $cleanTokens($tokens3);
+                                
+                                // Helper to render a cell with word-level styling
+                                $renderCellWithWords = function($tokens, $field, $otherTokens1, $otherTokens2) {
                                     $html = '<td style="padding:12px 10px;vertical-align:top;"><div class="subt-desc-cont"><div class="subtitle">' . htmlspecialchars($field) . '</div><div class="description">';
                                     
-                                    foreach ($tokens as $token) {
-                                        if (trim($token) === '') {
-                                            // Whitespace token
-                                            $html .= htmlspecialchars($token);
-                                        } else {
-                                            $isCommon = $isTokenCommon($token, $otherTokens1, $otherTokens2);
-                                            $class = $isCommon ? ' data-common-token' : ' data-unique-token';
-                                            $html .= '<span class="spec-word' . $class . '">' . htmlspecialchars($token) . '</span>';
+                                    foreach ($tokens as $idx => $token) {
+                                        // Check if this token appears in other cells
+                                        $isCommon = in_array($token, $otherTokens1) || in_array($token, $otherTokens2);
+                                        $dataAttr = $isCommon ? 'data-common-token="true"' : 'data-unique-token="true"';
+                                        
+                                        $html .= '<span class="spec-word" ' . $dataAttr . '>' . htmlspecialchars($token) . '</span>';
+                                        
+                                        // Add space after token except for last one
+                                        if ($idx < count($tokens) - 1) {
+                                            $html .= ' ';
                                         }
                                     }
                                     
@@ -2045,21 +2041,21 @@ function formatDeviceSpecsStructured($device)
 
                                 // Phone 1
                                 if (isset($rows1[$i])) {
-                                    echo $renderCell($val1, $tokens1, $rows1[$i]['field'], $tokens2, $tokens3);
+                                    echo $renderCellWithWords($tokens1, $rows1[$i]['field'], $tokens2, $tokens3);
                                 } else {
                                     echo '<td style="padding:12px 10px;color:#999;">N/A</td>';
                                 }
 
                                 // Phone 2
                                 if (isset($rows2[$i])) {
-                                    echo $renderCell($val2, $tokens2, $rows2[$i]['field'], $tokens1, $tokens3);
+                                    echo $renderCellWithWords($tokens2, $rows2[$i]['field'], $tokens1, $tokens3);
                                 } else {
                                     echo '<td style="padding:12px 10px;color:#999;">N/A</td>';
                                 }
 
                                 // Phone 3
                                 if (isset($rows3[$i])) {
-                                    echo $renderCell($val3, $tokens3, $rows3[$i]['field'], $tokens1, $tokens2);
+                                    echo $renderCellWithWords($tokens3, $rows3[$i]['field'], $tokens1, $tokens2);
                                 } else {
                                     echo '<td style="padding:12px 10px;color:#999;">N/A</td>';
                                 }
