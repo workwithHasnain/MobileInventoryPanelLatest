@@ -90,6 +90,7 @@ if (!empty($device_type_filter)) {
             height: fit-content;
             width: fit-content;
             align-self: center;
+            margin: 10px;
         }
     </style>
 </head>
