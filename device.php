@@ -2155,7 +2155,7 @@ $commentCount = getDeviceCommentCount($pdo, $device_id);
                 </div>
                 <div class="d-flex flexiable ">
                   <img src="/imges/download-removebg-preview.png" alt="">
-                  <h5 style="font-family:system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue' ; font-size: 16px; font-weight: 700;" class="mt-2" onclick="window.location.href='/compare'">COMPARE </h5>
+                  <h5 style="font-family:system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue' ; font-size: 16px; font-weight: 700;" class="mt-2" onclick="window.location.href='/compare/<?php echo htmlspecialchars($device['slug']); ?>'">COMPARE </h5>
                 </div>
                 <div class="d-flex flexiable ">
                   <img src="/imges/download-removebg-preview.png" alt="">
@@ -2273,7 +2273,7 @@ $commentCount = getDeviceCommentCount($pdo, $device_id);
             <?php else: ?>
               <button class="pad" disabled style="opacity: 0.5; cursor: default;" title="No review available">REVIEW</button>
             <?php endif; ?>
-            <button class="pad" onclick="window.location.href='/compare'">COMPARE</button>
+            <button class="pad" onclick="window.location.href='/compare/<?php echo htmlspecialchars($device['slug']); ?>'">COMPARE</button>
             <button class="pad" onclick="document.getElementById('comments').scrollIntoView({behavior:'smooth', block:'start'});">OPINIONS</button>
             <button class="pad" onclick="showPicturesModal()">PICTURES</button>
             <button class="pad" onclick="showRelatedPhonesModal()">RELATED PHONES</button>
