@@ -12,7 +12,7 @@
 
     <!-- DESKTOP VIEW -->
     <div class="d-none d-lg-flex"
-        style="overflow-y: auto; max-height:390px; width:100%; justify-content: center; flex-wrap:wrap; overflow-x:hidden; gap: 15px; padding: 0; margin: 0;">
+        style="overflow-y: auto; max-height:390px; width:100%; justify-content: center; flex-wrap:wrap; overflow-x:hidden; gap: 10px; padding: 0; margin: 0;">
 
         <?php foreach ($latestDevices as $device): ?>
             <a href="<?php echo $base; ?>device/<?php echo urlencode($device['slug']); ?>" class="module-phones-link">
