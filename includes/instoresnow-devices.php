@@ -1,6 +1,6 @@
 <h4 class="section-heading">In stores now</h4>
 
-<?php if (empty($devices)): ?>
+<?php if (empty($latestDevices)): ?>
 
     <div class="text-center py-5">
         <i class="fas fa-mobile-alt fa-3x text-muted mb-3"></i>
@@ -14,7 +14,7 @@
     <div class="d-none d-lg-flex"
         style="overflow-y: auto; max-height:390px; width:100%; justify-content: center; flex-wrap:wrap; overflow-x:hidden; gap: 15px; padding: 0; margin: 0;">
 
-        <?php foreach ($devices as $device): ?>
+        <?php foreach ($latestDevices as $device): ?>
             <a href="<?php echo $base; ?>device/<?php echo urlencode($device['slug']); ?>" class="module-phones-link">
                 <img src="<?php echo htmlspecialchars(getAbsoluteImagePath($device['image'], $base)); ?>" alt="">
                 <br><?php echo htmlspecialchars($device['name']); ?>
@@ -31,7 +31,7 @@
 
             <?php
             // split into chunks of 2 items (because mobile shows 2 per slide)
-            $mobileChunks = array_chunk($devices, 2);
+            $mobileChunks = array_chunk($latestDevices, 2);
             ?>
 
             <?php foreach ($mobileChunks as $chunk): ?>
