@@ -1735,7 +1735,7 @@ function formatDeviceSpecsStructured($device)
                     padding: 12px;
                     vertical-align: top;
                     text-align: left;
-                    word-wrap: break-word;
+                    /* word-wrap: break-word; */
                     font-size: 15px;
                 }
 
@@ -1750,12 +1750,12 @@ function formatDeviceSpecsStructured($device)
 
                 .subtitle {
                     font-weight: 600;
-                    word-break: break-word;
+                    /* word-break: break-word; */
                     font-size: 13px;
                 }
 
                 .description {
-                    word-break: break-word;
+                    /* word-break: break-word; */
                     white-space: normal;
                     line-height: 1.5;
                     font-size: 13px;
@@ -1800,12 +1800,12 @@ function formatDeviceSpecsStructured($device)
 
                     .subtitle {
                         font-weight: 600;
-                        word-break: break-word;
+                        /* word-break: break-word; */
                         font-size: 10px;
                     }
 
                     .description {
-                        word-break: break-word;
+                        /* word-break: break-word; */
                         white-space: normal;
                         line-height: 1.4;
                         font-size: 9px;
