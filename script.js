@@ -156,7 +156,8 @@ document.addEventListener('DOMContentLoaded', function () {
     function doSearch(query) {
         if (controller) controller.abort();
         controller = new AbortController();
-        const url = 'search.php?q=' + encodeURIComponent(query) + '&limit=8';
+        const baseURL = window.baseURL;
+        const url = baseURL + 'search.php?q=' + encodeURIComponent(query) + '&limit=8';
         fetch(url, { signal: controller.signal })
             .then(function (res) { return res.json(); })
             .then(function (data) {
@@ -249,7 +250,10 @@ function performMobileSearch(query) {
 
     mobileSearchController = new AbortController();
 
-    fetch(`search.php?q=${encodeURIComponent(query)}&limit=15`, {
+    const baseURL = window.baseURL || '/';
+    const url = baseURL + `search.php?q=${encodeURIComponent(query)}&limit=15`;
+
+    fetch(url, {
         signal: mobileSearchController.signal
     })
         .then(response => response.json())

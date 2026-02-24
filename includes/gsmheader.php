@@ -183,4 +183,6 @@ $mobile_brands = $mobile_brands_stmt->fetchAll();
             });
         });
     });
+    // Set global base URL for JavaScript
+    window.baseURL = '<?php echo $base; ?>';
 </script>

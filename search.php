@@ -1,5 +1,6 @@
 <?php
 // Live search endpoint: returns mixed posts and phones as JSON
+require_once __DIR__ . '/config.php';
 require_once __DIR__ . '/database_functions.php';
 
 header('Content-Type: application/json');
@@ -69,7 +70,7 @@ try {
             'title' => $p['title'],
             'slug' => $p['slug'],
             'image' => $p['featured_image'] ?? '',
-            'url' => 'post.php?slug=' . rawurlencode($p['slug'])
+            'url' => $base . 'post/' . rawurlencode($p['slug'])
         ];
     }
 
@@ -81,7 +82,7 @@ try {
             'title' => $label,
             'slug' => $ph['slug'],
             'image' => $ph['image'] ?? '',
-            'url' => 'device.php?slug=' . rawurlencode($ph['slug'])
+            'url' => $base . 'device/' . rawurlencode($ph['slug'])
         ];
     }
 
