@@ -169,7 +169,9 @@ $all_brands_stmt = $pdo->prepare("
 $all_brands_stmt->execute();
 $allBrandsModal = $all_brands_stmt->fetchAll();
 
-
+// Get latest 9 devices for the new section
+$latestDevices = getAllPhones();
+$latestDevices = array_slice(array_reverse($latestDevices), 0, 9); // Get latest 9 devices
 
 
 ?>
