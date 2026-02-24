@@ -105,7 +105,9 @@ document.addEventListener('DOMContentLoaded', function () {
 
             if (item.image) {
                 const img = document.createElement('img');
-                img.src = item.image;
+                const baseURL = window.baseURL || '/';
+                // Check if image is relative path and prepend baseURL
+                img.src = (item.image.startsWith('/') || item.image.startsWith('http')) ? item.image : baseURL + item.image;
                 img.alt = item.title || '';
                 img.style.width = '32px';
                 img.style.height = '32px';
@@ -286,7 +288,9 @@ function renderMobileSearchResults(items) {
 
         if (hasImage) {
             const img = document.createElement('img');
-            img.src = item.image;
+            const baseURL = window.baseURL;
+            // Check if image is relative path and prepend baseURL
+            img.src = (item.image.startsWith('/') || item.image.startsWith('http')) ? item.image : baseURL + item.image;
             img.alt = item.title;
             img.className = 'mobile-search-result-image';
             img.onerror = function () {
