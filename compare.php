@@ -1552,12 +1552,10 @@ function formatDeviceSpecsStructured($device)
             <div class="col-md-8 col-5  d-lg-inline d-none " style="padding: 0; position: relative;">
                 <div class="comfort-life position-absolute">
                     <img class="w-100 h-100" src="/hero-images/compare-hero.png"
-                        style="background-repeat: no-repeat; background-size: cover;" alt="">
+                        style="background-repeat: no-repeat; background-size: cover;" alt="header image of compare page for devicesarena.com">
                 </div>
             </div>
-            <div class="col-md-4 col-5 d-none d-lg-block" style="    position: relative;
-    /* left: 12px; */
-    padding: 0;">
+            <div class="col-md-4 col-5 d-none d-lg-block" style="position: relative; /* left: 12px; */ padding: 0;">
                 <button class="solid w-100 py-2">
                     <i class="fa-solid fa-mobile fa-sm mx-2" style="color: white;"></i>
                     Phone Finder</button>
@@ -1587,7 +1585,6 @@ function formatDeviceSpecsStructured($device)
                 </div>
             </div>
         </div>
-
     </div>
     <div class="comparison-container container bg-white margin-top-4rem">
         <div class="phone-cards-scroll-wrapper">

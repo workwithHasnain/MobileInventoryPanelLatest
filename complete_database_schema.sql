@@ -266,3 +266,21 @@ CREATE INDEX IF NOT EXISTS idx_content_views_content ON content_views(content_ty
 CREATE INDEX IF NOT EXISTS idx_reviews_phone_id ON reviews(phone_id);
 CREATE INDEX IF NOT EXISTS idx_reviews_post_id ON reviews(post_id);
 
+-- =====================================================
+-- QUERIES TABLE (Contact Form Submissions)
+-- =====================================================
+
+CREATE TABLE IF NOT EXISTS queries (
+    id SERIAL PRIMARY KEY,
+    name VARCHAR(100) NOT NULL,
+    email VARCHAR(255) NOT NULL,
+    query TEXT NOT NULL,
+    query_type VARCHAR(50) DEFAULT 'contact',
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
+-- Queries indexes
+CREATE INDEX IF NOT EXISTS idx_queries_email ON queries(email);
+CREATE INDEX IF NOT EXISTS idx_queries_query_type ON queries(query_type);
+CREATE INDEX IF NOT EXISTS idx_queries_created_at ON queries(created_at);
+

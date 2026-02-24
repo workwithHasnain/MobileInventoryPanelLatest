@@ -740,7 +740,7 @@ if ($_POST && isset($_POST['action'])) {
             fetch(`/get_post_details.php?id=${postId}`)
                 .then(response => response.text())
                 .then(data => {
-                    window.location.href = `<?php echo $base; ?>post.php?id=${postId}`;
+                    window.location.href = `<?php echo $base; ?>post/${postId}`;
                 })
                 .catch(error => {
                     console.error('Error:', error);

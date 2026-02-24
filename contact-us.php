@@ -114,68 +114,6 @@ $all_brands_stmt->execute();
 $allBrandsModal = $all_brands_stmt->fetchAll();
 
 
-// Get post by slug or ID
-// New way: slug comes from clean URL (domain/post/slug) rewritten by .htaccess
-$slug = $_GET['slug'] ?? $_GET['id'] ?? null;
-
-if (!$slug) {
-    header('Location: index.php');
-    exit;
-}
-
-// Try to get post by slug first, then by ID if it's numeric
-if (is_numeric($slug)) {
-    $stmt = $pdo->prepare("SELECT * FROM posts WHERE (slug = ? OR id = ?) AND status ILIKE 'published'");
-    $stmt->execute([$slug, intval($slug)]);
-} else {
-    $stmt = $pdo->prepare("SELECT * FROM posts WHERE slug = ? AND status ILIKE 'published'");
-    $stmt->execute([$slug]);
-}
-$post = $stmt->fetch();
-
-if (!$post) {
-    header('HTTP/1.0 404 Not Found');
-    include '404.php';
-    exit;
-}
-
-// Get post comments and comment count
-$postComments = getPostComments($post['id']);
-$postCommentCount = getPostCommentCount($post['id']);
-
-// Track view for this post (one per IP per day)
-$user_ip = $_SERVER['REMOTE_ADDR'] ?? '127.0.0.1';
-$user_agent = $_SERVER['HTTP_USER_AGENT'] ?? '';
-
-try {
-    $view_stmt = $pdo->prepare("INSERT INTO content_views (content_type, content_id, ip_address, user_agent) VALUES ('post', CAST(? AS VARCHAR), ?, ?) ON CONFLICT (content_type, content_id, ip_address) DO NOTHING");
-    $view_stmt->execute([$post['id'], $user_ip, $user_agent]);
-
-    // Update view count in posts table
-    $update_view_stmt = $pdo->prepare("UPDATE posts SET view_count = (SELECT COUNT(*) FROM content_views WHERE content_type = 'post' AND content_id = CAST(? AS VARCHAR)) WHERE id = ?");
-    $update_view_stmt->execute([$post['id'], $post['id']]);
-} catch (Exception $e) {
-    // Silently ignore view tracking errors
-}
-
-// Get comments for posts
-function getPostComments($post_id)
-{
-    global $pdo;
-    $stmt = $pdo->prepare("SELECT * FROM post_comments WHERE post_id = ? AND status = 'approved' ORDER BY created_at DESC");
-    $stmt->execute([$post_id]);
-    return $stmt->fetchAll();
-}
-
-// Get post comment count
-function getPostCommentCount($post_id)
-{
-    global $pdo;
-    $stmt = $pdo->prepare("SELECT COUNT(*) as count FROM post_comments WHERE post_id = ? AND status = 'approved'");
-    $stmt->execute([$post_id]);
-    return $stmt->fetch(PDO::FETCH_ASSOC)['count'] ?? 0;
-}
-
 // Function to generate gravatar URL
 function getGravatarUrl($email, $size = 50)
 {
@@ -183,120 +121,16 @@ function getGravatarUrl($email, $size = 50)
     return "https://www.gravatar.com/avatar/{$hash}?r=g&s={$size}&d=identicon";
 }
 
-// Function to format time ago
-function timeAgo($datetime)
-{
-    $time = time() - strtotime($datetime);
-
-    if ($time < 60) return 'just now';
-    if ($time < 3600) return floor($time / 60) . ' minutes ago';
-    if ($time < 86400) return floor($time / 3600) . ' hours ago';
-    if ($time < 2592000) return floor($time / 86400) . ' days ago';
-    if ($time < 31536000) return floor($time / 2592000) . ' months ago';
-
-    return floor($time / 31536000) . ' years ago';
-}
-
-// Function to generate avatar display
-function getAvatarDisplay($name, $email)
-{
-    if (!empty($email)) {
-        return '<img src="' . getGravatarUrl($email) . '" alt="' . htmlspecialchars($name) . '">';
-    } else {
-        $initials = strtoupper(substr($name, 0, 1));
-        $colors = ['#007bff', '#28a745', '#dc3545', '#ffc107', '#17a2b8', '#6f42c1', '#e83e8c'];
-        $color = $colors[abs(crc32($name)) % count($colors)];
-        return '<span class="avatar-box" style="background-color: ' . $color . '; color: white;">' . $initials . '</span>';
-    }
-}
-
-// Get comments for devices
-function getDeviceComments($device_id)
-{
-    global $pdo;
-    $stmt = $pdo->prepare("SELECT * FROM device_comments WHERE device_id = ? AND status = 'approved' ORDER BY created_at DESC");
-    $stmt->execute([$device_id]);
-    return $stmt->fetchAll();
-}
-
-// Handle comment submissions and newsletter subscriptions
-$comment_success = '';
-$comment_error = '';
-$newsletter_success = '';
-$newsletter_error = '';
-
-if ($_POST && isset($_POST['action'])) {
-    $action = $_POST['action'];
-
-    if ($action === 'newsletter_subscribe') {
-        $email = trim($_POST['newsletter_email'] ?? '');
-        $name = trim($_POST['newsletter_name'] ?? '');
-
-        if (empty($email)) {
-            $newsletter_error = 'Email address is required.';
-        } elseif (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
-            $newsletter_error = 'Please enter a valid email address.';
-        } else {
-            // Check if email already exists
-            $check_stmt = $pdo->prepare("SELECT id FROM newsletter_subscribers WHERE email = ?");
-            $check_stmt->execute([$email]);
-
-            if ($check_stmt->fetch()) {
-                $newsletter_error = 'This email is already subscribed to our newsletter.';
-            } else {
-                $insert_stmt = $pdo->prepare("INSERT INTO newsletter_subscribers (email, name, status, subscribed_at) VALUES (?, ?, 'active', NOW())");
-                if ($insert_stmt->execute([$email, $name])) {
-                    $newsletter_success = 'Thank you for subscribing to our newsletter! You\'ll receive the latest tech updates and device reviews.';
-                } else {
-                    $newsletter_error = 'Failed to subscribe. Please try again.';
-                }
-            }
-        }
-    } else {
-        // Handle comment submissions
-        $name = trim($_POST['name'] ?? '');
-        $email = trim($_POST['email'] ?? '');
-        $comment = trim($_POST['comment'] ?? '');
-
-        if (empty($name) || empty($email) || empty($comment)) {
-            $comment_error = 'All fields are required.';
-        } elseif (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
-            $comment_error = 'Please enter a valid email address.';
-        } elseif (strlen($comment) < 10) {
-            $comment_error = 'Comment must be at least 10 characters long.';
-        } else {
-            if ($action === 'comment_post') {
-                $post_id = $_POST['post_id'] ?? '';
-                $stmt = $pdo->prepare("INSERT INTO post_comments (post_id, name, email, comment, status, created_at) VALUES (?, ?, ?, ?, 'pending', NOW())");
-                if ($stmt->execute([$post_id, $name, $email, $comment])) {
-                    $comment_success = 'Your comment has been submitted and is pending approval.';
-                } else {
-                    $comment_error = 'Failed to submit comment. Please try again.';
-                }
-            } elseif ($action === 'comment_device') {
-                $device_id = $_POST['device_id'] ?? '';
-                $parent_id = !empty($_POST['parent_id']) ? $_POST['parent_id'] : null;
-                $stmt = $pdo->prepare("INSERT INTO device_comments (device_id, name, email, comment, parent_id, status, created_at) VALUES (?, ?, ?, ?, ?, 'pending', NOW())");
-                if ($stmt->execute([$device_id, $name, $email, $comment, $parent_id])) {
-                    $comment_success = 'Your comment has been submitted and is pending approval.';
-                } else {
-                    $comment_error = 'Failed to submit comment. Please try again.';
-                }
-            }
-        }
-    }
-}
 ?>
 <!DOCTYPE html>
 <html lang="en">
 
-
 <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <link rel="canonical" href="<?php echo $canonicalBase; ?>/post/<?php echo htmlspecialchars($slug); ?>" />
-    <meta name="description" content="<?php echo htmlspecialchars($post['meta_description'] ?? $post['short_description'] ?? substr($post['content_body'], 0, 160) . '...'); ?>" />
-    <title><?php echo htmlspecialchars($post['meta_title'] ?? $post['title']); ?> - DevicesArena</title>
+    <link rel="canonical" href="<?php echo $canonicalBase ?? ''; ?>/contact-us" />
+    <meta name="description" content="Contact DevicesArena for inquiries about device reviews, specifications, comparisons, and technology-related questions." />
+    <title>Contact Us - DevicesArena</title>
 
     <!-- Favicon & Icons -->
     <link rel="icon" type="image/png" sizes="32x32" href="<?php echo $base; ?>imges/icon-32.png">
@@ -354,9 +188,9 @@ if ($_POST && isset($_POST['action'])) {
 
     <link rel="stylesheet" href="<?php echo $base; ?>style.css">
 
-    <!-- Schema.org Structured Data for Blog Post Page -->
+    <!-- Schema.org Structured Data for Contact Page -->
     <?php
-    // Build breadcrumb schema for the blog post
+    // Build breadcrumb schema for the contact page
     $breadcrumbItems = [
         [
             "@type" => "ListItem",
@@ -367,19 +201,10 @@ if ($_POST && isset($_POST['action'])) {
         [
             "@type" => "ListItem",
             "position" => 2,
-            "name" => "Blog",
-            "item" => "https://www.devicesarena.com/posts"
+            "name" => "Contact Us",
+            "item" => "https://www.devicesarena.com/contact-us"
         ]
     ];
-
-    if ($post) {
-        $breadcrumbItems[] = [
-            "@type" => "ListItem",
-            "position" => 3,
-            "name" => $post['title'],
-            "item" => "https://www.devicesarena.com/post/" . htmlspecialchars($post['slug'])
-        ];
-    }
     ?>
 
     <!-- Breadcrumb Schema -->
@@ -391,53 +216,9 @@ if ($_POST && isset($_POST['action'])) {
         }
     </script>
 
-    <?php
-    // Build BlogPosting schema with full article details
-    if ($post) {
-        $blogPostingSchema = [
-            "@context" => "https://schema.org",
-            "@type" => "BlogPosting",
-            "headline" => $post['title'],
-            "description" => isset($post['excerpt']) && !empty($post['excerpt']) ? substr($post['excerpt'], 0, 160) : substr(strip_tags($post['content_body'] ?? ''), 0, 160),
-            "articleBody" => isset($post['content_body']) && !empty($post['content_body']) ? strip_tags($post['content_body']) : "",
-            "url" => "https://www.devicesarena.com/post/" . htmlspecialchars($post['slug']),
-            "datePublished" => isset($post['created_at']) ? date('Y-m-d', strtotime($post['created_at'])) : date('Y-m-d'),
-            "dateModified" => isset($post['updated_at']) && !empty($post['updated_at']) ? date('Y-m-d', strtotime($post['updated_at'])) : (isset($post['created_at']) ? date('Y-m-d', strtotime($post['created_at'])) : date('Y-m-d'))
-        ];
 
-        // Add author if available
-        $blogPostingSchema["author"] = [
-            "@type" => "Organization",
-            "name" => "DevicesArena"
-        ];
 
-        // Add featured image if available
-        if (isset($post['featured_image']) && !empty($post['featured_image'])) {
-            $imageUrl = getAbsoluteImagePath($post['featured_image'], 'https://www.devicesarena.com/');
-            $blogPostingSchema["image"] = $imageUrl;
-        } else {
-            $blogPostingSchema["image"] = "https://www.devicesarena.com/imges/icon-256.png";
-        }
-
-        // Add comment count if available
-        if (isset($postCommentCount) && $postCommentCount > 0) {
-            $blogPostingSchema["commentCount"] = $postCommentCount;
-        }
-
-        // Add keywords/article section if available
-        $blogPostingSchema["keywords"] = "smartphones, devices, reviews, specifications, tech news, mobile devices";
-        $blogPostingSchema["articleSection"] = "Technology";
-    }
-    ?>
-
-    <!-- BlogPosting Schema for Detailed Article Information -->
-    <?php if ($post && isset($blogPostingSchema)): ?>
-        <script type="application/ld+json">
-            <?php echo json_encode($blogPostingSchema, JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE | JSON_PRETTY_PRINT); ?>
-        </script>
-    <?php endif; ?>
-
-    <!-- Organization Schema for Author -->
+    <!-- Organization Schema with Contact Information -->
     <script type="application/ld+json">
         {
             "@context": "https://schema.org",
@@ -445,17 +226,23 @@ if ($_POST && isset($_POST['action'])) {
             "name": "DevicesArena",
             "url": "https://www.devicesarena.com",
             "logo": "https://www.devicesarena.com/imges/icon-256.png",
-            "description": "Your source for comprehensive device reviews, specifications, comparisons, and tech industry insights."
+            "description": "Your source for comprehensive device reviews, specifications, comparisons, and tech industry insights.",
+            "breadcrumb": {
+                "@type": "BreadcrumbList",
+                "itemListElement": <?php echo json_encode($breadcrumbItems, JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE); ?>
+            }
         }
     </script>
 
-    <!-- Generic Article Schema (for blog/news overview) -->
+    <!-- ContactPage Schema -->
     <script type="application/ld+json">
         {
             "@context": "https://schema.org",
-            "@type": "NewsArticle",
-            "headline": "Technology News, Reviews, and Device Guides - DevicesArena",
-            "description": "Stay updated with the latest smartphone, tablet, and smartwatch news, expert reviews, buying guides, and technology insights from DevicesArena.",
+            "@type": "ContactPage",
+            "name": "Contact Us - DevicesArena",
+            "headline": "Get in Touch with DevicesArena",
+            "description": "Contact DevicesArena for inquiries about device reviews, specifications, comparisons, and other technology-related questions.",
+            "url": "https://www.devicesarena.com/contact-us",
             "image": "https://www.devicesarena.com/imges/icon-256.png",
             "datePublished": "<?php echo date('Y-m-d'); ?>",
             "publisher": {
@@ -466,64 +253,70 @@ if ($_POST && isset($_POST['action'])) {
                     "url": "https://www.devicesarena.com/imges/icon-256.png"
                 }
             },
-            "author": {
-                "@type": "Organization",
-                "name": "DevicesArena Team"
+            "breadcrumb": {
+                "@type": "BreadcrumbList",
+                "itemListElement": <?php echo json_encode($breadcrumbItems, JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE); ?>
             }
         }
     </script>
 
-    <!-- FAQ Schema for Blog Posts -->
+    <!-- FAQ Schema for Contact Page -->
     <script type="application/ld+json">
         {
             "@context": "https://schema.org",
             "@type": "FAQPage",
+            "name": "DevicesArena Contact Page FAQs",
+            "url": "https://www.devicesarena.com/contact-us",
+            "breadcrumb": {
+                "@type": "BreadcrumbList",
+                "itemListElement": <?php echo json_encode($breadcrumbItems, JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE); ?>
+            },
             "mainEntity": [{
                     "@type": "Question",
-                    "name": "What kind of content does DevicesArena blog cover?",
+                    "name": "How can I contact DevicesArena?",
                     "acceptedAnswer": {
                         "@type": "Answer",
-                        "text": "DevicesArena blog features comprehensive articles about smartphones, tablets, smartwatches, and other mobile devices. Our content includes product reviews, technology news, device comparisons, buying guides, specification analysis, and insights into the latest tech industry trends and innovations."
+                        "text": "You can reach out to DevicesArena through our contact form on this page. Fill in your name, email, subject, and message, and our team will get back to you as soon as possible. We typically respond to inquiries within 24-48 hours."
                     }
                 },
                 {
                     "@type": "Question",
-                    "name": "How often is the blog updated with new posts?",
+                    "name": "What should I include in my inquiry?",
                     "acceptedAnswer": {
                         "@type": "Answer",
-                        "text": "We regularly publish new articles covering the latest device releases, tech news, detailed reviews, and buying guides. Check back frequently for fresh content or subscribe to our newsletter to receive notifications about new posts and device reviews."
+                        "text": "Please include a clear subject line, your full name, valid email address, and a detailed description of your inquiry. The more information you provide, the quicker we can assist you."
                     }
                 },
                 {
                     "@type": "Question",
-                    "name": "Can I find links to device comparisons in blog posts?",
+                    "name": "Can I request a device review?",
                     "acceptedAnswer": {
                         "@type": "Answer",
-                        "text": "Yes! Many of our blog posts include links to detailed device specifications and comparison tools. You can use these links to directly compare devices discussed in the articles to make informed purchasing decisions."
+                        "text": "Yes! We accept requests for device reviews. Use our contact form to submit your review request along with details about the device and why you'd like us to review it. Our editorial team will review your request and respond accordingly."
                     }
                 },
                 {
                     "@type": "Question",
-                    "name": "How are reviews and ratings determined?",
+                    "name": "How do I report an error or inaccuracy?",
                     "acceptedAnswer": {
                         "@type": "Answer",
-                        "text": "Our reviews are based on comprehensive testing and analysis of device specifications, real-world performance, camera quality, battery life, display characteristics, software experience, and value for money. We evaluate each device objectively across multiple categories."
+                        "text": "If you notice any errors or inaccuracies in our device specifications, reviews, or comparisons, please contact us immediately through our contact form. Include the specific page, device, and details about the error so we can verify and correct it quickly."
                     }
                 },
                 {
                     "@type": "Question",
-                    "name": "Can I share articles on social media?",
+                    "name": "Do you accept advertising or partnership inquiries?",
                     "acceptedAnswer": {
                         "@type": "Answer",
-                        "text": "Yes! Each blog post can be easily shared on social media platforms. Use your browser's share functionality or look for social sharing buttons to share interesting articles with your friends and followers."
+                        "text": "Yes, we are open to advertising and partnership opportunities. Please use our contact form to describe your proposal, and we'll connect you with the appropriate team member to discuss collaboration possibilities."
                     }
                 },
                 {
                     "@type": "Question",
-                    "name": "How can I stay updated with new articles?",
+                    "name": "How long does it take to receive a response?",
                     "acceptedAnswer": {
                         "@type": "Answer",
-                        "text": "Subscribe to our newsletter to receive notifications about new blog posts, device reviews, and technology insights. You can also browse our blog section regularly or use our Phone Finder tool to explore specific device categories."
+                        "text": "We aim to respond to all inquiries within 24-48 business hours. During peak periods, responses may take slightly longer. For urgent matters, please clearly mark your inquiry as urgent in the subject line."
                     }
                 }
             ]
@@ -767,48 +560,15 @@ if ($_POST && isset($_POST['action'])) {
 <body style="background-color: #EFEBE9; overflow-x: hidden;">
     <?php include 'includes/gsmheader.php'; ?>
 
-    <div class=" mt-4 d-lg-none d-block bg-white">
-        <h3 style="font-size: 23px;
-        font-weight: 600; font-family: 'system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif';" class="mx-3 my-5"><?php echo htmlspecialchars($post['title']); ?></h3>
-        <?php if (!empty($post['featured_image'])): ?>
-            <img style="height: 100%; width: -webkit-fill-available;" src="<?php echo htmlspecialchars(getAbsoluteImagePath($post['featured_image'], $base)); ?>" alt="<?php echo htmlspecialchars($post['title']); ?>">
-        <?php endif; ?>
-    </div>
     <div class="container support content-wrapper" id="Top">
         <div class="row">
-
-            <div class="col-md-8 col-5 d-md-inline  " style="border: 1px solid #e0e0e0;">
-                <div class="comfort-life-23 position-absolute d-flex justify-content-between">
-                    <div class="article-info post-image">
-                        <div class="bg-blur post-inside">
-                            <?php if (!empty($post['featured_image'])): ?>
-                                <img class="center-img" src="<?php echo htmlspecialchars(getAbsoluteImagePath($post['featured_image'], $base)); ?>" alt="<?php echo htmlspecialchars($post['title']); ?>">
-                            <?php endif; ?>
-                        </div>
-                    </div>
-                    <div style="display: flex;  flex-direction: column;">
-                        <h1 class="article-info-name" style="color: #D50000; text-shadow: none;"><?php echo htmlspecialchars($post['title']); ?></h1>
-                        <div class="article-info">
-                            <div class="bg-blur  m-auto" style="background-color: #D50000;">
-                                <div class="d-flex justify-content-end">
-                                    <div class="d-flex flexiable ">
-                                        <img src="/imges/download-removebg-preview.png" alt="">
-                                        <h5 style="font-family:'system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif' ; font-size: 17px" class="mt-2">COMMENTS (<?php echo $postCommentCount; ?>)
-                                        </h5>
-                                    </div>
-                                    <div class="d-flex flexiable " onclick="document.querySelector('.comment-form').scrollIntoView()">
-                                        <img src="/imges/download-removebg-preview.png" alt="">
-                                        <h5 style="font-family:'system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif' ; font-size: 17px;" class="mt-2">POST YOUR
-                                            COMMENT </h5>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-
+            <div class="col-md-8 col-5  d-lg-inline d-none " style="padding: 0; position: relative;">
+                <div class="comfort-life position-absolute">
+                    <img class="w-100 h-100" src="/hero-images/contact-hero.png"
+                        style="background-repeat: no-repeat; background-size: cover;" alt="header image of contact us page for devicesarena.com">
                 </div>
             </div>
-            <div class="col-md-4 col-5 d-none d-lg-block" style="position: relative; left: 0; padding: 0px;">
+            <div class="col-md-4 col-5 d-none d-lg-block" style="position: relative; /* left: 12px; */ padding: 0;">
                 <button class="solid w-100 py-2">
                     <i class="fa-solid fa-mobile fa-sm mx-2" style="color: white;"></i>
                     Phone Finder</button>
@@ -838,175 +598,64 @@ if ($_POST && isset($_POST['action'])) {
                 </div>
             </div>
         </div>
-
     </div>
     <div class="container bg-white" style="border: 1px solid #e0e0e0;">
         <div class="row">
-            <div class="col-lg-8 py-3" style=" padding-left: 0; padding-right: 0; border: 1px solid #e0e0e0;">
-                <div>
-                    <div class="d-flex align-items-center gap-portion mb-2">
-                        <div class="heading-jump d-flex align-items-center w-100">
-                            <button id="headingPrev" type="button" class="heading-nav-btn me-2 flex-shrink-0" title="Previous section" aria-label="Previous section" style="display:none;">
-                                <i class="fa-solid fa-chevron-left"></i>
-                            </button>
-                            <select id="headingDropdown" class="form-select form-select-sm w-100 flex-grow-1" aria-label="Jump to section" style="width:100%; display:none;"></select>
-                            <button id="headingNext" type="button" class="heading-nav-btn ms-2 flex-shrink-0" title="Next section" aria-label="Next section" style="display:none;">
-                                <i class="fa-solid fa-chevron-right"></i>
-                            </button>
-                        </div>
-                    </div>
-                    <div class="d-flex align-items-center justify-content-between gap-portion">
-                        <div class="d-flex">
-                            <button class="section-button"><?php echo htmlspecialchars($post['author']); ?></button>
-                            <p class="my-2 portion-headline mx-1"><?php echo !empty($post['publish_date']) ? date('j F Y', strtotime($post['publish_date'])) : date('j F Y', strtotime($post['created_at'])); ?></p>
-                        </div>
-                        <div>
-                            <?php
-                            $tags = $post['tags'];
-                            if (!empty($tags)) {
-                                // Handle both PostgreSQL array format and comma-separated strings
-                                if (is_string($tags)) {
-                                    $tagsString = trim($tags);
-                                    if (strlen($tagsString) > 1 && $tagsString[0] === '{' && substr($tagsString, -1) === '}') {
-                                        // PostgreSQL array string like {"Apple","iOS","Rumors"}
-                                        $tagsString = trim($tagsString, '{}');
-                                        $tags = array_map(function ($tag) {
-                                            return trim($tag, '"'); // Remove double quotes around tags
-                                        }, explode(',', $tagsString));
-                                    } else {
-                                        // Plain comma-separated string
-                                        $tags = array_map('trim', explode(',', $tagsString));
-                                    }
-                                }
-                                if (is_array($tags)) {
-                                    foreach ($tags as $tag) {
-                                        echo '<button class="section-button" style="margin-right: 5px;">' . htmlspecialchars($tag) . '</button>';
-                                    }
-                                }
-                            }
-                            ?>
-                        </div>
-                    </div>
-                </div>
+            <div class="col-lg-8 py-3" style="padding-left: 0; padding-right: 0; border: 1px solid #e0e0e0;">
                 <div class="document-section">
-                    <?php if (!empty($post['content_body'])): ?>
-                        <div class="gap-portion">
-                            <?php
-                            // Handle both plain text and rich content
-                            $content = $post['content_body'];
-                            // Check if content contains HTML tags
-                            if (strip_tags($content) != $content) {
-                                // Content has HTML, display as-is but sanitize
-                                echo $content;
-                            } else {
-                                // Plain text content, convert line breaks
-                                echo nl2br(htmlspecialchars($content));
-                            }
-                            ?>
-                        </div>
-                    <?php else: ?>
-                        <p class="classy gap-portion">Content is being updated. Please check back later for the full article.</p>
-                    <?php endif; ?>
+                    <div class="gap-portion" style="padding: 20px 30px;">
 
-                    <?php
-                    //$media_gallery = $post['media_gallery'];
-                    //if (!empty($media_gallery)):
-                    // Handle PostgreSQL array format
-                    //if (is_string($media_gallery)) {
-                    // Parse PostgreSQL array string
-                    //  $media_gallery = trim($media_gallery, '{}');
-                    //$media_gallery = explode(',', $media_gallery);
-                    //}
-                    //if (is_array($media_gallery)):
-                    ?>
-                    <!-- <div class="media-gallery mt-4"> -->
-                    <?php //foreach ($media_gallery as $media): 
-                    ?>
-                    <!-- <img class="center-img my-2" src="<?php //echo htmlspecialchars(trim($media)); 
-                                                            ?>" alt="Media from <?php //echo htmlspecialchars($post['title']); 
-                                                                                ?>"> -->
-                    <?php //endforeach; 
-                    ?>
-                    <!-- </div> -->
-                    <?php //endif; 
-                    ?>
-                    <?php //endif; 
-                    ?>
-                </div>
+                        <h4 style="color: #1B2035; margin-bottom: 15px;">We do appreciate your feedback</h4>
+                        <p style="color: #555; line-height: 1.7;">We will be glad to hear from you if:</p>
+                        <ul style="color: #555; line-height: 2; padding-left: 20px;">
+                            <li>You have found a mistake in our device specifications.</li>
+                            <li>You have info about a device which we don't have in our database.</li>
+                            <li>You have found a broken link.</li>
+                            <li>You have a suggestion for improving DevicesArena or you want to request a feature.</li>
+                        </ul>
 
-                <div class="comments">
-                    <h5 class="border-bottom reader  py-3 mx-2">READER COMMENTS</h5>
-                    <div class="first-user" style="background-color: #EDEEEE;">
+                        <p style="color: #555; line-height: 1.7; margin-top: 15px;">Before contacting us, please keep in mind:</p>
+                        <ul style="color: #555; line-height: 2; padding-left: 20px;">
+                            <li>We do not sell mobile phones.</li>
+                            <li>We do not know the price of any mobile phone in your country.</li>
+                            <li>We don't answer any "unlocking" related questions.</li>
+                            <li>We don't answer any "Which mobile should I buy?" questions.</li>
+                        </ul>
 
-                        <?php if (!empty($postComments)): ?>
-                            <?php foreach ($postComments as $comment): ?>
-                                <div class="user-thread">
-                                    <div class="uavatar">
-                                        <?php echo getAvatarDisplay($comment['name'], $comment['email']); ?>
-                                    </div>
-                                    <ul class="uinfo2">
-                                        <li class="uname">
-                                            <a href="#" style="color: #555; text-decoration: none;">
-                                                <?php echo htmlspecialchars($comment['name']); ?>
-                                            </a>
-                                        </li>
-                                        <li class="ulocation">
-                                            <i class="fa-solid fa-location-dot fa-sm"></i>
-                                            <span title="Anonymous location">---</span>
-                                        </li>
-                                        <li class="upost">
-                                            <i class="fa-regular fa-clock fa-sm mx-1"></i>
-                                            <?php echo timeAgo($comment['created_at']); ?>
-                                        </li>
-                                    </ul>
-                                    <p class="uopin"><?php echo nl2br(htmlspecialchars($comment['comment'])); ?></p>
-                                    <ul class="uinfo">
-                                        <li class="ureply" style="list-style: none;">
-                                            <span title="Reply to this post">
-                                                <p href="#">Reply</p>
-                                            </span>
-                                        </li>
-                                    </ul>
-                                </div>
-                            <?php endforeach; ?>
-                        <?php else: ?>
-                            <div class="user-thread text-center py-4">
-                                <p class="uopin text-muted">No comments yet. Be the first to share your opinion!</p>
-                            </div>
-                        <?php endif; ?>
-
-                        <!-- Comment Form -->
-                        <div class="comment-form mt-4 mx-2 mb-3">
-                            <h6 class="mb-3">Share Your Opinion</h6>
-
-                            <form id="post-comment-form" method="POST">
-                                <input type="hidden" name="action" value="comment_post">
-                                <input type="hidden" name="post_id" value="<?php echo $post['id']; ?>">
-
-                                <div class="row">
-                                    <div class="col-md-6 mb-3">
-                                        <input type="text" class="form-control" name="name" placeholder="Your Name" required>
-                                    </div>
-                                    <div class="col-md-6 mb-3">
-                                        <input type="email" class="form-control" name="email" placeholder="Your Email" required>
-                                    </div>
-                                </div>
-                                <div class="mb-3">
-                                    <textarea class="form-control" name="comment" rows="4" placeholder="Share your thoughts about this article..." required></textarea>
-                                </div>
-                                <div class="d-flex justify-content-between align-items-center">
-                                    <button type="submit" class="button-links">Post Your Comment</button>
-                                    <small class="text-muted">Comments are moderated and will appear after approval.</small>
-                                </div>
-                            </form>
-                        </div>
-
-                        <div class="button-secondary-div d-flex justify-content-between align-items-center ">
-
-                            <p class="div-last">Total reader comments: <b><?php echo $postCommentCount; ?></b></p>
-                        </div>
                     </div>
                 </div>
+
+                <!-- Contact Form -->
+                <div class="comment-form mt-4 mx-2 mb-3">
+                    <h6 class="mb-3">Send us a message</h6>
+
+                    <div id="contact_message_container"></div>
+
+                    <form id="contact_form" novalidate>
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <input type="text" class="form-control" id="contact_name" name="contact_name" placeholder="Your Name *" maxlength="100" required>
+                                <div class="invalid-feedback" id="name_error"></div>
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <input type="email" class="form-control" id="contact_email" name="contact_email" placeholder="Your Email *" maxlength="255" required>
+                                <div class="invalid-feedback" id="email_error"></div>
+                            </div>
+                        </div>
+                        <div class="mb-3">
+                            <textarea class="form-control" id="contact_query" name="contact_query" rows="5" placeholder="Please describe your inquiry in detail (no links allowed)..." maxlength="5000" required></textarea>
+                            <div class="invalid-feedback" id="query_error"></div>
+                            <small class="text-muted"><span id="char_count">0</span>/5000 characters</small>
+                        </div>
+                        <div class="d-flex justify-content-between align-items-center">
+                            <button type="submit" id="contact_submit_btn" class="button-links">
+                                Send Message
+                            </button>
+                            <small class="text-muted">We typically respond within 24-48 hours.</small>
+                        </div>
+                    </form>
+                </div>
+
             </div>
             <div class="col-lg-4 col-12 bg-white" style="margin-top: 18px;">
                 <?php include 'includes/latest-devices.php'; ?>
@@ -1073,185 +722,6 @@ if ($_POST && isset($_POST['action'])) {
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
 
     <script>
-        // Build a dynamic dropdown of all H1, H2, H3 headings and enable jump-to-section behavior
-        window.addEventListener('load', function() {
-            try {
-                const container = document.querySelector('.document-section');
-                const dropdown = document.getElementById('headingDropdown');
-                if (!container || !dropdown) return;
-
-                const headings = container.querySelectorAll('h1, h2, h3');
-                if (!headings.length) return;
-
-                // Prepare dropdown
-                dropdown.innerHTML = '';
-                const placeholder = document.createElement('option');
-                placeholder.value = '';
-                placeholder.textContent = 'Jump to section…';
-                placeholder.disabled = true;
-                placeholder.selected = true;
-                dropdown.appendChild(placeholder);
-
-                const usedIds = new Set();
-                const makeSlug = (str) => {
-                    return str
-                        .toLowerCase()
-                        .replace(/[^a-z0-9\s-]/g, '')
-                        .replace(/\s+/g, '-')
-                        .replace(/-+/g, '-')
-                        .replace(/^-+|-+$/g, '');
-                };
-
-                headings.forEach((h3, idx) => {
-                    let text = (h3.textContent || '').trim().replace(/\s+/g, ' ');
-                    if (!text) text = `Section ${idx + 1}`;
-
-                    // Ensure heading has a unique id
-                    let slug = h3.id || makeSlug(text) || `section-${idx + 1}`;
-                    let base = slug;
-                    let counter = 2;
-                    while (usedIds.has(slug) || document.getElementById(slug)) {
-                        slug = `${base}-${counter++}`;
-                    }
-                    if (!h3.id) {
-                        h3.id = slug;
-                    }
-                    usedIds.add(slug);
-
-                    // Add option
-                    const opt = document.createElement('option');
-                    opt.value = `#${slug}`;
-                    opt.textContent = text.length > 80 ? text.slice(0, 77) + '…' : text;
-                    dropdown.appendChild(opt);
-                });
-
-                // Show dropdown and arrow buttons now that they have content
-                dropdown.style.display = 'inline-block';
-                const prevBtn = document.getElementById('headingPrev');
-                const nextBtn = document.getElementById('headingNext');
-                const headingEls = Array.from(headings);
-                let activeIdx = -1; // 0-based index into headingEls; -1 means none selected yet
-
-                const fixed = document.querySelector('#navbar');
-                const getOffsetTop = (el) => {
-                    const offset = (fixed ? fixed.offsetHeight : 0) + 12;
-                    return el.getBoundingClientRect().top + window.pageYOffset - offset;
-                };
-                const scrollToEl = (el) => {
-                    window.scrollTo({
-                        top: getOffsetTop(el),
-                        behavior: 'smooth'
-                    });
-                };
-                const updateButtons = () => {
-                    if (!prevBtn || !nextBtn) return;
-                    prevBtn.disabled = activeIdx <= 0;
-                    // When nothing selected, allow Next to go to first
-                    nextBtn.disabled = (activeIdx >= headingEls.length - 1) && activeIdx !== -1;
-                };
-
-                if (prevBtn && nextBtn && headingEls.length) {
-                    prevBtn.style.display = 'inline-flex';
-                    nextBtn.style.display = 'inline-flex';
-                    updateButtons();
-                }
-
-                const setActiveByIndex = (idx) => {
-                    if (idx < 0 || idx >= headingEls.length) return;
-                    activeIdx = idx;
-                    // sync dropdown (account for placeholder at 0)
-                    dropdown.selectedIndex = idx + 1;
-                    updateButtons();
-                    scrollToEl(headingEls[idx]);
-                };
-
-                // Smooth-scroll to target with offset for fixed navbar
-                dropdown.addEventListener('change', function() {
-                    const selIndex = dropdown.selectedIndex;
-                    const idx = selIndex - 1; // account for placeholder
-                    if (idx >= 0 && idx < headingEls.length) {
-                        setActiveByIndex(idx);
-                    }
-                });
-
-                if (prevBtn) {
-                    prevBtn.addEventListener('click', function() {
-                        if (activeIdx === -1) {
-                            setActiveByIndex(0);
-                        } else if (activeIdx > 0) {
-                            setActiveByIndex(activeIdx - 1);
-                        }
-                    });
-                }
-                if (nextBtn) {
-                    nextBtn.addEventListener('click', function() {
-                        if (activeIdx === -1) {
-                            setActiveByIndex(0);
-                        } else if (activeIdx < headingEls.length - 1) {
-                            setActiveByIndex(activeIdx + 1);
-                        }
-                    });
-                }
-            } catch (e) {
-                // Fail silently to avoid breaking the page
-                console.error('Heading dropdown init failed:', e);
-            }
-        });
-        document.addEventListener('DOMContentLoaded', function() {
-            const commentForm = document.getElementById('main-comment-form');
-            const originalFormParent = commentForm.parentNode;
-            const parentIdInput = commentForm.querySelector('input[name="parent_id"]');
-            const formTitle = commentForm.querySelector('h5');
-            const submitButton = commentForm.querySelector('button[type="submit"]');
-            const cancelButton = commentForm.querySelector('.cancel-reply');
-
-            // Handle reply button clicks
-            document.addEventListener('click', function(e) {
-                if (e.target.classList.contains('reply-btn') || e.target.closest('.reply-btn')) {
-                    e.preventDefault();
-                    const button = e.target.closest('.reply-btn');
-                    const commentId = button.getAttribute('data-comment-id');
-                    const commentAuthor = button.getAttribute('data-comment-author');
-                    const placeholder = document.querySelector(`.reply-form-placeholder[data-comment-id="${commentId}"]`);
-
-                    // Move form to reply position
-                    placeholder.appendChild(commentForm);
-
-                    // Update form for reply
-                    parentIdInput.value = commentId;
-                    formTitle.textContent = `Reply to ${commentAuthor}`;
-                    submitButton.innerHTML = '<i class="fas fa-paper-plane me-2"></i>Submit Reply';
-                    cancelButton.style.display = 'inline-block';
-
-                    // Clear form fields
-                    commentForm.querySelector('#name').value = '';
-                    commentForm.querySelector('#email').value = '';
-                    commentForm.querySelector('#comment').value = '';
-
-                    // Focus on name field
-                    commentForm.querySelector('#name').focus();
-                }
-            });
-
-            // Handle cancel reply
-            cancelButton.addEventListener('click', function(e) {
-                e.preventDefault();
-
-                // Move form back to original position
-                originalFormParent.appendChild(commentForm);
-
-                // Reset form
-                parentIdInput.value = '';
-                formTitle.textContent = 'Leave a Comment';
-                submitButton.innerHTML = '<i class="fas fa-paper-plane me-2"></i>Submit Comment';
-                cancelButton.style.display = 'none';
-
-                // Clear form fields
-                commentForm.querySelector('#name').value = '';
-                commentForm.querySelector('#email').value = '';
-                commentForm.querySelector('#comment').value = '';
-            });
-        });
         // Handle clickable table rows for devices
         document.addEventListener('DOMContentLoaded', function() {
             // Handle device row clicks (for views and reviews tables)
@@ -1324,9 +794,9 @@ if ($_POST && isset($_POST['action'])) {
                         });
 
                         // Redirect to comparison page using slugs (preferred) or IDs (fallback)
-                        const compareUrl = device1Slug && device2Slug 
-                            ? `/compare/${device1Slug}-vs-${device2Slug}`
-                            : `/compare/${device1Id}-vs-${device2Id}`;
+                        const compareUrl = device1Slug && device2Slug ?
+                            `/compare/${device1Slug}-vs-${device2Slug}` :
+                            `/compare/${device1Id}-vs-${device2Id}`;
                         window.location.href = compareUrl;
                     }
                 });
@@ -1517,9 +987,129 @@ if ($_POST && isset($_POST['action'])) {
                 }
             }
         });
+
+        // Contact form handler
+        document.addEventListener('DOMContentLoaded', function() {
+            const contactForm = document.getElementById('contact_form');
+            const contactMsg = document.getElementById('contact_message_container');
+            const charCount = document.getElementById('char_count');
+            const queryField = document.getElementById('contact_query');
+
+            // Character counter
+            if (queryField && charCount) {
+                queryField.addEventListener('input', function() {
+                    charCount.textContent = this.value.length;
+                });
+            }
+
+            // Spam link detection (client-side)
+            function containsLinks(text) {
+                const patterns = [
+                    /https?:\/\/[^\s]+/i,
+                    /www\.[^\s]+/i,
+                    /[a-zA-Z0-9.-]+\.(com|net|org|info|biz|xyz|ru|cn|tk|ml|ga|cf|gq|top|work|click|link|site|online|store|shop|buzz|pw|cc|io|co|me)\b/i,
+                    /\[url[=\]].*?\[\/url\]/i,
+                    /<a\s[^>]*href[^>]*>/i,
+                    /href\s*=\s*["'][^"']*["']/i,
+                ];
+                for (const p of patterns) {
+                    if (p.test(text)) return true;
+                }
+                return false;
+            }
+
+            function clearErrors() {
+                document.querySelectorAll('#contact_form .form-control').forEach(el => el.classList.remove('is-invalid'));
+            }
+
+            function setError(fieldId, errorId, msg) {
+                document.getElementById(fieldId).classList.add('is-invalid');
+                document.getElementById(errorId).textContent = msg;
+            }
+
+            function showContactMessage(message, type) {
+                const bgColor = type === 'success' ? '#4CAF50' : '#f44336';
+                contactMsg.innerHTML = '<div style="background-color: ' + bgColor + '; color: white; padding: 12px; border-radius: 6px; margin-bottom: 15px; text-align: center;">' + message + '</div>';
+                if (type === 'success') {
+                    setTimeout(() => {
+                        contactMsg.innerHTML = '';
+                    }, 8000);
+                }
+            }
+
+            if (contactForm) {
+                contactForm.addEventListener('submit', function(e) {
+                    e.preventDefault();
+                    clearErrors();
+
+                    const name = document.getElementById('contact_name').value.trim();
+                    const email = document.getElementById('contact_email').value.trim();
+                    const query = queryField.value.trim();
+                    let hasError = false;
+
+                    if (!name) {
+                        setError('contact_name', 'name_error', 'Please enter your name.');
+                        hasError = true;
+                    } else if (containsLinks(name)) {
+                        setError('contact_name', 'name_error', 'Links are not allowed in the name field.');
+                        hasError = true;
+                    }
+
+                    if (!email) {
+                        setError('contact_email', 'email_error', 'Please enter your email.');
+                        hasError = true;
+                    } else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+                        setError('contact_email', 'email_error', 'Please enter a valid email address.');
+                        hasError = true;
+                    }
+
+                    if (!query) {
+                        setError('contact_query', 'query_error', 'Please enter your message.');
+                        hasError = true;
+                    } else if (query.length < 10) {
+                        setError('contact_query', 'query_error', 'Your message is too short (minimum 10 characters).');
+                        hasError = true;
+                    } else if (containsLinks(query)) {
+                        setError('contact_query', 'query_error', 'Links/URLs are not allowed in the message. Please remove any links and try again.');
+                        hasError = true;
+                    }
+
+                    if (hasError) return;
+
+                    const btn = document.getElementById('contact_submit_btn');
+                    const originalHTML = btn.innerHTML;
+                    btn.disabled = true;
+                    btn.innerHTML = '<i class="fas fa-spinner fa-spin me-2"></i>Sending...';
+
+                    fetch('/handle_contact.php', {
+                            method: 'POST',
+                            headers: {
+                                'Content-Type': 'application/x-www-form-urlencoded'
+                            },
+                            body: 'contact_name=' + encodeURIComponent(name) +
+                                '&contact_email=' + encodeURIComponent(email) +
+                                '&contact_query=' + encodeURIComponent(query)
+                        })
+                        .then(r => r.json())
+                        .then(data => {
+                            showContactMessage(data.message, data.success ? 'success' : 'error');
+                            if (data.success) {
+                                contactForm.reset();
+                                charCount.textContent = '0';
+                            }
+                            btn.disabled = false;
+                            btn.innerHTML = originalHTML;
+                        })
+                        .catch(() => {
+                            showContactMessage('An error occurred. Please try again later.', 'error');
+                            btn.disabled = false;
+                            btn.innerHTML = originalHTML;
+                        });
+                });
+            }
+        });
     </script>
     <script src="<?php echo $base; ?>script.js"></script>
-    <script src="<?php echo $base; ?>js/comment-ajax.js"></script>
 </body>
 
 </html>

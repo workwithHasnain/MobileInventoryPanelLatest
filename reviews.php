@@ -719,7 +719,7 @@ $latestDevices = array_slice(array_reverse($latestDevices), 0, 9); // Get latest
             fetch(`get_post_details.php?id=${postId}`)
                 .then(response => response.text())
                 .then(data => {
-                    window.location.href = `<?php echo $base; ?>post.php?id=${postId}`;
+                    window.location.href = `<?php echo $base; ?>post/${postId}`;
                 })
                 .catch(error => {
                     console.error('Error:', error);
@@ -732,7 +732,7 @@ $latestDevices = array_slice(array_reverse($latestDevices), 0, 9); // Get latest
             fetch(`get_device_details.php?id=${deviceId}`)
                 .then(response => response.text())
                 .then(data => {
-                    window.location.href = `device.php?id=${deviceId}`; // Will redirect to slug
+                    window.location.href = `<?php echo $base; ?>device/${deviceId}`; // Will redirect to slug
                 })
                 .catch(error => {
                     console.error('Error:', error);

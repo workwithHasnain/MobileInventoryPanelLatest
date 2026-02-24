@@ -2778,7 +2778,7 @@ $commentCount = getDeviceCommentCount($pdo, $device_id);
     fetch(`/get_post_details.php?id=${postId}`)
       .then(response => response.text())
       .then(data => {
-        window.location.href = `post.php?id=${postId}`;
+        window.location.href = `<?php echo $base; ?>post/${postId}`;
       })
       .catch(error => {
         console.error('Error:', error);
@@ -2791,7 +2791,7 @@ $commentCount = getDeviceCommentCount($pdo, $device_id);
     fetch(`/get_device_details.php?id=${deviceId}`)
       .then(response => response.text())
       .then(data => {
-        window.location.href = `device.php?id=${deviceId}`;
+        window.location.href = `<?php echo $base; ?>device/${deviceId}`;
       })
       .catch(error => {
         console.error('Error:', error);
