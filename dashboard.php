@@ -92,6 +92,9 @@ if (isset($_SESSION['success_message'])) {
             <button type="button" class="btn btn-outline-info ms-2" data-bs-toggle="modal" data-bs-target="#sitemapModal">
                 <i class="fas fa-sitemap"></i> Sitemap
             </button>
+            <button onclick="window.location.href='import_device.php'" type="button" class="btn btn-outline-info ms-2">
+                <i class="fas fa-sitemap"></i> Data Import
+            </button>
         </div>
     </div>
 

@@ -1,5 +1,7 @@
 <?php
-
+require_once 'auth.php';
+// Require login for this page
+requireLogin();
 /**
  * import_device.php - Import device from GSMArena scraper extension
  * 
