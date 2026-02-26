@@ -51,9 +51,9 @@
     RewriteRule ^home/?$ index.php [L,QSA]
 
     # Route domain root to dashboard for logged in users, else home (keep commented out for production, uncomment for localhost development)
-    RewriteRule ^/?$ index.php [L,QSA]
+    # RewriteRule ^/?$ index.php [L,QSA]
 
     # Route domain root to /home (comment out for localhost development)
-    # RewriteRule ^/?$ home/ [R=301,L]
+    RewriteRule ^/?$ home/ [R=301,L]
 
 </IfModule>
