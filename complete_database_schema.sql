@@ -84,14 +84,14 @@ CREATE TABLE IF NOT EXISTS phones (
     id SERIAL PRIMARY KEY,
     -- Launch Information
     release_date DATE,
-    name VARCHAR(255) NOT NULL,
+    name TEXT NOT NULL,
     brand_id INTEGER REFERENCES brands(id) ON DELETE CASCADE,
-    brand VARCHAR(100), -- For direct brand name storage
+    brand TEXT, -- For direct brand name storage
     year INTEGER,
-    availability VARCHAR(100),
+    availability TEXT,
     price DECIMAL(10,2),
-    device_page_color VARCHAR(7), -- Hex color code (e.g., #ffffff)
-    image VARCHAR(255),
+    device_page_color TEXT, -- Hex color code (e.g., #ffffff)
+    image TEXT,
     images TEXT[], -- Array of image paths
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
@@ -108,23 +108,23 @@ CREATE TABLE IF NOT EXISTS phones (
     features TEXT,
     battery TEXT,
     general_info TEXT,
-    weight VARCHAR(255),
-    thickness VARCHAR(255),
-    os VARCHAR(255),
-    storage VARCHAR(255),
-    card_slot VARCHAR(255),
-    display_size VARCHAR(255),
-    display_resolution VARCHAR(100),
-    main_camera_resolution VARCHAR(100),
-    main_camera_video VARCHAR(100),
-    ram VARCHAR(255),
-    chipset_name VARCHAR(100),
-    battery_capacity VARCHAR(255),
-    wired_charging VARCHAR(100),
-    wireless_charging VARCHAR(100),
+    weight TEXT,
+    thickness TEXT,
+    os TEXT,
+    storage TEXT,
+    card_slot TEXT,
+    display_size TEXT,
+    display_resolution TEXT,
+    main_camera_resolution TEXT,
+    main_camera_video TEXT,
+    ram TEXT,
+    chipset_name TEXT,
+    battery_capacity TEXT,
+    wired_charging TEXT,
+    wireless_charging TEXT,
     -- SEO fields
-    slug VARCHAR(255) UNIQUE,
-    meta_title VARCHAR(255),
+    slug TEXT UNIQUE,
+    meta_title TEXT,
     meta_desc TEXT
 );
 
