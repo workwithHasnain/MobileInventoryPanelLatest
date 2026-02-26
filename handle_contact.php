@@ -22,6 +22,13 @@ if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
 $name = trim($_POST['contact_name'] ?? '');
 $email = trim($_POST['contact_email'] ?? '');
 $query = trim($_POST['contact_query'] ?? '');
+$queryType = trim($_POST['query_type'] ?? 'contact');
+
+// Validate query_type (whitelist allowed values)
+$allowedTypes = ['contact', 'ad'];
+if (!in_array($queryType, $allowedTypes)) {
+    $queryType = 'contact';
+}
 
 // Validate required fields
 if (empty($name)) {
@@ -108,9 +115,9 @@ try {
 
     $stmt = $pdo->prepare("
         INSERT INTO queries (name, email, query, query_type, created_at)
-        VALUES (?, ?, ?, 'contact', CURRENT_TIMESTAMP)
+        VALUES (?, ?, ?, ?, CURRENT_TIMESTAMP)
     ");
-    $stmt->execute([$name, $email, $query]);
+    $stmt->execute([$name, $email, $query, $queryType]);
 
     $response['success'] = true;
     $response['message'] = 'Thank you for reaching out! We will get back to you within 24-48 hours.';

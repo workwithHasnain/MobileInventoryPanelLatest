@@ -275,7 +275,7 @@ CREATE TABLE IF NOT EXISTS queries (
     name VARCHAR(100) NOT NULL,
     email VARCHAR(255) NOT NULL,
     query TEXT NOT NULL,
-    query_type VARCHAR(50) DEFAULT 'contact',
+    query_type VARCHAR(50) NOT NULL,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 

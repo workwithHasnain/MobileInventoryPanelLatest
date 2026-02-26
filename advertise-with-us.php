@@ -128,9 +128,9 @@ function getGravatarUrl($email, $size = 50)
 <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <link rel="canonical" href="<?php echo $canonicalBase ?? ''; ?>/contact-us" />
-    <meta name="description" content="Contact DevicesArena for inquiries about device reviews, specifications, comparisons, and technology-related questions." />
-    <title>Contact Us - DevicesArena</title>
+    <link rel="canonical" href="<?php echo $canonicalBase ?? ''; ?>/advertise-with-us" />
+    <meta name="description" content="Advertise with DevicesArena - Reach a tech-savvy audience interested in smartphones, tablets, and mobile technology." />
+    <title>Advertise With Us - DevicesArena</title>
 
     <!-- Favicon & Icons -->
     <link rel="icon" type="image/png" sizes="32x32" href="<?php echo $base; ?>imges/icon-32.png">
@@ -188,9 +188,9 @@ function getGravatarUrl($email, $size = 50)
 
     <link rel="stylesheet" href="<?php echo $base; ?>style.css">
 
-    <!-- Schema.org Structured Data for Contact Page -->
+    <!-- Schema.org Structured Data for Advertise Page -->
     <?php
-    // Build breadcrumb schema for the contact page
+    // Build breadcrumb schema for the advertise page
     $breadcrumbItems = [
         [
             "@type" => "ListItem",
@@ -201,8 +201,8 @@ function getGravatarUrl($email, $size = 50)
         [
             "@type" => "ListItem",
             "position" => 2,
-            "name" => "Contact Us",
-            "item" => "https://www.devicesarena.com/contact-us"
+            "name" => "Advertise With Us",
+            "item" => "https://www.devicesarena.com/advertise-with-us"
         ]
     ];
     ?>
@@ -238,11 +238,11 @@ function getGravatarUrl($email, $size = 50)
     <script type="application/ld+json">
         {
             "@context": "https://schema.org",
-            "@type": "ContactPage",
-            "name": "Contact Us - DevicesArena",
-            "headline": "Get in Touch with DevicesArena",
-            "description": "Contact DevicesArena for inquiries about device reviews, specifications, comparisons, and other technology-related questions.",
-            "url": "https://www.devicesarena.com/contact-us",
+            "@type": "WebPage",
+            "name": "Advertise With Us - DevicesArena",
+            "headline": "Advertise With DevicesArena",
+            "description": "Advertise with DevicesArena to reach a tech-savvy audience interested in smartphones, tablets, and mobile technology.",
+            "url": "https://www.devicesarena.com/advertise-with-us",
             "image": "https://www.devicesarena.com/imges/icon-256.png",
             "datePublished": "<?php echo date('Y-m-d'); ?>",
             "publisher": {
@@ -260,63 +260,39 @@ function getGravatarUrl($email, $size = 50)
         }
     </script>
 
-    <!-- FAQ Schema for Contact Page -->
+    <!-- FAQ Schema for Advertise Page -->
     <script type="application/ld+json">
         {
             "@context": "https://schema.org",
             "@type": "FAQPage",
-            "name": "DevicesArena Contact Page FAQs",
-            "url": "https://www.devicesarena.com/contact-us",
+            "name": "DevicesArena Advertising FAQs",
+            "url": "https://www.devicesarena.com/advertise-with-us",
             "breadcrumb": {
                 "@type": "BreadcrumbList",
                 "itemListElement": <?php echo json_encode($breadcrumbItems, JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE); ?>
             },
             "mainEntity": [{
                     "@type": "Question",
-                    "name": "How can I contact DevicesArena?",
+                    "name": "What advertising options does DevicesArena offer?",
                     "acceptedAnswer": {
                         "@type": "Answer",
-                        "text": "You can reach out to DevicesArena through our contact form on this page. Fill in your name, email, subject, and message, and our team will get back to you as soon as possible. We typically respond to inquiries within 24-48 hours."
+                        "text": "We offer banner ads, sponsored content, product placements, and newsletter sponsorships. Contact us through our advertising inquiry form for a customized proposal."
                     }
                 },
                 {
                     "@type": "Question",
-                    "name": "What should I include in my inquiry?",
+                    "name": "What is DevicesArena's audience?",
                     "acceptedAnswer": {
                         "@type": "Answer",
-                        "text": "Please include a clear subject line, your full name, valid email address, and a detailed description of your inquiry. The more information you provide, the quicker we can assist you."
+                        "text": "Our audience primarily consists of tech enthusiasts, smartphone buyers, and gadget reviewers who visit DevicesArena for detailed device specifications, comparisons, and reviews."
                     }
                 },
                 {
                     "@type": "Question",
-                    "name": "Can I request a device review?",
+                    "name": "How do I get started with advertising?",
                     "acceptedAnswer": {
                         "@type": "Answer",
-                        "text": "Yes! We accept requests for device reviews. Use our contact form to submit your review request along with details about the device and why you'd like us to review it. Our editorial team will review your request and respond accordingly."
-                    }
-                },
-                {
-                    "@type": "Question",
-                    "name": "How do I report an error or inaccuracy?",
-                    "acceptedAnswer": {
-                        "@type": "Answer",
-                        "text": "If you notice any errors or inaccuracies in our device specifications, reviews, or comparisons, please contact us immediately through our contact form. Include the specific page, device, and details about the error so we can verify and correct it quickly."
-                    }
-                },
-                {
-                    "@type": "Question",
-                    "name": "Do you accept advertising or partnership inquiries?",
-                    "acceptedAnswer": {
-                        "@type": "Answer",
-                        "text": "Yes, we are open to advertising and partnership opportunities. Please use our contact form to describe your proposal, and we'll connect you with the appropriate team member to discuss collaboration possibilities."
-                    }
-                },
-                {
-                    "@type": "Question",
-                    "name": "How long does it take to receive a response?",
-                    "acceptedAnswer": {
-                        "@type": "Answer",
-                        "text": "We aim to respond to all inquiries within 24-48 business hours. During peak periods, responses may take slightly longer. For urgent matters, please clearly mark your inquiry as urgent in the subject line."
+                        "text": "Simply fill out the advertising inquiry form on this page with your company details and requirements. Our team will review your inquiry and get back to you within 24-48 business hours with a tailored proposal."
                     }
                 }
             ]
@@ -605,52 +581,54 @@ function getGravatarUrl($email, $size = 50)
                 <div class="document-section">
                     <div class="gap-portion" style="padding: 20px 30px;">
 
-                        <h4 style="color: #1B2035; margin-bottom: 15px;">We do appreciate your feedback</h4>
-                        <p style="color: #555; line-height: 1.7;">We will be glad to hear from you if:</p>
+                        <h4 style="color: #1B2035; margin-bottom: 15px;">Advertise With DevicesArena</h4>
+                        <p style="color: #555; line-height: 1.7;">DevicesArena is a leading destination for smartphone specifications, comparisons, and reviews. Partner with us to reach a highly engaged, tech-savvy audience.</p>
+
+                        <p style="color: #555; line-height: 1.7; margin-top: 15px;"><strong>What we offer:</strong></p>
                         <ul style="color: #555; line-height: 2; padding-left: 20px;">
-                            <li>You have found a mistake in our device specifications.</li>
-                            <li>You have info about a device which we don't have in our database.</li>
-                            <li>You have found a broken link.</li>
-                            <li>You have a suggestion for improving DevicesArena or you want to request a feature.</li>
+                            <li>Banner advertisements across our high-traffic pages.</li>
+                            <li>Sponsored content and product review placements.</li>
+                            <li>Newsletter sponsorship to our subscriber base.</li>
+                            <li>Custom partnership and collaboration opportunities.</li>
                         </ul>
 
-                        <p style="color: #555; line-height: 1.7; margin-top: 15px;">Before contacting us, please keep in mind:</p>
+                        <p style="color: #555; line-height: 1.7; margin-top: 15px;"><strong>Why advertise with us?</strong></p>
                         <ul style="color: #555; line-height: 2; padding-left: 20px;">
-                            <li>We do not sell mobile phones.</li>
-                            <li>We do not know the price of any mobile phone in your country.</li>
-                            <li>We don't answer any "unlocking" related questions.</li>
-                            <li>We don't answer any "Which mobile should I buy?" questions.</li>
+                            <li>Targeted audience of tech enthusiasts and smartphone buyers.</li>
+                            <li>High-quality, detailed content that keeps users engaged.</li>
+                            <li>Competitive pricing with flexible packages.</li>
+                            <li>Transparent reporting and performance metrics.</li>
                         </ul>
 
                     </div>
                 </div>
 
-                <!-- Contact Form -->
+                <!-- Advertising Inquiry Form -->
                 <div class="comment-form mt-4 mx-2 mb-3">
-                    <h6 class="mb-3">Send us a message</h6>
+                    <h6 class="mb-3">Send us your advertising inquiry</h6>
 
                     <div id="contact_message_container"></div>
 
                     <form id="contact_form" novalidate>
-                        <input type="hidden" name="query_type" value="contact">
+                        <input type="hidden" name="query_type" value="ad">
                         <div class="row">
                             <div class="col-md-6 mb-3">
-                                <input type="text" class="form-control" id="contact_name" name="contact_name" placeholder="Your Name *" maxlength="100" required>
+                                <input type="text" class="form-control" id="contact_name" name="contact_name" placeholder="Your Name / Company *" maxlength="100" required>
                                 <div class="invalid-feedback" id="name_error"></div>
                             </div>
                             <div class="col-md-6 mb-3">
-                                <input type="email" class="form-control" id="contact_email" name="contact_email" placeholder="Your Email *" maxlength="255" required>
+                                <input type="email" class="form-control" id="contact_email" name="contact_email" placeholder="Your Business Email *" maxlength="255" required>
                                 <div class="invalid-feedback" id="email_error"></div>
                             </div>
                         </div>
                         <div class="mb-3">
-                            <textarea class="form-control" id="contact_query" name="contact_query" rows="5" placeholder="Please describe your inquiry in detail (no links allowed)..." maxlength="5000" required></textarea>
+                            <textarea class="form-control" id="contact_query" name="contact_query" rows="5" placeholder="Tell us about your advertising needs, budget, and any specific requirements (no links allowed)..." maxlength="5000" required></textarea>
                             <div class="invalid-feedback" id="query_error"></div>
                             <small class="text-muted"><span id="char_count">0</span>/5000 characters</small>
                         </div>
                         <div class="d-flex justify-content-between align-items-center">
                             <button type="submit" id="contact_submit_btn" class="button-links">
-                                Send Message
+                                Submit Inquiry
                             </button>
                             <small class="text-muted">We typically respond within 24-48 hours.</small>
                         </div>
@@ -1090,7 +1068,7 @@ function getGravatarUrl($email, $size = 50)
                             body: 'contact_name=' + encodeURIComponent(name) +
                                 '&contact_email=' + encodeURIComponent(email) +
                                 '&contact_query=' + encodeURIComponent(query) +
-                                '&query_type=contact'
+                                '&query_type=ad'
                         })
                         .then(r => r.json())
                         .then(data => {
