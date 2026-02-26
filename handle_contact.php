@@ -123,6 +123,7 @@ try {
     $response['message'] = 'Thank you for reaching out! We will get back to you within 24-48 hours.';
 } catch (Exception $e) {
     error_log('Contact form error: ' . $e->getMessage());
+    error_log('Contact form trace: ' . $e->getTraceAsString());
     $response['message'] = 'An error occurred while submitting your message. Please try again later.';
 }
 

@@ -1082,7 +1082,7 @@ function getGravatarUrl($email, $size = 50)
                     btn.disabled = true;
                     btn.innerHTML = '<i class="fas fa-spinner fa-spin me-2"></i>Sending...';
 
-                    fetch('/handle_contact.php', {
+                    fetch('<?php echo $base; ?>handle_contact.php', {
                             method: 'POST',
                             headers: {
                                 'Content-Type': 'application/x-www-form-urlencoded'
