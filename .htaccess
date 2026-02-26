@@ -38,13 +38,22 @@
     # Route for phonefinder.php: /phonefinder
     RewriteRule ^phonefinder/?$ phonefinder.php [L,QSA]
 
+    # Route for about-us.php: /about-us
+    RewriteRule ^about-us/?$ about-us.php [L,QSA]
+
+    # Route for contact-us.php: /contact-us
+    RewriteRule ^contact-us/?$ contact-us.php [L,QSA]
+
+    # Route for advertise-with-us.php: /advertise-with-us
+    RewriteRule ^advertise-with-us/?$ advertise-with-us.php [L,QSA]
+
     # Route for index.php: /home
     RewriteRule ^home/?$ index.php [L,QSA]
 
     # Route domain root to dashboard for logged in users, else home (keep commented out for production, uncomment for localhost development)
-    # RewriteRule ^/?$ index.php [L,QSA]
+    RewriteRule ^/?$ index.php [L,QSA]
 
     # Route domain root to /home (comment out for localhost development)
-    RewriteRule ^/?$ home/ [R=301,L]
+    # RewriteRule ^/?$ home/ [R=301,L]
 
 </IfModule>

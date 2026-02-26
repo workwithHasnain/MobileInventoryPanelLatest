@@ -2,6 +2,6 @@
 gsmarenadevice.txt
 robots.txt
 sitemap.xml
-.htaccess
-config.php
+# .htaccess
+# config.php
 local.txt
