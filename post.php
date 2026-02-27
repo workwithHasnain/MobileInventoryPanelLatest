@@ -1,5 +1,6 @@
 <?php
 session_start();
+session_write_close(); // Release session lock early so captcha.php img loads instantly
 // Public home page - no authentication required
 require_once 'config.php';
 require_once 'database_functions.php';

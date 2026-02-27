@@ -1,5 +1,6 @@
 <?php
 session_start();
+session_write_close(); // Release session lock early so captcha.php img loads instantly
 // Device Details - Public page for viewing individual device specifications
 // No authentication required
 

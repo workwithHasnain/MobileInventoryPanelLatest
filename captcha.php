@@ -6,7 +6,27 @@
  * Stores the correct answer in $_SESSION['captcha'] for server-side validation.
  */
 
-session_start();
+// ── Prevent any text from corrupting the binary PNG stream ──
+error_reporting(0);
+ini_set('display_errors', '0');
+while (ob_get_level()) ob_end_clean();
+
+// ── GD check — fail gracefully with a visible error image ──
+if (!extension_loaded('gd') || !function_exists('imagecreatetruecolor')) {
+    // Serve a tiny pre-built 1×1 red pixel PNG so the browser shows *something*
+    header('Content-Type: image/png');
+    header('Cache-Control: no-store');
+    // Minimal valid 1×1 red PNG (67 bytes)
+    echo base64_decode('iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mP8z8BQDwADhQGAWjR9awAAAABJRU5ErkJggg==');
+    exit;
+}
+
+// ── Session: open, write captcha answer, then CLOSE immediately ──
+// Closing early releases the session file lock so concurrent requests
+// (like the page that embedded this <img>) aren't blocked.
+if (session_status() === PHP_SESSION_NONE) {
+    session_start();
+}
 
 // ── Word pool (200+ common words, 4-7 letters, easy to read) ──
 $words = [
@@ -226,6 +246,9 @@ $captchaText = $word1 . ' ' . $word2;
 // Store answer in session (case-insensitive comparison will be done during validation)
 $_SESSION['captcha'] = strtolower($captchaText);
 
+// ── Release session lock immediately so the parent page isn't blocked ──
+session_write_close();
+
 // ── Image generation settings ──
 $width  = 320;
 $height = 80;
@@ -269,10 +292,10 @@ for ($i = 0; $i < 50; $i++) {
     imagesetpixel($img, rand(0, $width), rand(0, $height), $c);
 }
 
-// ── Output as PNG with compression ──
+// ── Output as PNG ──
 header('Content-Type: image/png');
 header('Cache-Control: no-store, no-cache, must-revalidate, max-age=0');
 header('Pragma: no-cache');
 header('Expires: 0');
-imagepng($img, null, 9); // Compression level 9 (max)
+imagepng($img, null, 9);
 imagedestroy($img);
