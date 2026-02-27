@@ -154,8 +154,8 @@ function getGravatarUrl($email, $size = 50)
 
     <!-- Open Graph Meta Tags (Social Media Sharing) -->
     <meta property="og:site_name" content="DevicesArena">
-    <meta property="og:title" content="DevicesArena - Smartphone Reviews & Comparisons">
-    <meta property="og:description" content="Explore the latest smartphones, detailed specifications, reviews, and comparisons on DevicesArena.">
+    <meta property="og:title" content="Advertise With Us - DevicesArena">
+    <meta property="og:description" content="Advertise with DevicesArena to reach a tech-savvy audience interested in smartphones, tablets, and mobile technology.">
     <meta property="og:image" content="<?php echo $base; ?>imges/icon-256.png">
     <meta property="og:image:type" content="image/png">
     <meta property="og:image:width" content="256">
@@ -164,8 +164,8 @@ function getGravatarUrl($email, $size = 50)
 
     <!-- Twitter Card Meta Tags -->
     <meta name="twitter:card" content="summary">
-    <meta name="twitter:title" content="DevicesArena">
-    <meta name="twitter:description" content="Explore the latest smartphones, detailed specifications, reviews, and comparisons.">
+    <meta name="twitter:title" content="Advertise With Us - DevicesArena">
+    <meta name="twitter:description" content="Advertise with DevicesArena to reach a tech-savvy audience interested in smartphones, tablets, and mobile technology.">
     <meta name="twitter:image" content="<?php echo $base; ?>imges/icon-256.png">
 
     <!-- PWA Manifest -->

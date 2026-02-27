@@ -95,6 +95,9 @@ if (isset($_SESSION['success_message'])) {
             <button onclick="window.location.href='import_device.php'" type="button" class="btn btn-outline-info ms-2">
                 <i class="fas fa-sitemap"></i> Data Import
             </button>
+            <button type="button" class="btn btn-outline-warning ms-2" data-bs-toggle="modal" data-bs-target="#queriesModal">
+                <i class="fas fa-question-circle"></i> Queries
+            </button>
         </div>
     </div>
 
@@ -559,6 +562,69 @@ if (isset($_SESSION['success_message'])) {
                         </div>
                     </div>
                 </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Queries Modal -->
+<div class="modal fade" id="queriesModal" tabindex="-1" aria-labelledby="queriesLabel" aria-hidden="true">
+    <div class="modal-dialog modal-xl modal-dialog-scrollable">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="queriesLabel">
+                    <i class="fas fa-question-circle me-2"></i>Contact & Advertising Queries
+                </h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <div id="queries_message" style="display: none;"></div>
+
+                <!-- Filter Tabs -->
+                <ul class="nav nav-tabs mb-3" id="queriesTabs" role="tablist">
+                    <li class="nav-item" role="presentation">
+                        <button class="nav-link active" data-query-type="all" type="button">All</button>
+                    </li>
+                    <li class="nav-item" role="presentation">
+                        <button class="nav-link" data-query-type="contact" type="button">Contact</button>
+                    </li>
+                    <li class="nav-item" role="presentation">
+                        <button class="nav-link" data-query-type="ad" type="button">Advertising</button>
+                    </li>
+                </ul>
+
+                <!-- Queries List -->
+                <div id="queries_list_container">
+                    <div class="text-center py-4">
+                        <div class="spinner-border" role="status">
+                            <span class="visually-hidden">Loading...</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- View Query Modal -->
+<div class="modal fade" id="viewQueryModal" tabindex="-1" aria-labelledby="viewQueryLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="viewQueryLabel">
+                    <i class="fas fa-eye me-2"></i>View Query
+                </h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body" id="viewQueryBody">
+                <div class="text-center py-4">
+                    <div class="spinner-border" role="status">
+                        <span class="visually-hidden">Loading...</span>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
             </div>
         </div>
     </div>
@@ -1694,6 +1760,218 @@ if (isset($_SESSION['success_message'])) {
         messageDiv.className = 'alert alert-' + type + ' alert-dismissible fade show';
         messageDiv.innerHTML = message + '<button type="button" class="btn-close" data-bs-dismiss="alert"></button>';
         messageDiv.style.display = 'block';
+    }
+
+    // ===== QUERIES MANAGEMENT =====
+    let currentQueryFilter = 'all';
+    const queriesModal = document.getElementById('queriesModal');
+
+    if (queriesModal) {
+        queriesModal.addEventListener('show.bs.modal', function() {
+            loadQueries('all');
+        });
+    }
+
+    // Query type tab clicks
+    document.querySelectorAll('#queriesTabs .nav-link').forEach(tab => {
+        tab.addEventListener('click', function() {
+            document.querySelectorAll('#queriesTabs .nav-link').forEach(t => t.classList.remove('active'));
+            this.classList.add('active');
+            currentQueryFilter = this.getAttribute('data-query-type');
+            loadQueries(currentQueryFilter);
+        });
+    });
+
+    function loadQueries(type) {
+        const container = document.getElementById('queries_list_container');
+        container.innerHTML = '<div class="text-center py-4"><div class="spinner-border" role="status"><span class="visually-hidden">Loading...</span></div></div>';
+
+        fetch('manage_queries.php', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+                body: 'action=list&type=' + encodeURIComponent(type)
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    renderQueriesList(data.queries);
+                } else {
+                    container.innerHTML = '<div class="alert alert-danger">Error loading queries: ' + escapeHtml(data.message) + '</div>';
+                }
+            })
+            .catch(error => {
+                container.innerHTML = '<div class="alert alert-danger">Error: ' + error + '</div>';
+            });
+    }
+
+    function renderQueriesList(queries) {
+        const container = document.getElementById('queries_list_container');
+
+        if (!queries || queries.length === 0) {
+            container.innerHTML = '<div class="alert alert-info text-center">No queries found</div>';
+            return;
+        }
+
+        let html = '<div class="table-responsive"><table class="table table-hover table-sm"><thead><tr>' +
+            '<th>#</th><th>Type</th><th>Name</th><th>Email</th><th>Status</th><th>Date</th><th>Actions</th>' +
+            '</tr></thead><tbody>';
+
+        queries.forEach(q => {
+            const date = new Date(q.created_at).toLocaleDateString();
+            const typeBadge = q.query_type === 'ad'
+                ? '<span class="badge bg-warning text-dark">Ad</span>'
+                : '<span class="badge bg-info">Contact</span>';
+            const statusBadge = getStatusBadge(q.status || 'pending');
+            const queryPreview = escapeHtml((q.query || '').substring(0, 50)) + (q.query && q.query.length > 50 ? '...' : '');
+
+            html += `<tr>
+                <td>${q.id}</td>
+                <td>${typeBadge}</td>
+                <td>${escapeHtml(q.name)}</td>
+                <td><small>${escapeHtml(q.email)}</small></td>
+                <td>${statusBadge}</td>
+                <td><small class="text-muted">${date}</small></td>
+                <td>
+                    <button class="btn btn-sm btn-outline-primary" onclick="viewQuery(${q.id})" title="View">
+                        <i class="fas fa-eye"></i>
+                    </button>
+                    <div class="btn-group">
+                        <button class="btn btn-sm btn-outline-secondary dropdown-toggle" data-bs-toggle="dropdown" title="Status">
+                            <i class="fas fa-exchange-alt"></i>
+                        </button>
+                        <ul class="dropdown-menu">
+                            <li><a class="dropdown-item" href="#" onclick="updateQueryStatus(${q.id}, 'pending'); return false;">Pending</a></li>
+                            <li><a class="dropdown-item" href="#" onclick="updateQueryStatus(${q.id}, 'read'); return false;">Read</a></li>
+                            <li><a class="dropdown-item" href="#" onclick="updateQueryStatus(${q.id}, 'replied'); return false;">Replied</a></li>
+                            <li><a class="dropdown-item" href="#" onclick="updateQueryStatus(${q.id}, 'closed'); return false;">Closed</a></li>
+                        </ul>
+                    </div>
+                    <button class="btn btn-sm btn-outline-danger" onclick="deleteQuery(${q.id})" title="Delete">
+                        <i class="fas fa-trash"></i>
+                    </button>
+                </td>
+            </tr>`;
+        });
+
+        html += '</tbody></table></div>';
+        container.innerHTML = html;
+    }
+
+    function getStatusBadge(status) {
+        const map = {
+            'pending': '<span class="badge bg-secondary">Pending</span>',
+            'read': '<span class="badge bg-primary">Read</span>',
+            'replied': '<span class="badge bg-success">Replied</span>',
+            'closed': '<span class="badge bg-dark">Closed</span>'
+        };
+        return map[status] || '<span class="badge bg-secondary">' + escapeHtml(status) + '</span>';
+    }
+
+    function viewQuery(id) {
+        const body = document.getElementById('viewQueryBody');
+        body.innerHTML = '<div class="text-center py-4"><div class="spinner-border" role="status"><span class="visually-hidden">Loading...</span></div></div>';
+
+        const viewModal = new bootstrap.Modal(document.getElementById('viewQueryModal'));
+        viewModal.show();
+
+        fetch('manage_queries.php', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+                body: 'action=view&id=' + id
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success && data.query) {
+                    const q = data.query;
+                    const date = new Date(q.created_at).toLocaleString();
+                    const typeBadge = q.query_type === 'ad'
+                        ? '<span class="badge bg-warning text-dark">Advertising</span>'
+                        : '<span class="badge bg-info">Contact</span>';
+                    const statusBadge = getStatusBadge(q.status || 'pending');
+
+                    body.innerHTML = `
+                        <div class="row mb-3">
+                            <div class="col-md-6">
+                                <strong>Name:</strong> ${escapeHtml(q.name)}
+                            </div>
+                            <div class="col-md-6">
+                                <strong>Email:</strong> <a href="mailto:${escapeHtml(q.email)}">${escapeHtml(q.email)}</a>
+                            </div>
+                        </div>
+                        <div class="row mb-3">
+                            <div class="col-md-4">
+                                <strong>Type:</strong> ${typeBadge}
+                            </div>
+                            <div class="col-md-4">
+                                <strong>Status:</strong> ${statusBadge}
+                            </div>
+                            <div class="col-md-4">
+                                <strong>Date:</strong> <small class="text-muted">${date}</small>
+                            </div>
+                        </div>
+                        <hr>
+                        <div>
+                            <strong>Message:</strong>
+                            <div class="bg-light p-3 rounded mt-2" style="white-space: pre-wrap; word-break: break-word;">${escapeHtml(q.query)}</div>
+                        </div>
+                    `;
+                } else {
+                    body.innerHTML = '<div class="alert alert-danger">Query not found.</div>';
+                }
+            })
+            .catch(error => {
+                body.innerHTML = '<div class="alert alert-danger">Error: ' + error + '</div>';
+            });
+    }
+
+    function updateQueryStatus(id, status) {
+        fetch('manage_queries.php', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+                body: 'action=update_status&id=' + id + '&status=' + encodeURIComponent(status)
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    showQueriesMessage(data.message, 'success');
+                    loadQueries(currentQueryFilter);
+                } else {
+                    showQueriesMessage(data.message, 'danger');
+                }
+            })
+            .catch(error => {
+                showQueriesMessage('Error: ' + error, 'danger');
+            });
+    }
+
+    function deleteQuery(id) {
+        if (!confirm('Are you sure you want to delete this query? This cannot be undone.')) return;
+
+        fetch('manage_queries.php', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+                body: 'action=delete&id=' + id
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    showQueriesMessage(data.message, 'success');
+                    loadQueries(currentQueryFilter);
+                } else {
+                    showQueriesMessage(data.message, 'danger');
+                }
+            })
+            .catch(error => {
+                showQueriesMessage('Error: ' + error, 'danger');
+            });
+    }
+
+    function showQueriesMessage(message, type) {
+        const messageDiv = document.getElementById('queries_message');
+        messageDiv.className = 'alert alert-' + type + ' alert-dismissible fade show';
+        messageDiv.innerHTML = message + '<button type="button" class="btn-close" data-bs-dismiss="alert"></button>';
+        messageDiv.style.display = 'block';
+        setTimeout(() => { messageDiv.style.display = 'none'; }, 5000);
     }
 
     // ===== HERO IMAGES MANAGEMENT =====

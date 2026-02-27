@@ -29,6 +29,9 @@
                     <a href="<?php echo $base; ?>compare" style="color: white;">Compare</a>
                     <a href="<?php echo $base; ?>phonefinder" style="color: white;">Phone Finder</a>
                     <a href="<?php echo $base; ?>featured" style="color: white;">Featured</a>
+                    <a href="<?php echo $base; ?>about-us" style="color: white;">About Us</a>
+                    <a href="<?php echo $base; ?>contact-us" style="color: white;">Contact Us</a>
+                    <a href="<?php echo $base; ?>advertise-with-us" style="color: white;">Advertise With Us</a>
                     <br>
                     <a href="https://youtube.com/@devicesarena" style="color: white;"> <i class="fa-brands fa-youtube fa-sm"></i></a>
                     <a href="https://www.instagram.com/devicesarenaofficial/" style="color: white;"> <i class="fa-brands fa-instagram fa-sm"></i></a>

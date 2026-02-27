@@ -9,7 +9,10 @@ $heroPages = [
     'reviews' => 'Reviews Page',
     'featured' => 'Featured Page',
     'phonefinder' => 'Phone Finder Page',
-    'compare' => 'Compare Page'
+    'compare' => 'Compare Page',
+    'about-us' => 'About Us Page',
+    'contact' => 'Contact Us Page',
+    'advertise' => 'Advertise With Us Page'
 ];
 
 $heroImagesDir = __DIR__ . '/hero-images/';

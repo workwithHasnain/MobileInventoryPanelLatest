@@ -128,9 +128,9 @@ function getGravatarUrl($email, $size = 50)
 <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <link rel="canonical" href="<?php echo $canonicalBase ?? ''; ?>/contact-us" />
-    <meta name="description" content="Contact DevicesArena for inquiries about device reviews, specifications, comparisons, and technology-related questions." />
-    <title>Contact Us - DevicesArena</title>
+    <link rel="canonical" href="<?php echo $canonicalBase ?? ''; ?>/about-us" />
+    <meta name="description" content="Learn about DevicesArena - our mission, team, and commitment to providing comprehensive smartphone specifications, reviews, and comparisons." />
+    <title>About Us - DevicesArena</title>
 
     <!-- Favicon & Icons -->
     <link rel="icon" type="image/png" sizes="32x32" href="<?php echo $base; ?>imges/icon-32.png">
@@ -154,8 +154,8 @@ function getGravatarUrl($email, $size = 50)
 
     <!-- Open Graph Meta Tags (Social Media Sharing) -->
     <meta property="og:site_name" content="DevicesArena">
-    <meta property="og:title" content="Contact Us - DevicesArena">
-    <meta property="og:description" content="Contact DevicesArena for inquiries about device reviews, specifications, comparisons, and technology-related questions.">
+    <meta property="og:title" content="About Us - DevicesArena">
+    <meta property="og:description" content="Learn about DevicesArena - our mission, team, and commitment to providing comprehensive smartphone specifications, reviews, and comparisons.">
     <meta property="og:image" content="<?php echo $base; ?>imges/icon-256.png">
     <meta property="og:image:type" content="image/png">
     <meta property="og:image:width" content="256">
@@ -164,8 +164,8 @@ function getGravatarUrl($email, $size = 50)
 
     <!-- Twitter Card Meta Tags -->
     <meta name="twitter:card" content="summary">
-    <meta name="twitter:title" content="Contact Us - DevicesArena">
-    <meta name="twitter:description" content="Contact DevicesArena for inquiries about device reviews, specifications, comparisons, and technology-related questions.">
+    <meta name="twitter:title" content="About Us - DevicesArena">
+    <meta name="twitter:description" content="Learn about DevicesArena - our mission, team, and commitment to providing comprehensive smartphone specifications, reviews, and comparisons.">
     <meta name="twitter:image" content="<?php echo $base; ?>imges/icon-256.png">
 
     <!-- PWA Manifest -->
@@ -188,9 +188,9 @@ function getGravatarUrl($email, $size = 50)
 
     <link rel="stylesheet" href="<?php echo $base; ?>style.css">
 
-    <!-- Schema.org Structured Data for Contact Page -->
+    <!-- Schema.org Structured Data for About Us Page -->
     <?php
-    // Build breadcrumb schema for the contact page
+    // Build breadcrumb schema for the about us page
     $breadcrumbItems = [
         [
             "@type" => "ListItem",
@@ -201,8 +201,8 @@ function getGravatarUrl($email, $size = 50)
         [
             "@type" => "ListItem",
             "position" => 2,
-            "name" => "Contact Us",
-            "item" => "https://www.devicesarena.com/contact-us"
+            "name" => "About Us",
+            "item" => "https://www.devicesarena.com/about-us"
         ]
     ];
     ?>
@@ -234,15 +234,15 @@ function getGravatarUrl($email, $size = 50)
         }
     </script>
 
-    <!-- ContactPage Schema -->
+    <!-- AboutPage Schema -->
     <script type="application/ld+json">
         {
             "@context": "https://schema.org",
-            "@type": "ContactPage",
-            "name": "Contact Us - DevicesArena",
-            "headline": "Get in Touch with DevicesArena",
-            "description": "Contact DevicesArena for inquiries about device reviews, specifications, comparisons, and other technology-related questions.",
-            "url": "https://www.devicesarena.com/contact-us",
+            "@type": "AboutPage",
+            "name": "About Us - DevicesArena",
+            "headline": "About DevicesArena",
+            "description": "Learn about DevicesArena - our mission, team, and commitment to providing comprehensive smartphone specifications, reviews, and comparisons.",
+            "url": "https://www.devicesarena.com/about-us",
             "image": "https://www.devicesarena.com/imges/icon-256.png",
             "datePublished": "<?php echo date('Y-m-d'); ?>",
             "publisher": {
@@ -260,63 +260,47 @@ function getGravatarUrl($email, $size = 50)
         }
     </script>
 
-    <!-- FAQ Schema for Contact Page -->
+    <!-- FAQ Schema for About Us Page -->
     <script type="application/ld+json">
         {
             "@context": "https://schema.org",
             "@type": "FAQPage",
-            "name": "DevicesArena Contact Page FAQs",
-            "url": "https://www.devicesarena.com/contact-us",
+            "name": "DevicesArena About Us FAQs",
+            "url": "https://www.devicesarena.com/about-us",
             "breadcrumb": {
                 "@type": "BreadcrumbList",
                 "itemListElement": <?php echo json_encode($breadcrumbItems, JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE); ?>
             },
             "mainEntity": [{
                     "@type": "Question",
-                    "name": "How can I contact DevicesArena?",
+                    "name": "What is DevicesArena?",
                     "acceptedAnswer": {
                         "@type": "Answer",
-                        "text": "You can reach out to DevicesArena through our contact form on this page. Fill in your name, email, subject, and message, and our team will get back to you as soon as possible. We typically respond to inquiries within 24-48 hours."
+                        "text": "DevicesArena is a comprehensive online platform dedicated to providing detailed smartphone specifications, in-depth reviews, side-by-side comparisons, and the latest tech news to help users make informed purchasing decisions."
                     }
                 },
                 {
                     "@type": "Question",
-                    "name": "What should I include in my inquiry?",
+                    "name": "What kind of content does DevicesArena provide?",
                     "acceptedAnswer": {
                         "@type": "Answer",
-                        "text": "Please include a clear subject line, your full name, valid email address, and a detailed description of your inquiry. The more information you provide, the quicker we can assist you."
+                        "text": "We provide detailed device specifications, expert reviews, side-by-side device comparisons, tech news articles, and a phone finder tool to help users discover the perfect smartphone based on their preferences and budget."
                     }
                 },
                 {
                     "@type": "Question",
-                    "name": "Can I request a device review?",
+                    "name": "How does DevicesArena ensure accuracy of device specifications?",
                     "acceptedAnswer": {
                         "@type": "Answer",
-                        "text": "Yes! We accept requests for device reviews. Use our contact form to submit your review request along with details about the device and why you'd like us to review it. Our editorial team will review your request and respond accordingly."
+                        "text": "Our team carefully verifies all device specifications from official manufacturer sources and trusted industry databases. We regularly update our listings to ensure accuracy and welcome user feedback to correct any discrepancies."
                     }
                 },
                 {
                     "@type": "Question",
-                    "name": "How do I report an error or inaccuracy?",
+                    "name": "How can I contribute to DevicesArena?",
                     "acceptedAnswer": {
                         "@type": "Answer",
-                        "text": "If you notice any errors or inaccuracies in our device specifications, reviews, or comparisons, please contact us immediately through our contact form. Include the specific page, device, and details about the error so we can verify and correct it quickly."
-                    }
-                },
-                {
-                    "@type": "Question",
-                    "name": "Do you accept advertising or partnership inquiries?",
-                    "acceptedAnswer": {
-                        "@type": "Answer",
-                        "text": "Yes, we are open to advertising and partnership opportunities. Please use our contact form to describe your proposal, and we'll connect you with the appropriate team member to discuss collaboration possibilities."
-                    }
-                },
-                {
-                    "@type": "Question",
-                    "name": "How long does it take to receive a response?",
-                    "acceptedAnswer": {
-                        "@type": "Answer",
-                        "text": "We aim to respond to all inquiries within 24-48 business hours. During peak periods, responses may take slightly longer. For urgent matters, please clearly mark your inquiry as urgent in the subject line."
+                        "text": "You can contribute by leaving reviews and ratings on devices, reporting errors or inaccuracies in specifications, suggesting new features, or reaching out through our contact page for collaboration opportunities."
                     }
                 }
             ]
@@ -564,8 +548,8 @@ function getGravatarUrl($email, $size = 50)
         <div class="row">
             <div class="col-md-8 col-5  d-lg-inline d-none " style="padding: 0; position: relative;">
                 <div class="comfort-life position-absolute">
-                    <img class="w-100 h-100" src="<?php echo $base; ?>hero-images/contact-hero.png"
-                        style="background-repeat: no-repeat; background-size: cover;" alt="header image of contact us page for devicesarena.com">
+                    <img class="w-100 h-100" src="<?php echo $base; ?>hero-images/about-us-hero.png"
+                        style="background-repeat: no-repeat; background-size: cover;" alt="header image of about us page for devicesarena.com">
                 </div>
             </div>
             <div class="col-md-4 col-5 d-none d-lg-block" style="position: relative; /* left: 12px; */ padding: 0;">
@@ -605,58 +589,35 @@ function getGravatarUrl($email, $size = 50)
                 <div class="document-section">
                     <div class="gap-portion" style="padding: 20px 30px;">
 
-                        <h4 style="color: #1B2035; margin-bottom: 15px;">We do appreciate your feedback</h4>
-                        <p style="color: #555; line-height: 1.7;">We will be glad to hear from you if:</p>
+                        <h4 style="color: #1B2035; margin-bottom: 15px;">About DevicesArena</h4>
+                        <p style="color: #555; line-height: 1.7;">DevicesArena is a comprehensive online platform dedicated to smartphones and mobile technology. We provide detailed device specifications, expert reviews, side-by-side comparisons, and the latest tech news to help you make informed decisions.</p>
+
+                        <p style="color: #555; line-height: 1.7; margin-top: 15px;"><strong>Our Mission</strong></p>
+                        <p style="color: #555; line-height: 1.7;">Our mission is to empower consumers with accurate, up-to-date information about mobile devices. Whether you're researching your next smartphone purchase, comparing specifications, or staying updated on the latest tech trends, DevicesArena is your trusted companion.</p>
+
+                        <p style="color: #555; line-height: 1.7; margin-top: 15px;"><strong>What We Offer</strong></p>
                         <ul style="color: #555; line-height: 2; padding-left: 20px;">
-                            <li>You have found a mistake in our device specifications.</li>
-                            <li>You have info about a device which we don't have in our database.</li>
-                            <li>You have found a broken link.</li>
-                            <li>You have a suggestion for improving DevicesArena or you want to request a feature.</li>
+                            <li><strong>Detailed Specifications:</strong> Comprehensive specs for thousands of smartphones from all major brands.</li>
+                            <li><strong>Device Comparisons:</strong> Side-by-side comparisons to help you choose the right device.</li>
+                            <li><strong>Expert Reviews:</strong> In-depth reviews covering design, performance, camera quality, and more.</li>
+                            <li><strong>Phone Finder:</strong> Advanced filtering tools to discover devices that match your needs and budget.</li>
+                            <li><strong>Tech News:</strong> Stay updated with the latest developments in the mobile industry.</li>
                         </ul>
 
-                        <p style="color: #555; line-height: 1.7; margin-top: 15px;">Before contacting us, please keep in mind:</p>
+                        <p style="color: #555; line-height: 1.7; margin-top: 15px;"><strong>Why Trust DevicesArena?</strong></p>
                         <ul style="color: #555; line-height: 2; padding-left: 20px;">
-                            <li>We do not sell mobile phones.</li>
-                            <li>We do not know the price of any mobile phone in your country.</li>
-                            <li>We don't answer any "unlocking" related questions.</li>
-                            <li>We don't answer any "Which mobile should I buy?" questions.</li>
+                            <li>Verified specifications sourced from official manufacturers.</li>
+                            <li>Regularly updated database with the latest devices.</li>
+                            <li>Unbiased reviews and comparisons.</li>
+                            <li>Community-driven feedback and ratings.</li>
+                            <li>Dedicated team passionate about mobile technology.</li>
                         </ul>
+
+                        <p style="color: #555; line-height: 1.7; margin-top: 15px;"><strong>Get In Touch</strong></p>
+                        <p style="color: #555; line-height: 1.7;">Have questions, suggestions, or feedback? We'd love to hear from you. Visit our <a href="contact-us" style="color: #1B2035; font-weight: 500;">Contact Us</a> page to get in touch with our team.</p>
 
                     </div>
                 </div>
-
-                <!-- Contact Form -->
-                <div class="comment-form mt-4 mx-2 mb-3">
-                    <h6 class="mb-3">Send us a message</h6>
-
-                    <div id="contact_message_container"></div>
-
-                    <form id="contact_form" novalidate>
-                        <input type="hidden" name="query_type" value="contact">
-                        <div class="row">
-                            <div class="col-md-6 mb-3">
-                                <input type="text" class="form-control" id="contact_name" name="contact_name" placeholder="Your Name *" maxlength="100" required>
-                                <div class="invalid-feedback" id="name_error"></div>
-                            </div>
-                            <div class="col-md-6 mb-3">
-                                <input type="email" class="form-control" id="contact_email" name="contact_email" placeholder="Your Email *" maxlength="255" required>
-                                <div class="invalid-feedback" id="email_error"></div>
-                            </div>
-                        </div>
-                        <div class="mb-3">
-                            <textarea class="form-control" id="contact_query" name="contact_query" rows="5" placeholder="Please describe your inquiry in detail (no links allowed)..." maxlength="5000" required></textarea>
-                            <div class="invalid-feedback" id="query_error"></div>
-                            <small class="text-muted"><span id="char_count">0</span>/5000 characters</small>
-                        </div>
-                        <div class="d-flex justify-content-between align-items-center">
-                            <button type="submit" id="contact_submit_btn" class="button-links">
-                                Send Message
-                            </button>
-                            <small class="text-muted">We typically respond within 24-48 hours.</small>
-                        </div>
-                    </form>
-                </div>
-
             </div>
             <div class="col-lg-4 col-12 bg-white" style="margin-top: 18px;">
                 <?php include 'includes/latest-devices.php'; ?>
@@ -986,128 +947,6 @@ function getGravatarUrl($email, $size = 50)
                         document.head.appendChild(style);
                     }
                 }
-            }
-        });
-
-        // Contact form handler
-        document.addEventListener('DOMContentLoaded', function() {
-            const contactForm = document.getElementById('contact_form');
-            const contactMsg = document.getElementById('contact_message_container');
-            const charCount = document.getElementById('char_count');
-            const queryField = document.getElementById('contact_query');
-
-            // Character counter
-            if (queryField && charCount) {
-                queryField.addEventListener('input', function() {
-                    charCount.textContent = this.value.length;
-                });
-            }
-
-            // Spam link detection (client-side)
-            function containsLinks(text) {
-                const patterns = [
-                    /https?:\/\/[^\s]+/i,
-                    /www\.[^\s]+/i,
-                    /[a-zA-Z0-9.-]+\.(com|net|org|info|biz|xyz|ru|cn|tk|ml|ga|cf|gq|top|work|click|link|site|online|store|shop|buzz|pw|cc|io|co|me)\b/i,
-                    /\[url[=\]].*?\[\/url\]/i,
-                    /<a\s[^>]*href[^>]*>/i,
-                    /href\s*=\s*["'][^"']*["']/i,
-                ];
-                for (const p of patterns) {
-                    if (p.test(text)) return true;
-                }
-                return false;
-            }
-
-            function clearErrors() {
-                document.querySelectorAll('#contact_form .form-control').forEach(el => el.classList.remove('is-invalid'));
-            }
-
-            function setError(fieldId, errorId, msg) {
-                document.getElementById(fieldId).classList.add('is-invalid');
-                document.getElementById(errorId).textContent = msg;
-            }
-
-            function showContactMessage(message, type) {
-                const bgColor = type === 'success' ? '#4CAF50' : '#f44336';
-                contactMsg.innerHTML = '<div style="background-color: ' + bgColor + '; color: white; padding: 12px; border-radius: 6px; margin-bottom: 15px; text-align: center;">' + message + '</div>';
-                if (type === 'success') {
-                    setTimeout(() => {
-                        contactMsg.innerHTML = '';
-                    }, 8000);
-                }
-            }
-
-            if (contactForm) {
-                contactForm.addEventListener('submit', function(e) {
-                    e.preventDefault();
-                    clearErrors();
-
-                    const name = document.getElementById('contact_name').value.trim();
-                    const email = document.getElementById('contact_email').value.trim();
-                    const query = queryField.value.trim();
-                    let hasError = false;
-
-                    if (!name) {
-                        setError('contact_name', 'name_error', 'Please enter your name.');
-                        hasError = true;
-                    } else if (containsLinks(name)) {
-                        setError('contact_name', 'name_error', 'Links are not allowed in the name field.');
-                        hasError = true;
-                    }
-
-                    if (!email) {
-                        setError('contact_email', 'email_error', 'Please enter your email.');
-                        hasError = true;
-                    } else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
-                        setError('contact_email', 'email_error', 'Please enter a valid email address.');
-                        hasError = true;
-                    }
-
-                    if (!query) {
-                        setError('contact_query', 'query_error', 'Please enter your message.');
-                        hasError = true;
-                    } else if (query.length < 10) {
-                        setError('contact_query', 'query_error', 'Your message is too short (minimum 10 characters).');
-                        hasError = true;
-                    } else if (containsLinks(query)) {
-                        setError('contact_query', 'query_error', 'Links/URLs are not allowed in the message. Please remove any links and try again.');
-                        hasError = true;
-                    }
-
-                    if (hasError) return;
-
-                    const btn = document.getElementById('contact_submit_btn');
-                    const originalHTML = btn.innerHTML;
-                    btn.disabled = true;
-                    btn.innerHTML = '<i class="fas fa-spinner fa-spin me-2"></i>Sending...';
-
-                    fetch('<?php echo $base; ?>handle_contact.php', {
-                            method: 'POST',
-                            headers: {
-                                'Content-Type': 'application/x-www-form-urlencoded'
-                            },
-                            body: 'contact_name=' + encodeURIComponent(name) +
-                                '&contact_email=' + encodeURIComponent(email) +
-                                '&contact_query=' + encodeURIComponent(query) +
-                                '&query_type=contact'
-                        })
-                        .then(r => r.json())
-                        .then(data => {
-                            showContactMessage(data.message, data.success ? 'success' : 'error');
-                            if (data.success) {
-                                contactForm.reset();
-                                charCount.textContent = '0';
-                            }
-                            btn.disabled = false;
-                            btn.innerHTML = originalHTML;
-                        })
-                        .catch(() => {
-                            showContactMessage('An error occurred. Please try again later.', 'error');
-                            btn.disabled = false;
-                            btn.innerHTML = originalHTML;
-                        });
-                });
             }
         });
     </script>
