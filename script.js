@@ -97,8 +97,10 @@ document.addEventListener('DOMContentLoaded', function () {
             row.style.display = 'flex';
             row.style.alignItems = 'center';
             row.style.gap = '8px';
-            row.style.padding = '6px 10px';
+            row.style.padding = '5px 10px';
             row.style.cursor = 'pointer';
+            row.style.height = '50px';
+            row.style.width = '50px';
 
             row.addEventListener('mouseover', function () { row.style.background = '#f5f5f5'; });
             row.addEventListener('mouseout', function () { row.style.background = '#fff'; });
@@ -109,8 +111,8 @@ document.addEventListener('DOMContentLoaded', function () {
                 // Check if image is relative path and prepend baseURL
                 img.src = (item.image.startsWith('/') || item.image.startsWith('http')) ? item.image : baseURL + item.image;
                 img.alt = item.title || '';
-                img.style.width = '32px';
-                img.style.height = '32px';
+                img.style.width = '100%';
+                img.style.height = '100%';
                 img.style.objectFit = 'cover';
                 img.style.borderRadius = '3px';
                 row.appendChild(img);
