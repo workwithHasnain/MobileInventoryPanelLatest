@@ -1,4 +1,5 @@
 <?php
+session_start();
 header('Content-Type: application/json');
 require_once 'database_functions.php';
 
@@ -14,6 +15,26 @@ $action = $_POST['action'] ?? '';
 $name = trim($_POST['name'] ?? '');
 $email = trim($_POST['email'] ?? '');
 $comment = trim($_POST['comment'] ?? '');
+$captchaInput = strtolower(trim($_POST['captcha'] ?? ''));
+
+// CAPTCHA validation
+if (empty($captchaInput)) {
+    $response['message'] = 'Please enter the CAPTCHA text';
+    echo json_encode($response);
+    exit;
+}
+
+if (!isset($_SESSION['captcha']) || $captchaInput !== $_SESSION['captcha']) {
+    // Clear the used CAPTCHA so it can't be retried
+    unset($_SESSION['captcha']);
+    $response['message'] = 'CAPTCHA verification failed. Please try again.';
+    $response['captcha_failed'] = true;
+    echo json_encode($response);
+    exit;
+}
+
+// Clear CAPTCHA after successful validation (one-time use)
+unset($_SESSION['captcha']);
 
 // Validation
 if (empty($name)) {

@@ -1,4 +1,5 @@
 <?php
+session_start();
 // Device Details - Public page for viewing individual device specifications
 // No authentication required
 
@@ -2403,6 +2404,16 @@ $commentCount = getDeviceCommentCount($pdo, $device_id);
                   </div>
                   <div class="mb-3">
                     <textarea class="form-control" name="comment" rows="4" placeholder="Share your thoughts about this device..." required></textarea>
+                  </div>
+                  <div class="mb-3">
+                    <label class="form-label" style="font-size: 13px; font-weight: 500; color: #555;"><i class="fa fa-shield-halved me-1"></i>Type the words shown below</label>
+                    <div class="d-flex align-items-center gap-2">
+                      <img src="<?php echo $base; ?>captcha.php" id="captcha-image" alt="CAPTCHA" style="height: 60px; border: 1px solid #ddd; border-radius: 6px; cursor: pointer;" title="Click to refresh" onclick="refreshCaptcha()">
+                      <button type="button" class="btn btn-sm btn-outline-secondary" onclick="refreshCaptcha()" title="Refresh CAPTCHA" style="padding: 4px 10px;">
+                        <i class="fa fa-rotate-right"></i>
+                      </button>
+                      <input type="text" class="form-control" name="captcha" id="captcha-input" placeholder="Enter the words" required autocomplete="off" style="max-width: 200px; height: 45px;">
+                    </div>
                   </div>
                   <div class="d-flex justify-content-between align-items-center">
                     <button type="submit" class="button-links">Post Your Opinion</button>

@@ -1,8 +1,23 @@
 /**
- * AJAX Comment Submission Handler with Reply Support
+ * AJAX Comment Submission Handler with Reply Support + CAPTCHA
  * Uses global COMMENT_AJAX_BASE variable set by the page (via PHP $base)
  * No page reload — shows immediate success/error feedback
  */
+
+/**
+ * Refresh the CAPTCHA image by appending a timestamp to bust browser cache
+ */
+function refreshCaptcha() {
+    var basePath = (typeof COMMENT_AJAX_BASE !== 'undefined') ? COMMENT_AJAX_BASE : '/';
+    var img = document.getElementById('captcha-image');
+    if (img) {
+        img.src = basePath + 'captcha.php?t=' + Date.now();
+    }
+    var captchaInput = document.getElementById('captcha-input');
+    if (captchaInput) {
+        captchaInput.value = '';
+    }
+}
 
 document.addEventListener('DOMContentLoaded', function () {
     // Handle device comment form
@@ -128,8 +143,12 @@ function submitComment(form) {
                 form.reset();
                 // Reset reply state
                 cancelReply();
+                // Refresh CAPTCHA for next submission
+                refreshCaptcha();
             } else {
                 showMessage(form, data.message || 'Failed to submit comment.', 'error');
+                // Always refresh CAPTCHA after a failed attempt (it's single-use)
+                refreshCaptcha();
             }
         })
         .catch(function (error) {
