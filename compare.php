@@ -1,4 +1,5 @@
 <?php
+session_start();
 error_reporting(E_ALL);
 ini_set('display_errors', 1);
 require_once 'config.php';
@@ -552,6 +553,72 @@ function extractPriceFromMisc($miscJson)
     }
     return null;
 }
+
+// Helper function to get all device images (same logic as device.php)
+function getDeviceImages($device)
+{
+    $images = [];
+    if (!empty($device['image'])) {
+        $images[] = $device['image'];
+    }
+    for ($i = 1; $i <= 10; $i++) {
+        $imageKey = 'image_' . $i;
+        if (!empty($device[$imageKey]) && !in_array($device[$imageKey], $images)) {
+            $images[] = $device[$imageKey];
+        }
+    }
+    if (!empty($device['images'])) {
+        $imageArray = [];
+        if (is_array($device['images'])) {
+            $imageArray = $device['images'];
+        } elseif (is_string($device['images'])) {
+            $text = trim($device['images']);
+            if ($text !== '' && $text !== '{}') {
+                if ($text[0] === '{' && substr($text, -1) === '}') {
+                    $inner = substr($text, 1, -1);
+                    if ($inner !== '') {
+                        $parts = explode(',', $inner);
+                        foreach ($parts as $part) {
+                            $cleaned = trim($part);
+                            if ((strlen($cleaned) >= 2) &&
+                                (($cleaned[0] === '"' && substr($cleaned, -1) === '"') ||
+                                    ($cleaned[0] === "'" && substr($cleaned, -1) === "'"))
+                            ) {
+                                $cleaned = substr($cleaned, 1, -1);
+                            }
+                            if ($cleaned !== '' && $cleaned !== 'NULL') {
+                                $imageArray[] = $cleaned;
+                            }
+                        }
+                    }
+                }
+            }
+        }
+        foreach ($imageArray as $image) {
+            if (!empty($image) && !in_array($image, $images)) {
+                $images[] = $image;
+            }
+        }
+    }
+    $validImages = [];
+    foreach ($images as $image) {
+        if (!empty($image)) {
+            $image = str_replace('\\', '/', $image);
+            if (strpos($image, '/') !== 0 && !filter_var($image, FILTER_VALIDATE_URL)) {
+                $image = '/' . ltrim($image, '/');
+            }
+            if (!in_array($image, $validImages)) {
+                $validImages[] = $image;
+            }
+        }
+    }
+    return $validImages;
+}
+
+// Get images for each phone in comparison
+$phone1Images = $phone1 ? getDeviceImages($phone1) : [];
+$phone2Images = $phone2 ? getDeviceImages($phone2) : [];
+$phone3Images = $phone3 ? getDeviceImages($phone3) : [];
 
 // Helper function to get phone image
 function getPhoneImage($phone)
@@ -1403,7 +1470,7 @@ function formatDeviceSpecsStructured($device)
 
         .phone-search-input:focus {
             border-color: #1B2035;
-            box-shadow: 0 0 0 2px rgba(141,110,99,0.15);
+            box-shadow: 0 0 0 2px rgba(141, 110, 99, 0.15);
         }
 
         .phone-search-results {
@@ -1419,7 +1486,7 @@ function formatDeviceSpecsStructured($device)
             max-height: 280px;
             overflow-y: auto;
             z-index: 9999;
-            box-shadow: 0 4px 12px rgba(0,0,0,0.12);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.12);
         }
 
         .phone-search-results.active {
@@ -1600,12 +1667,12 @@ function formatDeviceSpecsStructured($device)
                     <?php if ($phone1): ?>
                         <div class="phone-name" style="flex-grow: 1;"><?php echo getPhoneName($phone1); ?></div>
                         <div class="d-flex">
-                            <img src="<?php echo getPhoneImage($phone1); ?>" alt="<?php echo getPhoneName($phone1); ?>">
+                            <img src="<?php echo getPhoneImage($phone1); ?>" alt="<?php echo getPhoneName($phone1); ?>" onclick="showComparePicturesModal(1)">
                             <div class="buttons">
                                 <button onclick="window.location.href='/device/<?php echo urlencode($phone1['slug'] ?? $phone1['id']); ?>'">REVIEW</button>
                                 <button onclick="window.location.href='/device/<?php echo urlencode($phone1['slug'] ?? $phone1['id']); ?>'">SPECIFICATIONS</button>
                                 <button onclick="window.location.href='/device/<?php echo urlencode($phone1['slug'] ?? $phone1['id']); ?>#comments'">READ OPINIONS</button>
-                                <button onclick="window.location.href='/device/<?php echo urlencode($phone1['slug'] ?? $phone1['id']); ?>'">PICTURES</button>
+                                <button onclick="showComparePicturesModal(1)">PICTURES</button>
                             </div>
                         </div>
                     <?php else: ?>
@@ -1632,12 +1699,12 @@ function formatDeviceSpecsStructured($device)
                     <?php if ($phone2): ?>
                         <div class="phone-name" style="flex-grow: 1;"><?php echo getPhoneName($phone2); ?></div>
                         <div class="d-flex">
-                            <img src="<?php echo getPhoneImage($phone2); ?>" alt="<?php echo getPhoneName($phone2); ?>">
+                            <img src="<?php echo getPhoneImage($phone2); ?>" alt="<?php echo getPhoneName($phone2); ?>" onclick="showComparePicturesModal(2)">
                             <div class="buttons">
                                 <button onclick="window.location.href='/device/<?php echo urlencode($phone2['slug'] ?? $phone2['id']); ?>'">REVIEW</button>
                                 <button onclick="window.location.href='/device/<?php echo urlencode($phone2['slug'] ?? $phone2['id']); ?>'">SPECIFICATIONS</button>
                                 <button onclick="window.location.href='/device/<?php echo urlencode($phone2['slug'] ?? $phone2['id']); ?>#comments'">READ OPINIONS</button>
-                                <button onclick="window.location.href='/device/<?php echo urlencode($phone2['slug'] ?? $phone2['id']); ?>'">PICTURES</button>
+                                <button onclick="showComparePicturesModal(2)">PICTURES</button>
                             </div>
                         </div>
                     <?php else: ?>
@@ -1666,12 +1733,12 @@ function formatDeviceSpecsStructured($device)
                     <?php if ($phone3): ?>
                         <div class="phone-name" style="flex-grow: 1;"><?php echo getPhoneName($phone3); ?></div>
                         <div class="d-flex">
-                            <img src="<?php echo getPhoneImage($phone3); ?>" alt="<?php echo getPhoneName($phone3); ?>">
+                            <img src="<?php echo getPhoneImage($phone3); ?>" alt="<?php echo getPhoneName($phone3); ?>" onclick="showComparePicturesModal(3)">
                             <div class="buttons">
                                 <button onclick="window.location.href='/device/<?php echo urlencode($phone3['slug'] ?? $phone3['id']); ?>'">REVIEW</button>
                                 <button onclick="window.location.href='/device/<?php echo urlencode($phone3['slug'] ?? $phone3['id']); ?>'">SPECIFICATIONS</button>
                                 <button onclick="window.location.href='/device/<?php echo urlencode($phone3['slug'] ?? $phone3['id']); ?>#comments'">READ OPINIONS</button>
-                                <button onclick="window.location.href='/device/<?php echo urlencode($phone3['slug'] ?? $phone3['id']); ?>'">PICTURES</button>
+                                <button onclick="showComparePicturesModal(3)">PICTURES</button>
                             </div>
                         </div>
                     <?php else: ?>
@@ -1965,7 +2032,7 @@ function formatDeviceSpecsStructured($device)
                             $val3 = $legacyFallback($section, $phone3);
                             $headerCell = '<td colspan="3" style="color:#f14d4d;font-size:16px;background:#f9f9f9;font-weight:700;position:relative;">' . htmlspecialchars($section);
                             if ($section === 'NETWORK') {
-                                $headerCell .= '<button class="compare-expand-btn" onclick="toggleCompareNetworkRows(this)" style="position:absolute;right:10px;top:50%;transform:translateY(-50%);background:none;border:none;color:#666;font-size:11px;cursor:pointer;text-transform:uppercase;font-weight:500;">COLLAPSE ▲</button>';
+                                $headerCell .= '<button class="compare-expand-btn" onclick="toggleCompareNetworkRows(this)" style="position:absolute;right:10px;top:50%;transform:translateY(-50%);background:none;border:none;color:#666;font-size:11px;cursor:pointer;text-transform:uppercase;font-weight:500;">EXPAND &#x25BC;</button>';
                             }
                             $headerCell .= '</td>';
                             echo '<tr>' . $headerCell . '</tr>';
@@ -1978,13 +2045,13 @@ function formatDeviceSpecsStructured($device)
                             // Section header row
                             $headerCell = '<td colspan="3" style="color:#f14d4d;font-size:16px;background:#f9f9f9;font-weight:700;position:relative;">' . htmlspecialchars($section);
                             if ($section === 'NETWORK') {
-                                $headerCell .= '<button class="compare-expand-btn" onclick="toggleCompareNetworkRows(this)" style="position:absolute;right:10px;top:50%;transform:translateY(-50%);background:none;border:none;color:#666;font-size:11px;cursor:pointer;text-transform:uppercase;font-weight:500;">COLLAPSE ▲</button>';
+                                $headerCell .= '<button class="compare-expand-btn" onclick="toggleCompareNetworkRows(this)" style="position:absolute;right:10px;top:50%;transform:translateY(-50%);background:none;border:none;color:#666;font-size:11px;cursor:pointer;text-transform:uppercase;font-weight:500;">EXPAND &#x25BC;</button>';
                             }
                             $headerCell .= '</td>';
                             echo '<tr>' . $headerCell . '</tr>';
 
                             // Helper function to tokenize content
-                            $tokenizeContent = function($text) {
+                            $tokenizeContent = function ($text) {
                                 if ($text === 'N/A') return ['N/A'];
                                 // Split by spaces, keep tokens
                                 return preg_split('/\s+/', trim($text));
@@ -1996,45 +2063,48 @@ function formatDeviceSpecsStructured($device)
                                 $val1 = isset($rows1[$i]) ? trim($rows1[$i]['description']) : 'N/A';
                                 $val2 = isset($rows2[$i]) ? trim($rows2[$i]['description']) : 'N/A';
                                 $val3 = isset($rows3[$i]) ? trim($rows3[$i]['description']) : 'N/A';
-                                
+
                                 // Get all tokens
                                 $tokens1 = $tokenizeContent($val1);
                                 $tokens2 = $tokenizeContent($val2);
                                 $tokens3 = $tokenizeContent($val3);
-                                
+
                                 // Helper to clean tokens (remove empty values)
-                                $cleanTokens = function($arr) {
-                                    $cleaned = array_filter($arr, function($t) { return !empty(trim($t)); });
+                                $cleanTokens = function ($arr) {
+                                    $cleaned = array_filter($arr, function ($t) {
+                                        return !empty(trim($t));
+                                    });
                                     return array_values($cleaned);
                                 };
-                                
+
                                 $tokens1 = $cleanTokens($tokens1);
                                 $tokens2 = $cleanTokens($tokens2);
                                 $tokens3 = $cleanTokens($tokens3);
-                                
+
                                 // Helper to render a cell with word-level styling
-                                $renderCellWithWords = function($tokens, $field, $otherTokens1, $otherTokens2) {
+                                $renderCellWithWords = function ($tokens, $field, $otherTokens1, $otherTokens2) {
                                     $html = '<td style="padding:12px 10px;vertical-align:top;"><div class="subt-desc-cont"><div class="subtitle">' . htmlspecialchars($field) . '</div><div class="description">';
-                                    
+
                                     foreach ($tokens as $idx => $token) {
                                         // Check if this token appears in other cells
                                         $isCommon = in_array($token, $otherTokens1) || in_array($token, $otherTokens2);
                                         $dataAttr = $isCommon ? 'data-common-token="true"' : 'data-unique-token="true"';
-                                        
+
                                         $html .= '<span class="spec-word" ' . $dataAttr . '>' . htmlspecialchars($token) . '</span>';
-                                        
+
                                         // Add space after token except for last one
                                         if ($idx < count($tokens) - 1) {
                                             $html .= ' ';
                                         }
                                     }
-                                    
+
                                     $html .= '</div></div></td>';
                                     return $html;
                                 };
-                                
+
                                 $rowClass = ($section === 'NETWORK' && $i > 0) ? ' compare-network-row' : '';
-                                echo '<tr class="' . trim($rowClass) . '">';
+                                $rowStyle = ($section === 'NETWORK' && $i > 0) ? ' style="display:none;"' : '';
+                                echo '<tr class="' . trim($rowClass) . '"' . $rowStyle . '>';
 
                                 // Phone 1
                                 if (isset($rows1[$i])) {
@@ -2125,30 +2195,30 @@ function formatDeviceSpecsStructured($device)
     <script>
         // Phone search data - built from PHP phones data
         const phonesList = <?php
-        global $base;
-        echo json_encode(array_map(function($phone) use ($base) {
-            // Build image path using $base for local uploads
-            $img = '/imges/icon-256.png';
-            if (!empty($phone['image'])) {
-                $raw = $phone['image'];
-                if (filter_var($raw, FILTER_VALIDATE_URL)) {
-                    $img = $raw; // absolute external URL
-                } elseif (strpos($raw, '/') === 0) {
-                    $img = $raw; // already absolute path
-                } else {
-                    $img = rtrim($base, '/') . '/' . ltrim($raw, '/'); // prepend base
-                }
-            }
-            // Name with brand for dropdown display
-            $nameOnly = trim((isset($phone['brand_name']) ? $phone['brand_name'] . ' ' : '') . (isset($phone['name']) ? $phone['name'] : ''));
-            $nameOnly = !empty($nameOnly) ? htmlspecialchars($nameOnly) : 'Unknown Device';
-            return [
-                'slug'  => $phone['slug'],
-                'name'  => $nameOnly,
-                'image' => $img
-            ];
-        }, $phones), JSON_HEX_TAG | JSON_HEX_APOS | JSON_HEX_AMP | JSON_UNESCAPED_UNICODE);
-        ?>;
+                            global $base;
+                            echo json_encode(array_map(function ($phone) use ($base) {
+                                // Build image path using $base for local uploads
+                                $img = '/imges/icon-256.png';
+                                if (!empty($phone['image'])) {
+                                    $raw = $phone['image'];
+                                    if (filter_var($raw, FILTER_VALIDATE_URL)) {
+                                        $img = $raw; // absolute external URL
+                                    } elseif (strpos($raw, '/') === 0) {
+                                        $img = $raw; // already absolute path
+                                    } else {
+                                        $img = rtrim($base, '/') . '/' . ltrim($raw, '/'); // prepend base
+                                    }
+                                }
+                                // Name with brand for dropdown display
+                                $nameOnly = trim((isset($phone['brand_name']) ? $phone['brand_name'] . ' ' : '') . (isset($phone['name']) ? $phone['name'] : ''));
+                                $nameOnly = !empty($nameOnly) ? htmlspecialchars($nameOnly) : 'Unknown Device';
+                                return [
+                                    'slug'  => $phone['slug'],
+                                    'name'  => $nameOnly,
+                                    'image' => $img
+                                ];
+                            }, $phones), JSON_HEX_TAG | JSON_HEX_APOS | JSON_HEX_AMP | JSON_UNESCAPED_UNICODE);
+                            ?>;
 
         // Initialize phone search functionality
         document.addEventListener('DOMContentLoaded', function() {
@@ -2162,14 +2232,14 @@ function formatDeviceSpecsStructured($device)
             <?php if ($phone3): ?>
                 document.getElementById('phone3-search').value = '<?php echo addslashes(getPhoneName($phone3)); ?>';
             <?php endif; ?>
-            
+
             // Set up search inputs for all three phones
             const searchInputs = document.querySelectorAll('.phone-search-input');
-            
+
             searchInputs.forEach(input => {
                 const phoneNumber = input.getAttribute('data-phone-number');
                 const resultsContainer = document.getElementById(`phone${phoneNumber}-results`);
-                
+
                 // Show results on focus
                 input.addEventListener('focus', function() {
                     if (phonesList.length > 0) {
@@ -2177,22 +2247,22 @@ function formatDeviceSpecsStructured($device)
                         resultsContainer.style.display = 'block';
                     }
                 });
-                
+
                 // Filter results on input
                 input.addEventListener('input', function() {
                     const searchTerm = this.value.toLowerCase();
                     let filteredPhones = phonesList;
-                    
+
                     if (searchTerm.trim()) {
-                        filteredPhones = phonesList.filter(phone => 
+                        filteredPhones = phonesList.filter(phone =>
                             phone.name.toLowerCase().includes(searchTerm)
                         );
                     }
-                    
+
                     displaySearchResults(filteredPhones, input, resultsContainer, phoneNumber);
                     resultsContainer.style.display = filteredPhones.length > 0 ? 'block' : 'none';
                 });
-                
+
                 // Hide results on blur
                 input.addEventListener('blur', function() {
                     setTimeout(() => {
@@ -2200,7 +2270,7 @@ function formatDeviceSpecsStructured($device)
                     }, 200);
                 });
             });
-            
+
             // Close results when clicking outside
             document.addEventListener('click', function(e) {
                 if (!e.target.closest('.compare-checkbox')) {
@@ -2210,13 +2280,13 @@ function formatDeviceSpecsStructured($device)
                 }
             });
         });
-        
+
         function displaySearchResults(phones, searchInput, resultsContainer, phoneNumber) {
             if (phones.length === 0) {
                 resultsContainer.innerHTML = '<div style="padding: 12px; text-align: center; color: #999;">No phones found</div>';
                 return;
             }
-            
+
             let html = '';
             phones.forEach(phone => {
                 html += `
@@ -2226,9 +2296,9 @@ function formatDeviceSpecsStructured($device)
                     </div>
                 `;
             });
-            
+
             resultsContainer.innerHTML = html;
-            
+
             // Add hover effect
             resultsContainer.querySelectorAll('.phone-result-item').forEach(item => {
                 item.addEventListener('mouseover', function() {
@@ -2239,15 +2309,15 @@ function formatDeviceSpecsStructured($device)
                 });
             });
         }
-        
+
         function selectPhone(slug, phoneNumber, phoneName) {
             const searchInput = document.getElementById(`phone${phoneNumber}-search`);
             const resultsContainer = document.getElementById(`phone${phoneNumber}-results`);
-            
+
             // Update search input with selected phone name
             searchInput.value = phoneName;
             resultsContainer.style.display = 'none';
-            
+
             // Update comparison
             updateComparison(phoneNumber, slug);
         }
@@ -2271,17 +2341,17 @@ function formatDeviceSpecsStructured($device)
             const phone1Input = document.getElementById('phone1-search');
             const phone2Input = document.getElementById('phone2-search');
             const phone3Input = document.getElementById('phone3-search');
-            
+
             // Find the selected phone slug from the phones list
             let phone1Slug = '';
             let phone2Slug = '';
             let phone3Slug = '';
-            
+
             const getSlugFromName = (searchInputName) => {
                 const phone = phonesList.find(p => p.name === searchInputName);
                 return phone ? phone.slug : '';
             };
-            
+
             phone1Slug = getSlugFromName(phone1Input.value);
             phone2Slug = getSlugFromName(phone2Input.value);
             phone3Slug = getSlugFromName(phone3Input.value);
@@ -2494,12 +2564,12 @@ function formatDeviceSpecsStructured($device)
                 // Show all specs
                 comparisonWrapper.classList.remove('specs-view-differences');
                 comparisonWrapper.classList.add('specs-view-all');
-                
+
                 allBtn.style.background = '#1B2035';
                 allBtn.style.border = '1px solid #1B2035';
                 allBtn.style.color = 'white';
                 allBtn.classList.add('specs-toggle-active');
-                
+
                 diffBtn.style.background = '#fff';
                 diffBtn.style.border = '1px solid #ccc';
                 diffBtn.style.color = '#333';
@@ -2508,12 +2578,12 @@ function formatDeviceSpecsStructured($device)
                 // Show only differences (grey out identical rows)
                 comparisonWrapper.classList.remove('specs-view-all');
                 comparisonWrapper.classList.add('specs-view-differences');
-                
+
                 diffBtn.style.background = '#1B2035';
                 diffBtn.style.border = '1px solid #1B2035';
                 diffBtn.style.color = 'white';
                 diffBtn.classList.add('specs-toggle-active');
-                
+
                 allBtn.style.background = '#fff';
                 allBtn.style.border = '1px solid #ccc';
                 allBtn.style.color = '#333';
@@ -2529,7 +2599,167 @@ function formatDeviceSpecsStructured($device)
                 comparisonWrapper.classList.add('specs-view-all');
             }
         });
+
+        // Pictures Modal for Compare page
+        const comparePhoneImages = {
+            1: <?php echo json_encode($phone1Images); ?>,
+            2: <?php echo json_encode($phone2Images); ?>,
+            3: <?php echo json_encode($phone3Images); ?>
+        };
+        const comparePhoneNames = {
+            1: <?php echo json_encode($phone1 ? getPhoneName($phone1) : 'Device 1'); ?>,
+            2: <?php echo json_encode($phone2 ? getPhoneName($phone2) : 'Device 2'); ?>,
+            3: <?php echo json_encode($phone3 ? getPhoneName($phone3) : 'Device 3'); ?>
+        };
+
+        let currentCompareSlideIndex = 0;
+
+        function showComparePicturesModal(phoneNum) {
+            const images = comparePhoneImages[phoneNum] || [];
+            const name = comparePhoneNames[phoneNum] || 'Device';
+            const titleEl = document.getElementById('comparePicturesDeviceName');
+            const carouselInner = document.getElementById('comparePicturesCarouselInner');
+            const indicators = document.getElementById('comparePicturesIndicators');
+            const thumbnailsContainer = document.getElementById('comparePicturesThumbnails');
+            const noImagesEl = document.getElementById('comparePicturesNoImages');
+            const carouselEl = document.getElementById('comparePicturesCarousel');
+            const prevBtn = document.getElementById('comparePicturesPrev');
+            const nextBtn = document.getElementById('comparePicturesNext');
+            const thumbWrapper = document.getElementById('comparePicturesThumbWrapper');
+
+            if (titleEl) titleEl.textContent = name;
+
+            if (!images || images.length === 0) {
+                if (carouselEl) carouselEl.style.display = 'none';
+                if (thumbWrapper) thumbWrapper.style.display = 'none';
+                if (noImagesEl) noImagesEl.style.display = 'block';
+            } else {
+                if (noImagesEl) noImagesEl.style.display = 'none';
+                if (carouselEl) carouselEl.style.display = 'block';
+
+                // Build indicators
+                let indicatorHtml = '';
+                images.forEach((img, i) => {
+                    indicatorHtml += '<button type="button" data-bs-target="#comparePicturesCarousel" data-bs-slide-to="' + i + '"' + (i === 0 ? ' class="active" aria-current="true"' : '') + ' aria-label="Slide ' + (i + 1) + '"></button>';
+                });
+                if (indicators) indicators.innerHTML = indicatorHtml;
+
+                // Build carousel items
+                let carouselHtml = '';
+                images.forEach((img, i) => {
+                    carouselHtml += '<div class="carousel-item' + (i === 0 ? ' active' : '') + '">';
+                    carouselHtml += '<div class="d-flex justify-content-center align-items-center" style="background-color:#F5F5F5;min-height:300px;max-height:80vh;">';
+                    carouselHtml += '<img src="' + img + '" class="d-block img-fluid" style="max-height:70vh;max-width:100%;height:auto;object-fit:contain;padding:20px;" alt="' + name + ' - Image ' + (i + 1) + '" onerror="this.style.display=\'none\'">';
+                    carouselHtml += '</div>';
+                    carouselHtml += '<div class="carousel-caption d-md-block" style="background-color:rgba(0,0,0,0.5);border-radius:10px;bottom:20px;"><p class="mb-0" style="font-size:14px;">Image ' + (i + 1) + ' of ' + images.length + '</p></div>';
+                    carouselHtml += '</div>';
+                });
+                if (carouselInner) carouselInner.innerHTML = carouselHtml;
+
+                // Build thumbnails
+                if (images.length > 1) {
+                    if (thumbWrapper) thumbWrapper.style.display = 'block';
+                    let thumbHtml = '';
+                    images.forEach((img, i) => {
+                        thumbHtml += '<img src="' + img + '" class="compare-thumbnail-nav border rounded" style="width:60px;height:60px;object-fit:cover;cursor:pointer;opacity:' + (i === 0 ? '1' : '0.7') + ';transition:opacity 0.3s;' + (i === 0 ? 'border:2px solid #5D4037!important;' : '') + '" onclick="showCompareSlide(' + i + ')" data-slide="' + i + '" alt="Thumbnail ' + (i + 1) + '" onerror="this.style.display=\'none\'">';
+                    });
+                    if (thumbnailsContainer) thumbnailsContainer.innerHTML = thumbHtml;
+                    if (prevBtn) prevBtn.style.display = '';
+                    if (nextBtn) nextBtn.style.display = '';
+                } else {
+                    if (thumbWrapper) thumbWrapper.style.display = 'none';
+                    if (prevBtn) prevBtn.style.display = 'none';
+                    if (nextBtn) nextBtn.style.display = 'none';
+                }
+
+                // Initialize carousel
+                setTimeout(() => {
+                    let carousel = bootstrap.Carousel.getInstance(carouselEl);
+                    if (carousel) carousel.dispose();
+                    carousel = new bootstrap.Carousel(carouselEl, {
+                        interval: false,
+                        wrap: true
+                    });
+                    carousel.to(0);
+                    updateCompareThumbnailHighlight(0);
+                }, 100);
+            }
+
+            const modal = new bootstrap.Modal(document.getElementById('comparePicturesModal'));
+            modal.show();
+        }
+
+        function showCompareSlide(index) {
+            const carouselEl = document.getElementById('comparePicturesCarousel');
+            let carousel = bootstrap.Carousel.getInstance(carouselEl);
+            if (!carousel) {
+                carousel = new bootstrap.Carousel(carouselEl, {
+                    interval: false,
+                    wrap: true
+                });
+            }
+            carousel.to(index);
+            updateCompareThumbnailHighlight(index);
+        }
+
+        function updateCompareThumbnailHighlight(activeIndex) {
+            document.querySelectorAll('.compare-thumbnail-nav').forEach((thumb, index) => {
+                if (index === activeIndex) {
+                    thumb.style.opacity = '1';
+                    thumb.style.border = '2px solid #5D4037';
+                } else {
+                    thumb.style.opacity = '0.7';
+                    thumb.style.border = '1px solid #ddd';
+                }
+            });
+        }
+
+        // Listen for carousel slide events to sync thumbnails
+        document.addEventListener('DOMContentLoaded', function() {
+            const carouselEl = document.getElementById('comparePicturesCarousel');
+            if (carouselEl) {
+                carouselEl.addEventListener('slid.bs.carousel', function(e) {
+                    updateCompareThumbnailHighlight(e.to);
+                });
+            }
+        });
     </script>
+
+    <!-- Pictures Modal for Compare -->
+    <div class="modal fade" id="comparePicturesModal" tabindex="-1" aria-labelledby="comparePicturesModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable" style="max-width: 90vw; margin: auto;">
+            <div class="modal-content" style="background-color: #EFEBE9; border: 2px solid #1B2035;">
+                <div class="modal-header" style="border-bottom: 1px solid #1B2035; background-color: #D7CCC8;">
+                    <h5 class="modal-title" id="comparePicturesModalLabel" style="font-family:system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue'; color: #5D4037;">
+                        <i class="fas fa-images me-2"></i><span id="comparePicturesDeviceName">Device</span> - Pictures
+                    </h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body p-0">
+                    <div id="comparePicturesCarousel" class="carousel slide" data-bs-ride="false">
+                        <div class="carousel-indicators" id="comparePicturesIndicators"></div>
+                        <div class="carousel-inner" id="comparePicturesCarouselInner"></div>
+                        <button class="carousel-control-prev" type="button" data-bs-target="#comparePicturesCarousel" data-bs-slide="prev" id="comparePicturesPrev">
+                            <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+                            <span class="visually-hidden">Previous</span>
+                        </button>
+                        <button class="carousel-control-next" type="button" data-bs-target="#comparePicturesCarousel" data-bs-slide="next" id="comparePicturesNext">
+                            <span class="carousel-control-next-icon" aria-hidden="true"></span>
+                            <span class="visually-hidden">Next</span>
+                        </button>
+                    </div>
+                    <div id="comparePicturesNoImages" class="text-center py-5" style="display:none;">
+                        <i class="fas fa-image fa-3x text-muted mb-3"></i>
+                        <h6 class="text-muted">No pictures available for this device</h6>
+                        <p class="text-muted small">Pictures will be added soon</p>
+                    </div>
+                </div>
+                <div class="modal-footer" id="comparePicturesThumbWrapper" style="border-top: 1px solid #1B2035; background-color: #D7CCC8; padding: 10px; display:none;">
+                    <div class="d-flex justify-content-center flex-wrap gap-2" id="comparePicturesThumbnails" style="max-height: 100px; overflow-y: auto;"></div>
+                </div>
+            </div>
+        </div>
+    </div>
 </body>
 
 </html>

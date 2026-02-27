@@ -284,3 +284,20 @@ CREATE INDEX IF NOT EXISTS idx_queries_email ON queries(email);
 CREATE INDEX IF NOT EXISTS idx_queries_query_type ON queries(query_type);
 CREATE INDEX IF NOT EXISTS idx_queries_created_at ON queries(created_at);
 
+-- =====================================================
+-- PUBLIC USERS TABLE (separate from admin_users)
+-- =====================================================
+
+CREATE TABLE IF NOT EXISTS users (
+    id SERIAL PRIMARY KEY,
+    name VARCHAR(100) NOT NULL,
+    email VARCHAR(255) NOT NULL UNIQUE,
+    password VARCHAR(255) NOT NULL,
+    status VARCHAR(20) NOT NULL DEFAULT 'active',
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
+CREATE INDEX IF NOT EXISTS idx_users_email ON users(email);
+CREATE INDEX IF NOT EXISTS idx_users_status ON users(status);
+

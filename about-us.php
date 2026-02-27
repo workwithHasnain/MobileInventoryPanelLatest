@@ -1,4 +1,5 @@
 <?php
+session_start();
 // Public home page - no authentication required
 require_once 'config.php';
 require_once 'database_functions.php';

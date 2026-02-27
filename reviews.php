@@ -1,4 +1,5 @@
 <?php
+session_start();
 // Public home page - no authentication required
 require_once 'config.php';
 require_once 'database_functions.php';
@@ -34,6 +35,7 @@ if ($isTagFiltering) {
               WHERE t ILIKE ?
           )
         ORDER BY p.created_at DESC
+        LIMIT 20
     ");
     $posts_stmt->execute([$tag]);
     $posts = $posts_stmt->fetchAll();
@@ -52,6 +54,7 @@ if ($isTagFiltering) {
               )
           )
         ORDER BY p.created_at DESC
+        LIMIT 20
     ");
     $posts_stmt->execute([$term, $term]);
     $posts = $posts_stmt->fetchAll();
@@ -62,6 +65,7 @@ if ($isTagFiltering) {
         FROM posts p 
         WHERE p.status ILIKE 'published'
         ORDER BY p.created_at DESC
+        LIMIT 20
     ");
     $posts_stmt->execute();
     $posts = $posts_stmt->fetchAll();
@@ -567,33 +571,32 @@ $latestDevices = array_slice(array_reverse($latestDevices), 0, 9); // Get latest
                         <?php endif; ?>
                     </div>
                 </div>
-                <?php
+            <?php
             else:
-                $maxPosts = count($posts);
-                $displayPosts = array_slice($posts, 0, $maxPosts);
-                $columns = max(1, ceil($maxPosts / 1));
-                $postChunks = array_chunk($displayPosts, $columns);
-                foreach ($postChunks as $colIndex => $colPosts):
-                ?>
-                    <div class="col-lg-8 col-md-6 col-12 sentizer-erx grid-colums" style="background-color: #EEEEEE; margin-top: 4px;">
-                        <?php foreach ($colPosts as $post): ?>
-                            <a href="<?php echo $base; ?>post/<?php echo urlencode($post['slug']); ?>">
-                                <div class="review-card mb-4" style="cursor:pointer;" onclick="window.location.href='<?php echo $base; ?>post/<?php echo urlencode($post['slug']); ?>'">
-                                    <?php if (isset($post['featured_image']) && !empty($post['featured_image'])): ?>
-                                        <img style="cursor:pointer;" onclick="window.location.href='<?php echo $base; ?>post/<?php echo urlencode($post['slug']); ?>'" src="<?php echo htmlspecialchars(getAbsoluteImagePath($post['featured_image'], $base)); ?>" alt="<?php echo htmlspecialchars($post['title']); ?>">
-                                    <?php endif; ?>
-                                    <div class="review-card-body">
-                                        <div style="cursor:pointer;" onclick="window.location.href='<?php echo $base; ?>post/<?php echo urlencode($post['slug']); ?>'" class="review-card-title"><?php echo htmlspecialchars($post['title']); ?></div>
-                                        <div class="review-card-meta">
-                                            <span><?php echo date('M j, Y', strtotime($post['created_at'])); ?></span>
-                                            <span><i class="bi bi-chat-dots-fill"></i><?php echo $post['comment_count']; ?> comments</span>
-                                        </div>
+            ?>
+                <div class="col-lg-8 col-md-6 col-12 sentizer-erx grid-colums" id="posts-feed-container" style="background-color: #EEEEEE; margin-top: 4px;">
+                    <?php foreach ($posts as $post): ?>
+                        <a href="<?php echo $base; ?>post/<?php echo urlencode($post['slug']); ?>">
+                            <div class="review-card mb-4" style="cursor:pointer;" onclick="window.location.href='<?php echo $base; ?>post/<?php echo urlencode($post['slug']); ?>'">
+                                <?php if (isset($post['featured_image']) && !empty($post['featured_image'])): ?>
+                                    <img style="cursor:pointer;" onclick="window.location.href='<?php echo $base; ?>post/<?php echo urlencode($post['slug']); ?>'" src="<?php echo htmlspecialchars(getAbsoluteImagePath($post['featured_image'], $base)); ?>" alt="<?php echo htmlspecialchars($post['title']); ?>">
+                                <?php endif; ?>
+                                <div class="review-card-body">
+                                    <div style="cursor:pointer;" onclick="window.location.href='<?php echo $base; ?>post/<?php echo urlencode($post['slug']); ?>'" class="review-card-title"><?php echo htmlspecialchars($post['title']); ?></div>
+                                    <div class="review-card-meta">
+                                        <span><?php echo date('M j, Y', strtotime($post['created_at'])); ?></span>
+                                        <span><i class="bi bi-chat-dots-fill"></i><?php echo $post['comment_count']; ?> comments</span>
                                     </div>
                                 </div>
-                            </a>
-                        <?php endforeach; ?>
+                            </div>
+                        </a>
+                    <?php endforeach; ?>
+                    <div id="posts-load-more" class="text-center py-3" style="display: <?php echo count($posts) >= 20 ? 'block' : 'none'; ?>;">
+                        <div class="spinner-border spinner-border-sm text-muted" role="status"><span class="visually-hidden">Loading...</span></div>
+                        <span class="text-muted ms-2" style="font-size: 13px;">Loading more posts...</span>
                     </div>
-            <?php endforeach;
+                </div>
+            <?php
             endif; ?>
 
             <div class="col-lg-4 col-12 bg-white" style="margin-top: 18px;">
@@ -899,6 +902,53 @@ $latestDevices = array_slice(array_reverse($latestDevices), 0, 9); // Get latest
         });
     </script>
     <script src="<?php echo $base; ?>script.js"></script>
+    <script>
+        // Infinite scroll for posts feed
+        (function() {
+            let currentPage = 1;
+            let isLoading = false;
+            let hasMore = <?php echo count($posts) >= 20 ? 'true' : 'false'; ?>;
+            const container = document.getElementById('posts-feed-container');
+            const loader = document.getElementById('posts-load-more');
+            const searchParams = new URLSearchParams(window.location.search);
+
+            function loadMorePosts() {
+                if (isLoading || !hasMore || !container) return;
+                isLoading = true;
+                currentPage++;
+                if (loader) loader.style.display = 'block';
+
+                let url = '<?php echo $base; ?>load_posts.php?page=' + currentPage + '&type=all&format=review';
+                if (searchParams.get('q')) url += '&q=' + encodeURIComponent(searchParams.get('q'));
+                if (searchParams.get('tag')) url += '&tag=' + encodeURIComponent(searchParams.get('tag'));
+
+                fetch(url)
+                    .then(r => r.json())
+                    .then(data => {
+                        if (data.success && data.html) {
+                            if (loader) loader.insertAdjacentHTML('beforebegin', data.html);
+                            hasMore = data.hasMore;
+                        } else {
+                            hasMore = false;
+                        }
+                        if (!hasMore && loader) loader.style.display = 'none';
+                        isLoading = false;
+                    })
+                    .catch(() => {
+                        isLoading = false;
+                        if (loader) loader.style.display = 'none';
+                    });
+            }
+
+            window.addEventListener('scroll', function() {
+                if (!container) return;
+                const rect = container.getBoundingClientRect();
+                if (rect.bottom - window.innerHeight < 300) {
+                    loadMorePosts();
+                }
+            });
+        })();
+    </script>
 </body>
 
 </html>

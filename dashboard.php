@@ -98,6 +98,9 @@ if (isset($_SESSION['success_message'])) {
             <button type="button" class="btn btn-outline-warning ms-2" data-bs-toggle="modal" data-bs-target="#queriesModal">
                 <i class="fas fa-question-circle"></i> Queries
             </button>
+            <button type="button" class="btn btn-outline-success ms-2" data-bs-toggle="modal" data-bs-target="#publicUsersModal">
+                <i class="fas fa-users"></i> User Accounts
+            </button>
         </div>
     </div>
 
@@ -514,6 +517,57 @@ if (isset($_SESSION['success_message'])) {
                 <button type="button" class="btn btn-primary" id="saveFilterSettingsBtn">
                     <i class="fas fa-save me-2"></i>Update Settings
                 </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Public User Accounts Modal -->
+<div class="modal fade" id="publicUsersModal" tabindex="-1" aria-labelledby="publicUsersLabel" aria-hidden="true">
+    <div class="modal-dialog modal-xl modal-dialog-scrollable">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="publicUsersLabel">
+                    <i class="fas fa-users me-2"></i>Public User Accounts
+                </h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <div id="pu_message" style="display: none;"></div>
+
+                <!-- Add User Form -->
+                <div class="card mb-4">
+                    <div class="card-header">
+                        <h6 class="card-title mb-0"><i class="fas fa-plus me-2"></i>Add New User</h6>
+                    </div>
+                    <div class="card-body">
+                        <div class="row g-2">
+                            <div class="col-md-3">
+                                <input type="text" id="pu_new_name" class="form-control" placeholder="Full Name" minlength="2">
+                            </div>
+                            <div class="col-md-3">
+                                <input type="email" id="pu_new_email" class="form-control" placeholder="Email Address">
+                            </div>
+                            <div class="col-md-3">
+                                <input type="password" id="pu_new_password" class="form-control" placeholder="Password (min 6)" minlength="6">
+                            </div>
+                            <div class="col-md-3">
+                                <button class="btn btn-primary w-100" type="button" id="pu_add_btn">
+                                    <i class="fas fa-plus me-1"></i>Add User
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Users List -->
+                <div id="pu_users_container">
+                    <div class="text-center py-4">
+                        <div class="spinner-border" role="status">
+                            <span class="visually-hidden">Loading...</span>
+                        </div>
+                    </div>
+                </div>
             </div>
         </div>
     </div>
@@ -1740,7 +1794,7 @@ if (isset($_SESSION['success_message'])) {
             .then(data => {
                 // Show the script's response
                 showSitemapMessage(data, data.startsWith('SUCCESS') ? 'success' : 'warning');
-                
+
                 // Reload sitemap content after 1 second
                 setTimeout(() => {
                     loadSitemap();
@@ -2193,6 +2247,190 @@ if (isset($_SESSION['success_message'])) {
         setTimeout(() => {
             messageDiv.style.display = 'none';
         }, 5000);
+    }
+
+    // ===== Public User Accounts Management =====
+    const publicUsersModal = document.getElementById('publicUsersModal');
+    if (publicUsersModal) {
+        publicUsersModal.addEventListener('show.bs.modal', function() {
+            loadPublicUsers();
+        });
+        document.getElementById('pu_add_btn').addEventListener('click', addPublicUser);
+    }
+
+    function loadPublicUsers() {
+        const container = document.getElementById('pu_users_container');
+        fetch('manage_users.php', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/x-www-form-urlencoded'
+                },
+                body: new URLSearchParams({
+                    action: 'list'
+                })
+            })
+            .then(r => r.json())
+            .then(data => {
+                if (data.success && data.users) {
+                    if (data.users.length === 0) {
+                        container.innerHTML = '<div class="alert alert-info text-center">No public users registered yet</div>';
+                        return;
+                    }
+                    let html = '<div class="table-responsive"><table class="table table-hover table-bordered align-middle mb-0">';
+                    html += '<thead class="table-light"><tr><th>#</th><th>Name</th><th>Email</th><th>Status</th><th>Password</th><th>Registered</th><th>Actions</th></tr></thead><tbody>';
+                    data.users.forEach((u, i) => {
+                        const statusBadge = u.status === 'active' ?
+                            '<span class="badge bg-success">Active</span>' :
+                            '<span class="badge bg-secondary">' + escapeHtml(u.status) + '</span>';
+                        html += '<tr>' +
+                            '<td>' + (i + 1) + '</td>' +
+                            '<td><input type="text" class="form-control form-control-sm pu-name" value="' + escapeHtml(u.name) + '" data-uid="' + u.id + '"></td>' +
+                            '<td><input type="email" class="form-control form-control-sm pu-email" value="' + escapeHtml(u.email) + '" data-uid="' + u.id + '"></td>' +
+                            '<td><select class="form-select form-select-sm pu-status" data-uid="' + u.id + '">' +
+                            '<option value="active"' + (u.status === 'active' ? ' selected' : '') + '>Active</option>' +
+                            '<option value="suspended"' + (u.status === 'suspended' ? ' selected' : '') + '>Suspended</option>' +
+                            '<option value="deleted"' + (u.status === 'deleted' ? ' selected' : '') + '>Deleted</option>' +
+                            '</select></td>' +
+                            '<td><input type="password" class="form-control form-control-sm pu-pass" placeholder="Leave blank" data-uid="' + u.id + '"></td>' +
+                            '<td><small class="text-muted">' + new Date(u.created_at).toLocaleDateString() + '</small></td>' +
+                            '<td class="text-nowrap">' +
+                            '<button class="btn btn-sm btn-success me-1" onclick="updatePublicUser(' + u.id + ')"><i class="fas fa-save"></i></button>' +
+                            '<button class="btn btn-sm btn-danger" onclick="deletePublicUser(' + u.id + ')"><i class="fas fa-trash"></i></button>' +
+                            '</td></tr>';
+                    });
+                    html += '</tbody></table></div>';
+                    container.innerHTML = html;
+                } else {
+                    container.innerHTML = '<div class="alert alert-danger">Failed to load users</div>';
+                }
+            })
+            .catch(err => {
+                container.innerHTML = '<div class="alert alert-danger">Error: ' + err + '</div>';
+            });
+    }
+
+    function addPublicUser() {
+        const name = document.getElementById('pu_new_name').value.trim();
+        const email = document.getElementById('pu_new_email').value.trim();
+        const password = document.getElementById('pu_new_password').value.trim();
+        const btn = document.getElementById('pu_add_btn');
+
+        if (!name || !email || !password) {
+            showPUMessage('All fields are required', 'warning');
+            return;
+        }
+        if (password.length < 6) {
+            showPUMessage('Password must be at least 6 characters', 'warning');
+            return;
+        }
+
+        btn.disabled = true;
+        btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Adding...';
+
+        fetch('manage_users.php', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/x-www-form-urlencoded'
+                },
+                body: new URLSearchParams({
+                    action: 'add',
+                    name,
+                    email,
+                    password
+                })
+            })
+            .then(r => r.json())
+            .then(data => {
+                if (data.success) {
+                    showPUMessage(data.message, 'success');
+                    document.getElementById('pu_new_name').value = '';
+                    document.getElementById('pu_new_email').value = '';
+                    document.getElementById('pu_new_password').value = '';
+                    loadPublicUsers();
+                } else {
+                    showPUMessage(data.message, 'danger');
+                }
+                btn.disabled = false;
+                btn.innerHTML = '<i class="fas fa-plus me-1"></i>Add User';
+            })
+            .catch(err => {
+                showPUMessage('Error: ' + err, 'danger');
+                btn.disabled = false;
+                btn.innerHTML = '<i class="fas fa-plus me-1"></i>Add User';
+            });
+    }
+
+    window.updatePublicUser = function(id) {
+        const name = document.querySelector('.pu-name[data-uid="' + id + '"]').value.trim();
+        const email = document.querySelector('.pu-email[data-uid="' + id + '"]').value.trim();
+        const password = document.querySelector('.pu-pass[data-uid="' + id + '"]').value.trim();
+        const status = document.querySelector('.pu-status[data-uid="' + id + '"]').value;
+
+        if (!name || !email) {
+            showPUMessage('Name and email are required', 'warning');
+            return;
+        }
+
+        fetch('manage_users.php', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/x-www-form-urlencoded'
+                },
+                body: new URLSearchParams({
+                    action: 'update',
+                    id,
+                    name,
+                    email,
+                    password,
+                    status
+                })
+            })
+            .then(r => r.json())
+            .then(data => {
+                if (data.success) {
+                    showPUMessage(data.message, 'success');
+                    document.querySelector('.pu-pass[data-uid="' + id + '"]').value = '';
+                    loadPublicUsers();
+                } else {
+                    showPUMessage(data.message, 'danger');
+                }
+            })
+            .catch(err => showPUMessage('Error: ' + err, 'danger'));
+    };
+
+    window.deletePublicUser = function(id) {
+        if (!confirm('Are you sure you want to permanently delete this user?')) return;
+
+        fetch('manage_users.php', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/x-www-form-urlencoded'
+                },
+                body: new URLSearchParams({
+                    action: 'delete',
+                    id
+                })
+            })
+            .then(r => r.json())
+            .then(data => {
+                if (data.success) {
+                    showPUMessage(data.message, 'success');
+                    loadPublicUsers();
+                } else {
+                    showPUMessage(data.message, 'danger');
+                }
+            })
+            .catch(err => showPUMessage('Error: ' + err, 'danger'));
+    };
+
+    function showPUMessage(message, type) {
+        const el = document.getElementById('pu_message');
+        el.className = 'alert alert-' + type + ' alert-dismissible fade show';
+        el.innerHTML = message + '<button type="button" class="btn-close" data-bs-dismiss="alert"></button>';
+        el.style.display = 'block';
+        if (type === 'success') setTimeout(() => {
+            el.style.display = 'none';
+        }, 3000);
     }
 </script>
 

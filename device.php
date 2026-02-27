@@ -2122,7 +2122,7 @@ $commentCount = getDeviceCommentCount($pdo, $device_id);
     background: white;
 ">
               <!-- Left: Phone Image -->
-              <div class="phone-image me-3 py-2  px-2"></div>
+              <div class="phone-image me-3 py-2  px-2" onclick="showPicturesModal()"></div>
             </div>
 
             <!-- Right: Details + Stats + Specs -->
@@ -2253,7 +2253,7 @@ $commentCount = getDeviceCommentCount($pdo, $device_id);
                       </th>
                       <?php if ($category === 'NETWORK'): ?>
                         <th style="text-align: right; padding: 0.75rem;">
-                          <button class="expand-btn" onclick="toggleExpandBtn(this)" style="background: none; border: none; color: #666; font-size: 11px; cursor: pointer; text-transform: uppercase; font-weight: 500;">COLLAPSE ▲</button>
+                          <button class="expand-btn" onclick="toggleExpandBtn(this)" style="background: none; border: none; color: #666; font-size: 11px; cursor: pointer; text-transform: uppercase; font-weight: 500;">EXPAND ▼</button>
                         </th>
                       <?php else: ?>
                         <th></th>
@@ -2262,10 +2262,10 @@ $commentCount = getDeviceCommentCount($pdo, $device_id);
 
                     <!-- Desktop + Mobile spec rows -->
                     <?php foreach ($rows as $rowIndex => $rowData): ?>
-                      <tr <?php echo ($category === 'NETWORK' && $rowIndex > 0) ? 'class="network-row"' : ''; ?>>
+                      <tr <?php echo ($category === 'NETWORK' && $rowIndex > 0) ? 'class="network-row" style="display:none;"' : ''; ?>>
                         <!-- Desktop only: rowspan on first row -->
                         <?php if ($rowIndex === 0): ?>
-                          <th class="spec-label d-none d-lg-table-cell" rowspan="<?php echo count($rows); ?>">
+                          <th class="spec-label d-none d-lg-table-cell" rowspan="<?php echo ($category === 'NETWORK') ? '1' : count($rows); ?>">
                             <?php echo htmlspecialchars($category); ?>
                           </th>
                         <?php endif; ?>
@@ -2273,7 +2273,7 @@ $commentCount = getDeviceCommentCount($pdo, $device_id);
                         <td class="spec-description" style="position: relative;">
                           <?php echo htmlspecialchars($rowData['description']); ?>
                           <?php if ($category === 'NETWORK' && $rowIndex === 0): ?>
-                            <button class="expand-btn d-none d-lg-inline" onclick="toggleExpandBtn(this)" style="position: absolute; right: 10px; top: 50%; transform: translateY(-50%); background: none; border: none; color: #666; font-size: 11px; cursor: pointer; text-transform: uppercase; font-weight: 500;">COLLAPSE ▲</button>
+                            <button class="expand-btn d-none d-lg-inline" onclick="toggleExpandBtn(this)" style="position: absolute; right: 10px; top: 50%; transform: translateY(-50%); background: none; border: none; color: #666; font-size: 11px; cursor: pointer; text-transform: uppercase; font-weight: 500;">EXPAND &#x25bc;</button>
                           <?php endif; ?>
                         </td>
                       </tr>
@@ -2390,16 +2390,33 @@ $commentCount = getDeviceCommentCount($pdo, $device_id);
                     </button>
                   </div>
                 </div>
+                <?php
+                // Determine logged-in user details for prefilling
+                $loggedInName = '';
+                $loggedInEmail = '';
+                $isUserLoggedIn = false;
+                if (!empty($_SESSION['public_user_name'])) {
+                  $loggedInName = $_SESSION['public_user_name'];
+                  $loggedInEmail = $_SESSION['public_user_email'] ?? '';
+                  $isUserLoggedIn = true;
+                } elseif (!empty($_SESSION['logged_in']) && $_SESSION['logged_in'] === true) {
+                  $loggedInName = $_SESSION['username'] ?? '';
+                  $loggedInEmail = '';
+                  $isUserLoggedIn = true;
+                }
+                ?>
                 <form id="device-comment-form" method="POST">
                   <input type="hidden" name="action" value="comment_device">
                   <input type="hidden" name="device_id" value="<?php echo htmlspecialchars($device['id']); ?>">
                   <input type="hidden" name="parent_id" id="parent_id" value="">
                   <div class="row">
                     <div class="col-md-6 mb-3">
-                      <input type="text" class="form-control" name="name" placeholder="Your Name" required>
+                      <input type="text" class="form-control" name="name" placeholder="Your Name" required <?php if ($isUserLoggedIn && $loggedInName): ?>value="<?php echo htmlspecialchars($loggedInName); ?>" disabled<?php endif; ?>>
+                      <?php if ($isUserLoggedIn && $loggedInName): ?><input type="hidden" name="name" value="<?php echo htmlspecialchars($loggedInName); ?>"><?php endif; ?>
                     </div>
                     <div class="col-md-6 mb-3">
-                      <input type="email" class="form-control" name="email" placeholder="Your Email (optional)">
+                      <input type="email" class="form-control" name="email" placeholder="Your Email (optional)" <?php if ($isUserLoggedIn && $loggedInEmail): ?>value="<?php echo htmlspecialchars($loggedInEmail); ?>" disabled<?php endif; ?>>
+                      <?php if ($isUserLoggedIn && $loggedInEmail): ?><input type="hidden" name="email" value="<?php echo htmlspecialchars($loggedInEmail); ?>"><?php endif; ?>
                     </div>
                   </div>
                   <div class="mb-3">

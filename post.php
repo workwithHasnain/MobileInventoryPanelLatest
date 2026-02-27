@@ -1012,6 +1012,21 @@ if ($_POST && isset($_POST['action']) && $_POST['action'] === 'newsletter_subscr
                                 </div>
                             </div>
 
+                            <?php
+                            // Determine logged-in user details for prefilling
+                            $loggedInName = '';
+                            $loggedInEmail = '';
+                            $isUserLoggedIn = false;
+                            if (!empty($_SESSION['public_user_name'])) {
+                                $loggedInName = $_SESSION['public_user_name'];
+                                $loggedInEmail = $_SESSION['public_user_email'] ?? '';
+                                $isUserLoggedIn = true;
+                            } elseif (!empty($_SESSION['logged_in']) && $_SESSION['logged_in'] === true) {
+                                $loggedInName = $_SESSION['username'] ?? '';
+                                $loggedInEmail = '';
+                                $isUserLoggedIn = true;
+                            }
+                            ?>
                             <form id="post-comment-form" method="POST">
                                 <input type="hidden" name="action" value="comment_post">
                                 <input type="hidden" name="post_id" value="<?php echo $post['id']; ?>">
@@ -1019,10 +1034,12 @@ if ($_POST && isset($_POST['action']) && $_POST['action'] === 'newsletter_subscr
 
                                 <div class="row">
                                     <div class="col-md-6 mb-3">
-                                        <input type="text" class="form-control" name="name" placeholder="Your Name" required>
+                                        <input type="text" class="form-control" name="name" placeholder="Your Name" required <?php if ($isUserLoggedIn && $loggedInName): ?>value="<?php echo htmlspecialchars($loggedInName); ?>" disabled<?php endif; ?>>
+                                        <?php if ($isUserLoggedIn && $loggedInName): ?><input type="hidden" name="name" value="<?php echo htmlspecialchars($loggedInName); ?>"><?php endif; ?>
                                     </div>
                                     <div class="col-md-6 mb-3">
-                                        <input type="email" class="form-control" name="email" placeholder="Your Email" required>
+                                        <input type="email" class="form-control" name="email" placeholder="Your Email" required <?php if ($isUserLoggedIn && $loggedInEmail): ?>value="<?php echo htmlspecialchars($loggedInEmail); ?>" disabled<?php endif; ?>>
+                                        <?php if ($isUserLoggedIn && $loggedInEmail): ?><input type="hidden" name="email" value="<?php echo htmlspecialchars($loggedInEmail); ?>"><?php endif; ?>
                                     </div>
                                 </div>
                                 <div class="mb-3">

@@ -1,4 +1,5 @@
 <?php
+session_start();
 // Public home page - no authentication required
 require_once 'config.php';
 require_once 'database_functions.php';
@@ -21,6 +22,7 @@ $posts_stmt = $pdo->prepare("
     FROM posts p 
     WHERE p.status ILIKE 'published' 
     ORDER BY p.created_at DESC 
+    LIMIT 20
 ");
 $posts_stmt->execute();
 $posts = $posts_stmt->fetchAll();
@@ -425,7 +427,7 @@ if ($_POST && isset($_POST['action'])) {
 
     <div class="container featured margin-top-4rem">
         <h2 class="section">Featured</h2>
-        <div class="featured-section">
+        <div class="featured-section" id="featured-scroll-container">
             <?php if (empty($posts)): ?>
                 <div class="text-center py-5">
                     <i class="fas fa-newspaper fa-3x text-muted mb-3"></i>
@@ -454,6 +456,9 @@ if ($_POST && isset($_POST['action'])) {
                         <h3 class="sony-tv" style="cursor:pointer;" onclick="window.location.href='<?php echo $base; ?>post/<?php echo urlencode($post['slug']); ?>'"><?php echo htmlspecialchars($post['title']); ?></h3>
                     </div>
                 <?php endforeach; ?>
+                <div id="featured-load-more" style="display:<?php echo count($posts) >= 20 ? 'flex' : 'none'; ?>;align-items:center;justify-content:center;min-width:120px;padding:20px;">
+                    <div class="spinner-border spinner-border-sm text-muted" role="status"><span class="visually-hidden">Loading...</span></div>
+                </div>
             <?php endif; ?>
         </div>
     </div>
@@ -922,6 +927,50 @@ if ($_POST && isset($_POST['action'])) {
         });
     </script>
     <script src="<?php echo $base; ?>script.js"></script>
+    <script>
+        // Infinite horizontal scroll for featured posts
+        (function() {
+            let currentPage = 1;
+            let isLoading = false;
+            let hasMore = <?php echo count($posts) >= 20 ? 'true' : 'false'; ?>;
+            const container = document.getElementById('featured-scroll-container');
+            const loader = document.getElementById('featured-load-more');
+
+            if (!container) return;
+
+            container.addEventListener('scroll', function() {
+                if (isLoading || !hasMore) return;
+                // Check if scrolled near the right edge (horizontal scroll)
+                if (container.scrollLeft + container.clientWidth >= container.scrollWidth - 300) {
+                    loadMorePosts();
+                }
+            });
+
+            function loadMorePosts() {
+                if (isLoading || !hasMore) return;
+                isLoading = true;
+                currentPage++;
+                if (loader) loader.style.display = 'flex';
+
+                fetch('<?php echo $base; ?>load_posts.php?page=' + currentPage + '&type=all&format=block')
+                    .then(r => r.json())
+                    .then(data => {
+                        if (data.success && data.html) {
+                            if (loader) loader.insertAdjacentHTML('beforebegin', data.html);
+                            hasMore = data.hasMore;
+                        } else {
+                            hasMore = false;
+                        }
+                        if (!hasMore && loader) loader.style.display = 'none';
+                        isLoading = false;
+                    })
+                    .catch(() => {
+                        isLoading = false;
+                        if (loader) loader.style.display = 'none';
+                    });
+            }
+        })();
+    </script>
 
 
 </body>
