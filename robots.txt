@@ -3,6 +3,7 @@ Allow: /
 
 # Public static content - explicitly allowed for crawlers
 Allow: /css/
+Allow: /hero-images/
 Allow: /js/
 Allow: /imges/
 Allow: /assets/
