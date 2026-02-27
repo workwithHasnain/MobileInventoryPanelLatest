@@ -1788,7 +1788,9 @@ if (isset($_SESSION['success_message'])) {
 
         fetch('manage_queries.php', {
                 method: 'POST',
-                headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+                headers: {
+                    'Content-Type': 'application/x-www-form-urlencoded'
+                },
                 body: 'action=list&type=' + encodeURIComponent(type)
             })
             .then(response => response.json())
@@ -1818,9 +1820,9 @@ if (isset($_SESSION['success_message'])) {
 
         queries.forEach(q => {
             const date = new Date(q.created_at).toLocaleDateString();
-            const typeBadge = q.query_type === 'ad'
-                ? '<span class="badge bg-warning text-dark">Ad</span>'
-                : '<span class="badge bg-info">Contact</span>';
+            const typeBadge = q.query_type === 'ad' ?
+                '<span class="badge bg-warning text-dark">Ad</span>' :
+                '<span class="badge bg-info">Contact</span>';
             const statusBadge = getStatusBadge(q.status || 'pending');
             const queryPreview = escapeHtml((q.query || '').substring(0, 50)) + (q.query && q.query.length > 50 ? '...' : '');
 
@@ -1876,7 +1878,9 @@ if (isset($_SESSION['success_message'])) {
 
         fetch('manage_queries.php', {
                 method: 'POST',
-                headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+                headers: {
+                    'Content-Type': 'application/x-www-form-urlencoded'
+                },
                 body: 'action=view&id=' + id
             })
             .then(response => response.json())
@@ -1884,9 +1888,9 @@ if (isset($_SESSION['success_message'])) {
                 if (data.success && data.query) {
                     const q = data.query;
                     const date = new Date(q.created_at).toLocaleString();
-                    const typeBadge = q.query_type === 'ad'
-                        ? '<span class="badge bg-warning text-dark">Advertising</span>'
-                        : '<span class="badge bg-info">Contact</span>';
+                    const typeBadge = q.query_type === 'ad' ?
+                        '<span class="badge bg-warning text-dark">Advertising</span>' :
+                        '<span class="badge bg-info">Contact</span>';
                     const statusBadge = getStatusBadge(q.status || 'pending');
 
                     body.innerHTML = `
@@ -1927,7 +1931,9 @@ if (isset($_SESSION['success_message'])) {
     function updateQueryStatus(id, status) {
         fetch('manage_queries.php', {
                 method: 'POST',
-                headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+                headers: {
+                    'Content-Type': 'application/x-www-form-urlencoded'
+                },
                 body: 'action=update_status&id=' + id + '&status=' + encodeURIComponent(status)
             })
             .then(response => response.json())
@@ -1949,7 +1955,9 @@ if (isset($_SESSION['success_message'])) {
 
         fetch('manage_queries.php', {
                 method: 'POST',
-                headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+                headers: {
+                    'Content-Type': 'application/x-www-form-urlencoded'
+                },
                 body: 'action=delete&id=' + id
             })
             .then(response => response.json())
@@ -1971,7 +1979,9 @@ if (isset($_SESSION['success_message'])) {
         messageDiv.className = 'alert alert-' + type + ' alert-dismissible fade show';
         messageDiv.innerHTML = message + '<button type="button" class="btn-close" data-bs-dismiss="alert"></button>';
         messageDiv.style.display = 'block';
-        setTimeout(() => { messageDiv.style.display = 'none'; }, 5000);
+        setTimeout(() => {
+            messageDiv.style.display = 'none';
+        }, 5000);
     }
 
     // ===== HERO IMAGES MANAGEMENT =====
