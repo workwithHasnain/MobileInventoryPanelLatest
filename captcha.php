@@ -229,74 +229,50 @@ $_SESSION['captcha'] = strtolower($captchaText);
 // ── Image generation settings ──
 $width  = 320;
 $height = 80;
-$scale  = 3; // Scale factor: render small with built-in font, then scale up
+$img = imagecreatetruecolor($width, $height);
 
-// ── Step 1: Render text on a small canvas using GD built-in font (no TTF needed) ──
-$builtinFont = 5; // Largest built-in font: ~9px wide, 15px tall per char
+// Background - light random tint
+$bgR = rand(235, 248);
+$bgG = rand(235, 248);
+$bgB = rand(235, 248);
+$bgColor = imagecolorallocate($img, $bgR, $bgG, $bgB);
+imagefilledrectangle($img, 0, 0, $width, $height, $bgColor);
+
+// ── Lightweight noise: fewer dots for speed ──
+for ($i = 0; $i < 40; $i++) {
+    $c = imagecolorallocate($img, rand(160, 210), rand(160, 210), rand(160, 210));
+    imagesetpixel($img, rand(0, $width), rand(0, $height), $c);
+}
+
+// ── Render text using GD built-in font (no TTF) ──
+$builtinFont = 5;
 $charW = imagefontwidth($builtinFont);
 $charH = imagefontheight($builtinFont);
 $textLen = strlen($captchaText);
-$smallW = (int)ceil($width / $scale);
-$smallH = (int)ceil($height / $scale);
 
-$smallImg = imagecreatetruecolor($smallW, $smallH);
+// Center text horizontally
+$totalTextW = $textLen * ($charW + 2);
+$startX = max(10, (int)(($width - $totalTextW) / 2));
+$baseY = (int)(($height - $charH) / 2);
 
-// Background - light random tint
-$bgR = rand(230, 250);
-$bgG = rand(230, 250);
-$bgB = rand(230, 250);
-$bgColor = imagecolorallocate($smallImg, $bgR, $bgG, $bgB);
-imagefilledrectangle($smallImg, 0, 0, $smallW, $smallH, $bgColor);
-
-// ── Noise (on small canvas): random dots ──
-for ($i = 0; $i < 60; $i++) {
-    $dotColor = imagecolorallocate($smallImg, rand(150, 220), rand(150, 220), rand(150, 220));
-    imagesetpixel($smallImg, rand(0, $smallW), rand(0, $smallH), $dotColor);
-}
-
-// ── Noise: random lines ──
-for ($i = 0; $i < 4; $i++) {
-    $lineColor = imagecolorallocate($smallImg, rand(140, 200), rand(140, 200), rand(140, 200));
-    imageline($smallImg, rand(0, $smallW), rand(0, $smallH), rand(0, $smallW), rand(0, $smallH), $lineColor);
-}
-
-// ── Render each character with random color and slight vertical jitter ──
-$totalTextW = $textLen * ($charW + 1);
-$startX = max(2, (int)(($smallW - $totalTextW) / 2));
-$baseY  = (int)(($smallH - $charH) / 2);
-
+// Render each character with varying color
 for ($i = 0; $i < $textLen; $i++) {
     $char = $captchaText[$i];
-    $charColor = imagecolorallocate($smallImg, rand(10, 100), rand(10, 100), rand(10, 100));
-    $yJitter = rand(-2, 2);
-    imagechar($smallImg, $builtinFont, $startX + $i * ($charW + 1), $baseY + $yJitter, $char, $charColor);
+    $charColor = imagecolorallocate($img, rand(20, 90), rand(20, 90), rand(20, 90));
+    $yOffset = $baseY + rand(-3, 3);
+    imagechar($img, $builtinFont, $startX + ($i * ($charW + 2)), $yOffset, $char, $charColor);
 }
 
-// ── More noise dots on top of text ──
-for ($i = 0; $i < 30; $i++) {
-    $dotColor = imagecolorallocate($smallImg, rand(100, 200), rand(100, 200), rand(100, 200));
-    imagesetpixel($smallImg, rand(0, $smallW), rand(0, $smallH), $dotColor);
+// ── Light noise overlay ──
+for ($i = 0; $i < 50; $i++) {
+    $c = imagecolorallocate($img, rand(180, 220), rand(180, 220), rand(180, 220));
+    imagesetpixel($img, rand(0, $width), rand(0, $height), $c);
 }
 
-// ── Step 2: Scale up the small image to the final canvas ──
-$img = imagecreatetruecolor($width, $height);
-imagecopyresampled($img, $smallImg, 0, 0, 0, 0, $width, $height, $smallW, $smallH);
-imagedestroy($smallImg);
-
-// ── Extra noise on the scaled-up final image ──
-for ($i = 0; $i < 5; $i++) {
-    $arcColor = imagecolorallocate($img, rand(130, 200), rand(130, 200), rand(130, 200));
-    imagearc($img, rand(0, $width), rand(0, $height), rand(40, 160), rand(20, 60), rand(0, 360), rand(0, 360), $arcColor);
-}
-for ($i = 0; $i < 100; $i++) {
-    $dotColor = imagecolorallocate($img, rand(120, 210), rand(120, 210), rand(120, 210));
-    imagesetpixel($img, rand(0, $width), rand(0, $height), $dotColor);
-}
-
-// ── Output as PNG ──
+// ── Output as PNG with compression ──
 header('Content-Type: image/png');
 header('Cache-Control: no-store, no-cache, must-revalidate, max-age=0');
 header('Pragma: no-cache');
 header('Expires: 0');
-imagepng($img);
+imagepng($img, null, 9); // Compression level 9 (max)
 imagedestroy($img);

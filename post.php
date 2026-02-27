@@ -1048,7 +1048,7 @@ if ($_POST && isset($_POST['action']) && $_POST['action'] === 'newsletter_subscr
                                 <div class="mb-3">
                                     <label class="form-label" style="font-size: 13px; font-weight: 500; color: #555;"><i class="fa fa-shield-halved me-1"></i>Type the words shown below</label>
                                     <div class="d-flex align-items-center gap-2">
-                                        <img src="" id="captcha-image" alt="CAPTCHA" style="height: 60px; border: 1px solid #ddd; border-radius: 6px; cursor: pointer;" title="Click to refresh" onclick="refreshCaptcha()">
+                                        <img src="<?php echo $base; ?>captcha.php" id="captcha-image" alt="CAPTCHA" style="height: 60px; border: 1px solid #ddd; border-radius: 6px; cursor: pointer;" title="Click to refresh" onclick="refreshCaptcha()">
                                         <button type="button" class="btn btn-sm btn-outline-secondary" onclick="refreshCaptcha()" title="Refresh CAPTCHA" style="padding: 4px 10px;">
                                             <i class="fa fa-rotate-right"></i>
                                         </button>

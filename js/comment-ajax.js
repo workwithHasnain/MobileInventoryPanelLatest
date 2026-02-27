@@ -20,9 +20,6 @@ function refreshCaptcha() {
 }
 
 document.addEventListener('DOMContentLoaded', function () {
-    // Initialize CAPTCHA image on page load
-    refreshCaptcha();
-
     // Handle device comment form
     var deviceCommentForm = document.getElementById('device-comment-form');
     if (deviceCommentForm) {
