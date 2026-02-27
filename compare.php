@@ -1801,6 +1801,7 @@ function formatDeviceSpecsStructured($device)
                     text-align: left;
                     /* word-wrap: break-word; */
                     font-size: 15px;
+                    text-transform: none;
                 }
 
                 /* Section headings */
