@@ -34,7 +34,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $image_paths = [];
     if (isset($_FILES['images']) && is_array($_FILES['images']['name'])) {
         $allowed_types = ['image/jpeg', 'image/png', 'image/gif'];
-        $max_size = 5 * 1024 * 1024; // 5MB
+        $max_size = 500 * 1024; // 500KB
         $max_images = 5;
 
         // Create uploads directory if it doesn't exist
@@ -54,7 +54,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
                 // Validate file size
                 if ($file_size > $max_size) {
-                    $errors['image' . ($i + 1)] = 'Image ' . ($i + 1) . ' size should not exceed 5MB';
+                    $errors['image' . ($i + 1)] = 'Image ' . ($i + 1) . ' size should not exceed 500KB';
                 }
 
                 // If no errors, process the upload

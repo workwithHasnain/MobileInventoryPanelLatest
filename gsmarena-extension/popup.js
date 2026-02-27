@@ -715,6 +715,16 @@ document.addEventListener('DOMContentLoaded', async () => {
             return;
         }
 
+        // Validate image sizes (max 500KB each)
+        const maxSizeKB = 500;
+        for (let i = 0; i < imageFiles.length; i++) {
+            const fileSizeKB = imageFiles[i].size / 1024;
+            if (fileSizeKB > maxSizeKB) {
+                showResult(`❌ Image ${i + 1} ("${imageFiles[i].name}") is ${Math.round(fileSizeKB)}KB — exceeds the 500KB limit. Please compress it.`, 'error');
+                return;
+            }
+        }
+
         // Save settings
         try {
             await chrome.storage.local.set({ bridgeUrl, serverUrl, apiKey });

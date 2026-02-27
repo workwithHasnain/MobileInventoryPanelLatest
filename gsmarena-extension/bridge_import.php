@@ -62,13 +62,24 @@ $postFields = [
     'device_data' => $deviceData
 ];
 
-// Attach image files
+// Attach image files (validate each does not exceed 500KB)
+$maxImageSize = 500 * 1024; // 500KB
 if (isset($_FILES['images']) && is_array($_FILES['images']['name'])) {
     for ($i = 0; $i < count($_FILES['images']['name']); $i++) {
         if (!empty($_FILES['images']['name'][$i]) && $_FILES['images']['error'][$i] === UPLOAD_ERR_OK) {
             $tmpPath = $_FILES['images']['tmp_name'][$i];
             $fileName = $_FILES['images']['name'][$i];
             $mimeType = $_FILES['images']['type'][$i];
+            $fileSize = $_FILES['images']['size'][$i];
+
+            // Validate image size
+            if ($fileSize > $maxImageSize) {
+                echo json_encode([
+                    'success' => false,
+                    'error' => 'Image ' . ($i + 1) . ' ("' . $fileName . '") exceeds 500KB limit (' . round($fileSize / 1024) . 'KB). Please compress it before importing.'
+                ]);
+                exit;
+            }
 
             $postFields["images[$i]"] = new CURLFile($tmpPath, $mimeType, $fileName);
         }

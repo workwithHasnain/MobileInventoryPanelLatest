@@ -1,7 +1,20 @@
 <?php
 require_once 'auth.php';
-// Require login for this page
-requireLogin();
+
+// Bypass login requirement when the request comes from the extension (has API key header)
+$allHeadersTop = function_exists('getallheaders') ? getallheaders() : [];
+$extensionApiKey = $_SERVER['HTTP_X_API_KEY']
+    ?? $_SERVER['HTTP_X_Api_Key']
+    ?? $allHeadersTop['X-API-Key']
+    ?? $allHeadersTop['X-Api-Key']
+    ?? $allHeadersTop['x-api-key']
+    ?? '';
+$isExtensionRequest = !empty($extensionApiKey);
+
+if (!$isExtensionRequest) {
+    // Require login only for web/form access, not extension imports
+    requireLogin();
+}
 /**
  * import_device.php - Import device from GSMArena scraper extension
  * 
@@ -268,7 +281,7 @@ function handleMultipartImport($apiKey)
     $image_paths = [];
     if (isset($_FILES['images']) && is_array($_FILES['images']['name'])) {
         $allowed_types = ['image/jpeg', 'image/png', 'image/gif', 'image/webp'];
-        $max_size = 5 * 1024 * 1024; // 5MB
+        $max_size = 500 * 1024; // 500KB
         $max_images = 5;
 
         // Create uploads directory if it doesn't exist
@@ -289,7 +302,7 @@ function handleMultipartImport($apiKey)
 
                 // Validate file size
                 if ($file_size > $max_size) {
-                    echo json_encode(['success' => false, 'error' => 'Image ' . ($i + 1) . ': File size must not exceed 5MB']);
+                    echo json_encode(['success' => false, 'error' => 'Image ' . ($i + 1) . ': File size must not exceed 500KB']);
                     exit;
                 }
 
