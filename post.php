@@ -158,13 +158,45 @@ try {
     // Silently ignore view tracking errors
 }
 
-// Get comments for posts
+// Get comments for posts (threaded: parents first, then replies grouped)
 function getPostComments($post_id)
 {
     global $pdo;
-    $stmt = $pdo->prepare("SELECT * FROM post_comments WHERE post_id = ? AND status = 'approved' ORDER BY created_at DESC");
+    $stmt = $pdo->prepare("SELECT * FROM post_comments WHERE post_id = ? AND status = 'approved' ORDER BY created_at ASC");
     $stmt->execute([$post_id]);
-    return $stmt->fetchAll();
+    $all = $stmt->fetchAll();
+
+    // Build threaded structure: parent comments with nested replies (1 level deep)
+    $parents = [];
+    $replies = [];
+    foreach ($all as $c) {
+        if (empty($c['parent_id'])) {
+            $c['replies'] = [];
+            $parents[$c['id']] = $c;
+        } else {
+            $replies[] = $c;
+        }
+    }
+    // Attach replies to their parent (or to the root parent if reply-to-reply)
+    foreach ($replies as $r) {
+        $pid = $r['parent_id'];
+        if (isset($parents[$pid])) {
+            $parents[$pid]['replies'][] = $r;
+        } else {
+            // reply-to-reply: find root parent
+            foreach ($parents as &$p) {
+                foreach ($p['replies'] as $existingReply) {
+                    if ($existingReply['id'] == $pid) {
+                        $p['replies'][] = $r;
+                        break 2;
+                    }
+                }
+            }
+            unset($p);
+        }
+    }
+    // Return as indexed array, newest parents first
+    return array_reverse(array_values($parents));
 }
 
 // Get post comment count
@@ -219,69 +251,31 @@ function getDeviceComments($device_id)
     return $stmt->fetchAll();
 }
 
-// Handle comment submissions and newsletter subscriptions
-$comment_success = '';
-$comment_error = '';
+// Handle newsletter subscriptions (comments handled via AJAX in ajax_comment_handler.php)
 $newsletter_success = '';
 $newsletter_error = '';
 
-if ($_POST && isset($_POST['action'])) {
-    $action = $_POST['action'];
+if ($_POST && isset($_POST['action']) && $_POST['action'] === 'newsletter_subscribe') {
+    $email = trim($_POST['newsletter_email'] ?? '');
+    $name = trim($_POST['newsletter_name'] ?? '');
 
-    if ($action === 'newsletter_subscribe') {
-        $email = trim($_POST['newsletter_email'] ?? '');
-        $name = trim($_POST['newsletter_name'] ?? '');
-
-        if (empty($email)) {
-            $newsletter_error = 'Email address is required.';
-        } elseif (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
-            $newsletter_error = 'Please enter a valid email address.';
-        } else {
-            // Check if email already exists
-            $check_stmt = $pdo->prepare("SELECT id FROM newsletter_subscribers WHERE email = ?");
-            $check_stmt->execute([$email]);
-
-            if ($check_stmt->fetch()) {
-                $newsletter_error = 'This email is already subscribed to our newsletter.';
-            } else {
-                $insert_stmt = $pdo->prepare("INSERT INTO newsletter_subscribers (email, name, status, subscribed_at) VALUES (?, ?, 'active', NOW())");
-                if ($insert_stmt->execute([$email, $name])) {
-                    $newsletter_success = 'Thank you for subscribing to our newsletter! You\'ll receive the latest tech updates and device reviews.';
-                } else {
-                    $newsletter_error = 'Failed to subscribe. Please try again.';
-                }
-            }
-        }
+    if (empty($email)) {
+        $newsletter_error = 'Email address is required.';
+    } elseif (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
+        $newsletter_error = 'Please enter a valid email address.';
     } else {
-        // Handle comment submissions
-        $name = trim($_POST['name'] ?? '');
-        $email = trim($_POST['email'] ?? '');
-        $comment = trim($_POST['comment'] ?? '');
+        // Check if email already exists
+        $check_stmt = $pdo->prepare("SELECT id FROM newsletter_subscribers WHERE email = ?");
+        $check_stmt->execute([$email]);
 
-        if (empty($name) || empty($email) || empty($comment)) {
-            $comment_error = 'All fields are required.';
-        } elseif (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
-            $comment_error = 'Please enter a valid email address.';
-        } elseif (strlen($comment) < 10) {
-            $comment_error = 'Comment must be at least 10 characters long.';
+        if ($check_stmt->fetch()) {
+            $newsletter_error = 'This email is already subscribed to our newsletter.';
         } else {
-            if ($action === 'comment_post') {
-                $post_id = $_POST['post_id'] ?? '';
-                $stmt = $pdo->prepare("INSERT INTO post_comments (post_id, name, email, comment, status, created_at) VALUES (?, ?, ?, ?, 'pending', NOW())");
-                if ($stmt->execute([$post_id, $name, $email, $comment])) {
-                    $comment_success = 'Your comment has been submitted and is pending approval.';
-                } else {
-                    $comment_error = 'Failed to submit comment. Please try again.';
-                }
-            } elseif ($action === 'comment_device') {
-                $device_id = $_POST['device_id'] ?? '';
-                $parent_id = !empty($_POST['parent_id']) ? $_POST['parent_id'] : null;
-                $stmt = $pdo->prepare("INSERT INTO device_comments (device_id, name, email, comment, parent_id, status, created_at) VALUES (?, ?, ?, ?, ?, 'pending', NOW())");
-                if ($stmt->execute([$device_id, $name, $email, $comment, $parent_id])) {
-                    $comment_success = 'Your comment has been submitted and is pending approval.';
-                } else {
-                    $comment_error = 'Failed to submit comment. Please try again.';
-                }
+            $insert_stmt = $pdo->prepare("INSERT INTO newsletter_subscribers (email, name, status, subscribed_at) VALUES (?, ?, 'active', NOW())");
+            if ($insert_stmt->execute([$email, $name])) {
+                $newsletter_success = 'Thank you for subscribing to our newsletter! You\'ll receive the latest tech updates and device reviews.';
+            } else {
+                $newsletter_error = 'Failed to subscribe. Please try again.';
             }
         }
     }
@@ -940,7 +934,7 @@ if ($_POST && isset($_POST['action'])) {
 
                         <?php if (!empty($postComments)): ?>
                             <?php foreach ($postComments as $comment): ?>
-                                <div class="user-thread">
+                                <div class="user-thread" id="comment-<?php echo $comment['id']; ?>">
                                     <div class="uavatar">
                                         <?php echo getAvatarDisplay($comment['name'], $comment['email']); ?>
                                     </div>
@@ -962,12 +956,41 @@ if ($_POST && isset($_POST['action'])) {
                                     <p class="uopin"><?php echo nl2br(htmlspecialchars($comment['comment'])); ?></p>
                                     <ul class="uinfo">
                                         <li class="ureply" style="list-style: none;">
-                                            <span title="Reply to this post">
-                                                <p href="#">Reply</p>
-                                            </span>
+                                            <button type="button" class="btn btn-sm btn-link reply-btn p-0" style="color: #d50000; text-decoration: none; font-size: 13px; font-weight: 500;" data-comment-id="<?php echo $comment['id']; ?>" data-comment-name="<?php echo htmlspecialchars($comment['name']); ?>" title="Reply to this comment">
+                                                <i class="fa fa-reply me-1"></i>Reply
+                                            </button>
                                         </li>
                                     </ul>
                                 </div>
+                                <?php if (!empty($comment['replies'])): ?>
+                                    <?php foreach ($comment['replies'] as $reply): ?>
+                                        <div class="user-thread comment-reply" id="comment-<?php echo $reply['id']; ?>" style="margin-left: 40px; border-left: 3px solid #d50000; padding-left: 12px;">
+                                            <div class="uavatar">
+                                                <?php echo getAvatarDisplay($reply['name'], $reply['email']); ?>
+                                            </div>
+                                            <ul class="uinfo2">
+                                                <li class="uname">
+                                                    <a href="#" style="color: #555; text-decoration: none;">
+                                                        <?php echo htmlspecialchars($reply['name']); ?>
+                                                    </a>
+                                                    <small class="text-muted ms-1" style="font-size: 11px;"><i class="fa fa-reply fa-xs"></i> replied</small>
+                                                </li>
+                                                <li class="upost">
+                                                    <i class="fa-regular fa-clock fa-sm mx-1"></i>
+                                                    <?php echo timeAgo($reply['created_at']); ?>
+                                                </li>
+                                            </ul>
+                                            <p class="uopin"><?php echo nl2br(htmlspecialchars($reply['comment'])); ?></p>
+                                            <ul class="uinfo">
+                                                <li class="ureply" style="list-style: none;">
+                                                    <button type="button" class="btn btn-sm btn-link reply-btn p-0" style="color: #d50000; text-decoration: none; font-size: 13px; font-weight: 500;" data-comment-id="<?php echo $comment['id']; ?>" data-comment-name="<?php echo htmlspecialchars($comment['name']); ?>" title="Reply to this thread">
+                                                        <i class="fa fa-reply me-1"></i>Reply
+                                                    </button>
+                                                </li>
+                                            </ul>
+                                        </div>
+                                    <?php endforeach; ?>
+                                <?php endif; ?>
                             <?php endforeach; ?>
                         <?php else: ?>
                             <div class="user-thread text-center py-4">
@@ -977,11 +1000,21 @@ if ($_POST && isset($_POST['action'])) {
 
                         <!-- Comment Form -->
                         <div class="comment-form mt-4 mx-2 mb-3">
-                            <h6 class="mb-3">Share Your Opinion</h6>
+                            <h6 class="mb-3 comment-form-title">Share Your Opinion</h6>
+                            <!-- Reply indicator (hidden by default, uses custom class to avoid auto-dismiss) -->
+                            <div id="reply-indicator" class="d-none" style="font-size: 13px; border-left: 4px solid #d50000; background-color: #e8f4fd; color: #31708f; padding: 8px 14px; border-radius: 6px; margin-bottom: 12px;">
+                                <div class="d-flex justify-content-between align-items-center">
+                                    <span><i class="fa fa-reply me-2"></i>Replying to <strong id="reply-to-name"></strong></span>
+                                    <button type="button" class="btn btn-sm btn-link text-danger p-0" id="cancel-reply" title="Cancel reply" style="text-decoration: none;">
+                                        <i class="fa fa-times"></i> Cancel
+                                    </button>
+                                </div>
+                            </div>
 
                             <form id="post-comment-form" method="POST">
                                 <input type="hidden" name="action" value="comment_post">
                                 <input type="hidden" name="post_id" value="<?php echo $post['id']; ?>">
+                                <input type="hidden" name="parent_id" id="parent_id" value="">
 
                                 <div class="row">
                                     <div class="col-md-6 mb-3">
@@ -1324,9 +1357,9 @@ if ($_POST && isset($_POST['action'])) {
                         });
 
                         // Redirect to comparison page using slugs (preferred) or IDs (fallback)
-                        const compareUrl = device1Slug && device2Slug 
-                            ? `/compare/${device1Slug}-vs-${device2Slug}`
-                            : `/compare/${device1Id}-vs-${device2Id}`;
+                        const compareUrl = device1Slug && device2Slug ?
+                            `/compare/${device1Slug}-vs-${device2Slug}` :
+                            `/compare/${device1Id}-vs-${device2Id}`;
                         window.location.href = compareUrl;
                     }
                 });
@@ -1519,6 +1552,9 @@ if ($_POST && isset($_POST['action'])) {
         });
     </script>
     <script src="<?php echo $base; ?>script.js"></script>
+    <script>
+        var COMMENT_AJAX_BASE = '<?php echo $base; ?>';
+    </script>
     <script src="<?php echo $base; ?>js/comment-ajax.js"></script>
 </body>
 

@@ -42,53 +42,52 @@ if (!empty($email) && !filter_var($email, FILTER_VALIDATE_EMAIL)) {
 
 try {
     $pdo = getConnection();
-    
+
     if ($action === 'comment_device') {
         $device_id = $_POST['device_id'] ?? '';
-        
+        $parent_id = !empty($_POST['parent_id']) ? $_POST['parent_id'] : null;
+
         if (empty($device_id)) {
             $response['message'] = 'Device ID is required';
             echo json_encode($response);
             exit;
         }
-        
+
         $stmt = $pdo->prepare("
-            INSERT INTO device_comments (device_id, name, email, comment, status, created_at) 
-            VALUES (?, ?, ?, ?, 'pending', NOW())
+            INSERT INTO device_comments (device_id, name, email, comment, parent_id, status, created_at) 
+            VALUES (?, ?, ?, ?, ?, 'pending', NOW())
         ");
-        
-        if ($stmt->execute([$device_id, $name, $email, $comment])) {
+
+        if ($stmt->execute([$device_id, $name, $email, $comment, $parent_id])) {
             $response['success'] = true;
             $response['message'] = 'Thank you! Your comment has been submitted and is awaiting approval.';
         } else {
             $response['message'] = 'Failed to submit comment. Please try again.';
         }
-        
     } elseif ($action === 'comment_post') {
         $post_id = $_POST['post_id'] ?? '';
-        
+        $parent_id = !empty($_POST['parent_id']) ? $_POST['parent_id'] : null;
+
         if (empty($post_id)) {
             $response['message'] = 'Post ID is required';
             echo json_encode($response);
             exit;
         }
-        
+
         $stmt = $pdo->prepare("
-            INSERT INTO post_comments (post_id, name, email, comment, status, created_at) 
-            VALUES (?, ?, ?, ?, 'pending', NOW())
+            INSERT INTO post_comments (post_id, name, email, comment, parent_id, status, created_at) 
+            VALUES (?, ?, ?, ?, ?, 'pending', NOW())
         ");
-        
-        if ($stmt->execute([$post_id, $name, $email, $comment])) {
+
+        if ($stmt->execute([$post_id, $name, $email, $comment, $parent_id])) {
             $response['success'] = true;
             $response['message'] = 'Your comment has been submitted and is pending approval.';
         } else {
             $response['message'] = 'Failed to submit comment. Please try again.';
         }
-        
     } else {
         $response['message'] = 'Invalid action';
     }
-    
 } catch (PDOException $e) {
     $response['message'] = 'Database error. Please try again.';
     error_log('Comment submission error: ' . $e->getMessage());

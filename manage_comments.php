@@ -65,6 +65,7 @@ $pending_by_post_stmt = $pdo->prepare("
                    'name', pc.name,
                    'email', pc.email,
                    'comment', pc.comment,
+                   'parent_id', pc.parent_id,
                    'created_at', pc.created_at
                ) ORDER BY pc.created_at DESC
            ) as comments
@@ -78,10 +79,62 @@ $pending_by_post_stmt = $pdo->prepare("
 $pending_by_post_stmt->execute();
 $pending_by_post = $pending_by_post_stmt->fetchAll();
 
-// Get pending device comments
+// Get pending device comments (include parent_id)
 $device_comments_stmt = $pdo->prepare("SELECT * FROM device_comments WHERE status = 'pending' ORDER BY created_at DESC");
 $device_comments_stmt->execute();
 $pending_device_comments = $device_comments_stmt->fetchAll();
+
+// Build lookup of device names for device comments
+$device_ids = [];
+foreach ($pending_device_comments as $dc) {
+    if (!empty($dc['device_id'])) $device_ids[] = $dc['device_id'];
+}
+$device_names = [];
+if (!empty($device_ids)) {
+    $device_ids = array_unique($device_ids);
+    $placeholders = implode(',', array_fill(0, count($device_ids), '?'));
+    $device_stmt = $pdo->prepare("SELECT id, name FROM phones WHERE id IN ($placeholders)");
+    $device_stmt->execute(array_values($device_ids));
+    foreach ($device_stmt->fetchAll() as $d) {
+        $device_names[$d['id']] = $d['name'];
+    }
+}
+
+// Build lookup of parent comment names for device comments
+$device_parent_ids = [];
+foreach ($pending_device_comments as $dc) {
+    if (!empty($dc['parent_id'])) $device_parent_ids[] = $dc['parent_id'];
+}
+$device_parent_names = [];
+if (!empty($device_parent_ids)) {
+    $placeholders = implode(',', array_fill(0, count($device_parent_ids), '?'));
+    $parent_stmt = $pdo->prepare("SELECT id, name FROM device_comments WHERE id IN ($placeholders)");
+    $parent_stmt->execute($device_parent_ids);
+    foreach ($parent_stmt->fetchAll() as $p) {
+        $device_parent_names[$p['id']] = $p['name'];
+    }
+}
+
+// Build lookup of parent comment names for post comments
+$all_post_parent_ids = [];
+foreach ($pending_by_post as $pg) {
+    $comments = json_decode($pg['comments'], true);
+    if ($comments) {
+        foreach ($comments as $c) {
+            if (!empty($c['parent_id'])) $all_post_parent_ids[] = $c['parent_id'];
+        }
+    }
+}
+$post_parent_names = [];
+if (!empty($all_post_parent_ids)) {
+    $all_post_parent_ids = array_unique($all_post_parent_ids);
+    $placeholders = implode(',', array_fill(0, count($all_post_parent_ids), '?'));
+    $parent_stmt = $pdo->prepare("SELECT id, name FROM post_comments WHERE id IN ($placeholders)");
+    $parent_stmt->execute(array_values($all_post_parent_ids));
+    foreach ($parent_stmt->fetchAll() as $p) {
+        $post_parent_names[$p['id']] = $p['name'];
+    }
+}
 
 // Get total pending counts for tabs
 $total_pending_posts_stmt = $pdo->prepare("SELECT COUNT(*) as count FROM post_comments WHERE status = 'pending'");
@@ -94,7 +147,7 @@ $total_pending_devices = $total_pending_devices_stmt->fetch()['count'];
 
 // Get recent approved comments - separate queries to avoid UNION type mismatch
 $post_approved_stmt = $pdo->prepare("
-    SELECT 'post' as type, pc.id, pc.post_id::text as reference_id, pc.name, pc.email, pc.comment, pc.status, pc.created_at, pc.updated_at, p.title as reference_title
+    SELECT 'post' as type, pc.id, pc.post_id::text as reference_id, pc.name, pc.email, pc.comment, pc.parent_id, pc.status, pc.created_at, pc.updated_at, p.title as reference_title
     FROM post_comments pc 
     LEFT JOIN posts p ON pc.post_id = p.id 
     WHERE pc.status = 'approved' 
@@ -104,8 +157,9 @@ $post_approved_stmt->execute();
 $recent_post_approved = $post_approved_stmt->fetchAll();
 
 $device_approved_stmt = $pdo->prepare("
-    SELECT 'device' as type, dc.id, dc.device_id as reference_id, dc.name, dc.email, dc.comment, dc.status, dc.created_at, dc.updated_at, dc.device_id as reference_title
+    SELECT 'device' as type, dc.id, dc.device_id as reference_id, dc.name, dc.email, dc.comment, dc.parent_id, dc.status, dc.created_at, dc.updated_at, COALESCE(p.name, dc.device_id) as reference_title
     FROM device_comments dc 
+    LEFT JOIN phones p ON CAST(dc.device_id AS INTEGER) = p.id
     WHERE dc.status = 'approved' 
     ORDER BY dc.created_at DESC LIMIT 10
 ");
@@ -260,6 +314,11 @@ $recent_approved = array_slice($recent_approved, 0, 20);
                                                             <div>
                                                                 <strong><?php echo htmlspecialchars($comment['name']); ?></strong>
                                                                 <small class="text-muted ms-2"><?php echo htmlspecialchars($comment['email']); ?></small>
+                                                                <?php if (!empty($comment['parent_id'])): ?>
+                                                                    <span class="badge bg-secondary ms-2" title="Reply to comment #<?php echo $comment['parent_id']; ?>">
+                                                                        <i class="fas fa-reply me-1"></i>Reply<?php if (isset($post_parent_names[$comment['parent_id']])): ?> to <?php echo htmlspecialchars($post_parent_names[$comment['parent_id']]); ?><?php endif; ?>
+                                                                    </span>
+                                                                <?php endif; ?>
                                                                 <br>
                                                                 <small class="text-muted">
                                                                     <i class="fas fa-clock me-1"></i>
@@ -314,9 +373,14 @@ $recent_approved = array_slice($recent_approved, 0, 20);
                                             <div>
                                                 <strong><?php echo htmlspecialchars($comment['name']); ?></strong>
                                                 <small class="text-muted ms-2"><?php echo htmlspecialchars($comment['email']); ?></small>
+                                                <?php if (!empty($comment['parent_id'])): ?>
+                                                    <span class="badge bg-secondary ms-2" title="Reply to comment #<?php echo $comment['parent_id']; ?>">
+                                                        <i class="fas fa-reply me-1"></i>Reply<?php if (isset($device_parent_names[$comment['parent_id']])): ?> to <?php echo htmlspecialchars($device_parent_names[$comment['parent_id']]); ?><?php endif; ?>
+                                                    </span>
+                                                <?php endif; ?>
                                                 <br>
                                                 <small class="text-muted">
-                                                    On device: <strong><?php echo htmlspecialchars($comment['device_id']); ?></strong>
+                                                    On device: <strong><?php echo htmlspecialchars($device_names[$comment['device_id']] ?? $comment['device_id']); ?></strong>
                                                 </small>
                                                 <br>
                                                 <small class="text-muted">
@@ -380,6 +444,11 @@ $recent_approved = array_slice($recent_approved, 0, 20);
                                             <span class="badge bg-<?php echo $comment['type'] === 'post' ? 'primary' : 'success'; ?> ms-2">
                                                 <?php echo ucfirst($comment['type']); ?>
                                             </span>
+                                            <?php if (!empty($comment['parent_id'])): ?>
+                                                <span class="badge bg-secondary ms-1" title="This is a reply">
+                                                    <i class="fas fa-reply me-1"></i>Reply
+                                                </span>
+                                            <?php endif; ?>
                                             <br>
                                             <small class="text-muted">
                                                 <?php if ($comment['type'] === 'post'): ?>

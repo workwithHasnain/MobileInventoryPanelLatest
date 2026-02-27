@@ -842,17 +842,49 @@ function generateDeviceStats($device)
   return $stats;
 }
 
-// Function to get device comments
+// Function to get device comments (threaded: parents first, then replies grouped)
 function getDeviceComments($pdo, $device_id)
 {
   try {
     $stmt = $pdo->prepare("
             SELECT * FROM device_comments 
             WHERE device_id = ? AND status = 'approved'
-            ORDER BY created_at DESC
+            ORDER BY created_at ASC
         ");
     $stmt->execute([$device_id]);
-    return $stmt->fetchAll(PDO::FETCH_ASSOC);
+    $all = $stmt->fetchAll(PDO::FETCH_ASSOC);
+
+    // Build threaded structure: parent comments with nested replies (1 level deep)
+    $parents = [];
+    $replies = [];
+    foreach ($all as $c) {
+      if (empty($c['parent_id'])) {
+        $c['replies'] = [];
+        $parents[$c['id']] = $c;
+      } else {
+        $replies[] = $c;
+      }
+    }
+    // Attach replies to their parent (or to the root parent if reply-to-reply)
+    foreach ($replies as $r) {
+      $pid = $r['parent_id'];
+      if (isset($parents[$pid])) {
+        $parents[$pid]['replies'][] = $r;
+      } else {
+        // reply-to-reply: find root parent
+        foreach ($parents as &$p) {
+          foreach ($p['replies'] as $existingReply) {
+            if ($existingReply['id'] == $pid) {
+              $p['replies'][] = $r;
+              break 2;
+            }
+          }
+        }
+        unset($p);
+      }
+    }
+    // Return as indexed array, newest parents first
+    return array_reverse(array_values($parents));
   } catch (PDOException $e) {
     return [];
   }
@@ -2285,7 +2317,7 @@ $commentCount = getDeviceCommentCount($pdo, $device_id);
 
               <?php if (!empty($comments)): ?>
                 <?php foreach ($comments as $comment): ?>
-                  <div class="user-thread">
+                  <div class="user-thread" id="comment-<?php echo $comment['id']; ?>">
                     <div class="uavatar">
                       <?php echo getAvatarDisplay($comment['name'], $comment['email']); ?>
                     </div>
@@ -2303,12 +2335,41 @@ $commentCount = getDeviceCommentCount($pdo, $device_id);
                     <p class="uopin"><?php echo nl2br(htmlspecialchars($comment['comment'])); ?></p>
                     <ul class="uinfo">
                       <li class="ureply" style="list-style: none;">
-                        <span title="Reply to this post">
-                          <p href="#">Reply</p>
-                        </span>
+                        <button type="button" class="btn btn-sm btn-link reply-btn p-0" style="color: #d50000; text-decoration: none; font-size: 13px; font-weight: 500;" data-comment-id="<?php echo $comment['id']; ?>" data-comment-name="<?php echo htmlspecialchars($comment['name']); ?>" title="Reply to this comment">
+                          <i class="fa fa-reply me-1"></i>Reply
+                        </button>
                       </li>
                     </ul>
                   </div>
+                  <?php if (!empty($comment['replies'])): ?>
+                    <?php foreach ($comment['replies'] as $reply): ?>
+                      <div class="user-thread comment-reply" id="comment-<?php echo $reply['id']; ?>" style="margin-left: 40px; border-left: 3px solid #d50000; padding-left: 12px;">
+                        <div class="uavatar">
+                          <?php echo getAvatarDisplay($reply['name'], $reply['email']); ?>
+                        </div>
+                        <ul class="uinfo2">
+                          <li class="uname">
+                            <a href="#" style="color: #555; text-decoration: none;">
+                              <?php echo htmlspecialchars($reply['name']); ?>
+                            </a>
+                            <small class="text-muted ms-1" style="font-size: 11px;"><i class="fa fa-reply fa-xs"></i> replied</small>
+                          </li>
+                          <li class="upost">
+                            <i class="fa-regular fa-clock fa-sm mx-1"></i>
+                            <?php echo timeAgo($reply['created_at']); ?>
+                          </li>
+                        </ul>
+                        <p class="uopin"><?php echo nl2br(htmlspecialchars($reply['comment'])); ?></p>
+                        <ul class="uinfo">
+                          <li class="ureply" style="list-style: none;">
+                            <button type="button" class="btn btn-sm btn-link reply-btn p-0" style="color: #d50000; text-decoration: none; font-size: 13px; font-weight: 500;" data-comment-id="<?php echo $comment['id']; ?>" data-comment-name="<?php echo htmlspecialchars($comment['name']); ?>" title="Reply to this thread">
+                              <i class="fa fa-reply me-1"></i>Reply
+                            </button>
+                          </li>
+                        </ul>
+                      </div>
+                    <?php endforeach; ?>
+                  <?php endif; ?>
                 <?php endforeach; ?>
               <?php else: ?>
                 <div class="user-thread text-center py-4">
@@ -2318,10 +2379,20 @@ $commentCount = getDeviceCommentCount($pdo, $device_id);
 
               <!-- Comment Form -->
               <div class="comment-form mt-4 mx-2 mb-3">
-                <h6 class="mb-3">Share Your Opinion</h6>
+                <h6 class="mb-3 comment-form-title">Share Your Opinion</h6>
+                <!-- Reply indicator (hidden by default, uses custom class to avoid auto-dismiss) -->
+                <div id="reply-indicator" class="d-none" style="font-size: 13px; border-left: 4px solid #d50000; background-color: #e8f4fd; color: #31708f; padding: 8px 14px; border-radius: 6px; margin-bottom: 12px;">
+                  <div class="d-flex justify-content-between align-items-center">
+                    <span><i class="fa fa-reply me-2"></i>Replying to <strong id="reply-to-name"></strong></span>
+                    <button type="button" class="btn btn-sm btn-link text-danger p-0" id="cancel-reply" title="Cancel reply" style="text-decoration: none;">
+                      <i class="fa fa-times"></i> Cancel
+                    </button>
+                  </div>
+                </div>
                 <form id="device-comment-form" method="POST">
                   <input type="hidden" name="action" value="comment_device">
                   <input type="hidden" name="device_id" value="<?php echo htmlspecialchars($device['id']); ?>">
+                  <input type="hidden" name="parent_id" id="parent_id" value="">
                   <div class="row">
                     <div class="col-md-6 mb-3">
                       <input type="text" class="form-control" name="name" placeholder="Your Name" required>
@@ -2523,7 +2594,10 @@ $commentCount = getDeviceCommentCount($pdo, $device_id);
   </div>
 
   <script src="<?php echo $base; ?>script.js"></script>
-  <script src="js/comment-ajax.js"></script>
+  <script>
+    var COMMENT_AJAX_BASE = '<?php echo $base; ?>';
+  </script>
+  <script src="<?php echo $base; ?>js/comment-ajax.js"></script>
 
   <script>
     // Enable tooltips
@@ -2610,9 +2684,9 @@ $commentCount = getDeviceCommentCount($pdo, $device_id);
           });
 
           // Redirect to comparison page using slugs (preferred) or IDs (fallback)
-          const compareUrl = device1Slug && device2Slug 
-            ? `/compare/${device1Slug}-vs-${device2Slug}`
-            : `/compare/${device1Id}-vs-${device2Id}`;
+          const compareUrl = device1Slug && device2Slug ?
+            `/compare/${device1Slug}-vs-${device2Slug}` :
+            `/compare/${device1Id}-vs-${device2Id}`;
           window.location.href = compareUrl;
         }
       });
