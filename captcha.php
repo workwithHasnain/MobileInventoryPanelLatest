@@ -259,12 +259,8 @@ for ($i = 0; $i < 3; $i++) {
 
 // ── Render text using TrueType font for large readable characters ──
 $ttfSize = 22; // Font size in points — large and readable
-// Use a system TrueType font (Arial is available on all Windows systems)
-$fontFile = 'C:/Windows/Fonts/arial.ttf';
-if (!file_exists($fontFile)) {
-    // Fallback: try common alternatives
-    $fontFile = 'C:/Windows/Fonts/verdana.ttf';
-}
+// Use bundled Open Sans font (works on any server, no system dependency)
+$fontFile = __DIR__ . '/fonts/OpenSans.ttf';
 
 // Calculate text bounding box for centering
 $bbox = imagettfbbox($ttfSize, 0, $fontFile, $captchaText);
