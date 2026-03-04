@@ -124,14 +124,24 @@ include 'includes/header.php';
                 </div>
             </div>
 
-            <!-- Results Count -->
-            <div class="mb-3">
-                <p class="text-muted">
+            <!-- Results Count and Sorter -->
+            <div class="mb-3 d-flex justify-content-between align-items-center">
+                <p class="text-muted mb-0">
                     Showing <?php echo count($posts); ?> posts
                     <?php if (!empty($search) || !empty($status_filter) || !empty($category_filter)): ?>
                         - <a href="posts.php" class="text-decoration-none">Clear all filters</a>
                     <?php endif; ?>
                 </p>
+                <div style="width: 200px;">
+                    <label for="postSorter" class="form-label mb-0 me-2 d-inline">Sort by:</label>
+                    <select class="form-select form-select-sm d-inline" id="postSorter" style="width: auto;">
+                        <option value="default">Default</option>
+                        <option value="views-desc">Most Views</option>
+                        <option value="views-asc">Least Views</option>
+                        <option value="comments-desc">Most Comments</option>
+                        <option value="comments-asc">Least Comments</option>
+                    </select>
+                </div>
             </div>
 
             <!-- Posts Table -->
@@ -164,9 +174,9 @@ include 'includes/header.php';
                                         <th>Actions</th>
                                     </tr>
                                 </thead>
-                                <tbody>
+                                <tbody id="postsTableBody">
                                     <?php foreach ($posts as $post): ?>
-                                        <tr>
+                                        <tr data-post-views="<?php echo intval($post['view_count']); ?>" data-post-comments="<?php echo intval($post['comment_count']); ?>" data-post-date="<?php echo strtotime($post['publish_date']); ?>">
                                             <td>
                                                 <?php if (!empty($post['featured_image'])): ?>
                                                     <img src="<?php echo htmlspecialchars($post['featured_image']); ?>"
@@ -297,6 +307,28 @@ include 'includes/header.php';
             bsAlert.close();
         });
     }, 5000);
+
+    // Post sorting functionality
+    document.getElementById('postSorter').addEventListener('change', function() {
+        const sortValue = this.value;
+        const tbody = document.getElementById('postsTableBody');
+        const rows = Array.from(tbody.querySelectorAll('tr[data-post-views]'));
+
+        if (sortValue === 'default') {
+            rows.sort((a, b) => parseInt(a.dataset.postDate) - parseInt(b.dataset.postDate));
+            rows.reverse(); // Most recent first for default
+        } else if (sortValue === 'views-desc') {
+            rows.sort((a, b) => parseInt(b.dataset.postViews) - parseInt(a.dataset.postViews));
+        } else if (sortValue === 'views-asc') {
+            rows.sort((a, b) => parseInt(a.dataset.postViews) - parseInt(b.dataset.postViews));
+        } else if (sortValue === 'comments-desc') {
+            rows.sort((a, b) => parseInt(b.dataset.postComments) - parseInt(a.dataset.postComments));
+        } else if (sortValue === 'comments-asc') {
+            rows.sort((a, b) => parseInt(a.dataset.postComments) - parseInt(b.dataset.postComments));
+        }
+
+        rows.forEach(row => tbody.appendChild(row));
+    });
 </script>
 
 <?php include 'includes/footer.php'; ?>

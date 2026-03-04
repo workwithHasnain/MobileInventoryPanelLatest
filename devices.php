@@ -158,14 +158,24 @@ if (!empty($device_type_filter)) {
                     </div>
                 </div>
 
-                <!-- Results Count -->
-                <div class="mb-3">
-                    <p class="text-muted">
+                <!-- Results Count and Sorter -->
+                <div class="mb-3 d-flex justify-content-between align-items-center">
+                    <p class="text-muted mb-0">
                         Showing <?php echo count($filtered_phones); ?> of <?php echo count($phones); ?> devices
                         <?php if (!empty($search) || !empty($brand_filter) || !empty($availability_filter) || !empty($device_type_filter)): ?>
                             - <a href="devices.php" class="text-decoration-none">Clear all filters</a>
                         <?php endif; ?>
                     </p>
+                    <div style="width: 200px;">
+                        <label for="deviceSorter" class="form-label mb-0 me-2 d-inline">Sort by:</label>
+                        <select class="form-select form-select-sm d-inline" id="deviceSorter" style="width: auto;">
+                            <option value="default">Default</option>
+                            <option value="views-desc">Most Views</option>
+                            <option value="views-asc">Least Views</option>
+                            <option value="comments-desc">Most Comments</option>
+                            <option value="comments-asc">Least Comments</option>
+                        </select>
+                    </div>
                 </div>
 
                 <!-- Device Grid -->
@@ -182,9 +192,9 @@ if (!empty($device_type_filter)) {
                         <?php endif; ?>
                     </div>
                 <?php else: ?>
-                    <div class="row">
+                    <div class="row" id="devicesGrid">
                         <?php foreach ($filtered_phones as $index => $phone): ?>
-                            <div class="col-lg-4 col-md-6 mb-4">
+                            <div class="col-lg-4 col-md-6 mb-4" data-device-views="<?php echo intval($phone['view_count']); ?>" data-device-comments="<?php echo intval($phone['comment_count']); ?>" data-device-index="<?php echo $index; ?>">
                                 <div class="card h-100 shadow-sm">
                                     <?php if (!empty($phone['image'])): ?>
                                         <img src="<?php echo htmlspecialchars($phone['image'] ?? ''); ?>"
@@ -411,6 +421,29 @@ if (!empty($device_type_filter)) {
         </div>
     </div>
     <?php include 'includes/footer.php'; ?>
+
+    <script>
+        document.getElementById('deviceSorter').addEventListener('change', function() {
+            const sortValue = this.value;
+            const grid = document.getElementById('devicesGrid');
+            const cards = Array.from(grid.querySelectorAll('[data-device-index]'));
+
+            if (sortValue === 'default') {
+                cards.sort((a, b) => parseInt(a.dataset.deviceIndex) - parseInt(b.dataset.deviceIndex));
+            } else if (sortValue === 'views-desc') {
+                cards.sort((a, b) => parseInt(b.dataset.deviceViews) - parseInt(a.dataset.deviceViews));
+            } else if (sortValue === 'views-asc') {
+                cards.sort((a, b) => parseInt(a.dataset.deviceViews) - parseInt(b.dataset.deviceViews));
+            } else if (sortValue === 'comments-desc') {
+                cards.sort((a, b) => parseInt(b.dataset.deviceComments) - parseInt(a.dataset.deviceComments));
+            } else if (sortValue === 'comments-asc') {
+                cards.sort((a, b) => parseInt(a.dataset.deviceComments) - parseInt(b.dataset.deviceComments));
+            }
+
+            cards.forEach(card => grid.appendChild(card));
+        });
+    </script>
+
 </body>
 
 </html>
