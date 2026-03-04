@@ -2339,24 +2339,35 @@ function formatDeviceSpecsStructured($device)
         });
 
         function updateComparison(phoneNumber, phoneId) {
-            // Get all three selected phone slugs from data attributes stored in search inputs
-            const phone1Input = document.getElementById('phone1-search');
-            const phone2Input = document.getElementById('phone2-search');
-            const phone3Input = document.getElementById('phone3-search');
-
-            // Find the selected phone slug from the phones list
+            // Get the current URL to preserve existing selections
+            const currentUrl = window.location.pathname;
+            const slugMatch = currentUrl.match(/\/compare\/(.+)$/);
             let phone1Slug = '';
             let phone2Slug = '';
             let phone3Slug = '';
 
+            // Parse existing selections from current URL
+            if (slugMatch) {
+                const parts = slugMatch[1].split('-vs-');
+                phone1Slug = parts[0] || '';
+                phone2Slug = parts[1] || '';
+                phone3Slug = parts[2] || '';
+            }
+
+            // Helper to find slug from phone name
             const getSlugFromName = (searchInputName) => {
                 const phone = phonesList.find(p => p.name === searchInputName);
                 return phone ? phone.slug : '';
             };
 
-            phone1Slug = getSlugFromName(phone1Input.value);
-            phone2Slug = getSlugFromName(phone2Input.value);
-            phone3Slug = getSlugFromName(phone3Input.value);
+            // Update only the phone that was just selected
+            if (phoneNumber === '1') {
+                phone1Slug = getSlugFromName(document.getElementById('phone1-search').value) || '';
+            } else if (phoneNumber === '2') {
+                phone2Slug = getSlugFromName(document.getElementById('phone2-search').value) || '';
+            } else if (phoneNumber === '3') {
+                phone3Slug = getSlugFromName(document.getElementById('phone3-search').value) || '';
+            }
 
             // Build clean URL format: domain/compare/slug1-vs-slug2-vs-slug3
             // Keep all three positions to preserve which phone is which (even if empty)
