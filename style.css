@@ -291,6 +291,7 @@ input:focus {
     color: white;
     font-weight: bold;
     font-size: 13px;
+    -webkit-user-select: none;
     user-select: none;
 }
 
@@ -321,6 +322,7 @@ input:focus {
     text-shadow: 1px 1px 4px rgba(0, 0, 0, 0.7);
     max-width: 90%;
     position: relative;
+    -webkit-user-select: none;
     user-select: none;
 }
 
@@ -386,6 +388,8 @@ input:focus {
     text-align: center;
     font-size: 12px;
     line-height: 17px;
+    -webkit-user-select: none;
+    user-select: none;
 }
 
 .wrapper {
@@ -517,6 +521,7 @@ input:focus {
     cursor: pointer;
     font-weight: 600;
     font-size: 1rem;
+    -webkit-user-select: none;
     user-select: none;
 }
 
@@ -671,6 +676,8 @@ input:focus {
     font-size: 13px;
     border-radius: 4px;
     cursor: pointer;
+    -webkit-user-select: none;
+    user-select: none;
 }
 
 .whitening {
@@ -1058,6 +1065,7 @@ input:hover {
     font-size: 12px;
     font-weight: 600;
     cursor: pointer;
+    -webkit-user-select: none;
     user-select: none;
     text-align: left;
     /* Align button text to the left */
@@ -1492,6 +1500,7 @@ table tr:hover {
 .bg-blur {
     background-image: none !important;
     height: 100%;
+    -webkit-backdrop-filter: blur(6px);
     backdrop-filter: blur(6px);
     transform: translateZ(0);
     overflow: hidden;
