@@ -1665,7 +1665,7 @@ function formatDeviceSpecsStructured($device)
                         </div>
                     </div>
                     <?php if ($phone1): ?>
-                        <div class="phone-name" style="flex-grow: 1;"><?php echo getPhoneName($phone1); ?></div>
+                        <div class="phone-name"><?php echo getPhoneName($phone1); ?></div>
                         <div class="d-flex">
                             <img src="<?php echo getPhoneImage($phone1); ?>" alt="<?php echo getPhoneName($phone1); ?>" onclick="showComparePicturesModal(1)">
                             <div class="buttons">
@@ -1697,7 +1697,7 @@ function formatDeviceSpecsStructured($device)
                         </div>
                     </div>
                     <?php if ($phone2): ?>
-                        <div class="phone-name" style="flex-grow: 1;"><?php echo getPhoneName($phone2); ?></div>
+                        <div class="phone-name"><?php echo getPhoneName($phone2); ?></div>
                         <div class="d-flex">
                             <img src="<?php echo getPhoneImage($phone2); ?>" alt="<?php echo getPhoneName($phone2); ?>" onclick="showComparePicturesModal(2)">
                             <div class="buttons">
@@ -1731,7 +1731,7 @@ function formatDeviceSpecsStructured($device)
                         </div>
                     </div>
                     <?php if ($phone3): ?>
-                        <div class="phone-name" style="flex-grow: 1;"><?php echo getPhoneName($phone3); ?></div>
+                        <div class="phone-name"><?php echo getPhoneName($phone3); ?></div>
                         <div class="d-flex">
                             <img src="<?php echo getPhoneImage($phone3); ?>" alt="<?php echo getPhoneName($phone3); ?>" onclick="showComparePicturesModal(3)">
                             <div class="buttons">

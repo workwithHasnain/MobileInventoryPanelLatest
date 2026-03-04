@@ -1033,7 +1033,6 @@ input:hover {
 }
 
 .phone-name {
-    flex-grow: 1;
     font-size: 18px;
     font-weight: bold;
     margin-bottom: 8px;
