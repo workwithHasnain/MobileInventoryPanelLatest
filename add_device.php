@@ -286,6 +286,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                                                 <?php if (isset($errors['name'])): ?>
                                                     <div class="invalid-feedback"><?php echo htmlspecialchars($errors['name']); ?></div>
                                                 <?php endif; ?>
+                                                <div id="name-duplicate-feedback" style="display:none; margin-top:4px; font-size:0.875em;"></div>
                                             </div>
 
                                             <div class="col-md-6 mb-3">
@@ -1123,6 +1124,72 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             });
         }
     });
+</script>
+
+<script>
+    (function() {
+        const nameInput = document.getElementById('name');
+        const brandSelect = document.getElementById('brand');
+        const feedback = document.getElementById('name-duplicate-feedback');
+        const submitBtn = document.querySelector('#add-device-form button[type="submit"], #add-device-form input[type="submit"]');
+        let timer = null;
+        let isDuplicate = false;
+
+        function checkDuplicate() {
+            const name = (nameInput.value || '').trim();
+            const brand = (brandSelect.value || '').trim();
+            if (name.length < 2) {
+                feedback.style.display = 'none';
+                nameInput.classList.remove('is-invalid', 'is-warning');
+                isDuplicate = false;
+                return;
+            }
+            fetch('check_device_name.php?name=' + encodeURIComponent(name) + '&brand=' + encodeURIComponent(brand))
+                .then(r => r.json())
+                .then(data => {
+                    if (data.exists) {
+                        feedback.style.display = 'block';
+                        feedback.style.color = '#dc3545';
+                        feedback.innerHTML = '<i class="fas fa-exclamation-circle"></i> ' + data.message;
+                        nameInput.classList.add('is-invalid');
+                        isDuplicate = true;
+                    } else if (data.warning) {
+                        feedback.style.display = 'block';
+                        feedback.style.color = '#fd7e14';
+                        feedback.innerHTML = '<i class="fas fa-exclamation-triangle"></i> ' + data.message;
+                        nameInput.classList.remove('is-invalid');
+                        isDuplicate = false;
+                    } else {
+                        feedback.style.display = 'none';
+                        nameInput.classList.remove('is-invalid');
+                        isDuplicate = false;
+                    }
+                })
+                .catch(() => {
+                    feedback.style.display = 'none';
+                    isDuplicate = false;
+                });
+        }
+
+        function debouncedCheck() {
+            clearTimeout(timer);
+            timer = setTimeout(checkDuplicate, 400);
+        }
+
+        nameInput.addEventListener('input', debouncedCheck);
+        brandSelect.addEventListener('change', debouncedCheck);
+
+        // Prevent submit if exact duplicate
+        const form = document.getElementById('add-device-form');
+        if (form) {
+            form.addEventListener('submit', function(e) {
+                if (isDuplicate) {
+                    e.preventDefault();
+                    alert('This device already exists. Please change the name or brand.');
+                }
+            });
+        }
+    })();
 </script>
 
 <?php include 'includes/footer.php'; ?>

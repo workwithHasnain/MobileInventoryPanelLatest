@@ -1895,6 +1895,7 @@ function formatDeviceSpecsStructured($device)
                     /* Default: show normally */
                     display: inline;
                     transition: color 0.3s ease, opacity 0.3s ease;
+                    text-transform: none;
                 }
 
                 .comparison-table .spec-word[data-common-token] {
