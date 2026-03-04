@@ -2224,7 +2224,16 @@ function formatDeviceSpecsStructured($device)
 
         // Initialize phone search functionality
         document.addEventListener('DOMContentLoaded', function() {
-            
+            // Populate search inputs if phones are already selected
+            <?php if ($phone1): ?>
+                document.getElementById('phone1-search').value = 'Search';
+            <?php endif; ?>
+            <?php if ($phone2): ?>
+                document.getElementById('phone2-search').value = 'Search';
+            <?php endif; ?>
+            <?php if ($phone3): ?>
+                document.getElementById('phone3-search').value = 'Search';
+            <?php endif; ?>
 
             // Set up search inputs for all three phones
             const searchInputs = document.querySelectorAll('.phone-search-input');
