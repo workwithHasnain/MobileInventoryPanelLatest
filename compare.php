@@ -1760,7 +1760,7 @@ function formatDeviceSpecsStructured($device)
         </div>
 
         <!-- Specs Toggle Control -->
-        <div style="display: flex; align-items: center; gap: 15px; margin-bottom: 20px; padding: 15px; background: #f9f9f9; border-radius: 8px; border-left: 4px solid #1B2035;">
+        <div style="display: flex; align-items: center; gap: 15px; margin-bottom: 20px; padding: 15px; border-radius: 8px; border-left: 4px solid #1B2035;">
             <span style="font-weight: 600; color: #333;">View Specs:</span>
             <div style="display: flex; gap: 10px;">
                 <button id="specs-all-btn" class="specs-toggle-btn specs-toggle-active" onclick="toggleSpecsView('all')" style="padding: 8px 16px; border: 1px solid #1B2035; background: #1B2035; color: white; border-radius: 4px; cursor: pointer; font-weight: 600; transition: all 0.3s;">
