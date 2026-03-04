@@ -2359,10 +2359,10 @@ function formatDeviceSpecsStructured($device)
             phone3Slug = getSlugFromName(phone3Input.value);
 
             // Build clean URL format: domain/compare/slug1-vs-slug2-vs-slug3
-            // Only include selected phones in the URL
-            const slugs = [phone1Slug, phone2Slug, phone3Slug].filter(slug => slug !== '');
+            // Keep all three positions to preserve which phone is which (even if empty)
+            const slugs = [phone1Slug, phone2Slug, phone3Slug];
 
-            if (slugs.length > 0) {
+            if (phone1Slug || phone2Slug || phone3Slug) {
                 const compareUrl = '/compare/' + slugs.join('-vs-');
                 window.location.href = compareUrl;
             }
