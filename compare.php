@@ -2226,13 +2226,13 @@ function formatDeviceSpecsStructured($device)
         document.addEventListener('DOMContentLoaded', function() {
             // Populate search inputs if phones are already selected
             <?php if ($phone1): ?>
-                document.getElementById('phone1-search').value = '<?php echo addslashes(getPhoneName($phone1)); ?>';
+                document.getElementById('phone1-search').value = 'Search Phone';
             <?php endif; ?>
             <?php if ($phone2): ?>
-                document.getElementById('phone2-search').value = '<?php echo addslashes(getPhoneName($phone2)); ?>';
+                document.getElementById('phone2-search').value = 'Search Phone';
             <?php endif; ?>
             <?php if ($phone3): ?>
-                document.getElementById('phone3-search').value = '<?php echo addslashes(getPhoneName($phone3)); ?>';
+                document.getElementById('phone3-search').value = 'Search Phone';
             <?php endif; ?>
 
             // Set up search inputs for all three phones
@@ -2294,7 +2294,7 @@ function formatDeviceSpecsStructured($device)
                 html += `
                     <div class="phone-result-item" onclick="selectPhone('${phone.slug}', '${phoneNumber}', '${phone.name.replace(/'/g, "\\'")}');" style="display: flex; align-items: center; padding: 8px 12px; cursor: pointer; border-bottom: 1px solid #f0f0f0; transition: background-color 0.2s;">
                         <img src="${phone.image}" alt="${phone.name}" style="width: 40px; height: 50px; object-fit: contain; margin-right: 10px; flex-shrink: 0;" onerror="this.onerror=null;this.src='/imges/icon-256.png'">
-                        <span style="font-size: 14px; color: #333;">${phone.name}</span>
+                        <span style="font-size: 14px; color: #333; text-transform: none; font-weight: bold;">${phone.name}</span>
                     </div>
                 `;
             });
