@@ -47,13 +47,10 @@
     # Route for advertise-with-us.php: /advertise-with-us
     RewriteRule ^advertise-with-us/?$ advertise-with-us.php [L,QSA]
 
-    # Route for index.php: /home
+    # Redirect /home to /
     RewriteRule ^home/?$ / [R=301,L]
 
     # Redirect /index.php to /
     RewriteRule ^index\.php/?$ / [R=301,L]
-
-    # Route domain root to index.php (comment out for localhost development)
-    RewriteRule ^/?$ index.php [L,QSA]
 
 </IfModule>
