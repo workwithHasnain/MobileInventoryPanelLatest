@@ -50,6 +50,9 @@
     # Route for index.php: /home
     RewriteRule ^home/?$ index.php [L,QSA]
 
+    # Redirect /index.php to /home
+    RewriteRule ^index\.php/?$ home/ [R=301,L]
+
     # Route domain root to /home (comment out for localhost development)
     RewriteRule ^/?$ home/ [R=301,L]
 
