@@ -48,12 +48,12 @@
     RewriteRule ^advertise-with-us/?$ advertise-with-us.php [L,QSA]
 
     # Route for index.php: /home
-    RewriteRule ^home/?$ index.php [L,QSA]
+    RewriteRule ^home/?$ / [R=301,L]
 
-    # Redirect /index.php to /home
-    RewriteRule ^index\.php/?$ home/ [R=301,L]
+    # Redirect /index.php to /
+    RewriteRule ^index\.php/?$ / [R=301,L]
 
-    # Route domain root to /home (comment out for localhost development)
-    RewriteRule ^/?$ home/ [R=301,L]
+    # Route domain root to index.php (comment out for localhost development)
+    RewriteRule ^/?$ index.php [L,QSA]
 
 </IfModule>
