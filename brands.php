@@ -6,6 +6,15 @@ require_once 'phone_data.php';
 
 $pdo = getConnection();
 
+// Helper function to make image paths absolute
+function getAbsoluteImagePath($imagePath, $base)
+{
+    if (empty($imagePath)) return '';
+    if (filter_var($imagePath, FILTER_VALIDATE_URL)) return $imagePath;
+    if (strpos($imagePath, '/') === 0) return $imagePath;
+    return $base . ltrim($imagePath, '/');
+}
+
 // Get all brands with device counts, ordered alphabetically
 $all_brands_stmt = $pdo->prepare("
     SELECT b.*, COUNT(p.id) as device_count

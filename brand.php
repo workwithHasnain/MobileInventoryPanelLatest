@@ -6,6 +6,15 @@ require_once 'phone_data.php';
 
 $pdo = getConnection();
 
+// Helper function to make image paths absolute
+function getAbsoluteImagePath($imagePath, $base)
+{
+    if (empty($imagePath)) return '';
+    if (filter_var($imagePath, FILTER_VALIDATE_URL)) return $imagePath;
+    if (strpos($imagePath, '/') === 0) return $imagePath;
+    return $base . ltrim($imagePath, '/');
+}
+
 // Get brand slug from URL
 $brandSlug = isset($_GET['slug']) ? trim($_GET['slug']) : '';
 
