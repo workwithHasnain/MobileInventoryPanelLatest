@@ -1,8 +1,8 @@
 # Enable mod_rewrite
 <IfModule mod_rewrite.c>
     RewriteEngine On
-    RewriteBase /MobileInventoryPanelLatest/
-    # RewriteBase /
+    # RewriteBase /MobileInventoryPanelLatest/
+    RewriteBase /
     
     # Redirect to www (only on production, not localhost)
     RewriteCond %{HTTP_HOST} ^devicesarena\.com$ [NC]
