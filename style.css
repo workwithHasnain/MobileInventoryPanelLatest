@@ -529,7 +529,7 @@ input:focus {
     margin-left: 11px;
     color: black;
     font-size: 12.3px;
-    padding-top: 43px;
+    /* padding-top: 43px; */
     text-decoration: none;
 }
 

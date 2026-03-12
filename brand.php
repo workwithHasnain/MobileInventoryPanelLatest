@@ -6,16 +6,42 @@ require_once 'phone_data.php';
 
 $pdo = getConnection();
 
-// Get all brands with device counts, ordered alphabetically
-$all_brands_stmt = $pdo->prepare("
-    SELECT b.*, COUNT(p.id) as device_count
-    FROM brands b
-    LEFT JOIN phones p ON b.id = p.brand_id
-    GROUP BY b.id, b.name, b.description, b.logo_url, b.website, b.created_at, b.updated_at
-    ORDER BY b.name ASC
+// Get brand slug from URL
+$brandSlug = isset($_GET['slug']) ? trim($_GET['slug']) : '';
+
+if (empty($brandSlug)) {
+    header('Location: ' . $base . 'brands');
+    exit;
+}
+
+// Convert slug to brand name pattern (replace hyphens with spaces for matching)
+$brandNamePattern = str_replace('-', ' ', $brandSlug);
+
+// Look up the brand by matching lowercased name
+$brand_stmt = $pdo->prepare("
+    SELECT * FROM brands WHERE LOWER(name) = LOWER(:name)
 ");
-$all_brands_stmt->execute();
-$allBrands = $all_brands_stmt->fetchAll();
+$brand_stmt->execute(['name' => $brandNamePattern]);
+$brandData = $brand_stmt->fetch();
+
+if (!$brandData) {
+    header('HTTP/1.0 404 Not Found');
+    include '404.php';
+    exit;
+}
+
+$brandName = $brandData['name'];
+$brandId = $brandData['id'];
+
+// Get all phones for this brand
+$phones_stmt = $pdo->prepare("
+    SELECT id, name, image, slug
+    FROM phones
+    WHERE brand_id = :brand_id
+    ORDER BY name ASC
+");
+$phones_stmt->execute(['brand_id' => $brandId]);
+$phones = $phones_stmt->fetchAll();
 
 // Get top brands for sidebar (by device count)
 $brands_stmt = $pdo->prepare("
@@ -75,6 +101,12 @@ try {
 $latestDevices = getAllPhones();
 $latestDevices = array_slice(array_reverse($latestDevices), 0, 9);
 
+// Helper to generate brand slug from name
+function brandSlugFromName($name)
+{
+    return strtolower(str_replace(' ', '-', trim($name)));
+}
+
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -82,9 +114,9 @@ $latestDevices = array_slice(array_reverse($latestDevices), 0, 9);
 <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <link rel="canonical" href="<?php echo $canonicalBase; ?>/brands" />
-    <meta name="description" content="Browse all smartphone brands on DevicesArena. Find devices from top manufacturers including Samsung, Apple, Xiaomi, and more." />
-    <title>All Brands - DevicesArena</title>
+    <link rel="canonical" href="<?php echo $canonicalBase; ?>/brand/<?php echo htmlspecialchars(urlencode($brandSlug)); ?>" />
+    <meta name="description" content="Browse all <?php echo htmlspecialchars($brandName); ?> phones and devices on DevicesArena. View specifications, images, and pricing." />
+    <title><?php echo htmlspecialchars($brandName); ?> Phones - DevicesArena</title>
 
     <!-- Favicon & Icons -->
     <link rel="icon" type="image/png" sizes="32x32" href="<?php echo $base; ?>imges/icon-32.png">
@@ -106,8 +138,8 @@ $latestDevices = array_slice(array_reverse($latestDevices), 0, 9);
 
     <!-- Open Graph Meta Tags -->
     <meta property="og:site_name" content="DevicesArena">
-    <meta property="og:title" content="All Brands - DevicesArena">
-    <meta property="og:description" content="Browse all smartphone brands on DevicesArena. Find devices from top manufacturers.">
+    <meta property="og:title" content="<?php echo htmlspecialchars($brandName); ?> Phones - DevicesArena">
+    <meta property="og:description" content="Browse all <?php echo htmlspecialchars($brandName); ?> phones and devices on DevicesArena.">
     <meta property="og:image" content="<?php echo $base; ?>imges/icon-256.png">
     <meta property="og:image:type" content="image/png">
     <meta property="og:image:width" content="256">
@@ -116,8 +148,8 @@ $latestDevices = array_slice(array_reverse($latestDevices), 0, 9);
 
     <!-- Twitter Card Meta Tags -->
     <meta name="twitter:card" content="summary">
-    <meta name="twitter:title" content="All Brands - DevicesArena">
-    <meta name="twitter:description" content="Browse all smartphone brands on DevicesArena. Find devices from top manufacturers.">
+    <meta name="twitter:title" content="<?php echo htmlspecialchars($brandName); ?> Phones - DevicesArena">
+    <meta name="twitter:description" content="Browse all <?php echo htmlspecialchars($brandName); ?> phones and devices on DevicesArena.">
     <meta name="twitter:image" content="<?php echo $base; ?>imges/icon-256.png">
 
     <!-- PWA Manifest -->
@@ -141,7 +173,8 @@ $latestDevices = array_slice(array_reverse($latestDevices), 0, 9);
     <?php
     $breadcrumbItems = [
         ["@type" => "ListItem", "position" => 1, "name" => "Home", "item" => "https://www.devicesarena.com/"],
-        ["@type" => "ListItem", "position" => 2, "name" => "Brands", "item" => "https://www.devicesarena.com/brands"]
+        ["@type" => "ListItem", "position" => 2, "name" => "Brands", "item" => "https://www.devicesarena.com/brands"],
+        ["@type" => "ListItem", "position" => 3, "name" => htmlspecialchars($brandName), "item" => "https://www.devicesarena.com/brand/" . urlencode($brandSlug)]
     ];
     ?>
     <script type="application/ld+json">
@@ -157,9 +190,9 @@ $latestDevices = array_slice(array_reverse($latestDevices), 0, 9);
         {
             "@context": "https://schema.org",
             "@type": "CollectionPage",
-            "name": "All Brands - DevicesArena",
-            "description": "Browse all smartphone brands on DevicesArena. Find devices from top manufacturers including Samsung, Apple, Xiaomi, and more.",
-            "url": "https://www.devicesarena.com/brands",
+            "name": "<?php echo htmlspecialchars($brandName); ?> Phones - DevicesArena",
+            "description": "Browse all <?php echo htmlspecialchars($brandName); ?> phones and devices on DevicesArena. View specifications, images, and pricing.",
+            "url": "https://www.devicesarena.com/brand/<?php echo urlencode($brandSlug); ?>",
             "image": "https://www.devicesarena.com/imges/icon-256.png",
             "publisher": {
                 "@type": "Organization",
@@ -181,86 +214,120 @@ $latestDevices = array_slice(array_reverse($latestDevices), 0, 9);
         {
             "@context": "https://schema.org",
             "@type": "ItemList",
-            "name": "Smartphone Brands",
-            "numberOfItems": <?php echo count($allBrands); ?>,
+            "name": "<?php echo htmlspecialchars($brandName); ?> Devices",
+            "numberOfItems": <?php echo count($phones); ?>,
             "itemListElement": [
                 <?php
-                $brandSchemaItems = [];
-                foreach ($allBrands as $i => $schemaBrand) {
-                    $brandSchemaItems[] = json_encode([
+                $deviceSchemaItems = [];
+                foreach ($phones as $i => $schemaPhone) {
+                    $deviceSchemaItems[] = json_encode([
                         "@type" => "ListItem",
                         "position" => $i + 1,
-                        "name" => $schemaBrand['name'],
-                        "url" => "https://www.devicesarena.com/brand/" . urlencode(strtolower(str_replace(' ', '-', trim($schemaBrand['name']))))
+                        "name" => $schemaPhone['name'],
+                        "url" => "https://www.devicesarena.com/device/" . urlencode($schemaPhone['slug'] ?? $schemaPhone['id'])
                     ], JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE);
                 }
-                echo implode(",\n                ", $brandSchemaItems);
+                echo implode(",\n                ", $deviceSchemaItems);
                 ?>
             ]
         }
     </script>
 
     <style>
-        .brand-grid-item {
-            padding: 14px 10px;
-            border-bottom: 1px solid #eee;
+        .device-grid {
+            display: grid;
+            grid-template-columns: repeat(5, 1fr);
+            gap: 0;
+            border-top: 1px solid #ddd;
+            border-left: 1px solid #ddd;
+        }
+
+        .device-grid-item {
+            border-right: 1px solid #ddd;
+            border-bottom: 1px solid #ddd;
+            text-align: center;
+            padding: 15px 8px;
             cursor: pointer;
-            transition: color 0.2s ease;
+            transition: background-color 0.2s ease;
+            text-decoration: none;
+            color: #333;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
         }
 
-        .brand-grid-item:hover .brand-name {
+        .device-grid-item:hover {
+            background-color: #f0f0f0;
+            color: #333;
+            text-decoration: none;
+        }
+
+        .device-grid-item img {
+            width: 100%;
+            max-width: 120px;
+            height: 150px;
+            object-fit: contain;
+            margin-bottom: 8px;
+        }
+
+        .device-grid-item .device-name {
+            font-size: 0.85rem;
+            font-weight: 400;
+            color: #333;
+            line-height: 1.3;
+            word-break: break-word;
+        }
+
+        .device-grid-item:hover .device-name {
             color: #d50000;
         }
 
-        .brand-grid-item:hover .brand-device-count {
-            color: #d50000;
+        .brand-page-header {
+            padding: 15px 20px;
+            border-bottom: 1px solid #ddd;
         }
 
-        .brand-name {
-            font-size: 1.15rem;
+        .brand-page-header h1 {
+            font-size: 1.3rem;
             font-weight: 700;
             color: #333;
-            text-transform: uppercase;
-            line-height: 1.2;
+            margin: 0;
         }
 
-        .brand-device-count {
-            font-size: 0.8rem;
+        .brand-page-header .device-count {
+            font-size: 0.85rem;
             color: #888;
             margin-top: 2px;
         }
 
-        /* Device Cell Modal Styling */
-        .device-cell-modal {
-            background-color: #fff;
-            border: 1px solid #c5b6b0;
-            color: #5D4037;
-            font-weight: 500;
-            transition: all 0.3s ease;
-            cursor: pointer;
-            font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue';
+        .no-image-placeholder {
+            width: 100%;
+            max-width: 120px;
+            height: 150px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: #f5f5f5;
+            color: #ccc;
+            margin-bottom: 8px;
         }
 
-        .device-cell-modal:hover {
-            background-color: #D7CCC8 !important;
-            border-color: #1B2035;
-            transform: translateY(-2px);
-            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
-            color: #3E2723;
+        @media (max-width: 991px) {
+            .device-grid {
+                grid-template-columns: repeat(4, 1fr);
+            }
         }
 
-        .device-cell-modal:active {
-            transform: translateY(0);
-            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        @media (max-width: 767px) {
+            .device-grid {
+                grid-template-columns: repeat(3, 1fr);
+            }
         }
 
-        .device-cell-modal:focus {
-            outline: none;
-            box-shadow: 0 0 0 3px rgba(141, 110, 99, 0.25);
-        }
-
-        #devicesModal .modal-dialog-scrollable {
-            max-height: 80vh;
+        @media (max-width: 480px) {
+            .device-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
         }
     </style>
     <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-4554952734894265"
@@ -274,8 +341,8 @@ $latestDevices = array_slice(array_reverse($latestDevices), 0, 9);
         <div class="row">
             <div class="col-md-8 col-5 d-lg-inline d-none" style="padding: 0; position: relative;">
                 <div class="comfort-life position-absolute">
-                    <img class="w-100 h-100" src="<?php echo $base; ?>hero-images/brands-hero.png"
-                        style="background-repeat: no-repeat; background-size: cover;" alt="header image of brands page for devicesarena.com">
+                    <img class="w-100 h-100" src="<?php echo $base; ?>hero-images/brand-hero.png"
+                        style="background-repeat: no-repeat; background-size: cover;" alt="<?php echo htmlspecialchars($brandName); ?> phones on DevicesArena">
                 </div>
             </div>
             <div class="col-md-4 col-5 d-none d-lg-block" style="position: relative; padding: 0;">
@@ -289,9 +356,9 @@ $latestDevices = array_slice(array_reverse($latestDevices), 0, 9);
                         <?php else:
                         $brandChunks = array_chunk($brands, 1);
                         foreach ($brandChunks as $brandRow):
-                            foreach ($brandRow as $brand):
+                            foreach ($brandRow as $b):
                         ?>
-                                <button class="brand-cell brand-item-bold" style="cursor: pointer;" data-brand-id="<?php echo $brand['id']; ?>"><?php echo htmlspecialchars($brand['name']); ?></button>
+                                <button class="brand-cell brand-item-bold" style="cursor: pointer;" data-brand-id="<?php echo $b['id']; ?>"><?php echo htmlspecialchars($b['name']); ?></button>
                     <?php
                             endforeach;
                         endforeach;
@@ -311,22 +378,37 @@ $latestDevices = array_slice(array_reverse($latestDevices), 0, 9);
     </div>
     <div class="container bg-white" style="border: 1px solid #e0e0e0;">
         <div class="row">
-            <div class="col-lg-8 py-3" style="padding-left: 0; padding-right: 0; border: 1px solid #e0e0e0;">
-                <div style="padding: 20px 30px;">
-                    <div class="row">
-                        <?php foreach ($allBrands as $brand): ?>
-                            <div class="col-6 brand-grid-item" data-brand-id="<?php echo $brand['id']; ?>" onclick="window.location.href='<?php echo $base; ?>brand/<?php echo urlencode(strtolower(str_replace(' ', '-', trim($brand['name'])))); ?>'">
-                                <div class="brand-name"><?php echo htmlspecialchars($brand['name']); ?></div>
-                                <div class="brand-device-count"><?php echo (int)$brand['device_count']; ?> devices</div>
-                            </div>
-                        <?php endforeach; ?>
+            <div class="col-lg-8 py-0" style="padding-left: 0; padding-right: 0; border: 1px solid #e0e0e0;">
+                <div class="brand-page-header">
+                    <h1><?php echo htmlspecialchars($brandName); ?> phones</h1>
+                    <div class="device-count"><?php echo count($phones); ?> devices</div>
+                </div>
+                <div class="device-grid">
+                    <?php foreach ($phones as $phone):
+                        $imagePath = $phone['image'] ?? '';
+                        if ($imagePath && !str_starts_with($imagePath, '/') && !str_starts_with($imagePath, 'http')) {
+                            $imagePath = '/' . $imagePath;
+                        }
+                        $deviceSlug = $phone['slug'] ?? $phone['id'];
+                    ?>
+                        <a href="<?php echo $base; ?>device/<?php echo htmlspecialchars(urlencode($deviceSlug)); ?>" class="device-grid-item">
+                            <?php if ($imagePath): ?>
+                                <img src="<?php echo htmlspecialchars($imagePath); ?>" alt="<?php echo htmlspecialchars($phone['name']); ?>" onerror="this.style.display='none'">
+                            <?php else: ?>
+                                <div class="no-image-placeholder">
+                                    <i class="fas fa-mobile-alt fa-3x"></i>
+                                </div>
+                            <?php endif; ?>
+                            <span class="device-name"><?php echo htmlspecialchars($phone['name']); ?></span>
+                        </a>
+                    <?php endforeach; ?>
 
-                        <?php if (empty($allBrands)): ?>
-                            <div class="col-12 text-center py-5">
-                                <p class="text-muted">No brands available</p>
-                            </div>
-                        <?php endif; ?>
-                    </div>
+                    <?php if (empty($phones)): ?>
+                        <div style="grid-column: 1 / -1; text-align: center; padding: 40px;">
+                            <i class="fas fa-mobile-alt fa-3x text-muted mb-3"></i>
+                            <p class="text-muted">No devices available for <?php echo htmlspecialchars($brandName); ?></p>
+                        </div>
+                    <?php endif; ?>
                 </div>
             </div>
             <div class="col-lg-4 col-12 bg-white" style="margin-top: 18px;">
@@ -349,6 +431,7 @@ $latestDevices = array_slice(array_reverse($latestDevices), 0, 9);
                 window.location.href = '<?php echo $base; ?>brand/' + encodeURIComponent(brandName);
             });
         });
+
         // Handle clickable table rows for devices (sidebar)
         document.addEventListener('DOMContentLoaded', function() {
             document.querySelectorAll('.clickable-row').forEach(function(row) {

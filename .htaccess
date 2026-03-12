@@ -1,8 +1,8 @@
 # Enable mod_rewrite
 <IfModule mod_rewrite.c>
     RewriteEngine On
-    # RewriteBase /MobileInventoryPanelLatest/
-    RewriteBase /
+    RewriteBase /MobileInventoryPanelLatest/
+    # RewriteBase /
     
     # Redirect to www (only on production, not localhost)
     RewriteCond %{HTTP_HOST} ^devicesarena\.com$ [NC]
@@ -16,6 +16,15 @@
     # Don't rewrite if it's a real file or directory
     RewriteCond %{REQUEST_FILENAME} !-f
     RewriteCond %{REQUEST_FILENAME} !-d
+
+    # Route for brands.php: /brands
+    RewriteRule ^brands/?$ brands.php [L,QSA]
+
+    # Route for /brand (no slug) -> redirect to /brands
+    RewriteRule ^brand/?$ brands.php [L,QSA]
+
+    # Route for brand.php: /brand/slug (brand detail page with devices)
+    RewriteRule ^brand/([a-zA-Z0-9\-]+)/?$ brand.php?slug=$1 [L,QSA]
 
     # Route for compare.php: /compare
     RewriteRule ^compare/?$ compare.php [L,QSA]

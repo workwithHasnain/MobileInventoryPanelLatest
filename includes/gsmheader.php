@@ -30,7 +30,7 @@ $mobile_brands = $mobile_brands_stmt->fetchAll();
                     alt="">
             </button>
 
-            <a class="navbar-brand d-flex align-items-center" href="<?php echo $base; ?>home">
+            <a class="navbar-brand d-flex align-items-center" href="<?php echo $base; ?>">
                 <img src="<?php echo $base; ?>imges/logo-wide.svg" alt="DevicesArena Logo" style="height: min-content; width: min-content; max-height: 50px; max-width: 200px;" />
             </a>
         </div>
@@ -328,7 +328,7 @@ $mobile_brands = $mobile_brands_stmt->fetchAll();
                 <a href="#" class="brand-cell brand-item-bold" data-brand-id="<?php echo $mobile_brand['id']; ?>"><?php echo htmlspecialchars($mobile_brand['name']); ?></a>
         <?php endforeach;
         endforeach; ?>
-        <a href="#" onclick="showBrandsModal(); return false;" style="cursor: pointer;">[...]</a>
+        <a href="<?php echo $base; ?>brands" style="cursor: pointer;">[...]</a>
     </div>
     <div class="menu-buttons d-flex justify-content-center ">
         <button class="btn bg-white w-50 text-black" onclick="window.open('<?php echo $base; ?>phonefinder')">Phone Finder</button>

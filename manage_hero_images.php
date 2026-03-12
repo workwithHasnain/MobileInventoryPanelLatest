@@ -12,7 +12,9 @@ $heroPages = [
     'compare' => 'Compare Page',
     'about-us' => 'About Us Page',
     'contact' => 'Contact Us Page',
-    'advertise' => 'Advertise With Us Page'
+    'advertise' => 'Advertise With Us Page',
+    'brands' => 'Brands Page',
+    'brand' => 'Brand Detail Page'
 ];
 
 $heroImagesDir = __DIR__ . '/hero-images/';

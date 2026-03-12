@@ -545,9 +545,9 @@ if ($_POST && isset($_POST['action'])) {
                     ?>
                 </div>
                 <div class="d-flex">
-                    <button class="solid w-50 py-2" onclick="showBrandsModal()">
+                    <a href="<?php echo $base; ?>brands" class="solid w-50 py-2 text-center" style="text-decoration: none; color: white;">
                         <i class="fa-solid fa-bars fa-sm mx-2"></i>
-                        All Brands</button>
+                        All Brands</a>
                     <button class="solid w-50 py-2" style="width: 177px;">
                         <i class="fa-solid fa-volume-high fa-sm mx-2"></i>
                         RUMORS MILL</button>
@@ -701,15 +701,12 @@ if ($_POST && isset($_POST['action'])) {
                 });
             });
 
-            // Handle brand cell clicks (from sidebar and mobile menu - open devices modal directly)
+            // Handle brand cell clicks (from sidebar and mobile menu - navigate to brand page)
             document.querySelectorAll('.brand-cell').forEach(function(cell) {
                 cell.addEventListener('click', function(e) {
                     e.preventDefault();
-                    const brandId = this.getAttribute('data-brand-id');
-                    if (brandId) {
-                        // Directly open devices modal for this brand
-                        selectBrandFromModal(brandId);
-                    }
+                    const brandName = this.textContent.trim().toLowerCase().replace(/\s+/g, '-');
+                    window.location.href = '<?php echo $base; ?>brand/' + encodeURIComponent(brandName);
                 });
             });
 

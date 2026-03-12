@@ -20,7 +20,7 @@
         </div>
         <div class="row align-items-center">
             <div class="m-auto col-2 d-flex justify-content-center align-items-center" style="width: max-content;">
-                <img src="<?php echo $base; ?>imges/logo-wide.svg" alt="devices arena logo for footer" style=" width: 185px;">
+                <a href="<?php echo $base; ?>"><img src="<?php echo $base; ?>imges/logo-wide.svg" alt="devices arena logo for footer" style=" width: 185px;"></a>
             </div>
             <div class="col-10 nav-wrap m-auto text-center ">
                 <div class="nav-container">
@@ -39,7 +39,7 @@
                     <a href="https://www.facebook.com/profile.php?id=61585936163841" style="color: white;"> <i class="fa-brands fa-facebook-f fa-sm"></i></a>
                     <a href="https://www.twitter.com/" style="color: white;"> <i class="fa-brands fa-twitter fa-sm"></i></a>
                     <br>
-                    <a href="#" style="color: white;">© 2000-2026 DevicesArena.com</a>
+                    <a href="<?php echo $base; ?>" style="color: white;">© 2000-2026 DevicesArena.com</a>
                 </div>
             </div>
         </div>
