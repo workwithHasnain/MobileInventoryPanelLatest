@@ -8,6 +8,41 @@ $isPublicUser = (session_status() === PHP_SESSION_ACTIVE) && !empty($_SESSION['p
 $publicUserName = (session_status() === PHP_SESSION_ACTIVE) ? ($_SESSION['public_user_name'] ?? '') : '';
 $publicUserInitial = $isPublicUser ? strtoupper(substr($publicUserName, 0, 1)) : '';
 
+// ═══════════════════════════════════════════════════
+// Notification System - Posts from Current Week
+// ═══════════════════════════════════════════════════
+$weekly_posts = [];
+$hasUnreadNotifications = false;
+
+// Initialize notification session flag if not set
+if (!isset($_SESSION['notif_seen'])) {
+    $_SESSION['notif_seen'] = false;
+}
+
+// Determine if we should show the unread dot
+// Show unread dot if: user is logged in AND notifications haven't been seen yet
+if ($isPublicUser && !$_SESSION['notif_seen']) {
+    $hasUnreadNotifications = true;
+}
+
+// Fetch posts from the current week (last 7 days)
+try {
+    $weekly_posts_stmt = $pdo->prepare("
+        SELECT p.id, p.title, p.slug, p.featured_image, p.short_description, 
+               p.created_at, p.author, 
+               (SELECT COUNT(*) FROM post_comments pc WHERE pc.post_id = p.id AND pc.status = 'approved') as comment_count
+        FROM posts p 
+        WHERE p.status ILIKE 'published' 
+        AND p.created_at >= CURRENT_TIMESTAMP - INTERVAL '7 days'
+        ORDER BY p.created_at DESC 
+        LIMIT 10
+    ");
+    $weekly_posts_stmt->execute();
+    $weekly_posts = $weekly_posts_stmt->fetchAll();
+} catch (Exception $e) {
+    $weekly_posts = [];
+}
+
 $mobile_brands_stmt = $pdo->prepare("
     SELECT b.*, COUNT(p.id) as device_count
     FROM brands b
@@ -62,7 +97,58 @@ $mobile_brands = $mobile_brands_stmt->fetchAll();
                     </svg>
                 </form>
                 <!-- User Auth Buttons (Desktop) -->
-                <div class="d-flex align-items-center ms-3" id="desktop-user-area">
+                <div class="d-flex align-items-center ms-3 gap-2" id="desktop-user-area">
+                    <!-- Notification Bell (Desktop) -->
+                    <?php if ($isPublicUser): ?>
+                        <div class="dropdown" id="notificationDropdownDesktop">
+                            <button class="btn d-flex align-items-center justify-content-center p-0 position-relative" type="button" id="notificationBellDesktop" data-bs-toggle="dropdown" aria-expanded="false" style="width: 36px; height: 36px; border-radius: 50%; background-color: transparent; color: #fff; border: 2px solid rgba(255,255,255,0.3); cursor: pointer;" title="Notifications">
+                                <i class="fa fa-bell" style="font-size: 18px;"></i>
+                                <?php if ($hasUnreadNotifications): ?>
+                                    <span class="position-absolute top-0 start-100 translate-middle p-1 bg-danger border border-light rounded-circle" id="notifDotDesktop" style="width: 10px; height: 10px; margin-top: -5px; margin-right: -8px;"></span>
+                                <?php endif; ?>
+                            </button>
+                            <ul class="dropdown-menu dropdown-menu-end" id="notificationListDesktop" style="min-width: 320px; max-height: 400px; overflow-y: auto;">
+                                <li style="padding: 12px 16px; background: linear-gradient(135deg, #fff5f5 0%, #fffbfb 100%);">
+                                    <div style="font-weight: 700; color: #d50000; font-size: 14px; margin-bottom: 4px;"><i class="fa fa-sparkles me-2"></i>Fresh Updates</div>
+                                    <div style="font-size: 11px; color: #666; font-weight: 400;">Check out the latest articles from this week</div>
+                                </li>
+                                <li>
+                                    <hr class="dropdown-divider" style="margin: 8px 0;">
+                                </li>
+                                <?php if (!empty($weekly_posts)): ?>
+                                    <?php foreach ($weekly_posts as $post): ?>
+                                        <li style="padding: 0;">
+                                            <a class="dropdown-item" href="<?php echo $base; ?>post/<?php echo htmlspecialchars($post['slug']); ?>" style="padding: 10px 16px; border-bottom: 1px solid #f0f0f0; display: flex; gap: 10px; transition: all 0.2s ease; position: relative;" onmouseover="this.style.backgroundColor='#f8f9fa'; this.style.borderLeft='3px solid #d50000'; this.style.paddingLeft='13px'; this.style.color='#333';" onmouseout="this.style.backgroundColor='transparent'; this.style.borderLeft='none'; this.style.paddingLeft='16px'; this.style.color='inherit';">
+                                                <?php if (!empty($post['featured_image'])): ?>
+                                                    <img src="<?php echo htmlspecialchars($post['featured_image']); ?>" alt="<?php echo htmlspecialchars($post['title']); ?>" style="width: 50px; height: 50px; object-fit: cover; border-radius: 4px; flex-shrink: 0;">
+                                                <?php else: ?>
+                                                    <div style="width: 50px; height: 50px; background-color: #f0f0f0; border-radius: 4px; flex-shrink: 0;"></div>
+                                                <?php endif; ?>
+                                                <div style="flex: 1; min-width: 0;">
+                                                    <div style="font-weight: 500; color: #333; font-size: 13px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;"><?php echo htmlspecialchars($post['title']); ?></div>
+                                                    <div style="color: #666; font-size: 12px; margin-top: 4px; font-weight: 500;">
+                                                        <i class="fa fa-clock me-1" style="color: #d50000;"></i><?php echo date('M d, Y', strtotime($post['created_at'])); ?>
+                                                    </div>
+                                                </div>
+                                            </a>
+                                        </li>
+                                    <?php endforeach; ?>
+                                <?php else: ?>
+                                    <li style="padding: 20px 16px; text-align: center; color: #999;">
+                                        <i class="fa fa-inbox" style="font-size: 24px; margin-bottom: 8px; display: block; color: #ddd;"></i>
+                                        <div style="font-size: 13px;">No posts this week</div>
+                                    </li>
+                                <?php endif; ?>
+                                <li>
+                                    <hr class="dropdown-divider" style="margin: 8px 0;">
+                                </li>
+                                <li style="text-align: center; padding: 8px 16px;">
+                                    <a href="<?php echo $base; ?>reviews" style="color: #d50000; text-decoration: none; font-size: 12px; font-weight: 600; transition: all 0.2s ease;" onmouseover="this.style.transform='translateX(4px)';" onmouseout="this.style.transform='translateX(0)';"><i class="fa fa-arrow-right me-1"></i>View All Posts</a>
+                                </li>
+                            </ul>
+                        </div>
+                    <?php endif; ?>
+                    <!-- User Profile (Desktop) -->
                     <?php if ($isPublicUser): ?>
                         <div class="dropdown">
                             <button class="btn d-flex align-items-center justify-content-center p-0" type="button" id="userDropdownDesktop" data-bs-toggle="dropdown" aria-expanded="false" style="width: 36px; height: 36px; border-radius: 50%; background-color: #d50000; color: #fff; font-weight: 700; font-size: 16px; border: 2px solid rgba(255,255,255,0.3); cursor: pointer;" title="<?php echo htmlspecialchars($publicUserName); ?>">
@@ -101,7 +187,58 @@ $mobile_brands = $mobile_brands_stmt->fetchAll();
         <img src="<?php echo $base; ?>imges/logo-wide.svg" alt="DevicesArena Logo" style="height: min-content; width: min-content; max-height: 30px; max-width: 150px;" />
     </a>
     <!-- User Auth Button (Mobile) -->
-    <div class="ms-auto me-2" id="mobile-user-area">
+    <div class="ms-auto me-2 d-flex align-items-center gap-2" id="mobile-user-area">
+        <!-- Notification Bell (Mobile) -->
+        <?php if ($isPublicUser): ?>
+            <div class="dropdown" id="notificationDropdownMobile">
+                <button class="btn d-flex align-items-center justify-content-center p-0 position-relative" type="button" id="notificationBellMobile" data-bs-toggle="dropdown" aria-expanded="false" style="width: 32px; height: 32px; border-radius: 50%; background-color: transparent; color: #fff; border: 2px solid rgba(255,255,255,0.3); cursor: pointer;" title="Notifications">
+                    <i class="fa fa-bell" style="font-size: 16px;"></i>
+                    <?php if ($hasUnreadNotifications): ?>
+                        <span class="position-absolute top-0 start-100 translate-middle p-1 bg-danger border border-light rounded-circle" id="notifDotMobile" style="width: 8px; height: 8px; margin-top: -4px; margin-right: -6px;"></span>
+                    <?php endif; ?>
+                </button>
+                <ul class="dropdown-menu dropdown-menu-end" id="notificationListMobile" style="min-width: 280px; max-height: 350px; overflow-y: auto;">
+                    <li style="padding: 12px 16px; background: linear-gradient(135deg, #fff5f5 0%, #fffbfb 100%);">
+                        <div style="font-weight: 700; color: #d50000; font-size: 13px; margin-bottom: 3px;"><i class="fa fa-sparkles me-2"></i>Fresh Updates</div>
+                        <div style="font-size: 10px; color: #666; font-weight: 400;">Latest articles this week</div>
+                    </li>
+                    <li>
+                        <hr class="dropdown-divider" style="margin: 8px 0;">
+                    </li>
+                    <?php if (!empty($weekly_posts)): ?>
+                        <?php foreach ($weekly_posts as $post): ?>
+                            <li style="padding: 0;">
+                                <a class="dropdown-item" href="<?php echo $base; ?>post/<?php echo htmlspecialchars($post['slug']); ?>" style="padding: 10px 16px; border-bottom: 1px solid #f0f0f0; display: flex; gap: 8px; transition: all 0.2s ease; position: relative;" onmouseover="this.style.backgroundColor='#f8f9fa'; this.style.borderLeft='3px solid #d50000'; this.style.paddingLeft='13px'; this.style.color='#333';" onmouseout="this.style.backgroundColor='transparent'; this.style.borderLeft='none'; this.style.paddingLeft='16px'; this.style.color='inherit';">
+                                    <?php if (!empty($post['featured_image'])): ?>
+                                        <img src="<?php echo htmlspecialchars($post['featured_image']); ?>" alt="<?php echo htmlspecialchars($post['title']); ?>" style="width: 45px; height: 45px; object-fit: cover; border-radius: 4px; flex-shrink: 0;">
+                                    <?php else: ?>
+                                        <div style="width: 45px; height: 45px; background-color: #f0f0f0; border-radius: 4px; flex-shrink: 0;"></div>
+                                    <?php endif; ?>
+                                    <div style="flex: 1; min-width: 0;">
+                                        <div style="font-weight: 500; color: #333; font-size: 12px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;"><?php echo htmlspecialchars($post['title']); ?></div>
+                                        <div style="color: #666; font-size: 11px; margin-top: 3px; font-weight: 500;">
+                                            <i class="fa fa-clock me-1" style="color: #d50000;"></i><?php echo date('M d', strtotime($post['created_at'])); ?>
+                                        </div>
+                                    </div>
+                                </a>
+                            </li>
+                        <?php endforeach; ?>
+                    <?php else: ?>
+                        <li style="padding: 20px 16px; text-align: center; color: #999;">
+                            <i class="fa fa-inbox" style="font-size: 20px; margin-bottom: 8px; display: block; color: #ddd;"></i>
+                            <div style="font-size: 12px;">No posts this week</div>
+                        </li>
+                    <?php endif; ?>
+                    <li>
+                        <hr class="dropdown-divider" style="margin: 8px 0;">
+                    </li>
+                    <li style="text-align: center; padding: 8px 16px;">
+                        <a href="<?php echo $base; ?>reviews" style="color: #d50000; text-decoration: none; font-size: 11px; font-weight: 600; transition: all 0.2s ease;" onmouseover="this.style.transform='translateX(3px)';" onmouseout="this.style.transform='translateX(0)';"><i class="fa fa-arrow-right me-1"></i>View All</a>
+                    </li>
+                </ul>
+            </div>
+        <?php endif; ?>
+        <!-- User Profile (Mobile) -->
         <?php if ($isPublicUser): ?>
             <div class="dropdown">
                 <button class="btn d-flex align-items-center justify-content-center p-0" type="button" id="userDropdownMobile" data-bs-toggle="dropdown" aria-expanded="false" style="width: 32px; height: 32px; border-radius: 50%; background-color: #d50000; color: #fff; font-weight: 700; font-size: 14px; border: 2px solid rgba(255,255,255,0.3); cursor: pointer;">
@@ -601,4 +738,64 @@ $mobile_brands = $mobile_brands_stmt->fetchAll();
             new bootstrap.Modal(document.getElementById('signupModal')).show();
         }, 300);
     }
+
+    // ═══════════════════════════════════════════════════
+    // Notification Bell System
+    // ═══════════════════════════════════════════════════
+
+    // Mark notifications as seen and hide the dot
+    function markNotificationsAsSeen() {
+        // Hide dots on both desktop and mobile
+        var dotDesktop = document.getElementById('notifDotDesktop');
+        var dotMobile = document.getElementById('notifDotMobile');
+
+        if (dotDesktop) dotDesktop.style.display = 'none';
+        if (dotMobile) dotMobile.style.display = 'none';
+
+        // Send AJAX request to set session flag
+        fetch(window.baseURL + 'notification_handler.php', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/x-www-form-urlencoded',
+            },
+            body: 'action=mark_seen'
+        }).catch(function(err) {
+            console.log('Notification update error:', err);
+        });
+    }
+
+    // Add event listeners to notification bells
+    document.addEventListener('DOMContentLoaded', function() {
+        var notifBellDesktop = document.getElementById('notificationBellDesktop');
+        var notifBellMobile = document.getElementById('notificationBellMobile');
+
+        if (notifBellDesktop) {
+            notifBellDesktop.addEventListener('click', function() {
+                setTimeout(markNotificationsAsSeen, 100);
+            });
+        }
+
+        if (notifBellMobile) {
+            notifBellMobile.addEventListener('click', function() {
+                setTimeout(markNotificationsAsSeen, 100);
+            });
+        }
+    });
+
+    // Override logout to reset notification dot
+    var originalLogout = publicUserLogout;
+    publicUserLogout = function() {
+        // Reset session flag on logout
+        fetch(window.baseURL + 'notification_handler.php', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/x-www-form-urlencoded',
+            },
+            body: 'action=reset'
+        }).then(function() {
+            originalLogout();
+        }).catch(function(err) {
+            originalLogout();
+        });
+    };
 </script>

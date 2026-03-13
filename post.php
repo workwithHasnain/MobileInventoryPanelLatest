@@ -1,6 +1,5 @@
 <?php
 session_start();
-session_write_close(); // Release session lock early so captcha.php img loads instantly
 // Public home page - no authentication required
 require_once 'config.php';
 require_once 'database_functions.php';
@@ -140,7 +139,6 @@ if (!$post) {
     include '404.php';
     exit;
 }
-
 // Get post comments and comment count
 $postComments = getPostComments($post['id']);
 $postCommentCount = getPostCommentCount($post['id']);
@@ -858,25 +856,35 @@ if ($_POST && isset($_POST['action']) && $_POST['action'] === 'newsletter_subscr
                         </div>
                         <div>
                             <?php
-                            $tags = $post['tags'];
+                            $tags = $post['tags'] ?? null;
                             if (!empty($tags)) {
-                                // Handle both PostgreSQL array format and comma-separated strings
+                                // Handle PostgreSQL array format, JSON array format, and comma-separated strings
                                 if (is_string($tags)) {
                                     $tagsString = trim($tags);
-                                    if (strlen($tagsString) > 1 && $tagsString[0] === '{' && substr($tagsString, -1) === '}') {
-                                        // PostgreSQL array string like {"Apple","iOS","Rumors"}
+
+                                    // Try JSON array format first: [apple,smartphones]
+                                    if (strlen($tagsString) > 1 && $tagsString[0] === '[' && substr($tagsString, -1) === ']') {
+                                        $tagsString = trim($tagsString, '[]');
+                                        $tags = array_map('trim', explode(',', $tagsString));
+                                    }
+                                    // PostgreSQL array format: {"Apple","iOS","Rumors"}
+                                    elseif (strlen($tagsString) > 1 && $tagsString[0] === '{' && substr($tagsString, -1) === '}') {
                                         $tagsString = trim($tagsString, '{}');
                                         $tags = array_map(function ($tag) {
                                             return trim($tag, '"'); // Remove double quotes around tags
                                         }, explode(',', $tagsString));
-                                    } else {
-                                        // Plain comma-separated string
+                                    }
+                                    // Plain comma-separated string
+                                    else {
                                         $tags = array_map('trim', explode(',', $tagsString));
                                     }
                                 }
+
                                 if (is_array($tags)) {
                                     foreach ($tags as $tag) {
-                                        echo '<button class="section-button" style="margin-right: 5px;">' . htmlspecialchars($tag) . '</button>';
+                                        if (!empty($tag)) {
+                                            echo '<button class="section-button" style="margin-right: 5px;">' . htmlspecialchars($tag) . '</button>';
+                                        }
                                     }
                                 }
                             }
