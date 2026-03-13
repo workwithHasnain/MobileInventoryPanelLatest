@@ -557,15 +557,6 @@ if ($_POST && isset($_POST['action'])) {
     </div>
     <div class="container mt-0 varasat">
         <div class="row">
-            <div class="rena w-100">
-                <h1 class=" d-flex align-items-center justify-content-start warently  text-center m-auto">SmartPhone
-                    Buyer's Guide
-                    <i class="fa-solid fa-bell fa-lg  d-flex justify-content-end align-items-end m-auto px-auto"
-                        style="color: #8c8c8c;">
-                    </i>
-                </h1>
-                <p class="d-none d-md-inline">The Cheat Sheet To The Best Phones to Get Right Now</p>
-            </div>
             <div class="container mt-0 war ">
                 <div class="row">
                     <?php
