@@ -6,91 +6,70 @@ require_once 'brand_data.php';
 // Require login for this page
 requireLogin();
 
-// Get all phones for display
-$phones = getAllPhones();
 $brands = getAllBrands();
 
-// Add view and comment counts for each device
-foreach ($phones as $index => $phone) {
-    $device_id = $phone['id'] ?? $phone['name'];
-
-    try {
-        $pdo = getConnection();
-
-        // Get view count
-        $view_stmt = $pdo->prepare("SELECT COUNT(*) as count FROM content_views WHERE content_type = 'device' AND content_id = ?");
-        $view_stmt->execute([$device_id]);
-        $phones[$index]['view_count'] = $view_stmt->fetch()['count'] ?? 0;
-
-        // Get comment count
-        $comment_stmt = $pdo->prepare("SELECT COUNT(*) as count FROM device_comments WHERE device_id = ?");
-        $comment_stmt->execute([$device_id]);
-        $phones[$index]['comment_count'] = $comment_stmt->fetch()['count'] ?? 0;
-    } catch (Exception $e) {
-        // If database error, set counts to 0
-        $phones[$index]['view_count'] = 0;
-        $phones[$index]['comment_count'] = 0;
-    }
-}
-unset($phone); // Clean up any reference variables
-
-// Handle search and filter
+// Get initial filter and search parameters
 $search = isset($_GET['search']) ? trim($_GET['search']) : '';
 $brand_filter = isset($_GET['brand']) ? trim($_GET['brand']) : '';
 $availability_filter = isset($_GET['availability']) ? trim($_GET['availability']) : '';
 $device_type_filter = isset($_GET['device_type']) ? trim($_GET['device_type']) : '';
-
-// Filter phones based on search criteria
-$filtered_phones = $phones;
-
-if (!empty($search)) {
-    $filtered_phones = array_filter($filtered_phones, function ($phone) use ($search) {
-        return stripos($phone['name'], $search) !== false ||
-            stripos($phone['brand'], $search) !== false;
-    });
-}
-
-if (!empty($brand_filter)) {
-    $filtered_phones = array_filter($filtered_phones, function ($phone) use ($brand_filter) {
-        return $phone['brand'] === $brand_filter;
-    });
-}
-
-if (!empty($availability_filter)) {
-    $filtered_phones = array_filter($filtered_phones, function ($phone) use ($availability_filter) {
-        return $phone['availability'] === $availability_filter;
-    });
-}
-
-if (!empty($device_type_filter)) {
-    $filtered_phones = array_filter($filtered_phones, function ($phone) use ($device_type_filter) {
-        // Heuristic: use display size to infer type (>= 7 inches => tablet)
-        $isTablet = false;
-        if (!empty($phone['display_size'])) {
-            $sizeNum = preg_replace('/[^0-9\.]/', '', (string)$phone['display_size']);
-            if ($sizeNum !== '' && is_numeric($sizeNum)) {
-                $isTablet = floatval($sizeNum) >= 7.0;
-            }
-        }
-
-        if ($device_type_filter === 'phone') {
-            return !$isTablet;
-        } elseif ($device_type_filter === 'tablet') {
-            return $isTablet;
-        }
-        return true;
-    });
-}
 ?>
 <html>
 
 <head>
     <style>
-        img.card-img-top {
-            height: fit-content;
-            width: fit-content;
-            align-self: center;
-            margin: 10px;
+        #devicesGrid {
+            display: grid;
+            grid-template-columns: repeat(10, 1fr);
+            gap: 1rem;
+        }
+
+        @media (max-width: 1400px) {
+            #devicesGrid {
+                grid-template-columns: repeat(5, 1fr);
+            }
+        }
+
+        @media (max-width: 768px) {
+            #devicesGrid {
+                grid-template-columns: repeat(3, 1fr);
+            }
+        }
+
+        @media (max-width: 576px) {
+            #devicesGrid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+
+        .device-card .card {
+            display: flex;
+            flex-direction: column;
+            height: 100%;
+        }
+
+        .device-card .card-img-top {
+            height: 120px;
+            object-fit: cover;
+        }
+
+        .device-card .card-body {
+            padding: 0.75rem;
+            font-size: 0.85rem;
+        }
+
+        .device-card .card-title {
+            font-size: 0.9rem !important;
+            font-weight: 600;
+        }
+
+        .device-card .btn-group {
+            margin-top: auto;
+        }
+
+        .device-card .btn-group .btn {
+            padding: 0.25rem 0.5rem;
+            font-size: 0.75rem;
         }
     </style>
 </head>
@@ -159,9 +138,9 @@ if (!empty($device_type_filter)) {
                 </div>
 
                 <!-- Results Count and Sorter -->
-                <div class="mb-3 d-flex justify-content-between align-items-center">
+                <div class="mb-3 d-flex justify-content-between align-items-center flex-wrap gap-2">
                     <p class="text-muted mb-0">
-                        Showing <?php echo count($filtered_phones); ?> of <?php echo count($phones); ?> devices
+                        Showing <span id="devicesCountShown">0</span> of <span id="devicesCountTotal">0</span> devices
                         <?php if (!empty($search) || !empty($brand_filter) || !empty($availability_filter) || !empty($device_type_filter)): ?>
                             - <a href="devices.php" class="text-decoration-none">Clear all filters</a>
                         <?php endif; ?>
@@ -179,268 +158,185 @@ if (!empty($device_type_filter)) {
                 </div>
 
                 <!-- Device Grid -->
-                <?php if (empty($filtered_phones)): ?>
+                <div id="devicesContainer">
                     <div class="text-center py-5">
-                        <i class="fas fa-mobile-alt fa-3x text-muted mb-3"></i>
-                        <h4 class="text-muted">No devices found</h4>
-                        <?php if (!empty($search) || !empty($brand_filter) || !empty($availability_filter) || !empty($device_type_filter)): ?>
-                            <p class="text-muted">Try adjusting your search filters</p>
-                            <a href="devices.php" class="btn btn-outline-primary">Show All Devices</a>
-                        <?php else: ?>
-                            <p class="text-muted">Start by adding your first device</p>
-                            <a href="add_device.php" class="btn btn-primary">Add New Device</a>
-                        <?php endif; ?>
+                        <div class="spinner-border" role="status">
+                            <span class="visually-hidden">Loading devices...</span>
+                        </div>
                     </div>
-                <?php else: ?>
-                    <div class="row" id="devicesGrid">
-                        <?php foreach ($filtered_phones as $index => $phone): ?>
-                            <div class="col-lg-4 col-md-6 mb-4" data-device-views="<?php echo intval($phone['view_count']); ?>" data-device-comments="<?php echo intval($phone['comment_count']); ?>" data-device-index="<?php echo $index; ?>">
-                                <div class="card h-100 shadow-sm">
-                                    <?php if (!empty($phone['image'])): ?>
-                                        <img src="<?php echo htmlspecialchars($phone['image'] ?? ''); ?>"
-                                            class="card-img-top" alt="<?php echo htmlspecialchars($phone['name'] ?? 'Device'); ?>"
-                                            style="height: 250px; object-fit: cover;">
-                                    <?php else: ?>
-                                        <div class="card-img-top d-flex align-items-center justify-content-center bg-light"
-                                            style="height: 250px;">
-                                            <i class="fas fa-mobile-alt fa-3x text-muted"></i>
-                                        </div>
-                                    <?php endif; ?>
+                </div>
 
-                                    <div class="card-body d-flex flex-column">
-                                        <div class="d-flex justify-content-between align-items-start mb-2">
-                                            <h5 class="card-title mb-0"><?php echo htmlspecialchars($phone['name'] ?? 'Unknown Device'); ?></h5>
-                                            <?php
-                                            // Determine device type using display size heuristic (>= 7 inches => Tablet)
-                                            $isTablet = false;
-                                            if (!empty($phone['display_size'])) {
-                                                $sizeNum = preg_replace('/[^0-9\.]/', '', (string)$phone['display_size']);
-                                                if ($sizeNum !== '' && is_numeric($sizeNum)) {
-                                                    $isTablet = floatval($sizeNum) >= 7.0;
-                                                }
-                                            }
-                                            $deviceTypeLabel = $isTablet ? 'Tablet' : 'Phone';
-                                            $deviceTypeClass = $isTablet ? 'bg-info' : 'bg-primary';
-                                            ?>
-                                            <span class="badge <?php echo $deviceTypeClass; ?>"><?php echo $deviceTypeLabel; ?></span>
-                                        </div>
-                                        <p class="card-text">
-                                            <strong>Brand:</strong> <?php echo htmlspecialchars($phone['brand'] ?? 'Unknown'); ?><br>
-                                            <strong>Year:</strong> <?php echo htmlspecialchars($phone['year'] ?? 'Unknown'); ?><br>
-                                            <strong>Price:</strong>
-                                            <?php if (isset($phone['price']) && $phone['price'] !== null && $phone['price'] !== ''): ?>
-                                                $<?php echo number_format((float)$phone['price'], 2); ?>
-                                            <?php else: ?>
-                                                <span class="text-muted">—</span>
-                                            <?php endif; ?>
-                                        </p>
-
-                                        <!-- Availability Badge -->
-                                        <?php
-                                        $badge_class = '';
-                                        switch ($phone['availability']) {
-                                            case 'Available':
-                                                $badge_class = 'bg-success';
-                                                break;
-                                            case 'Coming Soon':
-                                                $badge_class = 'bg-warning text-dark';
-                                                break;
-                                            case 'Discontinued':
-                                                $badge_class = 'bg-danger';
-                                                break;
-                                            case 'Rumored':
-                                                $badge_class = 'bg-info text-dark';
-                                                break;
-                                            default:
-                                                $badge_class = 'bg-secondary';
-                                        }
-                                        ?>
-                                        <span class="badge <?php echo $badge_class; ?> mb-3">
-                                            <?php echo htmlspecialchars($phone['availability'] ?? 'Unknown'); ?>
-                                        </span>
-
-                                        <!-- Key Specifications -->
-                                        <div class="mb-3">
-                                            <small class="text-muted">
-                                                <?php if (!empty($phone['ram'])): ?>
-                                                    <i class="fas fa-memory"></i>
-                                                    <?php echo htmlspecialchars($phone['ram']); ?> RAM
-                                                <?php endif; ?>
-
-                                                <?php if (!empty($phone['storage'])): ?>
-                                                    <i class="fas fa-hdd ms-2"></i>
-                                                    <?php echo htmlspecialchars($phone['storage']); ?>
-                                                <?php endif; ?>
-
-                                                <?php if (!empty($phone['display_size'])): ?>
-                                                    <i class="fas fa-desktop ms-2"></i>
-                                                    <?php echo htmlspecialchars(rtrim((string)$phone['display_size'], '"')); ?>"
-                                                <?php endif; ?>
-                                            </small>
-                                        </div>
-
-                                        <!-- View and Comment Stats -->
-                                        <div class="mb-3">
-                                            <div class="d-flex justify-content-between">
-                                                <small class="text-muted">
-                                                    <i class="fas fa-eye me-1"></i><?php echo number_format($phone['view_count']); ?> views
-                                                </small>
-                                                <small class="text-muted">
-                                                    <i class="fas fa-comments me-1"></i><?php echo number_format($phone['comment_count']); ?> comments
-                                                </small>
-                                            </div>
-                                        </div>
-
-                                        <!-- Action Buttons -->
-                                        <div class="mt-auto">
-                                            <div class="btn-group w-100" role="group">
-                                                <a href="edit_device.php?id=<?php echo $phone['id']; ?>"
-                                                    class="btn btn-outline-primary btn-sm">
-                                                    <i class="fas fa-edit"></i> Edit
-                                                </a>
-                                                <button type="button" class="btn btn-outline-info btn-sm"
-                                                    data-bs-toggle="modal" data-bs-target="#viewModal<?php echo $index; ?>">
-                                                    <i class="fas fa-eye"></i> View
-                                                </button>
-                                                <a href="delete_phone.php?id=<?php echo $phone['id']; ?>"
-                                                    class="btn btn-outline-danger btn-sm"
-                                                    onclick="return confirm('Are you sure you want to delete this device?')">
-                                                    <i class="fas fa-trash"></i> Delete
-                                                </a>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-
-                            <!-- View Modal for each device -->
-                            <div class="modal fade" id="viewModal<?php echo $index; ?>" tabindex="-1">
-                                <div class="modal-dialog modal-lg">
-                                    <div class="modal-content">
-                                        <div class="modal-header">
-                                            <h5 class="modal-title"><?php echo htmlspecialchars($phone['name']); ?></h5>
-                                            <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
-                                        </div>
-                                        <div class="modal-body">
-                                            <div class="row">
-                                                <div class="col-md-4">
-                                                    <?php if (!empty($phone['image'])): ?>
-                                                        <img src="<?php echo htmlspecialchars($phone['image']); ?>"
-                                                            class="img-fluid rounded" alt="<?php echo htmlspecialchars($phone['name']); ?>">
-                                                    <?php else: ?>
-                                                        <div class="bg-light rounded d-flex align-items-center justify-content-center" style="height: 250px;">
-                                                            <i class="fas fa-mobile-alt fa-3x text-muted"></i>
-                                                        </div>
-                                                    <?php endif; ?>
-                                                </div>
-                                                <div class="col-md-8">
-                                                    <table class="table table-sm">
-                                                        <tr>
-                                                            <td><strong>Brand:</strong></td>
-                                                            <td><?php echo htmlspecialchars($phone['brand']); ?></td>
-                                                        </tr>
-                                                        <tr>
-                                                            <td><strong>Year:</strong></td>
-                                                            <td><?php echo htmlspecialchars($phone['year']); ?></td>
-                                                        </tr>
-                                                        <tr>
-                                                            <td><strong>Price:</strong></td>
-                                                            <td>$<?php echo number_format($phone['price'], 2); ?></td>
-                                                        </tr>
-                                                        <tr>
-                                                            <td><strong>Availability:</strong></td>
-                                                            <td><?php echo htmlspecialchars($phone['availability']); ?></td>
-                                                        </tr>
-                                                        <?php if (!empty($phone['os'])): ?>
-                                                            <tr>
-                                                                <td><strong>OS:</strong></td>
-                                                                <td><?php echo htmlspecialchars($phone['os']); ?></td>
-                                                            </tr>
-                                                        <?php endif; ?>
-                                                        <?php if (!empty($phone['chipset']) || !empty($phone['chipset_name'])): ?>
-                                                            <tr>
-                                                                <td><strong>Chipset:</strong></td>
-                                                                <td><?php echo htmlspecialchars($phone['chipset'] ?? $phone['chipset_name']); ?></td>
-                                                            </tr>
-                                                        <?php endif; ?>
-                                                        <?php if (!empty($phone['ram'])): ?>
-                                                            <tr>
-                                                                <td><strong>RAM:</strong></td>
-                                                                <td><?php echo htmlspecialchars($phone['ram']); ?></td>
-                                                            </tr>
-                                                        <?php endif; ?>
-                                                        <?php if (!empty($phone['storage'])): ?>
-                                                            <tr>
-                                                                <td><strong>Storage:</strong></td>
-                                                                <td><?php echo htmlspecialchars($phone['storage']); ?></td>
-                                                            </tr>
-                                                        <?php endif; ?>
-                                                        <?php if (!empty($phone['display_size'])): ?>
-                                                            <tr>
-                                                                <td><strong>Display:</strong></td>
-                                                                <td><?php echo $phone['display_size']; ?>" <?php echo $phone['display_resolution'] ?? ''; ?></td>
-                                                            </tr>
-                                                        <?php endif; ?>
-                                                        <?php if (!empty($phone['main_camera_resolution'])): ?>
-                                                            <tr>
-                                                                <td><strong>Main Camera:</strong></td>
-                                                                <td>
-                                                                    <?php
-                                                                    $mc = (string)$phone['main_camera_resolution'];
-                                                                    echo htmlspecialchars(preg_match('/[a-zA-Z]/', $mc) ? $mc : ($mc . ' MP'));
-                                                                    ?>
-                                                                </td>
-                                                            </tr>
-                                                        <?php endif; ?>
-                                                        <?php if (!empty($phone['battery_capacity'])): ?>
-                                                            <tr>
-                                                                <td><strong>Battery:</strong></td>
-                                                                <td>
-                                                                    <?php
-                                                                    $bc = (string)$phone['battery_capacity'];
-                                                                    echo htmlspecialchars(preg_match('/[a-zA-Z]/', $bc) ? $bc : ($bc . ' mAh'));
-                                                                    ?>
-                                                                </td>
-                                                            </tr>
-                                                        <?php endif; ?>
-                                                    </table>
-                                                </div>
-                                            </div>
-                                        </div>
-                                        <div class="modal-footer">
-                                            <a href="edit_device.php?id=<?php echo $phone['id']; ?>" class="btn btn-primary">Edit Device</a>
-                                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                        <?php endforeach; ?>
-                    </div>
-                <?php endif; ?>
+                <!-- Load More Button -->
+                <div class="text-center mt-4" id="loadMoreContainer" style="display: none;">
+                    <button class="btn btn-primary" id="loadMoreBtn">
+                        <i class="fas fa-chevron-down me-2"></i>Load More Devices
+                    </button>
+                    <p class="text-muted mt-2"><small>Page <span id="currentPage">1</span> of <span id="totalPages">1</span></small></p>
+                </div>
             </div>
         </div>
     </div>
     <?php include 'includes/footer.php'; ?>
 
     <script>
-        document.getElementById('deviceSorter').addEventListener('change', function() {
-            const sortValue = this.value;
-            const grid = document.getElementById('devicesGrid');
-            const cards = Array.from(grid.querySelectorAll('[data-device-index]'));
+        let currentPage = 1;
+        let totalPages = 1;
+        let currentSort = 'default';
+        let gridElement = null;
 
-            if (sortValue === 'default') {
-                cards.sort((a, b) => parseInt(a.dataset.deviceIndex) - parseInt(b.dataset.deviceIndex));
-            } else if (sortValue === 'views-desc') {
-                cards.sort((a, b) => parseInt(b.dataset.deviceViews) - parseInt(a.dataset.deviceViews));
-            } else if (sortValue === 'views-asc') {
-                cards.sort((a, b) => parseInt(a.dataset.deviceViews) - parseInt(b.dataset.deviceViews));
-            } else if (sortValue === 'comments-desc') {
-                cards.sort((a, b) => parseInt(b.dataset.deviceComments) - parseInt(a.dataset.deviceComments));
-            } else if (sortValue === 'comments-asc') {
-                cards.sort((a, b) => parseInt(a.dataset.deviceComments) - parseInt(b.dataset.deviceComments));
+        function getFilterParams() {
+            return new URLSearchParams({
+                search: document.getElementById('search').value,
+                brand: document.getElementById('brand').value,
+                availability: document.getElementById('availability').value,
+                device_type: document.getElementById('device_type').value
+            });
+        }
+
+        function createDeviceCard(phone) {
+            const isTablet = phone.display_size && parseFloat(phone.display_size) >= 7.0;
+            const deviceTypeLabel = isTablet ? 'Tablet' : 'Phone';
+            const deviceTypeClass = isTablet ? 'bg-info' : 'bg-primary';
+
+            let badgeClass = 'bg-secondary';
+            switch (phone.availability) {
+                case 'Available':
+                    badgeClass = 'bg-success';
+                    break;
+                case 'Coming Soon':
+                    badgeClass = 'bg-warning text-dark';
+                    break;
+                case 'Discontinued':
+                    badgeClass = 'bg-danger';
+                    break;
+                case 'Rumored':
+                    badgeClass = 'bg-info text-dark';
+                    break;
             }
 
-            cards.forEach(card => grid.appendChild(card));
+            let imageHtml = phone.image 
+                ? `<img src="${escapeHtml(phone.image)}" class="card-img-top" alt="${escapeHtml(phone.name)}" style="height: 120px; object-fit: cover;">`
+                : `<div class="card-img-top d-flex align-items-center justify-content-center bg-light" style="height: 120px;"><i class="fas fa-mobile-alt fa-2x text-muted"></i></div>`;
+
+            return `
+                <div class="device-card">
+                    <div class="card h-100 shadow-sm">
+                        ${imageHtml}
+                        <div class="card-body d-flex flex-column">
+                            <div class="mb-1" style="flex-grow: 1;">
+                                <h6 class="card-title">${escapeHtml(phone.name)}</h6>
+                                <p style="margin-bottom: 0.25rem; font-size: 0.8rem;"><strong>${escapeHtml(phone.brand)}</strong></p>
+                            </div>
+                            <div style="margin-bottom: 0.5rem;">
+                                <span class="badge ${deviceTypeClass}" style="font-size: 0.7rem; white-space: nowrap;">${deviceTypeLabel}</span>
+                                <span class="badge ${badgeClass}" style="font-size: 0.7rem;">${escapeHtml(phone.availability)}</span>
+                            </div>
+                            <small class="text-muted" style="font-size: 0.75rem;">
+                                <i class="fas fa-eye"></i> ${phone.view_count} | 
+                                <i class="fas fa-comments"></i> ${phone.comment_count}
+                            </small>
+                            <div class="btn-group btn-group-sm mt-2" role="group">
+                                <a href="edit_device.php?id=${phone.id}" class="btn btn-outline-primary" title="Edit">
+                                    <i class="fas fa-edit"></i>
+                                </a>
+                                <a href="delete_phone.php?id=${phone.id}" class="btn btn-outline-danger" onclick="return confirm('Delete this device?')" title="Delete">
+                                    <i class="fas fa-trash"></i>
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            `;
+        }
+
+        function escapeHtml(text) {
+            const map = {
+                '&': '&amp;',
+                '<': '&lt;',
+                '>': '&gt;',
+                '"': '&quot;',
+                "'": '&#039;'
+            };
+            return String(text).replace(/[&<>"']/g, m => map[m]);
+        }
+
+        function loadDevices(pageNum = 1, sort = 'default') {
+            currentPage = pageNum;
+            currentSort = sort;
+
+            const params = getFilterParams();
+            params.append('page', pageNum);
+            params.append('sort', sort);
+
+            const container = document.getElementById('devicesContainer');
+
+            if (pageNum === 1) {
+                container.innerHTML = '<div class="text-center py-5"><div class="spinner-border" role="status"><span class="visually-hidden">Loading...</span></div></div>';
+                gridElement = null;
+            }
+
+            fetch(`api_get_devices.php?${params.toString()}`)
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        totalPages = data.total_pages;
+
+                        if (pageNum === 1) {
+                            gridElement = document.createElement('div');
+                            gridElement.id = 'devicesGrid';
+                        }
+
+                        if (data.devices.length === 0 && pageNum === 1) {
+                            container.innerHTML = `
+                                <div class="text-center py-5">
+                                    <i class="fas fa-mobile-alt fa-3x text-muted mb-3"></i>
+                                    <h4 class="text-muted">No devices found</h4>
+                                    <p class="text-muted">Try adjusting your search filters</p>
+                                    <a href="devices.php" class="btn btn-outline-primary">Show All Devices</a>
+                                </div>
+                            `;
+                            document.getElementById('loadMoreContainer').style.display = 'none';
+                        } else {
+                            data.devices.forEach((phone) => {
+                                const tempDiv = document.createElement('div');
+                                tempDiv.innerHTML = createDeviceCard(phone);
+                                gridElement.appendChild(tempDiv.firstElementChild);
+                            });
+
+                            if (pageNum === 1) {
+                                container.innerHTML = '';
+                                container.appendChild(gridElement);
+                            }
+
+                            const shownCount = Math.min(pageNum * 50, data.total);
+                            document.getElementById('devicesCountShown').textContent = shownCount;
+                            document.getElementById('devicesCountTotal').textContent = data.total;
+                            document.getElementById('currentPage').textContent = pageNum;
+                            document.getElementById('totalPages').textContent = totalPages;
+
+                            document.getElementById('loadMoreContainer').style.display = pageNum < totalPages ? 'block' : 'none';
+                        }
+                    }
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                    if (pageNum === 1) {
+                        container.innerHTML = '<div class="alert alert-danger">Error loading devices</div>';
+                    }
+                });
+        }
+
+        document.getElementById('deviceSorter').addEventListener('change', function() {
+            loadDevices(1, this.value);
+        });
+
+        document.getElementById('loadMoreBtn').addEventListener('click', function() {
+            loadDevices(currentPage + 1, currentSort);
+        });
+
+        // Load initial devices on page load
+        document.addEventListener('DOMContentLoaded', function() {
+            loadDevices(1, 'default');
         });
     </script>
 

@@ -24,38 +24,6 @@ $status_filter = $_GET['status'] ?? '';
 $category_filter = $_GET['category'] ?? '';
 $search = $_GET['search'] ?? '';
 
-// Build query with filters
-$where_conditions = [];
-$params = [];
-
-if (!empty($search)) {
-    $where_conditions[] = "(title LIKE ? OR author LIKE ? OR content_body LIKE ?)";
-    $params[] = "%$search%";
-    $params[] = "%$search%";
-    $params[] = "%$search%";
-}
-
-if (!empty($status_filter)) {
-    $where_conditions[] = "status = ?";
-    $params[] = $status_filter;
-}
-
-if (!empty($category_filter)) {
-    $where_conditions[] = "categories LIKE ?";
-    $params[] = "%$category_filter%";
-}
-
-$where_clause = !empty($where_conditions) ? "WHERE " . implode(" AND ", $where_conditions) : "";
-
-// Get posts with filters and counts
-$query = "SELECT p.*, 
-    COALESCE((SELECT COUNT(*) FROM content_views cv WHERE cv.content_type = 'post' AND cv.content_id = CAST(p.id AS VARCHAR)), 0) as view_count,
-    (SELECT COUNT(*) FROM post_comments pc WHERE pc.post_id = p.id) as comment_count
-    FROM posts p $where_clause ORDER BY p.created_at DESC";
-$stmt = $pdo->prepare($query);
-$stmt->execute($params);
-$posts = $stmt->fetchAll(PDO::FETCH_ASSOC);
-
 // Get categories for filter dropdown
 $categories_stmt = $pdo->query("SELECT * FROM post_categories ORDER BY name");
 $categories = $categories_stmt->fetchAll(PDO::FETCH_ASSOC);
@@ -127,10 +95,7 @@ include 'includes/header.php';
             <!-- Results Count and Sorter -->
             <div class="mb-3 d-flex justify-content-between align-items-center">
                 <p class="text-muted mb-0">
-                    Showing <?php echo count($posts); ?> posts
-                    <?php if (!empty($search) || !empty($status_filter) || !empty($category_filter)): ?>
-                        - <a href="posts.php" class="text-decoration-none">Clear all filters</a>
-                    <?php endif; ?>
+                    Showing <span id="postsCountShown">0</span> of <span id="postsCountTotal">0</span> posts
                 </p>
                 <div style="width: 200px;">
                     <label for="postSorter" class="form-label mb-0 me-2 d-inline">Sort by:</label>
@@ -144,126 +109,23 @@ include 'includes/header.php';
                 </div>
             </div>
 
-            <!-- Posts Table -->
-            <?php if (empty($posts)): ?>
+            <!-- Posts Container (AJAX-populated) -->
+            <div id="postsContainer">
                 <div class="text-center py-5">
-                    <i class="fas fa-newspaper fa-3x text-muted mb-3"></i>
-                    <h4 class="text-muted">No posts found</h4>
-                    <?php if (!empty($search) || !empty($status_filter) || !empty($category_filter)): ?>
-                        <p class="text-muted">Try adjusting your search filters</p>
-                        <a href="posts.php" class="btn btn-outline-primary">Show All Posts</a>
-                    <?php else: ?>
-                        <p class="text-muted">Start by creating your first post</p>
-                        <a href="add_post.php" class="btn btn-primary">Create New Post</a>
-                    <?php endif; ?>
-                </div>
-            <?php else: ?>
-                <div class="card">
-                    <div class="card-body">
-                        <div class="table-responsive">
-                            <table class="table table-hover">
-                                <thead>
-                                    <tr>
-                                        <th>Featured Image</th>
-                                        <th>Title</th>
-                                        <th>Author</th>
-                                        <th>Status</th>
-                                        <th>Categories</th>
-                                        <th>Stats</th>
-                                        <th>Publish Date</th>
-                                        <th>Actions</th>
-                                    </tr>
-                                </thead>
-                                <tbody id="postsTableBody">
-                                    <?php foreach ($posts as $post): ?>
-                                        <tr data-post-views="<?php echo intval($post['view_count']); ?>" data-post-comments="<?php echo intval($post['comment_count']); ?>" data-post-date="<?php echo strtotime($post['publish_date']); ?>">
-                                            <td>
-                                                <?php if (!empty($post['featured_image'])): ?>
-                                                    <img src="<?php echo htmlspecialchars($post['featured_image']); ?>"
-                                                        alt="Featured" class="img-thumbnail" style="width: 60px; height: 60px; object-fit: cover;">
-                                                <?php else: ?>
-                                                    <div class="bg-light d-flex align-items-center justify-content-center"
-                                                        style="width: 60px; height: 60px;">
-                                                        <i class="fas fa-image text-muted"></i>
-                                                    </div>
-                                                <?php endif; ?>
-                                            </td>
-                                            <td>
-                                                <div class="d-flex align-items-start">
-                                                    <div class="flex-grow-1">
-                                                        <strong><?php echo htmlspecialchars($post['title']); ?></strong>
-                                                        <?php if (isset($post['is_featured']) && $post['is_featured']): ?>
-                                                            <i class="fas fa-star text-warning ms-2" title="Featured Post"></i>
-                                                        <?php endif; ?>
-                                                        <br><small class="text-muted"><?php echo htmlspecialchars($post['slug']); ?></small>
-                                                        <?php if (!empty($post['short_description'])): ?>
-                                                            <br><small class="text-muted"><?php echo substr(htmlspecialchars($post['short_description']), 0, 80) . '...'; ?></small>
-                                                        <?php endif; ?>
-                                                    </div>
-                                                </div>
-                                            </td>
-                                            <td><?php echo htmlspecialchars($post['author']); ?></td>
-                                            <td>
-                                                <?php
-                                                $status_class = match ($post['status']) {
-                                                    'Published' => 'bg-success',
-                                                    'Draft' => 'bg-warning',
-                                                    'Archived' => 'bg-secondary',
-                                                    default => 'bg-secondary'
-                                                };
-                                                ?>
-                                                <span class="badge <?php echo $status_class; ?>">
-                                                    <?php echo htmlspecialchars($post['status']); ?>
-                                                </span>
-                                            </td>
-                                            <td>
-                                                <?php
-                                                $post_categories = json_decode($post['categories'], true) ?: [];
-                                                foreach ($post_categories as $cat): ?>
-                                                    <span class="badge bg-info me-1"><?php echo htmlspecialchars($cat); ?></span>
-                                                <?php endforeach; ?>
-                                            </td>
-                                            <td>
-                                                <div class="d-flex flex-column">
-                                                    <small class="text-muted mb-1">
-                                                        <i class="fas fa-eye me-1"></i><?php echo number_format($post['view_count']); ?> views
-                                                    </small>
-                                                    <small class="text-muted">
-                                                        <i class="fas fa-comments me-1"></i><?php echo number_format($post['comment_count']); ?> comments
-                                                    </small>
-                                                </div>
-                                            </td>
-                                            <td>
-                                                <?php echo date('M j, Y', strtotime($post['publish_date'])); ?>
-                                                <br><small class="text-muted"><?php echo date('g:i A', strtotime($post['publish_date'])); ?></small>
-                                            </td>
-                                            <td>
-                                                <div class="btn-group btn-group-sm">
-                                                    <a href="view_post.php?id=<?php echo $post['id']; ?>"
-                                                        class="btn btn-outline-info" title="View">
-                                                        <i class="fas fa-eye"></i>
-                                                    </a>
-                                                    <a href="edit_post.php?id=<?php echo $post['id']; ?>"
-                                                        class="btn btn-outline-primary" title="Edit">
-                                                        <i class="fas fa-edit"></i>
-                                                    </a>
-                                                    <?php if ($user_role === 'admin'): ?>
-                                                        <button type="button" class="btn btn-outline-danger"
-                                                            onclick="deletePost(<?php echo $post['id']; ?>, '<?php echo htmlspecialchars($post['title']); ?>')"
-                                                            title="Delete">
-                                                            <i class="fas fa-trash"></i>
-                                                        </button>
-                                                    <?php endif; ?>
-                                                </div>
-                                            </td>
-                                        </tr>
-                                    <?php endforeach; ?>
-                                </tbody>
-                            </table>
-                        </div>
+                    <div class="spinner-border" role="status">
+                        <span class="visually-hidden">Loading...</span>
                     </div>
                 </div>
-            <?php endif; ?>
+            </div>
+
+            <!-- Load More Button -->
+            <div class="text-center mt-4" id="loadMoreContainer" style="display: none;">
+                <button class="btn btn-primary" id="loadMoreBtn">
+                    <i class="fas fa-chevron-down me-2"></i>Load More Posts
+                </button>
+                <p class="text-muted mt-2"><small>Page <span id="currentPage">1</span> of <span id="totalPages">1</span></small></p>
+            </div>
+
         </div>
     </div>
 </div>
@@ -293,11 +155,196 @@ include 'includes/header.php';
 </div>
 
 <script>
-    function deletePost(postId, postTitle) {
-        document.getElementById('deletePostId').value = postId;
-        document.getElementById('postTitle').textContent = postTitle;
-        new bootstrap.Modal(document.getElementById('deleteModal')).show();
+    let currentPage = 1;
+    let totalPages = 1;
+    let currentSort = 'default';
+    let tableElement = null;
+    const userRole = '<?php echo htmlspecialchars($user_role); ?>';
+
+    function getFilterParams() {
+        return new URLSearchParams({
+            search: document.getElementById('search').value,
+            status: document.getElementById('status').value,
+            author: document.getElementById('category').value // Using category as author filter
+        });
     }
+
+    function createPostRow(post) {
+        let statusClass = 'bg-secondary';
+        switch (post.status) {
+            case 'Published':
+                statusClass = 'bg-success';
+                break;
+            case 'Draft':
+                statusClass = 'bg-warning text-dark';
+                break;
+            case 'Archived':
+                statusClass = 'bg-secondary';
+                break;
+        }
+
+        let imageHtml = post.featured_image 
+            ? `<img src="${escapeHtml(post.featured_image)}" alt="Featured" class="img-thumbnail" style="width: 60px; height: 60px; object-fit: cover;">`
+            : `<div class="bg-light d-flex align-items-center justify-content-center" style="width: 60px; height: 60px;"><i class="fas fa-image text-muted"></i></div>`;
+
+        const deleteBtn = userRole === 'admin' 
+            ? `<button type="button" class="btn btn-outline-danger btn-sm"
+                onclick="deletePost(${post.id}, '${escapeHtml(post.title)}')"
+                title="Delete">
+                <i class="fas fa-trash"></i>
+            </button>`
+            : '';
+
+        return `
+            <tr>
+                <td>${imageHtml}</td>
+                <td>
+                    <div class="d-flex align-items-start">
+                        <div class="flex-grow-1">
+                            <strong>${escapeHtml(post.title)}</strong>
+                            <br><small class="text-muted">${escapeHtml(post.slug)}</small>
+                            ${post.description ? '<br><small class="text-muted">' + escapeHtml(post.description.substring(0, 80)) + '...</small>' : ''}
+                        </div>
+                    </div>
+                </td>
+                <td>${escapeHtml(post.author)}</td>
+                <td><span class="badge ${statusClass}">${escapeHtml(post.status)}</span></td>
+                <td></td>
+                <td>
+                    <div class="d-flex flex-column">
+                        <small class="text-muted mb-1">
+                            <i class="fas fa-eye me-1"></i>${post.view_count} views
+                        </small>
+                        <small class="text-muted">
+                            <i class="fas fa-comments me-1"></i>${post.comment_count} comments
+                        </small>
+                    </div>
+                </td>
+                <td>
+                    ${new Date(post.created_at).toLocaleDateString('en-US', {month: 'short', day: 'numeric', year: 'numeric'})}
+                    <br><small class="text-muted">${new Date(post.created_at).toLocaleTimeString('en-US', {hour: 'numeric', minute: '2-digit'})}</small>
+                </td>
+                <td>
+                    <div class="btn-group btn-group-sm">
+                        <a href="view_post.php?id=${post.id}" class="btn btn-outline-info" title="View">
+                            <i class="fas fa-eye"></i>
+                        </a>
+                        <a href="edit_post.php?id=${post.id}" class="btn btn-outline-primary" title="Edit">
+                            <i class="fas fa-edit"></i>
+                        </a>
+                        ${deleteBtn}
+                    </div>
+                </td>
+            </tr>
+        `;
+    }
+
+    function escapeHtml(text) {
+        const map = {
+            '&': '&amp;',
+            '<': '&lt;',
+            '>': '&gt;',
+            '"': '&quot;',
+            "'": '&#039;'
+        };
+        return String(text).replace(/[&<>"']/g, m => map[m]);
+    }
+
+    function loadPosts(pageNum = 1, sort = 'default') {
+        currentPage = pageNum;
+        currentSort = sort;
+
+        const params = getFilterParams();
+        params.append('page', pageNum);
+        params.append('sort', sort);
+
+        const container = document.getElementById('postsContainer');
+
+        if (pageNum === 1) {
+            container.innerHTML = '<div class="text-center py-5"><div class="spinner-border" role="status"><span class="visually-hidden">Loading...</span></div></div>';
+            tableElement = null;
+        }
+
+        fetch(`api_get_posts.php?${params.toString()}`)
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    totalPages = data.total_pages;
+
+                    if (pageNum === 1) {
+                        tableElement = document.createElement('div');
+                        tableElement.className = 'card';
+                        tableElement.innerHTML = `
+                            <div class="card-body">
+                                <div class="table-responsive">
+                                    <table class="table table-hover" id="postsTable">
+                                        <thead>
+                                            <tr>
+                                                <th>Featured Image</th>
+                                                <th>Title</th>
+                                                <th>Author</th>
+                                                <th>Status</th>
+                                                <th>Categories</th>
+                                                <th>Stats</th>
+                                                <th>Publish Date</th>
+                                                <th>Actions</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody id="postsTableBody"></tbody>
+                                    </table>
+                                </div>
+                            </div>
+                        `;
+                    }
+
+                    if (data.posts.length === 0 && pageNum === 1) {
+                        container.innerHTML = `
+                            <div class="text-center py-5">
+                                <i class="fas fa-newspaper fa-3x text-muted mb-3"></i>
+                                <h4 class="text-muted">No posts found</h4>
+                                <p class="text-muted">Try adjusting your search filters</p>
+                                <a href="posts.php" class="btn btn-outline-primary">Show All Posts</a>
+                            </div>
+                        `;
+                        document.getElementById('loadMoreContainer').style.display = 'none';
+                    } else {
+                        const tbody = tableElement.querySelector('#postsTableBody');
+                        data.posts.forEach((post) => {
+                            const tempDiv = document.createElement('div');
+                            tempDiv.innerHTML = createPostRow(post);
+                            tbody.appendChild(tempDiv.firstElementChild);
+                        });
+
+                        if (pageNum === 1) {
+                            container.innerHTML = '';
+                            container.appendChild(tableElement);
+                        }
+
+                        const shownCount = Math.min(pageNum * 50, data.total);
+                        document.getElementById('postsCountShown').textContent = shownCount;
+                        document.getElementById('postsCountTotal').textContent = data.total;
+                        document.getElementById('currentPage').textContent = pageNum;
+                        document.getElementById('totalPages').textContent = totalPages;
+
+                        document.getElementById('loadMoreContainer').style.display = pageNum < totalPages ? 'block' : 'none';
+                    }
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                if (pageNum === 1) {
+                    container.innerHTML = '<div class="alert alert-danger">Error loading posts</div>';
+                }
+            });
+    }
+
+    document.getElementById('postSorter').addEventListener('change', function() {
+        loadPosts(1, this.value);
+    });
+
+    document.getElementById('loadMoreBtn').addEventListener('click', function() {
+        loadPosts(currentPage + 1, currentSort);
+    });
 
     // Auto-dismiss alerts after 5 seconds
     setTimeout(function() {
@@ -308,26 +355,15 @@ include 'includes/header.php';
         });
     }, 5000);
 
-    // Post sorting functionality
-    document.getElementById('postSorter').addEventListener('change', function() {
-        const sortValue = this.value;
-        const tbody = document.getElementById('postsTableBody');
-        const rows = Array.from(tbody.querySelectorAll('tr[data-post-views]'));
+    function deletePost(postId, postTitle) {
+        document.getElementById('deletePostId').value = postId;
+        document.getElementById('postTitle').textContent = postTitle;
+        new bootstrap.Modal(document.getElementById('deleteModal')).show();
+    }
 
-        if (sortValue === 'default') {
-            rows.sort((a, b) => parseInt(a.dataset.postDate) - parseInt(b.dataset.postDate));
-            rows.reverse(); // Most recent first for default
-        } else if (sortValue === 'views-desc') {
-            rows.sort((a, b) => parseInt(b.dataset.postViews) - parseInt(a.dataset.postViews));
-        } else if (sortValue === 'views-asc') {
-            rows.sort((a, b) => parseInt(a.dataset.postViews) - parseInt(b.dataset.postViews));
-        } else if (sortValue === 'comments-desc') {
-            rows.sort((a, b) => parseInt(b.dataset.postComments) - parseInt(a.dataset.postComments));
-        } else if (sortValue === 'comments-asc') {
-            rows.sort((a, b) => parseInt(a.dataset.postComments) - parseInt(b.dataset.postComments));
-        }
-
-        rows.forEach(row => tbody.appendChild(row));
+    // Load initial posts on page load
+    document.addEventListener('DOMContentLoaded', function() {
+        loadPosts(1, 'default');
     });
 </script>
 
