@@ -56,31 +56,47 @@ $device_type_filter = isset($_GET['device_type']) ? trim($_GET['device_type']) :
         }
 
         .device-card .card-body {
-            padding: 0.5rem;
-            font-size: 0.7rem;
+            padding: 0.4rem;
+            font-size: 0.65rem;
         }
 
         .device-card .card-title {
-            font-size: 0.75rem !important;
+            font-size: 0.7rem !important;
             font-weight: 600;
-            line-height: 1.1;
-            margin-bottom: 0.25rem !important;
+            line-height: 1;
+            margin-bottom: 0.15rem !important;
         }
 
-        .device-card .spec-info {
-            margin-bottom: 0.25rem;
-            line-height: 1.2;
+        .device-card .info-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 0.1rem 0.2rem;
+            margin-bottom: 0.2rem;
+            align-items: center;
+        }
+
+        .device-card .info-row small {
+            display: inline;
+            margin: 0;
         }
 
         .device-card .badge {
-            font-size: 0.6rem;
-            padding: 0.2rem 0.35rem;
-            margin-bottom: 0.25rem !important;
+            font-size: 0.55rem;
+            padding: 0.15rem 0.3rem;
+            margin-bottom: 0.15rem !important;
+            display: inline-block;
         }
 
-        .device-card small {
-            display: block;
-            margin-bottom: 0.15rem;
+        .device-card .specs-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 0.2rem;
+            margin-bottom: 0.2rem;
+        }
+
+        .device-card .spec-item {
+            font-size: 0.6rem;
+            line-height: 1.1;
         }
 
         .device-card .btn-group {
@@ -246,35 +262,35 @@ $device_type_filter = isset($_GET['device_type']) ? trim($_GET['device_type']) :
                     <div class="card h-100">
                         ${imageHtml}
                         <div class="card-body d-flex flex-column">
-                            <div class="d-flex justify-content-between align-items-start gap-1">
-                                <h5 class="card-title">${escapeHtml(phone.name)}</h5>
-                                <span class="badge ${deviceTypeClass}" style="white-space: nowrap; flex-shrink: 0;">${deviceTypeLabel}</span>
-                            </div>
+                            <h5 class="card-title">${escapeHtml(phone.name)}</h5>
                             
-                            <div class="spec-info">
+                            <div class="info-row">
                                 <small><strong>${escapeHtml(phone.brand)}</strong></small>
-                                ${phone.year ? `<small>${escapeHtml(phone.year)}</small>` : ''}
-                                ${phone.price ? `<small>$${parseFloat(phone.price).toFixed(2)}</small>` : ''}
+                                <span class="badge bg-primary" style="width: fit-content;">${phone.year || 'N/A'}</span>
                             </div>
 
-                            <span class="badge ${badgeClass} d-inline-block">${escapeHtml(phone.availability)}</span>
-
-                            <div class="spec-info">
-                                ${phone.ram ? `<small><i class="fas fa-memory"></i> ${escapeHtml(phone.ram)}</small>` : ''}
-                                ${phone.storage ? `<small><i class="fas fa-hdd"></i> ${escapeHtml(phone.storage)}</small>` : ''}
-                                ${phone.display_size ? `<small><i class="fas fa-desktop"></i> ${escapeHtml(String(phone.display_size).replace(/"/g, ''))}\"</small>` : ''}
+                            <div class="info-row">
+                                <small>💰 ${phone.price ? '$' + parseFloat(phone.price).toFixed(0) : 'N/A'}</small>
+                                <span class="badge bg-success d-inline-block">${escapeHtml(phone.availability)}</span>
                             </div>
 
-                            <div class="spec-info">
-                                <small><i class="fas fa-eye"></i> ${phone.view_count}</small>
-                                <small><i class="fas fa-comments"></i> ${phone.comment_count}</small>
+                            <div class="specs-grid">
+                                ${phone.ram ? `<div class="spec-item">📱 ${escapeHtml(phone.ram)}</div>` : ''}
+                                ${phone.storage ? `<div class="spec-item">💾 ${escapeHtml(phone.storage)}</div>` : ''}
+                                ${phone.display_size ? `<div class="spec-item">🖥️ ${escapeHtml(String(phone.display_size).replace(/"/g, ''))}\"</div>` : ''}
+                                ${phone.main_camera_resolution ? `<div class="spec-item">📷 ${isNaN(phone.main_camera_resolution) ? escapeHtml(phone.main_camera_resolution) : escapeHtml(phone.main_camera_resolution) + 'MP'}</div>` : ''}
+                            </div>
+
+                            <div class="info-row" style="margin-bottom: 0.3rem;">
+                                <small>👁️ ${phone.view_count}</small>
+                                <small>💬 ${phone.comment_count}</small>
                             </div>
 
                             <div class="btn-group mt-auto" role="group">
                                 <a href="edit_device.php?id=${phone.id}" class="btn btn-outline-primary btn-sm" title="Edit">
                                     <i class="fas fa-edit"></i>
                                 </a>
-                                <button type="button" class="btn btn-outline-info btn-sm" data-bs-toggle="modal" data-bs-target="#viewModal${index}" title="View details">
+                                <button type="button" class="btn btn-outline-info btn-sm" data-bs-toggle="modal" data-bs-target="#viewModal${index}" title="View">
                                     <i class="fas fa-eye"></i>
                                 </button>
                                 <a href="delete_phone.php?id=${phone.id}" class="btn btn-outline-danger btn-sm" onclick="return confirm('Delete this device?')" title="Delete">
