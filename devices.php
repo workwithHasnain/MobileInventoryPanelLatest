@@ -183,6 +183,7 @@ $device_type_filter = isset($_GET['device_type']) ? trim($_GET['device_type']) :
         let totalPages = 1;
         let currentSort = 'default';
         let gridElement = null;
+        let modalIndex = 0;
 
         function getFilterParams() {
             return new URLSearchParams({
@@ -193,7 +194,7 @@ $device_type_filter = isset($_GET['device_type']) ? trim($_GET['device_type']) :
             });
         }
 
-        function createDeviceCard(phone) {
+        function createDeviceCard(phone, index) {
             const isTablet = phone.display_size && parseFloat(phone.display_size) >= 7.0;
             const deviceTypeLabel = isTablet ? 'Tablet' : 'Phone';
             const deviceTypeClass = isTablet ? 'bg-info' : 'bg-primary';
@@ -214,34 +215,111 @@ $device_type_filter = isset($_GET['device_type']) ? trim($_GET['device_type']) :
                     break;
             }
 
-            let imageHtml = phone.image 
-                ? `<img src="${escapeHtml(phone.image)}" class="card-img-top" alt="${escapeHtml(phone.name)}" style="height: 120px; object-fit: cover;">`
-                : `<div class="card-img-top d-flex align-items-center justify-content-center bg-light" style="height: 120px;"><i class="fas fa-mobile-alt fa-2x text-muted"></i></div>`;
+            let imageHtml = phone.image ?
+                `<img src="${escapeHtml(phone.image)}" class="card-img-top" alt="${escapeHtml(phone.name)}" style="height: 250px; object-fit: cover;">` :
+                `<div class="card-img-top d-flex align-items-center justify-content-center bg-light" style="height: 250px;"><i class="fas fa-mobile-alt fa-3x text-muted"></i></div>`;
+
+            const mainCameraResolution = phone.main_camera_resolution ? (isNaN(phone.main_camera_resolution) ? phone.main_camera_resolution : phone.main_camera_resolution + ' MP') : '';
+            const batteryCapacity = phone.battery_capacity ? (isNaN(phone.battery_capacity) ? phone.battery_capacity : phone.battery_capacity + ' mAh') : '';
 
             return `
-                <div class="device-card">
+                <div class="device-card" data-device-index="${index}" data-device-views="${phone.view_count}" data-device-comments="${phone.comment_count}">
                     <div class="card h-100 shadow-sm">
                         ${imageHtml}
                         <div class="card-body d-flex flex-column">
-                            <div class="mb-1" style="flex-grow: 1;">
-                                <h6 class="card-title">${escapeHtml(phone.name)}</h6>
-                                <p style="margin-bottom: 0.25rem; font-size: 0.8rem;"><strong>${escapeHtml(phone.brand)}</strong></p>
+                            <div class="d-flex justify-content-between align-items-start mb-2">
+                                <h5 class="card-title mb-0">${escapeHtml(phone.name)}</h5>
+                                <span class="badge ${deviceTypeClass}">${deviceTypeLabel}</span>
                             </div>
-                            <div style="margin-bottom: 0.5rem;">
-                                <span class="badge ${deviceTypeClass}" style="font-size: 0.7rem; white-space: nowrap;">${deviceTypeLabel}</span>
-                                <span class="badge ${badgeClass}" style="font-size: 0.7rem;">${escapeHtml(phone.availability)}</span>
+                            <p class="card-text mb-3">
+                                <strong>Brand:</strong> ${escapeHtml(phone.brand)}<br>
+                                ${phone.year ? `<strong>Year:</strong> ${escapeHtml(phone.year)}<br>` : ''}
+                                ${phone.price ? `<strong>Price:</strong> $${parseFloat(phone.price).toFixed(2)}<br>` : '<strong>Price:</strong> <span class="text-muted">—</span><br>'}
+                            </p>
+
+                            <span class="badge ${badgeClass} mb-3">
+                                ${escapeHtml(phone.availability)}
+                            </span>
+
+                            <!-- Key Specifications -->
+                            <div class="mb-3">
+                                <small class="text-muted">
+                                    ${phone.ram ? `<i class="fas fa-memory"></i> ${escapeHtml(phone.ram)} RAM` : ''}
+                                    ${phone.storage ? `<i class="fas fa-hdd ms-2"></i> ${escapeHtml(phone.storage)}` : ''}
+                                    ${phone.display_size ? `<i class="fas fa-desktop ms-2"></i> ${escapeHtml(String(phone.display_size).replace(/"/g, ''))}\"` : ''}
+                                </small>
                             </div>
-                            <small class="text-muted" style="font-size: 0.75rem;">
-                                <i class="fas fa-eye"></i> ${phone.view_count} | 
-                                <i class="fas fa-comments"></i> ${phone.comment_count}
-                            </small>
-                            <div class="btn-group btn-group-sm mt-2" role="group">
-                                <a href="edit_device.php?id=${phone.id}" class="btn btn-outline-primary" title="Edit">
-                                    <i class="fas fa-edit"></i>
-                                </a>
-                                <a href="delete_phone.php?id=${phone.id}" class="btn btn-outline-danger" onclick="return confirm('Delete this device?')" title="Delete">
-                                    <i class="fas fa-trash"></i>
-                                </a>
+
+                            <!-- View and Comment Stats -->
+                            <div class="mb-3">
+                                <div class="d-flex justify-content-between">
+                                    <small class="text-muted">
+                                        <i class="fas fa-eye me-1"></i>${phone.view_count} views
+                                    </small>
+                                    <small class="text-muted">
+                                        <i class="fas fa-comments me-1"></i>${phone.comment_count} comments
+                                    </small>
+                                </div>
+                            </div>
+
+                            <!-- Action Buttons -->
+                            <div class="mt-auto">
+                                <div class="btn-group w-100" role="group">
+                                    <a href="edit_device.php?id=${phone.id}" class="btn btn-outline-primary btn-sm">
+                                        <i class="fas fa-edit"></i> Edit
+                                    </a>
+                                    <button type="button" class="btn btn-outline-info btn-sm" data-bs-toggle="modal" data-bs-target="#viewModal${index}">
+                                        <i class="fas fa-eye"></i> View
+                                    </button>
+                                    <a href="delete_phone.php?id=${phone.id}" class="btn btn-outline-danger btn-sm" onclick="return confirm('Are you sure you want to delete this device?')">
+                                        <i class="fas fa-trash"></i> Delete
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- View Modal for this device -->
+                <div class="modal fade" id="viewModal${index}" tabindex="-1" aria-hidden="true">
+                    <div class="modal-dialog modal-lg">
+                        <div class="modal-content">
+                            <div class="modal-header">
+                                <h5 class="modal-title">${escapeHtml(phone.name)}</h5>
+                                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                            </div>
+                            <div class="modal-body">
+                                <div class="row">
+                                    <div class="col-md-4">
+                                        ${imageHtml}
+                                    </div>
+                                    <div class="col-md-8">
+                                        <table class="table table-sm">
+                                            <tr>
+                                                <td><strong>Brand:</strong></td>
+                                                <td>${escapeHtml(phone.brand)}</td>
+                                            </tr>
+                                            ${phone.year ? `<tr><td><strong>Year:</strong></td><td>${escapeHtml(phone.year)}</td></tr>` : ''}
+                                            ${phone.price ? `<tr><td><strong>Price:</strong></td><td>$${parseFloat(phone.price).toFixed(2)}</td></tr>` : ''}
+                                            <tr>
+                                                <td><strong>Availability:</strong></td>
+                                                <td>${escapeHtml(phone.availability)}</td>
+                                            </tr>
+                                            ${phone.os ? `<tr><td><strong>OS:</strong></td><td>${escapeHtml(phone.os)}</td></tr>` : ''}
+                                            ${phone.chipset ? `<tr><td><strong>Chipset:</strong></td><td>${escapeHtml(phone.chipset)}</td></tr>` : ''}
+                                            ${phone.chipset_name ? `<tr><td><strong>Chipset:</strong></td><td>${escapeHtml(phone.chipset_name)}</td></tr>` : ''}
+                                            ${phone.ram ? `<tr><td><strong>RAM:</strong></td><td>${escapeHtml(phone.ram)}</td></tr>` : ''}
+                                            ${phone.storage ? `<tr><td><strong>Storage:</strong></td><td>${escapeHtml(phone.storage)}</td></tr>` : ''}
+                                            ${phone.display_size ? `<tr><td><strong>Display:</strong></td><td>${escapeHtml(String(phone.display_size))}\" ${phone.display_resolution ? escapeHtml(phone.display_resolution) : ''}</td></tr>` : ''}
+                                            ${mainCameraResolution ? `<tr><td><strong>Main Camera:</strong></td><td>${mainCameraResolution}</td></tr>` : ''}
+                                            ${batteryCapacity ? `<tr><td><strong>Battery:</strong></td><td>${batteryCapacity}</td></tr>` : ''}
+                                        </table>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="modal-footer">
+                                <a href="edit_device.php?id=${phone.id}" class="btn btn-primary">Edit Device</a>
+                                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
                             </div>
                         </div>
                     </div>
@@ -273,6 +351,7 @@ $device_type_filter = isset($_GET['device_type']) ? trim($_GET['device_type']) :
             if (pageNum === 1) {
                 container.innerHTML = '<div class="text-center py-5"><div class="spinner-border" role="status"><span class="visually-hidden">Loading...</span></div></div>';
                 gridElement = null;
+                modalIndex = 0;
             }
 
             fetch(`api_get_devices.php?${params.toString()}`)
@@ -298,9 +377,25 @@ $device_type_filter = isset($_GET['device_type']) ? trim($_GET['device_type']) :
                             document.getElementById('loadMoreContainer').style.display = 'none';
                         } else {
                             data.devices.forEach((phone) => {
+                                const cardHtml = createDeviceCard(phone, modalIndex);
+
+                                // Create temporary wrapper to separate card from modals
                                 const tempDiv = document.createElement('div');
-                                tempDiv.innerHTML = createDeviceCard(phone);
-                                gridElement.appendChild(tempDiv.firstElementChild);
+                                tempDiv.innerHTML = cardHtml;
+
+                                // Find and append the card (first element with device-card class)
+                                const card = tempDiv.querySelector('.device-card');
+                                if (card) {
+                                    gridElement.appendChild(card);
+                                }
+
+                                // Find and append any modal (modal elements)
+                                const modal = tempDiv.querySelector('.modal');
+                                if (modal) {
+                                    document.body.appendChild(modal);
+                                }
+
+                                modalIndex++;
                             });
 
                             if (pageNum === 1) {

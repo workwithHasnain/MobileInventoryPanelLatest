@@ -111,7 +111,7 @@ try {
     // Paginate
     $total_devices = count($filtered_phones);
     $total_pages = ceil($total_devices / $per_page);
-    
+
     // Ensure page is valid
     if ($page > $total_pages && $total_pages > 0) {
         $page = $total_pages;
@@ -135,4 +135,3 @@ try {
         'error' => $e->getMessage()
     ]);
 }
-?>

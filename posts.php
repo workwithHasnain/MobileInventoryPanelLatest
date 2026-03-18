@@ -183,17 +183,17 @@ include 'includes/header.php';
                 break;
         }
 
-        let imageHtml = post.featured_image 
-            ? `<img src="${escapeHtml(post.featured_image)}" alt="Featured" class="img-thumbnail" style="width: 60px; height: 60px; object-fit: cover;">`
-            : `<div class="bg-light d-flex align-items-center justify-content-center" style="width: 60px; height: 60px;"><i class="fas fa-image text-muted"></i></div>`;
+        let imageHtml = post.featured_image ?
+            `<img src="${escapeHtml(post.featured_image)}" alt="Featured" class="img-thumbnail" style="width: 60px; height: 60px; object-fit: cover;">` :
+            `<div class="bg-light d-flex align-items-center justify-content-center" style="width: 60px; height: 60px;"><i class="fas fa-image text-muted"></i></div>`;
 
-        const deleteBtn = userRole === 'admin' 
-            ? `<button type="button" class="btn btn-outline-danger btn-sm"
+        const deleteBtn = userRole === 'admin' ?
+            `<button type="button" class="btn btn-outline-danger btn-sm"
                 onclick="deletePost(${post.id}, '${escapeHtml(post.title)}')"
                 title="Delete">
                 <i class="fas fa-trash"></i>
-            </button>`
-            : '';
+            </button>` :
+            '';
 
         return `
             <tr>
