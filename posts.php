@@ -109,7 +109,7 @@ include 'includes/header.php';
                 </div>
             </div>
 
-            <!-- Posts Container (AJAX-populated) -->
+            <!-- Posts Table -->
             <div id="postsContainer">
                 <div class="text-center py-5">
                     <div class="spinner-border" role="status">
@@ -158,85 +158,15 @@ include 'includes/header.php';
     let currentPage = 1;
     let totalPages = 1;
     let currentSort = 'default';
-    let tableElement = null;
+    let allPosts = [];
     const userRole = '<?php echo htmlspecialchars($user_role); ?>';
 
     function getFilterParams() {
         return new URLSearchParams({
             search: document.getElementById('search').value,
             status: document.getElementById('status').value,
-            author: document.getElementById('category').value // Using category as author filter
+            author: document.getElementById('category').value
         });
-    }
-
-    function createPostRow(post) {
-        let statusClass = 'bg-secondary';
-        switch (post.status) {
-            case 'Published':
-                statusClass = 'bg-success';
-                break;
-            case 'Draft':
-                statusClass = 'bg-warning text-dark';
-                break;
-            case 'Archived':
-                statusClass = 'bg-secondary';
-                break;
-        }
-
-        let imageHtml = post.featured_image ?
-            `<img src="${escapeHtml(post.featured_image)}" alt="Featured" class="img-thumbnail" style="width: 60px; height: 60px; object-fit: cover;">` :
-            `<div class="bg-light d-flex align-items-center justify-content-center" style="width: 60px; height: 60px;"><i class="fas fa-image text-muted"></i></div>`;
-
-        const deleteBtn = userRole === 'admin' ?
-            `<button type="button" class="btn btn-outline-danger btn-sm"
-                onclick="deletePost(${post.id}, '${escapeHtml(post.title)}')"
-                title="Delete">
-                <i class="fas fa-trash"></i>
-            </button>` :
-            '';
-
-        return `
-            <tr>
-                <td>${imageHtml}</td>
-                <td>
-                    <div class="d-flex align-items-start">
-                        <div class="flex-grow-1">
-                            <strong>${escapeHtml(post.title)}</strong>
-                            <br><small class="text-muted">${escapeHtml(post.slug)}</small>
-                            ${post.description ? '<br><small class="text-muted">' + escapeHtml(post.description.substring(0, 80)) + '...</small>' : ''}
-                        </div>
-                    </div>
-                </td>
-                <td>${escapeHtml(post.author)}</td>
-                <td><span class="badge ${statusClass}">${escapeHtml(post.status)}</span></td>
-                <td></td>
-                <td>
-                    <div class="d-flex flex-column">
-                        <small class="text-muted mb-1">
-                            <i class="fas fa-eye me-1"></i>${post.view_count} views
-                        </small>
-                        <small class="text-muted">
-                            <i class="fas fa-comments me-1"></i>${post.comment_count} comments
-                        </small>
-                    </div>
-                </td>
-                <td>
-                    ${new Date(post.created_at).toLocaleDateString('en-US', {month: 'short', day: 'numeric', year: 'numeric'})}
-                    <br><small class="text-muted">${new Date(post.created_at).toLocaleTimeString('en-US', {hour: 'numeric', minute: '2-digit'})}</small>
-                </td>
-                <td>
-                    <div class="btn-group btn-group-sm">
-                        <a href="view_post.php?id=${post.id}" class="btn btn-outline-info" title="View">
-                            <i class="fas fa-eye"></i>
-                        </a>
-                        <a href="edit_post.php?id=${post.id}" class="btn btn-outline-primary" title="Edit">
-                            <i class="fas fa-edit"></i>
-                        </a>
-                        ${deleteBtn}
-                    </div>
-                </td>
-            </tr>
-        `;
     }
 
     function escapeHtml(text) {
@@ -248,6 +178,58 @@ include 'includes/header.php';
             "'": '&#039;'
         };
         return String(text).replace(/[&<>"']/g, m => map[m]);
+    }
+
+    function createTableRow(post) {
+        const statusClass = post.status === 'Published' ? 'bg-success' :
+            post.status === 'Draft' ? 'bg-warning text-dark' : 'bg-secondary';
+
+        const imageHtml = post.featured_image ?
+            `<img src="${escapeHtml(post.featured_image)}" alt="Featured" class="img-thumbnail" style="width: 60px; height: 60px; object-fit: cover;">` :
+            `<div class="bg-light d-flex align-items-center justify-content-center" style="width: 60px; height: 60px;"><i class="fas fa-image text-muted"></i></div>`;
+
+        const deleteBtn = userRole === 'admin' ?
+            `<button type="button" class="btn btn-outline-danger btn-sm" onclick="deletePost(${post.id}, '${escapeHtml(post.title)}')" title="Delete"><i class="fas fa-trash"></i></button>` :
+            '';
+
+        const row = document.createElement('tr');
+        row.setAttribute('data-post-views', post.view_count);
+        row.setAttribute('data-post-comments', post.comment_count);
+        row.setAttribute('data-post-date', new Date(post.created_at).getTime());
+
+        row.innerHTML = `
+            <td>${imageHtml}</td>
+            <td>
+                <div class="d-flex align-items-start">
+                    <div class="flex-grow-1">
+                        <strong>${escapeHtml(post.title)}</strong>
+                        <br><small class="text-muted">${escapeHtml(post.slug)}</small>
+                        ${post.short_description ? '<br><small class="text-muted">' + escapeHtml(post.short_description.substring(0, 80)) + '...</small>' : ''}
+                    </div>
+                </div>
+            </td>
+            <td>${escapeHtml(post.author)}</td>
+            <td><span class="badge ${statusClass}">${escapeHtml(post.status)}</span></td>
+            <td></td>
+            <td>
+                <div class="d-flex flex-column">
+                    <small class="text-muted mb-1"><i class="fas fa-eye me-1"></i>${post.view_count} views</small>
+                    <small class="text-muted"><i class="fas fa-comments me-1"></i>${post.comment_count} comments</small>
+                </div>
+            </td>
+            <td>
+                ${new Date(post.created_at).toLocaleDateString('en-US', {month: 'short', day: 'numeric', year: 'numeric'})}
+                <br><small class="text-muted">${new Date(post.created_at).toLocaleTimeString('en-US', {hour: 'numeric', minute: '2-digit'})}</small>
+            </td>
+            <td>
+                <div class="btn-group btn-group-sm">
+                    <a href="view_post.php?id=${post.id}" class="btn btn-outline-info" title="View"><i class="fas fa-eye"></i></a>
+                    <a href="edit_post.php?id=${post.id}" class="btn btn-outline-primary" title="Edit"><i class="fas fa-edit"></i></a>
+                    ${deleteBtn}
+                </div>
+            </td>
+        `;
+        return row;
     }
 
     function loadPosts(pageNum = 1, sort = 'default') {
@@ -262,7 +244,7 @@ include 'includes/header.php';
 
         if (pageNum === 1) {
             container.innerHTML = '<div class="text-center py-5"><div class="spinner-border" role="status"><span class="visually-hidden">Loading...</span></div></div>';
-            tableElement = null;
+            allPosts = [];
         }
 
         fetch(`api_get_posts.php?${params.toString()}`)
@@ -272,62 +254,19 @@ include 'includes/header.php';
                     totalPages = data.total_pages;
 
                     if (pageNum === 1) {
-                        tableElement = document.createElement('div');
-                        tableElement.className = 'card';
-                        tableElement.innerHTML = `
-                            <div class="card-body">
-                                <div class="table-responsive">
-                                    <table class="table table-hover" id="postsTable">
-                                        <thead>
-                                            <tr>
-                                                <th>Featured Image</th>
-                                                <th>Title</th>
-                                                <th>Author</th>
-                                                <th>Status</th>
-                                                <th>Categories</th>
-                                                <th>Stats</th>
-                                                <th>Publish Date</th>
-                                                <th>Actions</th>
-                                            </tr>
-                                        </thead>
-                                        <tbody id="postsTableBody"></tbody>
-                                    </table>
-                                </div>
-                            </div>
-                        `;
-                    }
-
-                    if (data.posts.length === 0 && pageNum === 1) {
-                        container.innerHTML = `
-                            <div class="text-center py-5">
-                                <i class="fas fa-newspaper fa-3x text-muted mb-3"></i>
-                                <h4 class="text-muted">No posts found</h4>
-                                <p class="text-muted">Try adjusting your search filters</p>
-                                <a href="posts.php" class="btn btn-outline-primary">Show All Posts</a>
-                            </div>
-                        `;
-                        document.getElementById('loadMoreContainer').style.display = 'none';
+                        allPosts = data.posts;
+                        renderTable(data.posts);
                     } else {
-                        const tbody = tableElement.querySelector('#postsTableBody');
-                        data.posts.forEach((post) => {
-                            const tempDiv = document.createElement('div');
-                            tempDiv.innerHTML = createPostRow(post);
-                            tbody.appendChild(tempDiv.firstElementChild);
-                        });
-
-                        if (pageNum === 1) {
-                            container.innerHTML = '';
-                            container.appendChild(tableElement);
-                        }
-
-                        const shownCount = Math.min(pageNum * 50, data.total);
-                        document.getElementById('postsCountShown').textContent = shownCount;
-                        document.getElementById('postsCountTotal').textContent = data.total;
-                        document.getElementById('currentPage').textContent = pageNum;
-                        document.getElementById('totalPages').textContent = totalPages;
-
-                        document.getElementById('loadMoreContainer').style.display = pageNum < totalPages ? 'block' : 'none';
+                        allPosts = allPosts.concat(data.posts);
+                        addRowsToTable(data.posts);
                     }
+
+                    document.getElementById('postsCountShown').textContent = Math.min(pageNum * 50, data.total);
+                    document.getElementById('postsCountTotal').textContent = data.total;
+                    document.getElementById('currentPage').textContent = pageNum;
+                    document.getElementById('totalPages').textContent = totalPages;
+
+                    document.getElementById('loadMoreContainer').style.display = pageNum < totalPages ? 'block' : 'none';
                 }
             })
             .catch(error => {
@@ -338,12 +277,80 @@ include 'includes/header.php';
             });
     }
 
+    function renderTable(posts) {
+        const container = document.getElementById('postsContainer');
+        const table = document.createElement('div');
+        table.className = 'card';
+        table.innerHTML = `
+            <div class="card-body">
+                <div class="table-responsive">
+                    <table class="table table-hover" id="postsTable">
+                        <thead>
+                            <tr>
+                                <th>Featured Image</th>
+                                <th>Title</th>
+                                <th>Author</th>
+                                <th>Status</th>
+                                <th>Categories</th>
+                                <th>Stats</th>
+                                <th>Publish Date</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody id="postsTableBody"></tbody>
+                    </table>
+                </div>
+            </div>
+        `;
+
+        if (posts.length === 0) {
+            container.innerHTML = `
+                <div class="text-center py-5">
+                    <i class="fas fa-newspaper fa-3x text-muted mb-3"></i>
+                    <h4 class="text-muted">No posts found</h4>
+                    <p class="text-muted">Try adjusting your search filters</p>
+                    <a href="posts.php" class="btn btn-outline-primary">Show All Posts</a>
+                </div>
+            `;
+            document.getElementById('loadMoreContainer').style.display = 'none';
+        } else {
+            container.innerHTML = '';
+            container.appendChild(table);
+            addRowsToTable(posts);
+        }
+    }
+
+    function addRowsToTable(posts) {
+        const tbody = document.getElementById('postsTableBody');
+        posts.forEach(post => {
+            tbody.appendChild(createTableRow(post));
+        });
+    }
+
     document.getElementById('postSorter').addEventListener('change', function() {
-        loadPosts(1, this.value);
+        const sortValue = this.value;
+        const tbody = document.getElementById('postsTableBody');
+        if (!tbody) return;
+
+        const rows = Array.from(tbody.querySelectorAll('tr[data-post-views]'));
+
+        if (sortValue === 'default') {
+            rows.sort((a, b) => parseInt(b.getAttribute('data-post-date')) - parseInt(a.getAttribute('data-post-date')));
+        } else if (sortValue === 'views-desc') {
+            rows.sort((a, b) => parseInt(b.getAttribute('data-post-views')) - parseInt(a.getAttribute('data-post-views')));
+        } else if (sortValue === 'views-asc') {
+            rows.sort((a, b) => parseInt(a.getAttribute('data-post-views')) - parseInt(b.getAttribute('data-post-views')));
+        } else if (sortValue === 'comments-desc') {
+            rows.sort((a, b) => parseInt(b.getAttribute('data-post-comments')) - parseInt(a.getAttribute('data-post-comments')));
+        } else if (sortValue === 'comments-asc') {
+            rows.sort((a, b) => parseInt(a.getAttribute('data-post-comments')) - parseInt(b.getAttribute('data-post-comments')));
+        }
+
+        rows.forEach(row => tbody.appendChild(row));
     });
 
     document.getElementById('loadMoreBtn').addEventListener('click', function() {
-        loadPosts(currentPage + 1, currentSort);
+        loadPosts(currentPage + 1, 'default');
     });
 
     // Auto-dismiss alerts after 5 seconds
