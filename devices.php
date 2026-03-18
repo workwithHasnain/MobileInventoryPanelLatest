@@ -21,7 +21,7 @@ $device_type_filter = isset($_GET['device_type']) ? trim($_GET['device_type']) :
         #devicesGrid {
             display: grid;
             grid-template-columns: repeat(10, 1fr);
-            gap: 0.5rem;
+            gap: 2.5rem;
         }
 
         @media (max-width: 1400px) {
@@ -51,7 +51,7 @@ $device_type_filter = isset($_GET['device_type']) ? trim($_GET['device_type']) :
         }
 
         .device-card .card-img-top {
-            height: 130px;
+            height: 100%;
             object-fit: cover;
         }
 
