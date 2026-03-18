@@ -73,7 +73,7 @@ try {
             p.status,
             COALESCE((SELECT COUNT(*) FROM content_views 
                      WHERE content_type = 'post' AND CAST(p.id AS VARCHAR) = content_id), 0) as view_count,
-            COALESCE((SELECT COUNT(*) FROM device_comments 
+            COALESCE((SELECT COUNT(*) FROM post_comments 
                      WHERE post_id = p.id), 0) as comment_count
         FROM posts p
         $where_clause
