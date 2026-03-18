@@ -52,10 +52,10 @@ $maxPrice = count($prices) > 0 ? max($prices) : 0;
 $topViewedDevices = [];
 try {
     $pdo = getConnection();
-    $query = "SELECT dv.device_id, p.name, p.slug, COUNT(*) as view_count 
+    $query = "SELECT p.id, p.name, p.slug, COUNT(dv.id) as view_count 
               FROM device_views dv 
-              LEFT JOIN phones p ON dv.device_id = p.id::text 
-              GROUP BY dv.device_id, p.name, p.slug 
+              INNER JOIN phones p ON dv.device_id = p.id::text 
+              GROUP BY p.id, p.name, p.slug 
               ORDER BY view_count DESC 
               LIMIT 10";
     $stmt = $pdo->query($query);
@@ -69,11 +69,11 @@ try {
 $topViewedPosts = [];
 try {
     $pdo = getConnection();
-    $query = "SELECT cv.content_id, p.title, p.slug, COUNT(*) as view_count 
+    $query = "SELECT p.id, p.title, p.slug, COUNT(cv.id) as view_count 
               FROM content_views cv 
-              LEFT JOIN posts p ON cv.content_id = p.id::text 
+              INNER JOIN posts p ON cv.content_id = p.id::text 
               WHERE cv.content_type = 'post' 
-              GROUP BY cv.content_id, p.title, p.slug 
+              GROUP BY p.id, p.title, p.slug 
               ORDER BY view_count DESC 
               LIMIT 10";
     $stmt = $pdo->query($query);
@@ -410,10 +410,10 @@ if (isset($_SESSION['success_message'])) {
                                         <?php
                                         $maxViews = max(array_column($topViewedDevices, 'view_count'));
                                         foreach ($topViewedDevices as $device):
-                                            $deviceUrl = !empty($device['slug']) ? '/device/' . htmlspecialchars($device['slug']) : '#';
+                                            $deviceUrl = '/device/' . htmlspecialchars($device['slug']);
                                         ?>
                                             <tr style="cursor: pointer;" onclick="window.location.href='<?php echo $deviceUrl; ?>';">
-                                                <td><strong><?php echo htmlspecialchars($device['name'] ?? 'Unknown Device'); ?></strong></td>
+                                                <td><strong><?php echo htmlspecialchars($device['name']); ?></strong></td>
                                                 <td><?php echo $device['view_count']; ?></td>
                                                 <td>
                                                     <div class="progress" style="height: 20px;">
@@ -459,10 +459,10 @@ if (isset($_SESSION['success_message'])) {
                                         <?php
                                         $maxPostViews = max(array_column($topViewedPosts, 'view_count'));
                                         foreach ($topViewedPosts as $post):
-                                            $postUrl = !empty($post['slug']) ? '/post/' . htmlspecialchars($post['slug']) : '#';
+                                            $postUrl = '/post/' . htmlspecialchars($post['slug']);
                                         ?>
                                             <tr style="cursor: pointer;" onclick="window.location.href='<?php echo $postUrl; ?>';">
-                                                <td><strong><?php echo htmlspecialchars($post['title'] ?? 'Unknown Post'); ?></strong></td>
+                                                <td><strong><?php echo htmlspecialchars($post['title']); ?></strong></td>
                                                 <td><?php echo $post['view_count']; ?></td>
                                                 <td>
                                                     <div class="progress" style="height: 20px;">
