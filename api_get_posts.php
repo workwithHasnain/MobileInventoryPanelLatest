@@ -7,6 +7,7 @@ try {
     $page = isset($_GET['page']) ? max(1, (int)$_GET['page']) : 1;
     $sort = isset($_GET['sort']) ? $_GET['sort'] : 'default';
     $search = isset($_GET['search']) ? trim($_GET['search']) : '';
+    $status = isset($_GET['status']) ? trim($_GET['status']) : '';
     $per_page = 50;
 
     $pdo = getConnection();
@@ -22,11 +23,10 @@ try {
         $params[] = "%$search%";
     }
 
-    // Filter by author if provided
-    $author_filter = isset($_GET['author']) ? trim($_GET['author']) : '';
-    if (!empty($author_filter)) {
-        $where[] = "p.author ILIKE ?";
-        $params[] = "%$author_filter%";
+    // Status filter
+    if (!empty($status)) {
+        $where[] = "p.status = ?";
+        $params[] = $status;
     }
 
     $where_clause = !empty($where) ? 'WHERE ' . implode(' AND ', $where) : '';
@@ -35,30 +35,31 @@ try {
     $count_sql = "SELECT COUNT(*) as total FROM posts p $where_clause";
     $count_stmt = $pdo->prepare($count_sql);
     $count_stmt->execute($params);
-    $total = (int)$count_stmt->fetch(PDO::FETCH_ASSOC)['total'];
+    $result = $count_stmt->fetch(PDO::FETCH_ASSOC);
+    $total = $result ? (int)$result['total'] : 0;
     $total_pages = ceil($total / $per_page);
 
-    // Determine ORDER BY
+    // Determine ORDER BY - use CASE for complex sorting
     $order_by = 'ORDER BY p.created_at DESC';
     switch ($sort) {
         case 'views-desc':
-            $order_by = 'ORDER BY COALESCE(view_count, 0) DESC, p.created_at DESC';
+            $order_by = 'ORDER BY view_count DESC, p.created_at DESC';
             break;
         case 'views-asc':
-            $order_by = 'ORDER BY COALESCE(view_count, 0) ASC, p.created_at DESC';
+            $order_by = 'ORDER BY view_count ASC, p.created_at DESC';
             break;
         case 'comments-desc':
-            $order_by = 'ORDER BY COALESCE(comment_count, 0) DESC, p.created_at DESC';
+            $order_by = 'ORDER BY comment_count DESC, p.created_at DESC';
             break;
         case 'comments-asc':
-            $order_by = 'ORDER BY COALESCE(comment_count, 0) ASC, p.created_at DESC';
+            $order_by = 'ORDER BY comment_count ASC, p.created_at DESC';
             break;
         case 'default':
         default:
             $order_by = 'ORDER BY p.created_at DESC';
     }
 
-    // Get paginated posts
+    // Get paginated posts with view/comment counts inline
     $offset = ($page - 1) * $per_page;
     $sql = "
         SELECT 
@@ -70,33 +71,17 @@ try {
             p.author,
             p.created_at,
             p.status,
-            COALESCE(
-                (SELECT COUNT(*) FROM content_views 
-                 WHERE content_type = 'post' AND CAST(p.id AS VARCHAR) = content_id), 
-                0
-            ) as view_count,
-            COALESCE(
-                (SELECT COUNT(*) FROM device_comments 
-                 WHERE post_id = p.id), 
-                0
-            ) as comment_count
+            COALESCE((SELECT COUNT(*) FROM content_views 
+                     WHERE content_type = 'post' AND CAST(p.id AS VARCHAR) = content_id), 0) as view_count,
+            COALESCE((SELECT COUNT(*) FROM device_comments 
+                     WHERE post_id = p.id), 0) as comment_count
         FROM posts p
         $where_clause
         $order_by
-        LIMIT ? OFFSET ?
+        LIMIT $per_page OFFSET $offset
     ";
 
-    $stmt = $pdo->prepare($sql);
-    // Add limit and offset to params
-    $stmt->bindValue(count($params) + 1, $per_page, PDO::PARAM_INT);
-    $stmt->bindValue(count($params) + 2, $offset, PDO::PARAM_INT);
-
-    // Bind all search/filter params
-    foreach ($params as $i => $param) {
-        $stmt->bindValue($i + 1, $param);
-    }
-
-    $stmt->execute();
+    $stmt = $pdo->query($sql);
     $posts = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
     // Convert to proper format
