@@ -48,6 +48,41 @@ $avgPrice = count($prices) > 0 ? array_sum($prices) / count($prices) : 0;
 $minPrice = count($prices) > 0 ? min($prices) : 0;
 $maxPrice = count($prices) > 0 ? max($prices) : 0;
 
+// Top 10 Viewed Devices
+$topViewedDevices = [];
+try {
+    $pdo = getConnection();
+    $query = "SELECT dv.device_id, p.name, COUNT(*) as view_count 
+              FROM device_views dv 
+              LEFT JOIN phones p ON dv.device_id = p.id::text 
+              GROUP BY dv.device_id, p.name 
+              ORDER BY view_count DESC 
+              LIMIT 10";
+    $stmt = $pdo->query($query);
+    $topViewedDevices = $stmt->fetchAll(PDO::FETCH_ASSOC);
+} catch (Exception $e) {
+    error_log('Error fetching top viewed devices: ' . $e->getMessage());
+    $topViewedDevices = [];
+}
+
+// Top 10 Viewed Posts
+$topViewedPosts = [];
+try {
+    $pdo = getConnection();
+    $query = "SELECT cv.content_id, p.title, COUNT(*) as view_count 
+              FROM content_views cv 
+              LEFT JOIN posts p ON cv.content_id = p.id::text 
+              WHERE cv.content_type = 'post' 
+              GROUP BY cv.content_id, p.title 
+              ORDER BY view_count DESC 
+              LIMIT 10";
+    $stmt = $pdo->query($query);
+    $topViewedPosts = $stmt->fetchAll(PDO::FETCH_ASSOC);
+} catch (Exception $e) {
+    error_log('Error fetching top viewed posts: ' . $e->getMessage());
+    $topViewedPosts = [];
+}
+
 // Success message handling
 $success_message = '';
 if (isset($_SESSION['success_message'])) {
@@ -346,6 +381,102 @@ if (isset($_SESSION['success_message'])) {
                             <div class="text-center text-muted py-4">
                                 <i class="fas fa-calendar-alt fa-3x mb-3"></i>
                                 <p>No data available</p>
+                            </div>
+                        <?php endif; ?>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Top 10 Viewed Devices -->
+        <div class="row">
+            <div class="col-lg-6 mb-4">
+                <div class="card h-100">
+                    <div class="card-header">
+                        <h5 class="card-title mb-0"><i class="fas fa-eye me-2"></i>Top 10 Most Viewed Devices</h5>
+                    </div>
+                    <div class="card-body">
+                        <?php if (!empty($topViewedDevices)): ?>
+                            <div class="table-responsive">
+                                <table class="table table-sm">
+                                    <thead>
+                                        <tr>
+                                            <th>Device Name</th>
+                                            <th>Views</th>
+                                            <th>Popularity</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <?php 
+                                        $maxViews = max(array_column($topViewedDevices, 'view_count'));
+                                        foreach ($topViewedDevices as $device): ?>
+                                            <tr>
+                                                <td><strong><?php echo htmlspecialchars($device['name'] ?? 'Unknown Device'); ?></strong></td>
+                                                <td><?php echo $device['view_count']; ?></td>
+                                                <td>
+                                                    <div class="progress" style="height: 20px;">
+                                                        <div class="progress-bar bg-success" role="progressbar"
+                                                            style="width: <?php echo ($device['view_count'] / $maxViews) * 100; ?>%">
+                                                            <?php echo round(($device['view_count'] / $maxViews) * 100, 0); ?>%
+                                                        </div>
+                                                    </div>
+                                                </td>
+                                            </tr>
+                                        <?php endforeach; ?>
+                                    </tbody>
+                                </table>
+                            </div>
+                        <?php else: ?>
+                            <div class="text-center text-muted py-4">
+                                <i class="fas fa-eye-slash fa-3x mb-3"></i>
+                                <p>No view data available</p>
+                            </div>
+                        <?php endif; ?>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Top 10 Viewed Posts -->
+            <div class="col-lg-6 mb-4">
+                <div class="card h-100">
+                    <div class="card-header">
+                        <h5 class="card-title mb-0"><i class="fas fa-newspaper me-2"></i>Top 10 Most Viewed Posts</h5>
+                    </div>
+                    <div class="card-body">
+                        <?php if (!empty($topViewedPosts)): ?>
+                            <div class="table-responsive">
+                                <table class="table table-sm">
+                                    <thead>
+                                        <tr>
+                                            <th>Post Title</th>
+                                            <th>Views</th>
+                                            <th>Engagement</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <?php 
+                                        $maxPostViews = max(array_column($topViewedPosts, 'view_count'));
+                                        foreach ($topViewedPosts as $post): ?>
+                                            <tr>
+                                                <td><strong><?php echo htmlspecialchars($post['title'] ?? 'Unknown Post'); ?></strong></td>
+                                                <td><?php echo $post['view_count']; ?></td>
+                                                <td>
+                                                    <div class="progress" style="height: 20px;">
+                                                        <div class="progress-bar bg-info" role="progressbar"
+                                                            style="width: <?php echo ($post['view_count'] / $maxPostViews) * 100; ?>%">
+                                                            <?php echo round(($post['view_count'] / $maxPostViews) * 100, 0); ?>%
+                                                        </div>
+                                                    </div>
+                                                </td>
+                                            </tr>
+                                        <?php endforeach; ?>
+                                    </tbody>
+                                </table>
+                            </div>
+                        <?php else: ?>
+                            <div class="text-center text-muted py-4">
+                                <i class="fas fa-newspaper fa-3x mb-3"></i>
+                                <p>No post view data available</p>
                             </div>
                         <?php endif; ?>
                     </div>
