@@ -17,7 +17,7 @@ try {
 
     // Search filter
     if (!empty($search)) {
-        $where[] = "(p.title ILIKE ? OR p.description ILIKE ?)";
+        $where[] = "(p.title ILIKE ? OR p.short_description ILIKE ?)";
         $params[] = "%$search%";
         $params[] = "%$search%";
     }
@@ -65,7 +65,7 @@ try {
             p.id,
             p.title,
             p.slug,
-            p.description,
+            p.short_description,
             p.featured_image,
             p.author,
             p.created_at,
@@ -106,7 +106,7 @@ try {
             'id' => (int)$post['id'],
             'title' => $post['title'],
             'slug' => $post['slug'],
-            'description' => $post['description'],
+            'description' => $post['short_description'],
             'featured_image' => $post['featured_image'],
             'author' => $post['author'],
             'created_at' => $post['created_at'],
