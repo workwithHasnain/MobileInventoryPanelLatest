@@ -52,10 +52,11 @@ $maxPrice = count($prices) > 0 ? max($prices) : 0;
 $topViewedDevices = [];
 try {
     $pdo = getConnection();
-    $query = "SELECT p.id, p.name, p.slug, COUNT(dv.id) as view_count 
-              FROM device_views dv 
-              INNER JOIN phones p ON dv.device_id = p.id::text 
-              GROUP BY p.id, p.name, p.slug 
+    $query = "SELECT p.id, p.name, p.slug, b.name as brand_name, COUNT(cv.id) as view_count 
+              FROM phones p 
+              LEFT JOIN brands b ON p.brand_id = b.id
+              LEFT JOIN content_views cv ON CAST(p.id AS VARCHAR) = cv.content_id AND cv.content_type = 'device'
+              GROUP BY p.id, p.name, p.slug, b.name 
               ORDER BY view_count DESC 
               LIMIT 10";
     $stmt = $pdo->query($query);
@@ -70,9 +71,8 @@ $topViewedPosts = [];
 try {
     $pdo = getConnection();
     $query = "SELECT p.id, p.title, p.slug, COUNT(cv.id) as view_count 
-              FROM content_views cv 
-              INNER JOIN posts p ON cv.content_id = p.id::text 
-              WHERE cv.content_type = 'post' 
+              FROM posts p 
+              LEFT JOIN content_views cv ON CAST(p.id AS VARCHAR) = cv.content_id AND cv.content_type = 'post'
               GROUP BY p.id, p.title, p.slug 
               ORDER BY view_count DESC 
               LIMIT 10";
@@ -413,7 +413,7 @@ if (isset($_SESSION['success_message'])) {
                                             $deviceUrl = '/device/' . htmlspecialchars($device['slug']);
                                         ?>
                                             <tr style="cursor: pointer;" onclick="window.location.href='<?php echo $deviceUrl; ?>';">
-                                                <td><strong><?php echo htmlspecialchars($device['name']); ?></strong></td>
+                                                <td><strong><?php echo htmlspecialchars($device['brand_name'] . ' ' . $device['name']); ?></strong></td>
                                                 <td><?php echo $device['view_count']; ?></td>
                                                 <td>
                                                     <div class="progress" style="height: 20px;">
