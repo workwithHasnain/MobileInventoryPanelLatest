@@ -15,41 +15,20 @@ function getAbsoluteImagePath($imagePath, $base)
     return $base . ltrim($imagePath, '/');
 }
 
-// Get brand slug from URL
-$brandSlug = isset($_GET['slug']) ? trim($_GET['slug']) : '';
-
-if (empty($brandSlug)) {
-    header('Location: ' . $base . 'brands');
-    exit;
+// For redirects/consistency (no brand filtering needed)
+if (empty($_GET)) {
+    // Continue to show all rumored devices
 }
 
-// Convert slug to brand name pattern (replace hyphens with spaces for matching)
-$brandNamePattern = str_replace('-', ' ', $brandSlug);
-
-// Look up the brand by matching lowercased name
-$brand_stmt = $pdo->prepare("
-    SELECT * FROM brands WHERE LOWER(name) = LOWER(:name)
-");
-$brand_stmt->execute(['name' => $brandNamePattern]);
-$brandData = $brand_stmt->fetch();
-
-if (!$brandData) {
-    header('HTTP/1.0 404 Not Found');
-    include '404.php';
-    exit;
-}
-
-$brandName = $brandData['name'];
-$brandId = $brandData['id'];
-
-// Get all phones for this brand
+// Get all rumored phones across all brands
 $phones_stmt = $pdo->prepare("
-    SELECT id, name, image, slug
-    FROM phones
-    WHERE brand_id = :brand_id
-    ORDER BY name ASC
+    SELECT p.id, p.name, p.image, p.slug, b.name as brand_name
+    FROM phones p
+    LEFT JOIN brands b ON p.brand_id = b.id
+    WHERE p.availability = 'Rumored'
+    ORDER BY b.name ASC, p.name ASC
 ");
-$phones_stmt->execute(['brand_id' => $brandId]);
+$phones_stmt->execute();
 $phones = $phones_stmt->fetchAll();
 
 // Get top brands for sidebar (by device count)
@@ -122,19 +101,22 @@ function brandSlugFromName($name)
 
 <head>
     <!-- Google tag (gtag.js) -->
-<script async src="https://www.googletagmanager.com/gtag/js?id=G-2LDCSSMXJT"></script>
-<script>
-  window.dataLayer = window.dataLayer || [];
-  function gtag(){dataLayer.push(arguments);}
-  gtag('js', new Date());
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-2LDCSSMXJT"></script>
+    <script>
+        window.dataLayer = window.dataLayer || [];
 
-  gtag('config', 'G-2LDCSSMXJT');
-</script>
+        function gtag() {
+            dataLayer.push(arguments);
+        }
+        gtag('js', new Date());
+
+        gtag('config', 'G-2LDCSSMXJT');
+    </script>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <link rel="canonical" href="<?php echo $canonicalBase; ?>/brand/<?php echo htmlspecialchars(urlencode($brandSlug)); ?>" />
-    <meta name="description" content="Browse all <?php echo htmlspecialchars($brandName); ?> phones and devices on DevicesArena. View specifications, images, and pricing." />
-    <title><?php echo htmlspecialchars($brandName); ?> Phones - DevicesArena</title>
+    <link rel="canonical" href="<?php echo $canonicalBase; ?>/rumored" />
+    <meta name="description" content="Browse all upcoming and rumored phones on DevicesArena. Stay informed about devices that have not yet been released." />
+    <title>Rumored Phones - DevicesArena</title>
 
     <!-- Favicon & Icons -->
     <link rel="icon" type="image/png" sizes="32x32" href="<?php echo $base; ?>imges/icon-32.png">
@@ -156,8 +138,8 @@ function brandSlugFromName($name)
 
     <!-- Open Graph Meta Tags -->
     <meta property="og:site_name" content="DevicesArena">
-    <meta property="og:title" content="<?php echo htmlspecialchars($brandName); ?> Phones - DevicesArena">
-    <meta property="og:description" content="Browse all <?php echo htmlspecialchars($brandName); ?> phones and devices on DevicesArena.">
+    <meta property="og:title" content="Rumored Phones - DevicesArena">
+    <meta property="og:description" content="Browse all upcoming and rumored phones on DevicesArena.">
     <meta property="og:image" content="<?php echo $base; ?>imges/icon-256.png">
     <meta property="og:image:type" content="image/png">
     <meta property="og:image:width" content="256">
@@ -166,8 +148,8 @@ function brandSlugFromName($name)
 
     <!-- Twitter Card Meta Tags -->
     <meta name="twitter:card" content="summary">
-    <meta name="twitter:title" content="<?php echo htmlspecialchars($brandName); ?> Phones - DevicesArena">
-    <meta name="twitter:description" content="Browse all <?php echo htmlspecialchars($brandName); ?> phones and devices on DevicesArena.">
+    <meta name="twitter:title" content="Rumored Phones - DevicesArena">
+    <meta name="twitter:description" content="Browse all upcoming and rumored phones on DevicesArena.">
     <meta name="twitter:image" content="<?php echo $base; ?>imges/icon-256.png">
 
     <!-- PWA Manifest -->
@@ -191,8 +173,7 @@ function brandSlugFromName($name)
     <?php
     $breadcrumbItems = [
         ["@type" => "ListItem", "position" => 1, "name" => "Home", "item" => "https://www.devicesarena.com/"],
-        ["@type" => "ListItem", "position" => 2, "name" => "Brands", "item" => "https://www.devicesarena.com/brands"],
-        ["@type" => "ListItem", "position" => 3, "name" => htmlspecialchars($brandName), "item" => "https://www.devicesarena.com/brand/" . urlencode($brandSlug)]
+        ["@type" => "ListItem", "position" => 2, "name" => "Rumored Phones", "item" => "https://www.devicesarena.com/rumored"]
     ];
     ?>
     <script type="application/ld+json">
@@ -208,9 +189,9 @@ function brandSlugFromName($name)
         {
             "@context": "https://schema.org",
             "@type": "CollectionPage",
-            "name": "<?php echo htmlspecialchars($brandName); ?> Phones - DevicesArena",
-            "description": "Browse all <?php echo htmlspecialchars($brandName); ?> phones and devices on DevicesArena. View specifications, images, and pricing.",
-            "url": "https://www.devicesarena.com/brand/<?php echo urlencode($brandSlug); ?>",
+            "name": "Rumored Phones - DevicesArena",
+            "description": "Browse all upcoming and rumored phones on DevicesArena. Stay informed about devices that have not yet been released.",
+            "url": "https://www.devicesarena.com/rumored",
             "image": "https://www.devicesarena.com/imges/icon-256.png",
             "publisher": {
                 "@type": "Organization",
@@ -232,7 +213,7 @@ function brandSlugFromName($name)
         {
             "@context": "https://schema.org",
             "@type": "ItemList",
-            "name": "<?php echo htmlspecialchars($brandName); ?> Devices",
+            "name": "Rumored Phones",
             "numberOfItems": <?php echo count($phones); ?>,
             "itemListElement": [
                 <?php
@@ -398,8 +379,8 @@ function brandSlugFromName($name)
         <div class="row">
             <div class="col-lg-8 py-0" style="padding-left: 0; padding-right: 0; border: 1px solid #e0e0e0;">
                 <div class="brand-page-header">
-                    <h1><?php echo htmlspecialchars($brandName); ?> phones</h1>
-                    <div class="device-count"><?php echo count($phones); ?> devices</div>
+                    <h1>Rumored Phones</h1>
+                    <div class="device-count"><?php echo count($phones); ?> rumored devices</div>
                 </div>
                 <div class="device-grid">
                     <?php foreach ($phones as $phone):
@@ -408,8 +389,9 @@ function brandSlugFromName($name)
                             $imagePath = '/' . $imagePath;
                         }
                         $deviceSlug = $phone['slug'] ?? $phone['id'];
+                        $brandName = $phone['brand_name'] ?? 'Unknown';
                     ?>
-                        <a href="<?php echo $base; ?>device/<?php echo htmlspecialchars(urlencode($deviceSlug)); ?>" class="device-grid-item">
+                        <a href="<?php echo $base; ?>device/<?php echo htmlspecialchars(urlencode($deviceSlug)); ?>" class="device-grid-item" title="<?php echo htmlspecialchars($phone['name']); ?> - <?php echo htmlspecialchars($brandName); ?>">
                             <?php if ($imagePath): ?>
                                 <img src="<?php echo htmlspecialchars($imagePath); ?>" alt="<?php echo htmlspecialchars($phone['name']); ?>" onerror="this.style.display='none'">
                             <?php else: ?>
@@ -418,13 +400,14 @@ function brandSlugFromName($name)
                                 </div>
                             <?php endif; ?>
                             <span class="device-name"><?php echo htmlspecialchars($phone['name']); ?></span>
+                            <span class="device-brand" style="font-size: 0.75rem; color: #999; margin-top: 2px;"><?php echo htmlspecialchars($brandName); ?></span>
                         </a>
                     <?php endforeach; ?>
 
                     <?php if (empty($phones)): ?>
                         <div style="grid-column: 1 / -1; text-align: center; padding: 40px;">
                             <i class="fas fa-mobile-alt fa-3x text-muted mb-3"></i>
-                            <p class="text-muted">No devices available for <?php echo htmlspecialchars($brandName); ?></p>
+                            <p class="text-muted">No rumored devices available at this time</p>
                         </div>
                     <?php endif; ?>
                 </div>

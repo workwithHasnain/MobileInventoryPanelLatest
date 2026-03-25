@@ -47,6 +47,9 @@
     # Route for news.php: /news
     RewriteRule ^news/?$ news.php [L,QSA]
 
+    # Route for rumored.php: /rumored
+    RewriteRule ^rumored/?$ rumored.php [L,QSA]
+
     # Route for phonefinder.php: /phonefinder
     RewriteRule ^phonefinder/?$ phonefinder.php [L,QSA]
 
