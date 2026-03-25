@@ -44,6 +44,7 @@ if ($_POST) {
     $meta_description = trim($_POST['meta_description'] ?? '');
     $status = $_POST['status'] ?? 'Draft';
     $is_featured = isset($_POST['is_featured']) && $_POST['is_featured'] ? 1 : 0;
+    $is_news = isset($_POST['is_news']) && $_POST['is_news'] ? 1 : 0;
 
     // Validation
     if (empty($title)) {
@@ -108,7 +109,8 @@ if ($_POST) {
                 $new_filename = 'featured_' . time() . '_' . uniqid() . '.' . $file_extension;
                 $upload_path = $upload_dir . $new_filename;
 
-                if (move_uploaded_file($compressedPath, $upload_path)) {
+                // Use copy() for compressed files, move_uploaded_file() only works with original uploads
+                if (copy($compressedPath, $upload_path)) {
                     $featured_image = $upload_path;
                 } else {
                     $errors[] = "Failed to upload featured image.";
@@ -151,7 +153,8 @@ if ($_POST) {
                         $new_filename = 'gallery_' . time() . '_' . uniqid() . '.' . $file_extension;
                         $upload_path = $upload_dir . $new_filename;
 
-                        if (move_uploaded_file($compressedPath, $upload_path)) {
+                        // Use copy() for compressed files
+                        if (copy($compressedPath, $upload_path)) {
                             $media_gallery[] = $upload_path;
                         }
 
@@ -177,7 +180,7 @@ if ($_POST) {
     // If no errors, save the post
     if (empty($errors)) {
         try {
-            $stmt = $pdo->prepare("INSERT INTO posts (title, slug, author, publish_date, featured_image, short_description, content_body, media_gallery, categories, tags, meta_title, meta_description, status, is_featured) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)");
+            $stmt = $pdo->prepare("INSERT INTO posts (title, slug, author, publish_date, featured_image, short_description, content_body, media_gallery, categories, tags, meta_title, meta_description, status, is_featured, is_news) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)");
 
 
             // Convert PHP arrays to PostgreSQL array literal format
@@ -211,7 +214,8 @@ if ($_POST) {
                 $meta_title ?: $title,
                 $meta_description,
                 $status,
-                $is_featured
+                $is_featured,
+                $is_news
             ]);
 
             $success = "Post created successfully!";
@@ -476,6 +480,20 @@ include 'includes/header.php';
                                 </label>
                                 <div class="form-text">
                                     Featured posts will be highlighted on the Featured Posts page and given priority display.
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="mb-3">
+                            <div class="form-check">
+                                <input class="form-check-input" type="checkbox" id="is_news" name="is_news" value="1"
+                                    <?php echo isset($_POST['is_news']) && $_POST['is_news'] ? 'checked' : ''; ?>>
+                                <label class="form-check-label" for="is_news">
+                                    <i class="fas fa-newspaper text-info me-1"></i>
+                                    <strong>News Article</strong>
+                                </label>
+                                <div class="form-text">
+                                    Mark this post as a news article. News articles will appear on the News page and be treated as news content.
                                 </div>
                             </div>
                         </div>

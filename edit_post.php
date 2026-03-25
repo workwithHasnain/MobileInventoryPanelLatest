@@ -61,6 +61,7 @@ if ($_POST) {
     $meta_description = trim($_POST['meta_description'] ?? '');
     $status = $_POST['status'] ?? 'Draft';
     $is_featured = isset($_POST['is_featured']) && $_POST['is_featured'] ? 1 : 0;
+    $is_news = isset($_POST['is_news']) && $_POST['is_news'] ? 1 : 0;
 
     // Validation
     if (empty($title)) {
@@ -125,7 +126,8 @@ if ($_POST) {
                 $new_filename = 'featured_' . time() . '_' . uniqid() . '.' . $file_extension;
                 $upload_path = $upload_dir . $new_filename;
 
-                if (move_uploaded_file($compressedPath, $upload_path)) {
+                // Use copy() for compressed files
+                if (copy($compressedPath, $upload_path)) {
                     // Delete old featured image if it exists
                     if (!empty($post['featured_image']) && file_exists($post['featured_image'])) {
                         unlink($post['featured_image']);
@@ -172,7 +174,8 @@ if ($_POST) {
                         $new_filename = 'gallery_' . time() . '_' . uniqid() . '.' . $file_extension;
                         $upload_path = $upload_dir . $new_filename;
 
-                        if (move_uploaded_file($compressedPath, $upload_path)) {
+                        // Use copy() for compressed files
+                        if (copy($compressedPath, $upload_path)) {
                             $media_gallery[] = $upload_path;
                         }
 
@@ -204,7 +207,7 @@ if ($_POST) {
             $old_was_published = ($old_status === 'Published');
             $new_will_be_published = ($status === 'Published');
 
-            $stmt = $pdo->prepare("UPDATE posts SET title = ?, slug = ?, author = ?, publish_date = ?, featured_image = ?, short_description = ?, content_body = ?, media_gallery = ?, categories = ?, tags = ?, meta_title = ?, meta_description = ?, status = ?, is_featured = ?, updated_at = CURRENT_TIMESTAMP WHERE id = ?");
+            $stmt = $pdo->prepare("UPDATE posts SET title = ?, slug = ?, author = ?, publish_date = ?, featured_image = ?, short_description = ?, content_body = ?, media_gallery = ?, categories = ?, tags = ?, meta_title = ?, meta_description = ?, status = ?, is_featured = ?, is_news = ?, updated_at = CURRENT_TIMESTAMP WHERE id = ?");
 
 
             // Convert PHP arrays to PostgreSQL array literal format
@@ -238,6 +241,7 @@ if ($_POST) {
                 $meta_description,
                 $status,
                 $is_featured,
+                $is_news,
                 $post_id
             ]);
 
@@ -562,6 +566,20 @@ include 'includes/header.php';
                                 </label>
                                 <div class="form-text">
                                     Featured posts will be highlighted on the Featured Posts page and given priority display.
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="mb-3">
+                            <div class="form-check">
+                                <input class="form-check-input" type="checkbox" id="is_news" name="is_news" value="1"
+                                    <?php echo (isset($_POST['is_news']) ? $_POST['is_news'] : ($post['is_news'] ?? false)) ? 'checked' : ''; ?>>
+                                <label class="form-check-label" for="is_news">
+                                    <i class="fas fa-newspaper text-info me-1"></i>
+                                    <strong>News Article</strong>
+                                </label>
+                                <div class="form-text">
+                                    Mark this post as a news article. News articles will appear on the News page and be treated as news content.
                                 </div>
                             </div>
                         </div>

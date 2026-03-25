@@ -44,6 +44,9 @@
     # Route for reviews.php: /reviews
     RewriteRule ^reviews/?$ reviews.php [L,QSA]
 
+    # Route for news.php: /news
+    RewriteRule ^news/?$ news.php [L,QSA]
+
     # Route for phonefinder.php: /phonefinder
     RewriteRule ^phonefinder/?$ phonefinder.php [L,QSA]
 

@@ -1,0 +1,967 @@
+<?php
+session_start();
+// Public home page - no authentication required
+require_once 'config.php';
+require_once 'database_functions.php';
+require_once 'phone_data.php';
+
+// Helper function to convert relative image paths to absolute
+function getAbsoluteImagePath($imagePath, $base)
+{
+    if (empty($imagePath)) return '';
+    if (filter_var($imagePath, FILTER_VALIDATE_URL)) return $imagePath;
+    if (strpos($imagePath, '/') === 0) return $imagePath;
+    return $base . ltrim($imagePath, '/');
+}
+
+// Get posts and devices for display (case-insensitive status check) with comment counts
+$pdo = getConnection();
+
+// Read search query (hero search bar)
+$q = trim($_GET['q'] ?? '');
+$tag = trim($_GET['tag'] ?? '');
+$isSearching = ($q !== '');
+$isTagFiltering = ($tag !== '');
+
+// Build posts list: default is published; if searching, filter by title/tags
+if ($isTagFiltering) {
+    $posts_stmt = $pdo->prepare("
+        SELECT p.*, 
+        (SELECT COUNT(*) FROM post_comments pc WHERE pc.post_id = p.id AND pc.status = 'approved') as comment_count
+        FROM posts p 
+        WHERE p.status ILIKE 'published'
+          AND p.is_news = true
+          AND EXISTS (
+              SELECT 1 FROM unnest(COALESCE(p.tags, ARRAY[]::varchar[])) t
+              WHERE t ILIKE ?
+          )
+        ORDER BY p.created_at DESC
+        LIMIT 20
+    ");
+    $posts_stmt->execute([$tag]);
+    $posts = $posts_stmt->fetchAll();
+} else if ($isSearching) {
+    $term = '%' . $q . '%';
+    $posts_stmt = $pdo->prepare("
+        SELECT p.*, 
+        (SELECT COUNT(*) FROM post_comments pc WHERE pc.post_id = p.id AND pc.status = 'approved') as comment_count
+        FROM posts p 
+        WHERE p.status ILIKE 'published'
+          AND p.is_news = true
+          AND (
+              p.title ILIKE ?
+              OR EXISTS (
+                  SELECT 1 FROM unnest(COALESCE(p.tags, ARRAY[]::varchar[])) t
+                  WHERE t ILIKE ?
+              )
+          )
+        ORDER BY p.created_at DESC
+        LIMIT 20
+    ");
+    $posts_stmt->execute([$term, $term]);
+    $posts = $posts_stmt->fetchAll();
+} else {
+    $posts_stmt = $pdo->prepare("
+        SELECT p.*, 
+        (SELECT COUNT(*) FROM post_comments pc WHERE pc.post_id = p.id AND pc.status = 'approved') as comment_count
+        FROM posts p 
+        WHERE p.status ILIKE 'published'
+          AND p.is_news = true
+        ORDER BY p.created_at DESC
+        LIMIT 20
+    ");
+    $posts_stmt->execute();
+    $posts = $posts_stmt->fetchAll();
+}
+
+// Get devices from database
+$devices = getAllPhones();
+$devices = array_slice($devices, 0, 6); // Limit to 6 devices for home page
+
+// Add comment counts to devices
+foreach ($devices as $index => $device) {
+    $comment_stmt = $pdo->prepare("SELECT COUNT(*) as count FROM device_comments WHERE device_id = CAST(? AS VARCHAR) AND status = 'approved'");
+    $comment_stmt->execute([$device['id']]);
+    $devices[$index]['comment_count'] = $comment_stmt->fetch()['count'] ?? 0;
+}
+
+// Get popular tags (top 8 most appearing in published posts)
+// Using PostgreSQL unnest() for efficient array handling
+$popularTags = [];
+try {
+    $stmt = $pdo->prepare("
+        SELECT tag, COUNT(*) as count
+        FROM (
+            SELECT DISTINCT unnest(tags) as tag
+            FROM posts 
+            WHERE status ILIKE 'published'
+            AND is_news = true
+            AND tags IS NOT NULL 
+            AND array_length(tags, 1) > 0
+        ) tag_list
+        GROUP BY tag
+        ORDER BY count DESC
+        LIMIT 8
+    ");
+    $stmt->execute();
+    $tagResults = $stmt->fetchAll(PDO::FETCH_ASSOC);
+
+    foreach ($tagResults as $row) {
+        $popularTags[$row['tag']] = $row['count'];
+    }
+} catch (Exception $e) {
+    $popularTags = [];
+}
+
+// Get data for the three tables
+$topViewedDevices = [];
+$topReviewedDevices = [];
+$topComparisons = [];
+
+// Get top comparisons from database
+try {
+    $topComparisons = getPopularComparisons(10);
+} catch (Exception $e) {
+    $topComparisons = [];
+}
+
+// Get top viewed devices
+try {
+    $stmt = $pdo->prepare("
+        SELECT p.*, b.name as brand_name, COUNT(cv.id) as view_count
+        FROM phones p 
+        LEFT JOIN brands b ON p.brand_id = b.id
+        LEFT JOIN content_views cv ON CAST(p.id AS VARCHAR) = cv.content_id AND cv.content_type = 'device'
+        GROUP BY p.id, b.name
+        ORDER BY view_count DESC
+        LIMIT 10
+    ");
+    $stmt->execute();
+    $topViewedDevices = $stmt->fetchAll();
+} catch (Exception $e) {
+    $topViewedDevices = [];
+}
+
+// Get top reviewed devices (by comment count)
+try {
+    $stmt = $pdo->prepare("
+        SELECT p.*, b.name as brand_name, COUNT(dc.id) as review_count
+        FROM phones p 
+        LEFT JOIN brands b ON p.brand_id = b.id
+        LEFT JOIN device_comments dc ON CAST(p.id AS VARCHAR) = dc.device_id AND dc.status = 'approved'
+        GROUP BY p.id, b.name
+        ORDER BY review_count DESC
+        LIMIT 10
+    ");
+    $stmt->execute();
+    $topReviewedDevices = $stmt->fetchAll();
+} catch (Exception $e) {
+    $topReviewedDevices = [];
+}
+$brands_stmt = $pdo->prepare("
+    SELECT b.*, COUNT(p.id) as device_count
+    FROM brands b
+    LEFT JOIN phones p ON b.id = p.brand_id
+    GROUP BY b.id, b.name, b.description, b.logo_url, b.website, b.created_at, b.updated_at
+    ORDER BY COUNT(p.id) DESC, b.name ASC
+    LIMIT 36
+");
+$brands_stmt->execute();
+$brands = $brands_stmt->fetchAll();
+
+// Get all brands alphabetically ordered - for modal
+$all_brands_stmt = $pdo->prepare("
+    SELECT * FROM brands
+    ORDER BY name ASC
+");
+$all_brands_stmt->execute();
+$allBrandsModal = $all_brands_stmt->fetchAll();
+
+// Get latest 9 devices for the new section
+$latestDevices = getAllPhones();
+$latestDevices = array_slice(array_reverse($latestDevices), 0, 9); // Get latest 9 devices
+
+
+?>
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <!-- Google tag (gtag.js) -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-2LDCSSMXJT"></script>
+    <script>
+        window.dataLayer = window.dataLayer || [];
+
+        function gtag() {
+            dataLayer.push(arguments);
+        }
+        gtag('js', new Date());
+
+        gtag('config', 'G-2LDCSSMXJT');
+    </script>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link rel="canonical" href="<?php echo $canonicalBase; ?>/news" />
+    <title>DevicesArena - Latest Tech News</title>
+
+    <!-- Favicon & Icons -->
+    <link rel="icon" type="image/png" sizes="32x32" href="<?php echo $base; ?>imges/icon-32.png">
+    <link rel="icon" type="image/png" sizes="256x256" href="<?php echo $base; ?>imges/icon-256.png">
+    <link rel="shortcut icon" href="<?php echo $base; ?>imges/icon-32.png">
+
+    <!-- Apple Touch Icon (iOS Home Screen) -->
+    <link rel="apple-touch-icon" href="<?php echo $base; ?>imges/icon-256.png">
+    <link rel="apple-touch-icon" sizes="256x256" href="<?php echo $base; ?>imges/icon-256.png">
+
+    <!-- Android Chrome Icons -->
+    <link rel="icon" type="image/png" sizes="192x192" href="<?php echo $base; ?>imges/icon-256.png">
+    <link rel="icon" type="image/png" sizes="512x512" href="<?php echo $base; ?>imges/icon-256.png">
+
+    <!-- Theme Color (Browser Chrome & Address Bar) -->
+    <meta name="theme-color" content="#1B2035">
+
+    <!-- Windows Tile Icon -->
+    <meta name="msapplication-TileColor" content="#1B2035">
+    <meta name="msapplication-TileImage" content="<?php echo $base; ?>imges/icon-256.png">
+
+    <!-- Open Graph Meta Tags (Social Media Sharing) -->
+    <meta property="og:site_name" content="DevicesArena">
+    <meta property="og:title" content="DevicesArena - Latest Technology News">
+    <meta property="og:description" content="Stay updated with the latest technology news, device announcements, and industry updates on DevicesArena.">
+    <meta property="og:image" content="<?php echo $base; ?>imges/icon-256.png">
+    <meta property="og:image:type" content="image/png">
+    <meta property="og:image:width" content="256">
+    <meta property="og:image:height" content="256">
+    <meta property="og:type" content="website">
+
+    <!-- Twitter Card Meta Tags -->
+    <meta name="twitter:card" content="summary">
+    <meta name="twitter:title" content="DevicesArena - Tech News">
+    <meta name="twitter:description" content="Latest technology news, device announcements, and industry updates.">
+    <meta name="twitter:image" content="<?php echo $base; ?>imges/icon-256.png">
+
+    <!-- PWA Manifest -->
+    <link rel="manifest" href="<?php echo $base; ?>manifest.json">
+
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/css/bootstrap.min.css" rel="stylesheet"
+        integrity="sha384-rbsA2VBKQhggwzxH7pPCaAqO46MgnOM80zW1RWuH61DGLwZJEdK2Kadq2F9CUG65" crossorigin="anonymous">
+    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.6/dist/umd/popper.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/js/bootstrap.bundle.min.js"
+        integrity="sha384-kenU1KFdBIe4zVF0s0G1M5b4hcpxyD9F7jL+jjXkk+Q2h455rYXK/7HAuoJl+0I4"
+        crossorigin="anonymous"></script>
+
+    <!-- Font Awesome (for icons) -->
+    <script src="https://kit.fontawesome.com/your-kit-code.js" crossorigin="anonymous"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" />
+
+
+    <link rel="stylesheet" href="<?php echo $base; ?>style.css">
+
+    <!-- Schema.org Structured Data for News Page -->
+    <!-- Breadcrumb Schema -->
+    <script type="application/ld+json">
+        {
+            "@context": "https://schema.org",
+            "@type": "BreadcrumbList",
+            "itemListElement": [{
+                    "@type": "ListItem",
+                    "position": 1,
+                    "name": "Home",
+                    "item": "https://www.devicesarena.com/"
+                },
+                {
+                    "@type": "ListItem",
+                    "position": 2,
+                    "name": "News",
+                    "item": "https://www.devicesarena.com/news"
+                }
+                <?php if ($isTagFiltering): ?>, {
+                        "@type": "ListItem",
+                        "position": 3,
+                        "name": "Tagged: <?php echo htmlspecialchars($tag); ?>",
+                        "item": "https://www.devicesarena.com/news?tag=<?php echo urlencode($tag); ?>"
+                    }
+                <?php elseif ($isSearching): ?>, {
+                        "@type": "ListItem",
+                        "position": 3,
+                        "name": "Search Results: <?php echo htmlspecialchars($q); ?>",
+                        "item": "https://www.devicesarena.com/news?q=<?php echo urlencode($q); ?>"
+                    }
+                <?php endif; ?>
+            ]
+        }
+    </script>
+
+    <!-- CollectionPage Schema for News Listing -->
+    <script type="application/ld+json">
+        {
+            "@context": "https://schema.org",
+            "@type": "CollectionPage",
+            "name": "<?php echo $isTagFiltering ? 'News Tagged: ' . htmlspecialchars($tag) : ($isSearching ? 'Search Results: ' . htmlspecialchars($q) : 'Technology News & Updates'); ?>",
+            "description": "<?php echo $isTagFiltering ? 'News articles tagged with ' . htmlspecialchars($tag) : ($isSearching ? 'Search results for ' . htmlspecialchars($q) : 'Latest technology news, device announcements, industry updates, and expert insights'); ?>",
+            "url": "https://www.devicesarena.com/news<?php echo $isTagFiltering ? '?tag=' . urlencode($tag) : ($isSearching ? '?q=' . urlencode($q) : ''); ?>",
+            "mainEntity": {
+                "@type": "ItemList",
+                "itemListElement": [
+                    <?php
+                    $itemCount = 0;
+                    foreach ($posts as $post):
+                        if ($itemCount >= 10) break; // Limit to 10 items in schema
+                        $itemCount++;
+                    ?> {
+                            "@type": "BlogPosting",
+                            "position": <?php echo $itemCount; ?>,
+                            "headline": "<?php echo addslashes(htmlspecialchars($post['title'])); ?>",
+                            "description": "<?php echo addslashes(htmlspecialchars(isset($post['excerpt']) && !empty($post['excerpt']) ? substr($post['excerpt'], 0, 160) : substr(strip_tags($post['content_body'] ?? ''), 0, 160))); ?>",
+                            "datePublished": "<?php echo date('Y-m-d', strtotime($post['created_at'])); ?>",
+                            "image": "<?php echo isset($post['featured_image']) && !empty($post['featured_image']) ? getAbsoluteImagePath($post['featured_image'], 'https://www.devicesarena.com/') : 'https://www.devicesarena.com/imges/icon-256.png'; ?>",
+                            "url": "https://www.devicesarena.com/post/<?php echo htmlspecialchars($post['slug']); ?>"
+                        }
+                        <?php echo $itemCount < count(array_slice($posts, 0, 10)) ? ',' : ''; ?>
+                    <?php endforeach; ?>
+                ]
+            }
+        }
+    </script>
+
+    <!-- Organization Schema for News Section -->
+    <script type="application/ld+json">
+        {
+            "@context": "https://schema.org",
+            "@type": "Organization",
+            "name": "DevicesArena News",
+            "url": "https://www.devicesarena.com/news",
+            "description": "Latest technology news, device announcements, industry updates, and expert analysis for smartphones, tablets, smartwatches, and other mobile devices."
+        }
+    </script>
+
+    <!-- FAQ Schema for News Pages -->
+    <script type="application/ld+json">
+        {
+            "@context": "https://schema.org",
+            "@type": "FAQPage",
+            "mainEntity": [{
+                    "@type": "Question",
+                    "name": "What types of news does DevicesArena cover?",
+                    "acceptedAnswer": {
+                        "@type": "Answer",
+                        "text": "DevicesArena covers comprehensive technology news including new device announcements, product launches, software updates, industry trends, technology breakthroughs, market analysis, manufacturer news, and expert commentary on the latest developments in smartphones, tablets, smartwatches, and other mobile devices."
+                    }
+                },
+                {
+                    "@type": "Question",
+                    "name": "How can I search for technology news?",
+                    "acceptedAnswer": {
+                        "@type": "Answer",
+                        "text": "You can use the search bar to find news articles by keywords, device names, brands, or topics. Simply enter what you're interested in, and our search will display all matching news articles and updates from our database."
+                    }
+                },
+                {
+                    "@type": "Question",
+                    "name": "What are tags and how do I use them to filter news?",
+                    "acceptedAnswer": {
+                        "@type": "Answer",
+                        "text": "Tags help organize news by topic, device category, or news type. You can click any tag to see all news articles related to that topic. Popular tags are displayed on the page, making it easy to explore news by specific categories like device launches, software updates, industry news, or manufacturer announcements."
+                    }
+                },
+                {
+                    "@type": "Question",
+                    "name": "How does DevicesArena cover technology news?",
+                    "acceptedAnswer": {
+                        "@type": "Answer",
+                        "text": "Our news coverage includes product announcements, launch events, software releases, performance benchmarks, industry analysis, expert commentary, market trends, manufacturer updates, and breaking technology news. We provide timely reporting and detailed insights on all major developments in the mobile technology space."
+                    }
+                },
+                {
+                    "@type": "Question",
+                    "name": "Where can I find related device information from news?",
+                    "acceptedAnswer": {
+                        "@type": "Answer",
+                        "text": "Many news articles include links to detailed device specifications, comparisons, and reviews. You can explore comprehensive device information, compare models mentioned in news articles, and access our detailed database of device specifications and features."
+                    }
+                },
+                {
+                    "@type": "Question",
+                    "name": "How often is technology news published?",
+                    "acceptedAnswer": {
+                        "@type": "Answer",
+                        "text": "We regularly publish breaking news and updates covering the latest technology announcements, device launches, software releases, and industry developments. Subscribe to our newsletter or check back frequently to stay updated with the latest tech news and industry insights."
+                    }
+                },
+                {
+                    "@type": "Question",
+                    "name": "Can I find historical technology news on DevicesArena?",
+                    "acceptedAnswer": {
+                        "@type": "Answer",
+                        "text": "Yes, our news archive includes both recent and historical technology news articles. You can explore past device announcements, industry milestones, software releases, and market trends. This allows you to understand the evolution of technology and find relevant context for current announcements."
+                    }
+                },
+                {
+                    "@type": "Question",
+                    "name": "Can I sort news by date or relevance?",
+                    "acceptedAnswer": {
+                        "@type": "Answer",
+                        "text": "News articles are displayed in order of publication (newest first), making it easy to find the latest technology updates and announcements. You can also use tags and search functionality to find news on specific devices, brands, or technology topics you're interested in."
+                    }
+                }
+            ]
+        }
+    </script>
+
+    <style>
+        /* Brand Modal Styling */
+        .brand-cell-modal {
+            background-color: #fff;
+            border: 1px solid #c5b6b0;
+            color: #5D4037;
+            font-weight: 500;
+            transition: all 0.3s ease;
+            cursor: pointer;
+            font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue';
+        }
+
+        .brand-cell-modal:hover {
+            background-color: #D7CCC8 !important;
+            border-color: #1B2035;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
+            color: #3E2723;
+        }
+
+        .brand-cell-modal:active {
+            transform: translateY(0);
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+
+        .brand-cell-modal:focus {
+            outline: none;
+            box-shadow: 0 0 0 3px rgba(141, 110, 99, 0.25);
+        }
+
+        #brandsModal .modal-dialog-scrollable {
+            max-height: 80vh;
+        }
+
+        /* Device Cell Modal Styling */
+        .device-cell-modal {
+            background-color: #fff;
+            border: 1px solid #c5b6b0;
+            color: #5D4037;
+            font-weight: 500;
+            transition: all 0.3s ease;
+            cursor: pointer;
+            font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue';
+        }
+
+        .device-cell-modal:hover {
+            background-color: #D7CCC8 !important;
+            border-color: #1B2035;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
+            color: #3E2723;
+        }
+
+        .device-cell-modal:active {
+            transform: translateY(0);
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+
+        .device-cell-modal:focus {
+            outline: none;
+            box-shadow: 0 0 0 3px rgba(141, 110, 99, 0.25);
+        }
+
+        #devicesModal .modal-dialog-scrollable {
+            max-height: 80vh;
+        }
+
+        .grid-colums {
+            background-color: #EEEEEE;
+            gap: 21px;
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            grid-template-rows: max-content;
+            height: max-content;
+        }
+
+        .anchor-card {
+            height: 300px;
+            /* margin-bottom: 40px; */
+        }
+
+        .review-card {
+            margin-top: 14px;
+        }
+
+        @media (max-width:786px) {
+            .grid-colums {
+                background-color: #EEEEEE;
+                display: block;
+                grid-template-columns: 1fr;
+
+            }
+
+        }
+    </style>
+    <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-4554952734894265"
+        crossorigin="anonymous"></script>
+</head>
+
+<body style="background-color: #EFEBE9;">
+    <!-- Desktop Navbar of Gsmarecn -->
+    <?php include 'includes/gsmheader.php'; ?>
+    <div class="container support content-wrapper" id="Top">
+        <div class="row">
+            <div class="col-md-8 col-5  d-lg-inline d-none col-12 " style="padding: 0px; position: relative;">
+                <div class="comfort-life position-absolute">
+                    <img class="w-100 h-100" src="<?php echo $base; ?>hero-images/news-hero.png"
+                        style="background-repeat: no-repeat; background-size: cover;" alt="">
+                    <div class="position-absolute d-flex mt-1 ml-2" style="top: 0; flex-wrap: wrap; gap: 8px;">
+                        <label class="text-white whitening">Popular Tags</label>
+                        <?php if (!empty($popularTags)): ?>
+                            <?php foreach ($popularTags as $tag => $count): ?>
+                                <a href="<?php echo $base; ?>news?tag=<?php echo urlencode($tag); ?>">
+                                    <button class="mobiles-button"><?php echo htmlspecialchars($tag); ?></button>
+                                </a>
+                            <?php endforeach; ?>
+                        <?php else: ?>
+                            <div class="no-tags">
+                                <span>No tags availble</span>
+                            </div>
+                        <?php endif; ?>
+                    </div>
+
+                    <form method="get" action="news.php" class="comon">
+                        <label for="hero-search-news" class="text-white whitening ">Search For</label>
+                        <input id="hero-search-news" name="q" type="text" class="bg-white" placeholder="Search news..." value="<?php echo htmlspecialchars($q ?? ''); ?>">
+                        <button type="submit" class="mobiles-button bg-grey">Search</button>
+                    </form>
+                </div>
+            </div>
+            <div class="col-md-4 col-5 d-none d-lg-block" style="position: relative; left: 0; padding: 0px;">
+                <button class="solid w-100 py-2">
+                    <i class="fa-solid fa-mobile fa-sm mx-2" style="color: white;"></i>
+                    Phone Finder</button>
+                <div class="devor">
+                    <?php
+                    if (empty($brands)): ?>
+                        <button class="px-3 py-1" style="cursor: default;" disabled>No brands available.</button>
+                        <?php else:
+                        $brandChunks = array_chunk($brands, 1); // Create chunks of 1 brand per row
+                        foreach ($brandChunks as $brandRow):
+                            foreach ($brandRow as $brand):
+                        ?>
+                                <button class="brand-cell brand-item-bold" style="cursor: pointer;" data-brand-id="<?php echo $brand['id']; ?>"><?php echo htmlspecialchars($brand['name']); ?></button>
+                    <?php
+                            endforeach;
+                        endforeach;
+                    endif;
+                    ?>
+                </div>
+                <div class="d-flex">
+                    <a href="<?php echo $base; ?>brands" class="solid w-50 py-2 text-center" style="text-decoration: none; color: white;">
+                        <i class="fa-solid fa-bars fa-sm mx-2"></i>
+                        All Brands</a>
+                    <button class="solid w-50 py-2">
+                        <i class="fa-solid fa-volume-high fa-sm mx-2"></i>
+                        RUMORS MILL</button>
+                </div>
+            </div>
+
+        </div>
+    </div>
+    <div class="container margin-top-4rem" style="border-left:1px solid #00000012;">
+        <div class="row">
+            <?php
+            if (empty($posts)):
+            ?>
+                <div class="col-12">
+                    <div class="alert alert-light border" role="alert">
+                        <?php if ($isTagFiltering): ?>
+                            No news articles found with tag "<?php echo htmlspecialchars($tag); ?>".
+                        <?php elseif ($isSearching): ?>
+                            No news articles found for "<?php echo htmlspecialchars($q); ?>".
+                        <?php else: ?>
+                            No news articles to show.
+                        <?php endif; ?>
+                    </div>
+                </div>
+            <?php
+            else:
+            ?>
+                <div class="col-lg-8 col-md-6 col-12 sentizer-erx grid-colums" id="posts-feed-container" style="background-color: #EEEEEE; margin-top: 4px;">
+                    <?php foreach ($posts as $post): ?>
+                        <a href="<?php echo $base; ?>post/<?php echo urlencode($post['slug']); ?>">
+                            <div class="review-card mb-4" style="cursor:pointer;" onclick="window.location.href='<?php echo $base; ?>post/<?php echo urlencode($post['slug']); ?>'">
+                                <?php if (isset($post['featured_image']) && !empty($post['featured_image'])): ?>
+                                    <img style="cursor:pointer;" onclick="window.location.href='<?php echo $base; ?>post/<?php echo urlencode($post['slug']); ?>'" src="<?php echo htmlspecialchars(getAbsoluteImagePath($post['featured_image'], $base)); ?>" alt="<?php echo htmlspecialchars($post['title']); ?>">
+                                <?php endif; ?>
+                                <div class="review-card-body">
+                                    <div style="cursor:pointer;" onclick="window.location.href='<?php echo $base; ?>post/<?php echo urlencode($post['slug']); ?>'" class="review-card-title"><?php echo htmlspecialchars($post['title']); ?></div>
+                                    <div class="review-card-meta">
+                                        <span><?php echo date('M j, Y', strtotime($post['created_at'])); ?></span>
+                                        <span><i class="bi bi-chat-dots-fill"></i><?php echo $post['comment_count']; ?> comments</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </a>
+                    <?php endforeach; ?>
+                    <div id="posts-load-more" class="text-center py-3" style="display: <?php echo count($posts) >= 20 ? 'block' : 'none'; ?>;">
+                        <div class="spinner-border spinner-border-sm text-muted" role="status"><span class="visually-hidden">Loading...</span></div>
+                        <span class="text-muted ms-2" style="font-size: 13px;">Loading more posts...</span>
+                    </div>
+                </div>
+            <?php
+            endif; ?>
+
+            <div class="col-lg-4 col-12 bg-white" style="margin-top: 18px;">
+                <?php include 'includes/latest-devices.php'; ?>
+                <?php include 'includes/comparisons-devices.php'; ?>
+                <?php include 'includes/topviewed-devices.php'; ?>
+                <?php include 'includes/topreviewed-devices.php'; ?>
+                <?php include 'includes/instoresnow-devices.php'; ?>
+            </div>
+        </div>
+    </div>
+    <?php include 'includes/gsmfooter.php'; ?>
+    <!-- Brands Modal -->
+    <div class="modal fade" id="brandsModal" tabindex="-1" aria-labelledby="brandsModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-lg modal-dialog-centered modal-dialog-scrollable">
+            <div class="modal-content" style="background-color: #EFEBE9; border: 2px solid #1B2035;">
+                <div class="modal-header" style="border-bottom: 1px solid #1B2035; background-color: #D7CCC8;">
+                    <h5 class="modal-title" id="brandsModalLabel" style="font-family:system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue'; color: #5D4037;">
+                        <i class="fas fa-industry me-2"></i>All Brands
+                    </h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="row">
+                        <?php if (!empty($allBrandsModal)): ?>
+                            <?php foreach ($allBrandsModal as $brand): ?>
+                                <div class="col-lg-4 col-md-6 col-sm-6 mb-3">
+                                    <button class="brand-cell-modal btn w-100 py-2 px-3" style="background-color: #fff; border: 1px solid #c5b6b0; color: #5D4037; font-weight: 500; transition: all 0.3s ease; cursor: pointer;" data-brand-id="<?php echo $brand['id']; ?>" onclick="selectBrandFromModal(<?php echo $brand['id']; ?>)">
+                                        <?php echo htmlspecialchars($brand['name']); ?>
+                                    </button>
+                                </div>
+                            <?php endforeach; ?>
+                        <?php else: ?>
+                            <div class="col-12">
+                                <div class="text-center py-5">
+                                    <i class="fas fa-industry fa-3x text-muted mb-3"></i>
+                                    <h6 class="text-muted">No brands available</h6>
+                                </div>
+                            </div>
+                        <?php endif; ?>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Devices Modal (Phones by Brand) -->
+    <div class="modal fade" id="devicesModal" tabindex="-1" aria-labelledby="deviceModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-lg modal-dialog-centered modal-dialog-scrollable">
+            <div class="modal-content" style="background-color: #EFEBE9; border: 2px solid #1B2035;">
+                <div class="modal-header" style="border-bottom: 1px solid #1B2035; background-color: #D7CCC8;">
+                    <h5 class="modal-title" id="deviceModalTitle" style="font-family:system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue'; color: #5D4037;">
+                        Devices
+                    </h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body" id="deviceModalBody">
+                    <div class="text-center py-5">
+                        <i class="fas fa-spinner fa-spin fa-2x text-muted"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <script>
+        // Handle clickable table rows for devices
+        document.addEventListener('DOMContentLoaded', function() {
+            // Handle device row clicks (for views and reviews tables)
+            document.querySelectorAll('.clickable-row').forEach(function(row) {
+                row.addEventListener('click', function() {
+                    const deviceId = this.getAttribute('data-device-id');
+                    if (deviceId) {
+                        // Track the view
+                        fetch('/track_device_view.php', {
+                            method: 'POST',
+                            headers: {
+                                'Content-Type': 'application/x-www-form-urlencoded',
+                            },
+                            body: 'device_id=' + encodeURIComponent(deviceId)
+                        });
+
+                        // Show device details modal
+                        showDeviceDetails(deviceId);
+                    }
+                });
+            });
+
+            // Handle device card clicks (for latest devices grid)
+            document.querySelectorAll('.device-card').forEach(function(card) {
+                card.addEventListener('click', function() {
+                    const deviceId = this.getAttribute('data-device-id');
+                    if (deviceId) {
+                        // Track the view
+                        fetch('/track_device_view.php', {
+                            method: 'POST',
+                            headers: {
+                                'Content-Type': 'application/x-www-form-urlencoded',
+                            },
+                            body: 'device_id=' + encodeURIComponent(deviceId)
+                        });
+
+                        // Show device details modal
+                        showDeviceDetails(deviceId);
+                    }
+                });
+            });
+
+            // Handle brand cell clicks (from sidebar and mobile menu - navigate to brand page)
+            document.querySelectorAll('.brand-cell').forEach(function(cell) {
+                cell.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    const brandName = this.textContent.trim().toLowerCase().replace(/\s+/g, '-');
+                    window.location.href = '<?php echo $base; ?>brand/' + encodeURIComponent(brandName);
+                });
+            });
+        });
+
+        // Show post details in modal
+        function showPostDetails(postId) {
+            fetch(`get_post_details.php?id=${postId}`)
+                .then(response => response.text())
+                .then(data => {
+                    window.location.href = `<?php echo $base; ?>post/${postId}`;
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                    alert('Failed to load post details');
+                });
+        }
+
+        // Show device details in modal
+        function showDeviceDetails(deviceId) {
+            fetch(`get_device_details.php?id=${deviceId}`)
+                .then(response => response.text())
+                .then(data => {
+                    window.location.href = `<?php echo $base; ?>device/${deviceId}`; // Will redirect to slug
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                    alert('Failed to load device details');
+                });
+        }
+
+
+
+        // Auto-dismiss alerts after 5 seconds
+        setTimeout(function() {
+            var alerts = document.querySelectorAll('.alert');
+            alerts.forEach(function(alert) {
+                var bsAlert = new bootstrap.Alert(alert);
+                bsAlert.close();
+            });
+        }, 5000);
+        // Show brands modal
+        function showBrandsModal() {
+            const modal = new bootstrap.Modal(document.getElementById('brandsModal'));
+            modal.show();
+        }
+
+        // Handle brand selection from modal
+        function selectBrandFromModal(brandId) {
+            // Close the brands modal
+            const brandsModal = bootstrap.Modal.getInstance(document.getElementById('brandsModal'));
+            if (brandsModal) {
+                brandsModal.hide();
+            }
+
+            // Fetch phones for this brand
+            fetch(`get_phones_by_brand.php?brand_id=${brandId}`)
+                .then(response => response.json())
+                .then(data => {
+                    // Populate the devices modal with phones
+                    displayPhonesModal(data, brandId);
+                })
+                .catch(error => {
+                    console.error('Error fetching phones:', error);
+                    alert('Failed to load phones');
+                });
+        }
+
+        // Display phones in modal
+        function displayPhonesModal(phones, brandId) {
+            const container = document.getElementById('deviceModalBody');
+            const titleElement = document.getElementById('deviceModalTitle');
+
+            // Update title with brand name
+            const brandButton = document.querySelector(`[data-brand-id="${brandId}"]`);
+            const brandName = brandButton ? brandButton.textContent.trim() : 'Brand';
+            titleElement.innerHTML = `<i class="fas fa-mobile-alt me-2"></i>${brandName} - Devices`;
+
+            if (phones && phones.length > 0) {
+                let html = '<div class="row">';
+                phones.forEach(phone => {
+                    // Convert relative image paths to absolute
+                    let imagePath = phone.image;
+                    if (imagePath && !imagePath.startsWith('/') && !imagePath.startsWith('http')) {
+                        imagePath = '/' + imagePath;
+                    }
+                    const phoneImage = imagePath ? `<img src="${imagePath}" alt="${phone.name}" style="width: 100%; max-width: 100%; height: 120px; object-fit: contain; margin: 8px; display: block;" onerror="this.style.display='none';">` : '';
+                    html += `
+          <div class="col-lg-4 col-md-6 col-sm-6 mb-3">
+            <button class="device-cell-modal btn w-100 p-0" style="background-color: #fff; border: 1px solid #c5b6b0; color: #5D4037; font-weight: 500; transition: all 0.3s ease; cursor: pointer; display: flex; flex-direction: column; align-items: center; overflow: hidden;" onclick="goToDevice('${phone.slug || phone.id}')">
+              ${phoneImage}
+              <span style="padding: 8px 10px; width: 100%; text-align: center; font-size: 0.95rem;">${phone.name}</span>
+            </button>
+          </div>
+        `;
+                });
+                html += '</div>';
+                container.innerHTML = html;
+            } else {
+                container.innerHTML = `
+        <div class="text-center py-5">
+          <i class="fas fa-mobile-alt fa-3x text-muted mb-3"></i>
+          <h6 class="text-muted">No devices available for this brand</h6>
+        </div>
+      `;
+            }
+
+            // Show devices modal
+            const devicesModal = new bootstrap.Modal(document.getElementById('devicesModal'));
+            devicesModal.show();
+        }
+
+        // Navigate to device page
+        function goToDevice(deviceSlugOrId) {
+            if (typeof deviceSlugOrId === 'string' && /[a-z-]/.test(deviceSlugOrId)) {
+                window.location.href = `device/${encodeURIComponent(deviceSlugOrId)}`;
+            } else {
+                window.location.href = `device/${deviceSlugOrId}`;
+            }
+        }
+
+        // Newsletter form AJAX handler
+        document.addEventListener('DOMContentLoaded', function() {
+            const form = document.getElementById('newsletter_form');
+            const messageContainer = document.getElementById('newsletter_message_container');
+            const emailInput = document.getElementById('newsletter_email');
+            const submitBtn = document.getElementById('newsletter_btn');
+
+            if (form) {
+                form.addEventListener('submit', function(e) {
+                    e.preventDefault();
+
+                    const email = emailInput.value.trim();
+                    const originalBtnText = submitBtn.textContent;
+
+                    if (!email) {
+                        showMessage('Please enter an email address.', 'error');
+                        return;
+                    }
+
+                    // Disable button and show loading state
+                    submitBtn.disabled = true;
+                    submitBtn.textContent = 'Subscribing...';
+
+                    // Send AJAX request
+                    fetch('/handle_newsletter.php', {
+                            method: 'POST',
+                            headers: {
+                                'Content-Type': 'application/x-www-form-urlencoded'
+                            },
+                            body: 'newsletter_email=' + encodeURIComponent(email)
+                        })
+                        .then(response => response.json())
+                        .then(data => {
+                            if (data.success) {
+                                showMessage(data.message, 'success');
+                                emailInput.value = '';
+                                // Auto-clear message after 5 seconds
+                                setTimeout(() => {
+                                    messageContainer.innerHTML = '';
+                                }, 5000);
+                            } else {
+                                showMessage(data.message, 'error');
+                            }
+                            submitBtn.disabled = false;
+                            submitBtn.textContent = originalBtnText;
+                        })
+                        .catch(error => {
+                            showMessage('An error occurred. Please try again.', 'error');
+                            submitBtn.disabled = false;
+                            submitBtn.textContent = originalBtnText;
+                        });
+                });
+
+                function showMessage(message, type) {
+                    const bgColor = type === 'success' ? '#4CAF50' : '#f44336';
+                    messageContainer.innerHTML = '<div style="background-color: ' + bgColor + '; color: white; padding: 12px; border-radius: 4px; margin-bottom: 12px; text-align: center; animation: slideIn 0.3s ease-in-out;">' + message + '</div>';
+
+                    // Add animation style
+                    if (!document.querySelector('style[data-newsletter]')) {
+                        const style = document.createElement('style');
+                        style.setAttribute('data-newsletter', 'true');
+                        style.textContent = '@keyframes slideIn { from { opacity: 0; transform: translateY(-10px); } to { opacity: 1; transform: translateY(0); } }';
+                        document.head.appendChild(style);
+                    }
+                }
+            }
+        });
+    </script>
+    <script src="<?php echo $base; ?>script.js"></script>
+    <script>
+        // Infinite scroll for posts feed
+        (function() {
+            let currentPage = 1;
+            let isLoading = false;
+            let hasMore = <?php echo count($posts) >= 20 ? 'true' : 'false'; ?>;
+            const container = document.getElementById('posts-feed-container');
+            const loader = document.getElementById('posts-load-more');
+            const searchParams = new URLSearchParams(window.location.search);
+
+            function loadMorePosts() {
+                if (isLoading || !hasMore || !container) return;
+                isLoading = true;
+                currentPage++;
+                if (loader) loader.style.display = 'block';
+
+                let url = '<?php echo $base; ?>load_posts.php?page=' + currentPage + '&type=all&format=review';
+                if (searchParams.get('q')) url += '&q=' + encodeURIComponent(searchParams.get('q'));
+                if (searchParams.get('tag')) url += '&tag=' + encodeURIComponent(searchParams.get('tag'));
+
+                fetch(url)
+                    .then(r => r.json())
+                    .then(data => {
+                        if (data.success && data.html) {
+                            if (loader) loader.insertAdjacentHTML('beforebegin', data.html);
+                            hasMore = data.hasMore;
+                        } else {
+                            hasMore = false;
+                        }
+                        if (!hasMore && loader) loader.style.display = 'none';
+                        isLoading = false;
+                    })
+                    .catch(() => {
+                        isLoading = false;
+                        if (loader) loader.style.display = 'none';
+                    });
+            }
+
+            window.addEventListener('scroll', function() {
+                if (!container) return;
+                const rect = container.getBoundingClientRect();
+                if (rect.bottom - window.innerHeight < 300) {
+                    loadMorePosts();
+                }
+            });
+        })();
+    </script>
+</body>
+
+</html>

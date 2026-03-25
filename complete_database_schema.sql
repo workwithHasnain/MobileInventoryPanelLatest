@@ -63,6 +63,7 @@ CREATE TABLE IF NOT EXISTS posts (
     meta_description TEXT,
     status VARCHAR(20) DEFAULT 'draft',
     is_featured BOOLEAN DEFAULT FALSE,
+    is_news BOOLEAN DEFAULT FALSE,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );

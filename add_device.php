@@ -69,7 +69,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                         $filename = 'device_' . time() . '_' . uniqid() . '_' . ($i + 1) . '.' . $file_extension;
                         $upload_path = 'uploads/' . $filename;
 
-                        if (move_uploaded_file($compressedPath, $upload_path)) {
+                        // Use copy() for compressed files
+                        if (copy($compressedPath, $upload_path)) {
                             $image_paths[] = $upload_path;
                         } else {
                             $errors['image' . ($i + 1)] = 'Failed to upload image ' . ($i + 1) . '. Please try again.';

@@ -45,12 +45,13 @@ function compressImageWithGD($tempFilePath, $jpegQuality = 75)
         }
 
         // Load image from file
+        // Suppress warnings about color profiles (iCCP warnings from libpng)
         if ($mimeType === 'image/jpeg') {
-            $image = imagecreatefromjpeg($tempFilePath);
+            $image = @imagecreatefromjpeg($tempFilePath);
         } elseif ($mimeType === 'image/png') {
-            $image = imagecreatefrompng($tempFilePath);
+            $image = @imagecreatefrompng($tempFilePath);
         } elseif ($mimeType === 'image/gif') {
-            $image = imagecreatefromgif($tempFilePath);
+            $image = @imagecreatefromgif($tempFilePath);
         } else {
             return $tempFilePath;
         }
