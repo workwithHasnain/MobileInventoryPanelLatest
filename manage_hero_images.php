@@ -14,7 +14,8 @@ $heroPages = [
     'contact' => 'Contact Us Page',
     'advertise' => 'Advertise With Us Page',
     'brands' => 'Brands Page',
-    'brand' => 'Brand Detail Page'
+    'brand' => 'Brand Detail Page',
+    'news' => 'News Page'
 ];
 
 $heroImagesDir = __DIR__ . '/hero-images/';
