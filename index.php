@@ -557,7 +557,7 @@ if ($_POST && isset($_POST['action'])) {
                     <a href="<?php echo $base; ?>brands" class="solid w-50 py-2 text-center" style="text-decoration: none; color: white;">
                         <i class="fa-solid fa-bars fa-sm mx-2"></i>
                         All Brands</a>
-                    <button class="solid w-50 py-2" style="width: 177px;">
+                    <button onclick="location.href='<?php echo $base; ?>rumored'" class="solid w-50 py-2" style="width: 177px;">
                         <i class="fa-solid fa-volume-high fa-sm mx-2"></i>
                         RUMORS MILL</button>
                 </div>

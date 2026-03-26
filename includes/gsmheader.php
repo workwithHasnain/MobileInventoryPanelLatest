@@ -469,7 +469,7 @@ $mobile_brands = $mobile_brands_stmt->fetchAll();
     </div>
     <div class="menu-buttons d-flex justify-content-center ">
         <button class="btn bg-white w-50 text-black" onclick="window.open('<?php echo $base; ?>phonefinder')">Phone Finder</button>
-        <button class="btn bg-white w-50 text-black">My Phone</button>
+        <button class="btn bg-white w-50 text-black" onclick="window.open('<?php echo $base; ?>rumored')">Rumors Mill</button>
     </div>
 </div>
 <!-- Display Menu of Gsmarecn -->
