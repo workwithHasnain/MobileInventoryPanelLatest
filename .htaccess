@@ -41,8 +41,8 @@
     RewriteRule ^post/([a-z0-9\-]+)/?$ post.php?slug=$1 [L,QSA]
 
     # Route for featured.php: /featured
-    RewriteRule ^featured/?$ featured.php [L,QSA]
     RewriteRule ^featured\.php/?$ /featured [R=301,L]
+    RewriteRule ^featured/?$ featured.php [L,QSA]
 
     # Route for reviews.php: /reviews
     RewriteRule ^reviews/?$ reviews.php [L,QSA]
