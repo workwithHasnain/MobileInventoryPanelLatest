@@ -87,6 +87,17 @@ $brands = $brands_stmt->fetchAll();
 <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/css/bootstrap.min.css" rel="stylesheet">
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css"/>
 <link rel="stylesheet" href="<?php echo $base; ?>redesign/style.css">
+
+<!-- Theme Initialization Script (Prevents FOUC) -->
+<script>
+  (function() {
+    var savedTheme = localStorage.getItem('da-theme');
+    if (savedTheme === 'light' || (!savedTheme && window.matchMedia('(prefers-color-scheme: light)').matches)) {
+      document.documentElement.setAttribute('data-theme', 'light');
+    }
+  })();
+</script>
+
 <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-4554952734894265" crossorigin="anonymous"></script>
 </head>
 <body>
@@ -123,6 +134,7 @@ $brands = $brands_stmt->fetchAll();
 
     <!-- Social -->
     <div class="da-social-icons">
+      <button class="da-theme-btn" id="da-theme-toggle" title="Toggle Theme" aria-label="Toggle Theme"><i class="fa fa-adjust"></i></button>
       <a href="https://youtube.com/@devicesarena" target="_blank" title="YouTube"><i class="fab fa-youtube"></i></a>
       <a href="https://www.instagram.com/devicesarenaofficial" target="_blank" title="Instagram"><i class="fab fa-instagram"></i></a>
       <a href="https://www.facebook.com/profile.php?id=61585936163841" target="_blank" title="Facebook"><i class="fab fa-facebook-f"></i></a>
@@ -192,6 +204,7 @@ $brands = $brands_stmt->fetchAll();
     <?php endif; ?>
   </ul>
   <div class="da-mobile-action-btns">
+    <button class="da-mobile-action-btn outline" id="da-mobile-theme-toggle" style="grid-column: span 2;"><i class="fa fa-adjust"></i> Toggle Theme</button>
     <a href="<?php echo $base; ?>phonefinder" class="da-mobile-action-btn red"><i class="fa fa-mobile-screen"></i> Phone Finder</a>
     <a href="<?php echo $base; ?>rumored" class="da-mobile-action-btn outline"><i class="fa fa-volume-high"></i> Rumors Mill</a>
   </div>
@@ -350,23 +363,7 @@ $brands = $brands_stmt->fetchAll();
     </div>
   </section>
 
-  <!-- ── BRAND STRIP ── -->
-  <section class="da-brand-strip-section" aria-label="Browse Brands">
-    <div class="da-brand-strip-inner">
-      <span class="da-brand-strip-label">Brands</span>
-      <button class="da-brand-strip-arrow" id="brand-strip-left" aria-label="Scroll left"><i class="fa fa-chevron-left"></i></button>
-      <div class="da-brand-scroll-wrapper">
-        <div class="da-brand-scroll" id="brand-strip-scroll">
-          <?php foreach ($brands as $brand):
-            $brandSlug = strtolower(preg_replace('/\s+/', '-', trim($brand['name'])));
-          ?>
-          <a href="<?php echo $base; ?>brand/<?php echo urlencode($brandSlug); ?>" class="da-brand-pill"><?php echo htmlspecialchars($brand['name']); ?></a>
-          <?php endforeach; ?>
-        </div>
-      </div>
-      <button class="da-brand-strip-arrow" id="brand-strip-right" aria-label="Scroll right"><i class="fa fa-chevron-right"></i></button>
-    </div>
-  </section>
+
 
   <!-- ── POST FEED + SIDEBAR ── -->
   <div class="da-content-area">
@@ -603,6 +600,30 @@ $brands = $brands_stmt->fetchAll();
     </div>
   </section>
 
+  <!-- ── INFINITE BRAND MARQUEE ── -->
+  <section class="da-marquee-section" aria-label="All Brands">
+    <div class="da-marquee-container">
+      <div class="da-marquee-track">
+        <!-- Original set -->
+        <div class="da-marquee-content">
+          <?php foreach ($brands as $brand):
+            $brandSlug = strtolower(preg_replace('/\s+/', '-', trim($brand['name'])));
+          ?>
+          <a href="<?php echo $base; ?>brand/<?php echo urlencode($brandSlug); ?>" class="da-marquee-pill"><?php echo htmlspecialchars($brand['name']); ?></a>
+          <?php endforeach; ?>
+        </div>
+        <!-- Duplicated set for seamless loop -->
+        <div class="da-marquee-content" aria-hidden="true">
+          <?php foreach ($brands as $brand):
+            $brandSlug = strtolower(preg_replace('/\s+/', '-', trim($brand['name'])));
+          ?>
+          <a href="<?php echo $base; ?>brand/<?php echo urlencode($brandSlug); ?>" class="da-marquee-pill"><?php echo htmlspecialchars($brand['name']); ?></a>
+          <?php endforeach; ?>
+        </div>
+      </div>
+    </div>
+  </section>
+
 </div><!-- /.da-page -->
 
 <!-- ══════════════════════ FOOTER ══════════════════════ -->
@@ -679,6 +700,36 @@ $brands = $brands_stmt->fetchAll();
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/js/bootstrap.bundle.min.js"></script>
 <script>
 window.baseURL = '<?php echo $base; ?>';
+
+// ── Theme Toggle ──
+const themeToggles = [document.getElementById('da-theme-toggle'), document.getElementById('da-mobile-theme-toggle')];
+
+function updateThemeIcons() {
+  const isLight = document.documentElement.getAttribute('data-theme') === 'light';
+  themeToggles.forEach(btn => {
+    if (!btn) return;
+    const icon = btn.querySelector('i');
+    if (icon) {
+      icon.className = isLight ? 'fa fa-moon' : 'fa fa-sun';
+    }
+  });
+}
+updateThemeIcons();
+
+themeToggles.forEach(btn => {
+  if (btn) {
+    btn.addEventListener('click', () => {
+      if (document.documentElement.getAttribute('data-theme') === 'light') {
+        document.documentElement.removeAttribute('data-theme');
+        localStorage.setItem('da-theme', 'dark');
+      } else {
+        document.documentElement.setAttribute('data-theme', 'light');
+        localStorage.setItem('da-theme', 'light');
+      }
+      updateThemeIcons();
+    });
+  }
+});
 
 // ── Navbar scroll effect ──
 const navbar = document.getElementById('da-navbar');
