@@ -50,7 +50,7 @@
 }
 
 [data-theme="light"] .da-leaderboard-row.top3::before {
-  background: linear-gradient(90deg, transparent, rgba(0, 0, 0, 0.04), transparent);
+  background: linear-gradient(90deg, transparent, rgba(0, 0, 0, 0.12), transparent);
 }
 
 /* Hardcoded dark backgrounds needing light variants */
@@ -1066,12 +1066,12 @@ button { cursor: pointer; border: none; outline: none; font-family: var(--font-m
 
 .da-device-card {
   flex-shrink: 0;
-  width: 140px;
+  width: 160px;
   scroll-snap-align: start;
   background: var(--bg-card);
   border: 1px solid var(--border);
   border-radius: var(--radius);
-  padding: 16px 10px 12px;
+  padding: 16px 12px 14px;
   text-align: center;
   cursor: pointer;
   transition: transform var(--transition), box-shadow var(--transition), border-color var(--transition);
@@ -1081,8 +1081,10 @@ button { cursor: pointer; border: none; outline: none; font-family: var(--font-m
   box-shadow: 0 8px 30px rgba(0,0,0,0.5);
   border-color: rgba(255,255,255,0.14);
 }
+[data-theme="light"] .da-device-card:hover { box-shadow: var(--shadow-hover); border-color: var(--accent); }
+
 .da-device-card img {
-  width: 80px; height: 100px;
+  width: 90px; height: 110px;
   object-fit: contain;
   margin: 0 auto 10px;
   transition: transform 0.4s ease;

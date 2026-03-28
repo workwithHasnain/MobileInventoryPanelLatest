@@ -55,7 +55,7 @@ try { $topComparisons = getPopularComparisons(10); } catch (Exception $e) { $top
 
 // Latest devices
 $latestDevices = getAllPhones();
-$latestDevices = array_slice(array_reverse($latestDevices), 0, 9);
+$latestDevices = array_slice(array_reverse($latestDevices), 0, 15);
 
 // Brands
 $brands_stmt = $pdo->prepare("SELECT b.*,COUNT(p.id) as device_count FROM brands b LEFT JOIN phones p ON b.id=p.brand_id GROUP BY b.id,b.name,b.description,b.logo_url,b.website,b.created_at,b.updated_at ORDER BY COUNT(p.id) DESC,b.name ASC LIMIT 36");
