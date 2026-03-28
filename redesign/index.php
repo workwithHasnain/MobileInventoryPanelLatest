@@ -522,8 +522,10 @@ $brands = $brands_stmt->fetchAll();
         </div>
         <a href="<?php echo $base; ?>brands" class="da-view-all">Browse All <i class="fa fa-arrow-right"></i></a>
       </div>
-      <div class="da-instore-scroll-wrapper">
-        <div class="da-instore-scroll" id="da-instore-scroll">
+      <div class="da-slider-wrap">
+        <button class="da-slider-btn prev" aria-label="Previous"><i class="fa fa-chevron-left"></i></button>
+        <button class="da-slider-btn next" aria-label="Next"><i class="fa fa-chevron-right"></i></button>
+        <div class="da-instore-scroll da-auto-slider" id="da-instore-scroll">
           <?php if (empty($latestDevices)): ?>
             <div class="da-empty"><i class="fa fa-mobile-alt"></i>No devices.</div>
           <?php else: ?>
@@ -549,23 +551,27 @@ $brands = $brands_stmt->fetchAll();
       </div>
       <a href="<?php echo $base; ?>compare" class="da-view-all">Compare Tool <i class="fa fa-arrow-right"></i></a>
     </div>
-    <div class="da-trending-scroll">
-      <?php foreach ($topComparisons as $cmp):
-        $s1 = $cmp['device1_slug'] ?? $cmp['device1_id'] ?? '';
-        $s2 = $cmp['device2_slug'] ?? $cmp['device2_id'] ?? '';
-        $cUrl = $base . 'compare/' . urlencode($s1) . '-vs-' . urlencode($s2);
-        $n1 = htmlspecialchars($cmp['device1_name'] ?? 'Device 1');
-        $n2 = htmlspecialchars($cmp['device2_name'] ?? 'Device 2');
-      ?>
-      <a href="<?php echo $cUrl; ?>" class="da-vs-card">
-        <div class="da-vs-row">
-          <div class="da-vs-device-name"><?php echo $n1; ?></div>
-          <div class="da-vs-divider">VS</div>
-          <div class="da-vs-device-name"><?php echo $n2; ?></div>
-        </div>
-        <div style="font-size:11px;color:var(--text-muted);margin-top:4px;">Click to compare →</div>
-      </a>
-      <?php endforeach; ?>
+    <div class="da-slider-wrap">
+      <button class="da-slider-btn prev" aria-label="Previous"><i class="fa fa-chevron-left"></i></button>
+      <button class="da-slider-btn next" aria-label="Next"><i class="fa fa-chevron-right"></i></button>
+      <div class="da-trending-scroll da-auto-slider">
+        <?php foreach ($topComparisons as $cmp):
+          $s1 = $cmp['device1_slug'] ?? $cmp['device1_id'] ?? '';
+          $s2 = $cmp['device2_slug'] ?? $cmp['device2_id'] ?? '';
+          $cUrl = $base . 'compare/' . urlencode($s1) . '-vs-' . urlencode($s2);
+          $n1 = htmlspecialchars($cmp['device1_name'] ?? 'Device 1');
+          $n2 = htmlspecialchars($cmp['device2_name'] ?? 'Device 2');
+        ?>
+        <a href="<?php echo $cUrl; ?>" class="da-vs-card">
+          <div class="da-vs-row">
+            <div class="da-vs-device-name"><?php echo $n1; ?></div>
+            <div class="da-vs-divider">VS</div>
+            <div class="da-vs-device-name"><?php echo $n2; ?></div>
+          </div>
+          <div style="font-size:11px;color:var(--text-muted);margin-top:4px;">Click to compare →</div>
+        </a>
+        <?php endforeach; ?>
+      </div>
     </div>
   </section>
   <?php endif; ?>
@@ -579,23 +585,27 @@ $brands = $brands_stmt->fetchAll();
       </div>
       <a href="<?php echo $base; ?>featured" class="da-view-all">See All <i class="fa fa-arrow-right"></i></a>
     </div>
-    <div class="da-ticker-scroll" id="featured-scroll-container">
-      <?php foreach ($posts as $post): ?>
-      <a href="<?php echo $base; ?>post/<?php echo urlencode($post['slug']); ?>" class="da-ticker-item">
-        <div class="da-ticker-item-img">
-          <?php if (!empty($post['featured_image'])): ?>
-            <img src="<?php echo htmlspecialchars(getAbsoluteImagePath($post['featured_image'], $base)); ?>" alt="<?php echo htmlspecialchars($post['title']); ?>" loading="lazy"/>
-          <?php else: ?>
-            <div style="width:100%;height:100%;background:linear-gradient(135deg,#1a1c2e,#2a2d45);display:flex;align-items:center;justify-content:center;"><i class="fa fa-newspaper" style="color:var(--text-muted);font-size:20px;"></i></div>
-          <?php endif; ?>
+    <div class="da-slider-wrap">
+      <button class="da-slider-btn prev" aria-label="Previous"><i class="fa fa-chevron-left"></i></button>
+      <button class="da-slider-btn next" aria-label="Next"><i class="fa fa-chevron-right"></i></button>
+      <div class="da-ticker-scroll da-auto-slider" id="featured-scroll-container">
+        <?php foreach ($posts as $post): ?>
+        <a href="<?php echo $base; ?>post/<?php echo urlencode($post['slug']); ?>" class="da-ticker-item">
+          <div class="da-ticker-item-img">
+            <?php if (!empty($post['featured_image'])): ?>
+              <img src="<?php echo htmlspecialchars(getAbsoluteImagePath($post['featured_image'], $base)); ?>" alt="<?php echo htmlspecialchars($post['title']); ?>" loading="lazy"/>
+            <?php else: ?>
+              <div style="width:100%;height:100%;background:linear-gradient(135deg,#1a1c2e,#2a2d45);display:flex;align-items:center;justify-content:center;"><i class="fa fa-newspaper" style="color:var(--text-muted);font-size:20px;"></i></div>
+            <?php endif; ?>
+          </div>
+          <div class="da-ticker-item-body">
+            <div class="da-ticker-item-title"><?php echo htmlspecialchars($post['title']); ?></div>
+          </div>
+        </a>
+        <?php endforeach; ?>
+        <div id="featured-load-more" style="display:<?php echo count($posts) >= 20 ? 'flex' : 'none'; ?>;align-items:center;justify-content:center;min-width:80px;">
+          <div class="spinner-border spinner-border-sm text-secondary" role="status"><span class="visually-hidden">Loading...</span></div>
         </div>
-        <div class="da-ticker-item-body">
-          <div class="da-ticker-item-title"><?php echo htmlspecialchars($post['title']); ?></div>
-        </div>
-      </a>
-      <?php endforeach; ?>
-      <div id="featured-load-more" style="display:<?php echo count($posts) >= 20 ? 'flex' : 'none'; ?>;align-items:center;justify-content:center;min-width:80px;">
-        <div class="spinner-border spinner-border-sm text-secondary" role="status"><span class="visually-hidden">Loading...</span></div>
       </div>
     </div>
   </section>
@@ -729,6 +739,64 @@ themeToggles.forEach(btn => {
       updateThemeIcons();
     });
   }
+});
+
+// ── Auto-Sliders Logic ──
+document.querySelectorAll('.da-slider-wrap').forEach(wrap => {
+  const scrollEl = wrap.querySelector('.da-auto-slider');
+  const prevBtn = wrap.querySelector('.prev');
+  const nextBtn = wrap.querySelector('.next');
+  let autoScrollTimer;
+  const pauseTime = 3000; // 3 seconds pause between slides
+
+  if (!scrollEl) return;
+
+  function doScroll() {
+    if (scrollEl.matches(':hover') || window.innerWidth < 1024) return; // Pause if hovered or if on mobile
+    
+    // Calculate scroll amount dynamically (width of first child + gap)
+    const firstChild = scrollEl.firstElementChild;
+    const scrollAmount = firstChild ? firstChild.clientWidth + 16 : 250;
+    
+    const maxScrollLeft = scrollEl.scrollWidth - scrollEl.clientWidth;
+    if (scrollEl.scrollLeft >= maxScrollLeft - 10) {
+      scrollEl.scrollTo({ left: 0, behavior: 'smooth' }); // Loop back
+    } else {
+      scrollEl.scrollBy({ left: scrollAmount, behavior: 'smooth' });
+    }
+  }
+
+  function startAuto() {
+    autoScrollTimer = setInterval(doScroll, pauseTime);
+  }
+  function stopAuto() {
+    clearInterval(autoScrollTimer);
+  }
+
+  // Handle interactions
+  wrap.addEventListener('mouseenter', stopAuto);
+  wrap.addEventListener('mouseleave', startAuto);
+
+  if (prevBtn) {
+    prevBtn.addEventListener('click', () => {
+      stopAuto();
+      const firstChild = scrollEl.firstElementChild;
+      const scrollAmount = firstChild ? firstChild.clientWidth + 16 : 250;
+      scrollEl.scrollBy({ left: -scrollAmount, behavior: 'smooth' });
+      startAuto();
+    });
+  }
+  if (nextBtn) {
+    nextBtn.addEventListener('click', () => {
+      stopAuto();
+      const firstChild = scrollEl.firstElementChild;
+      const scrollAmount = firstChild ? firstChild.clientWidth + 16 : 250;
+      scrollEl.scrollBy({ left: scrollAmount, behavior: 'smooth' });
+      startAuto();
+    });
+  }
+  
+  if (window.innerWidth >= 1024) startAuto();
 });
 
 // ── Navbar scroll effect ──
