@@ -1,8 +1,8 @@
 # Enable mod_rewrite
 <IfModule mod_rewrite.c>
     RewriteEngine On
-    RewriteBase /MobileInventoryPanelLatest/
-    # RewriteBase /
+    # RewriteBase /MobileInventoryPanelLatest/
+    RewriteBase /
     
     # Don't rewrite if it's a real file or directory
     RewriteCond %{REQUEST_FILENAME} !-f
