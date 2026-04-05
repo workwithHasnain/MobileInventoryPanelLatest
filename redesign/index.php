@@ -489,7 +489,7 @@ $brands = $brands_stmt->fetchAll();
               </div>
               <div style="text-align:center;margin-top:8px;">
                 <span class="count-badge" style="background:var(--bg-secondary);padding:4px 8px;border-radius:12px;font-size:10px;font-weight:600;color:var(--text-secondary);">
-                  <i class="fa fa-scale-balanced" style="margin-right:4px;color:var(--accent-blue);"></i> <?php echo number_format($cmp['comparison_count']); ?> comparisons <?php if ($i === 0) echo '🔥'; ?>
+                  <i class="fa fa-scale-balanced" style="margin-right:4px;color:var(--accent-blue);"></i> compared <?php echo number_format($cmp['comparison_count']); ?> times
                 </span>
               </div>
             </a>
