@@ -104,85 +104,91 @@ $brands = $brands_stmt->fetchAll();
 
 <!-- ══════════════════════ NAVBAR ══════════════════════ -->
 <nav class="da-navbar" id="da-navbar">
-  <div class="nav-inner">
-    <!-- Hamburger -->
-    <button class="da-hamburger" id="da-hamburger" aria-label="Menu">
-      <span></span><span></span><span></span>
-    </button>
+  <!-- Desktop Two-Tier Navbar -->
+  <div class="da-navbar-top">
+    <div class="nav-container-top">
+      <!-- Hamburger appended here for mobile -->
+      <button class="da-hamburger d-lg-none" type="button" aria-label="Menu" id="da-hamburger">
+        <span></span><span></span><span></span>
+      </button>
+      <!-- Logo -->
+      <a class="da-logo" href="<?php echo $base; ?>">
+        <img src="<?php echo $base; ?>imges/logo-wide.svg" alt="DevicesArena"/>
+      </a>
 
-    <!-- Logo -->
-    <a class="da-logo" href="<?php echo $base; ?>">
-      <img src="<?php echo $base; ?>imges/logo-wide.svg" alt="DevicesArena"/>
-    </a>
+      <!-- Large Center Search (Desktop) -->
+      <form class="da-search-large d-none d-lg-flex" action="<?php echo $base; ?>search" method="GET">
+        <input type="text" name="q" placeholder="Search in devices arena" autocomplete="off" required>
+        <button type="submit" aria-label="Search"><i class="fa fa-search"></i></button>
+      </form>
 
-    <!-- Desktop Nav Links -->
-    <ul class="da-nav-links">
-      <li><a href="<?php echo $base; ?>" class="active">Home</a></li>
-      <li><a href="<?php echo $base; ?>compare">Compare</a></li>
-      <li><a href="<?php echo $base; ?>reviews">Reviews</a></li>
-      <li><a href="<?php echo $base; ?>phonefinder">Phone Finder</a></li>
-      <li><a href="<?php echo $base; ?>rumored" class="accent-link">Rumored</a></li>
-      <li><a href="<?php echo $base; ?>brands">All Brands</a></li>
-    </ul>
+      <!-- Right Actions -->
+      <div class="da-top-actions">
+        <button class="da-theme-btn-top d-none d-lg-flex" id="da-theme-toggle" title="Toggle Theme" aria-label="Toggle Theme"><i class="fa fa-adjust"></i></button>
+        
+        <div class="da-social-icons-top d-none d-lg-flex">
+          <a href="https://youtube.com/@devicesarena" target="_blank" title="YouTube" class="yt"><i class="fab fa-youtube"></i></a>
+          <a href="https://www.instagram.com/devicesarenaofficial" target="_blank" title="Instagram" class="ig"><i class="fab fa-instagram"></i></a>
+          <a href="https://www.facebook.com/profile.php?id=61585936163841" target="_blank" title="Facebook" class="fb"><i class="fab fa-facebook-f"></i></a>
+          <a href="https://www.tiktok.com/" target="_blank" title="TikTok" class="tt"><i class="fab fa-tiktok"></i></a>
+        </div>
 
-    <!-- Live Search -->
-    <div class="da-search" id="da-search-wrap">
-      <i class="fas fa-search search-icon"></i>
-      <input type="text" id="da-search-input" placeholder="Search phones & news…" autocomplete="off"/>
-      <div class="da-search-results" id="da-search-results"></div>
-    </div>
-
-    <!-- Social -->
-    <div class="da-social-icons">
-      <button class="da-theme-btn" id="da-theme-toggle" title="Toggle Theme" aria-label="Toggle Theme"><i class="fa fa-adjust"></i></button>
-      <a href="https://youtube.com/@devicesarena" target="_blank" title="YouTube"><i class="fab fa-youtube"></i></a>
-      <a href="https://www.instagram.com/devicesarenaofficial" target="_blank" title="Instagram"><i class="fab fa-instagram"></i></a>
-      <a href="https://www.facebook.com/profile.php?id=61585936163841" target="_blank" title="Facebook"><i class="fab fa-facebook-f"></i></a>
-      <a href="https://twitter.com/" target="_blank" title="Twitter"><i class="fab fa-twitter"></i></a>
-    </div>
-
-    <!-- Auth -->
-    <div class="da-auth-btns">
-      <?php if ($isPublicUser): ?>
-        <!-- Notification Bell -->
-        <div class="dropdown">
-          <button class="da-notif-bell" type="button" data-bs-toggle="dropdown" id="notificationBellDesktop">
-            <i class="fa fa-bell"></i>
-            <?php if ($hasUnreadNotifications): ?><span class="da-notif-dot" id="notifDotDesktop"></span><?php endif; ?>
-          </button>
-          <ul class="dropdown-menu dropdown-menu-end" style="min-width:300px;max-height:360px;overflow-y:auto;">
-            <li style="padding:12px 16px;"><div style="font-weight:700;color:#d50000;font-size:13px;"><i class="fa fa-sparkles me-1"></i>Fresh This Week</div></li>
-            <li><hr class="dropdown-divider"></li>
-            <?php if (!empty($weekly_posts)): foreach ($weekly_posts as $wp): ?>
-              <li><a class="dropdown-item" href="<?php echo $base; ?>post/<?php echo htmlspecialchars($wp['slug']); ?>" style="display:flex;gap:10px;align-items:center;padding:9px 16px;">
-                <?php if (!empty($wp['featured_image'])): ?><img src="<?php echo htmlspecialchars($wp['featured_image']); ?>" style="width:44px;height:44px;object-fit:cover;border-radius:4px;flex-shrink:0;"><?php endif; ?>
-                <div><div style="font-size:12.5px;font-weight:600;"><?php echo htmlspecialchars($wp['title']); ?></div><div style="font-size:11px;color:#888;margin-top:2px;"><i class="fa fa-clock me-1"></i><?php echo date('M d', strtotime($wp['created_at'])); ?></div></div>
-              </a></li>
-            <?php endforeach; else: ?>
-              <li style="padding:20px 16px;text-align:center;color:#666;font-size:13px;">No posts this week</li>
+        <div class="da-auth-btns-top">
+          <?php if ($isPublicUser): ?>
+            <div class="dropdown me-2 d-none d-lg-block">
+              <button class="da-notif-bell-top" type="button" data-bs-toggle="dropdown" id="notificationBellDesktop">
+                  <i class="fa fa-bell"></i>
+                  <?php if ($hasUnreadNotifications): ?><span class="da-notif-dot" id="notifDotDesktop"></span><?php endif; ?>
+                </button>
+                <ul class="dropdown-menu dropdown-menu-end" style="min-width:300px;max-height:360px;overflow-y:auto;">
+                  <li style="padding:12px 16px;"><div style="font-weight:700;color:#d50000;font-size:13px;"><i class="fa fa-sparkles me-1"></i>Fresh This Week</div></li>
+                  <li><hr class="dropdown-divider"></li>
+                  <?php if (!empty($weekly_posts)): foreach ($weekly_posts as $wp): ?>
+                    <li><a class="dropdown-item" href="<?php echo $base; ?>post/<?php echo htmlspecialchars($wp['slug']); ?>" style="display:flex;gap:10px;align-items:center;padding:9px 16px;">
+                      <?php if (!empty($wp['featured_image'])): ?><img src="<?php echo htmlspecialchars($wp['featured_image']); ?>" style="width:44px;height:44px;object-fit:cover;border-radius:4px;flex-shrink:0;"><?php endif; ?>
+                      <div><div style="font-size:12.5px;font-weight:600;"><?php echo htmlspecialchars($wp['title']); ?></div><div style="font-size:11px;color:#888;margin-top:2px;"><i class="fa fa-clock me-1"></i><?php echo date('M d', strtotime($wp['created_at'])); ?></div></div>
+                    </a></li>
+                  <?php endforeach; else: ?>
+                    <li style="padding:20px 16px;text-align:center;color:#666;font-size:13px;">No posts this week</li>
+                  <?php endif; ?>
+                  <li><hr class="dropdown-divider"></li>
+                  <li style="text-align:center;padding:8px;"><a href="<?php echo $base; ?>reviews" style="color:#d50000;font-size:12px;font-weight:600;"><i class="fa fa-arrow-right me-1"></i>View All Posts</a></li>
+                </ul>
+              </div>
+              <div class="dropdown">
+                <button class="da-user-avatar" type="button" data-bs-toggle="dropdown" title="<?php echo htmlspecialchars($publicUserName); ?>">
+                  <?php echo $publicUserInitial; ?>
+                </button>
+                <ul class="dropdown-menu dropdown-menu-end" style="min-width:190px;">
+                  <li><span class="dropdown-item-text" style="font-size:12px;color:#888;"><i class="fa fa-hand-peace me-1"></i>Hi, <?php echo htmlspecialchars($publicUserName); ?></span></li>
+                  <li><hr class="dropdown-divider"></li>
+                  <li><a class="dropdown-item" href="#" onclick="openProfileModal();return false;"><i class="fa fa-user-pen me-2"></i>Profile</a></li>
+                  <li><a class="dropdown-item text-danger" href="#" onclick="publicUserLogout();return false;"><i class="fa fa-right-from-bracket me-2"></i>Logout</a></li>
+                </ul>
+              </div>
+            <?php else: ?>
+              <button class="btn-yellow-login d-none d-lg-flex" data-bs-toggle="modal" data-bs-target="#loginModal">Login</button>
+              <button class="btn-yellow-login-mobile d-lg-none" data-bs-toggle="modal" data-bs-target="#loginModal"><i class="fa fa-user"></i></button>
             <?php endif; ?>
-            <li><hr class="dropdown-divider"></li>
-            <li style="text-align:center;padding:8px;"><a href="<?php echo $base; ?>reviews" style="color:#d50000;font-size:12px;font-weight:600;"><i class="fa fa-arrow-right me-1"></i>View All Posts</a></li>
-          </ul>
+          </div>
         </div>
-        <!-- User Avatar -->
-        <div class="dropdown">
-          <button class="da-user-avatar" type="button" data-bs-toggle="dropdown" title="<?php echo htmlspecialchars($publicUserName); ?>">
-            <?php echo $publicUserInitial; ?>
-          </button>
-          <ul class="dropdown-menu dropdown-menu-end" style="min-width:190px;">
-            <li><span class="dropdown-item-text" style="font-size:12px;color:#888;"><i class="fa fa-hand-peace me-1"></i>Hi, <?php echo htmlspecialchars($publicUserName); ?></span></li>
-            <li><hr class="dropdown-divider"></li>
-            <li><a class="dropdown-item" href="#" onclick="openProfileModal();return false;"><i class="fa fa-user-pen me-2"></i>Profile</a></li>
-            <li><a class="dropdown-item text-danger" href="#" onclick="publicUserLogout();return false;"><i class="fa fa-right-from-bracket me-2"></i>Logout</a></li>
-          </ul>
-        </div>
-      <?php else: ?>
-        <button class="da-btn-login" data-bs-toggle="modal" data-bs-target="#loginModal"><i class="fa fa-right-to-bracket me-1"></i>Login</button>
-        <button class="da-btn-signup" data-bs-toggle="modal" data-bs-target="#signupModal"><i class="fa fa-user-plus me-1"></i>Sign Up</button>
-      <?php endif; ?>
+      </div>
     </div>
-  </div>
+
+    <!-- Bottom Tier -->
+    <div class="da-navbar-bottom d-none d-lg-block">
+      <div class="nav-container-bottom">
+        <ul class="da-nav-links-bottom">
+          <li><a href="<?php echo $base; ?>home">HOME</a></li>
+          <li><a href="<?php echo $base; ?>compare">COMPARE</a></li>
+          <li><a href="#">VIDEOS</a></li>
+          <li><a href="<?php echo $base; ?>reviews">REVIEWS</a></li>
+          <li><a href="<?php echo $base; ?>featured">FEATURED</a></li>
+          <li><a href="<?php echo $base; ?>phonefinder">PHONE FINDER</a></li>
+          <li><a href="<?php echo $base; ?>contact-us">CONTACT</a></li>
+        </ul>
+      </div>
+    </div>
 </nav>
 
 <!-- ══════════════════════ MOBILE MENU ══════════════════════ -->
@@ -338,27 +344,41 @@ $brands = $brands_stmt->fetchAll();
       <?php endif; ?>
     </div>
 
-    <!-- Right: Brand panel + CTAs -->
+    <!-- Right: Brand panel (Classic Widget) -->
     <div class="da-hero-right">
-      <div class="da-section-label" style="visibility: hidden; pointer-events: none;"><span>Brands</span></div>
-      <div class="da-hero-right-card">
-        <div class="da-hero-right-card-header"><i class="fa fa-industry me-2"></i>Browse by Brand</div>
-        <div class="da-brand-list">
-          <?php foreach (array_slice($brands, 0, 10) as $brand): ?>
-          <a href="<?php echo $base; ?>brand/<?php echo urlencode(strtolower(preg_replace('/\s+/','-',trim($brand['name'])))); ?>" class="da-brand-list-item">
-            <span><?php echo htmlspecialchars($brand['name']); ?></span>
-            <span class="dc-count"><?php echo $brand['device_count']; ?></span>
+      <div class="da-classic-brand-widget">
+        <!-- Top header -->
+        <div class="da-cbw-header">
+          <a href="<?php echo $base; ?>phonefinder">
+            <i class="fa fa-mobile-screen"></i> PHONE FINDER
+          </a>
+        </div>
+        
+        <!-- Brand Grid -->
+        <div class="da-cbw-grid">
+          <?php foreach (array_slice($brands, 0, 32) as $index => $brand): 
+            $brandSlug = strtolower(preg_replace('/\s+/', '-', trim($brand['name'])));
+          ?>
+          <a href="<?php echo $base; ?>brand/<?php echo urlencode($brandSlug); ?>" class="da-cbw-item" title="<?php echo htmlspecialchars($brand['name']); ?>">
+            <?php echo strtoupper(htmlspecialchars($brand['name'])); ?>
           </a>
           <?php endforeach; ?>
-          <a href="<?php echo $base; ?>brands" class="da-brand-list-item" style="color:var(--accent);">
-            <span>All Brands →</span>
+        </div>
+        
+        <!-- Bottom buttons -->
+        <div class="da-cbw-footer">
+          <a href="<?php echo $base; ?>brands" class="da-cbw-btn left">
+            <i class="fa fa-bars"></i> ALL BRANDS
+          </a>
+          <a href="<?php echo $base; ?>rumored" class="da-cbw-btn right">
+            <i class="fa fa-bullhorn"></i> RUMORS MILL
           </a>
         </div>
       </div>
-      <div class="da-hero-cta-stack">
-        <a href="<?php echo $base; ?>phonefinder" class="da-cta-btn primary"><i class="fa fa-mobile-screen-button"></i> Phone Finder</a>
-        <a href="<?php echo $base; ?>compare" class="da-cta-btn secondary"><i class="fa fa-scale-balanced"></i> Compare Devices</a>
-        <a href="<?php echo $base; ?>rumored" class="da-cta-btn secondary"><i class="fa fa-volume-high"></i> Rumors Mill</a>
+
+      <!-- AD PLACEHOLDER -->
+      <div class="da-ad-placeholder" style="width: 100%; height: 250px; background: rgba(128,128,128,0.1); border: 1px dashed rgba(128,128,128,0.3); border-radius: var(--radius-lg); display: flex; align-items: center; justify-content: center; color: var(--text-muted); font-size: 11px; font-weight: 700; letter-spacing: 0.1em; text-transform: uppercase; margin-top: 24px;">
+        Advertisement
       </div>
     </div>
   </section>
@@ -636,74 +656,131 @@ $brands = $brands_stmt->fetchAll();
 
 </div><!-- /.da-page -->
 
-<!-- ══════════════════════ FOOTER ══════════════════════ -->
-<footer class="da-footer" aria-label="Site Footer">
-  <div class="da-footer-inner">
-    <div class="da-footer-grid">
-      <!-- Brand col -->
-      <div class="da-footer-brand">
-        <a href="<?php echo $base; ?>"><img src="<?php echo $base; ?>imges/logo-wide.svg" alt="DevicesArena"/></a>
-        <p class="da-footer-tagline">Your go-to destination for smartphone specs, reviews, comparisons, and the latest tech news. Find your perfect device.</p>
-        <div class="da-footer-social">
-          <a href="https://youtube.com/@devicesarena" target="_blank" title="YouTube"><i class="fab fa-youtube"></i></a>
-          <a href="https://www.instagram.com/devicesarenaofficial" target="_blank" title="Instagram"><i class="fab fa-instagram"></i></a>
-          <a href="https://www.facebook.com/profile.php?id=61585936163841" target="_blank" title="Facebook"><i class="fab fa-facebook-f"></i></a>
-          <a href="https://twitter.com/" target="_blank" title="Twitter"><i class="fab fa-twitter"></i></a>
-          <a href="https://www.tiktok.com/" target="_blank" title="TikTok"><i class="fab fa-tiktok"></i></a>
+<!-- ══════════════════════ NEW FOOTER ══════════════════════ -->
+<footer class="da-footer-new" aria-label="Site Footer">
+  <div class="da-footer-container" style="max-width: 1400px; margin: 0 auto; padding: 40px 24px;">
+    
+    <!-- Top Row: Logo & Social -->
+    <div class="da-footer-top-row">
+      <a class="da-logo" href="<?php echo $base; ?>">
+        <img src="<?php echo $base; ?>imges/logo-wide.svg" alt="DevicesArena"/>
+      </a>
+      <div class="da-social-icons-top">
+        <a href="https://www.facebook.com/profile.php?id=61585936163841" target="_blank" title="Facebook" class="fb"><i class="fab fa-facebook-f"></i></a>
+        <a href="https://youtube.com/@devicesarena" target="_blank" title="YouTube" class="yt"><i class="fab fa-youtube"></i></a>
+        <a href="https://twitter.com/" target="_blank" title="X" class="tt"><i class="fa-brands fa-x-twitter"></i></a>
+        <a href="https://www.instagram.com/devicesarenaofficial" target="_blank" title="Instagram" class="ig"><i class="fab fa-instagram"></i></a>
+      </div>
+    </div>
+    
+    <!-- Middle Row: Company/Licensing & Content/Help -->
+    <div class="da-footer-mid-row">
+      <!-- Left Column: Company & Licensing -->
+      <div class="da-footer-col-group">
+        <div class="da-footer-section">
+          <h4>COMPANY</h4>
+          <ul class="da-footer-links">
+            <li><a href="<?php echo $base; ?>about-us">About Us</a></li>
+            <li><a href="#">Team</a></li>
+            <li><a href="<?php echo $base; ?>contact-us">Contact Us</a></li>
+            <li><a href="#">Careers</a></li>
+            <li><a href="#">Ethics statement</a></li>
+            <li><a href="#">How we rate</a></li>
+            <li><a href="#">AI at DevicesArena</a></li>
+          </ul>
+        </div>
+        <div class="da-footer-section">
+          <h4>LICENSING</h4>
+          <ul class="da-footer-links">
+            <li><a href="#">Reprint & Permissions</a></li>
+            <li><a href="#">Database Licensing</a></li>
+            <li><a href="<?php echo $base; ?>advertise-with-us">Advertise with us</a></li>
+          </ul>
         </div>
       </div>
 
-      <!-- Explore -->
-      <div class="da-footer-col">
-        <h4>Explore</h4>
-        <ul>
-          <li><a href="<?php echo $base; ?>">Home</a></li>
-          <li><a href="<?php echo $base; ?>reviews">Reviews</a></li>
-          <li><a href="<?php echo $base; ?>featured">Featured</a></li>
-          <li><a href="<?php echo $base; ?>news">News</a></li>
-          <li><a href="<?php echo $base; ?>rumored">Rumors Mill</a></li>
-        </ul>
-      </div>
-
-      <!-- Devices -->
-      <div class="da-footer-col">
-        <h4>Devices</h4>
-        <ul>
-          <li><a href="<?php echo $base; ?>phonefinder">Phone Finder</a></li>
-          <li><a href="<?php echo $base; ?>compare">Compare</a></li>
-          <li><a href="<?php echo $base; ?>brands">All Brands</a></li>
-          <li><a href="<?php echo $base; ?>devices">All Devices</a></li>
-        </ul>
-      </div>
-
-      <!-- Company + Newsletter -->
-      <div class="da-footer-col">
-        <h4>Company</h4>
-        <ul>
-          <li><a href="<?php echo $base; ?>about-us">About Us</a></li>
-          <li><a href="<?php echo $base; ?>contact-us">Contact</a></li>
-          <li><a href="<?php echo $base; ?>advertise-with-us">Advertise</a></li>
-        </ul>
-        <h4 style="margin-top:20px;">Newsletter</h4>
-        <div id="da-newsletter-msg"></div>
-        <div class="da-footer-newsletter-input">
-          <input type="email" id="da-newsletter-email" placeholder="your@email.com"/>
-          <button id="da-newsletter-btn" type="button">Subscribe</button>
+      <!-- Right Column: Content & Help -->
+      <div class="da-footer-col-group">
+        <div class="da-footer-section">
+          <h4>CONTENT</h4>
+          <ul class="da-footer-links inline-list">
+            <li><a href="<?php echo $base; ?>home">Home</a></li>
+            <li><a href="<?php echo $base; ?>news">News</a></li>
+            <li><a href="#">Manufacturers</a></li>
+            <li><a href="#">Carriers</a></li>
+            <li><a href="<?php echo $base; ?>reviews">Reviews</a></li>
+            <li><a href="<?php echo $base; ?>sitemap">Sitemap</a></li>
+            <li><a href="#">News Archive</a></li>
+            <li><a href="#">Reviews Archive</a></li>
+          </ul>
+        </div>
+        <div class="da-footer-section">
+          <h4>HELP</h4>
+          <ul class="da-footer-links inline-list">
+            <li><a href="#">Terms of Use</a></li>
+            <li><a href="#">Privacy Policy</a></li>
+            <li><a href="#">Web Notifications</a></li>
+            <li><a href="#">Cookies</a></li>
+          </ul>
         </div>
       </div>
     </div>
-
-    <!-- Bottom bar -->
-    <div class="da-footer-bottom">
-      <div class="da-footer-copy">
-        <a href="<?php echo $base; ?>">© 2000–2026 DevicesArena.com</a> · All rights reserved.
-      </div>
-      <div class="da-footer-bottom-links">
-        <a href="<?php echo $base; ?>about-us">About</a>
-        <a href="<?php echo $base; ?>contact-us">Contact</a>
-        <a href="<?php echo $base; ?>advertise-with-us">Advertise</a>
+    
+    <hr class="da-footer-hr">
+    
+    <!-- Bottom Row: Guides -->
+    <div class="da-footer-guides">
+      <h4>GUIDES</h4>
+      <div class="da-guides-grid">
+        <!-- Col 1 -->
+        <ul>
+          <li><a href="#">Best Phones</a></li>
+          <li><a href="#">Best Samsung Tablets</a></li>
+          <li><a href="#">Best Pixel Phones</a></li>
+          <li><a href="#">Best Foldable Phones</a></li>
+          <li><a href="#">Best Camera Phones</a></li>
+          <li><a href="#">Best Nokia Phones</a></li>
+          <li><a href="#">Best AirPods</a></li>
+        </ul>
+        <!-- Col 2 -->
+        <ul>
+          <li><a href="#">Best Tablets</a></li>
+          <li><a href="#">Best Apple Watch</a></li>
+          <li><a href="#">Best Motorola Phones</a></li>
+          <li><a href="#">Best Small Phones</a></li>
+          <li><a href="#">Best Gaming Phones</a></li>
+          <li><a href="#">Best Smartwatches</a></li>
+        </ul>
+        <!-- Col 3 -->
+        <ul>
+          <li><a href="#">Best iPads</a></li>
+          <li><a href="#">Best Android Phones</a></li>
+          <li><a href="#">Best Sony Phones</a></li>
+          <li><a href="#">Best Flip Phones</a></li>
+          <li><a href="#">Best Budget Phones</a></li>
+          <li><a href="#">Best Android Smartwatches</a></li>
+        </ul>
+        <!-- Col 4 -->
+        <ul>
+          <li><a href="#">Best Budget Tablets</a></li>
+          <li><a href="#">Best iPhone</a></li>
+          <li><a href="#">Best OnePlus Phones</a></li>
+          <li><a href="#">Best Mid-Range Phones</a></li>
+          <li><a href="#">Best Asus Phones</a></li>
+          <li><a href="#">Best Budget Smartwatches</a></li>
+        </ul>
+        <!-- Col 5 -->
+        <ul>
+          <li><a href="#">Best Android Tablets</a></li>
+          <li><a href="#">Best Samsung Phones</a></li>
+          <li><a href="#">Best Xiaomi Phones</a></li>
+          <li><a href="#">Phones with best battery</a></li>
+          <li><a href="#">Fastest Charging Phones</a></li>
+          <li><a href="#">Best Galaxy Watch</a></li>
+        </ul>
       </div>
     </div>
+
   </div>
 </footer>
 
@@ -827,6 +904,7 @@ document.getElementById('brand-strip-right').addEventListener('click', () => bra
 // ── Live Search ──
 const searchInput = document.getElementById('da-search-input');
 const searchResults = document.getElementById('da-search-results');
+if (searchInput && searchResults) {
 let searchTimer;
 searchInput.addEventListener('input', function() {
   clearTimeout(searchTimer);
@@ -858,7 +936,11 @@ searchInput.addEventListener('input', function() {
     });
   }, 320);
 });
-document.addEventListener('click', (e) => { if (!document.getElementById('da-search-wrap').contains(e.target)) searchResults.classList.remove('open'); });
+document.addEventListener('click', (e) => { 
+  const wrap = document.getElementById('da-search-wrap');
+  if (wrap && !wrap.contains(e.target)) searchResults.classList.remove('open'); 
+});
+}
 
 // ── Newsletter ──
 document.getElementById('da-newsletter-btn').addEventListener('click', function() {

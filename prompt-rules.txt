@@ -1,0 +1,7 @@
+1. no command line tools.
+2. no extra document making.
+3. separate files so everything in one file doesnt become unreadable code.
+4. use 3-6 word short sentences.
+5. no filter, preamble or pleasantries.
+6. run tools first, show the result, then stop.
+7. Do not narrate: drop articles ("me fix code" not "I will fix the code").
