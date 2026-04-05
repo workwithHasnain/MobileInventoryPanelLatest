@@ -468,14 +468,25 @@ $brands = $brands_stmt->fetchAll();
             <div class="da-empty">No comparisons yet.</div>
           <?php else: ?>
           <div class="da-comparison-list">
-            <?php foreach (array_slice($topComparisons, 0, 8) as $cmp):
+            <?php foreach (array_slice($topComparisons, 0, 5) as $cmp):
               $slug1 = $cmp['device1_slug'] ?? $cmp['device1_id'] ?? '';
               $slug2 = $cmp['device2_slug'] ?? $cmp['device2_id'] ?? '';
               $cUrl = $base . 'compare/' . urlencode($slug1) . '-vs-' . urlencode($slug2);
+              $n1 = htmlspecialchars($cmp['device1_name'] ?? 'Device');
+              $n2 = htmlspecialchars($cmp['device2_name'] ?? 'Device');
             ?>
-            <a href="<?php echo $cUrl; ?>" class="da-comparison-item">
-              <div class="vs-badge">VS</div>
-              <div class="vs-text"><?php echo htmlspecialchars(($cmp['device1_name'] ?? 'Device') . ' vs ' . ($cmp['device2_name'] ?? 'Device')); ?></div>
+            <a href="<?php echo $cUrl; ?>" class="da-sidebar-vs-card">
+              <div class="da-sidebar-vs-row">
+                <div class="da-vs-col">
+                  <?php if (!empty($cmp['device1_image'])): ?><img src="<?php echo htmlspecialchars(getAbsoluteImagePath($cmp['device1_image'], $base)); ?>" alt="<?php echo $n1; ?>" class="da-sidebar-vs-img" loading="lazy"/><?php endif; ?>
+                  <div class="da-sidebar-vs-name"><?php echo $n1; ?></div>
+                </div>
+                <div class="da-sidebar-vs-divider">VS</div>
+                <div class="da-vs-col">
+                  <?php if (!empty($cmp['device2_image'])): ?><img src="<?php echo htmlspecialchars(getAbsoluteImagePath($cmp['device2_image'], $base)); ?>" alt="<?php echo $n2; ?>" class="da-sidebar-vs-img" loading="lazy"/><?php endif; ?>
+                  <div class="da-sidebar-vs-name"><?php echo $n2; ?></div>
+                </div>
+              </div>
             </a>
             <?php endforeach; ?>
           </div>
