@@ -468,7 +468,7 @@ $brands = $brands_stmt->fetchAll();
             <div class="da-empty">No comparisons yet.</div>
           <?php else: ?>
           <div class="da-comparison-list">
-            <?php foreach (array_slice($topComparisons, 0, 5) as $cmp):
+            <?php foreach (array_slice($topComparisons, 0, 5) as $i => $cmp):
               $slug1 = $cmp['device1_slug'] ?? $cmp['device1_id'] ?? '';
               $slug2 = $cmp['device2_slug'] ?? $cmp['device2_id'] ?? '';
               $cUrl = $base . 'compare/' . urlencode($slug1) . '-vs-' . urlencode($slug2);
@@ -486,6 +486,11 @@ $brands = $brands_stmt->fetchAll();
                   <?php if (!empty($cmp['device2_image'])): ?><img src="<?php echo htmlspecialchars(getAbsoluteImagePath($cmp['device2_image'], $base)); ?>" alt="<?php echo $n2; ?>" class="da-sidebar-vs-img" loading="lazy"/><?php endif; ?>
                   <div class="da-sidebar-vs-name"><?php echo $n2; ?></div>
                 </div>
+              </div>
+              <div style="text-align:center;margin-top:8px;">
+                <span class="count-badge" style="background:var(--bg-secondary);padding:4px 8px;border-radius:12px;font-size:10px;font-weight:600;color:var(--text-secondary);">
+                  <i class="fa fa-scale-balanced" style="margin-right:4px;color:var(--accent-blue);"></i> <?php echo number_format($cmp['comparison_count']); ?> comparisons <?php if ($i === 0) echo '🔥'; ?>
+                </span>
               </div>
             </a>
             <?php endforeach; ?>

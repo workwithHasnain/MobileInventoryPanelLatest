@@ -5,3 +5,4 @@
 5. no filter, preamble or pleasantries.
 6. run tools first, show the result, then stop.
 7. Do not narrate: drop articles ("me fix code" not "I will fix the code").
+8. No inline css.
