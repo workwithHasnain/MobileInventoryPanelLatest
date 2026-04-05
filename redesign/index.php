@@ -584,9 +584,15 @@ $brands = $brands_stmt->fetchAll();
         ?>
         <a href="<?php echo $cUrl; ?>" class="da-vs-card">
           <div class="da-vs-row">
-            <div class="da-vs-device-name"><?php echo $n1; ?></div>
+            <div class="da-vs-col">
+              <?php if (!empty($cmp['device1_image'])): ?><img src="<?php echo htmlspecialchars(getAbsoluteImagePath($cmp['device1_image'], $base)); ?>" alt="<?php echo $n1; ?>" class="da-vs-img" loading="lazy"/><?php endif; ?>
+              <div class="da-vs-device-name"><?php echo $n1; ?></div>
+            </div>
             <div class="da-vs-divider">VS</div>
-            <div class="da-vs-device-name"><?php echo $n2; ?></div>
+            <div class="da-vs-col">
+              <?php if (!empty($cmp['device2_image'])): ?><img src="<?php echo htmlspecialchars(getAbsoluteImagePath($cmp['device2_image'], $base)); ?>" alt="<?php echo $n2; ?>" class="da-vs-img" loading="lazy"/><?php endif; ?>
+              <div class="da-vs-device-name"><?php echo $n2; ?></div>
+            </div>
           </div>
           <div style="font-size:11px;color:var(--text-muted);margin-top:4px;">Click to compare →</div>
         </a>
