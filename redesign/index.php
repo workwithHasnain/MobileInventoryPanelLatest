@@ -311,7 +311,7 @@ $brands = $brands_stmt->fetchAll();
         <?php if (!empty($hero['featured_image'])): ?>
           <img src="<?php echo htmlspecialchars(getAbsoluteImagePath($hero['featured_image'], $base)); ?>" alt="<?php echo htmlspecialchars($hero['title']); ?>" loading="eager"/>
         <?php else: ?>
-          <div style="width:100%;height:100%;background:linear-gradient(135deg,#1a1c2e,#2a2d45);"></div>
+          <div class="da-img-fallback"></div>
         <?php endif; ?>
         <div class="da-hero-main-overlay"></div>
         <div class="da-hero-main-content">
@@ -324,15 +324,15 @@ $brands = $brands_stmt->fetchAll();
         </div>
       </a>
 
-      <!-- 3 hot stories -->
-      <?php $hotStories = array_slice($posts, 1, 3); ?>
+      <!-- 4 hot stories -->
+      <?php $hotStories = array_slice($posts, 1, 4); ?>
       <div class="da-hero-stories">
         <?php foreach ($hotStories as $story): ?>
         <a href="<?php echo $base; ?>post/<?php echo urlencode($story['slug']); ?>" class="da-story-card">
           <?php if (!empty($story['featured_image'])): ?>
             <img src="<?php echo htmlspecialchars(getAbsoluteImagePath($story['featured_image'], $base)); ?>" alt="<?php echo htmlspecialchars($story['title']); ?>" loading="lazy"/>
           <?php else: ?>
-            <div style="width:100%;height:100%;background:linear-gradient(135deg,#1a1c2e,#2a2d45);"></div>
+            <div class="da-img-fallback"></div>
           <?php endif; ?>
           <div class="da-story-card-overlay"></div>
           <div class="da-story-card-title"><?php echo htmlspecialchars($story['title']); ?></div>
@@ -415,7 +415,7 @@ $brands = $brands_stmt->fetchAll();
             <?php if (!empty($post['featured_image'])): ?>
               <img src="<?php echo htmlspecialchars(getAbsoluteImagePath($post['featured_image'], $base)); ?>" alt="<?php echo htmlspecialchars($post['title']); ?>" loading="lazy"/>
             <?php else: ?>
-              <div style="width:100%;height:100%;background:linear-gradient(135deg,#1a1c2e,#2a2d45);display:flex;align-items:center;justify-content:center;"><i class="fa fa-newspaper" style="font-size:32px;color:var(--text-muted);"></i></div>
+              <div class="da-img-fallback-icon"><i class="fa fa-newspaper" style="font-size:32px;"></i></div>
             <?php endif; ?>
             <span class="da-post-card-tag">Article</span>
           </div>
@@ -637,7 +637,7 @@ $brands = $brands_stmt->fetchAll();
             <?php if (!empty($post['featured_image'])): ?>
               <img src="<?php echo htmlspecialchars(getAbsoluteImagePath($post['featured_image'], $base)); ?>" alt="<?php echo htmlspecialchars($post['title']); ?>" loading="lazy"/>
             <?php else: ?>
-              <div style="width:100%;height:100%;background:linear-gradient(135deg,#1a1c2e,#2a2d45);display:flex;align-items:center;justify-content:center;"><i class="fa fa-newspaper" style="color:var(--text-muted);font-size:20px;"></i></div>
+              <div class="da-img-fallback-icon"><i class="fa fa-newspaper" style="font-size:20px;"></i></div>
             <?php endif; ?>
           </div>
           <div class="da-ticker-item-body">
