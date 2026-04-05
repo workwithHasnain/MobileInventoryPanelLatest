@@ -394,8 +394,8 @@ button { cursor: pointer; border: none; outline: none; font-family: var(--font-m
   overflow: hidden;
   cursor: pointer;
   background: #1a1c2e;
-  aspect-ratio: 16/9;
-  max-height: 420px;
+  aspect-ratio: 21/9;
+  max-height: 380px;
 }
 .da-hero-main img {
   width: 100%; height: 100%;
@@ -459,7 +459,7 @@ button { cursor: pointer; border: none; outline: none; font-family: var(--font-m
   overflow: hidden;
   cursor: pointer;
   background: #1a1c2e;
-  aspect-ratio: 16/10;
+  aspect-ratio: 2/1;
 }
 .da-story-card img {
   width: 100%; height: 100%;
@@ -525,9 +525,9 @@ button { cursor: pointer; border: none; outline: none; font-family: var(--font-m
 .da-cbw-grid {
   display: grid;
   grid-template-columns: repeat(4, 1fr);
-  background: var(--bg-card-hover); /* A slightly offset background like the old light grey */
-  padding: 16px 8px;
-  gap: 12px 0; /* vertical gap 12px, horizontal 0 */
+  background: var(--bg-card-hover);
+  padding: 24px 8px;
+  gap: 16px 0;
   border-bottom: 1px solid var(--border);
 }
 
@@ -580,6 +580,47 @@ button { cursor: pointer; border: none; outline: none; font-family: var(--font-m
   background: rgba(255,255,255,0.05);
   color: #fff;
 }
+
+.da-ad-sidebar-rect {
+  width: 100%;
+  height: 380px;
+  background: rgba(128,128,128,0.1);
+  border: 1px dashed rgba(128,128,128,0.3);
+  border-radius: var(--radius-lg);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--text-muted);
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  margin-top: 24px;
+}
+
+.da-vs-hint {
+  font-size: 11px;
+  color: var(--text-muted);
+  margin-top: 4px;
+}
+
+.da-badge-count {
+  background: var(--bg-secondary);
+  padding: 4px 8px;
+  border-radius: 12px;
+  font-size: 10px;
+  font-weight: 600;
+  color: var(--text-secondary);
+}
+
+.da-icon-blue { margin-right: 4px; color: var(--accent-blue); }
+
+.da-widget-icon-red {
+  background: rgba(213,0,0,0.15);
+  color: var(--accent);
+}
+
+.da-trending-header { margin-bottom: 16px; }
 
 /* ══════════════════════════════════════════
    INFINITE BRAND MARQUEE (Bottom of page)

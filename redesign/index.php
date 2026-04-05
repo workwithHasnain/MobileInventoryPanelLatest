@@ -377,7 +377,7 @@ $brands = $brands_stmt->fetchAll();
       </div>
 
       <!-- AD PLACEHOLDER -->
-      <div class="da-ad-placeholder" style="width: 100%; height: 250px; background: rgba(128,128,128,0.1); border: 1px dashed rgba(128,128,128,0.3); border-radius: var(--radius-lg); display: flex; align-items: center; justify-content: center; color: var(--text-muted); font-size: 11px; font-weight: 700; letter-spacing: 0.1em; text-transform: uppercase; margin-top: 24px;">
+      <div class="da-ad-sidebar-rect">
         Advertisement
       </div>
     </div>
@@ -488,8 +488,8 @@ $brands = $brands_stmt->fetchAll();
                 </div>
               </div>
               <div style="text-align:center;margin-top:8px;">
-                <span class="count-badge" style="background:var(--bg-secondary);padding:4px 8px;border-radius:12px;font-size:10px;font-weight:600;color:var(--text-secondary);">
-                  <i class="fa fa-scale-balanced" style="margin-right:4px;color:var(--accent-blue);"></i> compared <?php echo number_format($cmp['comparison_count']); ?> times
+                <span class="count-badge da-badge-count">
+                  <i class="fa fa-scale-balanced da-icon-blue"></i> compared <?php echo number_format($cmp['comparison_count']); ?> times
                 </span>
               </div>
             </a>
@@ -503,7 +503,7 @@ $brands = $brands_stmt->fetchAll();
       <div class="da-widget">
         <div class="da-widget-header">
           <h3>Top 10 Daily Interest</h3>
-          <div class="da-widget-icon" style="background:rgba(213,0,0,0.15);color:var(--accent);"><i class="fa fa-fire"></i></div>
+          <div class="da-widget-icon da-widget-icon-red"><i class="fa fa-fire"></i></div>
         </div>
         <div class="da-widget-body">
           <?php if (empty($topViewedDevices)): ?>
@@ -580,7 +580,7 @@ $brands = $brands_stmt->fetchAll();
   <!-- ── TRENDING COMPARISONS ── -->
   <?php if (!empty($topComparisons)): ?>
   <section class="da-trending-section" aria-label="Trending Comparisons">
-    <div class="da-post-feed-header" style="margin-bottom:16px;">
+    <div class="da-post-feed-header da-trending-header">
       <div>
         <div class="da-section-label"><span>Compare</span></div>
         <h2 class="da-section-title">Trending Comparisons</h2>
@@ -610,7 +610,7 @@ $brands = $brands_stmt->fetchAll();
               <div class="da-vs-device-name"><?php echo $n2; ?></div>
             </div>
           </div>
-          <div style="font-size:11px;color:var(--text-muted);margin-top:4px;">Click to compare →</div>
+          <div class="da-vs-hint">Click to compare →</div>
         </a>
         <?php endforeach; ?>
       </div>
