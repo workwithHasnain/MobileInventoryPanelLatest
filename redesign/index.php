@@ -461,7 +461,7 @@ $brands = $brands_stmt->fetchAll();
                   <div class="da-device-spec-item"><i class="fa fa-memory"></i> <?php echo $device['ram']; ?></div>
                   <?php endif; ?>
                   <?php if (!empty($device['battery_capacity'])): ?>
-                  <div class="da-device-spec-item"><i class="fa fa-battery-full"></i> <?php echo $device['battery_capacity']; ?></div>
+                  <div class="da-device-spec-item"><i class="fa fa-battery-full"></i> <?php echo $device['battery_capacity']; ?> mAh</div>
                   <?php endif; ?>
                 </div>
               </div>
