@@ -346,6 +346,7 @@ $brands = $brands_stmt->fetchAll();
 
     <!-- Right: Brand panel (Classic Widget) -->
     <div class="da-hero-right">
+      <div class="da-section-label"><span>Brands</span></div>
       <div class="da-classic-brand-widget">
         <!-- Top header -->
         <div class="da-cbw-header">
