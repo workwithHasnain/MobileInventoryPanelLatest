@@ -6,3 +6,4 @@
 6. run tools first, show the result, then stop.
 7. Do not narrate: drop articles ("me fix code" not "I will fix the code").
 8. No inline css.
+9. keep Walkthroughs and Implementation plans as short as possible without narrations and using only short sentences.

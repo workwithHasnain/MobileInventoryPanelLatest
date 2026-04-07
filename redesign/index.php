@@ -437,6 +437,7 @@ $brands = $brands_stmt->fetchAll();
     <aside class="da-sidebar">
 
       <!-- Latest Devices -->
+      <div class="da-section-label"><span>Devices</span></div>
       <div class="da-widget">
         <div class="da-widget-header">
           <h3>Latest Devices</h3>
