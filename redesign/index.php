@@ -527,7 +527,9 @@ $brands = $brands_stmt->fetchAll();
           <div class="da-leaderboard">
             <?php foreach ($topViewedDevices as $i => $device): ?>
             <a href="<?php echo $base; ?>device/<?php echo urlencode($device['slug'] ?? $device['id']); ?>" class="da-leaderboard-row<?php echo $i < 3 ? ' top3' : ''; ?>">
-              <div class="rank"><?php echo $i + 1; ?></div>
+              <div class="rank <?php echo $i < 5 ? 'rank-up' : 'rank-down'; ?>">
+                <i class="fa fa-arrow-<?php echo $i < 5 ? 'up' : 'down'; ?>"></i>
+              </div>
               <div class="device-name"><?php echo htmlspecialchars($device['brand_name'] . ' ' . $device['name']); ?></div>
               <div class="count-badge"><?php echo $device['view_count']; ?></div>
             </a>
@@ -541,7 +543,7 @@ $brands = $brands_stmt->fetchAll();
       <div class="da-widget">
         <div class="da-widget-header">
           <h3>Top 10 by Fans</h3>
-          <div class="da-widget-icon" style="background:rgba(79,142,247,0.15);color:var(--accent-blue);"><i class="fa fa-star"></i></div>
+          <div class="da-widget-icon da-widget-icon-blue"><i class="fa fa-star"></i></div>
         </div>
         <div class="da-widget-body">
           <?php if (empty($topReviewedDevices)): ?>
@@ -550,7 +552,9 @@ $brands = $brands_stmt->fetchAll();
           <div class="da-leaderboard">
             <?php foreach ($topReviewedDevices as $i => $device): ?>
             <a href="<?php echo $base; ?>device/<?php echo urlencode($device['slug'] ?? $device['id']); ?>" class="da-leaderboard-row<?php echo $i < 3 ? ' top3' : ''; ?>">
-              <div class="rank"><?php echo $i + 1; ?></div>
+              <div class="rank <?php echo $i < 5 ? 'rank-up' : 'rank-down'; ?>">
+                <i class="fa fa-arrow-<?php echo $i < 5 ? 'up' : 'down'; ?>"></i>
+              </div>
               <div class="device-name"><?php echo htmlspecialchars($device['brand_name'] . ' ' . $device['name']); ?></div>
               <div class="count-badge"><?php echo $device['review_count']; ?></div>
             </a>

@@ -620,6 +620,11 @@ button { cursor: pointer; border: none; outline: none; font-family: var(--font-m
   color: var(--accent);
 }
 
+.da-widget-icon-blue {
+  background: rgba(79,142,247,0.15);
+  color: var(--accent-blue);
+}
+
 .da-trending-header { margin-bottom: 16px; }
 
 /* ══════════════════════════════════════════
@@ -1002,14 +1007,15 @@ button { cursor: pointer; border: none; outline: none; font-family: var(--font-m
 .da-leaderboard-row:last-child { border-bottom: none; }
 .da-leaderboard-row:hover { opacity: 0.82; }
 .da-leaderboard-row .rank {
-  width: 20px;
+  width: 24px;
   font-size: 11px;
-  font-weight: 700;
-  color: var(--text-muted);
+  display: flex;
+  align-items: center;
+  justify-content: center;
   flex-shrink: 0;
-  text-align: center;
 }
-.da-leaderboard-row.top3 .rank { color: var(--accent); }
+.rank-up { color: #2e7d32 !important; }
+.rank-down { color: #d32f2f !important; }
 .da-leaderboard-row .device-name {
   flex: 1;
   font-size: 12px;
