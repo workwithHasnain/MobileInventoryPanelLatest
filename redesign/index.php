@@ -563,7 +563,7 @@ $brands = $brands_stmt->fetchAll();
                       </div>
                     </div>
                     <div class="da-card-btn-wrap">
-                      <button class="da-card-cta-btn" onclick="window.location.href='<?php echo $cUrl; ?>'; return false;"></button>
+                      <button class="da-card-cta-btn" onclick="window.location.href='<?php echo $cUrl; ?>'; return false;">Compare Now →</button>
                     </div>
                   </a>
                 <?php endforeach; ?>

@@ -963,7 +963,6 @@ button {
   box-shadow: 0 4px 12px rgba(213, 0, 0, 0.2);
   overflow: hidden;
   white-space: nowrap;
-  content: 'Compare Now →';
 }
 
 /* .da-card-cta-btn::before {
