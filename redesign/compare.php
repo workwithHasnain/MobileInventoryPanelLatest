@@ -485,10 +485,8 @@ $da_active_nav = 'compare';
         </div>
       </div>
 
-      <div class="cp-table-scroll">
-
-      <!-- Sticky column headers -->
-      <div class="cp-col-heads<?php echo $phone3 ? ' three-phones' : ''; ?>">
+      <!-- Sticky column headers (outside scroll so sticky works) -->
+      <div class="cp-col-heads<?php echo $phone3 ? ' three-phones' : ''; ?>" id="cp-col-heads">
         <div class="cp-col-head-spacer"></div>
         <?php if ($phone1): ?>
         <div class="cp-col-head">
@@ -510,6 +508,8 @@ $da_active_nav = 'compare';
         <?php endif; ?>
       </div>
 
+      <!-- Horizontal scroll wrapper (only the table rows scroll) -->
+      <div class="cp-table-scroll" id="cp-table-scroll">
       <!-- Spec grid -->
       <div class="cp-table<?php echo $phone3 ? ' three-phones' : ''; ?>" id="cp-spec-table">
 
@@ -558,7 +558,7 @@ $da_active_nav = 'compare';
 
       </div><!-- /cp-table -->
       </div><!-- /cp-table-scroll -->
-    </div>
+    </div><!-- /cp-table-inner -->
   </div><!-- /cp-table-wrap -->
   <?php else: ?>
   <!-- Empty state -->
@@ -622,6 +622,15 @@ const cpNames = {
 
 // ══ Live Search ══
 let galleryState = { images: [], index: 0 };
+
+// ══ Sync col-heads horizontal scroll with table scroll ══
+(function() {
+  const scroll = document.getElementById('cp-table-scroll');
+  const heads  = document.getElementById('cp-col-heads');
+  if (scroll && heads) {
+    scroll.addEventListener('scroll', () => { heads.scrollLeft = scroll.scrollLeft; }, { passive: true });
+  }
+})();
 
 document.querySelectorAll('.cp-search-input').forEach(input => {
   const slot    = input.getAttribute('data-slot');

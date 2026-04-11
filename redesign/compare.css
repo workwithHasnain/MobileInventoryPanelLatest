@@ -346,14 +346,15 @@
 .cp-table-wrap {
   padding: 0 24px 60px;
   background: var(--bg-primary);
+  overflow: hidden;
 }
 .cp-table-scroll {
   overflow-x: auto;
   -webkit-overflow-scrolling: touch;
+  background: var(--bg-primary);
 }
 .cp-table-inner {
   max-width: 1300px;
-  min-width: 620px;
   margin: 0 auto;
 }
 
@@ -406,7 +407,11 @@
   background: #0b0d18;
   border: 1px solid var(--border);
   border-bottom: none;
+  position: sticky;
+  top: 0;
+  z-index: 20;
   min-width: 620px;
+  overflow-x: hidden;
 }
 .cp-col-heads.three-phones { grid-template-columns: 140px 1fr 1fr 1fr; }
 .cp-col-head-spacer { border-right: 1px solid var(--border); }
