@@ -402,18 +402,23 @@
 
 /* Column headers */
 .cp-col-heads {
-  display: grid;
-  grid-template-columns: 140px 1fr 1fr;
   background: #0b0d18;
   border: 1px solid var(--border);
   border-bottom: none;
   position: sticky;
   top: 0;
   z-index: 20;
-  min-width: 620px;
-  overflow-x: hidden;
+  overflow-x: scroll;
+  scrollbar-width: none;
 }
-.cp-col-heads.three-phones { grid-template-columns: 140px 1fr 1fr 1fr; }
+.cp-col-heads::-webkit-scrollbar { display: none; }
+.cp-col-heads-inner {
+  display: grid;
+  grid-template-columns: 140px 1fr 1fr;
+  min-width: 620px;
+  width: 100%;
+}
+.cp-col-heads-inner.three-phones { grid-template-columns: 140px 1fr 1fr 1fr; }
 .cp-col-head-spacer { border-right: 1px solid var(--border); }
 .cp-col-head {
   display: flex;

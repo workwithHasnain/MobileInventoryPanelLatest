@@ -485,8 +485,9 @@ $da_active_nav = 'compare';
         </div>
       </div>
 
-      <!-- Sticky column headers (outside scroll so sticky works) -->
+      <!-- Sticky column headers (outside scroll so sticky works, synced via JS) -->
       <div class="cp-col-heads<?php echo $phone3 ? ' three-phones' : ''; ?>" id="cp-col-heads">
+        <div class="cp-col-heads-inner<?php echo $phone3 ? ' three-phones' : ''; ?>">
         <div class="cp-col-head-spacer"></div>
         <?php if ($phone1): ?>
         <div class="cp-col-head">
@@ -506,6 +507,7 @@ $da_active_nav = 'compare';
           <span><?php echo getPhoneName($phone3); ?></span>
         </div>
         <?php endif; ?>
+        </div><!-- /cp-col-heads-inner -->
       </div>
 
       <!-- Horizontal scroll wrapper (only the table rows scroll) -->
