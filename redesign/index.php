@@ -546,6 +546,11 @@ $brands = $brands_stmt->fetchAll();
                   $n2 = htmlspecialchars($cmp['device2_name'] ?? 'Device');
                 ?>
                   <a href="<?php echo $cUrl; ?>" class="da-sidebar-vs-card">
+                    <div style="text-align:center;margin-top:3px;">
+                      <span class="count-badge da-badge-count">
+                        <i class="fa fa-scale-balanced da-icon-blue"></i> compared <?php echo number_format($cmp['comparison_count']); ?> times
+                      </span>
+                    </div>
                     <div class="da-sidebar-vs-row">
                       <div class="da-vs-col">
                         <?php if (!empty($cmp['device1_image'])): ?><img src="<?php echo htmlspecialchars(getAbsoluteImagePath($cmp['device1_image'], $base)); ?>" alt="<?php echo $n1; ?>" class="da-sidebar-vs-img" loading="lazy" /><?php endif; ?>
@@ -556,11 +561,6 @@ $brands = $brands_stmt->fetchAll();
                         <?php if (!empty($cmp['device2_image'])): ?><img src="<?php echo htmlspecialchars(getAbsoluteImagePath($cmp['device2_image'], $base)); ?>" alt="<?php echo $n2; ?>" class="da-sidebar-vs-img" loading="lazy" /><?php endif; ?>
                         <div class="da-sidebar-vs-name"><?php echo $n2; ?></div>
                       </div>
-                    </div>
-                    <div style="text-align:center;margin-top:3px;">
-                      <span class="count-badge da-badge-count">
-                        <i class="fa fa-scale-balanced da-icon-blue"></i> compared <?php echo number_format($cmp['comparison_count']); ?> times
-                      </span>
                     </div>
                     <div class="da-card-btn-wrap">
                       <button class="da-card-cta-btn" onclick="window.location.href='<?php echo $cUrl; ?>'; return false;"></button>
