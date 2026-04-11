@@ -557,7 +557,7 @@
 .cp-table-wrap {
   padding: 0 24px 60px;
   background: var(--bg-primary);
-  overflow: hidden;
+  overflow-x: clip;
 }
 .cp-table-scroll {
   overflow-x: auto;
