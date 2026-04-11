@@ -932,7 +932,7 @@ button {
 
 .da-badge-count {
   background: var(--bg-secondary);
-  padding: 4px 8px;
+  padding: 3px 6px;
   border-radius: 12px;
   font-size: 10px;
   font-weight: 600;
@@ -940,7 +940,7 @@ button {
 }
 
 .da-card-btn-wrap {
-  margin-top: 12px;
+  margin-top: 4px;
   text-align: center;
 }
 
@@ -948,28 +948,40 @@ button {
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  gap: 6px;
-  padding: 9px 14px;
-  border-radius: 6px;
+  gap: 0;
+  width: 44px;
+  height: 44px;
+  padding: 0;
+  border-radius: 50%;
   background: var(--accent);
   color: #fff;
-  font-size: 12px;
+  font-size: 16px;
   font-weight: 700;
   border: none;
   cursor: pointer;
-  transition: transform 0.2s ease, box-shadow 0.2s ease, opacity 0.2s ease;
+  transition: width 0.3s ease, gap 0.3s ease, border-radius 0.3s ease, box-shadow 0.2s ease;
   box-shadow: 0 4px 12px rgba(213, 0, 0, 0.2);
+  overflow: hidden;
+  white-space: nowrap;
+}
+
+.da-card-cta-btn::before {
+  content: '→';
+  display: inline-block;
+  font-size: 18px;
+  transition: opacity 0.3s ease;
 }
 
 .da-card-cta-btn:hover {
-  color: #fff;
-  transform: translateY(-1px);
-  opacity: 0.95;
+  width: 140px;
+  border-radius: 8px;
+  gap: 6px;
   box-shadow: 0 6px 16px rgba(213, 0, 0, 0.28);
 }
 
-.da-card-cta-btn:active {
-  transform: translateY(0);
+.da-card-cta-btn:hover::before {
+  content: '→ Compare Now';
+  font-size: 12px;
 }
 
 .da-icon-blue {
@@ -1350,7 +1362,7 @@ button {
   background: var(--bg-card);
   border: 1px solid var(--border);
   border-radius: var(--radius);
-  padding: 10px 8px;
+  padding: 8px 6px;
   cursor: pointer;
   transition: transform var(--transition), border-color var(--transition);
 }

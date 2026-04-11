@@ -557,13 +557,13 @@ $brands = $brands_stmt->fetchAll();
                         <div class="da-sidebar-vs-name"><?php echo $n2; ?></div>
                       </div>
                     </div>
-                    <div style="text-align:center;margin-top:8px;">
+                    <div style="text-align:center;margin-top:3px;">
                       <span class="count-badge da-badge-count">
                         <i class="fa fa-scale-balanced da-icon-blue"></i> compared <?php echo number_format($cmp['comparison_count']); ?> times
                       </span>
                     </div>
                     <div class="da-card-btn-wrap">
-                      <button class="da-card-cta-btn" onclick="window.location.href='<?php echo $cUrl; ?>'; return false;">Compare Now</button>
+                      <button class="da-card-cta-btn" onclick="window.location.href='<?php echo $cUrl; ?>'; return false;"></button>
                     </div>
                   </a>
                 <?php endforeach; ?>
