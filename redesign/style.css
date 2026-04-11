@@ -948,6 +948,27 @@ button {
   display: inline-flex;
   align-items: center;
   justify-content: center;
+  height: 25px;
+  padding: 0;
+  background: var(--accent);
+  color: #fff;
+  font-size: 11px;
+  font-weight: 700;
+  border: none;
+  cursor: pointer;
+  transition: width 0.3s ease, gap 0.3s ease, border-radius 0.3s ease, box-shadow 0.2s ease;
+  overflow: hidden;
+  white-space: nowrap;
+  width: 120px;
+  border-radius: 8px;
+  gap: 4px;
+  box-shadow: 0 6px 16px rgba(213, 0, 0, 0.28);
+}
+
+/* .da-card-cta-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
   gap: 0;
   width: 25px;
   height: 25px;
@@ -965,21 +986,21 @@ button {
   white-space: nowrap;
 }
 
-/* .da-card-cta-btn::before {
+.da-card-cta-btn::before {
   content: '→';
   display: inline-block;
   font-size: 16px;
   transition: opacity 0.3s ease;
-} */
+}
 
-/* .da-card-cta-btn:hover {
+.da-card-cta-btn:hover {
   width: 120px;
   border-radius: 8px;
   gap: 4px;
   box-shadow: 0 6px 16px rgba(213, 0, 0, 0.28);
-} */
+}
 
-/* .da-card-cta-btn:hover::before {
+.da-card-cta-btn:hover::before {
   content: '→ Compare Now';
   font-size: 11px;
 } */
