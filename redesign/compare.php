@@ -235,6 +235,55 @@ function formatPrice($phone) {
     return '<span class="cp-na">—</span>';
 }
 
+// ── Premium Phone Card Renderer ──
+function renderPhoneCard($phone, $slot, $base) {
+    $img   = getPhoneImage($phone);
+    $name  = htmlspecialchars($phone['name'] ?? '');
+    $brand = htmlspecialchars(strtoupper($phone['brand_name'] ?? ''));
+    $slug  = urlencode($phone['slug'] ?? $phone['id']);
+
+    $specs = [];
+    $dv = trim(($phone['display_size'] ?? '') . ($phone['display_size'] ? '"' : '') . (!empty($phone['display_resolution']) ? ' · ' . $phone['display_resolution'] : ''));
+    if ($dv) $specs[] = ['fa-display', 'Display', $dv];
+    if (!empty($phone['chipset_name'])) $specs[] = ['fa-microchip', 'Chipset', $phone['chipset_name']];
+    $mv = trim((!empty($phone['ram']) ? $phone['ram'] : '') . (!empty($phone['storage']) ? ' · ' . $phone['storage'] : ''));
+    if ($mv) $specs[] = ['fa-memory', 'Memory', $mv];
+    $cv = !empty($phone['main_camera_resolution']) ? $phone['main_camera_resolution'] . ' MP' : '';
+    if ($cv) $specs[] = ['fa-camera', 'Camera', $cv];
+    $bv = trim((!empty($phone['battery_capacity']) ? $phone['battery_capacity'] . ' mAh' : '') . (!empty($phone['wired_charging']) ? ' · ' . $phone['wired_charging'] . 'W' : ''));
+    if ($bv) $specs[] = ['fa-battery-full', 'Battery', $bv];
+    if (!empty($phone['os'])) $specs[] = ['fa-circle-info', 'OS', $phone['os']];
+
+    $html = '<div class="cp-filled-card">';
+    $html .= '<div class="cp-img-stage">';
+    $html .= '<div class="cp-phone-halo"></div>';
+    $html .= '<div class="cp-phone-halo cp-phone-halo-2"></div>';
+    $html .= '<img src="' . $img . '" alt="' . $brand . ' ' . $name . '" class="cp-img-float" onclick="showGallery(' . $slot . ')" />';
+    $html .= '<div class="cp-scanline"></div>';
+    $html .= '<div class="cp-gallery-badge" onclick="showGallery(' . $slot . ')"><i class="fa fa-images"></i> Gallery</div>';
+    $html .= '</div>';
+    $html .= '<div class="cp-device-identity">';
+    $html .= '<div class="cp-device-brand">' . $brand . '</div>';
+    $html .= '<div class="cp-device-name">' . $name . '</div>';
+    $html .= '</div>';
+    $html .= '<div class="cp-spec-dock">';
+    foreach ($specs as $sp) {
+        $html .= '<div class="cp-spec-block">';
+        $html .= '<div class="cp-spec-icon"><i class="fa ' . $sp[0] . '"></i></div>';
+        $html .= '<div class="cp-spec-content">';
+        $html .= '<div class="cp-spec-label">' . $sp[1] . '</div>';
+        $html .= '<div class="cp-spec-val">' . htmlspecialchars($sp[2]) . '</div>';
+        $html .= '</div></div>';
+    }
+    $html .= '</div>';
+    $html .= '<div class="cp-slot-ctas">';
+    $html .= '<a href="' . $base . 'device/' . $slug . '" class="cp-action-btn"><i class="fa fa-eye"></i> Full Specs</a>';
+    $html .= '<button class="cp-action-btn ghost" onclick="clearSlot(' . $slot . ')"><i class="fa fa-xmark"></i> Remove</button>';
+    $html .= '</div>';
+    $html .= '</div>';
+    return $html;
+}
+
 // ── Quick spec sections for summary rows ──
 $specSections = [
     ['icon' => 'fa-tower-broadcast',  'label' => 'Network',       'fn' => fn($p) => displayNetworkCapabilities($p)],
@@ -359,25 +408,7 @@ $da_active_nav = 'compare';
           </div>
         </div>
         <?php if ($phone1): ?>
-        <div class="cp-slot-preview cp-slot-filled">
-          <div class="cp-slot-img-ring" onclick="showGallery(1)" title="View gallery">
-            <img src="<?php echo getPhoneImage($phone1); ?>" alt="<?php echo getPhoneName($phone1); ?>" class="cp-slot-img"/>
-            <div class="cp-slot-img-hint"><i class="fa fa-images"></i> Gallery</div>
-          </div>
-          <div class="cp-slot-meta">
-            <div class="cp-slot-brand"><?php echo htmlspecialchars($phone1['brand_name'] ?? ''); ?></div>
-            <div class="cp-slot-name"><?php echo htmlspecialchars($phone1['name'] ?? ''); ?></div>
-            <div class="cp-slot-tags">
-              <?php if (!empty($phone1['display_size'])): ?><span class="cp-tag"><i class="fa fa-display"></i> <?php echo $phone1['display_size']; ?>"</span><?php endif; ?>
-              <?php if (!empty($phone1['ram'])): ?><span class="cp-tag"><i class="fa fa-memory"></i> <?php echo $phone1['ram']; ?></span><?php endif; ?>
-              <?php if (!empty($phone1['battery_capacity'])): ?><span class="cp-tag"><i class="fa fa-battery-full"></i> <?php echo $phone1['battery_capacity']; ?></span><?php endif; ?>
-            </div>
-            <div class="cp-slot-actions">
-              <a href="<?php echo $base; ?>device/<?php echo urlencode($phone1['slug'] ?? $phone1['id']); ?>" class="cp-action-btn"><i class="fa fa-eye"></i> Full Specs</a>
-              <button class="cp-action-btn ghost" onclick="clearSlot(1)"><i class="fa fa-xmark"></i> Remove</button>
-            </div>
-          </div>
-        </div>
+        <?php echo renderPhoneCard($phone1, 1, $base); ?>
         <?php else: ?>
         <div class="cp-slot-preview cp-slot-empty">
           <div class="cp-slot-empty-icon"><i class="fa fa-mobile-screen"></i></div>
@@ -400,25 +431,7 @@ $da_active_nav = 'compare';
           </div>
         </div>
         <?php if ($phone2): ?>
-        <div class="cp-slot-preview cp-slot-filled">
-          <div class="cp-slot-img-ring" onclick="showGallery(2)" title="View gallery">
-            <img src="<?php echo getPhoneImage($phone2); ?>" alt="<?php echo getPhoneName($phone2); ?>" class="cp-slot-img"/>
-            <div class="cp-slot-img-hint"><i class="fa fa-images"></i> Gallery</div>
-          </div>
-          <div class="cp-slot-meta">
-            <div class="cp-slot-brand"><?php echo htmlspecialchars($phone2['brand_name'] ?? ''); ?></div>
-            <div class="cp-slot-name"><?php echo htmlspecialchars($phone2['name'] ?? ''); ?></div>
-            <div class="cp-slot-tags">
-              <?php if (!empty($phone2['display_size'])): ?><span class="cp-tag"><i class="fa fa-display"></i> <?php echo $phone2['display_size']; ?>"</span><?php endif; ?>
-              <?php if (!empty($phone2['ram'])): ?><span class="cp-tag"><i class="fa fa-memory"></i> <?php echo $phone2['ram']; ?></span><?php endif; ?>
-              <?php if (!empty($phone2['battery_capacity'])): ?><span class="cp-tag"><i class="fa fa-battery-full"></i> <?php echo $phone2['battery_capacity']; ?></span><?php endif; ?>
-            </div>
-            <div class="cp-slot-actions">
-              <a href="<?php echo $base; ?>device/<?php echo urlencode($phone2['slug'] ?? $phone2['id']); ?>" class="cp-action-btn"><i class="fa fa-eye"></i> Full Specs</a>
-              <button class="cp-action-btn ghost" onclick="clearSlot(2)"><i class="fa fa-xmark"></i> Remove</button>
-            </div>
-          </div>
-        </div>
+        <?php echo renderPhoneCard($phone2, 2, $base); ?>
         <?php else: ?>
         <div class="cp-slot-preview cp-slot-empty">
           <div class="cp-slot-empty-icon"><i class="fa fa-mobile-screen"></i></div>
@@ -441,25 +454,7 @@ $da_active_nav = 'compare';
           </div>
         </div>
         <?php if ($phone3): ?>
-        <div class="cp-slot-preview cp-slot-filled">
-          <div class="cp-slot-img-ring" onclick="showGallery(3)" title="View gallery">
-            <img src="<?php echo getPhoneImage($phone3); ?>" alt="<?php echo getPhoneName($phone3); ?>" class="cp-slot-img"/>
-            <div class="cp-slot-img-hint"><i class="fa fa-images"></i> Gallery</div>
-          </div>
-          <div class="cp-slot-meta">
-            <div class="cp-slot-brand"><?php echo htmlspecialchars($phone3['brand_name'] ?? ''); ?></div>
-            <div class="cp-slot-name"><?php echo htmlspecialchars($phone3['name'] ?? ''); ?></div>
-            <div class="cp-slot-tags">
-              <?php if (!empty($phone3['display_size'])): ?><span class="cp-tag"><i class="fa fa-display"></i> <?php echo $phone3['display_size']; ?>"</span><?php endif; ?>
-              <?php if (!empty($phone3['ram'])): ?><span class="cp-tag"><i class="fa fa-memory"></i> <?php echo $phone3['ram']; ?></span><?php endif; ?>
-              <?php if (!empty($phone3['battery_capacity'])): ?><span class="cp-tag"><i class="fa fa-battery-full"></i> <?php echo $phone3['battery_capacity']; ?></span><?php endif; ?>
-            </div>
-            <div class="cp-slot-actions">
-              <a href="<?php echo $base; ?>device/<?php echo urlencode($phone3['slug'] ?? $phone3['id']); ?>" class="cp-action-btn"><i class="fa fa-eye"></i> Full Specs</a>
-              <button class="cp-action-btn ghost" onclick="clearSlot(3)"><i class="fa fa-xmark"></i> Remove</button>
-            </div>
-          </div>
-        </div>
+        <?php echo renderPhoneCard($phone3, 3, $base); ?>
         <?php else: ?>
         <div class="cp-slot-preview cp-slot-empty">
           <div class="cp-slot-empty-icon"><i class="fa fa-mobile-screen"></i></div>
