@@ -491,7 +491,7 @@ $da_active_nav = 'compare';
       </div>
 
       <!-- VS Badge 2→3 -->
-      <div class="cp-vs-badge cp-vs-optional">+</div>
+      <div class="cp-vs-badge">VS</div>
 
       <!-- Slot 3 -->
       <div class="cp-slot" id="cp-slot-3" data-slot="3">
@@ -533,7 +533,6 @@ $da_active_nav = 'compare';
       <!-- Sticky column headers (outside scroll so sticky works, synced via JS) -->
       <div class="cp-col-heads<?php echo $phone3 ? ' three-phones' : ''; ?>" id="cp-col-heads">
         <div class="cp-col-heads-inner<?php echo $phone3 ? ' three-phones' : ''; ?>">
-        <div class="cp-col-head-spacer"></div>
         <?php if ($phone1): ?>
         <div class="cp-col-head">
           <img src="<?php echo getPhoneImage($phone1); ?>" alt="<?php echo getPhoneName($phone1); ?>"/>

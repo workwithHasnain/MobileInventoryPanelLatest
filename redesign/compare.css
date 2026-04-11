@@ -625,12 +625,11 @@
 .cp-col-heads::-webkit-scrollbar { display: none; }
 .cp-col-heads-inner {
   display: grid;
-  grid-template-columns: 140px 1fr 1fr;
-  min-width: 620px;
+  grid-template-columns: 1fr 1fr;
+  min-width: 420px;
   width: 100%;
 }
-.cp-col-heads-inner.three-phones { grid-template-columns: 140px 1fr 1fr 1fr; }
-.cp-col-head-spacer { border-right: 1px solid var(--border); }
+.cp-col-heads-inner.three-phones { grid-template-columns: 1fr 1fr 1fr; }
 .cp-col-head {
   display: flex;
   align-items: center;
@@ -657,7 +656,7 @@
   border-top: none;
   border-radius: 0 0 var(--radius-lg) var(--radius-lg);
   overflow: hidden;
-  min-width: 620px;
+  min-width: 420px;
 }
 
 /* Section head */
