@@ -963,26 +963,27 @@ button {
   box-shadow: 0 4px 12px rgba(213, 0, 0, 0.2);
   overflow: hidden;
   white-space: nowrap;
+  content: 'Compare Now →';
 }
 
-.da-card-cta-btn::before {
+/* .da-card-cta-btn::before {
   content: '→';
   display: inline-block;
   font-size: 16px;
   transition: opacity 0.3s ease;
-}
+} */
 
-.da-card-cta-btn:hover {
+/* .da-card-cta-btn:hover {
   width: 120px;
   border-radius: 8px;
   gap: 4px;
   box-shadow: 0 6px 16px rgba(213, 0, 0, 0.28);
-}
+} */
 
-.da-card-cta-btn:hover::before {
+/* .da-card-cta-btn:hover::before {
   content: '→ Compare Now';
   font-size: 11px;
-}
+} */
 
 .da-icon-blue {
   margin-right: 4px;
