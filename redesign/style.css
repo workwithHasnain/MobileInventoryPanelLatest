@@ -939,32 +939,37 @@ button {
   color: var(--text-secondary);
 }
 
-.da-compare-now-wrap {
-  margin-top: 14px;
+.da-card-btn-wrap {
+  margin-top: 12px;
   text-align: center;
 }
 
-.da-compare-now-btn {
+.da-card-cta-btn {
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  gap: 8px;
-  min-width: 150px;
-  padding: 10px 16px;
-  border-radius: 999px;
+  gap: 6px;
+  padding: 9px 14px;
+  border-radius: 6px;
   background: var(--accent);
   color: #fff;
   font-size: 12px;
   font-weight: 700;
-  text-decoration: none;
+  border: none;
+  cursor: pointer;
   transition: transform 0.2s ease, box-shadow 0.2s ease, opacity 0.2s ease;
-  box-shadow: 0 10px 24px rgba(213, 0, 0, 0.24);
+  box-shadow: 0 4px 12px rgba(213, 0, 0, 0.2);
 }
 
-.da-compare-now-btn:hover {
+.da-card-cta-btn:hover {
   color: #fff;
   transform: translateY(-1px);
   opacity: 0.95;
+  box-shadow: 0 6px 16px rgba(213, 0, 0, 0.28);
+}
+
+.da-card-cta-btn:active {
+  transform: translateY(0);
 }
 
 .da-icon-blue {

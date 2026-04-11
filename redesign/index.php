@@ -562,11 +562,11 @@ $brands = $brands_stmt->fetchAll();
                         <i class="fa fa-scale-balanced da-icon-blue"></i> compared <?php echo number_format($cmp['comparison_count']); ?> times
                       </span>
                     </div>
+                    <div class="da-card-btn-wrap">
+                      <button class="da-card-cta-btn" onclick="window.location.href='<?php echo $cUrl; ?>'; return false;">Compare Now</button>
+                    </div>
                   </a>
                 <?php endforeach; ?>
-              </div>
-              <div class="da-compare-now-wrap">
-                <a href="<?php echo $base; ?>compare" class="da-compare-now-btn">Compare Now</a>
               </div>
             <?php endif; ?>
           </div>
