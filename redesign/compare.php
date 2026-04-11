@@ -485,6 +485,8 @@ $da_active_nav = 'compare';
         </div>
       </div>
 
+      <div class="cp-table-scroll">
+
       <!-- Sticky column headers -->
       <div class="cp-col-heads<?php echo $phone3 ? ' three-phones' : ''; ?>">
         <div class="cp-col-head-spacer"></div>
@@ -538,22 +540,24 @@ $da_active_nav = 'compare';
         ?>
         <div class="cp-section-head"><i class="fa fa-chevron-right"></i> <?php echo htmlspecialchars($section); ?></div>
         <?php for ($i = 0; $i < $maxRows; $i++):
+          $f1    = $rows1[$i]['field'] ?? '';
+          $f2    = $rows2[$i]['field'] ?? '';
+          $f3    = $rows3[$i]['field'] ?? '';
           $d1    = $rows1[$i]['description'] ?? '';
           $d2    = $rows2[$i]['description'] ?? '';
           $d3    = $rows3[$i]['description'] ?? '';
-          $label = $rows1[$i]['field'] ?? ($rows2[$i]['field'] ?? ($rows3[$i]['field'] ?? ''));
           $ident = ($d1 !== '' && $d1 === $d2) && (!$phone3 || $d1 === $d3);
         ?>
         <div class="cp-row cp-row-sub<?php echo $ident ? ' cp-row-identical' : ''; ?>" data-identical="<?php echo $ident ? '1' : '0'; ?>">
-          <div class="cp-row-label cp-row-sublabel"><?php echo htmlspecialchars($label); ?></div>
-          <?php if ($phone1): ?><div class="cp-row-cell"><?php echo $d1 !== '' ? nl2br(htmlspecialchars($d1)) : '<span class="cp-na">—</span>'; ?></div><?php endif; ?>
-          <?php if ($phone2): ?><div class="cp-row-cell"><?php echo $d2 !== '' ? nl2br(htmlspecialchars($d2)) : '<span class="cp-na">—</span>'; ?></div><?php endif; ?>
-          <?php if ($phone3): ?><div class="cp-row-cell"><?php echo $d3 !== '' ? nl2br(htmlspecialchars($d3)) : '<span class="cp-na">—</span>'; ?></div><?php endif; ?>
+          <?php if ($phone1): ?><div class="cp-row-cell"><?php if ($f1): ?><div class="cp-cell-field"><?php echo htmlspecialchars($f1); ?></div><?php endif; ?><?php echo $d1 !== '' ? nl2br(htmlspecialchars($d1)) : '<span class="cp-na">—</span>'; ?></div><?php endif; ?>
+          <?php if ($phone2): ?><div class="cp-row-cell"><?php if ($f2): ?><div class="cp-cell-field"><?php echo htmlspecialchars($f2); ?></div><?php endif; ?><?php echo $d2 !== '' ? nl2br(htmlspecialchars($d2)) : '<span class="cp-na">—</span>'; ?></div><?php endif; ?>
+          <?php if ($phone3): ?><div class="cp-row-cell"><?php if ($f3): ?><div class="cp-cell-field"><?php echo htmlspecialchars($f3); ?></div><?php endif; ?><?php echo $d3 !== '' ? nl2br(htmlspecialchars($d3)) : '<span class="cp-na">—</span>'; ?></div><?php endif; ?>
         </div>
         <?php endfor; ?>
         <?php endforeach; ?>
 
       </div><!-- /cp-table -->
+      </div><!-- /cp-table-scroll -->
     </div>
   </div><!-- /cp-table-wrap -->
   <?php else: ?>
