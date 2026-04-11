@@ -949,13 +949,13 @@ button {
   align-items: center;
   justify-content: center;
   gap: 0;
-  width: 44px;
-  height: 44px;
+  width: 36px;
+  height: 36px;
   padding: 0;
   border-radius: 50%;
   background: var(--accent);
   color: #fff;
-  font-size: 16px;
+  font-size: 14px;
   font-weight: 700;
   border: none;
   cursor: pointer;
@@ -968,20 +968,20 @@ button {
 .da-card-cta-btn::before {
   content: '→';
   display: inline-block;
-  font-size: 18px;
+  font-size: 16px;
   transition: opacity 0.3s ease;
 }
 
 .da-card-cta-btn:hover {
-  width: 140px;
+  width: 120px;
   border-radius: 8px;
-  gap: 6px;
+  gap: 4px;
   box-shadow: 0 6px 16px rgba(213, 0, 0, 0.28);
 }
 
 .da-card-cta-btn:hover::before {
   content: '→ Compare Now';
-  font-size: 12px;
+  font-size: 11px;
 }
 
 .da-icon-blue {
