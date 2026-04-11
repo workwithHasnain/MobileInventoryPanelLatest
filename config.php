@@ -56,7 +56,7 @@ $_ENV['APP_DEBUG'] = $_ENV['APP_DEBUG'] ?? 'true';
 // Base URL configuration - Change based on environment
 // Localhost: /MobileInventoryPanelLatest/
 // Production: /
-$base = '/'; // Adjust this if deploying to production or a different subdirectory
+$base = '/MobileInventoryPanelLatest/'; // Adjust this if deploying to production or a different subdirectory
 
 // Canonical base URL for SEO (fixed domain)
 $canonicalBase = 'https://www.devicesarena.com';

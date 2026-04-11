@@ -3115,6 +3115,17 @@ $commentCount = getDeviceCommentCount($pdo, $device_id);
     }
   });
 
+  // Truncate device card subtitle text if longer than 15 characters
+  document.addEventListener('DOMContentLoaded', function() {
+    const maxSubtitleLength = 15;
+    document.querySelectorAll('.spec-subtitle').forEach(function(element) {
+      const originalText = (element.textContent || '').trim();
+      if (originalText.length > maxSubtitleLength) {
+        element.textContent = originalText.substring(0, maxSubtitleLength) + '...';
+      }
+    });
+  });
+
   // Toggle expand/collapse button
   function toggleExpandBtn(btn) {
     const networkRows = document.querySelectorAll('.network-row');
