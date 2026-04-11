@@ -66,11 +66,9 @@
 .cp-stage {
   padding: 40px 24px;
   background: var(--bg-primary);
-  overflow-x: auto;
 }
 .cp-stage-inner {
   max-width: 1300px;
-  min-width: 700px;
   margin: 0 auto;
   display: flex;
   align-items: flex-start;
@@ -408,9 +406,6 @@
   background: #0b0d18;
   border: 1px solid var(--border);
   border-bottom: none;
-  position: sticky;
-  top: 0;
-  z-index: 10;
   min-width: 620px;
 }
 .cp-col-heads.three-phones { grid-template-columns: 140px 1fr 1fr 1fr; }
@@ -693,14 +688,15 @@
 
 /* ── Responsive ── */
 @media (max-width: 900px) {
-  .cp-stage {
-    padding: 24px 16px;
+  .cp-stage-inner {
+    flex-direction: column;
+    gap: 16px;
+    align-items: stretch;
   }
   .cp-vs-badge {
-    margin-top: 80px;
+    margin: 0 auto;
     width: 40px; height: 40px;
     font-size: 11px;
-    flex-shrink: 0;
   }
   .cp-vs-optional { display: none; }
   .cp-toggle-bar { flex-direction: column; gap: 10px; align-items: flex-start; }
@@ -709,5 +705,6 @@
 
 @media (max-width: 600px) {
   .cp-hero { padding: 36px 16px 32px; }
+  .cp-stage { padding: 24px 12px; }
   .cp-table-wrap { padding: 0 10px 40px; }
 }
