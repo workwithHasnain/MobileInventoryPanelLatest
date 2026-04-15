@@ -41,6 +41,31 @@ $brands = $brands_stmt->fetchAll();
 // ── All phones for comparison ──
 $phones = getAllPhones();
 
+// ── Data for bottom sections ──
+$latestDevices = array_slice(array_reverse($phones), 0, 9);
+
+try {
+    $topComparisons = getPopularComparisons(10);
+} catch (Exception $e) {
+    $topComparisons = [];
+}
+
+try {
+    $posts_stmt = $pdo->prepare("
+        SELECT p.*, 
+        (SELECT COUNT(*) FROM post_comments pc WHERE pc.post_id = p.id AND pc.status = 'approved') as comment_count
+        FROM posts p 
+        WHERE p.status ILIKE 'published' 
+        ORDER BY p.created_at DESC 
+        LIMIT 20
+    ");
+    $posts_stmt->execute();
+    $posts = $posts_stmt->fetchAll();
+} catch (Exception $e) {
+    $posts = [];
+}
+
+
 // ── Parse selected phone slugs ──
 if (isset($_GET['slugs'])) {
     $slugParts    = explode('-vs-', $_GET['slugs']);
@@ -441,6 +466,12 @@ $da_active_nav = 'compare';
 
   <!-- Hero Banner -->
   <div class="cp-hero">
+    
+    <!-- Background Image Implementation based on original layout -->
+    <div class="cp-hero-bg-container">
+        <img class="cp-hero-bg-img" src="<?php echo $base; ?>hero-images/compare-hero.png" alt="compare smartphones background">
+    </div>
+
     <div class="cp-hero-inner">
       <div class="cp-hero-left">
         <div class="cp-hero-label"><span>DevicesArena</span></div>
@@ -643,6 +674,108 @@ $da_active_nav = 'compare';
     <p>Search and select devices above. Compare up to 3 phones side by side.</p>
   </div>
   <?php endif; ?>
+
+  <!-- ── IN STORES NOW ── -->
+  <section class="da-instore-section" aria-label="In Stores Now">
+    <div class="da-instore-inner">
+      <div class="da-instore-header">
+        <div>
+          <div class="da-section-label"><span>Devices</span></div>
+          <h2 class="da-section-title">In Stores Now</h2>
+        </div>
+        <a href="<?php echo $base; ?>brands" class="da-view-all">Browse All <i class="fa fa-arrow-right"></i></a>
+      </div>
+      <div class="da-slider-wrap">
+        <button class="da-slider-btn prev" aria-label="Previous"><i class="fa fa-chevron-left"></i></button>
+        <button class="da-slider-btn next" aria-label="Next"><i class="fa fa-chevron-right"></i></button>
+        <div class="da-instore-scroll da-auto-slider" id="da-instore-scroll">
+          <?php if (empty($latestDevices)): ?>
+            <div class="da-empty"><i class="fa fa-mobile-alt"></i>No devices.</div>
+          <?php else: ?>
+            <?php foreach ($latestDevices as $device): ?>
+              <a href="<?php echo $base; ?>device/<?php echo urlencode($device['slug']); ?>" class="da-device-card">
+                <img src="<?php echo htmlspecialchars(getAbsoluteImagePath($device['image'], $base)); ?>" alt="<?php echo htmlspecialchars($device['name']); ?>" loading="lazy" />
+                <div class="da-device-card-name"><?php echo htmlspecialchars($device['name']); ?></div>
+              </a>
+            <?php endforeach; ?>
+          <?php endif; ?>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ── TRENDING COMPARISONS ── -->
+  <?php if (!empty($topComparisons)): ?>
+    <section class="da-trending-section" aria-label="Trending Comparisons">
+      <div class="da-post-feed-header da-trending-header">
+        <div>
+          <div class="da-section-label"><span>Compare</span></div>
+          <h2 class="da-section-title">Trending Comparisons</h2>
+        </div>
+        <a href="<?php echo $base; ?>compare" class="da-view-all">Compare Tool <i class="fa fa-arrow-right"></i></a>
+      </div>
+      <div class="da-slider-wrap">
+        <button class="da-slider-btn prev" aria-label="Previous"><i class="fa fa-chevron-left"></i></button>
+        <button class="da-slider-btn next" aria-label="Next"><i class="fa fa-chevron-right"></i></button>
+        <div class="da-trending-scroll da-auto-slider">
+          <?php foreach ($topComparisons as $cmp):
+            $s1 = $cmp['device1_slug'] ?? $cmp['device1_id'] ?? '';
+            $s2 = $cmp['device2_slug'] ?? $cmp['device2_id'] ?? '';
+            $cUrl = $base . 'compare/' . urlencode($s1) . '-vs-' . urlencode($s2);
+            $n1 = htmlspecialchars($cmp['device1_name'] ?? 'Device 1');
+            $n2 = htmlspecialchars($cmp['device2_name'] ?? 'Device 2');
+          ?>
+            <a href="<?php echo $cUrl; ?>" class="da-vs-card">
+              <div class="da-vs-row">
+                <div class="da-vs-col">
+                  <?php if (!empty($cmp['device1_image'])): ?><img src="<?php echo htmlspecialchars(getAbsoluteImagePath($cmp['device1_image'], $base)); ?>" alt="<?php echo $n1; ?>" class="da-vs-img" loading="lazy" /><?php endif; ?>
+                  <div class="da-vs-device-name"><?php echo $n1; ?></div>
+                </div>
+                <div class="da-vs-divider">VS</div>
+                <div class="da-vs-col">
+                  <?php if (!empty($cmp['device2_image'])): ?><img src="<?php echo htmlspecialchars(getAbsoluteImagePath($cmp['device2_image'], $base)); ?>" alt="<?php echo $n2; ?>" class="da-vs-img" loading="lazy" /><?php endif; ?>
+                  <div class="da-vs-device-name"><?php echo $n2; ?></div>
+                </div>
+              </div>
+              <div class="da-vs-hint">Click to compare →</div>
+            </a>
+          <?php endforeach; ?>
+        </div>
+      </div>
+    </section>
+  <?php endif; ?>
+
+  <!-- ── FEATURED POSTS TICKER ── -->
+  <section class="da-ticker-section" aria-label="All Posts">
+    <div class="da-ticker-header">
+      <div>
+        <div class="da-section-label"><span>Stories</span></div>
+        <h2 class="da-section-title">All Featured Posts</h2>
+      </div>
+      <a href="<?php echo $base; ?>featured" class="da-view-all">See All <i class="fa fa-arrow-right"></i></a>
+    </div>
+    <div class="da-slider-wrap">
+      <button class="da-slider-btn prev" aria-label="Previous"><i class="fa fa-chevron-left"></i></button>
+      <button class="da-slider-btn next" aria-label="Next"><i class="fa fa-chevron-right"></i></button>
+      <div class="da-ticker-scroll da-auto-slider" id="featured-scroll-container">
+        <?php foreach ($posts as $post): ?>
+          <a href="<?php echo $base; ?>post/<?php echo urlencode($post['slug']); ?>" class="da-ticker-item">
+            <div class="da-ticker-item-img">
+              <?php if (!empty($post['featured_image'])): ?>
+                <img src="<?php echo htmlspecialchars(getAbsoluteImagePath($post['featured_image'], $base)); ?>" alt="<?php echo htmlspecialchars($post['title']); ?>" loading="lazy" />
+              <?php else: ?>
+                <div class="da-img-fallback-icon"><i class="fa fa-newspaper" style="font-size:20px;"></i></div>
+              <?php endif; ?>
+            </div>
+            <div class="da-ticker-item-body">
+              <div class="da-ticker-item-title"><?php echo htmlspecialchars($post['title']); ?></div>
+            </div>
+          </a>
+        <?php endforeach; ?>
+      </div>
+    </div>
+  </section>
+
 
   <!-- ── INFINITE BRAND MARQUEE ── -->
   <section class="da-marquee-section" aria-label="All Brands">

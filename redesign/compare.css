@@ -11,15 +11,27 @@
 
 /* ── Hero Banner ── */
 .cp-hero {
-  background: linear-gradient(135deg, rgba(13,15,26,0.92) 0%, rgba(17,20,34,0.9) 50%, rgba(26,10,10,0.95) 100%),
-              url('../hero-images/compare-hero.png');
-  background-size: cover;
-  background-position: center;
-  background-repeat: no-repeat;
+  background: linear-gradient(135deg, #0d0f1a 0%, #111422 50%, #1a0a0a 100%);
   border-bottom: 1px solid var(--border);
   padding: 52px 24px 44px;
   position: relative;
   overflow: hidden;
+}
+.cp-hero-bg-container {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+  z-index: 0;
+  /* Blend nicely */
+  opacity: 0.15;
+  mix-blend-mode: luminosity;
+}
+.cp-hero-bg-img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
 }
 .cp-hero::before {
   content: '';
