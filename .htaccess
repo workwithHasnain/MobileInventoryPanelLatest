@@ -37,6 +37,9 @@
     # Route for compare.php: compare/slug1-vs-slug2-vs-slug3
     RewriteRule ^compare/(.+)/?$ compare.php?slugs=$1 [L,QSA]
 
+    # Route for device images: /device/slug/images
+    RewriteRule ^device/([a-z0-9\-]+)/images/?$ device-images.php?slug=$1 [L,QSA]
+
     # Route for device.php: /device/slug
     RewriteRule ^device/([a-z0-9\-]+)/?$ device.php?slug=$1 [L,QSA]
 
