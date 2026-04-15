@@ -678,10 +678,10 @@
 .cp-col-heads-inner {
   display: grid;
   grid-template-columns: 1fr 1fr;
-  min-width: 420px;
+  min-width: 600px;
   width: 100%;
 }
-.cp-col-heads-inner.three-phones { grid-template-columns: 1fr 1fr 1fr; }
+.cp-col-heads-inner.three-phones { grid-template-columns: 1fr 1fr 1fr; min-width: 780px; }
 .cp-col-head {
   display: flex;
   align-items: center;
@@ -708,7 +708,10 @@
   border-top: none;
   border-radius: 0 0 var(--radius-lg) var(--radius-lg);
   overflow: hidden;
-  min-width: 420px;
+  min-width: 600px;
+}
+.cp-table.three-phones {
+  min-width: 780px;
 }
 
 /* Section head */

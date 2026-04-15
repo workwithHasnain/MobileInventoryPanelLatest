@@ -1676,12 +1676,12 @@ function formatDeviceSpecsStructured($device)
                     <?php if ($phone1): ?>
                         <div class="phone-name"><?php echo getPhoneName($phone1); ?></div>
                         <div class="d-flex">
-                            <img src="<?php echo getPhoneImage($phone1); ?>" alt="<?php echo getPhoneName($phone1); ?>" onclick="showComparePicturesModal(1)">
+                            <img src="<?php echo getPhoneImage($phone1); ?>" alt="<?php echo getPhoneName($phone1); ?>" onclick="window.location.href='/device/<?php echo urlencode($phone1['slug'] ?? $phone1['id']); ?>/images'">
                             <div class="buttons">
                                 <button onclick="window.location.href='/device/<?php echo urlencode($phone1['slug'] ?? $phone1['id']); ?>'">REVIEW</button>
                                 <button onclick="window.location.href='/device/<?php echo urlencode($phone1['slug'] ?? $phone1['id']); ?>'">SPECIFICATIONS</button>
                                 <button onclick="window.location.href='/device/<?php echo urlencode($phone1['slug'] ?? $phone1['id']); ?>#comments'">READ OPINIONS</button>
-                                <button onclick="showComparePicturesModal(1)">PICTURES</button>
+                                <button onclick="window.location.href='/device/<?php echo urlencode($phone1['slug'] ?? $phone1['id']); ?>/images'">PICTURES</button>
                             </div>
                         </div>
                     <?php else: ?>
@@ -1708,12 +1708,12 @@ function formatDeviceSpecsStructured($device)
                     <?php if ($phone2): ?>
                         <div class="phone-name"><?php echo getPhoneName($phone2); ?></div>
                         <div class="d-flex">
-                            <img src="<?php echo getPhoneImage($phone2); ?>" alt="<?php echo getPhoneName($phone2); ?>" onclick="showComparePicturesModal(2)">
+                            <img src="<?php echo getPhoneImage($phone2); ?>" alt="<?php echo getPhoneName($phone2); ?>" onclick="window.location.href='/device/<?php echo urlencode($phone2['slug'] ?? $phone2['id']); ?>/images'">
                             <div class="buttons">
                                 <button onclick="window.location.href='/device/<?php echo urlencode($phone2['slug'] ?? $phone2['id']); ?>'">REVIEW</button>
                                 <button onclick="window.location.href='/device/<?php echo urlencode($phone2['slug'] ?? $phone2['id']); ?>'">SPECIFICATIONS</button>
                                 <button onclick="window.location.href='/device/<?php echo urlencode($phone2['slug'] ?? $phone2['id']); ?>#comments'">READ OPINIONS</button>
-                                <button onclick="showComparePicturesModal(2)">PICTURES</button>
+                                <button onclick="window.location.href='/device/<?php echo urlencode($phone2['slug'] ?? $phone2['id']); ?>/images'">PICTURES</button>
                             </div>
                         </div>
                     <?php else: ?>
@@ -1742,12 +1742,12 @@ function formatDeviceSpecsStructured($device)
                     <?php if ($phone3): ?>
                         <div class="phone-name"><?php echo getPhoneName($phone3); ?></div>
                         <div class="d-flex">
-                            <img src="<?php echo getPhoneImage($phone3); ?>" alt="<?php echo getPhoneName($phone3); ?>" onclick="showComparePicturesModal(3)">
+                            <img src="<?php echo getPhoneImage($phone3); ?>" alt="<?php echo getPhoneName($phone3); ?>" onclick="window.location.href='/device/<?php echo urlencode($phone3['slug'] ?? $phone3['id']); ?>/images'">
                             <div class="buttons">
                                 <button onclick="window.location.href='/device/<?php echo urlencode($phone3['slug'] ?? $phone3['id']); ?>'">REVIEW</button>
                                 <button onclick="window.location.href='/device/<?php echo urlencode($phone3['slug'] ?? $phone3['id']); ?>'">SPECIFICATIONS</button>
                                 <button onclick="window.location.href='/device/<?php echo urlencode($phone3['slug'] ?? $phone3['id']); ?>#comments'">READ OPINIONS</button>
-                                <button onclick="showComparePicturesModal(3)">PICTURES</button>
+                                <button onclick="window.location.href='/device/<?php echo urlencode($phone3['slug'] ?? $phone3['id']); ?>/images'">PICTURES</button>
                             </div>
                         </div>
                     <?php else: ?>
