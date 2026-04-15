@@ -579,7 +579,7 @@ function getGravatarUrl($email, $size = 50)
                 </div>
             </div>
             <div class="col-md-4 col-5 d-none d-lg-block" style="position: relative; /* left: 12px; */ padding: 0;">
-                <button class="solid w-100 py-2">
+                <button onclick="window.open('<?php echo $base; ?>phonefinder')" class="solid w-100 py-2">
                     <i class="fa-solid fa-mobile fa-sm mx-2" style="color: white;"></i>
                     Phone Finder</button>
                 <div class="devor">

@@ -812,7 +812,7 @@ if ($_POST && isset($_POST['action']) && $_POST['action'] === 'newsletter_subscr
                 </div>
             </div>
             <div class="col-md-4 col-5 d-none d-lg-block" style="position: relative; left: 0; padding: 0px;">
-                <button class="solid w-100 py-2">
+                <button onclick="window.open('<?php echo $base; ?>phonefinder')" class="solid w-100 py-2">
                     <i class="fa-solid fa-mobile fa-sm mx-2" style="color: white;"></i>
                     Phone Finder</button>
                 <div class="devor">
