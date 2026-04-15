@@ -522,9 +522,10 @@
 /* Spec dock grid */
 .cp-spec-dock {
   display: grid;
-  grid-template-columns: 1fr 1fr;
+  grid-template-columns: 1fr;
   gap: 7px;
   margin-bottom: 16px;
+  width: 100%;
 }
 
 /* Spec block */
