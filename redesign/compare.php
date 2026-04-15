@@ -1024,5 +1024,6 @@ function publicUserLogout() {
     .finally(() => fetch(window.baseURL + 'public_auth.php', { method:'POST', body: new URLSearchParams({action:'logout'}) }).then(() => location.reload()));
 }
 </script>
+<script src="<?php echo $base; ?>redesign/sliders.js"></script>
 </body>
 </html>

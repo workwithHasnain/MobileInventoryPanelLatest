@@ -191,7 +191,7 @@ button {
 /* Large Search */
 .da-search-large {
   flex: 1;
-  max-width: 600px;
+  max-width: 345px;
   display: flex;
   height: 40px;
   border-radius: 4px;
