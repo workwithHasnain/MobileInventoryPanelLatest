@@ -1950,7 +1950,7 @@ $commentCount = getDeviceCommentCount($pdo, $device_id);
         <button class="review-btn" onclick="document.getElementById('comments').scrollIntoView({behavior:'smooth', block:'start'});">
           OPINIONS
         </button>
-        <button class="review-btn" onclick="showPicturesModal()">
+        <button class="review-btn" onclick="window.location.href='/device/<?php echo htmlspecialchars($device_slug); ?>/images'">
           PICTURES
         </button>
         <button class="review-btn" onclick="showRelatedPhonesModal()">
@@ -2134,7 +2134,7 @@ $commentCount = getDeviceCommentCount($pdo, $device_id);
     background: white;
 ">
               <!-- Left: Phone Image -->
-              <div class="phone-image me-3 py-2  px-2" onclick="showPicturesModal()"></div>
+              <div class="phone-image me-3 py-2  px-2" onclick="window.location.href='/device/<?php echo htmlspecialchars($device_slug); ?>/images'"></div>
             </div>
 
             <!-- Right: Details + Stats + Specs -->
@@ -2196,7 +2196,7 @@ $commentCount = getDeviceCommentCount($pdo, $device_id);
                 </div>
                 <div class="d-flex flexiable ">
                   <img src="/imges/download-removebg-preview.png" alt="">
-                  <h5 style="font-family:system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue' ; font-size: 16px; cursor: pointer; font-weight: 700;" class="mt-2" onclick="showPicturesModal()">PICTURES</h5>
+                  <h5 style="font-family:system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue' ; font-size: 16px; cursor: pointer; font-weight: 700;" class="mt-2" onclick="window.location.href='/device/<?php echo htmlspecialchars($device_slug); ?>/images'">PICTURES</h5>
                 </div>
                 <div class="d-flex flexiable ">
                   <img src="/imges/download-removebg-preview.png" alt="">
@@ -2284,7 +2284,7 @@ $commentCount = getDeviceCommentCount($pdo, $device_id);
             <?php endif; ?>
             <button class="pad" onclick="window.location.href='/compare/<?php echo htmlspecialchars($device['slug']); ?>'">COMPARE</button>
             <button class="pad" onclick="document.getElementById('comments').scrollIntoView({behavior:'smooth', block:'start'});">OPINIONS</button>
-            <button class="pad" onclick="showPicturesModal()">PICTURES</button>
+            <button class="pad" onclick="window.location.href='/device/<?php echo htmlspecialchars($device_slug); ?>/images'">PICTURES</button>
             <button class="pad" onclick="showRelatedPhonesModal()">RELATED PHONES</button>
           </div>
           <div class="comments" id="comments">
