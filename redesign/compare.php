@@ -33,6 +33,11 @@ $mb_stmt = $pdo->prepare("SELECT b.*,COUNT(p.id) as device_count FROM brands b L
 $mb_stmt->execute();
 $mobile_brands = $mb_stmt->fetchAll();
 
+// ── All Brands for Hero Widget ──
+$brands_stmt = $pdo->prepare("SELECT b.*,COUNT(p.id) as device_count FROM brands b LEFT JOIN phones p ON b.id=p.brand_id GROUP BY b.id,b.name,b.description,b.logo_url,b.website,b.created_at,b.updated_at ORDER BY COUNT(p.id) DESC,b.name ASC LIMIT 36");
+$brands_stmt->execute();
+$brands = $brands_stmt->fetchAll();
+
 // ── All phones for comparison ──
 $phones = getAllPhones();
 
@@ -437,9 +442,46 @@ $da_active_nav = 'compare';
   <!-- Hero Banner -->
   <div class="cp-hero">
     <div class="cp-hero-inner">
-      <div class="cp-hero-label"><span>DevicesArena</span></div>
-      <h1 class="cp-hero-title">Compare Smartphones</h1>
-      <p class="cp-hero-sub">Select up to 3 devices and see their specs side by side. Highlight differences instantly.</p>
+      <div class="cp-hero-left">
+        <div class="cp-hero-label"><span>DevicesArena</span></div>
+        <h1 class="cp-hero-title">Compare Smartphones</h1>
+        <p class="cp-hero-sub">Select up to 3 devices and see their specs side by side. Highlight differences instantly.</p>
+      </div>
+      
+      <!-- Right: Brand panel (Classic Widget) -->
+      <div class="cp-hero-right">
+        <div class="da-section-label" style="text-align: left;"><span>Brands</span></div>
+        <div class="da-classic-brand-widget">
+          <!-- Top header -->
+          <div class="da-cbw-header">
+            <a href="<?php echo $base; ?>phonefinder">
+              <i class="fa fa-mobile-screen"></i> PHONE FINDER
+            </a>
+          </div>
+
+          <!-- Brand Grid -->
+          <div class="da-cbw-grid">
+            <?php foreach (array_slice($brands, 0, 32) as $index => $brand):
+              $brandSlug = strtolower(preg_replace('/\s+/', '-', trim($brand['name'])));
+            ?>
+              <a href="<?php echo $base; ?>brand/<?php echo urlencode($brandSlug); ?>" class="da-cbw-item" title="<?php echo htmlspecialchars($brand['name']); ?>">
+                <?php echo strtoupper(htmlspecialchars($brand['name'])); ?>
+              </a>
+            <?php endforeach; ?>
+          </div>
+
+          <!-- Bottom buttons -->
+          <div class="da-cbw-footer">
+            <a href="<?php echo $base; ?>brands" class="da-cbw-btn left">
+              <i class="fa fa-bars"></i> ALL BRANDS
+            </a>
+            <a href="<?php echo $base; ?>rumored" class="da-cbw-btn right">
+              <i class="fa fa-bullhorn"></i> RUMORS MILL
+            </a>
+          </div>
+        </div>
+      </div>
+      
     </div>
   </div>
 
@@ -601,6 +643,30 @@ $da_active_nav = 'compare';
     <p>Search and select devices above. Compare up to 3 phones side by side.</p>
   </div>
   <?php endif; ?>
+
+  <!-- ── INFINITE BRAND MARQUEE ── -->
+  <section class="da-marquee-section" aria-label="All Brands">
+    <div class="da-marquee-container">
+      <div class="da-marquee-track">
+        <!-- Original set -->
+        <div class="da-marquee-content">
+          <?php foreach ($brands as $brand):
+            $brandSlug = strtolower(preg_replace('/\s+/', '-', trim($brand['name'])));
+          ?>
+            <a href="<?php echo $base; ?>brand/<?php echo urlencode($brandSlug); ?>" class="da-marquee-pill"><?php echo htmlspecialchars($brand['name']); ?></a>
+          <?php endforeach; ?>
+        </div>
+        <!-- Duplicated set for seamless loop -->
+        <div class="da-marquee-content" aria-hidden="true">
+          <?php foreach ($brands as $brand):
+            $brandSlug = strtolower(preg_replace('/\s+/', '-', trim($brand['name'])));
+          ?>
+            <a href="<?php echo $base; ?>brand/<?php echo urlencode($brandSlug); ?>" class="da-marquee-pill"><?php echo htmlspecialchars($brand['name']); ?></a>
+          <?php endforeach; ?>
+        </div>
+      </div>
+    </div>
+  </section>
 
 </div><!-- /cp-page -->
 

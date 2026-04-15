@@ -11,10 +11,13 @@
 
 /* ── Hero Banner ── */
 .cp-hero {
-  background: linear-gradient(135deg, #0d0f1a 0%, #111422 50%, #1a0a0a 100%);
+  background: linear-gradient(135deg, rgba(13,15,26,0.92) 0%, rgba(17,20,34,0.9) 50%, rgba(26,10,10,0.95) 100%),
+              url('../hero-images/compare-hero.png');
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
   border-bottom: 1px solid var(--border);
   padding: 52px 24px 44px;
-  text-align: center;
   position: relative;
   overflow: hidden;
 }
@@ -25,7 +28,39 @@
   background: radial-gradient(ellipse 60% 80% at 50% 120%, rgba(213,0,0,0.12) 0%, transparent 70%);
   pointer-events: none;
 }
-.cp-hero-inner { position: relative; z-index: 1; }
+.cp-hero-inner {
+  position: relative;
+  z-index: 1;
+  max-width: 1300px;
+  margin: 0 auto;
+  display: flex;
+  flex-direction: column;
+  gap: 40px;
+  align-items: center;
+  text-align: center;
+}
+.cp-hero-left {
+  flex: 1;
+}
+.cp-hero-right {
+  width: 100%;
+  max-width: 360px;
+  flex-shrink: 0;
+  text-align: left;
+}
+@media (min-width: 992px) {
+  .cp-hero-inner {
+    flex-direction: row;
+    justify-content: space-between;
+    text-align: left;
+    align-items: center;
+  }
+}
+@media (max-width: 991px) {
+  .cp-hero-right {
+    display: none;
+  }
+}
 .cp-hero-label {
   display: inline-flex;
   align-items: center;
@@ -60,6 +95,11 @@
   max-width: 520px;
   margin: 0 auto;
   line-height: 1.6;
+}
+@media (min-width: 992px) {
+  .cp-hero-sub {
+    margin: 0;
+  }
 }
 
 /* ── Stage: device selectors ── */
