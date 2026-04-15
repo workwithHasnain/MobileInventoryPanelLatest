@@ -365,11 +365,17 @@
   color: var(--text-secondary);
 }
 .cp-tag i { font-size: 10px; color: var(--accent); }
-.cp-slot-ctas {
+.cp-slot-actions {
   display: flex;
+  flex-direction: column;
   gap: 8px;
+  margin-top: 10px;
+  width: 100%;
+}
+.cp-slot-actions .cp-action-btn {
   justify-content: center;
-  margin-top: 4px;
+  width: 100%;
+  padding: 10px;
 }
 .cp-action-btn {
   display: inline-flex;

@@ -272,66 +272,7 @@ function renderPhoneCard($phone, $slot, $base) {
     $brand = htmlspecialchars(strtoupper($phone['brand_name'] ?? ''));
     $slug  = urlencode($phone['slug'] ?? $phone['id']);
 
-    $specs = [];
-
-    // Network
-    $nw = [];
-    if (!empty($phone['network_5g']))  $nw[] = '5G';
-    if (!empty($phone['network_4g']))  $nw[] = 'LTE';
-    if (!empty($phone['network_3g']))  $nw[] = 'HSPA';
-    if (!empty($phone['network_2g']))  $nw[] = 'GSM';
-    if ($nw) $specs[] = ['fa-tower-broadcast', 'Network', implode(' / ', $nw)];
-
-    // Display
-    $dv = trim(($phone['display_size'] ?? '') . (!empty($phone['display_size']) ? '"' : '') . (!empty($phone['display_resolution']) ? ' · ' . $phone['display_resolution'] : ''));
-    if ($dv) $specs[] = ['fa-display', 'Display', $dv];
-
-    // Chipset
-    if (!empty($phone['chipset_name'])) $specs[] = ['fa-microchip', 'Chipset', $phone['chipset_name']];
-
-    // OS
-    if (!empty($phone['os'])) $specs[] = ['fa-circle-info', 'OS', $phone['os']];
-
-    // Memory
-    $mv = trim((!empty($phone['ram']) ? $phone['ram'] : '') . (!empty($phone['storage']) ? ' · ' . $phone['storage'] : ''));
-    if ($mv) $specs[] = ['fa-memory', 'Memory', $mv];
-
-    // Weight
-    if (!empty($phone['weight'])) $specs[] = ['fa-weight-hanging', 'Weight', $phone['weight'] . ' g'];
-
-    // Main Camera
-    $cv = !empty($phone['main_camera_resolution']) ? $phone['main_camera_resolution'] . ' MP' : '';
-    if ($cv) $specs[] = ['fa-camera', 'Camera', $cv];
-
-    // Selfie Camera
-    $sv = !empty($phone['selfie_camera_resolution']) ? $phone['selfie_camera_resolution'] . ' MP' : '';
-    if ($sv) $specs[] = ['fa-video', 'Selfie', $sv];
-
-    // Battery
-    $bv = trim((!empty($phone['battery_capacity']) ? $phone['battery_capacity'] . ' mAh' : '') . (!empty($phone['wired_charging']) ? ' · ' . $phone['wired_charging'] . 'W' : ''));
-    if ($bv) $specs[] = ['fa-battery-full', 'Battery', $bv];
-
-    // Connectivity
-    $cn = [];
-    if (!empty($phone['wifi']))      $cn[] = 'WiFi';
-    if (!empty($phone['bluetooth'])) $cn[] = 'BT';
-    if (!empty($phone['nfc']))       $cn[] = 'NFC';
-    if ($cn) $specs[] = ['fa-wifi', 'Connectivity', implode(' · ' , $cn)];
-
-    // Sensors
-    $se = [];
-    if (!empty($phone['fingerprint']))    $se[] = 'FP';
-    if (!empty($phone['gyro']))          $se[] = 'Gyro';
-    if (!empty($phone['nfc']))           $se[] = 'NFC';
-    if ($se) $specs[] = ['fa-satellite-dish', 'Sensors', implode(' · ', $se)];
-
-    // Colors
-    if (!empty($phone['colors'])) {
-        $clr = is_array($phone['colors']) ? implode(', ', $phone['colors']) : str_replace(['{','}'],'',  $phone['colors']);
-        $specs[] = ['fa-palette', 'Colors', $clr];
-    }
-
-    // Price
+    // Price Only
     if (!empty($phone['price']) && is_numeric($phone['price'])) $specs[] = ['fa-tag', 'Price', '$' . number_format((float)$phone['price'], 2)];
 
     $html = '<div class="cp-filled-card">';
@@ -356,9 +297,12 @@ function renderPhoneCard($phone, $slot, $base) {
         $html .= '</div></div>';
     }
     $html .= '</div>';
-    $html .= '<div class="cp-slot-ctas">';
-    $html .= '<a href="' . $base . 'device/' . $slug . '" class="cp-action-btn"><i class="fa fa-eye"></i> Full Specs</a>';
-    $html .= '<button class="cp-action-btn ghost" onclick="clearSlot(' . $slot . ')"><i class="fa fa-xmark"></i> Remove</button>';
+    $html .= '<div class="cp-slot-actions">';
+    $html .= '<a href="' . $base . 'device/' . $slug . '" class="cp-action-btn ghost">REVIEW</a>';
+    $html .= '<a href="' . $base . 'device/' . $slug . '" class="cp-action-btn ghost">SPECIFICATIONS</a>';
+    $html .= '<a href="' . $base . 'device/' . $slug . '#comments" class="cp-action-btn ghost">READ OPINIONS</a>';
+    $html .= '<a href="' . $base . 'device/' . $slug . '/images" class="cp-action-btn ghost">PICTURES</a>';
+    $html .= '<button class="cp-action-btn" onclick="clearSlot(' . $slot . ')">REMOVE</button>';
     $html .= '</div>';
     $html .= '</div>';
     return $html;
