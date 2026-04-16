@@ -38,14 +38,7 @@ if (!$post) {
 $categories_stmt = $pdo->query("SELECT * FROM post_categories ORDER BY name");
 $categories = $categories_stmt->fetchAll(PDO::FETCH_ASSOC);
 
-// Function to generate slug from title
-function generateSlug($title)
-{
-    $slug = strtolower($title);
-    $slug = preg_replace('/[^a-z0-9\s-]/', '', $slug);
-    $slug = preg_replace('/[\s-]+/', '-', $slug);
-    return trim($slug, '-');
-}
+// generateSlug imported from database_functions.php
 
 // Handle form submission
 if ($_POST) {
@@ -709,10 +702,11 @@ include 'includes/header.php';
 
         return html;
     }
-    // Generate slug from title
     function generateSlugFromTitle() {
         const title = document.getElementById('title').value;
         const slug = title.toLowerCase()
+            .replace(/&/g, 'and')
+            .replace(/\+/g, 'plus')
             .replace(/[^a-z0-9\s-]/g, '')
             .replace(/[\s-]+/g, '-')
             .replace(/^-+|-+$/g, '');

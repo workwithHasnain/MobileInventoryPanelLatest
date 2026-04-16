@@ -170,15 +170,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $slug = isset($_POST['slug']) ? trim($_POST['slug']) : '';
         if ($slug === '') {
             // Auto-generate slug if empty
-            $slug = strtolower(trim($brand)) . '-' . strtolower(trim($name));
-            $slug = preg_replace('/[^a-z0-9]+/', '-', $slug);
-            $slug = trim($slug, '-');
+            $slug = generateSlug($brand . '-' . $name);
         } else {
             // Validate and sanitize provided slug
-            $slug = strtolower(trim($slug));
-            $slug = preg_replace('/[^a-z0-9-]/', '', $slug);
-            $slug = preg_replace('/-+/', '-', $slug);
-            $slug = trim($slug, '-');
+            $slug = generateSlug($slug);
         }
 
         // Ensure slug is unique (excluding current device)

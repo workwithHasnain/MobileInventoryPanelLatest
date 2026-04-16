@@ -111,15 +111,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $slug = isset($_POST['slug']) ? trim($_POST['slug']) : '';
         if ($slug === '') {
             // Auto-generate slug: brand-name
-            $slug = strtolower(trim($brand)) . '-' . strtolower(trim($name));
-            $slug = preg_replace('/[^a-z0-9]+/', '-', $slug);
-            $slug = trim($slug, '-');
+            $slug = generateSlug($brand . '-' . $name);
         } else {
             // Validate and sanitize provided slug
-            $slug = strtolower(trim($slug));
-            $slug = preg_replace('/[^a-z0-9-]/', '', $slug);
-            $slug = preg_replace('/-+/', '-', $slug); // Remove duplicate hyphens
-            $slug = trim($slug, '-');
+            $slug = generateSlug($slug);
         }
 
         // Ensure slug is unique
@@ -894,10 +889,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             const name = nameInput.value;
 
             if (brand && name) {
-                let slug = (brand + '-' + name).toLowerCase();
-                slug = slug.replace(/[^a-z0-9]+/g, '-'); // Replace non-alphanumeric with hyphens
-                slug = slug.replace(/-+/g, '-'); // Remove duplicate hyphens
-                slug = slug.replace(/^-|-$/g, ''); // Remove leading/trailing hyphens
+                let slug = (brand + '-' + name).toLowerCase()
+                    .replace(/&/g, 'and')
+                    .replace(/\+/g, 'plus')
+                    .replace(/[^a-z0-9]+/g, '-')
+                    .replace(/-+/g, '-')
+                    .replace(/^-+|-+$/g, '');
                 slugInput.value = slug;
             }
         }

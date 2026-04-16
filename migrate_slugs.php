@@ -29,9 +29,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['update_slugs'])) {
 $stmt = $pdo->query("SELECT id, name, slug FROM brands ORDER BY name ASC");
 $brands = $stmt->fetchAll();
 
-function generateSlug($name) {
-    return strtolower(str_replace(' ', '-', trim($name)));
-}
+// generateSlug imported from database_functions.php
 ?>
 <!DOCTYPE html>
 <html lang="en">

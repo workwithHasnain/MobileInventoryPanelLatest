@@ -6,6 +6,20 @@
 require_once __DIR__ . '/config.php';
 
 /**
+ * Generate a URL-friendly slug from string
+ *
+ * @param string $text Title or name
+ * @return string Safe slug
+ */
+function generateSlug($text)
+{
+    $text = str_replace(['&', '+'], ['-and-', '-plus-'], $text);
+    $text = preg_replace('/[^a-z0-9]+/i', '-', $text);
+    $text = trim($text, '-');
+    return strtolower($text);
+}
+
+/**
  * Get PDO connection to PostgreSQL database
  *
  * @return PDO Database connection
