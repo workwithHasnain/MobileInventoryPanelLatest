@@ -28,8 +28,9 @@ function addBrandDB($name, $description)
         return false; // Brand already exists
     }
 
-    $sql = "INSERT INTO brands (name, description) VALUES (?, ?) RETURNING id";
-    $stmt = executeQuery($sql, [$name, $description]);
+    $slug = strtolower(str_replace(' ', '-', trim($name)));
+    $sql = "INSERT INTO brands (name, slug, description) VALUES (?, ?, ?) RETURNING id";
+    $stmt = executeQuery($sql, [$name, $slug, $description]);
     return $stmt->fetchColumn();
 }
 
@@ -42,8 +43,9 @@ function updateBrandDB($id, $name, $description)
         return false; // Another brand with same name exists
     }
 
-    $sql = "UPDATE brands SET name = ?, description = ?, updated_at = CURRENT_TIMESTAMP WHERE id = ?";
-    $stmt = executeQuery($sql, [$name, $description, $id]);
+    $slug = strtolower(str_replace(' ', '-', trim($name)));
+    $sql = "UPDATE brands SET name = ?, slug = ?, description = ?, updated_at = CURRENT_TIMESTAMP WHERE id = ?";
+    $stmt = executeQuery($sql, [$name, $slug, $description, $id]);
     return $stmt->rowCount() > 0;
 }
 

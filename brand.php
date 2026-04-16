@@ -23,14 +23,14 @@ if (empty($brandSlug)) {
     exit;
 }
 
-// Convert slug to brand name pattern (replace hyphens with spaces for matching)
+// Convert slug to brand name pattern for fallback matching
 $brandNamePattern = str_replace('-', ' ', $brandSlug);
 
-// Look up the brand by matching lowercased name
+// Look up the brand by matching slug first, then fallback to name pattern
 $brand_stmt = $pdo->prepare("
-    SELECT * FROM brands WHERE LOWER(name) = LOWER(:name)
+    SELECT * FROM brands WHERE slug = :slug OR LOWER(name) = LOWER(:name)
 ");
-$brand_stmt->execute(['name' => $brandNamePattern]);
+$brand_stmt->execute(['slug' => $brandSlug, 'name' => $brandNamePattern]);
 $brandData = $brand_stmt->fetch();
 
 if (!$brandData) {
@@ -376,7 +376,7 @@ function brandSlugFromName($name)
                         foreach ($brandChunks as $brandRow):
                             foreach ($brandRow as $b):
                         ?>
-                                <button class="brand-cell brand-item-bold" style="cursor: pointer;" data-brand-id="<?php echo $b['id']; ?>"><?php echo htmlspecialchars($b['name']); ?></button>
+                                <button class="brand-cell brand-item-bold" style="cursor: pointer;" data-brand-id="<?php echo $b['id']; ?>" data-slug="<?php echo htmlspecialchars($b['slug'] ?? ''); ?>"><?php echo htmlspecialchars($b['name']); ?></button>
                     <?php
                             endforeach;
                         endforeach;
@@ -445,8 +445,8 @@ function brandSlugFromName($name)
         document.querySelectorAll('.brand-cell').forEach(function(cell) {
             cell.addEventListener('click', function(e) {
                 e.preventDefault();
-                const brandName = this.textContent.trim().toLowerCase().replace(/\s+/g, '-');
-                window.location.href = '<?php echo $base; ?>brand/' + encodeURIComponent(brandName);
+                const brandSlug = this.dataset.slug || this.textContent.trim().toLowerCase().replace(/\s+/g, '-');
+                window.location.href = '<?php echo $base; ?>brand/' + encodeURIComponent(brandSlug);
             });
         });
 

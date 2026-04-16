@@ -34,10 +34,14 @@ function addBrand($brand) {
             return false; // Brand already exists
         }
         
+        // Generate slug
+        $slug = strtolower(str_replace(' ', '-', trim($brand['name'])));
+        
         // Insert new brand
-        $stmt = $pdo->prepare("INSERT INTO brands (name, description) VALUES (?, ?)");
+        $stmt = $pdo->prepare("INSERT INTO brands (name, slug, description) VALUES (?, ?, ?)");
         return $stmt->execute([
             $brand['name'],
+            $slug,
             $brand['description'] ?? ''
         ]);
     } catch (Exception $e) {
@@ -64,10 +68,14 @@ function updateBrand($id, $brand) {
             return false; // Brand name already exists
         }
         
+        // Generate slug
+        $slug = strtolower(str_replace(' ', '-', trim($brand['name'])));
+        
         // Update brand
-        $stmt = $pdo->prepare("UPDATE brands SET name = ?, description = ? WHERE id = ?");
+        $stmt = $pdo->prepare("UPDATE brands SET name = ?, slug = ?, description = ? WHERE id = ?");
         return $stmt->execute([
             $brand['name'],
+            $slug,
             $brand['description'] ?? '',
             $id
         ]);
@@ -135,6 +143,24 @@ function getBrandByName($name) {
         return $stmt->fetch(PDO::FETCH_ASSOC) ?: null;
     } catch (Exception $e) {
         error_log('Error getting brand by name: ' . $e->getMessage());
+        return null;
+    }
+}
+
+/**
+ * Get brand by slug
+ * 
+ * @param string $slug Brand slug
+ * @return array|null Brand data or null if not found
+ */
+function getBrandBySlug($slug) {
+    try {
+        $pdo = getConnection();
+        $stmt = $pdo->prepare("SELECT * FROM brands WHERE slug = ?");
+        $stmt->execute([$slug]);
+        return $stmt->fetch(PDO::FETCH_ASSOC) ?: null;
+    } catch (Exception $e) {
+        error_log('Error getting brand by slug: ' . $e->getMessage());
         return null;
     }
 }

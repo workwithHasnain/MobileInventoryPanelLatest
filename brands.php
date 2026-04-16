@@ -205,11 +205,12 @@ $latestDevices = array_slice(array_reverse($latestDevices), 0, 9);
                 <?php
                 $brandSchemaItems = [];
                 foreach ($allBrands as $i => $schemaBrand) {
+                    $slug = !empty($schemaBrand['slug']) ? $schemaBrand['slug'] : strtolower(str_replace(' ', '-', trim($schemaBrand['name'])));
                     $brandSchemaItems[] = json_encode([
                         "@type" => "ListItem",
                         "position" => $i + 1,
                         "name" => $schemaBrand['name'],
-                        "url" => "https://www.devicesarena.com/brand/" . urlencode(strtolower(str_replace(' ', '-', trim($schemaBrand['name']))))
+                        "url" => "https://www.devicesarena.com/brand/" . urlencode($slug)
                     ], JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE);
                 }
                 echo implode(",\n                ", $brandSchemaItems);
@@ -309,7 +310,7 @@ $latestDevices = array_slice(array_reverse($latestDevices), 0, 9);
                         foreach ($brandChunks as $brandRow):
                             foreach ($brandRow as $brand):
                         ?>
-                                <button class="brand-cell brand-item-bold" style="cursor: pointer;" data-brand-id="<?php echo $brand['id']; ?>"><?php echo htmlspecialchars($brand['name']); ?></button>
+                                <button class="brand-cell brand-item-bold" style="cursor: pointer;" data-brand-id="<?php echo $brand['id']; ?>" data-slug="<?php echo htmlspecialchars($brand['slug'] ?? ''); ?>"><?php echo htmlspecialchars($brand['name']); ?></button>
                     <?php
                             endforeach;
                         endforeach;
@@ -332,8 +333,10 @@ $latestDevices = array_slice(array_reverse($latestDevices), 0, 9);
             <div class="col-lg-8 py-3" style="padding-left: 0; padding-right: 0; border: 1px solid #e0e0e0;">
                 <div style="padding: 20px 30px;">
                     <div class="row">
-                        <?php foreach ($allBrands as $brand): ?>
-                            <div class="col-6 brand-grid-item" data-brand-id="<?php echo $brand['id']; ?>" onclick="window.location.href='<?php echo $base; ?>brand/<?php echo urlencode(strtolower(str_replace(' ', '-', trim($brand['name'])))); ?>'">
+                        <?php foreach ($allBrands as $brand): 
+                            $slug = !empty($brand['slug']) ? $brand['slug'] : strtolower(str_replace(' ', '-', trim($brand['name'])));
+                        ?>
+                            <div class="col-6 brand-grid-item" data-brand-id="<?php echo $brand['id']; ?>" onclick="window.location.href='<?php echo $base; ?>brand/<?php echo urlencode($slug); ?>'">
                                 <div class="brand-name"><?php echo htmlspecialchars($brand['name']); ?></div>
                                 <div class="brand-device-count"><?php echo (int)$brand['device_count']; ?> devices</div>
                             </div>
@@ -363,8 +366,8 @@ $latestDevices = array_slice(array_reverse($latestDevices), 0, 9);
         document.querySelectorAll('.brand-cell').forEach(function(cell) {
             cell.addEventListener('click', function(e) {
                 e.preventDefault();
-                const brandName = this.textContent.trim().toLowerCase().replace(/\s+/g, '-');
-                window.location.href = '<?php echo $base; ?>brand/' + encodeURIComponent(brandName);
+                const brandSlug = this.dataset.slug || this.textContent.trim().toLowerCase().replace(/\s+/g, '-');
+                window.location.href = '<?php echo $base; ?>brand/' + encodeURIComponent(brandSlug);
             });
         });
         // Handle clickable table rows for devices (sidebar)

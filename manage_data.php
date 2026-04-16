@@ -24,6 +24,23 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action'])) {
         } else {
             $error_message = "Brand name is required!";
         }
+    } elseif ($_POST['action'] === 'edit_brand') {
+        $id = $_POST['brand_id'];
+        $name = trim($_POST['brand_name']);
+        $description = trim($_POST['brand_description']);
+        if (!empty($name)) {
+            $brand_data = [
+                'name' => $name,
+                'description' => $description
+            ];
+            if (updateBrand($id, $brand_data)) {
+                $success_message = "Brand updated successfully!";
+            } else {
+                $error_message = "Error updating brand or name already exists!";
+            }
+        } else {
+            $error_message = "Brand name is required!";
+        }
     } elseif ($_POST['action'] === 'delete_brand') {
         $id = $_POST['brand_id'];
         if (deleteBrand($id)) {
@@ -137,6 +154,7 @@ $chipsets = getAllChipsets();
                                     <thead class="table-dark">
                                         <tr>
                                             <th>Brand Name</th>
+                                            <th>Slug</th>
                                             <th>Description</th>
                                             <th>Created</th>
                                             <th width="100">Actions</th>
@@ -151,6 +169,7 @@ $chipsets = getAllChipsets();
                                             <?php foreach ($brands as $brand): ?>
                                                 <tr>
                                                     <td><strong><?php echo htmlspecialchars($brand['name']); ?></strong></td>
+                                                    <td><?php echo htmlspecialchars($brand['slug'] ?? 'N/A'); ?></td>
                                                     <td><?php echo htmlspecialchars($brand['description'] ?? 'No description'); ?></td>
                                                     <td><?php 
                                                         $timestamp = $brand['created_at'] ?? time();
@@ -164,6 +183,9 @@ $chipsets = getAllChipsets();
                                                               onsubmit="return confirm('Are you sure you want to delete this brand?');">
                                                             <input type="hidden" name="action" value="delete_brand">
                                                             <input type="hidden" name="brand_id" value="<?php echo $brand['id']; ?>">
+                                                            <button type="button" class="btn btn-sm btn-primary" title="Edit Brand" data-id="<?php echo $brand['id']; ?>" onclick="editBrand(this)">
+                                                                <i class="fas fa-edit"></i>
+                                                            </button>
                                                             <button type="submit" class="btn btn-sm btn-danger" title="Delete Brand">
                                                                 <i class="fas fa-trash"></i>
                                                             </button>
@@ -267,6 +289,29 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     }, 5000);
 });
+
+function editBrand(btn) {
+    let tr = btn.closest('tr');
+    let id = btn.dataset.id;
+    let name = tr.cells[0].innerText.trim();
+    let desc = tr.cells[2].innerText.trim();
+    if (desc === 'No description') desc = '';
+    
+    let newName = prompt("Edit Brand Name:", name);
+    if (newName === null) return;
+    
+    let newDesc = prompt("Edit Description:", desc);
+    if (newDesc === null) return;
+    
+    let f = document.createElement('form');
+    f.method = 'POST';
+    f.innerHTML = '<input type="hidden" name="action" value="edit_brand">' +
+                  '<input type="hidden" name="brand_id" value="'+id+'">' +
+                  '<input type="hidden" name="brand_name" value="'+newName+'">' +
+                  '<input type="hidden" name="brand_description" value="'+newDesc+'">';
+    document.body.appendChild(f);
+    f.submit();
+}
 </script>
 
 <?php include 'includes/footer.php'; ?>

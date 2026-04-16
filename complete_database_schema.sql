@@ -26,6 +26,7 @@ CREATE TABLE IF NOT EXISTS admin_users (
 CREATE TABLE IF NOT EXISTS brands (
     id SERIAL PRIMARY KEY,
     name VARCHAR(100) NOT NULL UNIQUE,
+    slug VARCHAR(255) UNIQUE,
     description TEXT,
     logo_url VARCHAR(255),
     website VARCHAR(255),
@@ -231,6 +232,7 @@ CREATE INDEX IF NOT EXISTS idx_admin_users_username ON admin_users(username);
 -- Brands indexes
 CREATE INDEX IF NOT EXISTS idx_brands_name ON brands(name);
 CREATE INDEX IF NOT EXISTS idx_brands_lower_name ON brands(LOWER(name));
+CREATE INDEX IF NOT EXISTS idx_brands_slug ON brands(slug);
 
 -- Chipsets indexes
 CREATE INDEX IF NOT EXISTS idx_chipsets_name ON chipsets(name);
