@@ -34,8 +34,8 @@ function addBrand($brand) {
             return false; // Brand already exists
         }
         
-        // Generate slug
-        $slug = strtolower(str_replace(' ', '-', trim($brand['name'])));
+        // Generate slug using global utility
+        $slug = generateSlug($brand['name']);
         
         // Insert new brand
         $stmt = $pdo->prepare("INSERT INTO brands (name, slug, description) VALUES (?, ?, ?)");
@@ -68,8 +68,8 @@ function updateBrand($id, $brand) {
             return false; // Brand name already exists
         }
         
-        // Generate slug
-        $slug = strtolower(str_replace(' ', '-', trim($brand['name'])));
+        // Generate slug using global utility
+        $slug = generateSlug($brand['name']);
         
         // Update brand
         $stmt = $pdo->prepare("UPDATE brands SET name = ?, slug = ?, description = ? WHERE id = ?");

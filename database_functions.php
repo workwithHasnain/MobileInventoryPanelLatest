@@ -13,8 +13,13 @@ require_once __DIR__ . '/config.php';
  */
 function generateSlug($text)
 {
+    // Map common special characters to words
     $text = str_replace(['&', '+'], ['-and-', '-plus-'], $text);
+    // Replace all other non-alphanumeric characters with hyphens
     $text = preg_replace('/[^a-z0-9]+/i', '-', $text);
+    // Collapse multiple consecutive hyphens
+    $text = preg_replace('/-+/', '-', $text);
+    // Trim hyphens from ends and convert to lowercase
     $text = trim($text, '-');
     return strtolower($text);
 }

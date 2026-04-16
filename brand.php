@@ -110,11 +110,7 @@ try {
 $latestDevices = getAllPhones();
 $latestDevices = array_slice(array_reverse($latestDevices), 0, 9);
 
-// Helper to generate brand slug from name
-function brandSlugFromName($name)
-{
-    return strtolower(str_replace(' ', '-', trim($name)));
-}
+// generateSlug imported from database_functions.php
 
 ?>
 <!DOCTYPE html>
@@ -132,7 +128,7 @@ function brandSlugFromName($name)
 </script>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <link rel="canonical" href="<?php echo $canonicalBase; ?>/brand/<?php echo htmlspecialchars(urlencode($brandSlug)); ?>" />
+    <link rel="canonical" href="<?php echo $canonicalBase; ?>/brand/<?php echo htmlspecialchars($brandSlug); ?>" />
     <meta name="description" content="Browse all <?php echo htmlspecialchars($brandName); ?> phones and devices on DevicesArena. View specifications, images, and pricing." />
     <title><?php echo htmlspecialchars($brandName); ?> Phones - DevicesArena</title>
 
@@ -192,7 +188,7 @@ function brandSlugFromName($name)
     $breadcrumbItems = [
         ["@type" => "ListItem", "position" => 1, "name" => "Home", "item" => "https://www.devicesarena.com/"],
         ["@type" => "ListItem", "position" => 2, "name" => "Brands", "item" => "https://www.devicesarena.com/brands"],
-        ["@type" => "ListItem", "position" => 3, "name" => htmlspecialchars($brandName), "item" => "https://www.devicesarena.com/brand/" . urlencode($brandSlug)]
+        ["@type" => "ListItem", "position" => 3, "name" => htmlspecialchars($brandName), "item" => "https://www.devicesarena.com/brand/" . $brandSlug]
     ];
     ?>
     <script type="application/ld+json">
@@ -210,7 +206,7 @@ function brandSlugFromName($name)
             "@type": "CollectionPage",
             "name": "<?php echo htmlspecialchars($brandName); ?> Phones - DevicesArena",
             "description": "Browse all <?php echo htmlspecialchars($brandName); ?> phones and devices on DevicesArena. View specifications, images, and pricing.",
-            "url": "https://www.devicesarena.com/brand/<?php echo urlencode($brandSlug); ?>",
+            "url": "https://www.devicesarena.com/brand/<?php echo $brandSlug; ?>",
             "image": "https://www.devicesarena.com/imges/icon-256.png",
             "publisher": {
                 "@type": "Organization",
@@ -242,7 +238,7 @@ function brandSlugFromName($name)
                         "@type" => "ListItem",
                         "position" => $i + 1,
                         "name" => $schemaPhone['name'],
-                        "url" => "https://www.devicesarena.com/device/" . urlencode($schemaPhone['slug'] ?? $schemaPhone['id'])
+                        "url" => "https://www.devicesarena.com/device/" . ($schemaPhone['slug'] ?? $schemaPhone['id'])
                     ], JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE);
                 }
                 echo implode(",\n                ", $deviceSchemaItems);
@@ -409,7 +405,7 @@ function brandSlugFromName($name)
                         }
                         $deviceSlug = $phone['slug'] ?? $phone['id'];
                     ?>
-                        <a href="<?php echo $base; ?>device/<?php echo htmlspecialchars(urlencode($deviceSlug)); ?>" class="device-grid-item">
+                        <a href="<?php echo $base; ?>device/<?php echo htmlspecialchars($deviceSlug); ?>" class="device-grid-item">
                             <?php if ($imagePath): ?>
                                 <img src="<?php echo htmlspecialchars($imagePath); ?>" alt="<?php echo htmlspecialchars($phone['name']); ?>" onerror="this.style.display='none'">
                             <?php else: ?>
@@ -441,14 +437,24 @@ function brandSlugFromName($name)
     <?php include 'includes/gsmfooter.php'; ?>
 
     <script>
-        // Handle brand cell clicks (from sidebar - navigate to brand page)
-        document.querySelectorAll('.brand-cell').forEach(function(cell) {
-            cell.addEventListener('click', function(e) {
-                e.preventDefault();
-                const brandSlug = this.dataset.slug || this.textContent.trim().toLowerCase().replace(/\s+/g, '-');
-                window.location.href = '<?php echo $base; ?>brand/' + encodeURIComponent(brandSlug);
-            });
+    function generateSlug(text) {
+        return text.toString().toLowerCase()
+            .replace(/&/g, '-and-')
+            .replace(/\+/g, '-plus-')
+            .replace(/[^a-z0-9]+/g, '-')
+            .replace(/-+/g, '-')
+            .replace(/^-+/, '')
+            .replace(/-+$/, '');
+    }
+
+    // Handle brand cell clicks (from sidebar - navigate to brand page)
+    document.querySelectorAll('.brand-cell').forEach(function(cell) {
+        cell.addEventListener('click', function(e) {
+            e.preventDefault();
+            const brandSlug = this.dataset.slug || generateSlug(this.textContent.trim());
+            window.location.href = '<?php echo $base; ?>brand/' + brandSlug;
         });
+    });
 
         // Handle clickable table rows for devices (sidebar)
         document.addEventListener('DOMContentLoaded', function() {

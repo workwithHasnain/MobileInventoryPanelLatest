@@ -54,7 +54,7 @@ $brands = $stmt->fetchAll();
             <div class="col-md-8"><strong>Slug</strong></div>
         </div>
         <?php foreach ($brands as $brand): 
-            $suggested = $brand['slug'] ?: generateSlug($brand['name']);
+            $suggested = generateSlug($brand['name']);
         ?>
         <div class="row brand-row align-items-center">
             <div class="col-md-4 brand-name"><?php echo htmlspecialchars($brand['name']); ?></div>

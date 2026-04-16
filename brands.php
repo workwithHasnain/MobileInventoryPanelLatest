@@ -205,12 +205,12 @@ $latestDevices = array_slice(array_reverse($latestDevices), 0, 9);
                 <?php
                 $brandSchemaItems = [];
                 foreach ($allBrands as $i => $schemaBrand) {
-                    $slug = !empty($schemaBrand['slug']) ? $schemaBrand['slug'] : strtolower(str_replace(' ', '-', trim($schemaBrand['name'])));
+                    $slug = !empty($schemaBrand['slug']) ? $schemaBrand['slug'] : generateSlug($schemaBrand['name']);
                     $brandSchemaItems[] = json_encode([
                         "@type" => "ListItem",
                         "position" => $i + 1,
                         "name" => $schemaBrand['name'],
-                        "url" => "https://www.devicesarena.com/brand/" . urlencode($slug)
+                        "url" => "https://www.devicesarena.com/brand/" . $slug
                     ], JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE);
                 }
                 echo implode(",\n                ", $brandSchemaItems);
@@ -334,9 +334,9 @@ $latestDevices = array_slice(array_reverse($latestDevices), 0, 9);
                 <div style="padding: 20px 30px;">
                     <div class="row">
                         <?php foreach ($allBrands as $brand): 
-                            $slug = !empty($brand['slug']) ? $brand['slug'] : strtolower(str_replace(' ', '-', trim($brand['name'])));
+                            $slug = !empty($brand['slug']) ? $brand['slug'] : generateSlug($brand['name']);
                         ?>
-                            <div class="col-6 brand-grid-item" data-brand-id="<?php echo $brand['id']; ?>" onclick="window.location.href='<?php echo $base; ?>brand/<?php echo urlencode($slug); ?>'">
+                            <div class="col-6 brand-grid-item" data-brand-id="<?php echo $brand['id']; ?>" onclick="window.location.href='<?php echo $base; ?>brand/<?php echo $slug; ?>'">
                                 <div class="brand-name"><?php echo htmlspecialchars($brand['name']); ?></div>
                                 <div class="brand-device-count"><?php echo (int)$brand['device_count']; ?> devices</div>
                             </div>
@@ -362,14 +362,24 @@ $latestDevices = array_slice(array_reverse($latestDevices), 0, 9);
     <?php include 'includes/gsmfooter.php'; ?>
 
     <script>
-        // Handle brand cell clicks (from sidebar - navigate to brand page)
-        document.querySelectorAll('.brand-cell').forEach(function(cell) {
-            cell.addEventListener('click', function(e) {
-                e.preventDefault();
-                const brandSlug = this.dataset.slug || this.textContent.trim().toLowerCase().replace(/\s+/g, '-');
-                window.location.href = '<?php echo $base; ?>brand/' + encodeURIComponent(brandSlug);
-            });
+    function generateSlug(text) {
+        return text.toString().toLowerCase()
+            .replace(/&/g, '-and-')
+            .replace(/\+/g, '-plus-')
+            .replace(/[^a-z0-9]+/g, '-')
+            .replace(/-+/g, '-')
+            .replace(/^-+/, '')
+            .replace(/-+$/, '');
+    }
+
+    // Handle brand cell clicks (from sidebar - navigate to brand page)
+    document.querySelectorAll('.brand-cell').forEach(function(cell) {
+        cell.addEventListener('click', function(e) {
+            e.preventDefault();
+            const brandSlug = this.dataset.slug || generateSlug(this.textContent.trim());
+            window.location.href = '<?php echo $base; ?>brand/' + brandSlug;
         });
+    });
         // Handle clickable table rows for devices (sidebar)
         document.addEventListener('DOMContentLoaded', function() {
             document.querySelectorAll('.clickable-row').forEach(function(row) {
