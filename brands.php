@@ -332,11 +332,32 @@ $latestDevices = array_slice(array_reverse($latestDevices), 0, 9);
         <div class="row">
             <div class="col-lg-8 py-3" style="padding-left: 0; padding-right: 0; border: 1px solid #e0e0e0;">
                 <div style="padding: 20px 30px;">
-                    <div class="row">
+                    <div class="d-flex justify-content-between align-items-center mb-4 pb-2 border-bottom">
+                        <h2 class="m-0" style="font-size: 1.4rem; font-weight: 700; color: #1B2035;">All Brands</h2>
+                        <div class="d-flex align-items-center gap-2">
+                            <span style="font-size: 0.9rem; color: #666; font-weight: 500;">Sort By:</span>
+                            <div class="dropdown">
+                                <button class="btn btn-sm d-flex align-items-center gap-2 py-1 px-3" type="button" id="sortDropdown" data-bs-toggle="dropdown" aria-expanded="false" style="border: 1px solid #1B2035; color: #1B2035; font-weight: 600; border-radius: 4px; background: #fff; transition: all 0.2s ease;">
+                                    <span id="currentSort">Name (A-Z)</span>
+                                    <i class="fa fa-chevron-down" style="font-size: 0.7rem;"></i>
+                                </button>
+                                <ul class="dropdown-menu dropdown-menu-end shadow-sm" aria-labelledby="sortDropdown" style="border: 1px solid #eee;">
+                                    <li><a class="dropdown-item sort-option active" href="#" data-sort="name">Name (A-Z)</a></li>
+                                    <li><a class="dropdown-item sort-option" href="#" data-sort="count">Most Devices</a></li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="row" id="brandsGrid">
                         <?php foreach ($allBrands as $brand): 
                             $slug = !empty($brand['slug']) ? $brand['slug'] : generateSlug($brand['name']);
                         ?>
-                            <div class="col-6 brand-grid-item" data-brand-id="<?php echo $brand['id']; ?>" onclick="window.location.href='<?php echo $base; ?>brand/<?php echo $slug; ?>'">
+                            <div class="col-6 brand-grid-item" 
+                                 data-brand-id="<?php echo $brand['id']; ?>" 
+                                 data-name="<?php echo htmlspecialchars(strtolower($brand['name'])); ?>" 
+                                 data-count="<?php echo (int)$brand['device_count']; ?>"
+                                 onclick="window.location.href='<?php echo $base; ?>brand/<?php echo $slug; ?>'">
                                 <div class="brand-name"><?php echo htmlspecialchars($brand['name']); ?></div>
                                 <div class="brand-device-count"><?php echo (int)$brand['device_count']; ?> devices</div>
                             </div>
@@ -371,6 +392,61 @@ $latestDevices = array_slice(array_reverse($latestDevices), 0, 9);
             .replace(/^-+/, '')
             .replace(/-+$/, '');
     }
+
+    // Sorting functionality
+    document.addEventListener('DOMContentLoaded', function() {
+        const brandsGrid = document.getElementById('brandsGrid');
+        const sortOptions = document.querySelectorAll('.sort-option');
+        const currentSortLabel = document.getElementById('currentSort');
+        const sortDropdownBtn = document.getElementById('sortDropdown');
+
+        if (!brandsGrid) return;
+
+        sortOptions.forEach(option => {
+            option.addEventListener('click', function(e) {
+                e.preventDefault();
+                const criteria = this.dataset.sort;
+                
+                // Update UI state
+                sortOptions.forEach(opt => opt.classList.remove('active'));
+                this.classList.add('active');
+                currentSortLabel.textContent = this.textContent;
+
+                // Toggle button border/color for feedback
+                sortDropdownBtn.style.borderColor = '#d50000';
+                sortDropdownBtn.style.color = '#d50000';
+                setTimeout(() => {
+                    sortDropdownBtn.style.borderColor = '#1B2035';
+                    sortDropdownBtn.style.color = '#1B2035';
+                }, 400);
+
+                sortBrands(criteria);
+            });
+        });
+
+        function sortBrands(criteria) {
+            const brands = Array.from(brandsGrid.querySelectorAll('.brand-grid-item'));
+            
+            brands.sort((a, b) => {
+                if (criteria === 'name') {
+                    return a.dataset.name.localeCompare(b.dataset.name);
+                } else if (criteria === 'count') {
+                    return parseInt(b.dataset.count) - parseInt(a.dataset.count) || a.dataset.name.localeCompare(b.dataset.name);
+                }
+                return 0;
+            });
+
+            // Re-render with a subtle fade effect
+            brandsGrid.style.opacity = '0.5';
+            brandsGrid.style.transition = 'opacity 0.2s ease';
+            
+            setTimeout(() => {
+                // Clear and re-append
+                brands.forEach(brand => brandsGrid.appendChild(brand));
+                brandsGrid.style.opacity = '1';
+            }, 200);
+        }
+    });
 
     // Handle brand cell clicks (from sidebar - navigate to brand page)
     document.querySelectorAll('.brand-cell').forEach(function(cell) {
