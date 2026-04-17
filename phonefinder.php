@@ -114,6 +114,7 @@ if (!$filterConfig) {
 
 
     <link rel="stylesheet" href="<?php echo $base; ?>style.css">
+    <link rel="stylesheet" href="<?php echo $base; ?>admin-cards.css">
 
     <!-- Schema.org Structured Data for Phone Finder Tool -->
     <!-- Breadcrumb Schema -->

@@ -1,4 +1,4 @@
-1. no command line tools.
+1. if you need to search or analyze a file, use the edit tool and dont use command line or cmd tools, use grep or findstr or any other which is lightweight.
 2. no extra document making.
 3. separate files so everything in one file doesnt become unreadable code.
 4. use 3-6 word short sentences.
