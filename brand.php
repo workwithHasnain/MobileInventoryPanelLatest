@@ -44,7 +44,7 @@ $brandId = $brandData['id'];
 
 // Get all phones for this brand
 $phones_stmt = $pdo->prepare("
-    SELECT id, name, image, slug
+    SELECT id, name, image, slug, display, memory, battery, launch
     FROM phones
     WHERE brand_id = :brand_id
     ORDER BY name ASC
@@ -397,28 +397,49 @@ $latestDevices = array_slice(array_reverse($latestDevices), 0, 9);
                     <h1><?php echo htmlspecialchars($brandName); ?> phones</h1>
                     <div class="device-count"><?php echo count($phones); ?> devices</div>
                 </div>
-                <div class="device-grid">
+                <div class="row g-3 px-2 pt-2 pb-4">
                     <?php foreach ($phones as $phone):
                         $imagePath = $phone['image'] ?? '';
                         if ($imagePath && !str_starts_with($imagePath, '/') && !str_starts_with($imagePath, 'http')) {
                             $imagePath = '/' . $imagePath;
                         }
                         $deviceSlug = $phone['slug'] ?? $phone['id'];
+                        
+                        $specs = extractDeviceSpecs($phone);
                     ?>
-                        <a href="<?php echo $base; ?>device/<?php echo htmlspecialchars($deviceSlug); ?>" class="device-grid-item">
-                            <?php if ($imagePath): ?>
-                                <img src="<?php echo htmlspecialchars($imagePath); ?>" alt="<?php echo htmlspecialchars($phone['name']); ?>" onerror="this.style.display='none'">
-                            <?php else: ?>
-                                <div class="no-image-placeholder">
-                                    <i class="fas fa-mobile-alt fa-3x"></i>
-                                </div>
-                            <?php endif; ?>
-                            <span class="device-name"><?php echo htmlspecialchars($phone['name']); ?></span>
-                        </a>
+                        <div class="col-lg-3 col-md-4 col-sm-6 mb-2">
+                            <div class="card h-100 shadow-sm border-0 bg-white" style="border-radius: 8px; transition: transform 0.2s;">
+                                <a href="<?php echo $base; ?>device/<?php echo urlencode($deviceSlug); ?>" class="text-decoration-none d-flex flex-column h-100">
+                                    <?php if ($imagePath): ?>
+                                        <img src="<?php echo htmlspecialchars($imagePath); ?>" class="card-img-top mx-auto mt-3" alt="<?php echo htmlspecialchars($phone['name']); ?>" style="height: 180px; width: auto; max-width: 100%; object-fit: contain; padding: 10px;" onerror="this.style.display='none'">
+                                    <?php else: ?>
+                                        <div class="no-image-placeholder mx-auto mt-3" style="height: 180px;">
+                                            <i class="fas fa-mobile-alt fa-3x"></i>
+                                        </div>
+                                    <?php endif; ?>
+                                    <div class="card-body d-flex flex-column justify-content-end bg-white rounded-bottom">
+                                        <h6 class="card-title text-dark fw-bold mb-2"><?php echo htmlspecialchars($phone['name']); ?></h6>
+                                        <p class="text-muted small mb-1"><i class="fa fa-building me-2" style="color: #666;"></i><?php echo htmlspecialchars($brandName); ?></p>
+                                        <?php if (!empty($specs['announced'])): ?>
+                                            <p class="text-muted small mb-1"><i class="fa fa-calendar me-2" style="color: #666;"></i><?php echo htmlspecialchars($specs['announced']); ?></p>
+                                        <?php endif; ?>
+                                        <?php if (!empty($specs['display_size'])): ?>
+                                            <p class="text-muted small mb-1"><i class="fa fa-mobile-alt me-2" style="color: #666;"></i><?php echo htmlspecialchars($specs['display_size']); ?></p>
+                                        <?php endif; ?>
+                                        <?php if (!empty($specs['ram'])): ?>
+                                            <p class="text-muted small mb-1"><i class="fa fa-microchip me-2" style="color: #666;"></i><?php echo htmlspecialchars($specs['ram']); ?></p>
+                                        <?php endif; ?>
+                                        <?php if (!empty($specs['battery'])): ?>
+                                            <p class="text-muted small mb-0"><i class="fa fa-battery-full me-2" style="color: #666;"></i><?php echo htmlspecialchars($specs['battery']); ?></p>
+                                        <?php endif; ?>
+                                    </div>
+                                </a>
+                            </div>
+                        </div>
                     <?php endforeach; ?>
 
                     <?php if (empty($phones)): ?>
-                        <div style="grid-column: 1 / -1; text-align: center; padding: 40px;">
+                        <div class="col-12 text-center py-5">
                             <i class="fas fa-mobile-alt fa-3x text-muted mb-3"></i>
                             <p class="text-muted">No devices available for <?php echo htmlspecialchars($brandName); ?></p>
                         </div>

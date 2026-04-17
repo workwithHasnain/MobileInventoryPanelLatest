@@ -294,3 +294,72 @@ function getPopularComparisons($limit = 10)
         return [];
     }
 }
+
+/**
+ * Extract formatted specifications directly from phone data columns.
+ * Parses the JSON columns for launch, display, memory, and battery.
+ *
+ * @param array $device Database row containing launch, display, memory, battery
+ * @return array Formatted specs [announced, display_size, ram, battery]
+ */
+function extractDeviceSpecs($device) {
+    $launchData = !empty($device['launch']) ? json_decode($device['launch'], true) : [];
+    $displayData = !empty($device['display']) ? json_decode($device['display'], true) : [];
+    $memoryData = !empty($device['memory']) ? json_decode($device['memory'], true) : [];
+    $batteryData = !empty($device['battery']) ? json_decode($device['battery'], true) : [];
+
+    $displaySize = '';
+    if (is_array($displayData)) {
+        foreach ($displayData as $item) {
+            if (isset($item['field']) && stripos($item['field'], 'Size') !== false) {
+                $displaySize = $item['description'] ?? '';
+                break;
+            }
+        }
+    }
+
+    $ram = '';
+    if (is_array($memoryData)) {
+        foreach ($memoryData as $item) {
+            if (isset($item['field']) && stripos($item['field'], 'RAM') !== false) {
+                $ram = $item['description'] ?? '';
+                break;
+            }
+            if (isset($item['field']) && stripos($item['field'], 'Internal') !== false) {
+                // Sometime RAM is in Internal combined string e.g. "128GB 4GB RAM"
+                $internalDesc = $item['description'] ?? '';
+                if (preg_match('/([0-9]+\s*(?:GB|MB))\s*RAM/i', $internalDesc, $matches)) {
+                    $ram = $matches[1] . " RAM";
+                    break;
+                }
+            }
+        }
+    }
+
+    $battery = '';
+    if (is_array($batteryData)) {
+        foreach ($batteryData as $item) {
+            if (isset($item['field']) && stripos($item['field'], 'Type') !== false) {
+                $battery = $item['description'] ?? '';
+                break;
+            }
+        }
+    }
+
+    $announced = '';
+    if (is_array($launchData)) {
+        foreach ($launchData as $item) {
+            if (isset($item['field']) && stripos($item['field'], 'Announced') !== false) {
+                $announced = $item['description'] ?? '';
+                break;
+            }
+        }
+    }
+
+    return [
+        'announced' => $announced,
+        'display_size' => $displaySize,
+        'ram' => $ram,
+        'battery' => $battery
+    ];
+}
