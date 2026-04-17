@@ -310,7 +310,7 @@ $latestDevices = array_slice(array_reverse($latestDevices), 0, 9);
                         foreach ($brandChunks as $brandRow):
                             foreach ($brandRow as $brand):
                         ?>
-                                <button class="brand-cell brand-item-bold" style="cursor: pointer;" data-brand-id="<?php echo $brand['id']; ?>" data-slug="<?php echo htmlspecialchars($brand['slug'] ?? ''); ?>"><?php echo htmlspecialchars($brand['name']); ?></button>
+                                <a href="<?php echo $base; ?>brand/<?php echo htmlspecialchars($brand['slug'] ?? generateSlug($brand['name'])); ?>" class="brand-cell brand-item-bold text-decoration-none d-inline-block text-center" style="color: inherit;" data-brand-id="<?php echo $brand['id']; ?>"><?php echo htmlspecialchars($brand['name']); ?></a>
                     <?php
                             endforeach;
                         endforeach;
@@ -353,14 +353,15 @@ $latestDevices = array_slice(array_reverse($latestDevices), 0, 9);
                         <?php foreach ($allBrands as $brand): 
                             $slug = !empty($brand['slug']) ? $brand['slug'] : generateSlug($brand['name']);
                         ?>
-                            <div class="col-6 brand-grid-item" 
+                            <a href="<?php echo $base; ?>brand/<?php echo $slug; ?>"
+                                 class="col-6 brand-grid-item text-decoration-none" 
+                                 style="color: inherit; display: block;"
                                  data-brand-id="<?php echo $brand['id']; ?>" 
                                  data-name="<?php echo htmlspecialchars(strtolower($brand['name'])); ?>" 
-                                 data-count="<?php echo (int)$brand['device_count']; ?>"
-                                 onclick="window.location.href='<?php echo $base; ?>brand/<?php echo $slug; ?>'">
+                                 data-count="<?php echo (int)$brand['device_count']; ?>">
                                 <div class="brand-name"><?php echo htmlspecialchars($brand['name']); ?></div>
                                 <div class="brand-device-count"><?php echo (int)$brand['device_count']; ?> devices</div>
-                            </div>
+                            </a>
                         <?php endforeach; ?>
 
                         <?php if (empty($allBrands)): ?>
@@ -448,14 +449,7 @@ $latestDevices = array_slice(array_reverse($latestDevices), 0, 9);
         }
     });
 
-    // Handle brand cell clicks (from sidebar - navigate to brand page)
-    document.querySelectorAll('.brand-cell').forEach(function(cell) {
-        cell.addEventListener('click', function(e) {
-            e.preventDefault();
-            const brandSlug = this.dataset.slug || generateSlug(this.textContent.trim());
-            window.location.href = '<?php echo $base; ?>brand/' + brandSlug;
-        });
-    });
+    // Anchor tags naturally navigate via href
         // Handle clickable table rows for devices (sidebar)
         document.addEventListener('DOMContentLoaded', function() {
             document.querySelectorAll('.clickable-row').forEach(function(row) {
