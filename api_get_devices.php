@@ -50,8 +50,10 @@ try {
 
     if (!empty($search)) {
         $filtered_phones = array_filter($filtered_phones, function ($phone) use ($search) {
-            return stripos($phone['name'], $search) !== false ||
-                stripos($phone['brand'], $search) !== false;
+            $combinedName = trim(($phone['brand'] ?? '') . ' ' . ($phone['name'] ?? ''));
+            return stripos($phone['name'] ?? '', $search) !== false ||
+                stripos($phone['brand'] ?? '', $search) !== false ||
+                stripos($combinedName, $search) !== false;
         });
     }
 
