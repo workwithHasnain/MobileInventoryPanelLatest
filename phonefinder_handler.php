@@ -840,10 +840,15 @@ try {
             'name' => $device['name'],
             'brand' => $device['brand_name'],
             'thumbnail' => $thumbnail,
-            'display_size' => $displaySize,
-            'ram' => $ram,
+            'display_size' => $device['display_size'] ?? $displaySize,
+            'ram' => $device['ram'] ?? $ram,
             'battery' => $battery,
-            'announced' => $announced
+            'announced' => $announced,
+            'year' => $device['year'] ?? null,
+            'price' => $device['price'] ?? null,
+            'availability' => $device['availability'] ?? 'Unknown',
+            'storage' => $device['storage'] ?? null,
+            'main_camera_resolution' => $device['main_camera_resolution'] ?? null
         ];
     }
 

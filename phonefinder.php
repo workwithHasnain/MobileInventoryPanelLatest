@@ -249,6 +249,142 @@ if (!$filterConfig) {
     </script>
 
     <style>
+        .device-grid {
+            display: grid;
+            grid-template-columns: repeat(5, 1fr);
+            gap: 1.5rem;
+            padding: 1rem 0;
+        }
+
+        .device-card {
+            text-decoration: none;
+            color: inherit;
+            display: block;
+            transition: transform 0.2s ease, box-shadow 0.2s ease;
+            height: 100%;
+        }
+        
+        .device-card:hover {
+            transform: translateY(-3px);
+            text-decoration: none;
+            color: inherit;
+        }
+
+        .device-card .card {
+            display: flex;
+            flex-direction: column;
+            height: 100%;
+            border: 1px solid #e0e0e0;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.02);
+            background: #fff;
+            transition: box-shadow 0.2s ease;
+            border-radius: 6px;
+            overflow: hidden;
+        }
+
+        .device-card:hover .card {
+            box-shadow: 0 6px 12px rgba(0,0,0,0.08);
+        }
+
+        .device-card .card-img-top {
+            width: 100%;
+            height: 160px;
+            object-fit: contain;
+            padding: 15px;
+            border-bottom: 1px solid #f0f0f0;
+        }
+
+        .device-card .card-body {
+            padding: 0.6rem 0.8rem;
+            font-size: 0.75rem;
+            flex-grow: 1;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .device-card .card-title {
+            font-size: 0.85rem !important;
+            font-weight: 600;
+            line-height: 1.2;
+            margin-bottom: 0.4rem !important;
+            color: #333;
+            word-break: break-word;
+        }
+
+        .device-card:hover .card-title {
+            color: #d50000;
+        }
+
+        .device-card .info-row {
+            display: grid;
+            grid-template-columns: 1fr auto;
+            gap: 0.2rem 0.4rem;
+            margin-bottom: 0.3rem;
+            align-items: center;
+        }
+
+        .device-card .info-row small {
+            display: inline;
+            margin: 0;
+            color: #666;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .device-card .badge {
+            font-size: 0.6rem;
+            padding: 0.2rem 0.4rem;
+            margin-bottom: 0 !important;
+            display: inline-block;
+            font-weight: 500;
+        }
+
+        .device-card .specs-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 0.3rem 0.4rem;
+            margin-top: auto;
+            padding-top: 0.5rem;
+            border-top: 1px solid #eee;
+        }
+
+        .device-card .spec-item {
+            font-size: 0.65rem;
+            line-height: 1.2;
+            color: #555;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            display: flex;
+            align-items: center;
+            gap: 4px;
+        }
+
+        @media (max-width: 1199px) {
+            .device-grid {
+                grid-template-columns: repeat(4, 1fr);
+            }
+        }
+        
+        @media (max-width: 991px) {
+            .device-grid {
+                grid-template-columns: repeat(3, 1fr);
+            }
+        }
+
+        @media (max-width: 767px) {
+            .device-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+
+        @media (max-width: 480px) {
+            .device-grid {
+                grid-template-columns: repeat(1, 1fr);
+            }
+        }
+
         .filter-header {
             font-weight: bold;
         }
@@ -1264,7 +1400,7 @@ if (!$filterConfig) {
             </div>
         </div>
 
-        <div class="row" id="resultsContainer">
+        <div class="device-grid mb-5" id="resultsContainer">
             <!-- Results will be dynamically inserted here -->
         </div>
     </div>
@@ -2138,21 +2274,39 @@ if (!$filterConfig) {
             });
 
             function createDeviceCard(device) {
+                let badgeClass = 'bg-secondary';
+                if (device.availability === 'Available') badgeClass = 'bg-success';
+                else if (device.availability === 'Coming Soon') badgeClass = 'bg-warning text-dark';
+                else if (device.availability === 'Discontinued') badgeClass = 'bg-danger';
+                else if (device.availability === 'Rumored') badgeClass = 'bg-info text-dark';
+                
+                const priceFormatted = device.price ? '$' + parseFloat(device.price).toLocaleString() : 'N/A';
+                
                 return `
-                <div class="col-lg-3 col-md-4 col-sm-6 mb-4">
-                    <div class="card h-100 shadow-sm">
-                        <a href="<?php echo $base; ?>device/${encodeURIComponent(device.slug)}" class="text-decoration-none">
-                            <img src="${device.thumbnail}" class="card-img-top" alt="${device.name}" style="height: 200px; object-fit: contain; padding: 10px;">
-                            <div class="card-body">
-                                <h6 class="card-title text-dark fw-bold">${device.name}</h6>
-                                <p class="text-muted small mb-1"><i class="fa fa-building me-1"></i>${device.brand || 'Unknown'}</p>
-                                ${device.announced ? `<p class="text-muted small mb-1"><i class="fa fa-calendar me-1"></i>${device.announced}</p>` : ''}
-                                ${device.display_size ? `<p class="text-muted small mb-1"><i class="fa fa-mobile me-1"></i>${device.display_size}</p>` : ''}
-                                ${device.ram ? `<p class="text-muted small mb-1"><i class="fa fa-microchip me-1"></i>${device.ram}</p>` : ''}
-                                ${device.battery ? `<p class="text-muted small mb-0"><i class="fa fa-battery-full me-1"></i>${device.battery}</p>` : ''}
+                <div class="device-card">
+                    <a href="<?php echo $base; ?>device/${encodeURIComponent(device.slug)}" class="card text-decoration-none">
+                        <img src="${device.thumbnail}" class="card-img-top" alt="${device.name}" onerror="this.style.display='none'">
+                        <div class="card-body">
+                            <h5 class="card-title">${device.name}</h5>
+                            
+                            <div class="info-row">
+                                <small><strong>${device.brand || 'Unknown'}</strong></small>
+                                <span class="badge bg-primary" style="width: fit-content;">${device.year || 'N/A'}</span>
                             </div>
-                        </a>
-                    </div>
+
+                            <div class="info-row">
+                                <small>💰 ${priceFormatted}</small>
+                                <span class="badge ${badgeClass} d-inline-block">${device.availability || 'Unknown'}</span>
+                            </div>
+
+                            <div class="specs-grid">
+                                ${device.ram ? `<div class="spec-item"><i class="fas fa-microchip"></i> ${device.ram}</div>` : ''}
+                                ${device.storage ? `<div class="spec-item"><i class="fas fa-database"></i> ${device.storage}</div>` : ''}
+                                ${device.display_size ? `<div class="spec-item"><i class="fas fa-desktop"></i> ${device.display_size.replace('"', '')}"</div>` : ''}
+                                ${device.main_camera_resolution ? `<div class="spec-item"><i class="fas fa-camera"></i> ${!isNaN(parseFloat(device.main_camera_resolution)) ? device.main_camera_resolution + ' MP' : device.main_camera_resolution}</div>` : ''}
+                            </div>
+                        </div>
+                    </a>
                 </div>
             `;
             }
