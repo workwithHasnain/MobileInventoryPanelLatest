@@ -7,9 +7,9 @@ header('Content-Type: application/json');
 
 // Read query params
 $q = trim($_GET['q'] ?? '');
-$limit = (int)($_GET['limit'] ?? 10);
-if ($limit < 1 || $limit > 50) {
-    $limit = 10;
+$limit = (int)($_GET['limit'] ?? 50);
+if ($limit < 1 || $limit > 5000) {
+    $limit = 50;
 }
 
 if ($q === '') {
