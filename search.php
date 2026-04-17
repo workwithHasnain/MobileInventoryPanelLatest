@@ -23,6 +23,20 @@ try {
     // Prepare search term for ILIKE
     $term = '%' . $q . '%';
 
+    // Search brands
+    $brandSql = "
+        SELECT id, name, slug, logo_url
+        FROM brands
+        WHERE name ILIKE ?
+        ORDER BY name ASC
+        LIMIT ?
+    ";
+    $brandStmt = $pdo->prepare($brandSql);
+    $brandStmt->bindValue(1, $term, PDO::PARAM_STR);
+    $brandStmt->bindValue(2, $limit, PDO::PARAM_INT);
+    $brandStmt->execute();
+    $brands = $brandStmt->fetchAll();
+
     // Search posts
     $postSql = "
         SELECT id, title, slug, featured_image, short_description
@@ -49,19 +63,31 @@ try {
         SELECT p.id, p.name, p.slug, p.image, b.name AS brand_name
         FROM phones p
         LEFT JOIN brands b ON p.brand_id = b.id
-        WHERE p.name ILIKE ? OR COALESCE(b.name, '') ILIKE ?
+        WHERE p.name ILIKE ? OR COALESCE(b.name, '') ILIKE ? OR (COALESCE(b.name, '') || ' ' || p.name) ILIKE ?
         ORDER BY p.updated_at DESC NULLS LAST, p.created_at DESC NULLS LAST
         LIMIT ?
     ";
     $phoneStmt = $pdo->prepare($phoneSql);
     $phoneStmt->bindValue(1, $term, PDO::PARAM_STR);
     $phoneStmt->bindValue(2, $term, PDO::PARAM_STR);
-    $phoneStmt->bindValue(3, $limit, PDO::PARAM_INT);
+    $phoneStmt->bindValue(3, $term, PDO::PARAM_STR);
+    $phoneStmt->bindValue(4, $limit, PDO::PARAM_INT);
     $phoneStmt->execute();
     $phones = $phoneStmt->fetchAll();
 
     // Build unified results list
     $results = [];
+
+    foreach ($brands as $b) {
+        $results[] = [
+            'type' => 'brand',
+            'id' => (string)$b['id'],
+            'title' => $b['name'],
+            'slug' => $b['slug'],
+            'image' => $b['logo_url'] ?? '',
+            'url' => $base . 'brand/' . rawurlencode($b['slug'])
+        ];
+    }
 
     foreach ($posts as $p) {
         $results[] = [

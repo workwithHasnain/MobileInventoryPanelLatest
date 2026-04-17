@@ -133,7 +133,7 @@ document.addEventListener('DOMContentLoaded', function () {
             label.style.color = '#222';
 
             const meta = document.createElement('div');
-            meta.textContent = item.type === 'post' ? 'Post' : 'Device';
+            meta.textContent = item.type === 'post' ? 'Post' : (item.type === 'brand' ? 'Brand' : 'Device');
             meta.style.fontSize = '11px';
             meta.style.color = '#888';
 
@@ -146,6 +146,8 @@ document.addEventListener('DOMContentLoaded', function () {
                     window.location.href = item.url;
                 } else if (item.type === 'post' && item.slug) {
                     window.location.href = 'post.php?slug=' + encodeURIComponent(item.slug);
+                } else if (item.type === 'brand' && item.slug) {
+                    window.location.href = 'brand.php?slug=' + encodeURIComponent(item.slug);
                 } else if (item.type === 'device' && item.slug) {
                     window.location.href = 'device.php?slug=' + encodeURIComponent(item.slug);
                 }
@@ -316,7 +318,7 @@ function renderMobileSearchResults(items) {
 
         const type = document.createElement('p');
         type.className = 'mobile-search-result-type';
-        type.textContent = item.type === 'post' ? 'Article' : 'Device';
+        type.textContent = item.type === 'post' ? 'Article' : (item.type === 'brand' ? 'Brand' : 'Device');
         content.appendChild(type);
 
         link.appendChild(content);
