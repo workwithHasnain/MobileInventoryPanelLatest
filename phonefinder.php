@@ -2139,17 +2139,17 @@ if (!$filterConfig) {
 
             function createDeviceCard(device) {
                 return `
-                <div class="col-lg-3 col-md-4 col-sm-6 mb-2">
-                    <div class="card h-100 shadow-sm border-0 bg-white" style="border-radius: 8px; transition: transform 0.2s;">
-                        <a href="<?php echo $base; ?>device/${encodeURIComponent(device.slug)}" class="text-decoration-none d-flex flex-column h-100">
-                            <img src="${device.thumbnail}" class="card-img-top mx-auto mt-3" alt="${device.name}" style="height: 180px; width: auto; max-width: 100%; object-fit: contain; padding: 10px;" onerror="this.style.display='none'">
-                            <div class="card-body d-flex flex-column justify-content-end bg-white rounded-bottom">
-                                <h6 class="card-title text-dark fw-bold mb-2">${device.name}</h6>
-                                <p class="text-muted small mb-1"><i class="fa fa-building me-2" style="color: #666;"></i>${device.brand || 'Unknown'}</p>
-                                ${device.announced ? `<p class="text-muted small mb-1"><i class="fa fa-calendar me-2" style="color: #666;"></i>${device.announced}</p>` : ''}
-                                ${device.display_size ? `<p class="text-muted small mb-1"><i class="fa fa-mobile-alt me-2" style="color: #666;"></i>${device.display_size}</p>` : ''}
-                                ${device.ram ? `<p class="text-muted small mb-1"><i class="fa fa-microchip me-2" style="color: #666;"></i>${device.ram}</p>` : ''}
-                                ${device.battery ? `<p class="text-muted small mb-0"><i class="fa fa-battery-full me-2" style="color: #666;"></i>${device.battery}</p>` : ''}
+                <div class="col-lg-3 col-md-4 col-sm-6 mb-4">
+                    <div class="card h-100 shadow-sm">
+                        <a href="<?php echo $base; ?>device/${encodeURIComponent(device.slug)}" class="text-decoration-none">
+                            <img src="${device.thumbnail}" class="card-img-top" alt="${device.name}" style="height: 200px; object-fit: contain; padding: 10px;">
+                            <div class="card-body">
+                                <h6 class="card-title text-dark fw-bold">${device.name}</h6>
+                                <p class="text-muted small mb-1"><i class="fa fa-building me-1"></i>${device.brand || 'Unknown'}</p>
+                                ${device.announced ? `<p class="text-muted small mb-1"><i class="fa fa-calendar me-1"></i>${device.announced}</p>` : ''}
+                                ${device.display_size ? `<p class="text-muted small mb-1"><i class="fa fa-mobile me-1"></i>${device.display_size}</p>` : ''}
+                                ${device.ram ? `<p class="text-muted small mb-1"><i class="fa fa-microchip me-1"></i>${device.ram}</p>` : ''}
+                                ${device.battery ? `<p class="text-muted small mb-0"><i class="fa fa-battery-full me-1"></i>${device.battery}</p>` : ''}
                             </div>
                         </a>
                     </div>
