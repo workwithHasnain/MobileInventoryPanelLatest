@@ -251,7 +251,7 @@ $latestDevices = array_slice(array_reverse($latestDevices), 0, 9);
     <style>
         .device-grid {
             display: grid;
-            grid-template-columns: repeat(5, 1fr);
+            grid-template-columns: repeat(3, 1fr);
             gap: 1.5rem;
             padding: 1rem 0;
         }
@@ -393,19 +393,19 @@ $latestDevices = array_slice(array_reverse($latestDevices), 0, 9);
 
         @media (max-width: 991px) {
             .device-grid {
-                grid-template-columns: repeat(4, 1fr);
+                grid-template-columns: repeat(2, 1fr);
             }
         }
 
         @media (max-width: 767px) {
             .device-grid {
-                grid-template-columns: repeat(3, 1fr);
+                grid-template-columns: repeat(2, 1fr);
             }
         }
 
         @media (max-width: 480px) {
             .device-grid {
-                grid-template-columns: repeat(2, 1fr);
+                grid-template-columns: repeat(1, 1fr);
             }
         }
     </style>
