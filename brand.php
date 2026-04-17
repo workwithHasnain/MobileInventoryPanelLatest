@@ -44,10 +44,12 @@ $brandId = $brandData['id'];
 
 // Get all phones for this brand
 $phones_stmt = $pdo->prepare("
-    SELECT id, name, image, slug
-    FROM phones
-    WHERE brand_id = :brand_id
-    ORDER BY name ASC
+    SELECT p.*, b.name as brand_name,
+           (SELECT COUNT(*) FROM device_comments dc WHERE dc.device_id = CAST(p.id AS VARCHAR) AND dc.status = 'approved') as comment_count
+    FROM phones p
+    LEFT JOIN brands b ON p.brand_id = b.id
+    WHERE p.brand_id = :brand_id
+    ORDER BY p.name ASC
 ");
 $phones_stmt->execute(['brand_id' => $brandId]);
 $phones = $phones_stmt->fetchAll();
@@ -397,28 +399,72 @@ $latestDevices = array_slice(array_reverse($latestDevices), 0, 9);
                     <h1><?php echo htmlspecialchars($brandName); ?> phones</h1>
                     <div class="device-count"><?php echo count($phones); ?> devices</div>
                 </div>
-                <div class="device-grid">
+                <div class="premium-device-grid">
                     <?php foreach ($phones as $phone):
                         $imagePath = $phone['image'] ?? '';
                         if ($imagePath && !str_starts_with($imagePath, '/') && !str_starts_with($imagePath, 'http')) {
                             $imagePath = '/' . $imagePath;
                         }
                         $deviceSlug = $phone['slug'] ?? $phone['id'];
+                        $availability = $phone['availability'] ?? 'Available';
+                        $statusClass = strtolower(str_replace(' ', '-', $availability));
+                        $price = !empty($phone['price']) ? '$' . number_format((float)$phone['price'], 0) : 'N/A';
                     ?>
-                        <a href="<?php echo $base; ?>device/<?php echo htmlspecialchars($deviceSlug); ?>" class="device-grid-item">
-                            <?php if ($imagePath): ?>
-                                <img src="<?php echo htmlspecialchars($imagePath); ?>" alt="<?php echo htmlspecialchars($phone['name']); ?>" onerror="this.style.display='none'">
-                            <?php else: ?>
-                                <div class="no-image-placeholder">
-                                    <i class="fas fa-mobile-alt fa-3x"></i>
+                        <a href="<?php echo $base; ?>device/<?php echo htmlspecialchars($deviceSlug); ?>" class="premium-device-card">
+                            <div class="premium-card-image">
+                                <?php if ($imagePath): ?>
+                                    <img src="<?php echo htmlspecialchars($imagePath); ?>" alt="<?php echo htmlspecialchars($phone['name']); ?>" onerror="this.src='<?php echo $base; ?>imges/download.png'">
+                                <?php else: ?>
+                                    <img src="<?php echo $base; ?>imges/download.png" alt="No image">
+                                <?php endif; ?>
+                            </div>
+                            <div class="premium-card-body">
+                                <div class="premium-device-name"><?php echo htmlspecialchars($phone['name']); ?></div>
+                                <div class="premium-brand-name"><?php echo htmlspecialchars($phone['brand_name'] ?? ''); ?></div>
+                                
+                                <div class="premium-card-badges">
+                                    <span class="badge-year"><?php echo htmlspecialchars($phone['year'] ?? 'N/A'); ?></span>
+                                    <span class="badge-status <?php echo $statusClass; ?>"><?php echo htmlspecialchars($availability); ?></span>
                                 </div>
-                            <?php endif; ?>
-                            <span class="device-name"><?php echo htmlspecialchars($phone['name']); ?></span>
+
+                                <div class="premium-specs-grid">
+                                    <div class="spec-item spec-price">
+                                        <i class="fa-solid fa-sack-dollar"></i>
+                                        <span><?php echo $price; ?></span>
+                                    </div>
+                                    <div class="spec-item spec-ram">
+                                        <i class="fa-solid fa-table-cells"></i>
+                                        <span><?php echo htmlspecialchars($phone['ram'] ?? 'N/A'); ?></span>
+                                    </div>
+                                    <div class="spec-item spec-storage">
+                                        <i class="fa-solid fa-hard-drive"></i>
+                                        <span><?php echo htmlspecialchars($phone['storage'] ?? 'N/A'); ?></span>
+                                    </div>
+                                    <div class="spec-item spec-display">
+                                        <i class="fa-solid fa-mobile-screen-button"></i>
+                                        <span><?php echo htmlspecialchars($phone['display_size'] ?? 'N/A'); ?></span>
+                                    </div>
+                                    <div class="spec-item spec-camera">
+                                        <i class="fa-solid fa-camera"></i>
+                                        <span><?php echo htmlspecialchars($phone['main_camera_resolution'] ?? 'N/A'); ?></span>
+                                    </div>
+                                    <div class="spec-item spec-os">
+                                        <i class="fa-solid fa-circle-dot"></i>
+                                        <span><?php echo htmlspecialchars($phone['os'] ?? 'N/A'); ?></span>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="premium-card-footer">
+                                <div class="footer-item">
+                                    <i class="fa-solid fa-comment-dots"></i>
+                                    <span><?php echo (int)($phone['comment_count'] ?? 0); ?></span>
+                                </div>
+                            </div>
                         </a>
                     <?php endforeach; ?>
 
                     <?php if (empty($phones)): ?>
-                        <div style="grid-column: 1 / -1; text-align: center; padding: 40px;">
+                        <div style="grid-column: 1 / -1; text-align: center; padding: 40px; background: #fff;">
                             <i class="fas fa-mobile-alt fa-3x text-muted mb-3"></i>
                             <p class="text-muted">No devices available for <?php echo htmlspecialchars($brandName); ?></p>
                         </div>

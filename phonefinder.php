@@ -2106,6 +2106,7 @@ if (!$filterConfig) {
 
                             // Clear previous results
                             resultsContainer.innerHTML = '';
+                            resultsContainer.className = 'row premium-device-grid';
 
                             // Display devices
                             if (data.devices.length > 0) {
@@ -2138,22 +2139,57 @@ if (!$filterConfig) {
             });
 
             function createDeviceCard(device) {
+                const price = device.price ? '$' + parseInt(device.price).toLocaleString() : 'N/A';
+                const statusClass = (device.availability || 'Available').toLowerCase().replace(/\s+/g, '-');
+                
                 return `
-                <div class="col-lg-3 col-md-4 col-sm-6 mb-4">
-                    <div class="card h-100 shadow-sm">
-                        <a href="<?php echo $base; ?>device/${encodeURIComponent(device.slug)}" class="text-decoration-none">
-                            <img src="${device.thumbnail}" class="card-img-top" alt="${device.name}" style="height: 200px; object-fit: contain; padding: 10px;">
-                            <div class="card-body">
-                                <h6 class="card-title text-dark fw-bold">${device.name}</h6>
-                                <p class="text-muted small mb-1"><i class="fa fa-building me-1"></i>${device.brand || 'Unknown'}</p>
-                                ${device.announced ? `<p class="text-muted small mb-1"><i class="fa fa-calendar me-1"></i>${device.announced}</p>` : ''}
-                                ${device.display_size ? `<p class="text-muted small mb-1"><i class="fa fa-mobile me-1"></i>${device.display_size}</p>` : ''}
-                                ${device.ram ? `<p class="text-muted small mb-1"><i class="fa fa-microchip me-1"></i>${device.ram}</p>` : ''}
-                                ${device.battery ? `<p class="text-muted small mb-0"><i class="fa fa-battery-full me-1"></i>${device.battery}</p>` : ''}
-                            </div>
-                        </a>
+                <a href="<?php echo $base; ?>device/${encodeURIComponent(device.slug)}" class="premium-device-card">
+                    <div class="premium-card-image">
+                        <img src="${device.thumbnail}" alt="${device.name}" onerror="this.src='<?php echo $base; ?>imges/download.png'">
                     </div>
-                </div>
+                    <div class="premium-card-body">
+                        <div class="premium-device-name">${device.name}</div>
+                        <div class="premium-brand-name">${device.brand || 'Unknown'}</div>
+                        
+                        <div class="premium-card-badges">
+                            <span class="badge-year">${device.year || 'N/A'}</span>
+                            <span class="badge-status ${statusClass}">${device.availability || 'Available'}</span>
+                        </div>
+
+                        <div class="premium-specs-grid">
+                            <div class="spec-item spec-price">
+                                <i class="fa-solid fa-sack-dollar"></i>
+                                <span>${price}</span>
+                            </div>
+                            <div class="spec-item spec-ram">
+                                <i class="fa-solid fa-table-cells"></i>
+                                <span>${device.ram || 'N/A'}</span>
+                            </div>
+                            <div class="spec-item spec-storage">
+                                <i class="fa-solid fa-hard-drive"></i>
+                                <span>${device.storage || 'N/A'}</span>
+                            </div>
+                            <div class="spec-item spec-display">
+                                <i class="fa-solid fa-mobile-screen-button"></i>
+                                <span>${device.display_size || 'N/A'}</span>
+                            </div>
+                            <div class="spec-item spec-camera">
+                                <i class="fa-solid fa-camera"></i>
+                                <span>${device.camera || 'N/A'}</span>
+                            </div>
+                            <div class="spec-item spec-os">
+                                <i class="fa-solid fa-circle-dot"></i>
+                                <span>${device.os || 'N/A'}</span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="premium-card-footer">
+                        <div class="footer-item">
+                            <i class="fa-solid fa-comment-dots"></i>
+                            <span>${device.comment_count || 0}</span>
+                        </div>
+                    </div>
+                </a>
             `;
             }
         });
