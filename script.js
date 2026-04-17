@@ -194,6 +194,16 @@ document.addEventListener('DOMContentLoaded', function () {
             currentQuery = query;
             if (controller) controller.abort();
             controller = new AbortController();
+            
+            dropdown.innerHTML = '<div style="padding: 12px; text-align: center; color: #666;"><i class="fa fa-spinner fa-spin me-2"></i>Searching...</div>';
+            dropdown.style.display = 'block';
+        } else {
+            const loadMoreBtn = dropdown.querySelector('.load-more-btn');
+            if (loadMoreBtn) {
+                loadMoreBtn.innerHTML = '<i class="fa fa-spinner fa-spin me-2"></i>Loading...';
+                loadMoreBtn.style.pointerEvents = 'none';
+                loadMoreBtn.style.opacity = '0.7';
+            }
         }
         const baseURL = window.baseURL;
         const url = baseURL + 'search.php?q=' + encodeURIComponent(currentQuery) + '&limit=50&offset=' + currentOffset;
@@ -291,8 +301,15 @@ function performMobileSearch(query, isLoadMore = false) {
             mobileSearchController.abort();
         }
         mobileSearchController = new AbortController();
+        resultsContainer.innerHTML = '<div style="padding: 20px; text-align: center; color: #888;"><i class="fa fa-spinner fa-spin me-2"></i>Searching...</div>';
     } else {
         mobileCurrentOffset += 50;
+        const loadMoreBtn = resultsContainer.querySelector('.mobile-load-more');
+        if (loadMoreBtn) {
+            loadMoreBtn.innerHTML = '<i class="fa fa-spinner fa-spin me-2"></i>Loading...';
+            loadMoreBtn.style.pointerEvents = 'none';
+            loadMoreBtn.style.opacity = '0.7';
+        }
     }
 
     const baseURL = window.baseURL || '/';
