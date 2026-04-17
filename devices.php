@@ -187,6 +187,8 @@ $device_type_filter = isset($_GET['device_type']) ? trim($_GET['device_type']) :
                         <label for="deviceSorter" class="form-label mb-0 me-2 d-inline">Sort by:</label>
                         <select class="form-select form-select-sm d-inline" id="deviceSorter" style="width: auto;">
                             <option value="default">Default</option>
+                            <option value="latest-desc">Latest Release</option>
+                            <option value="latest-asc">Oldest Release</option>
                             <option value="views-desc">Most Views</option>
                             <option value="views-asc">Least Views</option>
                             <option value="comments-desc">Most Comments</option>

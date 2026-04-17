@@ -105,6 +105,18 @@ try {
         usort($filtered_phones, function ($a, $b) {
             return $a['comment_count'] - $b['comment_count'];
         });
+    } elseif ($sort === 'latest-desc') {
+        usort($filtered_phones, function ($a, $b) {
+            $dateA = !empty($a['release_date']) ? strtotime($a['release_date']) : (!empty($a['year']) ? strtotime($a['year'] . '-01-01') : 0);
+            $dateB = !empty($b['release_date']) ? strtotime($b['release_date']) : (!empty($b['year']) ? strtotime($b['year'] . '-01-01') : 0);
+            return $dateB - $dateA;
+        });
+    } elseif ($sort === 'latest-asc') {
+        usort($filtered_phones, function ($a, $b) {
+            $dateA = !empty($a['release_date']) ? strtotime($a['release_date']) : (!empty($a['year']) ? strtotime($a['year'] . '-01-01') : 0);
+            $dateB = !empty($b['release_date']) ? strtotime($b['release_date']) : (!empty($b['year']) ? strtotime($b['year'] . '-01-01') : 0);
+            return $dateA - $dateB;
+        });
     }
 
     // Reset array keys after filtering and sorting

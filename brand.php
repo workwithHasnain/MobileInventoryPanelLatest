@@ -42,13 +42,18 @@ if (!$brandData) {
 $brandName = $brandData['name'];
 $brandId = $brandData['id'];
 
-// Get all phones for this brand
+$count_stmt = $pdo->prepare("SELECT COUNT(*) FROM phones WHERE brand_id = :brand_id");
+$count_stmt->execute(['brand_id' => $brandId]);
+$totalDevicesCount = $count_stmt->fetchColumn();
+
+// Get initial 50 phones for this brand
 $phones_stmt = $pdo->prepare("
     SELECT p.*, b.name as brand_name
     FROM phones p
     LEFT JOIN brands b ON p.brand_id = b.id
     WHERE p.brand_id = :brand_id
     ORDER BY p.name ASC
+    LIMIT 50
 ");
 $phones_stmt->execute(['brand_id' => $brandId]);
 $phones = $phones_stmt->fetchAll();
@@ -458,9 +463,22 @@ $latestDevices = array_slice(array_reverse($latestDevices), 0, 9);
     <div class="container bg-white" style="border: 1px solid #e0e0e0;">
         <div class="row">
             <div class="col-lg-8 py-0" style="padding-left: 0; padding-right: 0; border: 1px solid #e0e0e0;">
-                <div class="brand-page-header">
-                    <h1><?php echo htmlspecialchars($brandName); ?> phones</h1>
-                    <div class="device-count"><?php echo count($phones); ?> devices</div>
+                <div class="brand-page-header d-flex justify-content-between align-items-center flex-wrap">
+                    <div>
+                        <h1><?php echo htmlspecialchars($brandName); ?> phones</h1>
+                        <div class="device-count"><?php echo $totalDevicesCount; ?> devices</div>
+                    </div>
+                    <div class="mt-2 mt-md-0">
+                        <select class="form-select form-select-sm" id="brandDeviceSorter" style="width: auto;">
+                            <option value="default">Name (A-Z)</option>
+                            <option value="latest-desc">Latest Release</option>
+                            <option value="latest-asc">Oldest Release</option>
+                            <option value="views-desc">Most Views</option>
+                            <option value="views-asc">Least Views</option>
+                            <option value="comments-desc">Most Comments</option>
+                            <option value="comments-asc">Least Comments</option>
+                        </select>
+                    </div>
                 </div>
                 <div class="device-grid">
                     <?php foreach ($phones as $phone):
@@ -534,6 +552,12 @@ $latestDevices = array_slice(array_reverse($latestDevices), 0, 9);
                         <div style="grid-column: 1 / -1; text-align: center; padding: 40px;">
                             <i class="fas fa-mobile-alt fa-3x text-muted mb-3"></i>
                             <p class="text-muted">No devices available for <?php echo htmlspecialchars($brandName); ?></p>
+                        </div>
+                    <?php endif; ?>
+                    
+                    <?php if ($totalDevicesCount > 50): ?>
+                        <div class="col-12 text-center mt-4" id="brandLoadMoreContainer" style="grid-column: 1 / -1;">
+                            <button id="brandLoadMoreBtn" class="btn btn-outline-primary px-4 py-2">Load More</button>
                         </div>
                     <?php endif; ?>
                 </div>
@@ -663,6 +687,133 @@ $latestDevices = array_slice(array_reverse($latestDevices), 0, 9);
                 }
             }
         });
+
+        const brandId = <?php echo $brandId; ?>;
+        const totalDevices = <?php echo $totalDevicesCount; ?>;
+        const brandSlug = "<?php echo htmlspecialchars($brandSlug); ?>";
+        let currentPage = 1;
+        
+        function getBrandDeviceCard(phone) {
+            const imagePath = phone.image ? (phone.image.startsWith('/') || phone.image.startsWith('http') ? phone.image : '/' + phone.image) : '';
+            const deviceSlug = phone.slug || phone.id;
+            
+            let badgeClass = 'bg-secondary';
+            switch (phone.availability) {
+                case 'Available': badgeClass = 'bg-success'; break;
+                case 'Coming Soon': badgeClass = 'bg-warning text-dark'; break;
+                case 'Discontinued': badgeClass = 'bg-danger'; break;
+                case 'Rumored': badgeClass = 'bg-info text-dark'; break;
+            }
+            
+            let imageHtml = imagePath ? `<img src="${imagePath}" class="card-img-top" alt="${phone.name}" onerror="this.style.display='none'">` : `<div class="card-img-top d-flex align-items-center justify-content-center bg-light"><i class="fas fa-mobile-alt fa-2x text-muted"></i></div>`;
+            
+            let specsHtml = '';
+            if (phone.ram) specsHtml += `<div class="spec-item"><i class="fas fa-microchip"></i> ${phone.ram}</div>`;
+            if (phone.storage) specsHtml += `<div class="spec-item"><i class="fas fa-database"></i> ${phone.storage}</div>`;
+            if (phone.display_size) specsHtml += `<div class="spec-item"><i class="fas fa-desktop"></i> ${phone.display_size.replace('"', '')}"</div>`;
+            if (phone.main_camera_resolution) specsHtml += `<div class="spec-item"><i class="fas fa-camera"></i> ${!isNaN(phone.main_camera_resolution) ? phone.main_camera_resolution + ' MP' : phone.main_camera_resolution}</div>`;
+
+            const price = parseFloat(phone.price);
+            const priceHtml = (!isNaN(price) && price > 0) ? '$' + price.toLocaleString() : 'N/A';
+            const year = phone.year || 'N/A';
+
+            return `
+                <div class="device-card">
+                    <a href="<?php echo $base; ?>device/${deviceSlug}" class="card text-decoration-none">
+                        ${imageHtml}
+                        <div class="card-body">
+                            <h5 class="card-title">${phone.name}</h5>
+                            <div class="info-row">
+                                <small><strong>${phone.brand_name || '<?php echo htmlspecialchars($brandName); ?>'}</strong></small>
+                                <span class="badge bg-primary" style="width: fit-content;">${year}</span>
+                            </div>
+                            <div class="info-row">
+                                <small>💰 ${priceHtml}</small>
+                                <span class="badge ${badgeClass} d-inline-block">${phone.availability || 'Unknown'}</span>
+                            </div>
+                            <div class="specs-grid">
+                                ${specsHtml}
+                            </div>
+                        </div>
+                    </a>
+                </div>
+            `;
+        }
+        
+        function loadBrandDevices(page, isAppend) {
+            const sort = document.getElementById('brandDeviceSorter').value;
+            const container = document.querySelector('.device-grid');
+            let btn = document.getElementById('brandLoadMoreBtn');
+            let btnContainer = document.getElementById('brandLoadMoreContainer');
+            
+            if (!isAppend) {
+                container.innerHTML = '<div style="grid-column: 1 / -1; text-align: center; padding: 40px;"><i class="fa fa-spinner fa-spin fa-3x text-muted mb-3"></i><p>Loading devices...</p></div>';
+            } else if (btn) {
+                btn.innerHTML = '<i class="fa fa-spinner fa-spin me-2"></i>Loading...';
+                btn.disabled = true;
+            }
+            
+            fetch(`<?php echo $base; ?>api_get_brand_devices.php?brand_id=${brandId}&page=${page}&sort=${sort}`)
+                .then(res => res.json())
+                .then(data => {
+                    if (data.success) {
+                        if (!isAppend) container.innerHTML = '';
+                        
+                        // Refetch elements since DOM might have changed
+                        btnContainer = document.getElementById('brandLoadMoreContainer');
+                        btn = document.getElementById('brandLoadMoreBtn');
+                        
+                        if (btnContainer && container.contains(btnContainer)) {
+                            container.removeChild(btnContainer);
+                        }
+                        
+                        if (data.devices.length === 0 && !isAppend) {
+                            container.innerHTML = '<div style="grid-column: 1 / -1; text-align: center; padding: 40px;"><i class="fas fa-mobile-alt fa-3x text-muted mb-3"></i><p class="text-muted">No devices available.</p></div>';
+                            return;
+                        }
+
+                        data.devices.forEach(device => {
+                            container.insertAdjacentHTML('beforeend', getBrandDeviceCard(device));
+                        });
+                        
+                        currentPage = page;
+                        
+                        if (data.page < data.total_pages) {
+                            container.insertAdjacentHTML('beforeend', `
+                                <div class="col-12 text-center mt-4" id="brandLoadMoreContainer" style="grid-column: 1 / -1;">
+                                    <button id="brandLoadMoreBtn" class="btn btn-outline-primary px-4 py-2">Load More</button>
+                                </div>
+                            `);
+                            document.getElementById('brandLoadMoreBtn').addEventListener('click', function() {
+                                loadBrandDevices(currentPage + 1, true);
+                            });
+                        }
+                    }
+                })
+                .catch(err => {
+                    console.error("Failed to load devices", err);
+                    if (!isAppend) {
+                        container.innerHTML = '<div style="grid-column: 1 / -1; text-align: center; padding: 40px; color: red;">Failed to load.</div>';
+                    } else if (btn) {
+                        btn.innerHTML = 'Load More';
+                        btn.disabled = false;
+                    }
+                });
+        }
+        
+        const sorter = document.getElementById('brandDeviceSorter');
+        if (sorter) {
+            sorter.addEventListener('change', function() {
+                loadBrandDevices(1, false);
+            });
+        }
+        
+        const initialBtn = document.getElementById('brandLoadMoreBtn');
+        if (initialBtn) {
+            initialBtn.addEventListener('click', function(e) {
+                loadBrandDevices(currentPage + 1, true);
+            });
+        }
     </script>
     <script src="<?php echo $base; ?>script.js"></script>
 </body>
