@@ -22,7 +22,7 @@ if (empty($_GET)) {
 
 // Get all rumored phones across all brands
 $phones_stmt = $pdo->prepare("
-    SELECT p.id, p.name, p.image, p.slug, b.name as brand_name
+    SELECT p.*, b.name as brand_name
     FROM phones p
     LEFT JOIN brands b ON p.brand_id = b.id
     WHERE p.availability = 'Rumored'
@@ -231,50 +231,114 @@ $latestDevices = array_slice(array_reverse($latestDevices), 0, 9);
     <style>
         .device-grid {
             display: grid;
-            grid-template-columns: repeat(5, 1fr);
-            gap: 0;
-            border-top: 1px solid #ddd;
-            border-left: 1px solid #ddd;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 1.5rem;
+            padding: 1rem 0;
         }
 
-        .device-grid-item {
-            border-right: 1px solid #ddd;
-            border-bottom: 1px solid #ddd;
-            text-align: center;
-            padding: 15px 8px;
-            cursor: pointer;
-            transition: background-color 0.2s ease;
+        .device-card {
             text-decoration: none;
-            color: #333;
+            color: inherit;
+            display: block;
+            transition: transform 0.2s ease, box-shadow 0.2s ease;
+            height: 100%;
+        }
+        
+        .device-card:hover {
+            transform: translateY(-3px);
+            text-decoration: none;
+            color: inherit;
+        }
+
+        .device-card .card {
             display: flex;
             flex-direction: column;
-            align-items: center;
+            height: 100%;
+            border: 1px solid #e0e0e0;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.02);
+            background: #fff;
+            transition: box-shadow 0.2s ease;
+            border-radius: 6px;
+            overflow: hidden;
         }
 
-        .device-grid-item:hover {
-            background-color: #f0f0f0;
-            color: #333;
-            text-decoration: none;
+        .device-card:hover .card {
+            box-shadow: 0 6px 12px rgba(0,0,0,0.08);
         }
 
-        .device-grid-item img {
+        .device-card .card-img-top {
             width: 100%;
-            max-width: 120px;
-            height: 150px;
+            height: 160px;
             object-fit: contain;
-            margin-bottom: 8px;
+            padding: 15px;
+            border-bottom: 1px solid #f0f0f0;
         }
 
-        .device-grid-item .device-name {
-            font-size: 0.85rem;
-            font-weight: 400;
+        .device-card .card-body {
+            padding: 0.6rem 0.8rem;
+            font-size: 0.75rem;
+            flex-grow: 1;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .device-card .card-title {
+            font-size: 0.85rem !important;
+            font-weight: 600;
+            line-height: 1.2;
+            margin-bottom: 0.4rem !important;
             color: #333;
-            line-height: 1.3;
             word-break: break-word;
         }
 
-        .device-grid-item:hover .device-name {
+        .device-card:hover .card-title {
             color: #d50000;
+        }
+
+        .device-card .info-row {
+            display: grid;
+            grid-template-columns: 1fr auto;
+            gap: 0.2rem 0.4rem;
+            margin-bottom: 0.3rem;
+            align-items: center;
+        }
+
+        .device-card .info-row small {
+            display: inline;
+            margin: 0;
+            color: #666;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .device-card .badge {
+            font-size: 0.6rem;
+            padding: 0.2rem 0.4rem;
+            margin-bottom: 0 !important;
+            display: inline-block;
+            font-weight: 500;
+        }
+
+        .device-card .specs-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 0.3rem 0.4rem;
+            margin-top: auto;
+            padding-top: 0.5rem;
+            border-top: 1px solid #eee;
+        }
+
+        .device-card .spec-item {
+            font-size: 0.65rem;
+            line-height: 1.2;
+            color: #555;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            display: flex;
+            align-items: center;
+            gap: 4px;
         }
 
         .brand-page-header {
@@ -295,33 +359,21 @@ $latestDevices = array_slice(array_reverse($latestDevices), 0, 9);
             margin-top: 2px;
         }
 
-        .no-image-placeholder {
-            width: 100%;
-            max-width: 120px;
-            height: 150px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            background: #f5f5f5;
-            color: #ccc;
-            margin-bottom: 8px;
-        }
-
         @media (max-width: 991px) {
             .device-grid {
-                grid-template-columns: repeat(4, 1fr);
+                grid-template-columns: repeat(2, 1fr);
             }
         }
 
         @media (max-width: 767px) {
             .device-grid {
-                grid-template-columns: repeat(3, 1fr);
+                grid-template-columns: repeat(2, 1fr);
             }
         }
 
         @media (max-width: 480px) {
             .device-grid {
-                grid-template-columns: repeat(2, 1fr);
+                grid-template-columns: repeat(1, 1fr);
             }
         }
     </style>
@@ -386,18 +438,65 @@ $latestDevices = array_slice(array_reverse($latestDevices), 0, 9);
                         }
                         $deviceSlug = $phone['slug'] ?? $phone['id'];
                         $brandName = $phone['brand_name'] ?? 'Unknown';
+                        
+                        $isTablet = !empty($phone['display_size']) && floatval(str_replace('"', '', $phone['display_size'])) >= 7.0;
+                        
+                        $badgeClass = 'bg-secondary';
+                        switch ($phone['availability']) {
+                            case 'Available':
+                                $badgeClass = 'bg-success';
+                                break;
+                            case 'Coming Soon':
+                                $badgeClass = 'bg-warning text-dark';
+                                break;
+                            case 'Discontinued':
+                                $badgeClass = 'bg-danger';
+                                break;
+                            case 'Rumored':
+                                $badgeClass = 'bg-info text-dark';
+                                break;
+                        }
                     ?>
-                        <a href="<?php echo $base; ?>device/<?php echo htmlspecialchars($deviceSlug); ?>" class="device-grid-item" title="<?php echo htmlspecialchars($phone['name']); ?> - <?php echo htmlspecialchars($brandName); ?>">
-                            <?php if ($imagePath): ?>
-                                <img src="<?php echo htmlspecialchars($imagePath); ?>" alt="<?php echo htmlspecialchars($phone['name']); ?>" onerror="this.style.display='none'">
-                            <?php else: ?>
-                                <div class="no-image-placeholder">
-                                    <i class="fas fa-mobile-alt fa-3x"></i>
+                        <div class="device-card">
+                            <a href="<?php echo $base; ?>device/<?php echo htmlspecialchars($deviceSlug); ?>" class="card text-decoration-none">
+                                <?php if ($imagePath): ?>
+                                    <img src="<?php echo htmlspecialchars($imagePath); ?>" class="card-img-top" alt="<?php echo htmlspecialchars($phone['name']); ?>" onerror="this.style.display='none'">
+                                <?php else: ?>
+                                    <div class="card-img-top d-flex align-items-center justify-content-center bg-light">
+                                        <i class="fas fa-mobile-alt fa-2x text-muted"></i>
+                                    </div>
+                                <?php endif; ?>
+                                
+                                <div class="card-body">
+                                    <h5 class="card-title"><?php echo htmlspecialchars($phone['name']); ?></h5>
+                                    
+                                    <div class="info-row">
+                                        <small><strong><?php echo htmlspecialchars($brandName); ?></strong></small>
+                                        <span class="badge bg-primary" style="width: fit-content;"><?php echo htmlspecialchars($phone['year'] ?? 'N/A'); ?></span>
+                                    </div>
+
+                                    <div class="info-row">
+                                        <small>💰 <?php echo !empty($phone['price']) ? '$' . number_format((float)$phone['price'], 0) : 'N/A'; ?></small>
+                                        <span class="badge <?php echo $badgeClass; ?> d-inline-block"><?php echo htmlspecialchars($phone['availability'] ?? 'Unknown'); ?></span>
+                                    </div>
+
+                                    <div class="specs-grid">
+                                        <?php if (!empty($phone['ram'])): ?>
+                                            <div class="spec-item"><i class="fas fa-microchip"></i> <?php echo htmlspecialchars($phone['ram']); ?></div>
+                                        <?php endif; ?>
+                                        <?php if (!empty($phone['storage'])): ?>
+                                            <div class="spec-item"><i class="fas fa-database"></i> <?php echo htmlspecialchars($phone['storage']); ?></div>
+                                        <?php endif; ?>
+                                        <?php if (!empty($phone['display_size'])): ?>
+                                            <div class="spec-item"><i class="fas fa-desktop"></i> <?php echo htmlspecialchars(str_replace('"', '', $phone['display_size'])) . '"'; ?></div>
+                                        <?php endif; ?>
+                                        <?php if (!empty($phone['main_camera_resolution'])): ?>
+                                            <div class="spec-item"><i class="fas fa-camera"></i> <?php echo is_numeric($phone['main_camera_resolution']) ? htmlspecialchars($phone['main_camera_resolution']) . ' MP' : htmlspecialchars($phone['main_camera_resolution']); ?></div>
+                                        <?php endif; ?>
+                                    </div>
                                 </div>
-                            <?php endif; ?>
-                            <span class="device-name"><?php echo htmlspecialchars($phone['name']); ?></span>
-                            <span class="device-brand" style="font-size: 0.75rem; color: #999; margin-top: 2px;"><?php echo htmlspecialchars($brandName); ?></span>
-                        </a>
+                            </a>
+                        </div>
                     <?php endforeach; ?>
 
                     <?php if (empty($phones)): ?>
