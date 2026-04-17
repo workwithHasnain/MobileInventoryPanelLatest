@@ -73,21 +73,31 @@ document.addEventListener('DOMContentLoaded', function () {
 
     let debounceTimer = null;
     let controller = null;
+    let currentQuery = '';
+    let currentOffset = 0;
 
     function clearResults() {
         dropdown.innerHTML = '';
         dropdown.style.display = 'none';
     }
 
-    function renderResults(items) {
-        dropdown.innerHTML = '';
+    function renderResults(items, isAppend = false) {
+        if (!isAppend) {
+            dropdown.innerHTML = '';
+        } else {
+            const loadMoreBtn = dropdown.querySelector('.load-more-btn');
+            if (loadMoreBtn) loadMoreBtn.remove();
+        }
+
         if (!items || items.length === 0) {
-            const empty = document.createElement('div');
-            empty.textContent = 'No results';
-            empty.style.padding = '8px 12px';
-            empty.style.color = '#666';
-            dropdown.appendChild(empty);
-            dropdown.style.display = 'block';
+            if (!isAppend) {
+                const empty = document.createElement('div');
+                empty.textContent = 'No results';
+                empty.style.padding = '8px 12px';
+                empty.style.color = '#666';
+                dropdown.appendChild(empty);
+                dropdown.style.display = 'block';
+            }
             return;
         }
 
@@ -116,7 +126,7 @@ document.addEventListener('DOMContentLoaded', function () {
                 img.style.objectFit = 'cover';
                 img.style.borderRadius = '3px';
                 row.appendChild(img);
-            } else {
+            } else if (item.type !== 'brand') {
                 const placeholder = document.createElement('div');
                 placeholder.style.width = '32px';
                 placeholder.style.height = '32px';
@@ -156,22 +166,45 @@ document.addEventListener('DOMContentLoaded', function () {
             dropdown.appendChild(row);
         });
 
+        if (items.length >= 50) {
+            const loadMoreBtn = document.createElement('div');
+            loadMoreBtn.className = 'load-more-btn';
+            loadMoreBtn.textContent = 'Load More';
+            loadMoreBtn.style.padding = '8px 12px';
+            loadMoreBtn.style.textAlign = 'center';
+            loadMoreBtn.style.color = '#007bff';
+            loadMoreBtn.style.cursor = 'pointer';
+            loadMoreBtn.style.fontWeight = '600';
+            loadMoreBtn.style.borderTop = '1px solid #eee';
+            
+            loadMoreBtn.addEventListener('click', function(e) {
+                e.stopPropagation();
+                currentOffset += 50;
+                doSearch(currentQuery, true);
+            });
+            dropdown.appendChild(loadMoreBtn);
+        }
+
         dropdown.style.display = 'block';
     }
 
-    function doSearch(query) {
-        if (controller) controller.abort();
-        controller = new AbortController();
+    function doSearch(query, isLoadMore = false) {
+        if (!isLoadMore) {
+            currentOffset = 0;
+            currentQuery = query;
+            if (controller) controller.abort();
+            controller = new AbortController();
+        }
         const baseURL = window.baseURL;
-        const url = baseURL + 'search.php?q=' + encodeURIComponent(query) + '&limit=1000';
+        const url = baseURL + 'search.php?q=' + encodeURIComponent(currentQuery) + '&limit=50&offset=' + currentOffset;
         fetch(url, { signal: controller.signal })
             .then(function (res) { return res.json(); })
             .then(function (data) {
-                renderResults((data && data.results) ? data.results : []);
+                renderResults((data && data.results) ? data.results : [], isLoadMore);
             })
             .catch(function (err) {
                 if (err && err.name === 'AbortError') return; // ignore
-                clearResults();
+                if (!isLoadMore) clearResults();
             });
     }
 
@@ -203,6 +236,8 @@ document.addEventListener('DOMContentLoaded', function () {
 // Mobile Search Modal Logic
 let mobileSearchDebounceTimer = null;
 let mobileSearchController = null;
+let mobileCurrentQuery = '';
+let mobileCurrentOffset = 0;
 
 function openMobileSearch(event) {
     event.preventDefault();
@@ -241,30 +276,34 @@ function closeMobileSearch() {
     }
 }
 
-function performMobileSearch(query) {
+function performMobileSearch(query, isLoadMore = false) {
     const resultsContainer = document.getElementById('mobileSearchResults');
 
-    if (!query.trim()) {
-        resultsContainer.innerHTML = '';
-        return;
+    if (!isLoadMore) {
+        if (!query.trim()) {
+            resultsContainer.innerHTML = '';
+            return;
+        }
+        mobileCurrentQuery = query.trim();
+        mobileCurrentOffset = 0;
+        
+        if (mobileSearchController) {
+            mobileSearchController.abort();
+        }
+        mobileSearchController = new AbortController();
+    } else {
+        mobileCurrentOffset += 50;
     }
-
-    // Cancel previous request
-    if (mobileSearchController) {
-        mobileSearchController.abort();
-    }
-
-    mobileSearchController = new AbortController();
 
     const baseURL = window.baseURL || '/';
-    const url = baseURL + `search.php?q=${encodeURIComponent(query)}&limit=1000`;
+    const url = baseURL + `search.php?q=${encodeURIComponent(mobileCurrentQuery)}&limit=50&offset=${mobileCurrentOffset}`;
 
     fetch(url, {
         signal: mobileSearchController.signal
     })
         .then(response => response.json())
         .then(data => {
-            renderMobileSearchResults(data.results || []);
+            renderMobileSearchResults(data.results || [], isLoadMore);
         })
         .catch(err => {
             if (err.name !== 'AbortError') {
@@ -273,57 +312,82 @@ function performMobileSearch(query) {
         });
 }
 
-function renderMobileSearchResults(items) {
+function renderMobileSearchResults(items, isAppend = false) {
     const resultsContainer = document.getElementById('mobileSearchResults');
 
-    if (!items || items.length === 0) {
-        resultsContainer.innerHTML = '<div class="mobile-search-empty">No results found</div>';
-        return;
+    if (!isAppend) {
+        if (!items || items.length === 0) {
+            resultsContainer.innerHTML = '<div class="mobile-search-empty">No results found</div>';
+            return;
+        }
+        resultsContainer.innerHTML = '';
+    } else {
+        const loadMoreBtn = resultsContainer.querySelector('.mobile-load-more');
+        if (loadMoreBtn) loadMoreBtn.remove();
     }
 
-    resultsContainer.innerHTML = '';
+    if (items && items.length > 0) {
+        items.forEach(item => {
+            const link = document.createElement('a');
+            link.href = item.url;
+            link.className = 'mobile-search-result-item';
 
-    items.forEach(item => {
-        const link = document.createElement('a');
-        link.href = item.url;
-        link.className = 'mobile-search-result-item';
+            const hasImage = item.image && item.image.trim();
 
-        const hasImage = item.image && item.image.trim();
+            if (hasImage) {
+                const img = document.createElement('img');
+                const baseURL = window.baseURL;
+                // Check if image is relative path and prepend baseURL
+                img.src = (item.image.startsWith('/') || item.image.startsWith('http')) ? item.image : baseURL + item.image;
+                img.alt = item.title;
+                img.className = 'mobile-search-result-image';
+                img.onerror = function () {
+                    this.style.display = 'none';
+                };
+                link.appendChild(img);
+            } else if (item.type !== 'brand') {
+                const placeholder = document.createElement('div');
+                placeholder.className = 'mobile-search-result-image';
+                placeholder.style.background = '#e0e0e0';
+                link.appendChild(placeholder);
+            }
 
-        if (hasImage) {
-            const img = document.createElement('img');
-            const baseURL = window.baseURL;
-            // Check if image is relative path and prepend baseURL
-            img.src = (item.image.startsWith('/') || item.image.startsWith('http')) ? item.image : baseURL + item.image;
-            img.alt = item.title;
-            img.className = 'mobile-search-result-image';
-            img.onerror = function () {
-                this.style.display = 'none';
-            };
-            link.appendChild(img);
-        } else {
-            const placeholder = document.createElement('div');
-            placeholder.className = 'mobile-search-result-image';
-            placeholder.style.background = '#e0e0e0';
-            link.appendChild(placeholder);
-        }
+            const content = document.createElement('div');
+            content.className = 'mobile-search-result-content';
 
-        const content = document.createElement('div');
-        content.className = 'mobile-search-result-content';
+            const title = document.createElement('p');
+            title.className = 'mobile-search-result-title';
+            title.textContent = item.title;
+            content.appendChild(title);
 
-        const title = document.createElement('p');
-        title.className = 'mobile-search-result-title';
-        title.textContent = item.title;
-        content.appendChild(title);
+            const type = document.createElement('p');
+            type.className = 'mobile-search-result-type';
+            type.textContent = item.type === 'post' ? 'Article' : (item.type === 'brand' ? 'Brand' : 'Device');
+            content.appendChild(type);
 
-        const type = document.createElement('p');
-        type.className = 'mobile-search-result-type';
-        type.textContent = item.type === 'post' ? 'Article' : (item.type === 'brand' ? 'Brand' : 'Device');
-        content.appendChild(type);
+            link.appendChild(content);
+            resultsContainer.appendChild(link);
+        });
+    }
 
-        link.appendChild(content);
-        resultsContainer.appendChild(link);
-    });
+    if (items && items.length >= 50) {
+        const loadMoreLink = document.createElement('div');
+        loadMoreLink.className = 'mobile-load-more';
+        loadMoreLink.textContent = 'Load More';
+        loadMoreLink.style.textAlign = 'center';
+        loadMoreLink.style.padding = '12px';
+        loadMoreLink.style.color = '#007bff';
+        loadMoreLink.style.fontWeight = '600';
+        loadMoreLink.style.cursor = 'pointer';
+        loadMoreLink.style.borderTop = '1px solid #eee';
+        
+        loadMoreLink.addEventListener('click', function(e) {
+            e.preventDefault();
+            performMobileSearch(mobileCurrentQuery, true);
+        });
+        
+        resultsContainer.appendChild(loadMoreLink);
+    }
 }
 
 // Mobile search event listeners

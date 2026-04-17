@@ -11,6 +11,10 @@ $limit = (int)($_GET['limit'] ?? 50);
 if ($limit < 1 || $limit > 5000) {
     $limit = 50;
 }
+$offset = (int)($_GET['offset'] ?? 0);
+if ($offset < 0) {
+    $offset = 0;
+}
 
 if ($q === '') {
     echo json_encode(['results' => []]);
@@ -29,11 +33,12 @@ try {
         FROM brands
         WHERE name ILIKE ?
         ORDER BY name ASC
-        LIMIT ?
+        LIMIT ? OFFSET ?
     ";
     $brandStmt = $pdo->prepare($brandSql);
     $brandStmt->bindValue(1, $term, PDO::PARAM_STR);
     $brandStmt->bindValue(2, $limit, PDO::PARAM_INT);
+    $brandStmt->bindValue(3, $offset, PDO::PARAM_INT);
     $brandStmt->execute();
     $brands = $brandStmt->fetchAll();
 
@@ -48,13 +53,14 @@ try {
             COALESCE(meta_description, '') ILIKE ?
           )
         ORDER BY created_at DESC
-        LIMIT ?
+        LIMIT ? OFFSET ?
     ";
     $postStmt = $pdo->prepare($postSql);
     $postStmt->bindValue(1, $term, PDO::PARAM_STR);
     $postStmt->bindValue(2, $term, PDO::PARAM_STR);
     $postStmt->bindValue(3, $term, PDO::PARAM_STR);
     $postStmt->bindValue(4, $limit, PDO::PARAM_INT);
+    $postStmt->bindValue(5, $offset, PDO::PARAM_INT);
     $postStmt->execute();
     $posts = $postStmt->fetchAll();
 
@@ -65,13 +71,14 @@ try {
         LEFT JOIN brands b ON p.brand_id = b.id
         WHERE p.name ILIKE ? OR COALESCE(b.name, '') ILIKE ? OR (COALESCE(b.name, '') || ' ' || p.name) ILIKE ?
         ORDER BY p.updated_at DESC NULLS LAST, p.created_at DESC NULLS LAST
-        LIMIT ?
+        LIMIT ? OFFSET ?
     ";
     $phoneStmt = $pdo->prepare($phoneSql);
     $phoneStmt->bindValue(1, $term, PDO::PARAM_STR);
     $phoneStmt->bindValue(2, $term, PDO::PARAM_STR);
     $phoneStmt->bindValue(3, $term, PDO::PARAM_STR);
     $phoneStmt->bindValue(4, $limit, PDO::PARAM_INT);
+    $phoneStmt->bindValue(5, $offset, PDO::PARAM_INT);
     $phoneStmt->execute();
     $phones = $phoneStmt->fetchAll();
 
@@ -84,7 +91,7 @@ try {
             'id' => (string)$b['id'],
             'title' => $b['name'],
             'slug' => $b['slug'],
-            'image' => $b['logo_url'] ?? '',
+            'image' => '',
             'url' => $base . 'brand/' . rawurlencode($b['slug'])
         ];
     }
