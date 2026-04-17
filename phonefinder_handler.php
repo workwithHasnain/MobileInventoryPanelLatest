@@ -121,9 +121,7 @@ try {
     $backMaterials = isset($_POST['back_material']) ? (array)$_POST['back_material'] : [];
 
     // Build the query
-    $query = "SELECT p.*, b.name as brand_name,
-              (SELECT COUNT(*) FROM content_views cv WHERE CAST(p.id AS VARCHAR) = cv.content_id AND cv.content_type = 'device') as view_count,
-              (SELECT COUNT(*) FROM device_comments dc WHERE CAST(p.id AS VARCHAR) = dc.device_id AND dc.status = 'approved') as comment_count
+    $query = "SELECT p.*, b.name as brand_name 
               FROM phones p 
               LEFT JOIN brands b ON p.brand_id = b.id 
               WHERE 1=1";
@@ -838,21 +836,14 @@ try {
 
         $results[] = [
             'id' => $device['id'],
+            'slug' => $device['slug'] ?? '',
             'name' => $device['name'],
-            'brand' => $device['brand_name'] ?? 'Unknown',
-            'slug' => $device['slug'],
+            'brand' => $device['brand_name'],
             'thumbnail' => $thumbnail,
-            'announced' => $announced,
             'display_size' => $displaySize,
-            'ram' => $device['ram'] ?? '',
-            'storage' => $device['storage'] ?? '',
-            'main_camera_resolution' => $device['main_camera_resolution'] ?? '',
+            'ram' => $ram,
             'battery' => $battery,
-            'year' => $device['year'] ?? '',
-            'price' => $device['price'] ?? '',
-            'availability' => $device['availability'] ?? 'Unknown',
-            'view_count' => $device['view_count'] ?? 0,
-            'comment_count' => $device['comment_count'] ?? 0
+            'announced' => $announced
         ];
     }
 

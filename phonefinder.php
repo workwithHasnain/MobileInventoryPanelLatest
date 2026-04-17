@@ -114,7 +114,6 @@ if (!$filterConfig) {
 
 
     <link rel="stylesheet" href="<?php echo $base; ?>style.css">
-    <link rel="stylesheet" href="<?php echo $base; ?>admin-cards.css">
 
     <!-- Schema.org Structured Data for Phone Finder Tool -->
     <!-- Breadcrumb Schema -->
@@ -1265,7 +1264,7 @@ if (!$filterConfig) {
             </div>
         </div>
 
-        <div class="admin-device-grid" id="resultsContainer">
+        <div class="row" id="resultsContainer">
             <!-- Results will be dynamically inserted here -->
         </div>
     </div>
@@ -2121,7 +2120,7 @@ if (!$filterConfig) {
                                     block: 'start'
                                 });
                             } else {
-                                resultsContainer.innerHTML = '<div style="grid-column: 1 / -1;"><div class="alert alert-warning">No devices found matching your criteria.</div></div>';
+                                resultsContainer.innerHTML = '<div class="col-12"><div class="alert alert-warning">No devices found matching your criteria.</div></div>';
                             }
                         } else {
                             alert('Error: ' + (data.error || 'Failed to fetch results'));
@@ -2139,50 +2138,23 @@ if (!$filterConfig) {
             });
 
             function createDeviceCard(device) {
-                // Determine badge class for availability
-                let badgeClass = 'bg-secondary';
-                if (device.availability === 'Available') badgeClass = 'bg-success';
-                else if (device.availability === 'Coming Soon') badgeClass = 'bg-warning text-dark';
-                else if (device.availability === 'Discontinued') badgeClass = 'bg-danger';
-                else if (device.availability === 'Rumored') badgeClass = 'bg-info text-dark';
-                
-                // Format price if present
-                let priceHtml = 'N/A';
-                if (device.price && !isNaN(device.price) && device.price > 0) {
-                    priceHtml = '$' + Number(device.price).toLocaleString();
-                }
-                
                 return `
-                <a href="<?php echo $base; ?>device/${encodeURIComponent(device.slug)}" class="admin-device-card bg-white" title="${device.name} - ${device.brand || 'Unknown'}">
-                    <img src="${device.thumbnail}" class="card-img-top" alt="${device.name}" onerror="this.src='/imges/download.png'">
-                    
-                    <div class="card-body d-flex flex-column">
-                        <h5 class="card-title">${device.name}</h5>
-                        
-                        <div class="info-row">
-                            <small><strong>${device.brand || 'Unknown'}</strong></small>
-                            <span class="badge bg-primary" style="width: fit-content;">${device.year || 'N/A'}</span>
-                        </div>
-
-                        <div class="info-row">
-                            <small>💰 ${priceHtml}</small>
-                            <span class="badge ${badgeClass} d-inline-block">${device.availability || 'Unknown'}</span>
-                        </div>
-
-                        <div class="specs-grid">
-                            ${device.ram ? `<div class="spec-item" title="${device.ram}">📱 ${device.ram}</div>` : ''}
-                            ${device.storage ? `<div class="spec-item" title="${device.storage}">💾 ${device.storage}</div>` : ''}
-                            ${device.display_size ? `<div class="spec-item">🖥️ ${device.display_size.replace('"', '')}"</div>` : ''}
-                            ${device.main_camera_resolution ? `<div class="spec-item">📷 ${!isNaN(device.main_camera_resolution) ? device.main_camera_resolution + 'MP' : device.main_camera_resolution}</div>` : ''}
-                        </div>
-
-                        <div class="info-row mt-auto" style="margin-bottom: 0;">
-                            <small>👁️ ${parseInt(device.view_count) || 0}</small>
-                            <small>💬 ${parseInt(device.comment_count) || 0}</small>
-                        </div>
+                <div class="col-lg-3 col-md-4 col-sm-6 mb-4">
+                    <div class="card h-100 shadow-sm">
+                        <a href="<?php echo $base; ?>device/${encodeURIComponent(device.slug)}" class="text-decoration-none">
+                            <img src="${device.thumbnail}" class="card-img-top" alt="${device.name}" style="height: 200px; object-fit: contain; padding: 10px;">
+                            <div class="card-body">
+                                <h6 class="card-title text-dark fw-bold">${device.name}</h6>
+                                <p class="text-muted small mb-1"><i class="fa fa-building me-1"></i>${device.brand || 'Unknown'}</p>
+                                ${device.announced ? `<p class="text-muted small mb-1"><i class="fa fa-calendar me-1"></i>${device.announced}</p>` : ''}
+                                ${device.display_size ? `<p class="text-muted small mb-1"><i class="fa fa-mobile me-1"></i>${device.display_size}</p>` : ''}
+                                ${device.ram ? `<p class="text-muted small mb-1"><i class="fa fa-microchip me-1"></i>${device.ram}</p>` : ''}
+                                ${device.battery ? `<p class="text-muted small mb-0"><i class="fa fa-battery-full me-1"></i>${device.battery}</p>` : ''}
+                            </div>
+                        </a>
                     </div>
-                </a>
-                `;
+                </div>
+            `;
             }
         });
         // Show brands modal
