@@ -121,8 +121,7 @@ try {
     $backMaterials = isset($_POST['back_material']) ? (array)$_POST['back_material'] : [];
 
     // Build the query
-    $query = "SELECT p.*, b.name as brand_name,
-              (SELECT COUNT(*) FROM device_comments dc WHERE dc.device_id = CAST(p.id AS VARCHAR) AND dc.status = 'approved') as comment_count
+    $query = "SELECT p.*, b.name as brand_name 
               FROM phones p 
               LEFT JOIN brands b ON p.brand_id = b.id 
               WHERE 1=1";
@@ -837,20 +836,14 @@ try {
 
         $results[] = [
             'id' => $device['id'],
+            'slug' => $device['slug'] ?? '',
             'name' => $device['name'],
             'brand' => $device['brand_name'],
-            'slug' => $device['slug'],
-            'thumbnail' => getAbsoluteImagePath($thumbnail, $base),
-            'price' => $device['price'],
-            'year' => $device['year'],
-            'availability' => $device['availability'],
-            'ram' => $device['ram'],
-            'storage' => $device['storage'],
+            'thumbnail' => $thumbnail,
             'display_size' => $displaySize,
-            'camera' => $mainCamera,
+            'ram' => $ram,
             'battery' => $battery,
-            'os' => $device['os'],
-            'comment_count' => (int)$device['comment_count']
+            'announced' => $announced
         ];
     }
 
