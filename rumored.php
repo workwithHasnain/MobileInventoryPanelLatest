@@ -20,9 +20,12 @@ if (empty($_GET)) {
     // Continue to show all rumored devices
 }
 
-// Get all rumored phones across all brands
+// Get all rumored phones across all brands with advanced stats
 $phones_stmt = $pdo->prepare("
-    SELECT p.id, p.name, p.image, p.slug, b.name as brand_name
+    SELECT p.id, p.name, p.image, p.slug, b.name as brand_name, p.year, p.price, p.availability, 
+           p.ram, p.storage, p.display_size, p.main_camera_resolution,
+           (SELECT COUNT(*) FROM content_views cv WHERE CAST(p.id AS VARCHAR) = cv.content_id AND cv.content_type = 'device') as view_count,
+           (SELECT COUNT(*) FROM device_comments dc WHERE CAST(p.id AS VARCHAR) = dc.device_id AND dc.status = 'approved') as comment_count
     FROM phones p
     LEFT JOIN brands b ON p.brand_id = b.id
     WHERE p.availability = 'Rumored'
@@ -378,7 +381,7 @@ $latestDevices = array_slice(array_reverse($latestDevices), 0, 9);
                     <h1>Rumored Phones</h1>
                     <div class="device-count"><?php echo count($phones); ?> rumored devices</div>
                 </div>
-                <div class="device-grid">
+                <div class="admin-device-grid">
                     <?php foreach ($phones as $phone):
                         $imagePath = $phone['image'] ?? '';
                         if ($imagePath && !str_starts_with($imagePath, '/') && !str_starts_with($imagePath, 'http')) {
@@ -386,17 +389,56 @@ $latestDevices = array_slice(array_reverse($latestDevices), 0, 9);
                         }
                         $deviceSlug = $phone['slug'] ?? $phone['id'];
                         $brandName = $phone['brand_name'] ?? 'Unknown';
+                        
+                        $availability = $phone['availability'] ?? 'Unknown';
+                        $badgeClass = 'bg-secondary';
+                        if ($availability === 'Available') $badgeClass = 'bg-success';
+                        elseif ($availability === 'Coming Soon') $badgeClass = 'bg-warning text-dark';
+                        elseif ($availability === 'Discontinued') $badgeClass = 'bg-danger';
+                        elseif ($availability === 'Rumored') $badgeClass = 'bg-info text-dark';
                     ?>
-                        <a href="<?php echo $base; ?>device/<?php echo htmlspecialchars($deviceSlug); ?>" class="device-grid-item" title="<?php echo htmlspecialchars($phone['name']); ?> - <?php echo htmlspecialchars($brandName); ?>">
+                        <a href="<?php echo $base; ?>device/<?php echo htmlspecialchars($deviceSlug); ?>" class="admin-device-card bg-white" title="<?php echo htmlspecialchars($phone['name']); ?> - <?php echo htmlspecialchars($brandName); ?>">
                             <?php if ($imagePath): ?>
-                                <img src="<?php echo htmlspecialchars($imagePath); ?>" alt="<?php echo htmlspecialchars($phone['name']); ?>" onerror="this.style.display='none'">
+                                <img src="<?php echo htmlspecialchars($imagePath); ?>" class="card-img-top" alt="<?php echo htmlspecialchars($phone['name']); ?>" onerror="this.style.display='none'">
                             <?php else: ?>
-                                <div class="no-image-placeholder">
-                                    <i class="fas fa-mobile-alt fa-3x"></i>
+                                <div class="card-img-top d-flex align-items-center justify-content-center bg-light">
+                                    <i class="fas fa-mobile-alt fa-2x text-muted"></i>
                                 </div>
                             <?php endif; ?>
-                            <span class="device-name"><?php echo htmlspecialchars($phone['name']); ?></span>
-                            <span class="device-brand" style="font-size: 0.75rem; color: #999; margin-top: 2px;"><?php echo htmlspecialchars($brandName); ?></span>
+                            
+                            <div class="card-body d-flex flex-column">
+                                <h5 class="card-title"><?php echo htmlspecialchars($phone['name']); ?></h5>
+                                
+                                <div class="info-row">
+                                    <small><strong><?php echo htmlspecialchars($brandName); ?></strong></small>
+                                    <span class="badge bg-primary" style="width: fit-content;"><?php echo htmlspecialchars($phone['year'] ?? 'N/A'); ?></span>
+                                </div>
+
+                                <div class="info-row">
+                                    <small>💰 <?php echo !empty($phone['price']) ? '$' . number_format((float)$phone['price'], 0) : 'N/A'; ?></small>
+                                    <span class="badge <?php echo $badgeClass; ?> d-inline-block"><?php echo htmlspecialchars($availability); ?></span>
+                                </div>
+
+                                <div class="specs-grid">
+                                    <?php if (!empty($phone['ram'])): ?>
+                                        <div class="spec-item" title="<?php echo htmlspecialchars($phone['ram']); ?>">📱 <?php echo htmlspecialchars($phone['ram']); ?></div>
+                                    <?php endif; ?>
+                                    <?php if (!empty($phone['storage'])): ?>
+                                        <div class="spec-item" title="<?php echo htmlspecialchars($phone['storage']); ?>">💾 <?php echo htmlspecialchars($phone['storage']); ?></div>
+                                    <?php endif; ?>
+                                    <?php if (!empty($phone['display_size'])): ?>
+                                        <div class="spec-item">🖥️ <?php echo htmlspecialchars(str_replace('"', '', $phone['display_size'])); ?>"</div>
+                                    <?php endif; ?>
+                                    <?php if (!empty($phone['main_camera_resolution'])): ?>
+                                        <div class="spec-item">📷 <?php echo is_numeric($phone['main_camera_resolution']) ? htmlspecialchars($phone['main_camera_resolution']) . 'MP' : htmlspecialchars($phone['main_camera_resolution']); ?></div>
+                                    <?php endif; ?>
+                                </div>
+
+                                <div class="info-row mt-auto" style="margin-bottom: 0;">
+                                    <small>👁️ <?php echo (int)($phone['view_count'] ?? 0); ?></small>
+                                    <small>💬 <?php echo (int)($phone['comment_count'] ?? 0); ?></small>
+                                </div>
+                            </div>
                         </a>
                     <?php endforeach; ?>
 
