@@ -379,6 +379,8 @@ $da_active_nav = 'compare';
 <meta property="og:description" content="Compare smartphones side by side. Full specs, camera, battery and more."/>
 <meta property="og:type" content="website"/>
 
+<script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-9906394285054446"crossorigin="anonymous"></script>
+
 <script async src="https://www.googletagmanager.com/gtag/js?id=G-2LDCSSMXJT"></script>
 <script>window.dataLayer=window.dataLayer||[];function gtag(){dataLayer.push(arguments);}gtag('js',new Date());gtag('config','G-2LDCSSMXJT');</script>
 

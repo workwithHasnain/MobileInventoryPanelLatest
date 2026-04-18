@@ -199,6 +199,8 @@ if ($_POST && isset($_POST['action'])) {
 <html lang="en">
 
 <head>
+<script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-9906394285054446"
+     crossorigin="anonymous"></script>
     <!-- Google tag (gtag.js) -->
 <script async src="https://www.googletagmanager.com/gtag/js?id=G-2LDCSSMXJT"></script>
 <script>
