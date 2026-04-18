@@ -876,23 +876,9 @@ function setSpecView(mode) {
   if (mode === 'diff') {
     table.classList.add('cp-diff-mode');
     btnDiff.classList.add('active'); btnAll.classList.remove('active');
-    document.querySelectorAll('.cp-row-identical').forEach(r => r.classList.add('cp-hidden'));
-    document.querySelectorAll('.cp-section-head').forEach(h => {
-      const siblings = [...h.parentElement.children].filter(el => el.classList.contains('cp-row-sub'));
-      const idx = [...h.parentElement.children].indexOf(h);
-      let allHidden = true;
-      for (let el = h.nextElementSibling; el && el.classList.contains('cp-row-sub'); el = el.nextElementSibling) {
-        if (!el.classList.contains('cp-hidden')) { allHidden = false; break; }
-      }
-      h.style.display = allHidden ? 'none' : '';
-    });
   } else {
     table.classList.remove('cp-diff-mode');
     btnAll.classList.add('active'); btnDiff.classList.remove('active');
-    document.querySelectorAll('.cp-row-identical, .cp-section-head').forEach(r => {
-      r.classList.remove('cp-hidden');
-      r.style.display = '';
-    });
   }
 }
 
