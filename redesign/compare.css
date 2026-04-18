@@ -970,23 +970,54 @@
 
 /* ── Responsive ── */
 @media (max-width: 900px) {
+  .cp-stage {
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+    padding-bottom: 24px;
+    padding-top: 24px;
+  }
   .cp-stage-inner {
-    flex-direction: column;
-    gap: 16px;
-    align-items: stretch;
+    flex-direction: row;
+    gap: 8px;
+    align-items: flex-start;
+    width: max-content;
+    min-width: 100%;
+  }
+  .cp-slot {
+    width: 46vw;
+    min-width: 160px;
+    max-width: 220px;
+    flex: 0 0 auto;
   }
   .cp-vs-badge {
-    margin: 0 auto;
-    width: 40px; height: 40px;
-    font-size: 11px;
+    margin-top: 130px;
+    width: 32px; height: 32px;
+    font-size: 10px;
+    margin-left: -4px;
+    margin-right: -4px;
+    z-index: 5;
   }
-  .cp-vs-optional { display: none; }
+  .cp-vs-optional { display: flex; }
   .cp-toggle-bar { flex-direction: column; gap: 10px; align-items: flex-start; }
   .cp-slot-img-ring { width: 110px; height: 140px; }
+
+  /* Compact the cards on mobile */
+  .cp-filled-card { padding: 16px 12px 14px; }
+  .cp-img-stage { width: 110px; height: 130px; margin-bottom: 12px; }
+  .cp-phone-halo { inset: -10px; }
+  .cp-phone-halo-2 { inset: -20px; }
+  .cp-device-name { font-size: 16px; margin-bottom: 8px; }
+  .cp-device-brand { font-size: 9px; }
+  .cp-action-btn { padding: 6px 10px; font-size: 10.5px; }
+  .cp-spec-label { font-size: 8px; }
+  .cp-spec-val { font-size: 10px; }
+  .cp-slot-empty { min-height: 240px; padding: 12px; }
+  .cp-slot-empty-icon { width: 50px; height: 50px; font-size: 20px; }
 }
 
 @media (max-width: 600px) {
   .cp-hero { padding: 36px 16px 32px; }
-  .cp-stage { padding: 24px 12px; }
+  .cp-stage { padding: 20px 8px; }
   .cp-table-wrap { padding: 0 10px 40px; }
+  .cp-slot { width: 44vw; min-width: 160px; }
 }
