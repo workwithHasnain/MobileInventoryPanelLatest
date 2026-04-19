@@ -582,6 +582,32 @@ $da_active_nav = 'compare';
 
         <!-- Detailed JSON-based sections -->
         <?php
+        $tokenizeWords = function($text) {
+            if ($text === '') return [];
+            return preg_split('/(\s+)/', $text, -1, PREG_SPLIT_DELIM_CAPTURE);
+        };
+        $renderWords = function($d, $other1, $other2) use ($tokenizeWords) {
+            if ($d === '') return '<span class="cp-na">—</span>';
+            $tokens = $tokenizeWords($d);
+            $o1 = $other1 ? $tokenizeWords($other1) : [];
+            $o2 = $other2 ? $tokenizeWords($other2) : [];
+            
+            $cleanO1 = array_filter($o1, function($t) { return trim($t) !== ''; });
+            $cleanO2 = array_filter($o2, function($t) { return trim($t) !== ''; });
+            
+            $html = '';
+            foreach ($tokens as $token) {
+                if (trim($token) === '') {
+                    $html .= nl2br(htmlspecialchars($token));
+                } else {
+                    $isCommon = in_array($token, $cleanO1) || in_array($token, $cleanO2);
+                    $attr = $isCommon ? 'data-common-token="true"' : 'data-unique-token="true"';
+                    $html .= '<span class="spec-word" ' . $attr . '>' . htmlspecialchars($token) . '</span>';
+                }
+            }
+            return $html;
+        };
+
         $orderedSections = ['NETWORK','LAUNCH','BODY','DISPLAY','HARDWARE','MEMORY','MAIN CAMERA','SELFIE CAMERA','MULTIMEDIA','CONNECTIVITY','FEATURES','BATTERY','GENERAL INFO'];
         foreach ($orderedSections as $section):
           $rows1 = $specs1[$section] ?? [];
@@ -601,9 +627,9 @@ $da_active_nav = 'compare';
           $ident = ($d1 !== '' && $d1 === $d2) && (!$phone3 || $d1 === $d3);
         ?>
         <div class="cp-row cp-row-sub<?php echo $ident ? ' cp-row-identical' : ''; ?>" data-identical="<?php echo $ident ? '1' : '0'; ?>">
-          <?php if ($phone1): ?><div class="cp-row-cell"><?php if ($f1): ?><div class="cp-cell-field"><?php echo htmlspecialchars($f1); ?></div><?php endif; ?><?php echo $d1 !== '' ? nl2br(htmlspecialchars($d1)) : '<span class="cp-na">—</span>'; ?></div><?php endif; ?>
-          <?php if ($phone2): ?><div class="cp-row-cell"><?php if ($f2): ?><div class="cp-cell-field"><?php echo htmlspecialchars($f2); ?></div><?php endif; ?><?php echo $d2 !== '' ? nl2br(htmlspecialchars($d2)) : '<span class="cp-na">—</span>'; ?></div><?php endif; ?>
-          <?php if ($phone3): ?><div class="cp-row-cell"><?php if ($f3): ?><div class="cp-cell-field"><?php echo htmlspecialchars($f3); ?></div><?php endif; ?><?php echo $d3 !== '' ? nl2br(htmlspecialchars($d3)) : '<span class="cp-na">—</span>'; ?></div><?php endif; ?>
+          <?php if ($phone1): ?><div class="cp-row-cell"><?php if ($f1): ?><div class="cp-cell-field"><?php echo htmlspecialchars($f1); ?></div><?php endif; ?><?php echo $renderWords($d1, $d2, $d3); ?></div><?php endif; ?>
+          <?php if ($phone2): ?><div class="cp-row-cell"><?php if ($f2): ?><div class="cp-cell-field"><?php echo htmlspecialchars($f2); ?></div><?php endif; ?><?php echo $renderWords($d2, $d1, $d3); ?></div><?php endif; ?>
+          <?php if ($phone3): ?><div class="cp-row-cell"><?php if ($f3): ?><div class="cp-cell-field"><?php echo htmlspecialchars($f3); ?></div><?php endif; ?><?php echo $renderWords($d3, $d1, $d2); ?></div><?php endif; ?>
         </div>
         <?php endfor; ?>
         <?php endforeach; ?>

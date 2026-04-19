@@ -799,7 +799,25 @@
 
 /* Differences mode */
 .cp-row-hidden, .cp-hidden { display: none !important; }
-.cp-diff-mode .cp-row[data-identical="1"] { opacity: 0.35; }
+
+/* Word-level comparison styles */
+.spec-word {
+  display: inline;
+  transition: opacity 0.3s ease, color 0.3s ease;
+}
+.spec-word[data-common-token="true"] { opacity: 1; }
+.spec-word[data-unique-token="true"] { opacity: 1; }
+
+.cp-diff-mode .spec-word[data-common-token="true"] {
+  color: var(--text-muted);
+  opacity: 0.45;
+}
+.cp-diff-mode .spec-word[data-unique-token="true"] {
+  font-weight: 700;
+  color: var(--text-primary);
+}
+
+.cp-diff-mode .cp-row-identical { opacity: 0.45; } /* Fallback for exact row match */
 
 /* Empty state */
 .cp-empty-state {
