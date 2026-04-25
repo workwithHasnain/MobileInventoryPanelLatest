@@ -47,11 +47,18 @@ function simpleAddDevice($phone)
             return ['error' => 'A device with this name and brand already exists'];
         }
 
-        // Helper function to convert array to PostgreSQL format
+        // Helper function to convert array to PostgreSQL TEXT[] literal format
+        // Elements MUST be double-quoted so paths with /, _, . etc. parse correctly.
         $toPostgresArray = function ($arr) {
             if (empty($arr)) return null;
             if (!is_array($arr)) $arr = [$arr];
-            return '{' . implode(',', array_map('trim', $arr)) . '}';
+            $quoted = array_map(function ($item) {
+                // Escape any existing backslashes and double-quotes inside the value
+                $escaped = str_replace('\\', '\\\\', trim($item));
+                $escaped = str_replace('"', '\\"', $escaped);
+                return '"' . $escaped . '"';
+            }, $arr);
+            return '{' . implode(',', $quoted) . '}';
         };
 
         // Build the insert query matching exact schema column order

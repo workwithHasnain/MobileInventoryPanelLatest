@@ -403,7 +403,7 @@ function generateSQL(deviceData, imageUrls) {
     const lines = [];
     lines.push(`    ${pgStr(deviceData.releaseDate)}`);          // release_date
     lines.push(`    ${pgStr(deviceData.name)}`);                 // name
-    lines.push(`    (SELECT id FROM brands WHERE LOWER(name) = LOWER(${pgStr(deviceData.brand)}))`); // brand_id
+    lines.push(`    (SELECT id FROM brands WHERE LOWER(name) = LOWER(${pgStr(deviceData.brand)}) LIMIT 1)`); // brand_id
     lines.push(`    ${pgStr(deviceData.brand)}`);                // brand
     lines.push(`    ${pgNum(deviceData.year)}`);                 // year
     lines.push(`    ${pgStr(deviceData.availability)}`);         // availability
