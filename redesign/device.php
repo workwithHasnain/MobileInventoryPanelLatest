@@ -1242,6 +1242,8 @@ $commentCount = getDeviceCommentCount($pdo, $device_id);
                             <th class="da-specs-category" rowspan="<?php echo ($category === 'NETWORK') ? '1' : count($rows); ?>">
                               <?php echo htmlspecialchars($category); ?>
                             </th>
+                          <?php elseif ($category === 'NETWORK'): ?>
+                            <th class="da-specs-category border-top-0"></th>
                           <?php endif; ?>
                           <td class="da-specs-field"><?php echo htmlspecialchars($rowData['field']); ?></td>
                           <td class="da-specs-value">
