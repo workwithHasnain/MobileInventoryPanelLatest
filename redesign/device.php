@@ -1234,21 +1234,21 @@ $commentCount = getDeviceCommentCount($pdo, $device_id);
                     <?php if (is_array($rows) && !empty($rows)): ?>
                       <?php foreach ($rows as $rowIndex => $rowData): ?>
                         <?php if ($category === 'NETWORK' && $rowIndex > 0): ?>
-                          <tr class="network-row" style="display:none;">
+                          <tr class="da-specs-row network-row" style="display:none;">
                         <?php else: ?>
                           <tr class="da-specs-row">
                         <?php endif; ?>
                           <?php if ($rowIndex === 0): ?>
                             <th class="da-specs-category" rowspan="<?php echo ($category === 'NETWORK') ? '1' : count($rows); ?>">
                               <?php echo htmlspecialchars($category); ?>
-                              <?php if ($category === 'NETWORK'): ?>
-                                <button class="da-spec-expand" onclick="toggleExpandBtn(this)">EXPAND ▼</button>
-                              <?php endif; ?>
                             </th>
                           <?php endif; ?>
                           <td class="da-specs-field"><?php echo htmlspecialchars($rowData['field']); ?></td>
                           <td class="da-specs-value">
                             <?php echo $rowData['description']; ?>
+                            <?php if ($category === 'NETWORK' && $rowIndex === 0): ?>
+                              <button class="da-spec-expand" onclick="toggleExpandBtn(this)">EXPAND ▼</button>
+                            <?php endif; ?>
                           </td>
                         </tr>
                       <?php endforeach; ?>
@@ -1367,13 +1367,13 @@ $commentCount = getDeviceCommentCount($pdo, $device_id);
                   <label>Type the words shown below</label>
                   <div class="da-captcha-box">
                     <img src="<?php echo $base; ?>captcha.php" id="captcha-image" alt="CAPTCHA" onclick="refreshCaptcha()">
-                    <button type="button" class="da-btn da-btn-outline" onclick="refreshCaptcha()"><i class="fa fa-rotate-right"></i></button>
+                    <button type="button" class="da-cta-btn secondary" onclick="refreshCaptcha()"><i class="fa fa-rotate-right"></i></button>
                     <input type="text" class="da-input" name="captcha" id="captcha-input" placeholder="Enter the words" required autocomplete="off">
                   </div>
                 </div>
                 
                 <div class="da-form-footer">
-                  <button type="submit" class="da-btn da-btn-primary">Post Your Opinion</button>
+                  <button type="submit" class="da-cta-btn">Post Your Opinion</button>
                   <small>Comments are moderated and will appear after approval.</small>
                 </div>
               </form>
