@@ -1,85 +1,84 @@
 <?php
-// Set working directory to the parent so that device.php can require_once its relative files correctly
-chdir(__DIR__ . '/..');
+session_start();
+require_once __DIR__ . '/../config.php';
+require_once __DIR__ . '/../database_functions.php';
+require_once __DIR__ . '/../phone_data.php';
 
-// Capture the output of the old device.php so it doesn't render the old HTML,
-// but we still get all its variables ($device, $deviceSpecs, $comments, etc.)
-ob_start();
-require_once 'device.php';
-$oldHtml = ob_get_clean();
-
-// Extract SEO tags from the old HTML
-$page_title = '';
-if (preg_match('/<title>(.*?)<\/title>/is', $oldHtml, $matches)) {
-    $page_title = $matches[1];
-}
-$meta_desc = '';
-if (preg_match('/<meta name="description" content="(.*?)">/is', $oldHtml, $matches)) {
-    $meta_desc = $matches[1];
-}
-$og_image = '';
-if (preg_match('/<meta property="og:image" content="(.*?)">/is', $oldHtml, $matches)) {
-    $og_image = $matches[1];
+function getAbsoluteImagePath($imagePath, $base)
+{
+  if (empty($imagePath)) return '';
+  if (filter_var($imagePath, FILTER_VALIDATE_URL)) return $imagePath;
+  if (strpos($imagePath, '/') === 0) return $imagePath;
+  return $base . ltrim($imagePath, '/');
 }
 
-// Reset working directory back to redesign for frontend includes (if any)
-chdir(__DIR__);
+$pdo = getConnection();
 
-// Fetch additional sidebar data that redesign/index.php requires
+// Auth
+$isPublicUser = !empty($_SESSION['public_user_id']);
+$publicUserName = $_SESSION['public_user_name'] ?? '';
+$publicUserInitial = $isPublicUser ? strtoupper(substr($publicUserName, 0, 1)) : '';
+
+if (!isset($_SESSION['notif_seen'])) $_SESSION['notif_seen'] = false;
+$hasUnreadNotifications = $isPublicUser && !$_SESSION['notif_seen'];
+
+// Weekly posts for notifications
 try {
   $weekly_stmt = $pdo->prepare("SELECT p.id,p.title,p.slug,p.featured_image,p.created_at FROM posts p WHERE p.status ILIKE 'published' AND p.created_at >= CURRENT_TIMESTAMP - INTERVAL '7 days' ORDER BY p.created_at DESC LIMIT 10");
   $weekly_stmt->execute();
   $weekly_posts = $weekly_stmt->fetchAll();
-} catch (Exception $e) { $weekly_posts = []; }
+} catch (Exception $e) {
+  $weekly_posts = [];
+}
 
-$mb_stmt = $pdo->prepare("SELECT b.*,COUNT(p.id) as device_count FROM brands b LEFT JOIN phones p ON b.id=p.brand_id GROUP BY b.id,b.name,b.description,b.logo_url,b.website,b.created_at,b.updated_at ORDER BY COUNT(p.id) DESC,b.name ASC LIMIT 12");
-$mb_stmt->execute();
-$mobile_brands = $mb_stmt->fetchAll();
 
+// Posts
+$posts_stmt = $pdo->prepare("SELECT p.*,(SELECT COUNT(*) FROM post_comments pc WHERE pc.post_id=p.id AND pc.status='approved') as comment_count FROM posts p WHERE p.status ILIKE 'published' ORDER BY p.created_at DESC LIMIT 20");
+$posts_stmt->execute();
+$posts = $posts_stmt->fetchAll();
+
+// Comparisons
+try {
+  $topComparisons = getPopularComparisons(10);
+} catch (Exception $e) {
+  $topComparisons = [];
+}
+
+// Latest devices
+$latestDevices = getAllPhones();
+$latestDevices = array_slice(array_reverse($latestDevices), 0, 15);
+
+// Brands
 $brands_stmt = $pdo->prepare("SELECT b.*,COUNT(p.id) as device_count FROM brands b LEFT JOIN phones p ON b.id=p.brand_id GROUP BY b.id,b.name,b.description,b.logo_url,b.website,b.created_at,b.updated_at ORDER BY COUNT(p.id) DESC,b.name ASC LIMIT 36");
 $brands_stmt->execute();
 $brands = $brands_stmt->fetchAll();
-
-$isPublicUser = !empty($_SESSION['public_user_id']);
-$publicUserName = $_SESSION['public_user_name'] ?? '';
-$publicUserInitial = $isPublicUser ? strtoupper(substr($publicUserName, 0, 1)) : '';
-if (!isset($_SESSION['notif_seen'])) $_SESSION['notif_seen'] = false;
-$hasUnreadNotifications = $isPublicUser && !$_SESSION['notif_seen'];
-
-// Fallbacks for data already in device.php
-$latestDevices = $latestDevices ?? [];
-$topComparisons = $topComparisons ?? [];
-$topViewedDevices = $topViewedDevices ?? [];
-$topReviewedDevices = $topReviewedDevices ?? [];
-
 ?>
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1.0" />
-  <link rel="canonical" href="<?php echo $canonicalBase; ?>/device/<?php echo htmlspecialchars($device_slug); ?>" />
-  <title><?php echo $page_title; ?></title>
-  <meta name="description" content="<?php echo $meta_desc; ?>" />
-  <meta property="og:title" content="<?php echo $page_title; ?>" />
-  <meta property="og:description" content="<?php echo $meta_desc; ?>" />
-  <meta property="og:image" content="<?php echo $og_image; ?>" />
+  <link rel="canonical" href="<?php echo $canonicalBase; ?>/" />
+  <title>DevicesArena — Smartphones, Reviews & Comparisons</title>
+  <meta name="description" content="Find your next phone on DevicesArena. Reviews, comparisons, specs, and the latest news from the tech world." />
+  <meta property="og:title" content="DevicesArena — Smartphones, Reviews & Comparisons" />
+  <meta property="og:description" content="Explore the latest smartphones, detailed specifications, reviews, and comparisons." />
+  <meta property="og:image" content="<?php echo $base; ?>imges/icon-256.png" />
   <meta property="og:type" content="website" />
-  <meta name="twitter:card" content="summary_large_image" />
-  <meta name="twitter:title" content="<?php echo $page_title; ?>">
-  <meta name="twitter:description" content="<?php echo $meta_desc; ?>">
-  <meta name="twitter:image" content="<?php echo $og_image; ?>">
-
+  <meta name="twitter:card" content="summary" />
   <link rel="icon" type="image/png" sizes="32x32" href="<?php echo $base; ?>imges/icon-32.png">
   <link rel="shortcut icon" href="<?php echo $base; ?>imges/icon-32.png">
   <meta name="theme-color" content="#0d0f1a">
-  
-  <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-9906394285054446" crossorigin="anonymous"></script>
+  <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-9906394285054446"crossorigin="anonymous"></script>
   <!-- Google Analytics -->
   <script async src="https://www.googletagmanager.com/gtag/js?id=G-2LDCSSMXJT"></script>
   <script>
     window.dataLayer = window.dataLayer || [];
-    function gtag() { dataLayer.push(arguments); }
+
+    function gtag() {
+      dataLayer.push(arguments);
+    }
     gtag('js', new Date());
     gtag('config', 'G-2LDCSSMXJT');
   </script>
@@ -89,7 +88,7 @@ $topReviewedDevices = $topReviewedDevices ?? [];
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" />
   <link rel="stylesheet" href="<?php echo $base; ?>redesign/style.css">
 
-  <!-- Theme Initialization Script -->
+  <!-- Theme Initialization Script (Prevents FOUC) -->
   <script>
     (function() {
       var savedTheme = localStorage.getItem('da-theme');
@@ -98,335 +97,180 @@ $topReviewedDevices = $topReviewedDevices ?? [];
       }
     })();
   </script>
+
+  <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-4554952734894265" crossorigin="anonymous"></script>
 </head>
+
 <body>
 
   <!-- ══════════════════════ NAVBAR ══════════════════════ -->
-  <nav class="da-navbar" id="da-navbar">
-    <div class="da-navbar-top">
-      <div class="nav-container-top">
-        <button class="da-hamburger d-lg-none" type="button" aria-label="Menu" id="da-hamburger">
-          <span></span><span></span><span></span>
-        </button>
-        <a class="da-logo" href="<?php echo $base; ?>">
-          <img src="<?php echo $base; ?>imges/logo-wide.svg" alt="DevicesArena" />
-        </a>
+  <?php include('includes/navbar.php'); ?>
 
-        <form class="da-search-large d-none d-lg-flex" action="<?php echo $base; ?>search" method="GET">
-          <input type="text" name="q" placeholder="Search in devices arena" autocomplete="off" required>
-          <button type="submit" aria-label="Search"><i class="fa fa-search"></i></button>
-        </form>
+  <!-- ══════════════════════ AUTH MODALS ══════════════════════ -->
+  <!-- Login -->
+  <?php include('includes/login-modal.php'); ?>
+  <!-- Sign Up -->
+  <?php include('includes/signup-modal.php'); ?>
 
-        <div class="da-top-actions">
-          <button class="da-theme-btn-top d-none d-lg-flex" id="da-theme-toggle" title="Toggle Theme"><i class="fa fa-adjust"></i></button>
-          
-          <div class="da-social-icons-top d-none d-lg-flex">
-            <a href="https://youtube.com/@devicesarena" target="_blank" title="YouTube" class="yt"><i class="fab fa-youtube"></i></a>
-            <a href="https://www.instagram.com/devicesarenaofficial" target="_blank" title="Instagram" class="ig"><i class="fab fa-instagram"></i></a>
-            <a href="https://www.facebook.com/profile.php?id=61585936163841" target="_blank" title="Facebook" class="fb"><i class="fab fa-facebook-f"></i></a>
-            <a href="https://www.tiktok.com/" target="_blank" title="TikTok" class="tt"><i class="fab fa-tiktok"></i></a>
-          </div>
-
-          <div class="da-auth-btns-top">
-            <?php if ($isPublicUser): ?>
-              <div class="dropdown">
-                <button class="da-user-avatar" type="button" data-bs-toggle="dropdown" title="<?php echo htmlspecialchars($publicUserName); ?>">
-                  <?php echo $publicUserInitial; ?>
-                </button>
-                <ul class="dropdown-menu dropdown-menu-end" style="min-width:190px;">
-                  <li><span class="dropdown-item-text" style="font-size:12px;color:#888;">Hi, <?php echo htmlspecialchars($publicUserName); ?></span></li>
-                  <li><hr class="dropdown-divider"></li>
-                  <li><a class="dropdown-item" href="#" onclick="openProfileModal();return false;"><i class="fa fa-user-pen me-2"></i>Profile</a></li>
-                  <li><a class="dropdown-item text-danger" href="#" onclick="publicUserLogout();return false;"><i class="fa fa-right-from-bracket me-2"></i>Logout</a></li>
-                </ul>
-              </div>
-            <?php else: ?>
-              <button class="btn-yellow-login d-none d-lg-flex" data-bs-toggle="modal" data-bs-target="#loginModal">Login</button>
-              <button class="btn-yellow-login-mobile d-lg-none" data-bs-toggle="modal" data-bs-target="#loginModal"><i class="fa fa-user"></i></button>
-            <?php endif; ?>
-          </div>
-        </div>
-      </div>
-    </div>
-
-    <div class="da-navbar-bottom d-none d-lg-block">
-      <div class="nav-container-bottom">
-        <ul class="da-nav-links-bottom">
-          <li><a href="<?php echo $base; ?>home">HOME</a></li>
-          <li><a href="<?php echo $base; ?>compare">COMPARE</a></li>
-          <li><a href="#">VIDEOS</a></li>
-          <li><a href="<?php echo $base; ?>reviews">REVIEWS</a></li>
-          <li><a href="<?php echo $base; ?>featured">FEATURED</a></li>
-          <li><a href="<?php echo $base; ?>phonefinder">PHONE FINDER</a></li>
-          <li><a href="<?php echo $base; ?>contact-us">CONTACT</a></li>
-        </ul>
-      </div>
-    </div>
-  </nav>
-
-  <!-- ══════════════════════ MOBILE MENU ══════════════════════ -->
-  <div class="da-mobile-menu" id="da-mobile-menu">
-    <ul class="da-mobile-nav-links">
-      <li><a href="<?php echo $base; ?>">Home</a></li>
-      <li><a href="<?php echo $base; ?>compare">Compare</a></li>
-      <li><a href="<?php echo $base; ?>reviews">Reviews</a></li>
-      <li><a href="<?php echo $base; ?>phonefinder">Phone Finder</a></li>
-      <li><a href="<?php echo $base; ?>brands">All Brands</a></li>
-    </ul>
-  </div>
+  <!-- Profile -->
+  <?php include('includes/profile-modal.php'); ?>
 
   <!-- ══════════════════════ MAIN PAGE ══════════════════════ -->
   <div class="da-page">
-    <div class="da-content-area">
-      
-      <!-- Device Main Detail -->
-      <main>
-        <div class="da-device-hero">
-          <div class="da-device-img" onclick="if(typeof showPicturesModal === 'function') showPicturesModal();">
-            <img src="<?php echo htmlspecialchars(getAbsoluteImagePath($device['image'], $base)); ?>" alt="<?php echo htmlspecialchars($device['name']); ?>" loading="eager" />
-          </div>
-          <div class="da-device-info">
-            <h1 class="da-device-title"><?php echo htmlspecialchars(($device['brand_name'] ?? '') . ' ' . ($device['name'] ?? 'Device')); ?></h1>
-            
-            <div class="da-device-highlights">
-              <?php if (!empty($deviceHighlights)): foreach ($deviceHighlights as $highlight): ?>
-                <span class="da-highlight-badge"><?php echo htmlspecialchars($highlight); ?></span>
-              <?php endforeach; else: ?>
-                <span class="da-highlight-badge">📅 Release date not available</span>
-              <?php endif; ?>
-            </div>
-            
-            <div class="da-device-actions">
-              <?php if ($review_post): ?>
-                <button class="da-card-cta-btn da-device-action-btn" onclick="window.location.href='<?php echo $base; ?>post/<?php echo urlencode($review_post['slug']); ?>'"><i class="fa fa-pen"></i> Review</button>
-              <?php else: ?>
-                <button class="da-card-cta-btn da-device-action-btn" disabled><i class="fa fa-pen"></i> Review</button>
-              <?php endif; ?>
-              <button class="da-card-cta-btn da-device-action-btn" onclick="window.location.href='<?php echo $base; ?>compare/<?php echo htmlspecialchars($device['slug']); ?>'"><i class="fa fa-scale-balanced"></i> Compare</button>
-              <button class="da-card-cta-btn da-device-action-btn secondary" onclick="document.getElementById('comments').scrollIntoView({behavior:'smooth'});"><i class="fa fa-comments"></i> Opinions</button>
-            </div>
-            
-            <!-- Specs Summary -->
-            <div class="da-device-stats">
-              <?php 
-              $statKeys = ['display', 'camera', 'performance', 'battery'];
-              $icons = [
-                  'display' => '<i class="fa fa-mobile-screen da-stat-icon"></i>',
-                  'camera' => '<i class="fa fa-camera da-stat-icon"></i>',
-                  'performance' => '<i class="fa fa-microchip da-stat-icon"></i>',
-                  'battery' => '<i class="fa fa-battery-full da-stat-icon"></i>'
-              ];
-              foreach ($statKeys as $key):
-                if (isset($deviceStats[$key])): $stat = $deviceStats[$key];
-              ?>
-              <div class="da-stat-box">
-                  <?php echo $icons[$key]; ?>
-                  <div class="da-stat-title"><?php echo htmlspecialchars($stat['title']); ?></div>
-                  <div class="da-stat-subtitle"><?php echo htmlspecialchars($stat['subtitle']); ?></div>
+
+    <!-- ── HERO NEWSROOM ── -->
+    <section class="da-hero" aria-label="Featured News">
+      <!-- Left: hero + stories -->
+      <div class="da-hero-left">
+        <div class="da-section-label"><span>Newsroom</span></div>
+
+        <?php if (!empty($posts)): $hero = $posts[0]; ?>
+          <a href="<?php echo $base; ?>post/<?php echo urlencode($hero['slug']); ?>" class="da-hero-main">
+            <?php if (!empty($hero['featured_image'])): ?>
+              <img src="<?php echo htmlspecialchars(getAbsoluteImagePath($hero['featured_image'], $base)); ?>" alt="<?php echo htmlspecialchars($hero['title']); ?>" loading="eager" />
+            <?php else: ?>
+              <div class="da-img-fallback"></div>
+            <?php endif; ?>
+            <div class="da-hero-main-overlay"></div>
+            <div class="da-hero-main-content">
+              <div class="da-section-label"><span>Latest Story</span></div>
+              <h1 class="da-hero-main-title"><?php echo htmlspecialchars($hero['title']); ?></h1>
+              <div class="da-hero-meta">
+                <span><i class="fa fa-calendar-alt"></i><?php echo date('M j, Y', strtotime($hero['created_at'])); ?></span>
+                <span><i class="fa fa-comment"></i><?php echo $hero['comment_count']; ?> comments</span>
               </div>
-              <?php endif; endforeach; ?>
             </div>
+          </a>
+
+          <!-- 4 hot stories -->
+          <?php $hotStories = array_slice($posts, 1, 4); ?>
+          <div class="da-hero-stories">
+            <?php foreach ($hotStories as $story): ?>
+              <a href="<?php echo $base; ?>post/<?php echo urlencode($story['slug']); ?>" class="da-story-card">
+                <?php if (!empty($story['featured_image'])): ?>
+                  <img src="<?php echo htmlspecialchars(getAbsoluteImagePath($story['featured_image'], $base)); ?>" alt="<?php echo htmlspecialchars($story['title']); ?>" loading="lazy" />
+                <?php else: ?>
+                  <div class="da-img-fallback"></div>
+                <?php endif; ?>
+                <div class="da-story-card-overlay"></div>
+                <div class="da-story-card-title"><?php echo htmlspecialchars($story['title']); ?></div>
+              </a>
+            <?php endforeach; ?>
           </div>
-        </div>
+        <?php else: ?>
+          <div class="da-empty"><i class="fa fa-newspaper"></i>No stories available yet.</div>
+        <?php endif; ?>
+      </div>
 
-        <!-- Detailed Specifications -->
-        <div class="da-section-label"><span>Specifications</span></div>
-        <div class="da-widget" style="margin-bottom: 24px;">
-          <table class="da-specs-table">
-            <tbody>
-              <?php if (!empty($deviceSpecs)): foreach ($deviceSpecs as $category => $rows): if (is_array($rows) && !empty($rows)): ?>
-                <?php foreach ($rows as $rowIndex => $rowData): ?>
-                  <tr class="da-specs-row">
-                      <?php if ($rowIndex === 0): ?>
-                          <th class="da-specs-category" rowspan="<?php echo count($rows); ?>">
-                              <?php echo htmlspecialchars($category); ?>
-                          </th>
-                      <?php endif; ?>
-                      <td class="da-specs-field">
-                          <?php echo htmlspecialchars($rowData['field']); ?>
-                      </td>
-                      <td class="da-specs-value">
-                          <?php echo $rowData['description']; ?>
-                      </td>
-                  </tr>
-                <?php endforeach; ?>
-              <?php endif; endforeach; else: ?>
-                <tr><td class="da-empty">No detailed specifications available.</td></tr>
-              <?php endif; ?>
-            </tbody>
-          </table>
-          <div class="da-specs-disclaimer">
-            <strong>Disclaimer:</strong> We can not guarantee that the information on this page is 100% correct.
+      <!-- Right: Brand panel (Classic Widget) -->
+      <div class="da-hero-right">
+        <?php include('includes/sidebar/brands-area.php'); ?>
+
+        <!-- AD PLACEHOLDER -->
+        <?php include('includes/sidebar/ad-placeholder.php'); ?>
+      </div>
+    </section>
+
+
+
+    <!-- ── POST FEED + SIDEBAR ── -->
+    <div class="da-content-area">
+      <!-- Post Feed -->
+      <main>
+        <div class="da-post-feed-header">
+          <div>
+            <div class="da-section-label"><span>Latest</span></div>
+            <h2 class="da-section-title">Recent Stories</h2>
           </div>
+          <a href="<?php echo $base; ?>reviews" class="da-view-all">View All <i class="fa fa-arrow-right"></i></a>
         </div>
 
-        <!-- User Opinions -->
-        <div class="da-section-label" id="comments"><span>Opinions</span></div>
-        <div class="da-widget da-opinions-widget">
-           <h3 class="da-opinions-title">User Opinions and Reviews (<?php echo $commentCount; ?>)</h3>
-           
-           <?php if (!empty($comments)): foreach ($comments as $comment): ?>
-             <div class="da-comment-thread">
-                <div class="da-comment-avatar">
-                  <?php echo getAvatarDisplay($comment['name'], $comment['email']); ?>
+        <?php
+        $feedPosts = array_slice($posts, 4);
+        if (empty($feedPosts)):
+        ?>
+          <div class="da-empty"><i class="fa fa-newspaper"></i>More stories coming soon!</div>
+        <?php else: ?>
+          <div class="da-post-grid" id="da-post-grid">
+            <?php
+            $isFirst = true;
+            foreach ($feedPosts as $post):
+              $cls = $isFirst ? 'da-post-card featured' : 'da-post-card';
+              $isFirst = false;
+            ?>
+              <a href="<?php echo $base; ?>post/<?php echo urlencode($post['slug']); ?>" class="<?php echo $cls; ?>">
+                <div class="da-post-card-img">
+                  <?php if (!empty($post['featured_image'])): ?>
+                    <img src="<?php echo htmlspecialchars(getAbsoluteImagePath($post['featured_image'], $base)); ?>" alt="<?php echo htmlspecialchars($post['title']); ?>" loading="lazy" />
+                  <?php else: ?>
+                    <div class="da-img-fallback-icon"><i class="fa fa-newspaper" style="font-size:32px;"></i></div>
+                  <?php endif; ?>
+                  <span class="da-post-card-tag">Article</span>
                 </div>
-                <div class="da-comment-content">
-                   <div class="da-comment-header">
-                     <span class="da-comment-name"><?php echo htmlspecialchars($comment['name']); ?></span>
-                     <span class="da-comment-time"><i class="fa fa-clock me-1"></i><?php echo timeAgo($comment['created_at']); ?></span>
-                   </div>
-                   <div class="da-comment-text">
-                     <?php echo nl2br(htmlspecialchars($comment['comment'])); ?>
-                   </div>
-                </div>
-             </div>
-           <?php endforeach; else: ?>
-             <div class="da-empty">
-                <i class="fa fa-comments"></i>
-                <p>No comments yet. Be the first to share your opinion!</p>
-             </div>
-           <?php endif; ?>
-
-           <!-- Comment Form -->
-           <div class="da-comment-form-wrap">
-              <h4 class="da-comment-form-title">Share Your Opinion</h4>
-              <form id="device-comment-form" method="POST">
-                <input type="hidden" name="action" value="comment_device">
-                <input type="hidden" name="device_id" value="<?php echo htmlspecialchars($device['id']); ?>">
-                <div class="row">
-                  <div class="col-md-6 mb-3">
-                    <input type="text" class="form-control da-comment-input" name="name" placeholder="Your Name" required>
-                  </div>
-                  <div class="col-md-6 mb-3">
-                    <input type="email" class="form-control da-comment-input" name="email" placeholder="Your Email (optional)">
+                <div class="da-post-card-body">
+                  <div class="da-post-card-title"><?php echo htmlspecialchars($post['title']); ?></div>
+                  <div class="da-post-card-meta">
+                    <span><i class="fa fa-calendar-alt"></i><?php echo date('M j, Y', strtotime($post['created_at'])); ?></span>
+                    <span><i class="fa fa-comment"></i><?php echo $post['comment_count']; ?></span>
                   </div>
                 </div>
-                <div class="mb-3">
-                  <textarea class="form-control da-comment-input" name="comment" rows="4" placeholder="Share your thoughts about this device..." required></textarea>
-                </div>
-                <div class="mb-3 d-flex align-items-center gap-3">
-                  <img src="<?php echo $base; ?>captcha.php" id="captcha-image" style="height: 40px; border-radius: 4px; cursor: pointer;" onclick="this.src='<?php echo $base; ?>captcha.php?r='+Math.random()">
-                  <input type="text" class="form-control da-comment-input" name="captcha" placeholder="Enter CAPTCHA" required style="width: 150px;">
-                </div>
-                <button type="submit" class="da-card-cta-btn"><i class="fa fa-paper-plane"></i> Post Opinion</button>
-              </form>
-           </div>
-        </div>
+              </a>
+            <?php endforeach; ?>
+          </div>
+        <?php endif; ?>
       </main>
 
       <!-- Sidebar -->
       <aside class="da-sidebar">
+
         <!-- Latest Devices -->
-        <div class="da-section-label"><span>Devices</span></div>
-        <div class="da-widget">
-          <div class="da-widget-header">
-            <h3>Latest Devices</h3>
-            <div class="da-widget-icon"><i class="fa fa-mobile-screen-button"></i></div>
-          </div>
-          <div class="da-widget-body">
-            <?php if (empty($latestDevices)): ?>
-              <div class="da-empty"><i class="fa fa-mobile-alt"></i>No devices yet.</div>
-            <?php else: ?>
-              <div class="da-device-list">
-                <?php foreach (array_slice($latestDevices, 0, 8) as $dev): ?>
-                  <a href="<?php echo $base; ?>device/<?php echo urlencode($dev['slug']); ?>" class="da-device-row">
-                    <div class="da-device-img-wrapper">
-                      <img src="<?php echo htmlspecialchars(getAbsoluteImagePath($dev['image'] ?? '', $base)); ?>" alt="<?php echo htmlspecialchars($dev['name']); ?>" loading="lazy" />
-                    </div>
-                    <div class="da-device-info">
-                      <div class="da-device-name"><?php echo htmlspecialchars($dev['name']); ?></div>
-                    </div>
-                  </a>
-                <?php endforeach; ?>
-              </div>
-            <?php endif; ?>
-          </div>
-        </div>
+        <?php include('includes/sidebar/latest-devices.php'); ?>
 
         <!-- Popular Comparisons -->
-        <div class="da-widget">
-          <div class="da-widget-header">
-            <h3>Popular Comparisons</h3>
-            <div class="da-widget-icon"><i class="fa fa-scale-balanced"></i></div>
-          </div>
-          <div class="da-widget-body">
-            <?php if (empty($topComparisons)): ?>
-              <div class="da-empty">No comparisons yet.</div>
-            <?php else: ?>
-              <div class="da-comparison-list">
-                <?php foreach (array_slice($topComparisons, 0, 5) as $cmp):
-                  $slug1 = $cmp['device1_slug'] ?? $cmp['device1_id'] ?? '';
-                  $slug2 = $cmp['device2_slug'] ?? $cmp['device2_id'] ?? '';
-                  $cUrl = $base . 'compare/' . urlencode($slug1) . '-vs-' . urlencode($slug2);
-                ?>
-                  <a href="<?php echo $cUrl; ?>" class="da-sidebar-vs-card">
-                    <div class="da-sidebar-vs-row">
-                      <div class="da-vs-col">
-                        <?php if (!empty($cmp['device1_image'])): ?><img src="<?php echo htmlspecialchars(getAbsoluteImagePath($cmp['device1_image'], $base)); ?>" class="da-sidebar-vs-img" loading="lazy" /><?php endif; ?>
-                        <div class="da-sidebar-vs-name"><?php echo htmlspecialchars($cmp['device1_name'] ?? 'Device'); ?></div>
-                      </div>
-                      <div class="da-sidebar-vs-divider">VS</div>
-                      <div class="da-vs-col">
-                        <?php if (!empty($cmp['device2_image'])): ?><img src="<?php echo htmlspecialchars(getAbsoluteImagePath($cmp['device2_image'], $base)); ?>" class="da-sidebar-vs-img" loading="lazy" /><?php endif; ?>
-                        <div class="da-sidebar-vs-name"><?php echo htmlspecialchars($cmp['device2_name'] ?? 'Device'); ?></div>
-                      </div>
-                    </div>
-                  </a>
-                <?php endforeach; ?>
-              </div>
-            <?php endif; ?>
-          </div>
-        </div>
+        <?php include('includes/sidebar/popular-comparisons.php'); ?>
+
+        <!-- Top 10 Daily Interest -->
+        <?php include('includes/sidebar/top-daily-interests.php'); ?>
+
+        <!-- Top 10 by Fans -->
+        <?php include('includes/sidebar/top-by-fans.php'); ?>
+        
       </aside>
     </div>
+    <!-- BOTTOM AREA -->
+    
+    <!-- ── IN STORES NOW ── -->
+    <?php include('includes/bottom-area/in-stores-now.php'); ?>
+
+    <!-- ── TRENDING COMPARISONS ── -->
+    <?php include('includes/bottom-area/trending-comparisons.php'); ?>
+
+    <!-- ── FEATURED POSTS TICKER ── -->
+    <?php include('includes/bottom-area/featured-posts.php'); ?>
 
     <!-- ── INFINITE BRAND MARQUEE ── -->
-    <section class="da-marquee-section" aria-label="All Brands">
-      <div class="da-marquee-container">
-        <div class="da-marquee-track">
-          <div class="da-marquee-content">
-            <?php foreach ($brands as $brand): $brandSlug = strtolower(preg_replace('/\s+/', '-', trim($brand['name']))); ?>
-              <a href="<?php echo $base; ?>brand/<?php echo urlencode($brandSlug); ?>" class="da-marquee-pill"><?php echo htmlspecialchars($brand['name']); ?></a>
-            <?php endforeach; ?>
-          </div>
-          <div class="da-marquee-content" aria-hidden="true">
-            <?php foreach ($brands as $brand): $brandSlug = strtolower(preg_replace('/\s+/', '-', trim($brand['name']))); ?>
-              <a href="<?php echo $base; ?>brand/<?php echo urlencode($brandSlug); ?>" class="da-marquee-pill"><?php echo htmlspecialchars($brand['name']); ?></a>
-            <?php endforeach; ?>
-          </div>
-        </div>
-      </div>
-    </section>
+    <?php include('includes/bottom-area/brand-marquee.php'); ?>
 
-  </div><!-- /.da-page -->
+  </div>
 
-  <!-- ══════════════════════ FOOTER ══════════════════════ -->
-  <footer class="da-footer-new">
-    <div class="da-footer-container" style="max-width: 1400px; margin: 0 auto; padding: 40px 24px;">
-      <div class="da-footer-top-row">
-        <a class="da-logo" href="<?php echo $base; ?>"><img src="<?php echo $base; ?>imges/logo-wide.svg" alt="DevicesArena" /></a>
-        <div class="da-social-icons-top">
-          <a href="#" class="fb"><i class="fab fa-facebook-f"></i></a>
-          <a href="#" class="yt"><i class="fab fa-youtube"></i></a>
-        </div>
-      </div>
-      <hr class="da-footer-hr">
-      <div style="text-align: center; font-size: 13px; color: #94a3b8;">&copy; <?php echo date('Y'); ?> DevicesArena. All rights reserved.</div>
-    </div>
-  </footer>
+  <!-- ══════════════════════ NEW FOOTER ══════════════════════ -->
+  <?php include('includes/footer.php'); ?>
 
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/js/bootstrap.bundle.min.js"></script>
   <script>
     window.baseURL = '<?php echo $base; ?>';
-    
-    // Theme toggle logic
-    const themeToggles = [document.getElementById('da-theme-toggle')];
+
+    // ── Theme Toggle ──
+    const themeToggles = [document.getElementById('da-theme-toggle'), document.getElementById('da-mobile-theme-toggle')];
+
     function updateThemeIcons() {
       const isLight = document.documentElement.getAttribute('data-theme') === 'light';
       themeToggles.forEach(btn => {
         if (!btn) return;
         const icon = btn.querySelector('i');
-        if (icon) icon.className = isLight ? 'fa fa-moon' : 'fa fa-sun';
+        if (icon) {
+          icon.className = isLight ? 'fa fa-moon' : 'fa fa-sun';
+        }
       });
     }
     updateThemeIcons();
@@ -446,32 +290,331 @@ $topReviewedDevices = $topReviewedDevices ?? [];
       }
     });
 
-    // Mobile Menu
+    // Auto-Sliders moved to redesign/sliders.js
+
+    // ── Navbar scroll effect ──
+    const navbar = document.getElementById('da-navbar');
+    window.addEventListener('scroll', () => {
+      navbar.classList.toggle('scrolled', window.scrollY > 40);
+    }, {
+      passive: true
+    });
+
+    // ── Mobile Menu ──
     const hamburger = document.getElementById('da-hamburger');
     const mobileMenu = document.getElementById('da-mobile-menu');
-    if (hamburger) {
-      hamburger.addEventListener('click', () => {
-        hamburger.classList.toggle('open');
-        mobileMenu.classList.toggle('open');
-        document.body.style.overflow = mobileMenu.classList.contains('open') ? 'hidden' : '';
+    hamburger.addEventListener('click', () => {
+      hamburger.classList.toggle('open');
+      mobileMenu.classList.toggle('open');
+      document.body.style.overflow = mobileMenu.classList.contains('open') ? 'hidden' : '';
+    });
+
+    function closeMobileMenu() {
+      hamburger.classList.remove('open');
+      mobileMenu.classList.remove('open');
+      document.body.style.overflow = '';
+    }
+
+    // ── Brand Strip Arrows ──
+    const brandScroll = document.getElementById('brand-strip-scroll');
+    document.getElementById('brand-strip-left').addEventListener('click', () => brandScroll.scrollBy({
+      left: -300,
+      behavior: 'smooth'
+    }));
+    document.getElementById('brand-strip-right').addEventListener('click', () => brandScroll.scrollBy({
+      left: 300,
+      behavior: 'smooth'
+    }));
+
+    // ── Live Search ──
+    const searchInput = document.getElementById('da-search-input');
+    const searchResults = document.getElementById('da-search-results');
+    if (searchInput && searchResults) {
+      let searchTimer;
+      searchInput.addEventListener('input', function() {
+        clearTimeout(searchTimer);
+        const q = this.value.trim();
+        if (q.length < 2) {
+          searchResults.classList.remove('open');
+          return;
+        }
+        searchTimer = setTimeout(() => {
+          Promise.all([
+            fetch(baseURL + 'api_get_devices.php?q=' + encodeURIComponent(q) + '&limit=4').then(r => r.json()).catch(() => ({
+              devices: []
+            })),
+            fetch(baseURL + 'api_get_posts.php?q=' + encodeURIComponent(q) + '&limit=4').then(r => r.json()).catch(() => ({
+              posts: []
+            }))
+          ]).then(([devData, postData]) => {
+            const devices = devData.devices || [];
+            const posts = postData.posts || [];
+            if (!devices.length && !posts.length) {
+              searchResults.innerHTML = '<div class="da-search-result-item"><div class="sr-text">No results found</div></div>';
+              searchResults.classList.add('open');
+              return;
+            }
+            let html = '';
+            devices.forEach(d => {
+              html += `<a href="${baseURL}device/${encodeURIComponent(d.slug || d.id)}" class="da-search-result-item">
+          ${d.image ? `<img src="${d.image}" onerror="this.style.display='none'">` : ''}
+          <div><div class="sr-text">${d.name}</div><div class="sr-meta"><i class="fa fa-mobile-screen me-1"></i>${d.brand_name || 'Device'}</div></div>
+        </a>`;
+            });
+            posts.forEach(p => {
+              html += `<a href="${baseURL}post/${encodeURIComponent(p.slug)}" class="da-search-result-item">
+          ${p.featured_image ? `<img src="${p.featured_image}" onerror="this.style.display='none'">` : ''}
+          <div><div class="sr-text">${p.title}</div><div class="sr-meta"><i class="fa fa-newspaper me-1"></i>${p.created_at ? p.created_at.substring(0,10) : 'Article'}</div></div>
+        </a>`;
+            });
+            searchResults.innerHTML = html;
+            searchResults.classList.add('open');
+          });
+        }, 320);
+      });
+      document.addEventListener('click', (e) => {
+        const wrap = document.getElementById('da-search-wrap');
+        if (wrap && !wrap.contains(e.target)) searchResults.classList.remove('open');
       });
     }
 
-    // Expand text dots logic
-    document.addEventListener('click', function(e) {
-      if (e.target.classList.contains('expand-dots')) {
-         const full = e.target.getAttribute('data-full');
-         if (full) {
-            const temp = document.createElement('div');
-            temp.innerHTML = full;
-            const prev = e.target.previousSibling;
-            if (prev && prev.nodeType === Node.TEXT_NODE) prev.textContent = temp.textContent || temp.innerText || '';
-            e.target.remove();
-         }
+    // ── Newsletter ──
+    document.getElementById('da-newsletter-btn').addEventListener('click', function() {
+      const email = document.getElementById('da-newsletter-email').value.trim();
+      const msg = document.getElementById('da-newsletter-msg');
+      if (!email) {
+        msg.textContent = 'Please enter your email.';
+        msg.className = 'error';
+        return;
       }
+      this.disabled = true;
+      this.textContent = 'Subscribing...';
+      const btn = this;
+      fetch(baseURL + 'handle_newsletter.php', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/x-www-form-urlencoded'
+          },
+          body: 'newsletter_email=' + encodeURIComponent(email)
+        })
+        .then(r => r.json())
+        .then(data => {
+          msg.textContent = data.message;
+          msg.className = data.success ? 'success' : 'error';
+          if (data.success) document.getElementById('da-newsletter-email').value = '';
+          btn.disabled = false;
+          btn.textContent = 'Subscribe';
+        }).catch(() => {
+          msg.textContent = 'An error occurred.';
+          msg.className = 'error';
+          btn.disabled = false;
+          btn.textContent = 'Subscribe';
+        });
     });
+
+    // ── Notification mark seen ──
+    function markNotificationsAsSeen() {
+      const dots = ['notifDotDesktop'];
+      dots.forEach(id => {
+        const el = document.getElementById(id);
+        if (el) el.style.display = 'none';
+      });
+      fetch(baseURL + 'notification_handler.php', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/x-www-form-urlencoded'
+        },
+        body: 'action=mark_seen'
+      }).catch(() => {});
+    }
+    const bell = document.getElementById('notificationBellDesktop');
+    if (bell) bell.addEventListener('click', () => setTimeout(markNotificationsAsSeen, 100));
+
+    // ── Auth helpers ──
+    function userAuthFetch(action, fd) {
+      fd.append('action', action);
+      return fetch(baseURL + 'user_auth_handler.php', {
+        method: 'POST',
+        body: fd
+      }).then(r => r.json());
+    }
+
+    function showAuthMsg(id, msg, type) {
+      const el = document.getElementById(id);
+      el.className = 'alert alert-' + type + ' alert-dismissible fade show';
+      el.innerHTML = msg + '<button type="button" class="btn-close" data-bs-dismiss="alert"></button>';
+      el.style.display = 'block';
+    }
+
+    const loginForm = document.getElementById('publicLoginForm');
+    if (loginForm) loginForm.addEventListener('submit', function(e) {
+      e.preventDefault();
+      const btn = document.getElementById('loginSubmitBtn');
+      btn.disabled = true;
+      btn.innerHTML = '<i class="fa fa-spinner fa-spin me-1"></i>Logging in...';
+      userAuthFetch('login', new FormData(this)).then(data => {
+        if (data.success) {
+          showAuthMsg('login-message', data.message, 'success');
+          setTimeout(() => location.reload(), 800);
+        } else {
+          showAuthMsg('login-message', data.message, 'danger');
+          btn.disabled = false;
+          btn.innerHTML = '<i class="fa fa-right-to-bracket me-1"></i>Login';
+        }
+      }).catch(() => {
+        showAuthMsg('login-message', 'An error occurred.', 'danger');
+        btn.disabled = false;
+        btn.innerHTML = '<i class="fa fa-right-to-bracket me-1"></i>Login';
+      });
+    });
+
+    const signupForm = document.getElementById('publicSignupForm');
+    if (signupForm) signupForm.addEventListener('submit', function(e) {
+      e.preventDefault();
+      const btn = document.getElementById('signupSubmitBtn');
+      btn.disabled = true;
+      btn.innerHTML = '<i class="fa fa-spinner fa-spin me-1"></i>Creating account...';
+      userAuthFetch('register', new FormData(this)).then(data => {
+        if (data.success) {
+          showAuthMsg('signup-message', data.message, 'success');
+          setTimeout(() => location.reload(), 800);
+        } else {
+          showAuthMsg('signup-message', data.message, 'danger');
+          btn.disabled = false;
+          btn.innerHTML = '<i class="fa fa-user-plus me-1"></i>Create Account';
+        }
+      }).catch(() => {
+        showAuthMsg('signup-message', 'An error occurred.', 'danger');
+        btn.disabled = false;
+        btn.innerHTML = '<i class="fa fa-user-plus me-1"></i>Create Account';
+      });
+    });
+
+    function openProfileModal() {
+      const modal = new bootstrap.Modal(document.getElementById('profileModal'));
+      userAuthFetch('get_profile', new FormData()).then(data => {
+        if (data.success && data.user) {
+          document.getElementById('profile-name').value = data.user.name;
+          document.getElementById('profile-email').value = data.user.email;
+        }
+      });
+      document.getElementById('profile-current-password').value = '';
+      document.getElementById('profile-new-password').value = '';
+      document.getElementById('delete-account-password').value = '';
+      document.getElementById('profile-message').style.display = 'none';
+      modal.show();
+    }
+
+    const profileForm = document.getElementById('profileUpdateForm');
+    if (profileForm) profileForm.addEventListener('submit', function(e) {
+      e.preventDefault();
+      const btn = document.getElementById('profileUpdateBtn');
+      btn.disabled = true;
+      btn.innerHTML = '<i class="fa fa-spinner fa-spin me-1"></i>Saving...';
+      userAuthFetch('update_profile', new FormData(this)).then(data => {
+        showAuthMsg('profile-message', data.message, data.success ? 'success' : 'danger');
+        if (data.success) setTimeout(() => location.reload(), 1000);
+        btn.disabled = false;
+        btn.innerHTML = '<i class="fa fa-save me-1"></i>Save Changes';
+      }).catch(() => {
+        showAuthMsg('profile-message', 'An error occurred.', 'danger');
+        btn.disabled = false;
+        btn.innerHTML = '<i class="fa fa-save me-1"></i>Save Changes';
+      });
+    });
+
+    function deletePublicAccount() {
+      if (!confirm('Permanently delete your account? This cannot be undone.')) return;
+      const pwd = document.getElementById('delete-account-password').value.trim();
+      if (!pwd) {
+        showAuthMsg('profile-message', 'Please enter your password.', 'warning');
+        return;
+      }
+      const btn = document.getElementById('deleteAccountBtn');
+      btn.disabled = true;
+      btn.innerHTML = '<i class="fa fa-spinner fa-spin me-1"></i>Deleting...';
+      const fd = new FormData();
+      fd.append('password', pwd);
+      userAuthFetch('delete_account', fd).then(data => {
+        showAuthMsg('profile-message', data.message, data.success ? 'success' : 'danger');
+        if (data.success) setTimeout(() => location.reload(), 1000);
+        else {
+          btn.disabled = false;
+          btn.innerHTML = '<i class="fa fa-trash me-1"></i>Delete Account';
+        }
+      }).catch(() => {
+        showAuthMsg('profile-message', 'An error occurred.', 'danger');
+        btn.disabled = false;
+        btn.innerHTML = '<i class="fa fa-trash me-1"></i>Delete Account';
+      });
+    }
+
+    function publicUserLogout() {
+      fetch(baseURL + 'notification_handler.php', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/x-www-form-urlencoded'
+          },
+          body: 'action=reset'
+        })
+        .finally(() => {
+          userAuthFetch('logout', new FormData()).then(() => location.reload());
+        });
+    }
+
+    function switchToSignup() {
+      bootstrap.Modal.getInstance(document.getElementById('loginModal')).hide();
+      setTimeout(() => new bootstrap.Modal(document.getElementById('signupModal')).show(), 300);
+    }
+
+    function switchToLogin() {
+      bootstrap.Modal.getInstance(document.getElementById('signupModal')).hide();
+      setTimeout(() => new bootstrap.Modal(document.getElementById('loginModal')).show(), 300);
+    }
+
+    // ── Infinite horizontal post scroll ──
+    (function() {
+      let page = 1,
+        loading = false,
+        hasMore = <?php echo count($posts) >= 20 ? 'true' : 'false'; ?>;
+      const container = document.getElementById('featured-scroll-container');
+      const loader = document.getElementById('featured-load-more');
+      if (!container) return;
+      container.addEventListener('scroll', function() {
+        if (loading || !hasMore) return;
+        if (this.scrollLeft + this.clientWidth >= this.scrollWidth - 300) loadMore();
+      }, {
+        passive: true
+      });
+
+      function loadMore() {
+        if (loading || !hasMore) return;
+        loading = true;
+        page++;
+        if (loader) loader.style.display = 'flex';
+        fetch(baseURL + 'load_posts.php?page=' + page + '&type=all&format=block')
+          .then(r => r.json())
+          .then(data => {
+            if (data.success && data.html) {
+              if (loader) loader.insertAdjacentHTML('beforebegin', data.html);
+              hasMore = data.hasMore;
+              // Re-skin new items
+              container.querySelectorAll('.div-block').forEach(el => {
+                if (!el.classList.contains('da-ticker-item')) el.classList.add('da-ticker-compat');
+              });
+            } else {
+              hasMore = false;
+            }
+            if (!hasMore && loader) loader.style.display = 'none';
+            loading = false;
+          }).catch(() => {
+            loading = false;
+            if (loader) loader.style.display = 'none';
+          });
+      }
+    })();
   </script>
-  <script>var COMMENT_AJAX_BASE = '<?php echo $base; ?>';</script>
-  <script src="<?php echo $base; ?>js/comment-ajax.js"></script>
+  <script src="<?php echo $base; ?>redesign/sliders.js"></script>
 </body>
+
 </html>
