@@ -88,6 +88,23 @@ function extractPriceFromMisc($miscJson)
 
 // Get posts and devices for display (case-insensitive status check) with comment counts
 $pdo = getConnection();
+
+// ── Auth variables required by navbar.php ──
+$isPublicUser = !empty($_SESSION['public_user_id']);
+$publicUserName = $_SESSION['public_user_name'] ?? '';
+$publicUserInitial = $isPublicUser ? strtoupper(substr($publicUserName, 0, 1)) : '';
+if (!isset($_SESSION['notif_seen'])) $_SESSION['notif_seen'] = false;
+$hasUnreadNotifications = $isPublicUser && !$_SESSION['notif_seen'];
+
+// Weekly posts for notification bell
+try {
+  $weekly_stmt = $pdo->prepare("SELECT p.id,p.title,p.slug,p.featured_image,p.created_at FROM posts p WHERE p.status ILIKE 'published' AND p.created_at >= CURRENT_TIMESTAMP - INTERVAL '7 days' ORDER BY p.created_at DESC LIMIT 10");
+  $weekly_stmt->execute();
+  $weekly_posts = $weekly_stmt->fetchAll();
+} catch (Exception $e) {
+  $weekly_posts = [];
+}
+
 $posts_stmt = $pdo->prepare("
     SELECT p.*, 
     (SELECT COUNT(*) FROM post_comments pc WHERE pc.post_id = p.id AND pc.status = 'approved') as comment_count
@@ -157,9 +174,9 @@ try {
 }
 
 
-// Get latest 9 devices for the new section
+// Get latest devices for sidebar widget (15 latest)
 $latestDevices = getAllPhones();
-$latestDevices = array_slice(array_reverse($latestDevices), 0, 9); // Get latest 9 devices
+$latestDevices = array_slice(array_reverse($latestDevices), 0, 15);
 
 // Get top 36 brands ordered by device count (highest first) then alphabetically - for sidebar
 $brands_stmt = $pdo->prepare("
@@ -1216,21 +1233,22 @@ $commentCount = getDeviceCommentCount($pdo, $device_id);
                   <?php foreach ($deviceSpecs as $category => $rows): ?>
                     <?php if (is_array($rows) && !empty($rows)): ?>
                       <?php foreach ($rows as $rowIndex => $rowData): ?>
-                        <tr class="da-specs-row" <?php echo ($category === 'NETWORK' && $rowIndex > 0) ? 'class="network-row" style="display:none;"' : ''; ?>>
+                        <?php if ($category === 'NETWORK' && $rowIndex > 0): ?>
+                          <tr class="network-row" style="display:none;">
+                        <?php else: ?>
+                          <tr class="da-specs-row">
+                        <?php endif; ?>
                           <?php if ($rowIndex === 0): ?>
                             <th class="da-specs-category" rowspan="<?php echo ($category === 'NETWORK') ? '1' : count($rows); ?>">
                               <?php echo htmlspecialchars($category); ?>
                               <?php if ($category === 'NETWORK'): ?>
-                                <br><button class="da-spec-expand d-none d-lg-inline" onclick="toggleExpandBtn(this)">EXPAND ▼</button>
+                                <button class="da-spec-expand" onclick="toggleExpandBtn(this)">EXPAND ▼</button>
                               <?php endif; ?>
                             </th>
                           <?php endif; ?>
                           <td class="da-specs-field"><?php echo htmlspecialchars($rowData['field']); ?></td>
                           <td class="da-specs-value">
                             <?php echo $rowData['description']; ?>
-                            <?php if ($category === 'NETWORK' && $rowIndex === 0): ?>
-                              <button class="da-spec-expand d-lg-none" onclick="toggleExpandBtn(this)">EXPAND ▼</button>
-                            <?php endif; ?>
                           </td>
                         </tr>
                       <?php endforeach; ?>
@@ -1279,25 +1297,25 @@ $commentCount = getDeviceCommentCount($pdo, $device_id);
                       <div class="da-comment-text"><?php echo nl2br(htmlspecialchars($comment['comment'])); ?></div>
                       <button class="da-reply-btn reply-btn" data-comment-id="<?php echo $comment['id']; ?>" data-comment-name="<?php echo htmlspecialchars($comment['name']); ?>"><i class="fa fa-reply"></i> Reply</button>
                     </div>
-                    <?php if (!empty($comment['replies'])): ?>
-                      <div class="da-comment-replies">
-                        <?php foreach ($comment['replies'] as $reply): ?>
-                          <div class="da-comment-avatar" id="comment-<?php echo $reply['id']; ?>">
-                            <?php echo getAvatarDisplay($reply['name'], $reply['email']); ?>
-                          </div>
-                          <div class="da-comment-content">
-                            <div class="da-comment-header">
-                              <span class="da-comment-name"><?php echo htmlspecialchars($reply['name']); ?></span>
-                              <span class="da-section-label" style="display:inline-flex;padding:2px 8px;"><span>Replied</span></span>
-                              <span class="da-comment-time"><i class="fa fa-clock"></i> <?php echo timeAgo($reply['created_at']); ?></span>
-                            </div>
-                            <div class="da-comment-text"><?php echo nl2br(htmlspecialchars($reply['comment'])); ?></div>
-                            <button class="da-reply-btn reply-btn" data-comment-id="<?php echo $comment['id']; ?>" data-comment-name="<?php echo htmlspecialchars($comment['name']); ?>"><i class="fa fa-reply"></i> Reply</button>
-                          </div>
-                        <?php endforeach; ?>
-                      </div>
-                    <?php endif; ?>
                   </div>
+                  <?php if (!empty($comment['replies'])): ?>
+                    <?php foreach ($comment['replies'] as $reply): ?>
+                      <div class="da-comment-thread da-comment-reply" id="comment-<?php echo $reply['id']; ?>">
+                        <div class="da-comment-avatar">
+                          <?php echo getAvatarDisplay($reply['name'], $reply['email']); ?>
+                        </div>
+                        <div class="da-comment-content">
+                          <div class="da-comment-header">
+                            <span class="da-comment-name"><?php echo htmlspecialchars($reply['name']); ?></span>
+                            <small class="da-replied-tag"><i class="fa fa-reply fa-xs"></i> replied</small>
+                            <span class="da-comment-time"><i class="fa fa-clock"></i> <?php echo timeAgo($reply['created_at']); ?></span>
+                          </div>
+                          <div class="da-comment-text"><?php echo nl2br(htmlspecialchars($reply['comment'])); ?></div>
+                          <button class="da-reply-btn reply-btn" data-comment-id="<?php echo $comment['id']; ?>" data-comment-name="<?php echo htmlspecialchars($comment['name']); ?>"><i class="fa fa-reply"></i> Reply</button>
+                        </div>
+                      </div>
+                    <?php endforeach; ?>
+                  <?php endif; ?>
                 <?php endforeach; ?>
               <?php else: ?>
                 <div class="da-empty"><i class="fa fa-comments"></i>No comments yet. Be the first to share your opinion!</div>
@@ -1371,12 +1389,12 @@ $commentCount = getDeviceCommentCount($pdo, $device_id);
 
       <!-- Sidebar -->
       <aside class="da-sidebar">
+        <?php include(__DIR__ . '/includes/sidebar/brands-area.php'); ?>
+        <?php include(__DIR__ . '/includes/sidebar/ad-placeholder.php'); ?>
         <?php include(__DIR__ . '/includes/sidebar/latest-devices.php'); ?>
         <?php include(__DIR__ . '/includes/sidebar/popular-comparisons.php'); ?>
         <?php include(__DIR__ . '/includes/sidebar/top-daily-interests.php'); ?>
         <?php include(__DIR__ . '/includes/sidebar/top-by-fans.php'); ?>
-        <?php include(__DIR__ . '/includes/sidebar/brands-area.php'); ?>
-        <?php include(__DIR__ . '/includes/sidebar/ad-placeholder.php'); ?>
       </aside>
     </div>
 

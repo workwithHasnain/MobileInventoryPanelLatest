@@ -3846,3 +3846,24 @@ textarea.da-input {
   .da-device-actions { gap: 6px; }
   .da-cta-btn { padding: 7px 12px; font-size: 12px; }
 }
+
+/* Reply thread indent */
+.da-comment-reply {
+  margin-left: 40px;
+  border-left: 3px solid var(--accent);
+  padding-left: 16px;
+}
+
+.da-replied-tag {
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--accent);
+  background: rgba(213,0,0,0.08);
+  border-radius: 4px;
+  padding: 1px 6px;
+  margin: 0 6px;
+}
+
+@media (max-width: 768px) {
+  .da-comment-reply { margin-left: 16px; }
+}
