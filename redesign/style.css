@@ -3867,3 +3867,242 @@ textarea.da-input {
 @media (max-width: 768px) {
   .da-comment-reply { margin-left: 16px; }
 }
+
+/* ══════════════════════════════════════════
+   DEVICE HERO — PREMIUM REDESIGN
+══════════════════════════════════════════ */
+
+/* Image wrapper with gallery hover overlay */
+.da-device-img {
+  position: relative;
+  overflow: hidden;
+}
+
+.da-device-img-overlay {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(to top, rgba(0,0,0,0.7) 0%, transparent 60%);
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+  padding-bottom: 18px;
+  gap: 6px;
+  color: #fff;
+  font-size: 13px;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  opacity: 0;
+  transform: translateY(8px);
+  transition: opacity 0.3s ease, transform 0.3s ease;
+}
+
+.da-device-img:hover .da-device-img-overlay {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+.da-device-img img {
+  transition: transform 0.4s ease;
+}
+
+.da-device-img:hover img {
+  transform: scale(1.04);
+}
+
+/* Brand label with red animated dot */
+.da-device-brand-label {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 11px;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 0.12em;
+  color: var(--accent);
+  margin-bottom: 8px;
+}
+
+.da-brand-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: var(--accent);
+  flex-shrink: 0;
+  animation: da-pulse-dot 2s ease-in-out infinite;
+}
+
+@keyframes da-pulse-dot {
+  0%, 100% { box-shadow: 0 0 0 0 rgba(213,0,0,0.6); }
+  50%       { box-shadow: 0 0 0 5px rgba(213,0,0,0); }
+}
+
+/* KEY HIGHLIGHTS strip */
+.da-highlights-strip {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin: 14px 0 20px;
+}
+
+.da-highlight-chip {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 8px 14px 8px 10px;
+  background: var(--bg-secondary);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  transition: border-color 0.25s, transform 0.25s, box-shadow 0.25s;
+  cursor: default;
+
+  /* Staggered fade-in */
+  opacity: 0;
+  transform: translateY(10px);
+  animation: chipIn 0.4s ease forwards;
+  animation-delay: var(--chip-delay, 0s);
+}
+
+@keyframes chipIn {
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.da-highlight-chip:hover {
+  border-color: var(--accent);
+  transform: translateY(-2px);
+  box-shadow: 0 4px 16px rgba(213,0,0,0.14);
+}
+
+.da-highlight-chip-icon {
+  width: 30px;
+  height: 30px;
+  border-radius: 8px;
+  background: rgba(213,0,0,0.12);
+  color: var(--accent);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 13px;
+  flex-shrink: 0;
+}
+
+.da-highlight-chip-text {
+  display: flex;
+  flex-direction: column;
+  line-height: 1.3;
+}
+
+.da-highlight-chip-label {
+  font-size: 9px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--text-muted);
+}
+
+.da-highlight-chip-val {
+  font-size: 12.5px;
+  font-weight: 600;
+  color: var(--text-primary);
+}
+
+/* ── CTA BUTTON ROW ── */
+.da-hero-cta-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-bottom: 24px;
+}
+
+.da-hero-cta {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 9px 16px;
+  border-radius: 8px;
+  font-size: 13px;
+  font-weight: 700;
+  font-family: var(--font-main);
+  cursor: pointer;
+  transition: transform 0.22s ease, box-shadow 0.22s ease, background 0.22s ease, border-color 0.22s ease;
+  border: 1px solid var(--border);
+  background: var(--bg-card);
+  color: var(--text-primary);
+  text-decoration: none;
+  white-space: nowrap;
+  backdrop-filter: blur(4px);
+  -webkit-backdrop-filter: blur(4px);
+}
+
+.da-hero-cta i {
+  font-size: 13px;
+  opacity: 0.8;
+}
+
+.da-hero-cta:hover {
+  transform: translateY(-3px);
+  border-color: rgba(213,0,0,0.5);
+  box-shadow: 0 6px 20px rgba(213,0,0,0.18);
+  background: rgba(213,0,0,0.06);
+  color: var(--text-primary);
+  text-decoration: none;
+}
+
+.da-hero-cta:hover i {
+  opacity: 1;
+  color: var(--accent);
+}
+
+/* Primary CTA (Review when available) */
+.da-hero-cta-primary {
+  background: var(--accent);
+  border-color: var(--accent);
+  color: #fff !important;
+  box-shadow: 0 4px 18px rgba(213,0,0,0.35);
+}
+
+.da-hero-cta-primary:hover {
+  background: #b30000;
+  border-color: #b30000;
+  box-shadow: 0 8px 28px rgba(213,0,0,0.45);
+  color: #fff !important;
+}
+
+.da-hero-cta-primary i {
+  opacity: 1 !important;
+  color: #fff !important;
+}
+
+/* Disabled state */
+.da-hero-cta-disabled {
+  opacity: 0.38;
+  pointer-events: none;
+  cursor: not-allowed;
+}
+
+/* ── STATS BAR (entry animation) ── */
+.da-stat-box {
+  opacity: 0;
+  transform: translateY(12px);
+  animation: statIn 0.4s ease forwards;
+  animation-delay: var(--stat-delay, 0s);
+}
+
+@keyframes statIn {
+  to { opacity: 1; transform: translateY(0); }
+}
+
+/* Mobile responsive */
+@media (max-width: 768px) {
+  .da-highlights-strip { gap: 8px; }
+  .da-highlight-chip { padding: 7px 12px 7px 8px; }
+  .da-highlight-chip-icon { width: 26px; height: 26px; font-size: 11px; }
+  .da-highlight-chip-val { font-size: 11.5px; }
+  .da-hero-cta { padding: 8px 12px; font-size: 12px; }
+  .da-hero-cta-row { gap: 6px; }
+}
+
+@media (max-width: 480px) {
+  .da-hero-cta span { display: none; }
+  .da-hero-cta { padding: 10px 12px; border-radius: 10px; }
+  .da-hero-cta i { font-size: 15px; opacity: 1; }
+}

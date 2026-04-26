@@ -1167,51 +1167,95 @@ $commentCount = getDeviceCommentCount($pdo, $device_id);
       <main>
         <!-- Device Hero -->
         <div class="da-device-hero">
-          <div class="da-device-img" onclick="window.location.href='<?php echo $base; ?>device/<?php echo htmlspecialchars($device_slug); ?>/images'">
+          <!-- Phone Image -->
+          <div class="da-device-img" onclick="window.location.href='<?php echo $base; ?>device/<?php echo htmlspecialchars($device_slug); ?>/images'" title="View all images">
             <?php
             $heroImage = $device["image"] ?? $device["image_1"] ?? "";
             if (!empty($heroImage)): ?>
               <img src="<?php echo htmlspecialchars(getAbsoluteImagePath($heroImage, $base)); ?>" alt="<?php echo htmlspecialchars($page_title); ?>">
+              <div class="da-device-img-overlay"><i class="fa fa-images"></i> <span>Gallery</span></div>
             <?php else: ?>
               <div class="da-img-fallback"><i class="fa fa-mobile-screen"></i></div>
             <?php endif; ?>
           </div>
 
+          <!-- Info Column -->
           <div class="da-device-info">
-            <div class="da-section-label"><span><?php echo htmlspecialchars($device['brand_name'] ?? 'Device'); ?></span></div>
+            <!-- Brand label -->
+            <div class="da-device-brand-label">
+              <span class="da-brand-dot"></span>
+              <?php echo htmlspecialchars($device['brand_name'] ?? 'Device'); ?>
+            </div>
+
+            <!-- Device Name -->
             <h1 class="da-device-title"><?php echo htmlspecialchars(($device['brand_name'] ?? '') . ' ' . ($device['name'] ?? 'Device')); ?></h1>
 
-            <div class="da-device-highlights">
-              <?php if (!empty($deviceHighlights)): ?>
-                <?php foreach ($deviceHighlights as $key => $highlight): ?>
-                  <span class="da-highlight-badge"><?php echo htmlspecialchars(strip_tags($highlight)); ?></span>
-                <?php endforeach; ?>
-              <?php endif; ?>
+            <!-- KEY HIGHLIGHTS (icon chips, distinct from buttons) -->
+            <?php if (!empty($deviceHighlights)): ?>
+            <?php
+            $highlightIconMap = [
+              'release'     => ['icon' => 'fa-calendar-days',  'label' => 'Released'],
+              'weight_dims' => ['icon' => 'fa-weight-hanging', 'label' => 'Build'],
+              'os'          => ['icon' => 'fa-mobile-screen',  'label' => 'OS'],
+              'storage'     => ['icon' => 'fa-hard-drive',     'label' => 'Storage'],
+            ];
+            $hiIdx = 0;
+            ?>
+            <div class="da-highlights-strip">
+              <?php foreach ($deviceHighlights as $hKey => $highlight):
+                $meta = $highlightIconMap[$hKey] ?? ['icon' => 'fa-circle-info', 'label' => ucfirst($hKey)];
+                $cleanText = htmlspecialchars(preg_replace('/^[\x{1F300}-\x{1FAFF}\x{2600}-\x{26FF}\x{2700}-\x{27BF}\x{FE00}-\x{FEFF}\x{200D}]+\s*/u', '', strip_tags($highlight)));
+              ?>
+              <div class="da-highlight-chip" style="--chip-delay:<?php echo $hiIdx++ * 0.07; ?>s">
+                <div class="da-highlight-chip-icon"><i class="fa <?php echo $meta['icon']; ?>"></i></div>
+                <div class="da-highlight-chip-text">
+                  <span class="da-highlight-chip-label"><?php echo $meta['label']; ?></span>
+                  <span class="da-highlight-chip-val"><?php echo $cleanText; ?></span>
+                </div>
+              </div>
+              <?php endforeach; ?>
             </div>
+            <?php endif; ?>
 
-            <!-- Action Buttons -->
-            <div class="da-device-actions">
+            <!-- CTA BUTTONS (visually completely different from highlights) -->
+            <div class="da-hero-cta-row">
               <?php if ($review_post): ?>
-                <button class="da-cta-btn da-device-action-btn" onclick="window.location.href='<?php echo $base; ?>post/<?php echo urlencode($review_post['slug']); ?>'"><i class="fa fa-star"></i> Review</button>
+                <a class="da-hero-cta da-hero-cta-primary" href="<?php echo $base; ?>post/<?php echo urlencode($review_post['slug']); ?>">
+                  <i class="fa fa-star"></i><span>Review</span>
+                </a>
               <?php else: ?>
-                <button class="da-cta-btn da-device-action-btn secondary" disabled title="No review available"><i class="fa fa-star"></i> Review</button>
+                <span class="da-hero-cta da-hero-cta-disabled"><i class="fa fa-star"></i><span>Review</span></span>
               <?php endif; ?>
-              <button class="da-cta-btn da-device-action-btn secondary" onclick="window.location.href='<?php echo $base; ?>compare/<?php echo htmlspecialchars($device['slug'] ?? $device_slug); ?>'"><i class="fa fa-scale-balanced"></i> Compare</button>
-              <button class="da-cta-btn da-device-action-btn secondary" onclick="document.getElementById('comments').scrollIntoView({behavior:'smooth',block:'start'})"><i class="fa fa-comments"></i> Opinions</button>
-              <button class="da-cta-btn da-device-action-btn secondary" onclick="window.location.href='<?php echo $base; ?>device/<?php echo htmlspecialchars($device_slug); ?>/images'"><i class="fa fa-images"></i> Pictures</button>
-              <button class="da-cta-btn da-device-action-btn secondary" onclick="showRelatedPhonesModal()"><i class="fa fa-mobile-screen-button"></i> Related</button>
+              <a class="da-hero-cta" href="<?php echo $base; ?>compare/<?php echo htmlspecialchars($device['slug'] ?? $device_slug); ?>">
+                <i class="fa fa-scale-balanced"></i><span>Compare</span>
+              </a>
+              <button class="da-hero-cta" onclick="document.getElementById('comments').scrollIntoView({behavior:'smooth',block:'start'})">
+                <i class="fa fa-comments"></i><span>Opinions</span>
+              </button>
+              <a class="da-hero-cta" href="<?php echo $base; ?>device/<?php echo htmlspecialchars($device_slug); ?>/images">
+                <i class="fa fa-images"></i><span>Pictures</span>
+              </a>
+              <button class="da-hero-cta" onclick="showRelatedPhonesModal()">
+                <i class="fa fa-mobile-screen-button"></i><span>Related</span>
+              </button>
             </div>
 
-            <!-- Stats Bar -->
-            <div class="da-device-stats">
+            <!-- STATS BAR (animated count-up on scroll) -->
+            <div class="da-device-stats" id="da-stats-bar">
               <?php
-              $statMeta = ['display'=>'fa-expand','camera'=>'fa-camera','performance'=>'fa-microchip','battery'=>'fa-battery-full'];
-              foreach ($statMeta as $key => $icon):
+              $statMeta = [
+                'display'     => ['icon' => 'fa-expand',      'unit' => '"'],
+                'camera'      => ['icon' => 'fa-camera',      'unit' => ''],
+                'performance' => ['icon' => 'fa-microchip',   'unit' => ''],
+                'battery'     => ['icon' => 'fa-battery-full','unit' => ''],
+              ];
+              $si = 0;
+              foreach ($statMeta as $key => $meta):
                 if (!isset($deviceStats[$key])) continue;
                 $stat = $deviceStats[$key];
               ?>
-                <div class="da-stat-box">
-                  <div class="da-stat-icon"><i class="fa <?php echo $icon; ?>"></i></div>
+                <div class="da-stat-box" style="--stat-delay:<?php echo $si++ * 0.1; ?>s">
+                  <div class="da-stat-icon"><i class="fa <?php echo $meta['icon']; ?>"></i></div>
                   <div class="da-stat-title"><?php echo htmlspecialchars($stat['title']); ?></div>
                   <div class="da-stat-subtitle"><?php echo htmlspecialchars($stat['subtitle']); ?></div>
                 </div>
