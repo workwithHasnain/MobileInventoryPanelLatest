@@ -1246,7 +1246,7 @@ $commentCount = getDeviceCommentCount($pdo, $device_id);
                           <td class="da-specs-field"><?php echo htmlspecialchars($rowData['field']); ?></td>
                           <td class="da-specs-value">
                             <?php if ($category === 'NETWORK' && $rowIndex === 0): ?>
-                              <div class="d-flex justify-content-between align-items-center">
+                              <div class="d-flex justify-content-between align-items-center w-100">
                                 <span><?php echo $rowData['description']; ?></span>
                                 <button class="da-spec-expand" onclick="toggleExpandBtn(this)">EXPAND ▼</button>
                               </div>
@@ -1377,14 +1377,15 @@ $commentCount = getDeviceCommentCount($pdo, $device_id);
                 </div>
                 
                 <div class="da-form-footer">
-                  <button type="submit" class="da-cta-btn">Post Your Opinion</button>
-                  <small>Comments are moderated and will appear after approval.</small>
+                  <div class="d-flex align-items-center flex-wrap gap-3">
+                    <button type="submit" class="da-cta-btn">Post Your Opinion</button>
+                    <small>Comments are moderated and will appear after approval.</small>
+                  </div>
+                  <div style="font-size: 13px; color: var(--text-muted);">
+                    Total reader comments: <b class="text-white"><?php echo $commentCount; ?></b>
+                  </div>
                 </div>
               </form>
-            </div>
-            
-            <div class="da-comment-count-footer mt-4 pb-2">
-              Total reader comments: <b class="text-white"><?php echo $commentCount; ?></b>
             </div>
           </div>
         </div>
