@@ -1150,57 +1150,55 @@ $commentCount = getDeviceCommentCount($pdo, $device_id);
       <main>
         <!-- Device Hero -->
         <div class="da-device-hero">
-          <div class="da-device-hero-inner">
-            <div class="da-device-hero-img" onclick="window.location.href='<?php echo $base; ?>device/<?php echo htmlspecialchars($device_slug); ?>/images'">
-              <?php
-              $heroImage = $device["image"] ?? $device["image_1"] ?? "";
-              if (!empty($heroImage)): ?>
-                <img src="<?php echo htmlspecialchars(getAbsoluteImagePath($heroImage, $base)); ?>" alt="<?php echo htmlspecialchars($page_title); ?>">
-              <?php else: ?>
-                <div class="da-img-fallback"><i class="fa fa-mobile-screen"></i></div>
+          <div class="da-device-img" onclick="window.location.href='<?php echo $base; ?>device/<?php echo htmlspecialchars($device_slug); ?>/images'">
+            <?php
+            $heroImage = $device["image"] ?? $device["image_1"] ?? "";
+            if (!empty($heroImage)): ?>
+              <img src="<?php echo htmlspecialchars(getAbsoluteImagePath($heroImage, $base)); ?>" alt="<?php echo htmlspecialchars($page_title); ?>">
+            <?php else: ?>
+              <div class="da-img-fallback"><i class="fa fa-mobile-screen"></i></div>
+            <?php endif; ?>
+          </div>
+
+          <div class="da-device-info">
+            <div class="da-section-label"><span><?php echo htmlspecialchars($device['brand_name'] ?? 'Device'); ?></span></div>
+            <h1 class="da-device-title"><?php echo htmlspecialchars(($device['brand_name'] ?? '') . ' ' . ($device['name'] ?? 'Device')); ?></h1>
+
+            <div class="da-device-highlights">
+              <?php if (!empty($deviceHighlights)): ?>
+                <?php foreach ($deviceHighlights as $key => $highlight): ?>
+                  <span class="da-highlight-badge"><?php echo htmlspecialchars(strip_tags($highlight)); ?></span>
+                <?php endforeach; ?>
               <?php endif; ?>
             </div>
-            
-            <div class="da-device-hero-content">
-              <div class="da-section-label"><span><?php echo htmlspecialchars($device['brand_name'] ?? 'Device'); ?></span></div>
-              <h1 class="da-device-hero-title"><?php echo htmlspecialchars(($device['brand_name'] ?? '') . ' ' . ($device['name'] ?? 'Device')); ?></h1>
-              
-              <div class="da-device-hero-quick-specs">
-                <?php if (!empty($deviceHighlights)): ?>
-                  <?php foreach ($deviceHighlights as $key => $highlight): ?>
-                    <span class="da-badge"><i class="fa <?php echo $key === 'release' ? 'fa-calendar' : ($key === 'weight_dims' ? 'fa-weight-hanging' : ($key === 'os' ? 'fa-mobile-screen' : 'fa-microchip')); ?>"></i> <?php echo htmlspecialchars(strip_tags($highlight)); ?></span>
-                  <?php endforeach; ?>
-                <?php endif; ?>
-              </div>
 
-              <!-- Stats Bar -->
-              <div class="da-device-stats-bar">
-                <?php
-                $statKeys = ['display' => 'fa-expand', 'camera' => 'fa-camera', 'performance' => 'fa-microchip', 'battery' => 'fa-battery-full'];
-                foreach ($statKeys as $key => $icon):
-                  if (isset($deviceStats[$key])):
-                    $stat = $deviceStats[$key];
-                ?>
-                  <div class="da-device-stat-item">
-                    <i class="fa <?php echo $icon; ?>"></i>
-                    <div class="da-device-stat-info">
-                      <div class="da-device-stat-title"><?php echo htmlspecialchars($stat['title']); ?></div>
-                      <div class="da-device-stat-subtitle"><?php echo htmlspecialchars($stat['subtitle']); ?></div>
-                    </div>
-                  </div>
-                <?php endif; endforeach; ?>
-              </div>
+            <!-- Action Buttons -->
+            <div class="da-device-actions">
+              <?php if ($review_post): ?>
+                <button class="da-cta-btn da-device-action-btn" onclick="window.location.href='<?php echo $base; ?>post/<?php echo urlencode($review_post['slug']); ?>'"><i class="fa fa-star"></i> Review</button>
+              <?php else: ?>
+                <button class="da-cta-btn da-device-action-btn secondary" disabled title="No review available"><i class="fa fa-star"></i> Review</button>
+              <?php endif; ?>
+              <button class="da-cta-btn da-device-action-btn secondary" onclick="window.location.href='<?php echo $base; ?>compare/<?php echo htmlspecialchars($device['slug'] ?? $device_slug); ?>'"><i class="fa fa-scale-balanced"></i> Compare</button>
+              <button class="da-cta-btn da-device-action-btn secondary" onclick="document.getElementById('comments').scrollIntoView({behavior:'smooth',block:'start'})"><i class="fa fa-comments"></i> Opinions</button>
+              <button class="da-cta-btn da-device-action-btn secondary" onclick="window.location.href='<?php echo $base; ?>device/<?php echo htmlspecialchars($device_slug); ?>/images'"><i class="fa fa-images"></i> Pictures</button>
+              <button class="da-cta-btn da-device-action-btn secondary" onclick="showRelatedPhonesModal()"><i class="fa fa-mobile-screen-button"></i> Related</button>
+            </div>
 
-              <div class="da-device-actions">
-                <?php if ($review_post): ?>
-                  <button class="da-btn da-btn-primary" onclick="window.location.href='<?php echo $base; ?>post/<?php echo urlencode($review_post['slug']); ?>'">Review</button>
-                <?php else: ?>
-                  <button class="da-btn da-btn-outline" disabled title="No review available">Review</button>
-                <?php endif; ?>
-                <button class="da-btn da-btn-outline" onclick="window.location.href='<?php echo $base; ?>compare/<?php echo htmlspecialchars($device['slug']); ?>'">Compare</button>
-                <button class="da-btn da-btn-outline" onclick="document.getElementById('comments').scrollIntoView({behavior:'smooth', block:'start'});">Opinions</button>
-                <button class="da-btn da-btn-outline" onclick="window.location.href='<?php echo $base; ?>device/<?php echo htmlspecialchars($device_slug); ?>/images'">Pictures</button>
-              </div>
+            <!-- Stats Bar -->
+            <div class="da-device-stats">
+              <?php
+              $statMeta = ['display'=>'fa-expand','camera'=>'fa-camera','performance'=>'fa-microchip','battery'=>'fa-battery-full'];
+              foreach ($statMeta as $key => $icon):
+                if (!isset($deviceStats[$key])) continue;
+                $stat = $deviceStats[$key];
+              ?>
+                <div class="da-stat-box">
+                  <div class="da-stat-icon"><i class="fa <?php echo $icon; ?>"></i></div>
+                  <div class="da-stat-title"><?php echo htmlspecialchars($stat['title']); ?></div>
+                  <div class="da-stat-subtitle"><?php echo htmlspecialchars($stat['subtitle']); ?></div>
+                </div>
+              <?php endforeach; ?>
             </div>
           </div>
         </div>
@@ -1208,35 +1206,30 @@ $commentCount = getDeviceCommentCount($pdo, $device_id);
         <!-- Specs Table -->
         <div class="da-widget mt-4">
           <div class="da-widget-header">
-            <h3>Specifications</h3>
+            <h3>Full Specifications</h3>
             <div class="da-widget-icon"><i class="fa fa-list"></i></div>
           </div>
-          <div class="da-widget-body" style="padding: 0;">
+          <div class="da-widget-body" style="padding:0">
             <table class="da-specs-table">
               <tbody>
                 <?php if (!empty($deviceSpecs)): ?>
                   <?php foreach ($deviceSpecs as $category => $rows): ?>
                     <?php if (is_array($rows) && !empty($rows)): ?>
-                      <tr class="da-spec-header-mobile">
-                        <th colspan="2">
-                          <?php echo htmlspecialchars($category); ?>
-                          <?php if ($category === 'NETWORK'): ?>
-                            <button class="da-spec-expand" onclick="toggleExpandBtn(this)">EXPAND ▼</button>
-                          <?php endif; ?>
-                        </th>
-                      </tr>
                       <?php foreach ($rows as $rowIndex => $rowData): ?>
-                        <tr <?php echo ($category === 'NETWORK' && $rowIndex > 0) ? 'class="network-row" style="display:none;"' : ''; ?>>
+                        <tr class="da-specs-row" <?php echo ($category === 'NETWORK' && $rowIndex > 0) ? 'class="network-row" style="display:none;"' : ''; ?>>
                           <?php if ($rowIndex === 0): ?>
-                            <th class="da-spec-category" rowspan="<?php echo ($category === 'NETWORK') ? '1' : count($rows); ?>">
+                            <th class="da-specs-category" rowspan="<?php echo ($category === 'NETWORK') ? '1' : count($rows); ?>">
                               <?php echo htmlspecialchars($category); ?>
+                              <?php if ($category === 'NETWORK'): ?>
+                                <br><button class="da-spec-expand d-none d-lg-inline" onclick="toggleExpandBtn(this)">EXPAND ▼</button>
+                              <?php endif; ?>
                             </th>
                           <?php endif; ?>
-                          <td class="da-spec-title"><?php echo htmlspecialchars($rowData['field']); ?></td>
-                          <td class="da-spec-value">
-                            <?php echo $rowData['description']; // Keep HTML here because of expand-dots ?>
+                          <td class="da-specs-field"><?php echo htmlspecialchars($rowData['field']); ?></td>
+                          <td class="da-specs-value">
+                            <?php echo $rowData['description']; ?>
                             <?php if ($category === 'NETWORK' && $rowIndex === 0): ?>
-                              <button class="da-spec-expand" onclick="toggleExpandBtn(this)">EXPAND ▼</button>
+                              <button class="da-spec-expand d-lg-none" onclick="toggleExpandBtn(this)">EXPAND ▼</button>
                             <?php endif; ?>
                           </td>
                         </tr>
@@ -1244,22 +1237,22 @@ $commentCount = getDeviceCommentCount($pdo, $device_id);
                     <?php endif; ?>
                   <?php endforeach; ?>
                 <?php else: ?>
-                  <tr>
-                    <th class="da-spec-category">DEVICE</th>
-                    <td class="da-spec-title">Name</td>
-                    <td class="da-spec-value"><?php echo htmlspecialchars($device['name'] ?? 'Unknown Device'); ?></td>
+                  <tr class="da-specs-row">
+                    <th class="da-specs-category">DEVICE</th>
+                    <td class="da-specs-field">Name</td>
+                    <td class="da-specs-value"><?php echo htmlspecialchars($device['name'] ?? 'Unknown Device'); ?></td>
                   </tr>
                   <?php if (isset($device['brand_name'])): ?>
-                    <tr>
-                      <th class="da-spec-category"></th>
-                      <td class="da-spec-title">Brand</td>
-                      <td class="da-spec-value"><?php echo htmlspecialchars($device['brand_name']); ?></td>
+                    <tr class="da-specs-row">
+                      <th class="da-specs-category"></th>
+                      <td class="da-specs-field">Brand</td>
+                      <td class="da-specs-value"><?php echo htmlspecialchars($device['brand_name']); ?></td>
                     </tr>
                   <?php endif; ?>
                 <?php endif; ?>
               </tbody>
             </table>
-            <div class="da-disclaimer">Disclaimer: We can not guarantee that the information on this page is 100% correct.</div>
+            <div class="da-specs-disclaimer"><i class="fa fa-circle-info"></i> Disclaimer: We can not guarantee that the information on this page is 100% correct.</div>
           </div>
         </div>
 
@@ -1275,39 +1268,31 @@ $commentCount = getDeviceCommentCount($pdo, $device_id);
               <?php if (!empty($comments)): ?>
                 <?php foreach ($comments as $comment): ?>
                   <div class="da-comment-thread" id="comment-<?php echo $comment['id']; ?>">
-                    <div class="da-comment-item">
-                      <div class="da-comment-avatar">
-                        <?php echo getAvatarDisplay($comment['name'], $comment['email']); ?>
+                    <div class="da-comment-avatar">
+                      <?php echo getAvatarDisplay($comment['name'], $comment['email']); ?>
+                    </div>
+                    <div class="da-comment-content">
+                      <div class="da-comment-header">
+                        <span class="da-comment-name"><?php echo htmlspecialchars($comment['name']); ?></span>
+                        <span class="da-comment-time"><i class="fa fa-clock"></i> <?php echo timeAgo($comment['created_at']); ?></span>
                       </div>
-                      <div class="da-comment-content">
-                        <div class="da-comment-meta">
-                          <span class="da-comment-author"><?php echo htmlspecialchars($comment['name']); ?></span>
-                          <span class="da-comment-time"><i class="fa fa-clock"></i> <?php echo timeAgo($comment['created_at']); ?></span>
-                        </div>
-                        <div class="da-comment-text"><?php echo nl2br(htmlspecialchars($comment['comment'])); ?></div>
-                        <div class="da-comment-actions">
-                          <button class="da-reply-btn reply-btn" data-comment-id="<?php echo $comment['id']; ?>" data-comment-name="<?php echo htmlspecialchars($comment['name']); ?>"><i class="fa fa-reply"></i> Reply</button>
-                        </div>
-                      </div>
+                      <div class="da-comment-text"><?php echo nl2br(htmlspecialchars($comment['comment'])); ?></div>
+                      <button class="da-reply-btn reply-btn" data-comment-id="<?php echo $comment['id']; ?>" data-comment-name="<?php echo htmlspecialchars($comment['name']); ?>"><i class="fa fa-reply"></i> Reply</button>
                     </div>
                     <?php if (!empty($comment['replies'])): ?>
                       <div class="da-comment-replies">
                         <?php foreach ($comment['replies'] as $reply): ?>
-                          <div class="da-comment-item" id="comment-<?php echo $reply['id']; ?>">
-                            <div class="da-comment-avatar">
-                              <?php echo getAvatarDisplay($reply['name'], $reply['email']); ?>
+                          <div class="da-comment-avatar" id="comment-<?php echo $reply['id']; ?>">
+                            <?php echo getAvatarDisplay($reply['name'], $reply['email']); ?>
+                          </div>
+                          <div class="da-comment-content">
+                            <div class="da-comment-header">
+                              <span class="da-comment-name"><?php echo htmlspecialchars($reply['name']); ?></span>
+                              <span class="da-section-label" style="display:inline-flex;padding:2px 8px;"><span>Replied</span></span>
+                              <span class="da-comment-time"><i class="fa fa-clock"></i> <?php echo timeAgo($reply['created_at']); ?></span>
                             </div>
-                            <div class="da-comment-content">
-                              <div class="da-comment-meta">
-                                <span class="da-comment-author"><?php echo htmlspecialchars($reply['name']); ?></span>
-                                <span class="da-badge da-badge-sm">Replied</span>
-                                <span class="da-comment-time"><i class="fa fa-clock"></i> <?php echo timeAgo($reply['created_at']); ?></span>
-                              </div>
-                              <div class="da-comment-text"><?php echo nl2br(htmlspecialchars($reply['comment'])); ?></div>
-                              <div class="da-comment-actions">
-                                <button class="da-reply-btn reply-btn" data-comment-id="<?php echo $comment['id']; ?>" data-comment-name="<?php echo htmlspecialchars($comment['name']); ?>"><i class="fa fa-reply"></i> Reply</button>
-                              </div>
-                            </div>
+                            <div class="da-comment-text"><?php echo nl2br(htmlspecialchars($reply['comment'])); ?></div>
+                            <button class="da-reply-btn reply-btn" data-comment-id="<?php echo $comment['id']; ?>" data-comment-name="<?php echo htmlspecialchars($comment['name']); ?>"><i class="fa fa-reply"></i> Reply</button>
                           </div>
                         <?php endforeach; ?>
                       </div>
