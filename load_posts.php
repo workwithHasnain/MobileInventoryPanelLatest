@@ -33,64 +33,45 @@ $isSearching = ($q !== '');
 $isTagFiltering = ($tag !== '');
 
 try {
+    $where = ["p.status ILIKE 'published'"];
+    $params = [];
+
     if ($isTagFiltering) {
-        $sql = "
-            SELECT p.*, 
-            (SELECT COUNT(*) FROM post_comments pc WHERE pc.post_id = p.id AND pc.status = 'approved') as comment_count
-            FROM posts p 
-            WHERE p.status ILIKE 'published'
-              AND EXISTS (
-                  SELECT 1 FROM unnest(COALESCE(p.tags, ARRAY[]::varchar[])) t
-                  WHERE t ILIKE ?
-              )
-            ORDER BY p.created_at DESC
-            LIMIT ? OFFSET ?
-        ";
-        $stmt = $pdo->prepare($sql);
-        $stmt->execute([$tag, $limit, $offset]);
+        $where[] = "EXISTS (SELECT 1 FROM unnest(COALESCE(p.tags, ARRAY[]::varchar[])) t WHERE t ILIKE ?)";
+        $params[] = $tag;
     } elseif ($isSearching) {
         $term = '%' . $q . '%';
-        $sql = "
-            SELECT p.*, 
-            (SELECT COUNT(*) FROM post_comments pc WHERE pc.post_id = p.id AND pc.status = 'approved') as comment_count
-            FROM posts p 
-            WHERE p.status ILIKE 'published'
-              AND (
-                  p.title ILIKE ?
-                  OR EXISTS (
-                      SELECT 1 FROM unnest(COALESCE(p.tags, ARRAY[]::varchar[])) t
-                      WHERE t ILIKE ?
-                  )
-              )
-            ORDER BY p.created_at DESC
-            LIMIT ? OFFSET ?
-        ";
-        $stmt = $pdo->prepare($sql);
-        $stmt->execute([$term, $term, $limit, $offset]);
-    } elseif ($type === 'featured') {
-        $sql = "
-            SELECT p.*, 
-            (SELECT COUNT(*) FROM post_comments pc WHERE pc.post_id = p.id AND pc.status = 'approved') as comment_count
-            FROM posts p 
-            WHERE p.status ILIKE 'published'
-            AND p.is_featured = TRUE 
-            ORDER BY p.created_at DESC
-            LIMIT ? OFFSET ?
-        ";
-        $stmt = $pdo->prepare($sql);
-        $stmt->execute([$limit, $offset]);
-    } else {
-        $sql = "
-            SELECT p.*, 
-            (SELECT COUNT(*) FROM post_comments pc WHERE pc.post_id = p.id AND pc.status = 'approved') as comment_count
-            FROM posts p 
-            WHERE p.status ILIKE 'published'
-            ORDER BY p.created_at DESC
-            LIMIT ? OFFSET ?
-        ";
-        $stmt = $pdo->prepare($sql);
-        $stmt->execute([$limit, $offset]);
+        $where[] = "(p.title ILIKE ? OR EXISTS (SELECT 1 FROM unnest(COALESCE(p.tags, ARRAY[]::varchar[])) t WHERE t ILIKE ?))";
+        $params[] = $term;
+        $params[] = $term;
     }
+
+    if ($type === 'featured') {
+        $where[] = "p.is_featured = TRUE";
+    } elseif ($type === 'news') {
+        $where[] = "p.is_news = TRUE";
+    }
+
+    $join = "";
+    if ($type === 'reviews') {
+        $join = "INNER JOIN reviews r ON p.id = r.post_id";
+    }
+
+    $sql = "
+        SELECT p.*, 
+        (SELECT COUNT(*) FROM post_comments pc WHERE pc.post_id = p.id AND pc.status = 'approved') as comment_count
+        FROM posts p 
+        $join
+        WHERE " . implode(' AND ', $where) . "
+        ORDER BY p.created_at DESC
+        LIMIT ? OFFSET ?
+    ";
+
+    $params[] = $limit;
+    $params[] = $offset;
+
+    $stmt = $pdo->prepare($sql);
+    $stmt->execute($params);
 
     $posts = $stmt->fetchAll();
 

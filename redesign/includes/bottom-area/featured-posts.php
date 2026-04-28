@@ -1,10 +1,15 @@
+<?php
+$tickerLabel = $tickerLabel ?? 'Stories';
+$tickerTitle = $tickerTitle ?? 'All Featured Posts';
+$tickerLink = $tickerLink ?? 'featured';
+?>
 <section class="da-ticker-section" aria-label="All Posts">
       <div class="da-ticker-header">
         <div>
-          <div class="da-section-label"><span>Stories</span></div>
-          <h2 class="da-section-title">All Featured Posts</h2>
+          <div class="da-section-label"><span><?php echo htmlspecialchars($tickerLabel); ?></span></div>
+          <h2 class="da-section-title"><?php echo htmlspecialchars($tickerTitle); ?></h2>
         </div>
-        <a href="<?php echo $base; ?>featured" class="da-view-all">See All <i class="fa fa-arrow-right"></i></a>
+        <a href="<?php echo $base; ?><?php echo htmlspecialchars($tickerLink); ?>" class="da-view-all">See All <i class="fa fa-arrow-right"></i></a>
       </div>
       <div class="da-slider-wrap">
         <button class="da-slider-btn prev" aria-label="Previous"><i class="fa fa-chevron-left"></i></button>
