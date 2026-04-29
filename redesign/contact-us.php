@@ -387,15 +387,6 @@ $brands = $brands_stmt->fetchAll();
         <!-- Latest Devices -->
         <?php include('includes/sidebar/latest-devices.php'); ?>
 
-        <!-- Popular Comparisons -->
-        <?php include('includes/sidebar/popular-comparisons.php'); ?>
-
-        <!-- Top 10 Daily Interest -->
-        <?php include('includes/sidebar/top-daily-interests.php'); ?>
-
-        <!-- Top 10 by Fans -->
-        <?php include('includes/sidebar/top-by-fans.php'); ?>
-
       </aside>
     </div>
     <!-- BOTTOM AREA -->
