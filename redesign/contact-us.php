@@ -63,13 +63,13 @@ $brands = $brands_stmt->fetchAll();
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1.0" />
-  <link rel="canonical" href="<?php echo $canonicalBase; ?>/about-us" />
-  <title>DevicesArena — About Us</title>
+  <link rel="canonical" href="<?php echo $canonicalBase; ?>/contact-us" />
+  <title>Contact Us — DevicesArena</title>
   <meta name="description"
-    content="About Us, top device reviews, and expert insights about mobile technology on DevicesArena." />
-  <meta property="og:title" content="DevicesArena — About Us" />
+    content="Contact DevicesArena for inquiries about device reviews, specifications, comparisons, and other technology-related questions." />
+  <meta property="og:title" content="Contact Us — DevicesArena" />
   <meta property="og:description"
-    content="About Us, top device reviews, and expert insights about mobile technology." />
+    content="Contact DevicesArena for inquiries about device reviews, specifications, comparisons, and other technology-related questions." />
   <meta property="og:image" content="<?php echo $base; ?>imges/icon-256.png" />
   <meta property="og:type" content="website" />
   <meta name="twitter:card" content="summary" />
@@ -780,7 +780,7 @@ $brands = $brands_stmt->fetchAll();
       }
     })();
     // ── Contact Form Handler ──
-    document.addEventListener('DOMContentLoaded', function() {
+    (function() {
         const contactForm = document.getElementById('contact_form');
         const contactMsg = document.getElementById('contact_message_container');
         const charCount = document.getElementById('char_count');
@@ -899,7 +899,7 @@ $brands = $brands_stmt->fetchAll();
                     });
             });
         }
-    });
+    })();
   </script>
   <script src="<?php echo $base; ?>redesign/sliders.js"></script>
 </body>

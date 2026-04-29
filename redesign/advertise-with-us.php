@@ -741,7 +741,7 @@ $brands = $brands_stmt->fetchAll();
     })();
 
     // ── Contact Form Handler ──
-    document.addEventListener('DOMContentLoaded', function() {
+    (function() {
         const contactForm = document.getElementById('contact_form');
         const contactMsg = document.getElementById('contact_message_container');
         const charCount = document.getElementById('char_count');
@@ -865,7 +865,7 @@ $brands = $brands_stmt->fetchAll();
                     });
             });
         }
-    });
+    })();
   </script>
   <script src="<?php echo $base; ?>redesign/sliders.js"></script>
 </body>
