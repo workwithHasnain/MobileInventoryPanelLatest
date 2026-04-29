@@ -266,15 +266,14 @@ $brands = $brands_stmt->fetchAll();
 
       <!-- Background Image Implementation based on original layout -->
       <div class="cp-hero-bg-container">
-        <img class="cp-hero-bg-img" src="<?php echo $base; ?>hero-images/about-hero.png" alt="about us page background">
+        <img class="cp-hero-bg-img" src="<?php echo $base; ?>hero-images/contact-hero.png" alt="contact us page background">
       </div>
 
       <div class="cp-hero-inner">
         <div class="cp-hero-left">
           <div class="cp-hero-label"><span>DevicesArena</span></div>
-          <h1 class="cp-hero-title">About Us</h1>
-          <p class="cp-hero-sub">Learn about DevicesArena, your ultimate source for smartphone specifications,
-            comparisons, tech news, and industry insights.</p>
+          <h1 class="cp-hero-title">Contact Us</h1>
+          <p class="cp-hero-sub">Get in touch with DevicesArena for any inquiries, suggestions, or feedback about smartphones and mobile technology.</p>
         </div>
 
         <!-- Right: Brand panel (Classic Widget) -->
@@ -873,7 +872,7 @@ $brands = $brands_stmt->fetchAll();
                 btn.disabled = true;
                 btn.innerHTML = '<i class="fas fa-spinner fa-spin me-2"></i>Sending...';
 
-                fetch(baseURL + 'handle_contact.php', {
+                fetch('<?php echo $base; ?>handle_contact.php', {
                         method: 'POST',
                         headers: {
                             'Content-Type': 'application/x-www-form-urlencoded'

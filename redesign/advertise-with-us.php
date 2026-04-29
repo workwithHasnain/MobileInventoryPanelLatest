@@ -838,7 +838,7 @@ $brands = $brands_stmt->fetchAll();
                 btn.disabled = true;
                 btn.innerHTML = '<i class="fas fa-spinner fa-spin me-2"></i>Sending...';
 
-                fetch(baseURL + 'handle_contact.php', {
+                fetch('<?php echo $base; ?>handle_contact.php', {
                         method: 'POST',
                         headers: {
                             'Content-Type': 'application/x-www-form-urlencoded'
