@@ -63,13 +63,13 @@ $brands = $brands_stmt->fetchAll();
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1.0" />
-  <link rel="canonical" href="<?php echo $canonicalBase; ?>/featured" />
-  <title>DevicesArena — Featured Content</title>
+  <link rel="canonical" href="<?php echo $canonicalBase; ?>/advertise-with-us" />
+  <title>Advertise With Us — DevicesArena</title>
   <meta name="description"
-    content="Curated featured articles, top device reviews, and expert insights about mobile technology on DevicesArena." />
-  <meta property="og:title" content="DevicesArena — Featured Content" />
+    content="Advertise with DevicesArena to reach a tech-savvy audience interested in smartphones, tablets, and mobile technology." />
+  <meta property="og:title" content="Advertise With Us — DevicesArena" />
   <meta property="og:description"
-    content="Curated featured articles, top device reviews, and expert insights about mobile technology." />
+    content="Advertise with DevicesArena to reach a tech-savvy audience interested in smartphones, tablets, and mobile technology." />
   <meta property="og:image" content="<?php echo $base; ?>imges/icon-256.png" />
   <meta property="og:type" content="website" />
   <meta name="twitter:card" content="summary" />
@@ -96,6 +96,99 @@ $brands = $brands_stmt->fetchAll();
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/css/bootstrap.min.css" rel="stylesheet">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" />
   <link rel="stylesheet" href="<?php echo $base; ?>redesign/style.css">
+
+  <!-- Schema.org Structured Data for Advertise Page -->
+  <?php
+  // Build breadcrumb schema for the advertise page
+  $breadcrumbItems = [
+      [
+          "@type" => "ListItem",
+          "position" => 1,
+          "name" => "Home",
+          "item" => "https://www.devicesarena.com/"
+      ],
+      [
+          "@type" => "ListItem",
+          "position" => 2,
+          "name" => "Advertise With Us",
+          "item" => "https://www.devicesarena.com/advertise-with-us"
+      ]
+  ];
+  ?>
+
+  <!-- Breadcrumb Schema -->
+  <script type="application/ld+json">
+      {
+          "@context": "https://schema.org",
+          "@type": "BreadcrumbList",
+          "itemListElement": <?php echo json_encode($breadcrumbItems, JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE); ?>
+      }
+  </script>
+
+  <!-- AdvertisePage Schema -->
+  <script type="application/ld+json">
+      {
+          "@context": "https://schema.org",
+          "@type": "WebPage",
+          "name": "Advertise With Us - DevicesArena",
+          "headline": "Advertise With DevicesArena",
+          "description": "Advertise with DevicesArena to reach a tech-savvy audience interested in smartphones, tablets, and mobile technology.",
+          "url": "https://www.devicesarena.com/advertise-with-us",
+          "image": "https://www.devicesarena.com/imges/icon-256.png",
+          "datePublished": "<?php echo date('Y-m-d'); ?>",
+          "publisher": {
+              "@type": "Organization",
+              "name": "DevicesArena",
+              "logo": {
+                  "@type": "ImageObject",
+                  "url": "https://www.devicesarena.com/imges/icon-256.png"
+              }
+          },
+          "breadcrumb": {
+              "@type": "BreadcrumbList",
+              "itemListElement": <?php echo json_encode($breadcrumbItems, JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE); ?>
+          }
+      }
+  </script>
+
+  <!-- FAQ Schema for Advertise Page -->
+  <script type="application/ld+json">
+      {
+          "@context": "https://schema.org",
+          "@type": "FAQPage",
+          "name": "DevicesArena Advertising FAQs",
+          "url": "https://www.devicesarena.com/advertise-with-us",
+          "breadcrumb": {
+              "@type": "BreadcrumbList",
+              "itemListElement": <?php echo json_encode($breadcrumbItems, JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE); ?>
+          },
+          "mainEntity": [{
+                  "@type": "Question",
+                  "name": "What advertising options does DevicesArena offer?",
+                  "acceptedAnswer": {
+                      "@type": "Answer",
+                      "text": "We offer banner ads, sponsored content, product placements, and newsletter sponsorships. Contact us through our advertising inquiry form for a customized proposal."
+                  }
+              },
+              {
+                  "@type": "Question",
+                  "name": "What is DevicesArena's audience?",
+                  "acceptedAnswer": {
+                      "@type": "Answer",
+                      "text": "Our audience primarily consists of tech enthusiasts, smartphone buyers, and gadget reviewers who visit DevicesArena for detailed device specifications, comparisons, and reviews."
+                  }
+              },
+              {
+                  "@type": "Question",
+                  "name": "How do I get started with advertising?",
+                  "acceptedAnswer": {
+                      "@type": "Answer",
+                      "text": "Simply fill out the advertising inquiry form on this page with your company details and requirements. Our team will review your inquiry and get back to you within 24-48 business hours with a tailored proposal."
+                  }
+              }
+          ]
+      }
+  </script>
 
   <!-- Theme Initialization Script (Prevents FOUC) -->
   <script>
@@ -133,16 +226,14 @@ $brands = $brands_stmt->fetchAll();
 
       <!-- Background Image Implementation based on original layout -->
       <div class="cp-hero-bg-container">
-        <img class="cp-hero-bg-img" src="<?php echo $base; ?>hero-images/featured-hero.png"
-          alt="featured smartphones background">
+        <img class="cp-hero-bg-img" src="<?php echo $base; ?>hero-images/advertise-hero.png" alt="advertise with us page background">
       </div>
 
       <div class="cp-hero-inner">
         <div class="cp-hero-left">
           <div class="cp-hero-label"><span>DevicesArena</span></div>
-          <h1 class="cp-hero-title">Featured Content</h1>
-          <p class="cp-hero-sub">Curated featured articles, top device reviews, and expert insights about mobile
-            technology.</p>
+          <h1 class="cp-hero-title">Advertise With Us</h1>
+          <p class="cp-hero-sub">Partner with DevicesArena to reach a highly engaged, tech-savvy audience interested in smartphones, tablets, and mobile technology.</p>
         </div>
 
         <!-- Right: Brand panel (Classic Widget) -->
@@ -155,7 +246,6 @@ $brands = $brands_stmt->fetchAll();
                 <i class="fa fa-mobile-screen"></i> PHONE FINDER
               </a>
             </div>
-
             <!-- Brand Grid -->
             <div class="da-cbw-grid">
               <?php foreach (array_slice($brands, 0, 32) as $index => $brand):
@@ -179,7 +269,6 @@ $brands = $brands_stmt->fetchAll();
             </div>
           </div>
         </div>
-
       </div>
     </div>
 
@@ -191,47 +280,65 @@ $brands = $brands_stmt->fetchAll();
       <main>
         <div class="da-post-feed-header">
           <div>
-            <div class="da-section-label"><span>Latest</span></div>
-            <h2 class="da-section-title">Featured Stories</h2>
+            <div class="da-section-label"><span>Advertise With Us</span></div>
+            <h2 class="da-section-title">Grow Your Brand</h2>
           </div>
-          <a href="<?php echo $base; ?>featured" class="da-view-all">View All <i class="fa fa-arrow-right"></i></a>
         </div>
 
-        <?php
-        $feedPosts = array_slice($posts, 4);
-        if (empty($feedPosts)):
-          ?>
-          <div class="da-empty"><i class="fa fa-newspaper"></i>More stories coming soon!</div>
-        <?php else: ?>
-          <div class="da-post-grid" id="da-post-grid">
-            <?php
-            $isFirst = true;
-            foreach ($feedPosts as $post):
-              $cls = $isFirst ? 'da-post-card featured' : 'da-post-card';
-              $isFirst = false;
-              ?>
-              <a href="<?php echo $base; ?>post/<?php echo urlencode($post['slug']); ?>" class="<?php echo $cls; ?>">
-                <div class="da-post-card-img">
-                  <?php if (!empty($post['featured_image'])): ?>
-                    <img src="<?php echo htmlspecialchars(getAbsoluteImagePath($post['featured_image'], $base)); ?>"
-                      alt="<?php echo htmlspecialchars($post['title']); ?>" loading="lazy" />
-                  <?php else: ?>
-                    <div class="da-img-fallback-icon"><i class="fa fa-newspaper" style="font-size:32px;"></i></div>
-                  <?php endif; ?>
-                  <span class="da-post-card-tag">Featured</span>
-                </div>
-                <div class="da-post-card-body">
-                  <div class="da-post-card-title"><?php echo htmlspecialchars($post['title']); ?></div>
-                  <div class="da-post-card-meta">
-                    <span><i
-                        class="fa fa-calendar-alt"></i><?php echo date('M j, Y', strtotime($post['created_at'])); ?></span>
-                    <span><i class="fa fa-comment"></i><?php echo $post['comment_count']; ?></span>
-                  </div>
-                </div>
-              </a>
-            <?php endforeach; ?>
-          </div>
-        <?php endif; ?>
+        <div class="da-about-content">
+          <h4 class="da-about-heading mt-0">Advertise With DevicesArena</h4>
+          <p class="da-about-text">DevicesArena is a leading destination for smartphone specifications, comparisons, and reviews. Partner with us to reach a highly engaged, tech-savvy audience.</p>
+
+          <h4 class="da-about-heading mt-4">What we offer:</h4>
+          <ul class="da-about-list">
+            <li>Banner advertisements across our high-traffic pages.</li>
+            <li>Sponsored content and product review placements.</li>
+            <li>Newsletter sponsorship to our subscriber base.</li>
+            <li>Custom partnership and collaboration opportunities.</li>
+          </ul>
+
+          <h4 class="da-about-heading mt-4">Why advertise with us?</h4>
+          <ul class="da-about-list">
+            <li>Targeted audience of tech enthusiasts and smartphone buyers.</li>
+            <li>High-quality, detailed content that keeps users engaged.</li>
+            <li>Competitive pricing with flexible packages.</li>
+            <li>Transparent reporting and performance metrics.</li>
+          </ul>
+        </div>
+
+        <div class="da-about-content mt-4">
+          <h4 class="da-about-heading mt-0 mb-4">Send us your advertising inquiry</h4>
+          
+          <div id="contact_message_container"></div>
+          
+          <form id="contact_form" class="da-form" novalidate>
+            <input type="hidden" name="query_type" value="ad">
+            
+            <div class="da-form-row">
+              <div class="da-form-group">
+                <input type="text" class="da-input" id="contact_name" name="contact_name" placeholder="Your Name / Company *" maxlength="100" required>
+                <div class="da-error-msg" id="name_error"></div>
+              </div>
+              <div class="da-form-group">
+                <input type="email" class="da-input" id="contact_email" name="contact_email" placeholder="Your Business Email *" maxlength="255" required>
+                <div class="da-error-msg" id="email_error"></div>
+              </div>
+            </div>
+            
+            <div class="da-form-group">
+              <textarea class="da-input" id="contact_query" name="contact_query" rows="5" placeholder="Tell us about your advertising needs, budget, and any specific requirements (no links allowed)..." maxlength="5000" required></textarea>
+              <div class="da-error-msg" id="query_error"></div>
+              <div class="text-end mt-1"><small class="text-muted"><span id="char_count">0</span>/5000 characters</small></div>
+            </div>
+            
+            <div class="da-form-footer">
+              <div class="d-flex align-items-center flex-wrap gap-3 w-100 justify-content-between">
+                <button type="submit" id="contact_submit_btn" class="da-cta-btn">Submit Inquiry</button>
+                <small class="text-muted">We typically respond within 24-48 hours.</small>
+              </div>
+            </div>
+          </form>
+        </div>
       </main>
 
       <!-- Sidebar -->
@@ -632,6 +739,133 @@ $brands = $brands_stmt->fetchAll();
           });
       }
     })();
+
+    // ── Contact Form Handler ──
+    document.addEventListener('DOMContentLoaded', function() {
+        const contactForm = document.getElementById('contact_form');
+        const contactMsg = document.getElementById('contact_message_container');
+        const charCount = document.getElementById('char_count');
+        const queryField = document.getElementById('contact_query');
+
+        if (queryField && charCount) {
+            queryField.addEventListener('input', function() {
+                charCount.textContent = this.value.length;
+            });
+        }
+
+        function containsLinks(text) {
+            const patterns = [
+                /https?:\/\/[^\s]+/i,
+                /www\.[^\s]+/i,
+                /[a-zA-Z0-9.-]+\.(com|net|org|info|biz|xyz|ru|cn|tk|ml|ga|cf|gq|top|work|click|link|site|online|store|shop|buzz|pw|cc|io|co|me)\b/i,
+                /\[url[=\]].*?\[\/url\]/i,
+                /<a\s[^>]*href[^>]*>/i,
+                /href\s*=\s*["'][^"']*["']/i,
+            ];
+            for (const p of patterns) {
+                if (p.test(text)) return true;
+            }
+            return false;
+        }
+
+        function clearErrors() {
+            document.querySelectorAll('#contact_form .da-input').forEach(el => el.classList.remove('is-invalid'));
+            document.querySelectorAll('#contact_form .da-error-msg').forEach(el => el.classList.remove('show-error'));
+        }
+
+        function setError(fieldId, errorId, msg) {
+            document.getElementById(fieldId).classList.add('is-invalid');
+            document.getElementById(errorId).textContent = msg;
+            document.getElementById(errorId).classList.add('show-error');
+        }
+
+        function showContactMessage(message, type) {
+            const alertClass = type === 'success' ? 'alert-success' : 'alert-danger';
+            contactMsg.innerHTML = '<div class="alert ' + alertClass + ' alert-dismissible fade show">' + message + '<button type="button" class="btn-close" data-bs-dismiss="alert"></button></div>';
+            if (type === 'success') {
+                setTimeout(() => {
+                    contactMsg.innerHTML = '';
+                }, 8000);
+            }
+        }
+
+        if (contactForm) {
+            contactForm.addEventListener('submit', function(e) {
+                e.preventDefault();
+                clearErrors();
+
+                const name = document.getElementById('contact_name').value.trim();
+                const email = document.getElementById('contact_email').value.trim();
+                const query = queryField.value.trim();
+                
+                // Get the hidden query_type value
+                const queryTypeInput = document.querySelector('input[name="query_type"]');
+                const queryType = queryTypeInput ? queryTypeInput.value : 'ad';
+                
+                let hasError = false;
+
+                if (!name) {
+                    setError('contact_name', 'name_error', 'Please enter your name/company.');
+                    hasError = true;
+                } else if (containsLinks(name)) {
+                    setError('contact_name', 'name_error', 'Links are not allowed in the name field.');
+                    hasError = true;
+                }
+
+                if (!email) {
+                    setError('contact_email', 'email_error', 'Please enter your email.');
+                    hasError = true;
+                } else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+                    setError('contact_email', 'email_error', 'Please enter a valid email address.');
+                    hasError = true;
+                }
+
+                if (!query) {
+                    setError('contact_query', 'query_error', 'Please tell us about your advertising needs.');
+                    hasError = true;
+                } else if (query.length < 10) {
+                    setError('contact_query', 'query_error', 'Your message is too short (minimum 10 characters).');
+                    hasError = true;
+                } else if (containsLinks(query)) {
+                    setError('contact_query', 'query_error', 'Links/URLs are not allowed in the message. Please remove any links and try again.');
+                    hasError = true;
+                }
+
+                if (hasError) return;
+
+                const btn = document.getElementById('contact_submit_btn');
+                const originalHTML = btn.innerHTML;
+                btn.disabled = true;
+                btn.innerHTML = '<i class="fas fa-spinner fa-spin me-2"></i>Sending...';
+
+                fetch(baseURL + 'handle_contact.php', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/x-www-form-urlencoded'
+                        },
+                        body: 'contact_name=' + encodeURIComponent(name) +
+                            '&contact_email=' + encodeURIComponent(email) +
+                            '&contact_query=' + encodeURIComponent(query) +
+                            '&query_type=' + encodeURIComponent(queryType)
+                    })
+                    .then(r => r.json())
+                    .then(data => {
+                        showContactMessage(data.message, data.success ? 'success' : 'error');
+                        if (data.success) {
+                            contactForm.reset();
+                            if(charCount) charCount.textContent = '0';
+                        }
+                        btn.disabled = false;
+                        btn.innerHTML = originalHTML;
+                    })
+                    .catch(() => {
+                        showContactMessage('An error occurred. Please try again later.', 'error');
+                        btn.disabled = false;
+                        btn.innerHTML = originalHTML;
+                    });
+            });
+        }
+    });
   </script>
   <script src="<?php echo $base; ?>redesign/sliders.js"></script>
 </body>

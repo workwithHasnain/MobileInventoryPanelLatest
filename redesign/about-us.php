@@ -63,13 +63,13 @@ $brands = $brands_stmt->fetchAll();
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1.0" />
-  <link rel="canonical" href="<?php echo $canonicalBase; ?>/featured" />
-  <title>DevicesArena — Featured Content</title>
+  <link rel="canonical" href="<?php echo $canonicalBase; ?>/about-us" />
+  <title>DevicesArena — About Us</title>
   <meta name="description"
-    content="Curated featured articles, top device reviews, and expert insights about mobile technology on DevicesArena." />
-  <meta property="og:title" content="DevicesArena — Featured Content" />
+    content="About Us, top device reviews, and expert insights about mobile technology on DevicesArena." />
+  <meta property="og:title" content="DevicesArena — About Us" />
   <meta property="og:description"
-    content="Curated featured articles, top device reviews, and expert insights about mobile technology." />
+    content="About Us, top device reviews, and expert insights about mobile technology." />
   <meta property="og:image" content="<?php echo $base; ?>imges/icon-256.png" />
   <meta property="og:type" content="website" />
   <meta name="twitter:card" content="summary" />
@@ -96,6 +96,123 @@ $brands = $brands_stmt->fetchAll();
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/css/bootstrap.min.css" rel="stylesheet">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" />
   <link rel="stylesheet" href="<?php echo $base; ?>redesign/style.css">
+
+  <!-- Schema.org Structured Data for About Us Page -->
+  <?php
+  // Build breadcrumb schema for the about us page
+  $breadcrumbItems = [
+    [
+      "@type" => "ListItem",
+      "position" => 1,
+      "name" => "Home",
+      "item" => "https://www.devicesarena.com/"
+    ],
+    [
+      "@type" => "ListItem",
+      "position" => 2,
+      "name" => "About Us",
+      "item" => "https://www.devicesarena.com/about-us"
+    ]
+  ];
+  ?>
+
+  <!-- Breadcrumb Schema -->
+  <script type="application/ld+json">
+      {
+          "@context": "https://schema.org",
+          "@type": "BreadcrumbList",
+          "itemListElement": <?php echo json_encode($breadcrumbItems, JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE); ?>
+      }
+  </script>
+
+  <!-- Organization Schema with Contact Information -->
+  <script type="application/ld+json">
+      {
+          "@context": "https://schema.org",
+          "@type": "Organization",
+          "name": "DevicesArena",
+          "url": "https://www.devicesarena.com",
+          "logo": "https://www.devicesarena.com/imges/icon-256.png",
+          "description": "Your source for comprehensive device reviews, specifications, comparisons, and tech industry insights.",
+          "breadcrumb": {
+              "@type": "BreadcrumbList",
+              "itemListElement": <?php echo json_encode($breadcrumbItems, JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE); ?>
+          }
+      }
+  </script>
+
+  <!-- AboutPage Schema -->
+  <script type="application/ld+json">
+      {
+          "@context": "https://schema.org",
+          "@type": "AboutPage",
+          "name": "About Us - DevicesArena",
+          "headline": "About DevicesArena",
+          "description": "Learn about DevicesArena - our mission, team, and commitment to providing comprehensive smartphone specifications, reviews, and comparisons.",
+          "url": "https://www.devicesarena.com/about-us",
+          "image": "https://www.devicesarena.com/imges/icon-256.png",
+          "datePublished": "<?php echo date('Y-m-d'); ?>",
+          "publisher": {
+              "@type": "Organization",
+              "name": "DevicesArena",
+              "logo": {
+                  "@type": "ImageObject",
+                  "url": "https://www.devicesarena.com/imges/icon-256.png"
+              }
+          },
+          "breadcrumb": {
+              "@type": "BreadcrumbList",
+              "itemListElement": <?php echo json_encode($breadcrumbItems, JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE); ?>
+          }
+      }
+  </script>
+
+  <!-- FAQ Schema for About Us Page -->
+  <script type="application/ld+json">
+      {
+          "@context": "https://schema.org",
+          "@type": "FAQPage",
+          "name": "DevicesArena About Us FAQs",
+          "url": "https://www.devicesarena.com/about-us",
+          "breadcrumb": {
+              "@type": "BreadcrumbList",
+              "itemListElement": <?php echo json_encode($breadcrumbItems, JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE); ?>
+          },
+          "mainEntity": [{
+                  "@type": "Question",
+                  "name": "What is DevicesArena?",
+                  "acceptedAnswer": {
+                      "@type": "Answer",
+                      "text": "DevicesArena is a comprehensive online platform dedicated to providing detailed smartphone specifications, in-depth reviews, side-by-side comparisons, and the latest tech news to help users make informed purchasing decisions."
+                  }
+              },
+              {
+                  "@type": "Question",
+                  "name": "What kind of content does DevicesArena provide?",
+                  "acceptedAnswer": {
+                      "@type": "Answer",
+                      "text": "We provide detailed device specifications, expert reviews, side-by-side device comparisons, tech news articles, and a phone finder tool to help users discover the perfect smartphone based on their preferences and budget."
+                  }
+              },
+              {
+                  "@type": "Question",
+                  "name": "How does DevicesArena ensure accuracy of device specifications?",
+                  "acceptedAnswer": {
+                      "@type": "Answer",
+                      "text": "Our team carefully verifies all device specifications from official manufacturer sources and trusted industry databases. We regularly update our listings to ensure accuracy and welcome user feedback to correct any discrepancies."
+                  }
+              },
+              {
+                  "@type": "Question",
+                  "name": "How can I contribute to DevicesArena?",
+                  "acceptedAnswer": {
+                      "@type": "Answer",
+                      "text": "You can contribute by leaving reviews and ratings on devices, reporting errors or inaccuracies in specifications, suggesting new features, or reaching out through our contact page for collaboration opportunities."
+                  }
+              }
+          ]
+      }
+  </script>
 
   <!-- Theme Initialization Script (Prevents FOUC) -->
   <script>
@@ -133,16 +250,15 @@ $brands = $brands_stmt->fetchAll();
 
       <!-- Background Image Implementation based on original layout -->
       <div class="cp-hero-bg-container">
-        <img class="cp-hero-bg-img" src="<?php echo $base; ?>hero-images/featured-hero.png"
-          alt="featured smartphones background">
+        <img class="cp-hero-bg-img" src="<?php echo $base; ?>hero-images/about-hero.png" alt="about us page background">
       </div>
 
       <div class="cp-hero-inner">
         <div class="cp-hero-left">
           <div class="cp-hero-label"><span>DevicesArena</span></div>
-          <h1 class="cp-hero-title">Featured Content</h1>
-          <p class="cp-hero-sub">Curated featured articles, top device reviews, and expert insights about mobile
-            technology.</p>
+          <h1 class="cp-hero-title">About Us</h1>
+          <p class="cp-hero-sub">Learn about DevicesArena, your ultimate source for smartphone specifications,
+            comparisons, tech news, and industry insights.</p>
         </div>
 
         <!-- Right: Brand panel (Classic Widget) -->
@@ -182,56 +298,54 @@ $brands = $brands_stmt->fetchAll();
 
       </div>
     </div>
-
-
-
     <!-- ── POST FEED + SIDEBAR ── -->
     <div class="da-content-area">
       <!-- Post Feed -->
       <main>
         <div class="da-post-feed-header">
           <div>
-            <div class="da-section-label"><span>Latest</span></div>
-            <h2 class="da-section-title">Featured Stories</h2>
+            <div class="da-section-label"><span>About Us</span></div>
+            <h2 class="da-section-title">Who We Are</h2>
           </div>
-          <a href="<?php echo $base; ?>featured" class="da-view-all">View All <i class="fa fa-arrow-right"></i></a>
         </div>
 
-        <?php
-        $feedPosts = array_slice($posts, 4);
-        if (empty($feedPosts)):
-          ?>
-          <div class="da-empty"><i class="fa fa-newspaper"></i>More stories coming soon!</div>
-        <?php else: ?>
-          <div class="da-post-grid" id="da-post-grid">
-            <?php
-            $isFirst = true;
-            foreach ($feedPosts as $post):
-              $cls = $isFirst ? 'da-post-card featured' : 'da-post-card';
-              $isFirst = false;
-              ?>
-              <a href="<?php echo $base; ?>post/<?php echo urlencode($post['slug']); ?>" class="<?php echo $cls; ?>">
-                <div class="da-post-card-img">
-                  <?php if (!empty($post['featured_image'])): ?>
-                    <img src="<?php echo htmlspecialchars(getAbsoluteImagePath($post['featured_image'], $base)); ?>"
-                      alt="<?php echo htmlspecialchars($post['title']); ?>" loading="lazy" />
-                  <?php else: ?>
-                    <div class="da-img-fallback-icon"><i class="fa fa-newspaper" style="font-size:32px;"></i></div>
-                  <?php endif; ?>
-                  <span class="da-post-card-tag">Featured</span>
-                </div>
-                <div class="da-post-card-body">
-                  <div class="da-post-card-title"><?php echo htmlspecialchars($post['title']); ?></div>
-                  <div class="da-post-card-meta">
-                    <span><i
-                        class="fa fa-calendar-alt"></i><?php echo date('M j, Y', strtotime($post['created_at'])); ?></span>
-                    <span><i class="fa fa-comment"></i><?php echo $post['comment_count']; ?></span>
-                  </div>
-                </div>
-              </a>
-            <?php endforeach; ?>
-          </div>
-        <?php endif; ?>
+        <div class="da-about-content">
+          <h4 class="da-about-heading">About DevicesArena</h4>
+          <p class="da-about-text">DevicesArena is a comprehensive online platform dedicated to smartphones and mobile
+            technology. We provide detailed device specifications, expert reviews, side-by-side comparisons, and the
+            latest tech news to help you make informed decisions.</p>
+
+          <h4 class="da-about-heading">Our Mission</h4>
+          <p class="da-about-text">Our mission is to empower consumers with accurate, up-to-date information about
+            mobile devices. Whether you're researching your next smartphone purchase, comparing specifications, or
+            staying updated on the latest tech trends, DevicesArena is your trusted companion.</p>
+
+          <h4 class="da-about-heading">What We Offer</h4>
+          <ul class="da-about-list">
+            <li><strong>Detailed Specifications:</strong> Comprehensive specs for thousands of smartphones from all
+              major brands.</li>
+            <li><strong>Device Comparisons:</strong> Side-by-side comparisons to help you choose the right device.</li>
+            <li><strong>Expert Reviews:</strong> In-depth reviews covering design, performance, camera quality, and
+              more.</li>
+            <li><strong>Phone Finder:</strong> Advanced filtering tools to discover devices that match your needs and
+              budget.</li>
+            <li><strong>Tech News:</strong> Stay updated with the latest developments in the mobile industry.</li>
+          </ul>
+
+          <h4 class="da-about-heading">Why Trust DevicesArena?</h4>
+          <ul class="da-about-list">
+            <li>Verified specifications sourced from official manufacturers.</li>
+            <li>Regularly updated database with the latest devices.</li>
+            <li>Unbiased reviews and comparisons.</li>
+            <li>Community-driven feedback and ratings.</li>
+            <li>Dedicated team passionate about mobile technology.</li>
+          </ul>
+
+          <h4 class="da-about-heading">Get In Touch</h4>
+          <p class="da-about-text">Have questions, suggestions, or feedback? We'd love to hear from you. Visit our <a
+              href="<?php echo $base; ?>contact-us" class="da-about-link">Contact Us</a> page to get in touch with our
+            team.</p>
+        </div>
       </main>
 
       <!-- Sidebar -->

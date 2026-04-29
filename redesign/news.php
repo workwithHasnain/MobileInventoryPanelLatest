@@ -6,9 +6,12 @@ require_once __DIR__ . '/../phone_data.php';
 
 function getAbsoluteImagePath($imagePath, $base)
 {
-  if (empty($imagePath)) return '';
-  if (filter_var($imagePath, FILTER_VALIDATE_URL)) return $imagePath;
-  if (strpos($imagePath, '/') === 0) return $imagePath;
+  if (empty($imagePath))
+    return '';
+  if (filter_var($imagePath, FILTER_VALIDATE_URL))
+    return $imagePath;
+  if (strpos($imagePath, '/') === 0)
+    return $imagePath;
   return $base . ltrim($imagePath, '/');
 }
 
@@ -19,7 +22,8 @@ $isPublicUser = !empty($_SESSION['public_user_id']);
 $publicUserName = $_SESSION['public_user_name'] ?? '';
 $publicUserInitial = $isPublicUser ? strtoupper(substr($publicUserName, 0, 1)) : '';
 
-if (!isset($_SESSION['notif_seen'])) $_SESSION['notif_seen'] = false;
+if (!isset($_SESSION['notif_seen']))
+  $_SESSION['notif_seen'] = false;
 $hasUnreadNotifications = $isPublicUser && !$_SESSION['notif_seen'];
 
 // Weekly posts for notifications
@@ -61,16 +65,19 @@ $brands = $brands_stmt->fetchAll();
   <meta name="viewport" content="width=device-width,initial-scale=1.0" />
   <link rel="canonical" href="<?php echo $canonicalBase; ?>/news" />
   <title>DevicesArena — Latest Tech News</title>
-  <meta name="description" content="Stay updated with the latest technology news, device announcements, and industry updates on DevicesArena." />
+  <meta name="description"
+    content="Stay updated with the latest technology news, device announcements, and industry updates on DevicesArena." />
   <meta property="og:title" content="DevicesArena — Latest Tech News" />
-  <meta property="og:description" content="Stay updated with the latest technology news, device announcements, and industry updates." />
+  <meta property="og:description"
+    content="Stay updated with the latest technology news, device announcements, and industry updates." />
   <meta property="og:image" content="<?php echo $base; ?>imges/icon-256.png" />
   <meta property="og:type" content="website" />
   <meta name="twitter:card" content="summary" />
   <link rel="icon" type="image/png" sizes="32x32" href="<?php echo $base; ?>imges/icon-32.png">
   <link rel="shortcut icon" href="<?php echo $base; ?>imges/icon-32.png">
   <meta name="theme-color" content="#0d0f1a">
-  <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-9906394285054446"crossorigin="anonymous"></script>
+  <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-9906394285054446"
+    crossorigin="anonymous"></script>
   <!-- Google Analytics -->
   <script async src="https://www.googletagmanager.com/gtag/js?id=G-2LDCSSMXJT"></script>
   <script>
@@ -83,14 +90,16 @@ $brands = $brands_stmt->fetchAll();
     gtag('config', 'G-2LDCSSMXJT');
   </script>
 
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link
+    href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=Space+Grotesk:wght@400;500;600;700&display=swap"
+    rel="stylesheet">
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/css/bootstrap.min.css" rel="stylesheet">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" />
   <link rel="stylesheet" href="<?php echo $base; ?>redesign/style.css">
 
   <!-- Theme Initialization Script (Prevents FOUC) -->
   <script>
-    (function() {
+    (function () {
       var savedTheme = localStorage.getItem('da-theme');
       if (savedTheme === 'light' || (!savedTheme && window.matchMedia('(prefers-color-scheme: light)').matches)) {
         document.documentElement.setAttribute('data-theme', 'light');
@@ -98,7 +107,8 @@ $brands = $brands_stmt->fetchAll();
     })();
   </script>
 
-  <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-4554952734894265" crossorigin="anonymous"></script>
+  <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-4554952734894265"
+    crossorigin="anonymous"></script>
 </head>
 
 <body>
@@ -120,22 +130,24 @@ $brands = $brands_stmt->fetchAll();
 
     <!-- ── HERO NEWSROOM ── -->
     <div class="cp-hero">
-    
+
       <!-- Background Image Implementation based on original layout -->
       <div class="cp-hero-bg-container">
-          <img class="cp-hero-bg-img" src="<?php echo $base; ?>hero-images/news-hero.png" alt="compare smartphones background">
+        <img class="cp-hero-bg-img" src="<?php echo $base; ?>hero-images/news-hero.png"
+          alt="latest tech news background">
       </div>
 
       <div class="cp-hero-inner">
         <div class="cp-hero-left">
           <div class="cp-hero-label"><span>DevicesArena</span></div>
           <h1 class="cp-hero-title">Latest Tech News</h1>
-          <p class="cp-hero-sub">Stay updated with the latest technology news, device announcements, and industry updates.</p>
+          <p class="cp-hero-sub">Stay updated with the latest technology news, device announcements, and industry
+            updates.</p>
         </div>
-        
+
         <!-- Right: Brand panel (Classic Widget) -->
         <div class="cp-hero-right">
-          <div class="da-section-label" style="text-align: left;"><span>Brands</span></div>
+          <div class="da-section-label"><span>Brands</span></div>
           <div class="da-classic-brand-widget">
             <!-- Top header -->
             <div class="da-cbw-header">
@@ -148,8 +160,9 @@ $brands = $brands_stmt->fetchAll();
             <div class="da-cbw-grid">
               <?php foreach (array_slice($brands, 0, 32) as $index => $brand):
                 $brandSlug = strtolower(preg_replace('/\s+/', '-', trim($brand['name'])));
-              ?>
-                <a href="<?php echo $base; ?>brand/<?php echo urlencode($brandSlug); ?>" class="da-cbw-item" title="<?php echo htmlspecialchars($brand['name']); ?>">
+                ?>
+                <a href="<?php echo $base; ?>brand/<?php echo urlencode($brandSlug); ?>" class="da-cbw-item"
+                  title="<?php echo htmlspecialchars($brand['name']); ?>">
                   <?php echo strtoupper(htmlspecialchars($brand['name'])); ?>
                 </a>
               <?php endforeach; ?>
@@ -183,7 +196,7 @@ $brands = $brands_stmt->fetchAll();
         <?php
         $feedPosts = array_slice($posts, 4);
         if (empty($feedPosts)):
-        ?>
+          ?>
           <div class="da-empty"><i class="fa fa-newspaper"></i>More stories coming soon!</div>
         <?php else: ?>
           <div class="da-post-grid" id="da-post-grid">
@@ -192,11 +205,12 @@ $brands = $brands_stmt->fetchAll();
             foreach ($feedPosts as $post):
               $cls = $isFirst ? 'da-post-card featured' : 'da-post-card';
               $isFirst = false;
-            ?>
+              ?>
               <a href="<?php echo $base; ?>post/<?php echo urlencode($post['slug']); ?>" class="<?php echo $cls; ?>">
                 <div class="da-post-card-img">
                   <?php if (!empty($post['featured_image'])): ?>
-                    <img src="<?php echo htmlspecialchars(getAbsoluteImagePath($post['featured_image'], $base)); ?>" alt="<?php echo htmlspecialchars($post['title']); ?>" loading="lazy" />
+                    <img src="<?php echo htmlspecialchars(getAbsoluteImagePath($post['featured_image'], $base)); ?>"
+                      alt="<?php echo htmlspecialchars($post['title']); ?>" loading="lazy" />
                   <?php else: ?>
                     <div class="da-img-fallback-icon"><i class="fa fa-newspaper" style="font-size:32px;"></i></div>
                   <?php endif; ?>
@@ -205,7 +219,8 @@ $brands = $brands_stmt->fetchAll();
                 <div class="da-post-card-body">
                   <div class="da-post-card-title"><?php echo htmlspecialchars($post['title']); ?></div>
                   <div class="da-post-card-meta">
-                    <span><i class="fa fa-calendar-alt"></i><?php echo date('M j, Y', strtotime($post['created_at'])); ?></span>
+                    <span><i
+                        class="fa fa-calendar-alt"></i><?php echo date('M j, Y', strtotime($post['created_at'])); ?></span>
                     <span><i class="fa fa-comment"></i><?php echo $post['comment_count']; ?></span>
                   </div>
                 </div>
@@ -229,11 +244,11 @@ $brands = $brands_stmt->fetchAll();
 
         <!-- Top 10 by Fans -->
         <?php include('includes/sidebar/top-by-fans.php'); ?>
-        
+
       </aside>
     </div>
     <!-- BOTTOM AREA -->
-    
+
     <!-- ── IN STORES NOW ── -->
     <?php include('includes/bottom-area/in-stores-now.php'); ?>
 
@@ -241,11 +256,11 @@ $brands = $brands_stmt->fetchAll();
     <?php include('includes/bottom-area/trending-comparisons.php'); ?>
 
     <!-- ── FEATURED POSTS TICKER ── -->
-    <?php 
+    <?php
     $tickerLabel = 'News';
     $tickerTitle = 'More News Stories';
     $tickerLink = 'news';
-    include('includes/bottom-area/featured-posts.php'); 
+    include('includes/bottom-area/featured-posts.php');
     ?>
 
     <!-- ── INFINITE BRAND MARQUEE ── -->
@@ -331,7 +346,7 @@ $brands = $brands_stmt->fetchAll();
     const searchResults = document.getElementById('da-search-results');
     if (searchInput && searchResults) {
       let searchTimer;
-      searchInput.addEventListener('input', function() {
+      searchInput.addEventListener('input', function () {
         clearTimeout(searchTimer);
         const q = this.value.trim();
         if (q.length < 2) {
@@ -364,7 +379,7 @@ $brands = $brands_stmt->fetchAll();
             posts.forEach(p => {
               html += `<a href="${baseURL}post/${encodeURIComponent(p.slug)}" class="da-search-result-item">
           ${p.featured_image ? `<img src="${p.featured_image}" onerror="this.style.display='none'">` : ''}
-          <div><div class="sr-text">${p.title}</div><div class="sr-meta"><i class="fa fa-newspaper me-1"></i>${p.created_at ? p.created_at.substring(0,10) : 'Article'}</div></div>
+          <div><div class="sr-text">${p.title}</div><div class="sr-meta"><i class="fa fa-newspaper me-1"></i>${p.created_at ? p.created_at.substring(0, 10) : 'Article'}</div></div>
         </a>`;
             });
             searchResults.innerHTML = html;
@@ -379,7 +394,7 @@ $brands = $brands_stmt->fetchAll();
     }
 
     // ── Newsletter ──
-    document.getElementById('da-newsletter-btn').addEventListener('click', function() {
+    document.getElementById('da-newsletter-btn').addEventListener('click', function () {
       const email = document.getElementById('da-newsletter-email').value.trim();
       const msg = document.getElementById('da-newsletter-msg');
       if (!email) {
@@ -391,12 +406,12 @@ $brands = $brands_stmt->fetchAll();
       this.textContent = 'Subscribing...';
       const btn = this;
       fetch(baseURL + 'handle_newsletter.php', {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/x-www-form-urlencoded'
-          },
-          body: 'newsletter_email=' + encodeURIComponent(email)
-        })
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/x-www-form-urlencoded'
+        },
+        body: 'newsletter_email=' + encodeURIComponent(email)
+      })
         .then(r => r.json())
         .then(data => {
           msg.textContent = data.message;
@@ -425,7 +440,7 @@ $brands = $brands_stmt->fetchAll();
           'Content-Type': 'application/x-www-form-urlencoded'
         },
         body: 'action=mark_seen'
-      }).catch(() => {});
+      }).catch(() => { });
     }
     const bell = document.getElementById('notificationBellDesktop');
     if (bell) bell.addEventListener('click', () => setTimeout(markNotificationsAsSeen, 100));
@@ -447,7 +462,7 @@ $brands = $brands_stmt->fetchAll();
     }
 
     const loginForm = document.getElementById('publicLoginForm');
-    if (loginForm) loginForm.addEventListener('submit', function(e) {
+    if (loginForm) loginForm.addEventListener('submit', function (e) {
       e.preventDefault();
       const btn = document.getElementById('loginSubmitBtn');
       btn.disabled = true;
@@ -469,7 +484,7 @@ $brands = $brands_stmt->fetchAll();
     });
 
     const signupForm = document.getElementById('publicSignupForm');
-    if (signupForm) signupForm.addEventListener('submit', function(e) {
+    if (signupForm) signupForm.addEventListener('submit', function (e) {
       e.preventDefault();
       const btn = document.getElementById('signupSubmitBtn');
       btn.disabled = true;
@@ -506,7 +521,7 @@ $brands = $brands_stmt->fetchAll();
     }
 
     const profileForm = document.getElementById('profileUpdateForm');
-    if (profileForm) profileForm.addEventListener('submit', function(e) {
+    if (profileForm) profileForm.addEventListener('submit', function (e) {
       e.preventDefault();
       const btn = document.getElementById('profileUpdateBtn');
       btn.disabled = true;
@@ -551,12 +566,12 @@ $brands = $brands_stmt->fetchAll();
 
     function publicUserLogout() {
       fetch(baseURL + 'notification_handler.php', {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/x-www-form-urlencoded'
-          },
-          body: 'action=reset'
-        })
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/x-www-form-urlencoded'
+        },
+        body: 'action=reset'
+      })
         .finally(() => {
           userAuthFetch('logout', new FormData()).then(() => location.reload());
         });
@@ -573,14 +588,14 @@ $brands = $brands_stmt->fetchAll();
     }
 
     // ── Infinite horizontal post scroll ──
-    (function() {
+    (function () {
       let page = 1,
         loading = false,
         hasMore = <?php echo count($posts) >= 20 ? 'true' : 'false'; ?>;
       const container = document.getElementById('featured-scroll-container');
       const loader = document.getElementById('featured-load-more');
       if (!container) return;
-      container.addEventListener('scroll', function() {
+      container.addEventListener('scroll', function () {
         if (loading || !hasMore) return;
         if (this.scrollLeft + this.clientWidth >= this.scrollWidth - 300) loadMore();
       }, {

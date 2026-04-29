@@ -634,6 +634,7 @@ button {
   margin-bottom: 8px;
   line-height: 1;
   height: 16px;
+  text-align: left;
 }
 
 .da-section-label::before {
@@ -4148,4 +4149,69 @@ textarea.da-input {
   .da-float-btn span { display: none; }
   .da-float-btn { justify-content: center; padding: 10px; }
   .da-float-btn i { font-size: 15px; opacity: 1; }
+}
+
+/* ── ABOUT US PAGE CONTENT STYLING ── */
+.da-about-content {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  padding: 32px;
+  margin-top: 16px;
+  box-shadow: var(--shadow-card);
+}
+.da-about-heading {
+  color: var(--text-primary);
+  font-family: var(--font-display);
+  font-size: 20px;
+  font-weight: 700;
+  margin-top: 32px;
+  margin-bottom: 16px;
+}
+.da-about-heading:first-child {
+  margin-top: 0;
+}
+.da-about-text {
+  color: var(--text-secondary);
+  line-height: 1.8;
+  margin-bottom: 16px;
+  font-size: 16px;
+}
+.da-about-list {
+  color: var(--text-secondary);
+  line-height: 1.8;
+  margin-bottom: 16px;
+  padding-left: 24px;
+  font-size: 16px;
+}
+.da-about-list li {
+  margin-bottom: 10px;
+}
+.da-about-list strong {
+  color: var(--text-primary);
+  font-weight: 600;
+}
+.da-about-link {
+  color: var(--accent-blue);
+  font-weight: 600;
+  text-decoration: none;
+  transition: color var(--transition);
+}
+.da-about-link:hover {
+  color: var(--accent);
+  text-decoration: underline;
+}
+
+/* ── FORM UTILITIES ── */
+.da-error-msg {
+  color: #ef4444;
+  font-size: 13px;
+  margin-top: 4px;
+  display: none;
+}
+.da-error-msg.show-error {
+  display: block;
+}
+.da-input.is-invalid {
+  border-color: #ef4444 !important;
 }
