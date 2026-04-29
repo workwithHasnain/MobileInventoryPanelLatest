@@ -119,57 +119,56 @@ $brands = $brands_stmt->fetchAll();
   <div class="da-page">
 
     <!-- ── HERO NEWSROOM ── -->
-    <section class="da-hero" aria-label="Featured News">
-      <!-- Left: hero + stories -->
-      <div class="da-hero-left">
-        <div class="da-section-label"><span>Featured Content</span></div>
+    <div class="cp-hero">
+    
+    <!-- Background Image Implementation based on original layout -->
+    <div class="cp-hero-bg-container">
+        <img class="cp-hero-bg-img" src="<?php echo $base; ?>hero-images/featured-hero.png" alt="compare smartphones background">
+    </div>
 
-        <?php if (!empty($posts)): $hero = $posts[0]; ?>
-          <a href="<?php echo $base; ?>post/<?php echo urlencode($hero['slug']); ?>" class="da-hero-main">
-            <?php if (!empty($hero['featured_image'])): ?>
-              <img src="<?php echo htmlspecialchars(getAbsoluteImagePath($hero['featured_image'], $base)); ?>" alt="<?php echo htmlspecialchars($hero['title']); ?>" loading="eager" />
-            <?php else: ?>
-              <div class="da-img-fallback"></div>
-            <?php endif; ?>
-            <div class="da-hero-main-overlay"></div>
-            <div class="da-hero-main-content">
-              <div class="da-section-label"><span>Featured Story</span></div>
-              <h1 class="da-hero-main-title"><?php echo htmlspecialchars($hero['title']); ?></h1>
-              <div class="da-hero-meta">
-                <span><i class="fa fa-calendar-alt"></i><?php echo date('M j, Y', strtotime($hero['created_at'])); ?></span>
-                <span><i class="fa fa-comment"></i><?php echo $hero['comment_count']; ?> comments</span>
-              </div>
-            </div>
-          </a>
+    <div class="cp-hero-inner">
+      <div class="cp-hero-left">
+        <div class="cp-hero-label"><span>DevicesArena</span></div>
+        <h1 class="cp-hero-title">Featured Content</h1>
+        <p class="cp-hero-sub">Curated featured articles, top device reviews, and expert insights about mobile technology.</p>
+      </div>
+      
+      <!-- Right: Brand panel (Classic Widget) -->
+      <div class="cp-hero-right">
+        <div class="da-section-label" style="text-align: left;"><span>Brands</span></div>
+        <div class="da-classic-brand-widget">
+          <!-- Top header -->
+          <div class="da-cbw-header">
+            <a href="<?php echo $base; ?>phonefinder">
+              <i class="fa fa-mobile-screen"></i> PHONE FINDER
+            </a>
+          </div>
 
-          <!-- 4 hot stories -->
-          <?php $hotStories = array_slice($posts, 1, 4); ?>
-          <div class="da-hero-stories">
-            <?php foreach ($hotStories as $story): ?>
-              <a href="<?php echo $base; ?>post/<?php echo urlencode($story['slug']); ?>" class="da-story-card">
-                <?php if (!empty($story['featured_image'])): ?>
-                  <img src="<?php echo htmlspecialchars(getAbsoluteImagePath($story['featured_image'], $base)); ?>" alt="<?php echo htmlspecialchars($story['title']); ?>" loading="lazy" />
-                <?php else: ?>
-                  <div class="da-img-fallback"></div>
-                <?php endif; ?>
-                <div class="da-story-card-overlay"></div>
-                <div class="da-story-card-title"><?php echo htmlspecialchars($story['title']); ?></div>
+          <!-- Brand Grid -->
+          <div class="da-cbw-grid">
+            <?php foreach (array_slice($brands, 0, 32) as $index => $brand):
+              $brandSlug = strtolower(preg_replace('/\s+/', '-', trim($brand['name'])));
+            ?>
+              <a href="<?php echo $base; ?>brand/<?php echo urlencode($brandSlug); ?>" class="da-cbw-item" title="<?php echo htmlspecialchars($brand['name']); ?>">
+                <?php echo strtoupper(htmlspecialchars($brand['name'])); ?>
               </a>
             <?php endforeach; ?>
           </div>
-        <?php else: ?>
-          <div class="da-empty"><i class="fa fa-newspaper"></i>No stories available yet.</div>
-        <?php endif; ?>
-      </div>
 
-      <!-- Right: Brand panel (Classic Widget) -->
-      <div class="da-hero-right">
-        <?php include('includes/sidebar/brands-area.php'); ?>
-
-        <!-- AD PLACEHOLDER -->
-        <?php include('includes/sidebar/ad-placeholder.php'); ?>
+          <!-- Bottom buttons -->
+          <div class="da-cbw-footer">
+            <a href="<?php echo $base; ?>brands" class="da-cbw-btn left">
+              <i class="fa fa-bars"></i> ALL BRANDS
+            </a>
+            <a href="<?php echo $base; ?>rumored" class="da-cbw-btn right">
+              <i class="fa fa-bullhorn"></i> RUMORS MILL
+            </a>
+          </div>
+        </div>
       </div>
-    </section>
+      
+    </div>
+  </div>
 
 
 
