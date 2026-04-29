@@ -89,6 +89,7 @@
           <li><a href="<?php echo $base; ?>home">HOME</a></li>
           <li><a href="<?php echo $base; ?>compare">COMPARE</a></li>
           <li><a href="#">VIDEOS</a></li>
+          <li><a href="<?php echo $base; ?>news">NEWS</a></li>
           <li><a href="<?php echo $base; ?>reviews">REVIEWS</a></li>
           <li><a href="<?php echo $base; ?>featured">FEATURED</a></li>
           <li><a href="<?php echo $base; ?>phonefinder">PHONE FINDER</a></li>
@@ -108,7 +109,10 @@
     <ul class="da-mobile-nav-links">
       <li><a href="<?php echo $base; ?>">Home</a></li>
       <li><a href="<?php echo $base; ?>compare">Compare</a></li>
+      <li><a href="#">Videos</a></li>
+      <li><a href="<?php echo $base; ?>news">News</a></li>
       <li><a href="<?php echo $base; ?>reviews">Reviews</a></li>
+      <li><a href="<?php echo $base; ?>featured">Featured</a></li>
       <li><a href="<?php echo $base; ?>phonefinder">Phone Finder</a></li>
       <li><a href="<?php echo $base; ?>rumored">Rumored</a></li>
       <li><a href="<?php echo $base; ?>brands">All Brands</a></li>
