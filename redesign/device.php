@@ -1275,7 +1275,7 @@ $commentCount = getDeviceCommentCount($pdo, $device_id);
             <h3>Full Specifications</h3>
             <div class="da-widget-icon"><i class="fa fa-list"></i></div>
           </div>
-          <div class="da-widget-body" style="padding:0">
+          <div class="da-widget-body p-0">
             <table class="da-specs-table">
               <tbody>
                 <?php if (!empty($deviceSpecs)): ?>
@@ -1283,7 +1283,7 @@ $commentCount = getDeviceCommentCount($pdo, $device_id);
                     <?php if (is_array($rows) && !empty($rows)): ?>
                       <?php foreach ($rows as $rowIndex => $rowData): ?>
                         <?php if ($category === 'NETWORK' && $rowIndex > 0): ?>
-                          <tr class="da-specs-row network-row" style="display:none;">
+                          <tr class="da-specs-row network-row da-d-none">
                         <?php else: ?>
                           <tr class="da-specs-row">
                         <?php endif; ?>
@@ -1432,7 +1432,7 @@ $commentCount = getDeviceCommentCount($pdo, $device_id);
                     <button type="submit" class="da-cta-btn">Post Your Opinion</button>
                     <small>Comments are moderated and will appear after approval.</small>
                   </div>
-                  <div style="font-size: 13px; color: var(--text-muted);">
+                  <div class="da-comments-count-text">
                     Total reader comments: <b class="text-white"><?php echo $commentCount; ?></b>
                   </div>
                 </div>
@@ -1534,11 +1534,11 @@ $commentCount = getDeviceCommentCount($pdo, $device_id);
 
       if (btn.textContent.includes('COLLAPSE')) {
         btn.textContent = 'EXPAND ▼';
-        networkRows.forEach(row => row.style.display = 'none');
+        networkRows.forEach(row => row.classList.add('da-d-none'));
         if (networkLabel) networkLabel.setAttribute('rowspan', '1');
       } else {
         btn.textContent = 'COLLAPSE ▲';
-        networkRows.forEach(row => row.style.display = '');
+        networkRows.forEach(row => row.classList.remove('da-d-none'));
         if (networkLabel) networkLabel.setAttribute('rowspan', originalRowspan);
       }
     }

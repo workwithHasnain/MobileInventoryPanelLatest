@@ -761,6 +761,7 @@ button {
   align-items: center;
   justify-content: center;
   color: var(--text-muted);
+  font-size:32px;
 }
 
 .da-story-card {
@@ -4657,6 +4658,23 @@ textarea.da-input {
   gap: 16px;
 }
 
+.da-sort-dropdown-btn {
+  width: auto;
+  cursor: pointer;
+  background-color: var(--bg-primary);
+  color: var(--text-primary);
+  border-color: var(--border);
+}
+
+.da-d-none {
+  display: none !important;
+}
+
+.da-comments-count-text {
+  font-size: 13px;
+  color: var(--text-muted);
+}
+
 @media (max-width: 576px) {
   .da-brand-device-grid {
     grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
@@ -4685,4 +4703,35 @@ textarea.da-input {
   .da-device-body { padding: 12px; }
   .da-device-title { font-size: 14px; }
   .da-device-specs { grid-template-columns: 1fr; gap: 8px; }
+}
+
+/* ==========================================================================
+   AJAX LOADING & STATES
+   ========================================================================== */
+
+.da-empty-state {
+  grid-column: 1 / -1;
+  text-align: center;
+  padding: 40px;
+}
+
+.da-load-more-container {
+  text-align: center;
+  margin-top: 24px;
+}
+
+.da-load-more-btn {
+  background: var(--bg-card);
+  color: var(--text-primary);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  padding: 8px 24px;
+  transition: var(--transition);
+  cursor: pointer;
+  font-weight: 600;
+}
+
+.da-load-more-btn:hover {
+  background: var(--bg-card-hover);
+  border-color: var(--accent);
 }

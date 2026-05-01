@@ -57,47 +57,21 @@ $brands_stmt = $pdo->prepare("SELECT b.*,COUNT(p.id) as device_count FROM brands
 $brands_stmt->execute();
 $brands = $brands_stmt->fetchAll();
 
-// Get brand slug from URL
-$brandSlug = isset($_GET['slug']) ? trim($_GET['slug']) : '';
-
-if (empty($brandSlug)) {
-    header('Location: ' . $base . 'brands');
-    exit;
-}
-
-// Convert slug to brand name pattern for fallback matching
-$brandNamePattern = str_replace('-', ' ', $brandSlug);
-
-// Look up the brand by matching slug first, then fallback to name pattern
-$brand_stmt = $pdo->prepare("
-    SELECT * FROM brands WHERE slug = :slug OR LOWER(name) = LOWER(:name)
-");
-$brand_stmt->execute(['slug' => $brandSlug, 'name' => $brandNamePattern]);
-$brandData = $brand_stmt->fetch();
-
-if (!$brandData) {
-    header('HTTP/1.0 404 Not Found');
-    include '404.php';
-    exit;
-}
-
-$brandName = $brandData['name'];
-$brandId = $brandData['id'];
-
-$count_stmt = $pdo->prepare("SELECT COUNT(*) FROM phones WHERE brand_id = :brand_id");
-$count_stmt->execute(['brand_id' => $brandId]);
+// Get total count of rumored phones
+$count_stmt = $pdo->prepare("SELECT COUNT(*) FROM phones WHERE availability = 'Rumored'");
+$count_stmt->execute();
 $totalDevicesCount = $count_stmt->fetchColumn();
 
-// Get initial 50 phones for this brand
+// Get initial 50 rumored phones
 $phones_stmt = $pdo->prepare("
     SELECT p.*, b.name as brand_name
     FROM phones p
     LEFT JOIN brands b ON p.brand_id = b.id
-    WHERE p.brand_id = :brand_id
-    ORDER BY p.name ASC
+    WHERE p.availability = 'Rumored'
+    ORDER BY b.name ASC, p.name ASC
     LIMIT 50
 ");
-$phones_stmt->execute(['brand_id' => $brandId]);
+$phones_stmt->execute();
 $phones = $phones_stmt->fetchAll();
 ?>
 <!DOCTYPE html>
@@ -106,13 +80,13 @@ $phones = $phones_stmt->fetchAll();
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1.0" />
-  <link rel="canonical" href="<?php echo $canonicalBase; ?>/brand/<?php echo htmlspecialchars($brandSlug); ?>" />
-  <title><?php echo htmlspecialchars($brandName); ?> Phones - DevicesArena</title>
+  <link rel="canonical" href="<?php echo $canonicalBase; ?>/rumored" />
+  <title>Rumored Phones - DevicesArena</title>
   <meta name="description"
-    content="Browse all <?php echo htmlspecialchars($brandName); ?> phones and devices on DevicesArena. View specifications, images, and pricing." />
-  <meta property="og:title" content="<?php echo htmlspecialchars($brandName); ?> Phones - DevicesArena" />
+    content="Browse all upcoming and rumored phones on DevicesArena. Stay informed about devices that have not yet been released." />
+  <meta property="og:title" content="Rumored Phones - DevicesArena" />
   <meta property="og:description"
-    content="Browse all <?php echo htmlspecialchars($brandName); ?> phones and devices on DevicesArena. View specifications, images, and pricing." />
+    content="Browse all upcoming and rumored phones on DevicesArena. Stay informed about devices that have not yet been released." />
   <meta property="og:image" content="<?php echo $base; ?>imges/icon-256.png" />
   <meta property="og:type" content="website" />
   <meta name="twitter:card" content="summary" />
@@ -140,9 +114,9 @@ $phones = $phones_stmt->fetchAll();
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" />
   <link rel="stylesheet" href="<?php echo $base; ?>redesign/style.css">
 
-  <!-- Schema.org Structured Data for About Us Page -->
+  <!-- Schema.org Structured Data -->
   <?php
-  // Build breadcrumb schema for the brand page
+  // Build breadcrumb schema for the rumored page
   $breadcrumbItems = [
     [
       "@type" => "ListItem",
@@ -153,14 +127,8 @@ $phones = $phones_stmt->fetchAll();
     [
       "@type" => "ListItem",
       "position" => 2,
-      "name" => "Brands",
-      "item" => "https://www.devicesarena.com/brands"
-    ],
-    [
-      "@type" => "ListItem",
-      "position" => 3,
-      "name" => htmlspecialchars($brandName),
-      "item" => "https://www.devicesarena.com/brand/" . htmlspecialchars($brandSlug)
+      "name" => "Rumored Phones",
+      "item" => "https://www.devicesarena.com/rumored"
     ]
   ];
   ?>
@@ -174,7 +142,7 @@ $phones = $phones_stmt->fetchAll();
       }
   </script>
 
-  <!-- Organization Schema with Contact Information -->
+  <!-- Organization Schema -->
   <script type="application/ld+json">
       {
           "@context": "https://schema.org",
@@ -195,9 +163,9 @@ $phones = $phones_stmt->fetchAll();
       {
           "@context": "https://schema.org",
           "@type": "CollectionPage",
-          "name": "<?php echo htmlspecialchars($brandName); ?> Phones - DevicesArena",
-          "description": "Browse all <?php echo htmlspecialchars($brandName); ?> phones and devices on DevicesArena. View specifications, images, and pricing.",
-          "url": "https://www.devicesarena.com/brand/<?php echo $brandSlug; ?>",
+          "name": "Rumored Phones - DevicesArena",
+          "description": "Browse all upcoming and rumored phones on DevicesArena. Stay informed about devices that have not yet been released.",
+          "url": "https://www.devicesarena.com/rumored",
           "image": "https://www.devicesarena.com/imges/icon-256.png",
           "publisher": {
               "@type": "Organization",
@@ -219,7 +187,7 @@ $phones = $phones_stmt->fetchAll();
       {
           "@context": "https://schema.org",
           "@type": "ItemList",
-          "name": "<?php echo htmlspecialchars($brandName); ?> Devices",
+          "name": "Rumored Phones",
           "numberOfItems": <?php echo count($phones); ?>,
           "itemListElement": [
               <?php
@@ -329,14 +297,14 @@ $phones = $phones_stmt->fetchAll();
           <div class="da-brand-header-flex">
             <div>
               <div class="da-section-label"><span>Discover</span></div>
-              <h2 class="da-section-title"><?php echo htmlspecialchars($brandName); ?> phones</h2>
-              <div class="da-brand-device-count"><?php echo $totalDevicesCount; ?> devices</div>
+              <h2 class="da-section-title">Rumored Phones</h2>
+              <div class="da-brand-device-count"><?php echo $totalDevicesCount; ?> rumored devices</div>
             </div>
             
             <div class="da-brands-sort">
               <span class="da-brands-sort-label">Sort By:</span>
               <div class="dropdown">
-                <select class="form-select form-select-sm da-sort-dropdown-btn" id="brandDeviceSorter">
+                <select class="form-select form-select-sm da-sort-dropdown-btn" id="rumoredDeviceSorter">
                   <option value="default">Name (A-Z)</option>
                   <option value="latest-desc">Latest Release</option>
                   <option value="latest-asc">Oldest Release</option>
@@ -349,7 +317,7 @@ $phones = $phones_stmt->fetchAll();
             </div>
           </div>
 
-          <div class="da-brand-device-grid" id="brandDeviceGrid">
+          <div class="da-brand-device-grid" id="rumoredDeviceGrid">
             <?php foreach ($phones as $phone): 
                 $imagePath = $phone['image'] ?? '';
                 if ($imagePath && !str_starts_with($imagePath, '/') && !str_starts_with($imagePath, 'http')) {
@@ -410,14 +378,14 @@ $phones = $phones_stmt->fetchAll();
             <?php if (empty($phones)): ?>
               <div class="da-empty-state">
                 <i class="fa fa-mobile-screen fa-3x text-muted mb-3"></i>
-                <p class="text-muted">No devices available for <?php echo htmlspecialchars($brandName); ?></p>
+                <p class="text-muted">No rumored devices available at this time.</p>
               </div>
             <?php endif; ?>
           </div>
           
           <?php if ($totalDevicesCount > 50): ?>
-            <div class="da-load-more-container mt-4" id="brandLoadMoreContainer">
-              <button id="brandLoadMoreBtn" class="da-load-more-btn">Load More</button>
+            <div class="da-load-more-container mt-4" id="rumoredLoadMoreContainer">
+              <button id="rumoredLoadMoreBtn" class="da-load-more-btn">Load More</button>
             </div>
           <?php endif; ?>
         </div>
@@ -827,14 +795,10 @@ $phones = $phones_stmt->fetchAll();
   <!-- Separate Script Block for Brands Sorting to avoid being blocked by other errors -->
   <script>
     // ── Pagination and Sorting for Brand Devices ──
-    const brandId = <?php echo $brandId; ?>;
-    const totalDevices = <?php echo $totalDevicesCount; ?>;
-    const brandSlug = "<?php echo htmlspecialchars($brandSlug); ?>";
-    const brandName = "<?php echo htmlspecialchars($brandName); ?>";
     const baseUri = "<?php echo $base; ?>";
     let currentPage = 1;
     
-    function getBrandDeviceCard(phone) {
+    function getRumoredDeviceCard(phone) {
         const imagePath = phone.image ? (phone.image.startsWith('/') || phone.image.startsWith('http') ? phone.image : '/' + phone.image) : '';
         const deviceSlug = phone.slug || phone.id;
         
@@ -866,7 +830,7 @@ $phones = $phones_stmt->fetchAll();
             <div class="da-device-body">
               <h3 class="da-device-title">${phone.name}</h3>
               <div class="da-device-brand-row">
-                <span class="da-device-brand-name">${phone.brand_name || brandName}</span>
+                <span class="da-device-brand-name">${phone.brand_name || 'Unknown'}</span>
                 <span class="da-device-badge year">${year}</span>
               </div>
               <div class="da-device-badges">
@@ -881,11 +845,11 @@ $phones = $phones_stmt->fetchAll();
         `;
     }
     
-    function loadBrandDevices(page, isAppend) {
-        const sort = document.getElementById('brandDeviceSorter').value;
-        const container = document.getElementById('brandDeviceGrid');
-        let btn = document.getElementById('brandLoadMoreBtn');
-        let btnContainer = document.getElementById('brandLoadMoreContainer');
+    function loadRumoredDevices(page, isAppend) {
+        const sort = document.getElementById('rumoredDeviceSorter').value;
+        const container = document.getElementById('rumoredDeviceGrid');
+        let btn = document.getElementById('rumoredLoadMoreBtn');
+        let btnContainer = document.getElementById('rumoredLoadMoreContainer');
         
         if (!isAppend) {
             container.innerHTML = '<div class="da-empty-state"><i class="fa fa-spinner fa-spin fa-3x text-muted mb-3"></i><p>Loading devices...</p></div>';
@@ -894,15 +858,15 @@ $phones = $phones_stmt->fetchAll();
             btn.disabled = true;
         }
         
-        fetch(`${baseUri}api_get_brand_devices.php?brand_id=${brandId}&page=${page}&sort=${sort}`)
+        fetch(`${baseUri}api_get_rumored_devices.php?page=${page}&sort=${sort}`)
             .then(res => res.json())
             .then(data => {
                 if (data.success) {
                     if (!isAppend) container.innerHTML = '';
                     
                     // Refetch elements since DOM might have changed
-                    btnContainer = document.getElementById('brandLoadMoreContainer');
-                    btn = document.getElementById('brandLoadMoreBtn');
+                    btnContainer = document.getElementById('rumoredLoadMoreContainer');
+                    btn = document.getElementById('rumoredLoadMoreBtn');
                     
                     if (btnContainer && btnContainer.parentNode) {
                         btnContainer.parentNode.removeChild(btnContainer);
@@ -914,19 +878,19 @@ $phones = $phones_stmt->fetchAll();
                     }
 
                     data.devices.forEach(device => {
-                        container.insertAdjacentHTML('beforeend', getBrandDeviceCard(device));
+                        container.insertAdjacentHTML('beforeend', getRumoredDeviceCard(device));
                     });
                     
                     currentPage = page;
                     
                     if (data.page < data.total_pages) {
                         container.insertAdjacentHTML('afterend', `
-                            <div class="da-load-more-container mt-4" id="brandLoadMoreContainer">
-                                <button id="brandLoadMoreBtn" class="da-load-more-btn">Load More</button>
+                            <div class="da-load-more-container mt-4" id="rumoredLoadMoreContainer">
+                                <button id="rumoredLoadMoreBtn" class="da-load-more-btn">Load More</button>
                             </div>
                         `);
-                        document.getElementById('brandLoadMoreBtn').addEventListener('click', function() {
-                            loadBrandDevices(currentPage + 1, true);
+                        document.getElementById('rumoredLoadMoreBtn').addEventListener('click', function() {
+                            loadRumoredDevices(currentPage + 1, true);
                         });
                     }
                 }
@@ -943,10 +907,10 @@ $phones = $phones_stmt->fetchAll();
     }
     
     document.addEventListener('DOMContentLoaded', function() {
-        const sorter = document.getElementById('brandDeviceSorter');
+        const sorter = document.getElementById('rumoredDeviceSorter');
         if (sorter) {
             sorter.addEventListener('change', function() {
-                loadBrandDevices(1, false);
+                loadRumoredDevices(1, false);
             });
         }
         

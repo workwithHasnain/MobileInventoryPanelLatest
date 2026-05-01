@@ -889,7 +889,7 @@ $da_active_nav = 'compare';
                   <img src="<?php echo htmlspecialchars(getAbsoluteImagePath($post['featured_image'], $base)); ?>"
                     alt="<?php echo htmlspecialchars($post['title']); ?>" loading="lazy" />
                 <?php else: ?>
-                  <div class="da-img-fallback-icon"><i class="fa fa-newspaper" style="font-size:20px;"></i></div>
+                  <div class="da-img-fallback-icon"><i class="fa fa-newspaper"></i></div>
                 <?php endif; ?>
               </div>
               <div class="da-ticker-item-body">

@@ -203,7 +203,7 @@ $brands = $brands_stmt->fetchAll();
                   <?php if (!empty($post['featured_image'])): ?>
                     <img src="<?php echo htmlspecialchars(getAbsoluteImagePath($post['featured_image'], $base)); ?>" alt="<?php echo htmlspecialchars($post['title']); ?>" loading="lazy" />
                   <?php else: ?>
-                    <div class="da-img-fallback-icon"><i class="fa fa-newspaper" style="font-size:32px;"></i></div>
+                    <div class="da-img-fallback-icon"><i class="fa fa-newspaper"></i></div>
                   <?php endif; ?>
                   <span class="da-post-card-tag">Article</span>
                 </div>
