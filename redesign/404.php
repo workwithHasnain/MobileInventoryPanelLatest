@@ -218,59 +218,6 @@ $brands = $brands_stmt->fetchAll();
 
   <!-- ══════════════════════ MAIN PAGE ══════════════════════ -->
   <div class="da-page">
-
-    <!-- ── HERO NEWSROOM ── -->
-    <div class="cp-hero">
-
-      <!-- Background Image Implementation based on original layout -->
-      <div class="cp-hero-bg-container">
-        <img class="cp-hero-bg-img" src="<?php echo $base; ?>hero-images/404-hero.png" alt="error 404 page background">
-      </div>
-
-      <div class="cp-hero-inner">
-        <div class="cp-hero-left">
-          <div class="cp-hero-label"><span>Error 404</span></div>
-          <h1 class="cp-hero-title">Oops! Page Not Found</h1>
-          <p class="cp-hero-sub">The page you're looking for seems to have vanished into the digital void. Don't worry, we'll help you find your way back.</p>
-        </div>
-
-        <!-- Right: Brand panel (Classic Widget) -->
-        <div class="cp-hero-right">
-          <div class="da-section-label"><span>Brands</span></div>
-          <div class="da-classic-brand-widget">
-            <!-- Top header -->
-            <div class="da-cbw-header">
-              <a href="<?php echo $base; ?>phonefinder">
-                <i class="fa fa-mobile-screen"></i> PHONE FINDER
-              </a>
-            </div>
-
-            <!-- Brand Grid -->
-            <div class="da-cbw-grid">
-              <?php foreach (array_slice($brands, 0, 32) as $index => $brand):
-                $brandSlug = strtolower(preg_replace('/\s+/', '-', trim($brand['name'])));
-                ?>
-                <a href="<?php echo $base; ?>brand/<?php echo urlencode($brandSlug); ?>" class="da-cbw-item"
-                  title="<?php echo htmlspecialchars($brand['name']); ?>">
-                  <?php echo strtoupper(htmlspecialchars($brand['name'])); ?>
-                </a>
-              <?php endforeach; ?>
-            </div>
-
-            <!-- Bottom buttons -->
-            <div class="da-cbw-footer">
-              <a href="<?php echo $base; ?>brands" class="da-cbw-btn left">
-                <i class="fa fa-bars"></i> ALL BRANDS
-              </a>
-              <a href="<?php echo $base; ?>rumored" class="da-cbw-btn right">
-                <i class="fa fa-bullhorn"></i> RUMORS MILL
-              </a>
-            </div>
-          </div>
-        </div>
-
-      </div>
-    </div>
     <!-- ── POST FEED + SIDEBAR ── -->
     <div class="da-content-area">
       <!-- Post Feed -->
@@ -296,14 +243,6 @@ $brands = $brands_stmt->fetchAll();
           </div>
         </div>
       </main>
-
-      <!-- Sidebar -->
-      <aside class="da-sidebar">
-
-        <!-- Latest Devices -->
-        <?php include('includes/sidebar/latest-devices.php'); ?>
-
-      </aside>
     </div>
     <!-- BOTTOM AREA -->
 
