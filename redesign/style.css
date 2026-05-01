@@ -1099,11 +1099,11 @@ button {
    MAIN CONTENT AREA (Feed + Sidebar)
 ══════════════════════════════════════════ */
 .da-content-area {
-  max-width: 1400px;
+  max-width: 1600px;
   margin: 0 auto;
   padding: 24px;
   display: grid;
-  grid-template-columns: 1fr 320px;
+  grid-template-columns: 1fr 280px;
   gap: 24px;
   align-items: start;
 }
@@ -4420,8 +4420,8 @@ textarea.da-input {
 
 .da-device-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(230px, 1fr));
-  gap: 10px;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 16px;
   width: 100%;
 }
 
@@ -4448,7 +4448,7 @@ textarea.da-input {
 
 .da-device-img-wrap {
   width: 100%;
-  height: 100px;
+  height: 110px;
   background: var(--bg-primary);
   display: flex;
   align-items: center;
@@ -4479,7 +4479,7 @@ textarea.da-input {
 }
 
 .da-device-body {
-  padding: 20px;
+  padding: 14px;
   display: flex;
   flex-direction: column;
   flex-grow: 1;
@@ -4588,11 +4588,11 @@ textarea.da-input {
 
 @media (max-width: 576px) {
   .da-device-grid {
-    grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
-    gap: 12px;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 10px;
   }
-  .da-device-img-wrap { height: 140px; padding: 12px; }
+  .da-device-img-wrap { height: 100px; padding: 10px; }
   .da-device-body { padding: 12px; }
-  .da-device-title { font-size: 14px; }
-  .da-device-specs { grid-template-columns: 1fr; gap: 8px; }
+  .da-device-title { font-size: 13px; }
+  .da-device-specs { grid-template-columns: 1fr; gap: 6px; }
 }
