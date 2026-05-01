@@ -4413,3 +4413,148 @@ textarea.da-input {
   color: var(--text-muted);
   font-weight: 500;
 }
+
+/* ══════════════════════════════════════════
+   BRAND DEVICE GRID & CARDS
+══════════════════════════════════════════ */
+.da-device-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 20px;
+  padding: 16px 0;
+}
+
+@media (max-width: 991px) {
+  .da-device-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media (max-width: 575px) {
+  .da-device-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+.da-device-card {
+  display: flex;
+  flex-direction: column;
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  overflow: hidden;
+  transition: var(--transition);
+  text-decoration: none;
+  height: 100%;
+}
+
+.da-device-card:hover {
+  background: var(--bg-card-hover);
+  border-color: var(--accent);
+  transform: translateY(-4px);
+  box-shadow: var(--shadow-card);
+}
+
+.da-device-card-img-wrap {
+  width: 100%;
+  height: 180px;
+  padding: 20px;
+  background: var(--bg-primary);
+  border-bottom: 1px solid var(--border);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.da-device-card-img-wrap img {
+  max-width: 100%;
+  max-height: 100%;
+  object-fit: contain;
+}
+
+.da-device-card-body {
+  padding: 16px;
+  display: flex;
+  flex-direction: column;
+  flex-grow: 1;
+}
+
+.da-device-card-title {
+  font-family: var(--font-display);
+  font-size: 16px;
+  font-weight: 700;
+  color: var(--text-primary);
+  margin-bottom: 8px;
+  line-height: 1.3;
+  transition: color 0.2s;
+}
+
+.da-device-card:hover .da-device-card-title {
+  color: var(--accent);
+}
+
+.da-device-card-info-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 8px;
+  font-size: 13px;
+}
+
+.da-device-card-brand {
+  color: var(--text-secondary);
+  font-weight: 600;
+  text-transform: uppercase;
+  font-size: 12px;
+  letter-spacing: 0.5px;
+}
+
+.da-device-card-badge {
+  padding: 2px 8px;
+  border-radius: 4px;
+  font-size: 11px;
+  font-weight: 600;
+  text-transform: uppercase;
+}
+
+.da-device-card-badge.year {
+  background: var(--accent-blue-dim);
+  color: var(--accent-blue);
+}
+
+.da-device-card-price {
+  font-weight: 700;
+  color: var(--text-primary);
+  font-size: 14px;
+}
+
+.da-device-card-badge.available { background: rgba(16, 185, 129, 0.15); color: #10b981; }
+.da-device-card-badge.coming-soon { background: rgba(245, 158, 11, 0.15); color: #f59e0b; }
+.da-device-card-badge.discontinued { background: rgba(239, 68, 68, 0.15); color: #ef4444; }
+.da-device-card-badge.rumored { background: rgba(59, 130, 246, 0.15); color: #3b82f6; }
+
+.da-device-card-specs {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 8px;
+  margin-top: auto;
+  padding-top: 12px;
+  border-top: 1px solid var(--border);
+}
+
+.da-device-card-spec-item {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 12px;
+  color: var(--text-muted);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.da-device-card-spec-item i {
+  color: var(--text-secondary);
+  width: 14px;
+  text-align: center;
+}
