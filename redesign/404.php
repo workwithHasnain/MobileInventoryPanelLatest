@@ -223,8 +223,8 @@ $brands = $brands_stmt->fetchAll();
       <!-- Post Feed -->
       <main>
         <div class="da-404-container">
-          <div class="da-404-number">404</div>
-          <h2 class="da-404-title">Lost in Technology?</h2>
+          <div class="da-404-number">404!</div>
+          <h2 class="da-404-title">Page Not Found!</h2>
           <p class="da-404-text">The link you followed might be broken, or the page may have been moved. Either way, we've got plenty of other tech to explore.</p>
           
           <div class="da-404-btn-group">
