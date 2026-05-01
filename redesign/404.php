@@ -243,6 +243,14 @@ $brands = $brands_stmt->fetchAll();
           </div>
         </div>
       </main>
+
+      <!-- Sidebar -->
+      <aside class="da-sidebar">
+
+        <!-- Latest Devices -->
+        <?php include('includes/sidebar/brands-area.php'); ?>
+
+      </aside>
     </div>
     <!-- BOTTOM AREA -->
 
