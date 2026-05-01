@@ -349,7 +349,7 @@ $phones = $phones_stmt->fetchAll();
             </div>
           </div>
 
-          <div class="da-device-grid" id="brandDeviceGrid">
+          <div class="da-brand-device-grid" id="brandDeviceGrid">
             <?php foreach ($phones as $phone): 
                 $imagePath = $phone['image'] ?? '';
                 if ($imagePath && !str_starts_with($imagePath, '/') && !str_starts_with($imagePath, 'http')) {
@@ -365,7 +365,7 @@ $phones = $phones_stmt->fetchAll();
                     case 'Rumored': $badgeClass = 'rumored'; break;
                 }
             ?>
-              <a href="<?php echo $base; ?>device/<?php echo htmlspecialchars($deviceSlug); ?>" class="da-device-card">
+              <a href="<?php echo $base; ?>device/<?php echo htmlspecialchars($deviceSlug); ?>" class="da-brand-device-card">
                 <div class="da-device-img-wrap">
                   <?php if ($imagePath): ?>
                     <img src="<?php echo htmlspecialchars($imagePath); ?>" alt="<?php echo htmlspecialchars($phone['name']); ?>" onerror="this.style.display='none'">
@@ -859,7 +859,7 @@ $phones = $phones_stmt->fetchAll();
         const year = phone.year || 'N/A';
 
         return `
-          <a href="${baseUri}device/${deviceSlug}" class="da-device-card">
+          <a href="${baseUri}device/${deviceSlug}" class="da-brand-device-card">
             <div class="da-device-img-wrap">
               ${imageHtml}
             </div>

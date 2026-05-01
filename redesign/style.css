@@ -4418,10 +4418,72 @@ textarea.da-input {
    DEVICE CARD GRID (Brand Page)
    ========================================================================== */
 
+/* ==========================================================================
+   BRAND PAGE SPECIFIC GRID & CARDS
+   ========================================================================== */
+
+.da-brand-device-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+  gap: 12px;
+  width: 100%;
+}
+
+.da-brand-device-card {
+  display: flex;
+  flex-direction: column;
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+  overflow: hidden;
+  text-decoration: none;
+  color: var(--text-primary);
+  transition: var(--transition);
+  height: 340px; /* Fixed height to enforce 3:4 ratio with ~250px width */
+  box-shadow: var(--shadow-card);
+  position: relative;
+}
+
+.da-brand-device-card:hover {
+  transform: translateY(-4px);
+  border-color: var(--accent);
+  box-shadow: 0 10px 25px rgba(213, 0, 0, 0.15);
+  color: var(--text-primary);
+}
+
+.da-brand-device-card .da-device-img-wrap {
+  height: 180px; /* Larger image area for 3:4 ratio */
+  padding: 15px;
+}
+
+.da-brand-device-card .da-device-body {
+  padding: 15px;
+  height: 160px; /* Remaining space */
+  display: flex;
+  flex-direction: column;
+}
+
+.da-brand-device-card .da-device-title {
+  font-size: 15px;
+  line-height: 1.2;
+  margin-bottom: 8px;
+}
+
+.da-brand-device-card .da-device-specs {
+  margin-top: auto;
+  padding-top: 8px;
+  gap: 5px 8px;
+}
+
+.da-brand-device-card .da-device-spec-item {
+  font-size: 11px;
+}
+
+/* Generic Device Card (Other pages) */
 .da-device-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(230px, 1fr));
-  gap: 10px;
+  grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+  gap: 16px;
   width: 100%;
 }
 
@@ -4587,6 +4649,25 @@ textarea.da-input {
 }
 
 @media (max-width: 576px) {
+  .da-brand-device-grid {
+    grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+    gap: 10px;
+  }
+  .da-brand-device-card {
+    height: 260px; /* Adjusted for mobile width */
+  }
+  .da-brand-device-card .da-device-img-wrap {
+    height: 130px;
+    padding: 10px;
+  }
+  .da-brand-device-card .da-device-body {
+    padding: 10px;
+    height: 130px;
+  }
+  .da-brand-device-card .da-device-title {
+    font-size: 13px;
+  }
+
   .da-device-grid {
     grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
     gap: 12px;
