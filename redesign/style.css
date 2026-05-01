@@ -4215,3 +4215,81 @@ textarea.da-input {
 .da-input.is-invalid {
   border-color: #ef4444 !important;
 }
+
+/* ── 404 ERROR PAGE ── */
+.da-404-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 80px 24px;
+  text-align: center;
+  min-height: 50vh;
+}
+
+.da-404-number {
+  font-family: var(--font-display);
+  font-size: clamp(100px, 15vw, 180px);
+  font-weight: 900;
+  line-height: 1;
+  background: linear-gradient(135deg, var(--accent), #ff5555);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  margin-bottom: 20px;
+  letter-spacing: -0.05em;
+  filter: drop-shadow(0 10px 20px rgba(213, 0, 0, 0.2));
+}
+
+.da-404-title {
+  font-size: clamp(24px, 4vw, 36px);
+  font-weight: 800;
+  color: var(--text-primary);
+  margin-bottom: 16px;
+}
+
+.da-404-text {
+  max-width: 500px;
+  color: var(--text-secondary);
+  font-size: 16px;
+  margin-bottom: 32px;
+}
+
+.da-404-btn-group {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 16px;
+  justify-content: center;
+}
+
+.da-404-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  padding: 12px 28px;
+  border-radius: var(--radius);
+  font-weight: 700;
+  font-size: 15px;
+  transition: var(--transition);
+}
+
+.da-404-btn.primary {
+  background: var(--accent);
+  color: #fff;
+}
+
+.da-404-btn.primary:hover {
+  background: var(--accent-hover);
+  transform: translateY(-2px);
+  box-shadow: 0 8px 20px rgba(213, 0, 0, 0.3);
+}
+
+.da-404-btn.outline {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  color: var(--text-primary);
+}
+
+.da-404-btn.outline:hover {
+  background: var(--bg-card-hover);
+  transform: translateY(-2px);
+}
