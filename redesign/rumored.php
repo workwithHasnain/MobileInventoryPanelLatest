@@ -898,7 +898,7 @@ $phones = $phones_stmt->fetchAll();
             .catch(err => {
                 console.error("Failed to load devices", err);
                 if (!isAppend) {
-                    container.innerHTML = '<div class="da-empty-state" style="color: red;">Failed to load.</div>';
+                    container.innerHTML = '<div class="da-empty-state">Failed to load.</div>';
                 } else if (btn) {
                     btn.innerHTML = 'Load More';
                     btn.disabled = false;
