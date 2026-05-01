@@ -4344,6 +4344,36 @@ textarea.da-input {
   border-color: var(--accent);
 }
 
+/* Custom Dropdown Menu */
+.da-brands-sort .dropdown-menu {
+  background-color: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  padding: 8px 0;
+  min-width: 160px;
+  box-shadow: var(--shadow-card);
+}
+
+.da-brands-sort .dropdown-item {
+  color: var(--text-primary);
+  font-weight: 500;
+  font-size: 14px;
+  padding: 8px 16px;
+  transition: var(--transition);
+}
+
+.da-brands-sort .dropdown-item:hover,
+.da-brands-sort .dropdown-item:focus {
+  background-color: var(--bg-card-hover);
+  color: var(--accent);
+}
+
+.da-brands-sort .dropdown-item.active,
+.da-brands-sort .dropdown-item:active {
+  background-color: var(--accent);
+  color: #fff;
+}
+
 .da-brand-grid-item {
   display: flex;
   flex-direction: column;
