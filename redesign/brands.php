@@ -727,6 +727,10 @@ $allBrands = $all_brands_stmt->fetchAll();
       }
     })();
 
+  </script>
+
+  <!-- Separate Script Block for Brands Sorting to avoid being blocked by other errors -->
+  <script>
     // ── Sorting functionality for Brands ──
     document.addEventListener('DOMContentLoaded', function() {
         const brandsGrid = document.getElementById('brandsGrid');
@@ -744,7 +748,9 @@ $allBrands = $all_brands_stmt->fetchAll();
                 // Update UI state
                 sortOptions.forEach(opt => opt.classList.remove('active'));
                 this.classList.add('active');
-                currentSortLabel.textContent = this.textContent;
+                if (currentSortLabel) {
+                    currentSortLabel.textContent = this.textContent;
+                }
 
                 sortBrands(criteria);
             });
