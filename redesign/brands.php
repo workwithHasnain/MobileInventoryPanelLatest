@@ -751,28 +751,45 @@ $allBrands = $all_brands_stmt->fetchAll();
         });
 
         function sortBrands(criteria) {
-            const brandWrappers = Array.from(brandsGrid.querySelectorAll('.brand-grid-item-wrapper'));
-            
-            brandWrappers.sort((a, b) => {
-                const itemA = a.querySelector('.da-brand-grid-item');
-                const itemB = b.querySelector('.da-brand-grid-item');
-                if (criteria === 'name') {
-                    return itemA.dataset.name.localeCompare(itemB.dataset.name);
-                } else if (criteria === 'count') {
-                    return parseInt(itemB.dataset.count) - parseInt(itemA.dataset.count) || itemA.dataset.name.localeCompare(itemB.dataset.name);
-                }
-                return 0;
-            });
+            try {
+                const brandWrappers = Array.from(brandsGrid.querySelectorAll('.brand-grid-item-wrapper'));
+                
+                brandWrappers.sort((a, b) => {
+                    const itemA = a.querySelector('.da-brand-grid-item');
+                    const itemB = b.querySelector('.da-brand-grid-item');
+                    
+                    if (!itemA || !itemB) return 0;
+                    
+                    const nameA = itemA.dataset.name || '';
+                    const nameB = itemB.dataset.name || '';
 
-            // Re-render with a subtle fade effect
-            brandsGrid.style.opacity = '0.5';
-            brandsGrid.style.transition = 'opacity 0.2s ease';
-            
-            setTimeout(() => {
-                // Clear and re-append
-                brandWrappers.forEach(wrapper => brandsGrid.appendChild(wrapper));
-                brandsGrid.style.opacity = '1';
-            }, 200);
+                    if (criteria === 'name') {
+                        return nameA.localeCompare(nameB);
+                    } else if (criteria === 'count') {
+                        const countA = parseInt(itemA.dataset.count, 10) || 0;
+                        const countB = parseInt(itemB.dataset.count, 10) || 0;
+                        if (countA !== countB) {
+                            return countB - countA; // Descending
+                        }
+                        return nameA.localeCompare(nameB);
+                    }
+                    return 0;
+                });
+
+                // Re-render with a subtle fade effect
+                brandsGrid.style.opacity = '0.5';
+                brandsGrid.style.transition = 'opacity 0.2s ease';
+                
+                setTimeout(() => {
+                    brandsGrid.innerHTML = ''; // Safely clear all old nodes including text nodes
+                    brandWrappers.forEach(wrapper => {
+                        brandsGrid.appendChild(wrapper);
+                    });
+                    brandsGrid.style.opacity = '1';
+                }, 200);
+            } catch (err) {
+                console.error("Sorting failed", err);
+            }
         }
     });
   </script>
