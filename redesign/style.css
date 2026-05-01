@@ -4234,6 +4234,7 @@ textarea.da-input {
   line-height: 1;
   background: linear-gradient(135deg, var(--accent), #ff5555);
   -webkit-background-clip: text;
+  background-clip: text;
   -webkit-text-fill-color: transparent;
   margin-bottom: 20px;
   letter-spacing: -0.05em;
@@ -4292,4 +4293,93 @@ textarea.da-input {
 .da-404-btn.outline:hover {
   background: var(--bg-card-hover);
   transform: translateY(-2px);
+}
+
+/* ══════════════════════════════════════════
+   BRANDS PAGE (All Brands Grid)
+══════════════════════════════════════════ */
+.da-brands-list-container {
+  background: var(--bg-card);
+  border-radius: var(--radius);
+  border: 1px solid var(--border);
+  padding: 24px;
+}
+
+.da-brands-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 24px;
+  padding-bottom: 16px;
+  border-bottom: 1px solid var(--border);
+}
+
+.da-brands-sort {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.da-brands-sort-label {
+  font-size: 14px;
+  color: var(--text-muted);
+  font-weight: 600;
+}
+
+.da-sort-dropdown-btn {
+  background: var(--bg-primary);
+  border: 1px solid var(--border);
+  color: var(--text-primary);
+  padding: 8px 16px;
+  border-radius: var(--radius-sm);
+  font-weight: 600;
+  font-size: 14px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  transition: var(--transition);
+}
+
+.da-sort-dropdown-btn:hover, .da-sort-dropdown-btn[aria-expanded="true"] {
+  border-color: var(--accent);
+}
+
+.da-brand-grid-item {
+  display: flex;
+  flex-direction: column;
+  padding: 16px;
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  margin-bottom: 16px;
+  transition: var(--transition);
+  cursor: pointer;
+  text-decoration: none;
+}
+
+.da-brand-grid-item:hover {
+  background: var(--bg-card-hover);
+  border-color: var(--accent);
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-card);
+}
+
+.da-brand-name {
+  font-family: var(--font-display);
+  font-size: 18px;
+  font-weight: 700;
+  color: var(--text-primary);
+  text-transform: uppercase;
+  margin-bottom: 4px;
+  transition: color 0.2s;
+}
+
+.da-brand-grid-item:hover .da-brand-name {
+  color: var(--accent);
+}
+
+.da-brand-device-count {
+  font-size: 13px;
+  color: var(--text-muted);
+  font-weight: 500;
 }
