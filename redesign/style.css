@@ -4439,7 +4439,7 @@ textarea.da-input {
   text-decoration: none;
   color: var(--text-primary);
   transition: var(--transition);
-  height: 340px; /* Fixed height to enforce 3:4 ratio with ~250px width */
+  height: 360px; /* Slightly taller for better content clearance */
   box-shadow: var(--shadow-card);
   position: relative;
 }
@@ -4452,29 +4452,30 @@ textarea.da-input {
 }
 
 .da-brand-device-card .da-device-img-wrap {
-  height: 180px; /* Larger image area for 3:4 ratio */
+  height: 170px; /* Balanced image area */
   padding: 15px;
+  flex-shrink: 0;
 }
 
 .da-brand-device-card .da-device-body {
   padding: 15px;
-  height: 160px; /* Remaining space */
+  flex: 1; /* Automatically take remaining space */
   display: flex;
   flex-direction: column;
+  overflow: hidden;
 }
 
 .da-brand-device-card .da-device-title {
   font-size: 15px;
   line-height: 1.2;
+  font-weight: 700;
   margin-bottom: 8px;
-  color: var(--text-primary);
   display: -webkit-box;
   -webkit-line-clamp: 2;
   line-clamp: 2;
   -webkit-box-orient: vertical;
   overflow: hidden;
   text-overflow: ellipsis;
-  height: 36px; /* Ensures consistent 2-line space */
 }
 
 .da-brand-device-card .da-device-specs {
