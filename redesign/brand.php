@@ -4,16 +4,58 @@ require_once __DIR__ . '/../config.php';
 require_once __DIR__ . '/../database_functions.php';
 require_once __DIR__ . '/../phone_data.php';
 
-$pdo = getConnection();
-
-// Helper function to make image paths absolute
 function getAbsoluteImagePath($imagePath, $base)
 {
-    if (empty($imagePath)) return '';
-    if (filter_var($imagePath, FILTER_VALIDATE_URL)) return $imagePath;
-    if (strpos($imagePath, '/') === 0) return $imagePath;
-    return $base . ltrim($imagePath, '/');
+  if (empty($imagePath))
+    return '';
+  if (filter_var($imagePath, FILTER_VALIDATE_URL))
+    return $imagePath;
+  if (strpos($imagePath, '/') === 0)
+    return $imagePath;
+  return $base . ltrim($imagePath, '/');
 }
+
+$pdo = getConnection();
+
+// Auth
+$isPublicUser = !empty($_SESSION['public_user_id']);
+$publicUserName = $_SESSION['public_user_name'] ?? '';
+$publicUserInitial = $isPublicUser ? strtoupper(substr($publicUserName, 0, 1)) : '';
+
+if (!isset($_SESSION['notif_seen']))
+  $_SESSION['notif_seen'] = false;
+$hasUnreadNotifications = $isPublicUser && !$_SESSION['notif_seen'];
+
+// Weekly posts for notifications
+try {
+  $weekly_stmt = $pdo->prepare("SELECT p.id,p.title,p.slug,p.featured_image,p.created_at FROM posts p WHERE p.status ILIKE 'published' AND p.created_at >= CURRENT_TIMESTAMP - INTERVAL '7 days' ORDER BY p.created_at DESC LIMIT 10");
+  $weekly_stmt->execute();
+  $weekly_posts = $weekly_stmt->fetchAll();
+} catch (Exception $e) {
+  $weekly_posts = [];
+}
+
+
+// Posts — featured only
+$posts_stmt = $pdo->prepare("SELECT p.*,(SELECT COUNT(*) FROM post_comments pc WHERE pc.post_id=p.id AND pc.status='approved') as comment_count FROM posts p WHERE p.status ILIKE 'published' AND p.is_featured = true ORDER BY p.created_at DESC LIMIT 20");
+$posts_stmt->execute();
+$posts = $posts_stmt->fetchAll();
+
+// Comparisons
+try {
+  $topComparisons = getPopularComparisons(10);
+} catch (Exception $e) {
+  $topComparisons = [];
+}
+
+// Latest devices
+$latestDevices = getAllPhones();
+$latestDevices = array_slice(array_reverse($latestDevices), 0, 15);
+
+// Brands
+$brands_stmt = $pdo->prepare("SELECT b.*,COUNT(p.id) as device_count FROM brands b LEFT JOIN phones p ON b.id=p.brand_id GROUP BY b.id,b.name,b.description,b.logo_url,b.website,b.created_at,b.updated_at ORDER BY COUNT(p.id) DESC,b.name ASC LIMIT 36");
+$brands_stmt->execute();
+$brands = $brands_stmt->fetchAll();
 
 // Get brand slug from URL
 $brandSlug = isset($_GET['slug']) ? trim($_GET['slug']) : '';
@@ -57,64 +99,73 @@ $phones_stmt = $pdo->prepare("
 ");
 $phones_stmt->execute(['brand_id' => $brandId]);
 $phones = $phones_stmt->fetchAll();
-
-// Get top brands for sidebar
-$brands_stmt = $pdo->prepare("
-    SELECT b.*, COUNT(p.id) as device_count
-    FROM brands b
-    LEFT JOIN phones p ON b.id = p.brand_id
-    GROUP BY b.id, b.name, b.description, b.logo_url, b.website, b.created_at, b.updated_at
-    ORDER BY COUNT(p.id) DESC, b.name ASC
-    LIMIT 36
-");
-$brands_stmt->execute();
-$brands = $brands_stmt->fetchAll();
-
-// Auth variables for redesign layout
-$isPublicUser = !empty($_SESSION['public_user_id']);
-$publicUserName = $_SESSION['public_user_name'] ?? '';
-$publicUserInitial = $isPublicUser ? strtoupper(substr($publicUserName, 0, 1)) : '';
-if (!isset($_SESSION['notif_seen'])) $_SESSION['notif_seen'] = false;
-$hasUnreadNotifications = $isPublicUser && !$_SESSION['notif_seen'];
-
-// Other sidebar content
-$latestDevices = getAllPhones();
-$latestDevices = array_slice(array_reverse($latestDevices), 0, 15);
-try {
-  $topComparisons = getPopularComparisons(10);
-} catch (Exception $e) {
-  $topComparisons = [];
-}
 ?>
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1.0" />
   <link rel="canonical" href="<?php echo $canonicalBase; ?>/brand/<?php echo htmlspecialchars($brandSlug); ?>" />
   <title><?php echo htmlspecialchars($brandName); ?> Phones - DevicesArena</title>
-  <meta name="description" content="Browse all <?php echo htmlspecialchars($brandName); ?> phones and devices on DevicesArena. View specifications, images, and pricing." />
+  <meta name="description"
+    content="Browse all <?php echo htmlspecialchars($brandName); ?> phones and devices on DevicesArena. View specifications, images, and pricing." />
   <meta property="og:title" content="<?php echo htmlspecialchars($brandName); ?> Phones - DevicesArena" />
-  <meta property="og:description" content="Browse all <?php echo htmlspecialchars($brandName); ?> phones and devices on DevicesArena." />
+  <meta property="og:description"
+    content="Browse all <?php echo htmlspecialchars($brandName); ?> phones and devices on DevicesArena. View specifications, images, and pricing." />
   <meta property="og:image" content="<?php echo $base; ?>imges/icon-256.png" />
   <meta property="og:type" content="website" />
   <meta name="twitter:card" content="summary" />
   <link rel="icon" type="image/png" sizes="32x32" href="<?php echo $base; ?>imges/icon-32.png">
   <link rel="shortcut icon" href="<?php echo $base; ?>imges/icon-32.png">
   <meta name="theme-color" content="#0d0f1a">
+  <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-9906394285054446"
+    crossorigin="anonymous"></script>
+  <!-- Google Analytics -->
+  <script async src="https://www.googletagmanager.com/gtag/js?id=G-2LDCSSMXJT"></script>
+  <script>
+    window.dataLayer = window.dataLayer || [];
 
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet">
+    function gtag() {
+      dataLayer.push(arguments);
+    }
+    gtag('js', new Date());
+    gtag('config', 'G-2LDCSSMXJT');
+  </script>
+
+  <link
+    href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=Space+Grotesk:wght@400;500;600;700&display=swap"
+    rel="stylesheet">
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/css/bootstrap.min.css" rel="stylesheet">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" />
   <link rel="stylesheet" href="<?php echo $base; ?>redesign/style.css">
 
+  <!-- Schema.org Structured Data for About Us Page -->
   <?php
+  // Build breadcrumb schema for the brand page
   $breadcrumbItems = [
-    ["@type" => "ListItem", "position" => 1, "name" => "Home", "item" => "https://www.devicesarena.com/"],
-    ["@type" => "ListItem", "position" => 2, "name" => "Brands", "item" => "https://www.devicesarena.com/brands"],
-    ["@type" => "ListItem", "position" => 3, "name" => htmlspecialchars($brandName), "item" => "https://www.devicesarena.com/brand/" . $brandSlug]
+    [
+      "@type" => "ListItem",
+      "position" => 1,
+      "name" => "Home",
+      "item" => "https://www.devicesarena.com/"
+    ],
+    [
+      "@type" => "ListItem",
+      "position" => 2,
+      "name" => "Brands",
+      "item" => "https://www.devicesarena.com/brands"
+    ],
+    [
+      "@type" => "ListItem",
+      "position" => 3,
+      "name" => htmlspecialchars($brandName),
+      "item" => "https://www.devicesarena.com/brand/" . htmlspecialchars($brandSlug)
+    ]
   ];
   ?>
+
+  <!-- Breadcrumb Schema -->
   <script type="application/ld+json">
       {
           "@context": "https://schema.org",
@@ -123,6 +174,23 @@ try {
       }
   </script>
 
+  <!-- Organization Schema with Contact Information -->
+  <script type="application/ld+json">
+      {
+          "@context": "https://schema.org",
+          "@type": "Organization",
+          "name": "DevicesArena",
+          "url": "https://www.devicesarena.com",
+          "logo": "https://www.devicesarena.com/imges/icon-256.png",
+          "description": "Your source for comprehensive device reviews, specifications, comparisons, and tech industry insights.",
+          "breadcrumb": {
+              "@type": "BreadcrumbList",
+              "itemListElement": <?php echo json_encode($breadcrumbItems, JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE); ?>
+          }
+      }
+  </script>
+
+  <!-- CollectionPage Schema -->
   <script type="application/ld+json">
       {
           "@context": "https://schema.org",
@@ -146,6 +214,7 @@ try {
       }
   </script>
 
+  <!-- ItemList Schema -->
   <script type="application/ld+json">
       {
           "@context": "https://schema.org",
@@ -169,6 +238,7 @@ try {
       }
   </script>
 
+  <!-- Theme Initialization Script (Prevents FOUC) -->
   <script>
     (function () {
       var savedTheme = localStorage.getItem('da-theme');
@@ -177,80 +247,110 @@ try {
       }
     })();
   </script>
+
+  <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-4554952734894265"
+    crossorigin="anonymous"></script>
 </head>
 
 <body>
+
+  <!-- ══════════════════════ NAVBAR ══════════════════════ -->
   <?php include('includes/navbar.php'); ?>
+
+  <!-- ══════════════════════ AUTH MODALS ══════════════════════ -->
+  <!-- Login -->
   <?php include('includes/login-modal.php'); ?>
+  <!-- Sign Up -->
   <?php include('includes/signup-modal.php'); ?>
+
+  <!-- Profile -->
   <?php include('includes/profile-modal.php'); ?>
 
+  <!-- ══════════════════════ MAIN PAGE ══════════════════════ -->
   <div class="da-page">
-    <!-- HERO SECTION -->
+
+    <!-- ── HERO NEWSROOM ── -->
     <div class="cp-hero">
+
+      <!-- Background Image Implementation based on original layout -->
       <div class="cp-hero-bg-container">
-        <img class="cp-hero-bg-img" src="<?php echo $base; ?>hero-images/brand-hero.png" alt="<?php echo htmlspecialchars($brandName); ?> background">
+        <img class="cp-hero-bg-img" src="<?php echo $base; ?>hero-images/brand-hero.png" alt="<?php echo htmlspecialchars($brandName); ?> phones on DevicesArena">
       </div>
+
       <div class="cp-hero-inner">
         <div class="cp-hero-left">
-          <div class="cp-hero-label"><span>Brands</span></div>
-          <h1 class="cp-hero-title"><?php echo htmlspecialchars($brandName); ?></h1>
-          <p class="cp-hero-sub">Explore the complete catalog of <?php echo htmlspecialchars($brandName); ?> devices, from their latest flagship releases to classic models.</p>
+          <div class="cp-hero-label"><span>DevicesArena</span></div>
+          <h1 class="cp-hero-title"><?php echo htmlspecialchars($brandName); ?> phones</h1>
+          <p class="cp-hero-sub">Browse all <?php echo htmlspecialchars($brandName); ?> phones and devices on DevicesArena. View specifications, images, and pricing.</p>
         </div>
 
+        <!-- Right: Brand panel (Classic Widget) -->
         <div class="cp-hero-right">
-          <div class="da-section-label"><span>Explore</span></div>
+          <div class="da-section-label"><span>Brands</span></div>
           <div class="da-classic-brand-widget">
+            <!-- Top header -->
             <div class="da-cbw-header">
-              <a href="<?php echo $base; ?>phonefinder"><i class="fa fa-mobile-screen"></i> PHONE FINDER</a>
+              <a href="<?php echo $base; ?>phonefinder">
+                <i class="fa fa-mobile-screen"></i> PHONE FINDER
+              </a>
             </div>
+
+            <!-- Brand Grid -->
             <div class="da-cbw-grid">
-              <?php foreach (array_slice($brands, 0, 32) as $index => $sbBrand):
-                $sbSlug = strtolower(preg_replace('/\s+/', '-', trim($sbBrand['name'])));
+              <?php foreach (array_slice($brands, 0, 32) as $index => $brand):
+                $sidebarBrandSlug = strtolower(preg_replace('/\s+/', '-', trim($brand['name'])));
                 ?>
-                <a href="<?php echo $base; ?>brand/<?php echo urlencode($sbSlug); ?>" class="da-cbw-item" title="<?php echo htmlspecialchars($sbBrand['name']); ?>">
-                  <?php echo strtoupper(htmlspecialchars($sbBrand['name'])); ?>
+                <a href="<?php echo $base; ?>brand/<?php echo urlencode($sidebarBrandSlug); ?>" class="da-cbw-item"
+                  title="<?php echo htmlspecialchars($brand['name']); ?>">
+                  <?php echo strtoupper(htmlspecialchars($brand['name'])); ?>
                 </a>
               <?php endforeach; ?>
             </div>
+
+            <!-- Bottom buttons -->
             <div class="da-cbw-footer">
-              <a href="<?php echo $base; ?>brands" class="da-cbw-btn left"><i class="fa fa-bars"></i> ALL BRANDS</a>
-              <a href="<?php echo $base; ?>rumored" class="da-cbw-btn right"><i class="fa fa-bullhorn"></i> RUMORS MILL</a>
+              <a href="<?php echo $base; ?>brands" class="da-cbw-btn left">
+                <i class="fa fa-bars"></i> ALL BRANDS
+              </a>
+              <a href="<?php echo $base; ?>rumored" class="da-cbw-btn right">
+                <i class="fa fa-bullhorn"></i> RUMORS MILL
+              </a>
             </div>
           </div>
         </div>
+
       </div>
     </div>
-
-    <!-- CONTENT AREA -->
+    <!-- ── POST FEED + SIDEBAR ── -->
     <div class="da-content-area">
+      <!-- Main Content Area -->
       <main>
         <div class="da-brands-list-container">
-          <div class="da-brands-header">
+          <div class="da-brand-header-flex">
             <div>
-              <div class="da-section-label"><span>Devices</span></div>
-              <h2 class="da-section-title"><?php echo htmlspecialchars($brandName); ?> Phones</h2>
-              <div class="da-brand-device-count"><?php echo $totalDevicesCount; ?> devices available</div>
+              <div class="da-section-label"><span>Discover</span></div>
+              <h2 class="da-section-title"><?php echo htmlspecialchars($brandName); ?> phones</h2>
+              <div class="da-brand-device-count"><?php echo $totalDevicesCount; ?> devices</div>
             </div>
             
             <div class="da-brands-sort">
               <span class="da-brands-sort-label">Sort By:</span>
               <div class="dropdown">
-                <select class="da-sort-dropdown-btn" id="brandDeviceSorter" style="background: var(--bg-primary); border: 1px solid var(--border); color: var(--text-primary); padding: 8px 16px; border-radius: var(--radius-sm); font-weight: 600; font-size: 14px; cursor: pointer; outline: none; transition: var(--transition);">
-                    <option value="default">Name (A-Z)</option>
-                    <option value="latest-desc">Latest Release</option>
-                    <option value="latest-asc">Oldest Release</option>
-                    <option value="views-desc">Most Views</option>
-                    <option value="views-asc">Least Views</option>
-                    <option value="comments-desc">Most Comments</option>
-                    <option value="comments-asc">Least Comments</option>
+                <select class="form-select form-select-sm da-sort-dropdown-btn" id="brandDeviceSorter" style="width: auto; cursor: pointer; background-color: var(--bg-primary); color: var(--text-primary); border-color: var(--border);">
+                  <option value="default">Name (A-Z)</option>
+                  <option value="latest-desc">Latest Release</option>
+                  <option value="latest-asc">Oldest Release</option>
+                  <option value="views-desc">Most Views</option>
+                  <option value="views-asc">Least Views</option>
+                  <option value="comments-desc">Most Comments</option>
+                  <option value="comments-asc">Least Comments</option>
                 </select>
               </div>
             </div>
           </div>
 
-          <div class="da-device-grid" id="brandDevicesGrid">
-            <?php foreach ($phones as $phone):
+          <div class="da-device-grid" id="brandDeviceGrid">
+            <?php foreach ($phones as $phone): 
                 $imagePath = $phone['image'] ?? '';
                 if ($imagePath && !str_starts_with($imagePath, '/') && !str_starts_with($imagePath, 'http')) {
                     $imagePath = '/' . $imagePath;
@@ -258,84 +358,113 @@ try {
                 $deviceSlug = $phone['slug'] ?? $phone['id'];
                 
                 $badgeClass = 'year'; // Default
-                $availClass = 'available';
                 switch ($phone['availability']) {
-                    case 'Available': $availClass = 'available'; break;
-                    case 'Coming Soon': $availClass = 'coming-soon'; break;
-                    case 'Discontinued': $availClass = 'discontinued'; break;
-                    case 'Rumored': $availClass = 'rumored'; break;
+                    case 'Available': $badgeClass = 'available'; break;
+                    case 'Coming Soon': $badgeClass = 'coming-soon'; break;
+                    case 'Discontinued': $badgeClass = 'discontinued'; break;
+                    case 'Rumored': $badgeClass = 'rumored'; break;
                 }
             ?>
-                <a href="<?php echo $base; ?>device/<?php echo htmlspecialchars($deviceSlug); ?>" class="da-device-card">
-                    <div class="da-device-card-img-wrap">
-                        <?php if ($imagePath): ?>
-                            <img src="<?php echo htmlspecialchars($imagePath); ?>" alt="<?php echo htmlspecialchars($phone['name']); ?>" onerror="this.style.display='none'">
-                        <?php else: ?>
-                            <i class="fas fa-mobile-alt fa-3x" style="color: var(--border);"></i>
-                        <?php endif; ?>
+              <a href="<?php echo $base; ?>device/<?php echo htmlspecialchars($deviceSlug); ?>" class="da-device-card">
+                <div class="da-device-img-wrap">
+                  <?php if ($imagePath): ?>
+                    <img src="<?php echo htmlspecialchars($imagePath); ?>" alt="<?php echo htmlspecialchars($phone['name']); ?>" onerror="this.style.display='none'">
+                  <?php else: ?>
+                    <div class="da-device-img-placeholder">
+                      <i class="fa fa-mobile-screen fa-2x"></i>
                     </div>
-                    <div class="da-device-card-body">
-                        <h5 class="da-device-card-title"><?php echo htmlspecialchars($phone['name']); ?></h5>
-                        <div class="da-device-card-info-row">
-                            <span class="da-device-card-brand"><?php echo htmlspecialchars($phone['brand_name'] ?? $brandName); ?></span>
-                            <span class="da-device-card-badge year"><?php echo htmlspecialchars($phone['year'] ?? 'N/A'); ?></span>
-                        </div>
-                        <div class="da-device-card-info-row">
-                            <span class="da-device-card-price"><?php echo !empty($phone['price']) ? '$' . number_format((float)$phone['price'], 0) : 'N/A'; ?></span>
-                            <span class="da-device-card-badge <?php echo $availClass; ?>"><?php echo htmlspecialchars($phone['availability'] ?? 'Unknown'); ?></span>
-                        </div>
-                        <div class="da-device-card-specs">
-                            <?php if (!empty($phone['ram'])): ?>
-                                <div class="da-device-card-spec-item" title="RAM"><i class="fas fa-microchip"></i> <?php echo htmlspecialchars($phone['ram']); ?></div>
-                            <?php endif; ?>
-                            <?php if (!empty($phone['storage'])): ?>
-                                <div class="da-device-card-spec-item" title="Storage"><i class="fas fa-database"></i> <?php echo htmlspecialchars($phone['storage']); ?></div>
-                            <?php endif; ?>
-                            <?php if (!empty($phone['display_size'])): ?>
-                                <div class="da-device-card-spec-item" title="Display"><i class="fas fa-desktop"></i> <?php echo htmlspecialchars(str_replace('"', '', $phone['display_size'])) . '"'; ?></div>
-                            <?php endif; ?>
-                            <?php if (!empty($phone['main_camera_resolution'])): ?>
-                                <div class="da-device-card-spec-item" title="Camera"><i class="fas fa-camera"></i> <?php echo is_numeric($phone['main_camera_resolution']) ? htmlspecialchars($phone['main_camera_resolution']) . ' MP' : htmlspecialchars($phone['main_camera_resolution']); ?></div>
-                            <?php endif; ?>
-                        </div>
-                    </div>
-                </a>
+                  <?php endif; ?>
+                </div>
+                
+                <div class="da-device-body">
+                  <h3 class="da-device-title"><?php echo htmlspecialchars($phone['name']); ?></h3>
+                  
+                  <div class="da-device-brand-row">
+                    <span class="da-device-brand-name"><?php echo htmlspecialchars($phone['brand_name'] ?? $brandName); ?></span>
+                    <span class="da-device-badge year"><?php echo htmlspecialchars($phone['year'] ?? 'N/A'); ?></span>
+                  </div>
+                  
+                  <div class="da-device-badges">
+                    <span class="da-device-price"><?php echo !empty($phone['price']) ? '$' . number_format((float)$phone['price'], 0) : 'N/A'; ?></span>
+                    <span class="da-device-badge <?php echo $badgeClass; ?>"><?php echo htmlspecialchars($phone['availability'] ?? 'Unknown'); ?></span>
+                  </div>
+                  
+                  <div class="da-device-specs">
+                    <?php if (!empty($phone['ram'])): ?>
+                      <div class="da-device-spec-item" title="RAM"><i class="fa fa-microchip"></i> <?php echo htmlspecialchars($phone['ram']); ?></div>
+                    <?php endif; ?>
+                    <?php if (!empty($phone['storage'])): ?>
+                      <div class="da-device-spec-item" title="Storage"><i class="fa fa-hard-drive"></i> <?php echo htmlspecialchars($phone['storage']); ?></div>
+                    <?php endif; ?>
+                    <?php if (!empty($phone['display_size'])): ?>
+                      <div class="da-device-spec-item" title="Display"><i class="fa fa-mobile-screen-button"></i> <?php echo htmlspecialchars(str_replace('"', '', $phone['display_size'])) . '"'; ?></div>
+                    <?php endif; ?>
+                    <?php if (!empty($phone['main_camera_resolution'])): ?>
+                      <div class="da-device-spec-item" title="Camera"><i class="fa fa-camera"></i> <?php echo is_numeric($phone['main_camera_resolution']) ? htmlspecialchars($phone['main_camera_resolution']) . ' MP' : htmlspecialchars($phone['main_camera_resolution']); ?></div>
+                    <?php endif; ?>
+                  </div>
+                </div>
+              </a>
             <?php endforeach; ?>
 
             <?php if (empty($phones)): ?>
-                <div style="grid-column: 1 / -1; text-align: center; padding: 40px;">
-                    <i class="fas fa-mobile-alt fa-3x mb-3" style="color: var(--border);"></i>
-                    <p style="color: var(--text-muted);">No devices available for <?php echo htmlspecialchars($brandName); ?></p>
-                </div>
+              <div style="grid-column: 1 / -1; text-align: center; padding: 40px;">
+                <i class="fa fa-mobile-screen fa-3x text-muted mb-3"></i>
+                <p class="text-muted">No devices available for <?php echo htmlspecialchars($brandName); ?></p>
+              </div>
             <?php endif; ?>
           </div>
           
           <?php if ($totalDevicesCount > 50): ?>
-              <div class="text-center mt-4" id="brandLoadMoreContainer">
-                  <button id="brandLoadMoreBtn" class="da-sort-dropdown-btn mx-auto">Load More</button>
-              </div>
+            <div class="da-load-more-container mt-4" id="brandLoadMoreContainer" style="text-align: center;">
+              <button id="brandLoadMoreBtn" style="background: var(--bg-card); color: var(--text-primary); border: 1px solid var(--border); border-radius: var(--radius-sm); padding: 8px 24px; transition: var(--transition); cursor: pointer; font-weight: 600;">Load More</button>
+            </div>
           <?php endif; ?>
         </div>
       </main>
 
+      <!-- Sidebar -->
       <aside class="da-sidebar">
+
+        <!-- Latest Devices -->
         <?php include('includes/sidebar/latest-devices.php'); ?>
+
+        <!-- Popular Comparisons -->
         <?php include('includes/sidebar/popular-comparisons.php'); ?>
+
+        <!-- Top 10 Daily Interest -->
         <?php include('includes/sidebar/top-daily-interests.php'); ?>
+
+        <!-- Top 10 by Fans -->
         <?php include('includes/sidebar/top-by-fans.php'); ?>
+
       </aside>
     </div>
+    <!-- BOTTOM AREA -->
 
+    <!-- ── IN STORES NOW ── -->
     <?php include('includes/bottom-area/in-stores-now.php'); ?>
+
+    <!-- ── TRENDING COMPARISONS ── -->
     <?php include('includes/bottom-area/trending-comparisons.php'); ?>
+
+    <!-- ── FEATURED POSTS TICKER ── -->
+    <?php
+    $tickerLabel = 'Featured';
+    $tickerTitle = 'All Featured Posts';
+    $tickerLink = 'featured';
+    include('includes/bottom-area/featured-posts.php');
+    ?>
+
+    <!-- ── INFINITE BRAND MARQUEE ── -->
     <?php include('includes/bottom-area/brand-marquee.php'); ?>
+
   </div>
 
+  <!-- ══════════════════════ NEW FOOTER ══════════════════════ -->
   <?php include('includes/footer.php'); ?>
 
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/js/bootstrap.bundle.min.js"></script>
-
-  <!-- Base UI Scripts (Navbar, Modals, Search, Theme) -->
   <script>
     window.baseURL = '<?php echo $base; ?>';
 
@@ -369,10 +498,12 @@ try {
       }
     });
 
+    // Auto-Sliders moved to redesign/sliders.js
+
     // ── Navbar scroll effect ──
     const navbar = document.getElementById('da-navbar');
     window.addEventListener('scroll', () => {
-      if(navbar) navbar.classList.toggle('scrolled', window.scrollY > 40);
+      navbar.classList.toggle('scrolled', window.scrollY > 40);
     }, {
       passive: true
     });
@@ -380,30 +511,28 @@ try {
     // ── Mobile Menu ──
     const hamburger = document.getElementById('da-hamburger');
     const mobileMenu = document.getElementById('da-mobile-menu');
-    if (hamburger && mobileMenu) {
-        hamburger.addEventListener('click', () => {
-        hamburger.classList.toggle('open');
-        mobileMenu.classList.toggle('open');
-        document.body.style.overflow = mobileMenu.classList.contains('open') ? 'hidden' : '';
-        });
-    }
+    hamburger.addEventListener('click', () => {
+      hamburger.classList.toggle('open');
+      mobileMenu.classList.toggle('open');
+      document.body.style.overflow = mobileMenu.classList.contains('open') ? 'hidden' : '';
+    });
 
     function closeMobileMenu() {
-      if (hamburger) hamburger.classList.remove('open');
-      if (mobileMenu) mobileMenu.classList.remove('open');
+      hamburger.classList.remove('open');
+      mobileMenu.classList.remove('open');
       document.body.style.overflow = '';
     }
 
     // ── Brand Strip Arrows ──
     const brandScroll = document.getElementById('brand-strip-scroll');
-    const bLeft = document.getElementById('brand-strip-left');
-    const bRight = document.getElementById('brand-strip-right');
-    if (brandScroll && bLeft) {
-        bLeft.addEventListener('click', () => brandScroll.scrollBy({ left: -300, behavior: 'smooth' }));
-    }
-    if (brandScroll && bRight) {
-        bRight.addEventListener('click', () => brandScroll.scrollBy({ left: 300, behavior: 'smooth' }));
-    }
+    document.getElementById('brand-strip-left').addEventListener('click', () => brandScroll.scrollBy({
+      left: -300,
+      behavior: 'smooth'
+    }));
+    document.getElementById('brand-strip-right').addEventListener('click', () => brandScroll.scrollBy({
+      left: 300,
+      behavior: 'smooth'
+    }));
 
     // ── Live Search ──
     const searchInput = document.getElementById('da-search-input');
@@ -458,41 +587,38 @@ try {
     }
 
     // ── Newsletter ──
-    const nlBtn = document.getElementById('da-newsletter-btn');
-    if (nlBtn) {
-        nlBtn.addEventListener('click', function () {
-        const email = document.getElementById('da-newsletter-email').value.trim();
-        const msg = document.getElementById('da-newsletter-msg');
-        if (!email) {
-            msg.textContent = 'Please enter your email.';
-            msg.className = 'error';
-            return;
-        }
-        this.disabled = true;
-        this.textContent = 'Subscribing...';
-        const btn = this;
-        fetch(baseURL + 'handle_newsletter.php', {
-            method: 'POST',
-            headers: {
-            'Content-Type': 'application/x-www-form-urlencoded'
-            },
-            body: 'newsletter_email=' + encodeURIComponent(email)
-        })
-            .then(r => r.json())
-            .then(data => {
-            msg.textContent = data.message;
-            msg.className = data.success ? 'success' : 'error';
-            if (data.success) document.getElementById('da-newsletter-email').value = '';
-            btn.disabled = false;
-            btn.textContent = 'Subscribe';
-            }).catch(() => {
-            msg.textContent = 'An error occurred.';
-            msg.className = 'error';
-            btn.disabled = false;
-            btn.textContent = 'Subscribe';
-            });
+    document.getElementById('da-newsletter-btn').addEventListener('click', function () {
+      const email = document.getElementById('da-newsletter-email').value.trim();
+      const msg = document.getElementById('da-newsletter-msg');
+      if (!email) {
+        msg.textContent = 'Please enter your email.';
+        msg.className = 'error';
+        return;
+      }
+      this.disabled = true;
+      this.textContent = 'Subscribing...';
+      const btn = this;
+      fetch(baseURL + 'handle_newsletter.php', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/x-www-form-urlencoded'
+        },
+        body: 'newsletter_email=' + encodeURIComponent(email)
+      })
+        .then(r => r.json())
+        .then(data => {
+          msg.textContent = data.message;
+          msg.className = data.success ? 'success' : 'error';
+          if (data.success) document.getElementById('da-newsletter-email').value = '';
+          btn.disabled = false;
+          btn.textContent = 'Subscribe';
+        }).catch(() => {
+          msg.textContent = 'An error occurred.';
+          msg.className = 'error';
+          btn.disabled = false;
+          btn.textContent = 'Subscribe';
         });
-    }
+    });
 
     // ── Notification mark seen ──
     function markNotificationsAsSeen() {
@@ -523,7 +649,6 @@ try {
 
     function showAuthMsg(id, msg, type) {
       const el = document.getElementById(id);
-      if(!el) return;
       el.className = 'alert alert-' + type + ' alert-dismissible fade show';
       el.innerHTML = msg + '<button type="button" class="btn-close" data-bs-dismiss="alert"></button>';
       el.style.display = 'block';
@@ -654,146 +779,186 @@ try {
       bootstrap.Modal.getInstance(document.getElementById('signupModal')).hide();
       setTimeout(() => new bootstrap.Modal(document.getElementById('loginModal')).show(), 300);
     }
+
+    // ── Infinite horizontal post scroll ──
+    (function () {
+      let page = 1,
+        loading = false,
+        hasMore = <?php echo count($posts) >= 20 ? 'true' : 'false'; ?>;
+      const container = document.getElementById('featured-scroll-container');
+      const loader = document.getElementById('featured-load-more');
+      if (!container) return;
+      container.addEventListener('scroll', function () {
+        if (loading || !hasMore) return;
+        if (this.scrollLeft + this.clientWidth >= this.scrollWidth - 300) loadMore();
+      }, {
+        passive: true
+      });
+
+      function loadMore() {
+        if (loading || !hasMore) return;
+        loading = true;
+        page++;
+        if (loader) loader.style.display = 'flex';
+        fetch(baseURL + 'load_posts.php?page=' + page + '&type=featured&format=block')
+          .then(r => r.json())
+          .then(data => {
+            if (data.success && data.html) {
+              if (loader) loader.insertAdjacentHTML('beforebegin', data.html);
+              hasMore = data.hasMore;
+              // Re-skin new items
+              container.querySelectorAll('.div-block').forEach(el => {
+                if (!el.classList.contains('da-ticker-item')) el.classList.add('da-ticker-compat');
+              });
+            } else {
+              hasMore = false;
+            }
+            if (!hasMore && loader) loader.style.display = 'none';
+            loading = false;
+          }).catch(() => {
+            loading = false;
+            if (loader) loader.style.display = 'none';
+          });
+      }
+    })();
+
   </script>
 
-  <!-- Separate Script Block for Brand Devices Fetching & Sorting -->
+  <!-- Separate Script Block for Brands Sorting to avoid being blocked by other errors -->
   <script>
-        const brandId = <?php echo $brandId; ?>;
-        const totalDevices = <?php echo $totalDevicesCount; ?>;
-        const brandSlug = "<?php echo htmlspecialchars($brandSlug); ?>";
-        let currentPage = 1;
-        const base_URL = '<?php echo $base; ?>';
+    // ── Pagination and Sorting for Brand Devices ──
+    const brandId = <?php echo $brandId; ?>;
+    const totalDevices = <?php echo $totalDevicesCount; ?>;
+    const brandSlug = "<?php echo htmlspecialchars($brandSlug); ?>";
+    const brandName = "<?php echo htmlspecialchars($brandName); ?>";
+    const baseUri = "<?php echo $base; ?>";
+    let currentPage = 1;
+    
+    function getBrandDeviceCard(phone) {
+        const imagePath = phone.image ? (phone.image.startsWith('/') || phone.image.startsWith('http') ? phone.image : '/' + phone.image) : '';
+        const deviceSlug = phone.slug || phone.id;
         
-        function getBrandDeviceCard(phone) {
-            const imagePath = phone.image ? (phone.image.startsWith('/') || phone.image.startsWith('http') ? phone.image : '/' + phone.image) : '';
-            const deviceSlug = phone.slug || phone.id;
-            
-            let availClass = 'available';
-            switch (phone.availability) {
-                case 'Available': availClass = 'available'; break;
-                case 'Coming Soon': availClass = 'coming-soon'; break;
-                case 'Discontinued': availClass = 'discontinued'; break;
-                case 'Rumored': availClass = 'rumored'; break;
-            }
-            
-            let imageHtml = imagePath ? `<img src="${imagePath}" alt="${phone.name}" onerror="this.style.display='none'">` : `<i class="fas fa-mobile-alt fa-3x" style="color: var(--border);"></i>`;
-            
-            let specsHtml = '';
-            if (phone.ram) specsHtml += `<div class="da-device-card-spec-item" title="RAM"><i class="fas fa-microchip"></i> ${phone.ram}</div>`;
-            if (phone.storage) specsHtml += `<div class="da-device-card-spec-item" title="Storage"><i class="fas fa-database"></i> ${phone.storage}</div>`;
-            if (phone.display_size) specsHtml += `<div class="da-device-card-spec-item" title="Display"><i class="fas fa-desktop"></i> ${phone.display_size.replace('"', '')}"</div>`;
-            if (phone.main_camera_resolution) {
-                let cam = !isNaN(phone.main_camera_resolution) ? phone.main_camera_resolution + ' MP' : phone.main_camera_resolution;
-                specsHtml += `<div class="da-device-card-spec-item" title="Camera"><i class="fas fa-camera"></i> ${cam}</div>`;
-            }
-
-            const price = parseFloat(phone.price);
-            const priceHtml = (!isNaN(price) && price > 0) ? '$' + price.toLocaleString() : 'N/A';
-            const year = phone.year || 'N/A';
-
-            return `
-                <a href="${base_URL}device/${deviceSlug}" class="da-device-card">
-                    <div class="da-device-card-img-wrap">
-                        ${imageHtml}
-                    </div>
-                    <div class="da-device-card-body">
-                        <h5 class="da-device-card-title">${phone.name}</h5>
-                        <div class="da-device-card-info-row">
-                            <span class="da-device-card-brand">${phone.brand_name || '<?php echo htmlspecialchars($brandName); ?>'}</span>
-                            <span class="da-device-card-badge year">${year}</span>
-                        </div>
-                        <div class="da-device-card-info-row">
-                            <span class="da-device-card-price">${priceHtml}</span>
-                            <span class="da-device-card-badge ${availClass}">${phone.availability || 'Unknown'}</span>
-                        </div>
-                        <div class="da-device-card-specs">
-                            ${specsHtml}
-                        </div>
-                    </div>
-                </a>
-            `;
+        let badgeClass = 'year';
+        switch (phone.availability) {
+            case 'Available': badgeClass = 'available'; break;
+            case 'Coming Soon': badgeClass = 'coming-soon'; break;
+            case 'Discontinued': badgeClass = 'discontinued'; break;
+            case 'Rumored': badgeClass = 'rumored'; break;
         }
         
-        function loadBrandDevices(page, isAppend) {
-            const sort = document.getElementById('brandDeviceSorter').value;
-            const container = document.getElementById('brandDevicesGrid');
-            let btn = document.getElementById('brandLoadMoreBtn');
-            let btnContainer = document.getElementById('brandLoadMoreContainer');
-            
-            if (!isAppend) {
-                container.innerHTML = '<div style="grid-column: 1 / -1; text-align: center; padding: 40px;"><i class="fa fa-spinner fa-spin fa-3x mb-3" style="color: var(--text-muted);"></i><p style="color: var(--text-muted);">Loading devices...</p></div>';
-            } else if (btn) {
-                btn.innerHTML = '<i class="fa fa-spinner fa-spin me-2"></i>Loading...';
-                btn.disabled = true;
-            }
-            
-            fetch(`${base_URL}api_get_brand_devices.php?brand_id=${brandId}&page=${page}&sort=${sort}`)
-                .then(res => res.json())
-                .then(data => {
-                    if (data.success) {
-                        if (!isAppend) container.innerHTML = '';
-                        
-                        // Refetch elements since DOM might have changed
-                        btnContainer = document.getElementById('brandLoadMoreContainer');
-                        btn = document.getElementById('brandLoadMoreBtn');
-                        
-                        if (btnContainer && btnContainer.parentNode) {
-                            btnContainer.parentNode.removeChild(btnContainer);
-                        }
-                        
-                        if (data.devices.length === 0 && !isAppend) {
-                            container.innerHTML = '<div style="grid-column: 1 / -1; text-align: center; padding: 40px;"><i class="fas fa-mobile-alt fa-3x mb-3" style="color: var(--border);"></i><p style="color: var(--text-muted);">No devices available.</p></div>';
-                            return;
-                        }
+        let imageHtml = imagePath ? `<img src="${imagePath}" alt="${phone.name}" onerror="this.style.display='none'">` : `<div class="da-device-img-placeholder"><i class="fa fa-mobile-screen fa-2x"></i></div>`;
+        
+        let specsHtml = '';
+        if (phone.ram) specsHtml += `<div class="da-device-spec-item" title="RAM"><i class="fa fa-microchip"></i> ${phone.ram}</div>`;
+        if (phone.storage) specsHtml += `<div class="da-device-spec-item" title="Storage"><i class="fa fa-hard-drive"></i> ${phone.storage}</div>`;
+        if (phone.display_size) specsHtml += `<div class="da-device-spec-item" title="Display"><i class="fa fa-mobile-screen-button"></i> ${phone.display_size.replace('"', '')}"</div>`;
+        if (phone.main_camera_resolution) specsHtml += `<div class="da-device-spec-item" title="Camera"><i class="fa fa-camera"></i> ${!isNaN(phone.main_camera_resolution) ? phone.main_camera_resolution + ' MP' : phone.main_camera_resolution}</div>`;
 
-                        let htmlBuffer = '';
-                        data.devices.forEach(device => {
-                            htmlBuffer += getBrandDeviceCard(device);
+        const price = parseFloat(phone.price);
+        const priceHtml = (!isNaN(price) && price > 0) ? '$' + price.toLocaleString() : 'N/A';
+        const year = phone.year || 'N/A';
+
+        return `
+          <a href="${baseUri}device/${deviceSlug}" class="da-device-card">
+            <div class="da-device-img-wrap">
+              ${imageHtml}
+            </div>
+            <div class="da-device-body">
+              <h3 class="da-device-title">${phone.name}</h3>
+              <div class="da-device-brand-row">
+                <span class="da-device-brand-name">${phone.brand_name || brandName}</span>
+                <span class="da-device-badge year">${year}</span>
+              </div>
+              <div class="da-device-badges">
+                <span class="da-device-price">${priceHtml}</span>
+                <span class="da-device-badge ${badgeClass}">${phone.availability || 'Unknown'}</span>
+              </div>
+              <div class="da-device-specs">
+                ${specsHtml}
+              </div>
+            </div>
+          </a>
+        `;
+    }
+    
+    function loadBrandDevices(page, isAppend) {
+        const sort = document.getElementById('brandDeviceSorter').value;
+        const container = document.getElementById('brandDeviceGrid');
+        let btn = document.getElementById('brandLoadMoreBtn');
+        let btnContainer = document.getElementById('brandLoadMoreContainer');
+        
+        if (!isAppend) {
+            container.innerHTML = '<div style="grid-column: 1 / -1; text-align: center; padding: 40px;"><i class="fa fa-spinner fa-spin fa-3x text-muted mb-3"></i><p>Loading devices...</p></div>';
+        } else if (btn) {
+            btn.innerHTML = '<i class="fa fa-spinner fa-spin me-2"></i>Loading...';
+            btn.disabled = true;
+        }
+        
+        fetch(`${baseUri}api_get_brand_devices.php?brand_id=${brandId}&page=${page}&sort=${sort}`)
+            .then(res => res.json())
+            .then(data => {
+                if (data.success) {
+                    if (!isAppend) container.innerHTML = '';
+                    
+                    // Refetch elements since DOM might have changed
+                    btnContainer = document.getElementById('brandLoadMoreContainer');
+                    btn = document.getElementById('brandLoadMoreBtn');
+                    
+                    if (btnContainer && btnContainer.parentNode) {
+                        btnContainer.parentNode.removeChild(btnContainer);
+                    }
+                    
+                    if (data.devices.length === 0 && !isAppend) {
+                        container.innerHTML = '<div style="grid-column: 1 / -1; text-align: center; padding: 40px;"><i class="fa fa-mobile-screen fa-3x text-muted mb-3"></i><p class="text-muted">No devices available.</p></div>';
+                        return;
+                    }
+
+                    data.devices.forEach(device => {
+                        container.insertAdjacentHTML('beforeend', getBrandDeviceCard(device));
+                    });
+                    
+                    currentPage = page;
+                    
+                    if (data.page < data.total_pages) {
+                        container.insertAdjacentHTML('afterend', `
+                            <div class="da-load-more-container mt-4" id="brandLoadMoreContainer" style="text-align: center;">
+                                <button id="brandLoadMoreBtn" style="background: var(--bg-card); color: var(--text-primary); border: 1px solid var(--border); border-radius: var(--radius-sm); padding: 8px 24px; transition: var(--transition); cursor: pointer; font-weight: 600;">Load More</button>
+                            </div>
+                        `);
+                        document.getElementById('brandLoadMoreBtn').addEventListener('click', function() {
+                            loadBrandDevices(currentPage + 1, true);
                         });
-                        container.insertAdjacentHTML('beforeend', htmlBuffer);
-                        
-                        currentPage = page;
-                        
-                        if (data.page < data.total_pages) {
-                            // Append Load More button after the grid
-                            const newBtnContainer = document.createElement('div');
-                            newBtnContainer.className = 'text-center mt-4';
-                            newBtnContainer.id = 'brandLoadMoreContainer';
-                            newBtnContainer.innerHTML = '<button id="brandLoadMoreBtn" class="da-sort-dropdown-btn mx-auto">Load More</button>';
-                            container.parentNode.appendChild(newBtnContainer);
-                            
-                            document.getElementById('brandLoadMoreBtn').addEventListener('click', function() {
-                                loadBrandDevices(currentPage + 1, true);
-                            });
-                        }
                     }
-                })
-                .catch(err => {
-                    console.error("Failed to load devices", err);
-                    if (!isAppend) {
-                        container.innerHTML = '<div style="grid-column: 1 / -1; text-align: center; padding: 40px; color: var(--accent);">Failed to load.</div>';
-                    } else if (btn) {
-                        btn.innerHTML = 'Load More';
-                        btn.disabled = false;
-                    }
-                });
+                }
+            })
+            .catch(err => {
+                console.error("Failed to load devices", err);
+                if (!isAppend) {
+                    container.innerHTML = '<div style="grid-column: 1 / -1; text-align: center; padding: 40px; color: red;">Failed to load.</div>';
+                } else if (btn) {
+                    btn.innerHTML = 'Load More';
+                    btn.disabled = false;
+                }
+            });
+    }
+    
+    document.addEventListener('DOMContentLoaded', function() {
+        const sorter = document.getElementById('brandDeviceSorter');
+        if (sorter) {
+            sorter.addEventListener('change', function() {
+                loadBrandDevices(1, false);
+            });
         }
-
-        document.addEventListener('DOMContentLoaded', function() {
-            const sorter = document.getElementById('brandDeviceSorter');
-            if (sorter) {
-                sorter.addEventListener('change', function() {
-                    loadBrandDevices(1, false);
-                });
-            }
-            
-            const btn = document.getElementById('brandLoadMoreBtn');
-            if (btn) {
-                btn.addEventListener('click', function() {
-                    loadBrandDevices(currentPage + 1, true);
-                });
-            }
-        });
+        
+        const btn = document.getElementById('brandLoadMoreBtn');
+        if (btn) {
+            btn.addEventListener('click', function() {
+                loadBrandDevices(currentPage + 1, true);
+            });
+        }
+    });
   </script>
+  <script src="<?php echo $base; ?>redesign/sliders.js"></script>
 </body>
+
 </html>
