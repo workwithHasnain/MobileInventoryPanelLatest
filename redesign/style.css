@@ -4736,3 +4736,348 @@ textarea.da-input {
   background: var(--bg-card-hover);
   border-color: var(--accent);
 }
+
+/* ==========================================================================
+   ARTICLE PAGE STYLES
+   ========================================================================== */
+
+.da-article-layout {
+  display: grid;
+  grid-template-columns: 1fr 340px;
+  gap: 32px;
+  align-items: start;
+}
+
+.da-article {
+  background: var(--bg-card);
+  border-radius: var(--radius-lg);
+  overflow: hidden;
+  border: 1px solid var(--border);
+  padding: 32px;
+}
+
+.da-article-header {
+  margin-bottom: 32px;
+}
+
+.da-article-meta-top {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 16px;
+  flex-wrap: wrap;
+  gap: 12px;
+}
+
+.da-article-jump {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  background: var(--bg-primary);
+  padding: 4px 8px;
+  border-radius: var(--radius-sm);
+  border: 1px solid var(--border);
+}
+
+.da-jump-select {
+  background: transparent;
+  color: var(--text-primary);
+  border: none;
+  font-size: 13px;
+  font-weight: 500;
+  outline: none;
+  max-width: 180px;
+}
+
+.da-jump-btn {
+  background: transparent;
+  border: none;
+  color: var(--accent);
+  cursor: pointer;
+  padding: 0 4px;
+  transition: var(--transition);
+}
+
+.da-jump-btn:hover {
+  color: var(--accent-hover);
+}
+
+.da-article-date {
+  font-size: 13px;
+  color: var(--text-muted);
+  font-weight: 500;
+}
+
+.da-article-title {
+  font-size: 36px;
+  font-weight: 800;
+  color: var(--text-primary);
+  line-height: 1.2;
+  margin-bottom: 24px;
+  letter-spacing: -0.5px;
+}
+
+.da-article-meta-bottom {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 16px;
+  padding-top: 20px;
+  border-top: 1px solid var(--border);
+}
+
+.da-article-author {
+  font-size: 14px;
+  color: var(--text-muted);
+}
+
+.da-article-author span {
+  color: var(--text-primary);
+  font-weight: 600;
+}
+
+.da-article-tags {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.da-tag {
+  background: rgba(255, 61, 0, 0.1);
+  color: var(--accent);
+  padding: 4px 12px;
+  border-radius: 20px;
+  font-size: 12px;
+  font-weight: 600;
+  text-transform: uppercase;
+}
+
+.da-article-featured-image {
+  margin: 0 -32px 32px -32px;
+}
+
+.da-article-featured-image img {
+  width: 100%;
+  height: auto;
+  display: block;
+}
+
+.da-article-content {
+  font-size: 18px;
+  line-height: 1.8;
+  color: var(--text-secondary);
+}
+
+.da-article-content p {
+  margin-bottom: 24px;
+}
+
+.da-article-content h2, 
+.da-article-content h3 {
+  color: var(--text-primary);
+  margin: 40px 0 20px;
+  font-weight: 700;
+}
+
+.da-article-content img {
+  max-width: 100%;
+  height: auto;
+  border-radius: var(--radius-md);
+  margin: 24px 0;
+}
+
+/* ==========================================================================
+   COMMENTS SECTION
+   ========================================================================== */
+
+.da-comment-thread {
+  display: flex;
+  gap: 16px;
+  margin-bottom: 24px;
+  padding: 20px;
+  background: var(--bg-primary);
+  border-radius: var(--radius-md);
+  border: 1px solid var(--border);
+}
+
+.da-comment-thread.da-reply {
+  margin-left: 48px;
+  background: rgba(255, 255, 255, 0.02);
+}
+
+.da-comment-avatar {
+  flex-shrink: 0;
+}
+
+.da-comment-avatar img,
+.da-avatar-initial {
+  width: 48px;
+  height: 48px;
+  border-radius: 50%;
+  object-fit: cover;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 700;
+  font-size: 18px;
+}
+
+.da-comment-content {
+  flex-grow: 1;
+}
+
+.da-comment-header {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 8px;
+}
+
+.da-comment-name {
+  font-weight: 700;
+  color: var(--text-primary);
+  font-size: 15px;
+}
+
+.da-comment-time {
+  font-size: 12px;
+  color: var(--text-muted);
+}
+
+.da-comment-text {
+  font-size: 15px;
+  line-height: 1.6;
+  color: var(--text-secondary);
+  margin-bottom: 12px;
+}
+
+.da-comment-reply-btn {
+  background: transparent;
+  border: none;
+  color: var(--accent);
+  font-size: 13px;
+  font-weight: 600;
+  padding: 0;
+  cursor: pointer;
+}
+
+.da-comment-reply-btn:hover {
+  text-decoration: underline;
+}
+
+.da-reply-indicator-text {
+  color: var(--text-muted);
+  font-weight: 400;
+  margin-left: 8px;
+}
+
+.da-comment-form-wrap {
+  padding: 24px;
+  background: var(--bg-primary);
+  border-radius: var(--radius-md);
+  border: 1px solid var(--border);
+}
+
+.da-reply-indicator {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background: rgba(255, 61, 0, 0.1);
+  padding: 12px 16px;
+  border-radius: var(--radius-sm);
+  margin-bottom: 20px;
+  border-left: 4px solid var(--accent);
+}
+
+.da-reply-info {
+  font-size: 14px;
+  color: var(--text-primary);
+}
+
+.da-form-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 16px;
+  margin-bottom: 16px;
+}
+
+.da-form-group {
+  margin-bottom: 16px;
+}
+
+.da-input {
+  width: 100%;
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  padding: 12px 16px;
+  color: var(--text-primary);
+  font-family: inherit;
+  transition: var(--transition);
+}
+
+.da-input:focus {
+  border-color: var(--accent);
+  outline: none;
+  box-shadow: 0 0 0 2px rgba(255, 61, 0, 0.1);
+}
+
+.da-captcha-group {
+  margin-top: 24px;
+}
+
+.da-captcha-box {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-top: 8px;
+}
+
+.da-captcha-box img {
+  height: 48px;
+  border-radius: var(--radius-sm);
+  cursor: pointer;
+}
+
+.da-form-footer {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-top: 24px;
+  flex-wrap: wrap;
+  gap: 20px;
+}
+
+.da-form-submit-info {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  flex-wrap: wrap;
+}
+
+.da-form-note {
+  color: var(--text-muted);
+  font-size: 12px;
+}
+
+/* Mobile Adjustments for Article */
+@media (max-width: 991px) {
+  .da-article-layout {
+    grid-template-columns: 1fr;
+  }
+  .da-article-title {
+    font-size: 28px;
+  }
+  .da-article {
+    padding: 20px;
+  }
+  .da-article-featured-image {
+    margin: 0 -20px 24px -20px;
+  }
+  .da-form-row {
+    grid-template-columns: 1fr;
+  }
+  .da-comment-thread.da-reply {
+    margin-left: 20px;
+  }
+}
