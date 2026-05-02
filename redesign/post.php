@@ -351,17 +351,13 @@ $featured_image_url = getAbsoluteImagePath($post['featured_image'], $base);
                 <a href="<?php echo $base; ?>" class="da-breadcrumb-link">Home</a>
                 <span class="da-breadcrumb-sep">/</span>
                 <a href="<?php echo $base; ?>posts" class="da-breadcrumb-link">Blog</a>
-                <?php if (!empty($post['categories'])): ?>
-                    <?php 
-                    $cats = $post['categories'];
-                    if (is_string($cats)) {
-                        $cats = str_replace(['{', '}'], '', $cats);
-                        $cats = explode(',', $cats);
-                    }
+                <?php 
+                $cats = parseTags($post['categories'] ?? null);
+                if (!empty($cats)): 
                     foreach ($cats as $cat): ?>
                         <span class="da-category-pill"><?php echo htmlspecialchars(trim($cat, '" ')); ?></span>
-                    <?php endforeach; ?>
-                <?php endif; ?>
+                    <?php endforeach; 
+                endif; ?>
             </nav>
             
             <h1 class="da-post-title"><?php echo htmlspecialchars($post['title']); ?></h1>
