@@ -8,6 +8,8 @@ require_once __DIR__ . '/../config.php';
 require_once __DIR__ . '/../database_functions.php';
 require_once __DIR__ . '/../phone_data.php';
 
+$pdo = getConnection();
+
 // New clean URL format: domain/post/slug (instead of domain/post.php?slug=xyz)
 // The .htaccess file rewrites clean URLs to this page and passes slug as query parameter
 // Base path variable is now defined in config.php
