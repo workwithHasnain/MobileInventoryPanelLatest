@@ -98,6 +98,11 @@ $brands_stmt = $pdo->prepare("SELECT b.*,COUNT(p.id) as device_count FROM brands
 $brands_stmt->execute();
 $brands = $brands_stmt->fetchAll();
 
+// All brands alphabetically for brand/device modal
+$all_brands_stmt = $pdo->prepare("SELECT * FROM brands ORDER BY name ASC");
+$all_brands_stmt->execute();
+$allBrandsModal = $all_brands_stmt->fetchAll();
+
 // ── Resolve post by slug ──
 $slug = $_GET['slug'] ?? $_GET['id'] ?? null;
 if (!$slug) { header('Location: ' . $base); exit; }
@@ -127,23 +132,72 @@ try {
   $upd->execute([$post['id'], $post['id']]);
 } catch (Exception $e) {}
 
-// Parse tags helper
+// Parse tags helper — exact match of legacy post.php tag parsing logic
 function parseTags($tags) {
   if (empty($tags)) return [];
   if (is_string($tags)) {
-    $t = trim($tags);
-    if ($t[0] === '[') { $t = trim($t,'[]'); return array_filter(array_map('trim', explode(',', $t))); }
-    if ($t[0] === '{') { $t = trim($t,'{}'); return array_filter(array_map(fn($x)=>trim($x,'"'), explode(',', $t))); }
-    return array_filter(array_map('trim', explode(',', $t)));
+    $tagsString = trim($tags);
+    // JSON array format: [apple,smartphones]
+    if (strlen($tagsString) > 1 && $tagsString[0] === '[' && substr($tagsString, -1) === ']') {
+      $tagsString = trim($tagsString, '[]');
+      return array_filter(array_map('trim', explode(',', $tagsString)));
+    }
+    // PostgreSQL array format: {"Apple","iOS","Rumors"}
+    elseif (strlen($tagsString) > 1 && $tagsString[0] === '{' && substr($tagsString, -1) === '}') {
+      $tagsString = trim($tagsString, '{}');
+      return array_filter(array_map(function($tag) {
+        return trim($tag, '"');
+      }, explode(',', $tagsString)));
+    }
+    // Plain comma-separated
+    else {
+      return array_filter(array_map('trim', explode(',', $tagsString)));
+    }
   }
   return is_array($tags) ? $tags : [];
 }
 $postTags = parseTags($post['tags'] ?? '');
 
-// Session logged-in user for comment form prefill
-$loggedInName = $_SESSION['public_user_name'] ?? ($_SESSION['username'] ?? '');
-$loggedInEmail = $_SESSION['public_user_email'] ?? '';
-$isUserLoggedIn = !empty($loggedInName);
+// Session logged-in user for comment form prefill — matches legacy logic exactly
+$loggedInName = '';
+$loggedInEmail = '';
+$isUserLoggedIn = false;
+if (!empty($_SESSION['public_user_id'])) {
+  $loggedInName  = $_SESSION['public_user_name'] ?? '';
+  $loggedInEmail = $_SESSION['public_user_email'] ?? '';
+  $isUserLoggedIn = true;
+} elseif (!empty($_SESSION['logged_in']) && $_SESSION['logged_in'] === true) {
+  // Admin/staff session fallback
+  $loggedInName  = $_SESSION['username'] ?? '';
+  $loggedInEmail = '';
+  $isUserLoggedIn = true;
+}
+
+// Newsletter server-side handler
+$newsletter_success = '';
+$newsletter_error = '';
+if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && $_POST['action'] === 'newsletter_subscribe') {
+  $nl_email = trim($_POST['newsletter_email'] ?? '');
+  $nl_name  = trim($_POST['newsletter_name'] ?? '');
+  if (empty($nl_email)) {
+    $newsletter_error = 'Email address is required.';
+  } elseif (!filter_var($nl_email, FILTER_VALIDATE_EMAIL)) {
+    $newsletter_error = 'Please enter a valid email address.';
+  } else {
+    $chk = $pdo->prepare("SELECT id FROM newsletter_subscribers WHERE email = ?");
+    $chk->execute([$nl_email]);
+    if ($chk->fetch()) {
+      $newsletter_error = 'This email is already subscribed to our newsletter.';
+    } else {
+      $ins = $pdo->prepare("INSERT INTO newsletter_subscribers (email, name, status, subscribed_at) VALUES (?, ?, 'active', NOW())");
+      if ($ins->execute([$nl_email, $nl_name])) {
+        $newsletter_success = 'Thank you for subscribing! You will receive the latest tech updates.';
+      } else {
+        $newsletter_error = 'Failed to subscribe. Please try again.';
+      }
+    }
+  }
+}
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -240,16 +294,22 @@ $isUserLoggedIn = !empty($loggedInName);
           <nav class="da-post-breadcrumb" aria-label="breadcrumb">
             <a href="<?php echo $base; ?>"><i class="fa fa-home"></i></a>
             <span class="da-post-breadcrumb-sep">/</span>
-            <a href="<?php echo $base; ?>news">Blog</a>
+            <?php
+              $bcLabel = !empty($post['is_news']) ? 'News' : (!empty($post['is_review']) ? 'Reviews' : 'Posts');
+              $bcLink  = !empty($post['is_news']) ? 'news' : (!empty($post['is_review']) ? 'reviews' : 'news');
+            ?>
+            <a href="<?php echo $base . $bcLink; ?>"><?php echo $bcLabel; ?></a>
             <span class="da-post-breadcrumb-sep">/</span>
-            <span><?php echo htmlspecialchars(mb_strimwidth($post['title'], 0, 40, '...')); ?></span>
+            <span><?php $t=$post['title']; echo htmlspecialchars(strlen($t)>42 ? substr($t,0,39).'...' : $t); ?></span>
           </nav>
-          <!-- Category label -->
-          <?php if (!empty($post['category'])): ?>
-            <div class="cp-hero-label"><span><?php echo htmlspecialchars($post['category']); ?></span></div>
-          <?php else: ?>
-            <div class="cp-hero-label"><span>Article</span></div>
-          <?php endif; ?>
+          <!-- Category / Post type chip -->
+          <?php
+            if (!empty($post['is_news'])) $heroLabel = 'News';
+            elseif (!empty($post['is_review'])) $heroLabel = 'Review';
+            elseif (!empty($post['is_featured'])) $heroLabel = 'Featured';
+            else $heroLabel = !empty($post['category']) ? $post['category'] : 'Post';
+          ?>
+          <div class="cp-hero-label"><span><?php echo htmlspecialchars($heroLabel); ?></span></div>
           <h1 class="cp-hero-title da-post-hero-title"><?php echo htmlspecialchars($post['title']); ?></h1>
           <!-- Post meta -->
           <div class="da-post-hero-meta">
@@ -903,6 +963,9 @@ $isUserLoggedIn = !empty($loggedInName);
     })();
   </script>
   <script src="<?php echo $base; ?>redesign/sliders.js"></script>
+  <!-- Legacy comment-ajax.js compatibility (COMMENT_AJAX_BASE used by shared script) -->
+  <script>var COMMENT_AJAX_BASE = '<?php echo $base; ?>';</script>
+  <script src="<?php echo $base; ?>js/comment-ajax.js"></script>
 </body>
 
 </html>
