@@ -39,6 +39,17 @@ if (!$post) {
 }
 
 // Helper functions for posts
+function getAbsoluteImagePath($imagePath, $base)
+{
+  if (empty($imagePath)) return '';
+  // Already an absolute URL
+  if (filter_var($imagePath, FILTER_VALIDATE_URL)) return $imagePath;
+  // Already an absolute path starting with /
+  if (strpos($imagePath, '/') === 0) return $imagePath;
+  // Relative path - prepend base
+  return $base . ltrim($imagePath, '/');
+}
+
 function getPostComments($post_id)
 {
   global $pdo;
@@ -108,8 +119,6 @@ function getAvatarDisplay($name, $email)
     return '<img src="' . getGravatarUrl($email) . '" alt="' . htmlspecialchars($name) . '">';
   } else {
     $initials = strtoupper(substr($name, 0, 1));
-    $colors = ['#007bff', '#28a745', '#dc3545', '#ffc107', '#17a2b8', '#6f42c1', '#e83e8c'];
-    $color = $colors[abs(crc32($name)) % count($colors)];
     return '<span class="avatar-box">' . $initials . '</span>';
   }
 }
@@ -172,39 +181,6 @@ $brands = $brands_stmt->fetchAll();
 $all_brands_stmt = $pdo->prepare("SELECT * FROM brands ORDER BY name ASC");
 $all_brands_stmt->execute();
 $allBrandsModal = $all_brands_stmt->fetchAll();
-
-// Get top viewed/reviewed for sidebar
-try {
-  $stmt = $pdo->prepare("
-        SELECT p.*, b.name as brand_name, COUNT(cv.id) as view_count
-        FROM phones p 
-        LEFT JOIN brands b ON p.brand_id = b.id
-        LEFT JOIN content_views cv ON CAST(p.id AS VARCHAR) = cv.content_id AND cv.content_type = 'device'
-        GROUP BY p.id, b.name
-        ORDER BY view_count DESC
-        LIMIT 10
-    ");
-  $stmt->execute();
-  $topViewedDevices = $stmt->fetchAll();
-} catch (Exception $e) {
-  $topViewedDevices = [];
-}
-
-try {
-  $stmt = $pdo->prepare("
-        SELECT p.*, b.name as brand_name, COUNT(dc.id) as review_count
-        FROM phones p 
-        LEFT JOIN brands b ON p.brand_id = b.id
-        LEFT JOIN device_comments dc ON CAST(p.id AS VARCHAR) = dc.device_id AND dc.status = 'approved'
-        GROUP BY p.id, b.name
-        ORDER BY review_count DESC
-        LIMIT 10
-    ");
-  $stmt->execute();
-  $topReviewedDevices = $stmt->fetchAll();
-} catch (Exception $e) {
-  $topReviewedDevices = [];
-}
 
 // SEO Metadata setup
 $page_title = htmlspecialchars($post['meta_title'] ?? $post['title']) . " - DevicesArena";
@@ -402,9 +378,11 @@ $featured_image_url = getAbsoluteImagePath($post['featured_image'], $base);
         </header>
 
         <!-- Featured Image -->
+        <?php if (!empty($post['featured_image'])): ?>
         <div class="da-post-featured-image-wrapper">
             <img src="<?php echo $featured_image_url; ?>" alt="<?php echo htmlspecialchars($post['title']); ?>" class="da-post-featured-image">
         </div>
+        <?php endif; ?>
 
         <!-- Jump to Section -->
         <div class="da-post-toc-wrapper mb-4">
@@ -451,12 +429,27 @@ $featured_image_url = getAbsoluteImagePath($post['featured_image'], $base);
                         </div>
                     </div>
 
+                    <?php
+                    // Determine logged-in user details for prefilling
+                    $loggedInName = '';
+                    $loggedInEmail = '';
+                    $isUserLoggedIn = false;
+                    if (!empty($_SESSION['public_user_name'])) {
+                        $loggedInName = $_SESSION['public_user_name'];
+                        $loggedInEmail = $_SESSION['public_user_email'] ?? '';
+                        $isUserLoggedIn = true;
+                    } elseif (!empty($_SESSION['logged_in']) && $_SESSION['logged_in'] === true) {
+                        $loggedInName = $_SESSION['username'] ?? '';
+                        $loggedInEmail = '';
+                        $isUserLoggedIn = true;
+                    }
+                    ?>
                     <div class="da-comment-form-grid">
                         <div class="da-form-group">
-                            <input type="text" name="name" class="da-input" placeholder="Name*" required>
+                            <input type="text" name="name" class="da-input" placeholder="Name*" required <?php if ($isUserLoggedIn && $loggedInName): ?>value="<?php echo htmlspecialchars($loggedInName); ?>" readonly<?php endif; ?>>
                         </div>
                         <div class="da-form-group">
-                            <input type="email" name="email" class="da-input" placeholder="Email*" required>
+                            <input type="email" name="email" class="da-input" placeholder="Email*" required <?php if ($isUserLoggedIn && $loggedInEmail): ?>value="<?php echo htmlspecialchars($loggedInEmail); ?>" readonly<?php endif; ?>>
                         </div>
                     </div>
                     <div class="da-form-group mb-4">
@@ -539,6 +532,8 @@ $featured_image_url = getAbsoluteImagePath($post['featured_image'], $base);
         <?php include(__DIR__ . '/includes/sidebar/ad-placeholder.php'); ?>
         <?php include(__DIR__ . '/includes/sidebar/brands-area.php'); ?>
         <?php include(__DIR__ . '/includes/sidebar/latest-devices.php'); ?>
+        <?php include(__DIR__ . '/includes/sidebar/top-daily-interests.php'); ?>
+        <?php include(__DIR__ . '/includes/sidebar/top-by-fans.php'); ?>
         <?php include(__DIR__ . '/includes/sidebar/popular-comparisons.php'); ?>
       </aside>
     </div>
