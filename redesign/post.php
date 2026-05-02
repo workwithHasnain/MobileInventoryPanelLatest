@@ -89,6 +89,25 @@ function extractPriceFromMisc($miscJson)
 // Get posts and devices for display (case-insensitive status check) with comment counts
 $pdo = getConnection();
 
+// Retrieve slug from URL and load the post
+$slug = $_GET['slug'] ?? null;
+if (!$slug) {
+    header($_SERVER["SERVER_PROTOCOL"]." 404 Not Found");
+    exit('Post not found');
+}
+$stmt = $pdo->prepare('SELECT * FROM posts WHERE slug = :slug AND status ILIKE \'published\' LIMIT 1');
+$stmt->execute(['slug' => $slug]);
+$post = $stmt->fetch();
+if (!$post) {
+    header($_SERVER["SERVER_PROTOCOL"]." 404 Not Found");
+    exit('Post not found');
+}
+
+// Get comment count for this post
+$comment_stmt = $pdo->prepare('SELECT COUNT(*) as count FROM post_comments WHERE post_id = :pid AND status = \'approved\'');
+$comment_stmt->execute(['pid' => $post['id']]);
+$postCommentCount = $comment_stmt->fetch()['count'] ?? 0;
+
 // ── Auth variables required by navbar.php ──
 $isPublicUser = !empty($_SESSION['public_user_id']);
 $publicUserName = $_SESSION['public_user_name'] ?? '';
