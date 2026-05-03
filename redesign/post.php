@@ -203,6 +203,117 @@ $brands = $brands_stmt->fetchAll();
               href="<?php echo $base; ?>contact-us" class="da-about-link">Contact Us</a> page to get in touch with our
             team.</p>
         </div>
+        <!-- Comments Section -->
+        <div class="da-widget mt-4" id="comments">
+          <div class="da-widget-header">
+            <h3>User Opinions and Reviews</h3>
+            <div class="da-widget-icon"><i class="fa fa-comments"></i></div>
+          </div>
+          <div class="da-widget-body">
+            
+            <div class="da-comments-list">
+              <?php if (!empty($comments)): ?>
+                <?php foreach ($comments as $comment): ?>
+                  <div class="da-comment-thread" id="comment-<?php echo $comment['id']; ?>">
+                    <div class="da-comment-avatar">
+                      <?php echo getAvatarDisplay($comment['name'], $comment['email']); ?>
+                    </div>
+                    <div class="da-comment-content">
+                      <div class="da-comment-header">
+                        <span class="da-comment-name"><?php echo htmlspecialchars($comment['name']); ?></span>
+                        <span class="da-comment-time"><i class="fa fa-clock"></i> <?php echo timeAgo($comment['created_at']); ?></span>
+                      </div>
+                      <div class="da-comment-text"><?php echo nl2br(htmlspecialchars($comment['comment'])); ?></div>
+                      <button class="da-reply-btn reply-btn" data-comment-id="<?php echo $comment['id']; ?>" data-comment-name="<?php echo htmlspecialchars($comment['name']); ?>"><i class="fa fa-reply"></i> Reply</button>
+                    </div>
+                  </div>
+                  <?php if (!empty($comment['replies'])): ?>
+                    <?php foreach ($comment['replies'] as $reply): ?>
+                      <div class="da-comment-thread da-comment-reply" id="comment-<?php echo $reply['id']; ?>">
+                        <div class="da-comment-avatar">
+                          <?php echo getAvatarDisplay($reply['name'], $reply['email']); ?>
+                        </div>
+                        <div class="da-comment-content">
+                          <div class="da-comment-header">
+                            <span class="da-comment-name"><?php echo htmlspecialchars($reply['name']); ?></span>
+                            <small class="da-replied-tag"><i class="fa fa-reply fa-xs"></i> replied</small>
+                            <span class="da-comment-time"><i class="fa fa-clock"></i> <?php echo timeAgo($reply['created_at']); ?></span>
+                          </div>
+                          <div class="da-comment-text"><?php echo nl2br(htmlspecialchars($reply['comment'])); ?></div>
+                          <button class="da-reply-btn reply-btn" data-comment-id="<?php echo $comment['id']; ?>" data-comment-name="<?php echo htmlspecialchars($comment['name']); ?>"><i class="fa fa-reply"></i> Reply</button>
+                        </div>
+                      </div>
+                    <?php endforeach; ?>
+                  <?php endif; ?>
+                <?php endforeach; ?>
+              <?php else: ?>
+                <div class="da-empty"><i class="fa fa-comments"></i>No comments yet. Be the first to share your opinion!</div>
+              <?php endif; ?>
+            </div>
+
+            <!-- Comment Form -->
+            <div class="da-comment-form-wrap mt-4">
+              <h4 class="mb-3">Share Your Opinion</h4>
+              <div id="reply-indicator" class="da-reply-indicator d-none">
+                <div><i class="fa fa-reply me-2"></i>Replying to <strong id="reply-to-name"></strong></div>
+                <button type="button" id="cancel-reply" class="da-btn-close"><i class="fa fa-times"></i></button>
+              </div>
+              <?php
+              $loggedInName = '';
+              $loggedInEmail = '';
+              $isUserLoggedIn = false;
+              if (!empty($_SESSION['public_user_name'])) {
+                $loggedInName = $_SESSION['public_user_name'];
+                $loggedInEmail = $_SESSION['public_user_email'] ?? '';
+                $isUserLoggedIn = true;
+              } elseif (!empty($_SESSION['logged_in']) && $_SESSION['logged_in'] === true) {
+                $loggedInName = $_SESSION['username'] ?? '';
+                $loggedInEmail = '';
+                $isUserLoggedIn = true;
+              }
+              ?>
+              <form id="device-comment-form" method="POST" class="da-form">
+                <input type="hidden" name="action" value="comment_device">
+                <input type="hidden" name="device_id" value="<?php echo htmlspecialchars($device['id']); ?>">
+                <input type="hidden" name="parent_id" id="parent_id" value="">
+                
+                <div class="da-form-row">
+                  <div class="da-form-group">
+                    <input type="text" class="da-input" name="name" placeholder="Your Name" required <?php if ($isUserLoggedIn && $loggedInName): ?>value="<?php echo htmlspecialchars($loggedInName); ?>" disabled<?php endif; ?>>
+                    <?php if ($isUserLoggedIn && $loggedInName): ?><input type="hidden" name="name" value="<?php echo htmlspecialchars($loggedInName); ?>"><?php endif; ?>
+                  </div>
+                  <div class="da-form-group">
+                    <input type="email" class="da-input" name="email" placeholder="Your Email (optional)" <?php if ($isUserLoggedIn && $loggedInEmail): ?>value="<?php echo htmlspecialchars($loggedInEmail); ?>" disabled<?php endif; ?>>
+                    <?php if ($isUserLoggedIn && $loggedInEmail): ?><input type="hidden" name="email" value="<?php echo htmlspecialchars($loggedInEmail); ?>"><?php endif; ?>
+                  </div>
+                </div>
+                
+                <div class="da-form-group">
+                  <textarea class="da-input" name="comment" rows="4" placeholder="Share your thoughts about this device..." required></textarea>
+                </div>
+                
+                <div class="da-form-group da-captcha-group">
+                  <label>Type the words shown below</label>
+                  <div class="da-captcha-box">
+                    <img src="<?php echo $base; ?>captcha.php" id="captcha-image" alt="CAPTCHA" onclick="refreshCaptcha()">
+                    <button type="button" class="da-cta-btn secondary" onclick="refreshCaptcha()"><i class="fa fa-rotate-right"></i></button>
+                    <input type="text" class="da-input" name="captcha" id="captcha-input" placeholder="Enter the words" required autocomplete="off">
+                  </div>
+                </div>
+                
+                <div class="da-form-footer">
+                  <div class="d-flex align-items-center flex-wrap gap-3">
+                    <button type="submit" class="da-cta-btn">Post Your Opinion</button>
+                    <small>Comments are moderated and will appear after approval.</small>
+                  </div>
+                  <div class="da-comments-count-text">
+                    Total reader comments: <b class="text-white"><?php echo $commentCount; ?></b>
+                  </div>
+                </div>
+              </form>
+            </div>
+          </div>
+        </div>
       </main>
 
       <!-- Sidebar -->
