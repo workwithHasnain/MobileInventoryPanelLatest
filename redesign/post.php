@@ -52,23 +52,184 @@ $latestDevices = array_slice(array_reverse($latestDevices), 0, 15);
 $brands_stmt = $pdo->prepare("SELECT b.*,COUNT(p.id) as device_count FROM brands b LEFT JOIN phones p ON b.id=p.brand_id GROUP BY b.id,b.name,b.description,b.logo_url,b.website,b.created_at,b.updated_at ORDER BY COUNT(p.id) DESC,b.name ASC LIMIT 36");
 $brands_stmt->execute();
 $brands = $brands_stmt->fetchAll();
+
+// Get post by slug or ID
+// New way: slug comes from clean URL (domain/post/slug) rewritten by .htaccess
+$slug = $_GET['slug'] ?? $_GET['id'] ?? null;
+
+if (!$slug) {
+    header('Location: index.php');
+    exit;
+}
+
+
+// Try to get post by slug first, then by ID if it's numeric
+if (is_numeric($slug)) {
+    $stmt = $pdo->prepare("SELECT * FROM posts WHERE (slug = ? OR id = ?) AND status ILIKE 'published'");
+    $stmt->execute([$slug, intval($slug)]);
+} else {
+    $stmt = $pdo->prepare("SELECT * FROM posts WHERE slug = ? AND status ILIKE 'published'");
+    $stmt->execute([$slug]);
+}
+$post = $stmt->fetch();
+
+if (!$post) {
+    header('HTTP/1.0 404 Not Found');
+    include '404.php';
+    exit;
+}
+// Get post comments and comment count
+$postComments = getPostComments($post['id']);
+$postCommentCount = getPostCommentCount($post['id']);
+
+// Track view for this post (one per IP per day)
+$user_ip = $_SERVER['REMOTE_ADDR'] ?? '127.0.0.1';
+$user_agent = $_SERVER['HTTP_USER_AGENT'] ?? '';
+
+try {
+    $view_stmt = $pdo->prepare("INSERT INTO content_views (content_type, content_id, ip_address, user_agent) VALUES ('post', CAST(? AS VARCHAR), ?, ?) ON CONFLICT (content_type, content_id, ip_address) DO NOTHING");
+    $view_stmt->execute([$post['id'], $user_ip, $user_agent]);
+
+    // Update view count in posts table
+    $update_view_stmt = $pdo->prepare("UPDATE posts SET view_count = (SELECT COUNT(*) FROM content_views WHERE content_type = 'post' AND content_id = CAST(? AS VARCHAR)) WHERE id = ?");
+    $update_view_stmt->execute([$post['id'], $post['id']]);
+} catch (Exception $e) {
+    // Silently ignore view tracking errors
+}
+
+// Get comments for posts (threaded: parents first, then replies grouped)
+function getPostComments($post_id)
+{
+    global $pdo;
+    $stmt = $pdo->prepare("SELECT * FROM post_comments WHERE post_id = ? AND status = 'approved' ORDER BY created_at ASC");
+    $stmt->execute([$post_id]);
+    $all = $stmt->fetchAll();
+
+    // Build threaded structure: parent comments with nested replies (1 level deep)
+    $parents = [];
+    $replies = [];
+    foreach ($all as $c) {
+        if (empty($c['parent_id'])) {
+            $c['replies'] = [];
+            $parents[$c['id']] = $c;
+        } else {
+            $replies[] = $c;
+        }
+    }
+    // Attach replies to their parent (or to the root parent if reply-to-reply)
+    foreach ($replies as $r) {
+        $pid = $r['parent_id'];
+        if (isset($parents[$pid])) {
+            $parents[$pid]['replies'][] = $r;
+        } else {
+            // reply-to-reply: find root parent
+            foreach ($parents as &$p) {
+                foreach ($p['replies'] as $existingReply) {
+                    if ($existingReply['id'] == $pid) {
+                        $p['replies'][] = $r;
+                        break 2;
+                    }
+                }
+            }
+            unset($p);
+        }
+    }
+    // Return as indexed array, newest parents first
+    return array_reverse(array_values($parents));
+}
+
+// Get post comment count
+function getPostCommentCount($post_id)
+{
+    global $pdo;
+    $stmt = $pdo->prepare("SELECT COUNT(*) as count FROM post_comments WHERE post_id = ? AND status = 'approved'");
+    $stmt->execute([$post_id]);
+    return $stmt->fetch(PDO::FETCH_ASSOC)['count'] ?? 0;
+}
+
+// Function to generate gravatar URL
+function getGravatarUrl($email, $size = 50)
+{
+    $hash = md5(strtolower(trim($email)));
+    return "https://www.gravatar.com/avatar/{$hash}?r=g&s={$size}&d=identicon";
+}
+
+// Function to format time ago
+function timeAgo($datetime)
+{
+    $time = time() - strtotime($datetime);
+
+    if ($time < 60) return 'just now';
+    if ($time < 3600) return floor($time / 60) . ' minutes ago';
+    if ($time < 86400) return floor($time / 3600) . ' hours ago';
+    if ($time < 2592000) return floor($time / 86400) . ' days ago';
+    if ($time < 31536000) return floor($time / 2592000) . ' months ago';
+
+    return floor($time / 31536000) . ' years ago';
+}
+
+// Function to generate avatar display
+function getAvatarDisplay($name, $email)
+{
+    if (!empty($email)) {
+        return '<img src="' . getGravatarUrl($email) . '" alt="' . htmlspecialchars($name) . '">';
+    } else {
+        $initials = strtoupper(substr($name, 0, 1));
+        $colors = ['#007bff', '#28a745', '#dc3545', '#ffc107', '#17a2b8', '#6f42c1', '#e83e8c'];
+        $color = $colors[abs(crc32($name)) % count($colors)];
+        return '<span class="avatar-box" style="background-color: ' . $color . '; color: white;">' . $initials . '</span>';
+    }
+}
+
 ?>
 <!DOCTYPE html>
 <html lang="en">
 
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width,initial-scale=1.0" />
-  <link rel="canonical" href="<?php echo $canonicalBase; ?>/" />
-  <title>DevicesArena — Smartphones, Reviews & Comparisons</title>
-  <meta name="description" content="Find your next phone on DevicesArena. Reviews, comparisons, specs, and the latest news from the tech world." />
-  <meta property="og:title" content="DevicesArena — Smartphones, Reviews & Comparisons" />
-  <meta property="og:description" content="Explore the latest smartphones, detailed specifications, reviews, and comparisons." />
-  <meta property="og:image" content="<?php echo $base; ?>imges/icon-256.png" />
-  <meta property="og:type" content="website" />
-  <meta name="twitter:card" content="summary" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <link rel="canonical" href="<?php echo $canonicalBase; ?>/post/<?php echo htmlspecialchars($slug); ?>" />
+  <meta name="description" content="<?php echo htmlspecialchars($post['meta_description'] ?? $post['short_description'] ?? substr($post['content_body'], 0, 160) . '...'); ?>" />
+  <title><?php echo htmlspecialchars($post['meta_title'] ?? $post['title']); ?> - DevicesArena</title>
+
+  <!-- Favicon & Icons -->
   <link rel="icon" type="image/png" sizes="32x32" href="<?php echo $base; ?>imges/icon-32.png">
+  <link rel="icon" type="image/png" sizes="256x256" href="<?php echo $base; ?>imges/icon-256.png">
   <link rel="shortcut icon" href="<?php echo $base; ?>imges/icon-32.png">
+
+  <!-- Apple Touch Icon (iOS Home Screen) -->
+  <link rel="apple-touch-icon" href="<?php echo $base; ?>imges/icon-256.png">
+  <link rel="apple-touch-icon" sizes="256x256" href="<?php echo $base; ?>imges/icon-256.png">
+
+  <!-- Android Chrome Icons -->
+  <link rel="icon" type="image/png" sizes="192x192" href="<?php echo $base; ?>imges/icon-256.png">
+  <link rel="icon" type="image/png" sizes="512x512" href="<?php echo $base; ?>imges/icon-256.png">
+
+  <!-- Theme Color (Browser Chrome & Address Bar) -->
+  <meta name="theme-color" content="#1B2035">
+
+  <!-- Windows Tile Icon -->
+  <meta name="msapplication-TileColor" content="#1B2035">
+  <meta name="msapplication-TileImage" content="<?php echo $base; ?>imges/icon-256.png">
+
+  <!-- Open Graph Meta Tags (Social Media Sharing) -->
+  <meta property="og:site_name" content="DevicesArena">
+  <meta property="og:title" content="DevicesArena - Smartphone Reviews & Comparisons">
+  <meta property="og:description" content="Explore the latest smartphones, detailed specifications, reviews, and comparisons on DevicesArena.">
+  <meta property="og:image" content="<?php echo $base; ?>imges/icon-256.png">
+  <meta property="og:image:type" content="image/png">
+  <meta property="og:image:width" content="256">
+  <meta property="og:image:height" content="256">
+  <meta property="og:type" content="website">
+
+  <!-- Twitter Card Meta Tags -->
+  <meta name="twitter:card" content="summary">
+  <meta name="twitter:title" content="DevicesArena">
+  <meta name="twitter:description" content="<?php echo htmlspecialchars($post['meta_description'] ?? $post['short_description'] ?? substr($post['content_body'], 0, 160) . '...'); ?>">
+  <meta name="twitter:image" content="<?php echo $base; ?>imges/icon-256.png">
+
+  <!-- PWA Manifest -->
+  <link rel="manifest" href="<?php echo $base; ?>manifest.json">
   <meta name="theme-color" content="#0d0f1a">
   <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-9906394285054446"crossorigin="anonymous"></script>
   <!-- Google Analytics -->
@@ -99,6 +260,181 @@ $brands = $brands_stmt->fetchAll();
   </script>
 
   <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-4554952734894265" crossorigin="anonymous"></script>
+
+  <?php
+  // Build breadcrumb schema for the blog post
+  $breadcrumbItems = [
+      [
+          "@type" => "ListItem",
+          "position" => 1,
+          "name" => "Home",
+          "item" => "https://www.devicesarena.com/"
+      ],
+      [
+          "@type" => "ListItem",
+          "position" => 2,
+          "name" => "Blog",
+          "item" => "https://www.devicesarena.com/posts"
+      ]
+  ];
+
+  if ($post) {
+      $breadcrumbItems[] = [
+          "@type" => "ListItem",
+          "position" => 3,
+          "name" => $post['title'],
+          "item" => "https://www.devicesarena.com/post/" . htmlspecialchars($post['slug'])
+      ];
+  }
+  ?>
+
+  <!-- Breadcrumb Schema -->
+  <script type="application/ld+json">
+      {
+          "@context": "https://schema.org",
+          "@type": "BreadcrumbList",
+          "itemListElement": <?php echo json_encode($breadcrumbItems, JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE); ?>
+      }
+  </script>
+
+  <?php
+  // Build BlogPosting schema with full article details
+  if ($post) {
+      $blogPostingSchema = [
+          "@context" => "https://schema.org",
+          "@type" => "BlogPosting",
+          "headline" => $post['title'],
+          "description" => isset($post['excerpt']) && !empty($post['excerpt']) ? substr($post['excerpt'], 0, 160) : substr(strip_tags($post['content_body'] ?? ''), 0, 160),
+          "articleBody" => isset($post['content_body']) && !empty($post['content_body']) ? strip_tags($post['content_body']) : "",
+          "url" => "https://www.devicesarena.com/post/" . htmlspecialchars($post['slug']),
+          "datePublished" => isset($post['created_at']) ? date('Y-m-d', strtotime($post['created_at'])) : date('Y-m-d'),
+          "dateModified" => isset($post['updated_at']) && !empty($post['updated_at']) ? date('Y-m-d', strtotime($post['updated_at'])) : (isset($post['created_at']) ? date('Y-m-d', strtotime($post['created_at'])) : date('Y-m-d'))
+      ];
+
+      // Add author if available
+      $blogPostingSchema["author"] = [
+          "@type" => "Organization",
+          "name" => "DevicesArena"
+      ];
+
+      // Add featured image if available
+      if (isset($post['featured_image']) && !empty($post['featured_image'])) {
+          $imageUrl = getAbsoluteImagePath($post['featured_image'], 'https://www.devicesarena.com/');
+          $blogPostingSchema["image"] = $imageUrl;
+      } else {
+          $blogPostingSchema["image"] = "https://www.devicesarena.com/imges/icon-256.png";
+      }
+
+      // Add comment count if available
+      if (isset($postCommentCount) && $postCommentCount > 0) {
+          $blogPostingSchema["commentCount"] = $postCommentCount;
+      }
+
+      // Add keywords/article section if available
+      $blogPostingSchema["keywords"] = "smartphones, devices, reviews, specifications, tech news, mobile devices";
+      $blogPostingSchema["articleSection"] = "Technology";
+  }
+  ?>
+
+  <!-- BlogPosting Schema for Detailed Article Information -->
+  <?php if ($post && isset($blogPostingSchema)): ?>
+      <script type="application/ld+json">
+          <?php echo json_encode($blogPostingSchema, JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE | JSON_PRETTY_PRINT); ?>
+      </script>
+  <?php endif; ?>
+
+  <!-- Organization Schema for Author -->
+  <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "Organization",
+      "name": "DevicesArena",
+      "url": "https://www.devicesarena.com",
+      "logo": "https://www.devicesarena.com/imges/icon-256.png",
+      "description": "Your source for comprehensive device reviews, specifications, comparisons, and tech industry insights."
+    }
+  </script>
+
+  <!-- Generic Article Schema (for blog/news overview) -->
+  <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "NewsArticle",
+      "headline": "Technology News, Reviews, and Device Guides - DevicesArena",
+      "description": "Stay updated with the latest smartphone, tablet, and smartwatch news, expert reviews, buying guides, and technology insights from DevicesArena.",
+      "image": "https://www.devicesarena.com/imges/icon-256.png",
+      "datePublished": "<?php echo date('Y-m-d'); ?>",
+      "publisher": {
+          "@type": "Organization",
+          "name": "DevicesArena",
+          "logo": {
+              "@type": "ImageObject",
+              "url": "https://www.devicesarena.com/imges/icon-256.png"
+          }
+      },
+      "author": {
+          "@type": "Organization",
+          "name": "DevicesArena Team"
+      }
+    }
+  </script>
+
+  <!-- FAQ Schema for Blog Posts -->
+  <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "FAQPage",
+      "mainEntity": [{
+              "@type": "Question",
+              "name": "What kind of content does DevicesArena blog cover?",
+              "acceptedAnswer": {
+                  "@type": "Answer",
+                  "text": "DevicesArena blog features comprehensive articles about smartphones, tablets, smartwatches, and other mobile devices. Our content includes product reviews, technology news, device comparisons, buying guides, specification analysis, and insights into the latest tech industry trends and innovations."
+              }
+          },
+          {
+              "@type": "Question",
+              "name": "How often is the blog updated with new posts?",
+              "acceptedAnswer": {
+                  "@type": "Answer",
+                  "text": "We regularly publish new articles covering the latest device releases, tech news, detailed reviews, and buying guides. Check back frequently for fresh content or subscribe to our newsletter to receive notifications about new posts and device reviews."
+              }
+          },
+          {
+              "@type": "Question",
+              "name": "Can I find links to device comparisons in blog posts?",
+              "acceptedAnswer": {
+                  "@type": "Answer",
+                  "text": "Yes! Many of our blog posts include links to detailed device specifications and comparison tools. You can use these links to directly compare devices discussed in the articles to make informed purchasing decisions."
+              }
+          },
+          {
+              "@type": "Question",
+              "name": "How are reviews and ratings determined?",
+              "acceptedAnswer": {
+                  "@type": "Answer",
+                  "text": "Our reviews are based on comprehensive testing and analysis of device specifications, real-world performance, camera quality, battery life, display characteristics, software experience, and value for money. We evaluate each device objectively across multiple categories."
+              }
+          },
+          {
+              "@type": "Question",
+              "name": "Can I share articles on social media?",
+              "acceptedAnswer": {
+                  "@type": "Answer",
+                  "text": "Yes! Each blog post can be easily shared on social media platforms. Use your browser's share functionality or look for social sharing buttons to share interesting articles with your friends and followers."
+              }
+          },
+          {
+              "@type": "Question",
+              "name": "How can I stay updated with new articles?",
+              "acceptedAnswer": {
+                  "@type": "Answer",
+                  "text": "Subscribe to our newsletter to receive notifications about new blog posts, device reviews, and technology insights. You can also browse our blog section regularly or use our Phone Finder tool to explore specific device categories."
+              }
+          }
+      ]
+    }
+  </script>
 </head>
 
 <body>
@@ -165,7 +501,25 @@ $brands = $brands_stmt->fetchAll();
             <h2 class="da-section-title">Who We Are</h2>
           </div>
         </div>
-
+        <?php if (!empty($post['content_body'])): ?>
+        <div class="gap-portion">
+          <?php
+          // Handle both plain text and rich content
+          $content = $post['content_body'];
+          // Check if content contains HTML tags
+          if (strip_tags($content) != $content) {
+            // Content has HTML, display as-is but sanitize
+            echo $content;
+          }
+          else {
+            // Plain text content, convert line breaks
+            echo nl2br(htmlspecialchars($content));
+          }
+          ?>
+        </div>
+        <?php else: ?>
+          <p class="classy gap-portion">Content is being updated. Please check back later for the full article.</p>
+        <?php endif; ?>
         <div class="da-about-content">
           <h4 class="da-about-heading">About DevicesArena</h4>
           <p class="da-about-text">DevicesArena is a comprehensive online platform dedicated to smartphones and mobile
