@@ -143,431 +143,633 @@ if (file_exists($filterConfigPath)) {
       </div>
 
       <!-- FILTERS SECTION -->
-      <div class="da-filter-container">
-        <form id="da-phonefinder-form" class="da-form" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 20px;">
+      <div class="da-pf-container">
+        <form id="da-phonefinder-form" class="da-form" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 24px;">
           
           <!-- GENERAL & BRAND -->
-          <div class="da-filter-panel">
-            <div class="da-filter-header"><i class="fa fa-tags me-2"></i> Brand</div>
-            <div class="da-filter-body" style="max-height: 200px; overflow-y: auto;">
-              <?php if (!empty($brands)): foreach ($brands as $brand): ?>
-                <label class="da-checkbox-label">
-                  <input type="checkbox" name="brand[]" value="<?php echo $brand['id']; ?>" class="da-check-input" id="brand<?php echo $brand['id']; ?>">
-                  <span><?php echo htmlspecialchars($brand['name']); ?></span>
-                </label>
-              <?php endforeach; else: ?>
-                <p>No brands available</p>
-              <?php endif; ?>
+          <div class="da-pf-panel">
+            <div class="da-pf-header">
+              <div class="da-pf-header-title">
+                <i class="fa fa-tags me-2"></i> Brand
+              </div>
+            </div>
+            <div class="da-pf-body" style="max-height: 200px; overflow-y: auto;">
+              <div class="da-pf-grid-2">
+                <?php if (!empty($brands)): foreach ($brands as $brand): ?>
+                  <label class="da-pf-checkbox">
+                    <input type="checkbox" name="brand[]" value="<?php echo $brand['id']; ?>" id="brand<?php echo $brand['id']; ?>">
+                    <span><?php echo htmlspecialchars($brand['name']); ?></span>
+                  </label>
+                <?php endforeach; else: ?>
+                  <p>No brands available</p>
+                <?php endif; ?>
+              </div>
             </div>
           </div>
 
-          <div class="da-filter-panel">
-            <div class="da-filter-header"><i class="fa fa-calendar-check me-2"></i> Availability</div>
-            <div class="da-filter-body">
-              <?php foreach(['Available', 'Coming Soon', 'Discontinued', 'Rumored'] as $av): ?>
-              <label class="da-checkbox-label">
-                <input type="checkbox" name="availability" value="<?php echo $av; ?>" class="da-check-input" id="availability<?php echo str_replace(' ', '', $av); ?>"> <span><?php echo $av; ?></span>
-              </label>
-              <?php endforeach; ?>
+          <div class="da-pf-panel">
+            <div class="da-pf-header">
+              <div class="da-pf-header-title">
+                <i class="fa fa-calendar-check me-2"></i> Availability
+              </div>
+            </div>
+            <div class="da-pf-body">
+              <div class="da-pf-grid-2">
+                <?php foreach(['Available', 'Coming Soon', 'Discontinued', 'Rumored'] as $av): ?>
+                <label class="da-pf-checkbox">
+                  <input type="checkbox" name="availability" value="<?php echo $av; ?>" id="availability<?php echo str_replace(' ', '', $av); ?>"> <span><?php echo $av; ?></span>
+                </label>
+                <?php endforeach; ?>
+              </div>
             </div>
           </div>
 
           <!-- PRICING & YEAR -->
-          <div class="da-filter-panel">
-            <div class="da-filter-header"><i class="fa fa-dollar-sign me-2"></i> Price (Max)</div>
-            <div class="da-filter-body">
-              <input type="range" class="da-range w-100" id="priceMax" min="0" max="<?php echo $filterConfig['price']['max']; ?>" step="<?php echo $filterConfig['price']['step']; ?>" value="<?php echo $filterConfig['price']['max']; ?>">
-              <div class="da-range-val text-center mt-2" id="priceMaxValue">Any</div>
+          <div class="da-pf-panel">
+            <div class="da-pf-header">
+              <div class="da-pf-header-title">
+                <i class="fa fa-dollar-sign me-2"></i> Price (Max)
+              </div>
+              <div class="da-pf-slider-value" id="priceMaxValue">Any</div>
+            </div>
+            <div class="da-pf-body">
+              <input type="range" class="da-pf-range" id="priceMax" min="0" max="<?php echo $filterConfig['price']['max']; ?>" step="<?php echo $filterConfig['price']['step']; ?>" value="<?php echo $filterConfig['price']['max']; ?>">
             </div>
           </div>
 
-          <div class="da-filter-panel">
-            <div class="da-filter-header"><i class="fa fa-calendar-alt me-2"></i> Release Year</div>
-            <div class="da-filter-body">
-              <label class="da-label text-muted">Min Year:</label>
-              <input type="range" class="da-range w-100" id="yearMin" min="<?php echo $filterConfig['year']['min']; ?>" max="<?php echo $filterConfig['year']['max']; ?>" step="1" value="<?php echo $filterConfig['year']['min']; ?>">
-              <div class="da-range-val text-center mb-2" id="yearMinValue"><?php echo $filterConfig['year']['min']; ?></div>
+          <div class="da-pf-panel">
+            <div class="da-pf-header">
+              <div class="da-pf-header-title">
+                <i class="fa fa-calendar-alt me-2"></i> Release Year
+              </div>
+            </div>
+            <div class="da-pf-body">
+              <div class="da-pf-slider-header">
+                <span class="da-pf-slider-label">Min Year</span>
+                <span class="da-pf-slider-value" id="yearMinValue"><?php echo $filterConfig['year']['min']; ?></span>
+              </div>
+              <input type="range" class="da-pf-range" id="yearMin" min="<?php echo $filterConfig['year']['min']; ?>" max="<?php echo $filterConfig['year']['max']; ?>" step="1" value="<?php echo $filterConfig['year']['min']; ?>">
               
-              <label class="da-label text-muted">Max Year:</label>
-              <input type="range" class="da-range w-100" id="yearMax" min="<?php echo $filterConfig['year']['min']; ?>" max="<?php echo $filterConfig['year']['max']; ?>" step="1" value="<?php echo $filterConfig['year']['max']; ?>">
-              <div class="da-range-val text-center" id="yearMaxValue"><?php echo $filterConfig['year']['max']; ?></div>
+              <div class="da-pf-slider-header mt-3">
+                <span class="da-pf-slider-label">Max Year</span>
+                <span class="da-pf-slider-value" id="yearMaxValue"><?php echo $filterConfig['year']['max']; ?></span>
+              </div>
+              <input type="range" class="da-pf-range" id="yearMax" min="<?php echo $filterConfig['year']['min']; ?>" max="<?php echo $filterConfig['year']['max']; ?>" step="1" value="<?php echo $filterConfig['year']['max']; ?>">
             </div>
           </div>
 
           <!-- PERFORMANCE -->
-          <div class="da-filter-panel">
-            <div class="da-filter-header"><i class="fa fa-memory me-2"></i> RAM (Min GB)</div>
-            <div class="da-filter-body">
-              <input type="range" class="da-range w-100" id="ramMin" min="<?php echo $filterConfig['ram']['min']; ?>" max="<?php echo $filterConfig['ram']['max']; ?>" step="<?php echo $filterConfig['ram']['step']; ?>" value="<?php echo $filterConfig['ram']['min']; ?>">
-              <div class="da-range-val text-center mt-2" id="ramMinValue">Any</div>
+          <div class="da-pf-panel">
+            <div class="da-pf-header">
+              <div class="da-pf-header-title">
+                <i class="fa fa-memory me-2"></i> RAM (Min GB)
+              </div>
+              <div class="da-pf-slider-value" id="ramMinValue">Any</div>
+            </div>
+            <div class="da-pf-body">
+              <input type="range" class="da-pf-range" id="ramMin" min="<?php echo $filterConfig['ram']['min']; ?>" max="<?php echo $filterConfig['ram']['max']; ?>" step="<?php echo $filterConfig['ram']['step']; ?>" value="<?php echo $filterConfig['ram']['min']; ?>">
             </div>
           </div>
 
-          <div class="da-filter-panel">
-            <div class="da-filter-header"><i class="fa fa-hdd me-2"></i> Storage (Min GB)</div>
-            <div class="da-filter-body">
-              <input type="range" class="da-range w-100" id="storageMin" min="<?php echo $filterConfig['storage']['min']; ?>" max="<?php echo $filterConfig['storage']['max']; ?>" step="<?php echo $filterConfig['storage']['step']; ?>" value="<?php echo $filterConfig['storage']['min']; ?>">
-              <div class="da-range-val text-center mt-2" id="storageMinValue">Any</div>
+          <div class="da-pf-panel">
+            <div class="da-pf-header">
+              <div class="da-pf-header-title">
+                <i class="fa fa-hdd me-2"></i> Storage (Min GB)
+              </div>
+              <div class="da-pf-slider-value" id="storageMinValue">Any</div>
+            </div>
+            <div class="da-pf-body">
+              <input type="range" class="da-pf-range" id="storageMin" min="<?php echo $filterConfig['storage']['min']; ?>" max="<?php echo $filterConfig['storage']['max']; ?>" step="<?php echo $filterConfig['storage']['step']; ?>" value="<?php echo $filterConfig['storage']['min']; ?>">
             </div>
           </div>
 
-          <div class="da-filter-panel">
-            <div class="da-filter-header"><i class="fa fa-microchip me-2"></i> CPU Clock (Min GHz)</div>
-            <div class="da-filter-body">
-              <input type="range" class="da-range w-100" id="cpuClockMin" min="<?php echo $filterConfig['cpu_clock']['min']; ?>" max="<?php echo $filterConfig['cpu_clock']['max']; ?>" step="<?php echo $filterConfig['cpu_clock']['step']; ?>" value="<?php echo $filterConfig['cpu_clock']['min']; ?>">
-              <div class="da-range-val text-center mt-2" id="cpuClockMinValue">Any</div>
+          <div class="da-pf-panel">
+            <div class="da-pf-header">
+              <div class="da-pf-header-title">
+                <i class="fa fa-microchip me-2"></i> CPU Clock (Min GHz)
+              </div>
+              <div class="da-pf-slider-value" id="cpuClockMinValue">Any</div>
+            </div>
+            <div class="da-pf-body">
+              <input type="range" class="da-pf-range" id="cpuClockMin" min="<?php echo $filterConfig['cpu_clock']['min']; ?>" max="<?php echo $filterConfig['cpu_clock']['max']; ?>" step="<?php echo $filterConfig['cpu_clock']['step']; ?>" value="<?php echo $filterConfig['cpu_clock']['min']; ?>">
             </div>
           </div>
 
           <!-- DISPLAY -->
-          <div class="da-filter-panel">
-            <div class="da-filter-header"><i class="fa fa-mobile-screen me-2"></i> Display Size (Inches)</div>
-            <div class="da-filter-body">
-              <label class="da-label text-muted">Min Size:</label>
-              <input type="range" class="da-range w-100" id="displaySizeMin" min="<?php echo $filterConfig['display_size']['min']; ?>" max="<?php echo $filterConfig['display_size']['max']; ?>" step="<?php echo $filterConfig['display_size']['step']; ?>" value="<?php echo $filterConfig['display_size']['min']; ?>">
-              <div class="da-range-val text-center mb-2" id="displaySizeMinValue"><?php echo $filterConfig['display_size']['min']; ?></div>
+          <div class="da-pf-panel">
+            <div class="da-pf-header">
+              <div class="da-pf-header-title">
+                <i class="fa fa-mobile-screen me-2"></i> Display Size (Inches)
+              </div>
+            </div>
+            <div class="da-pf-body">
+              <div class="da-pf-slider-header">
+                <span class="da-pf-slider-label">Min Size</span>
+                <span class="da-pf-slider-value" id="displaySizeMinValue"><?php echo $filterConfig['display_size']['min']; ?></span>
+              </div>
+              <input type="range" class="da-pf-range" id="displaySizeMin" min="<?php echo $filterConfig['display_size']['min']; ?>" max="<?php echo $filterConfig['display_size']['max']; ?>" step="<?php echo $filterConfig['display_size']['step']; ?>" value="<?php echo $filterConfig['display_size']['min']; ?>">
               
-              <label class="da-label text-muted">Max Size:</label>
-              <input type="range" class="da-range w-100" id="displaySizeMax" min="<?php echo $filterConfig['display_size']['min']; ?>" max="<?php echo $filterConfig['display_size']['max']; ?>" step="<?php echo $filterConfig['display_size']['step']; ?>" value="<?php echo $filterConfig['display_size']['max']; ?>">
-              <div class="da-range-val text-center" id="displaySizeMaxValue"><?php echo $filterConfig['display_size']['max']; ?></div>
+              <div class="da-pf-slider-header mt-3">
+                <span class="da-pf-slider-label">Max Size</span>
+                <span class="da-pf-slider-value" id="displaySizeMaxValue"><?php echo $filterConfig['display_size']['max']; ?></span>
+              </div>
+              <input type="range" class="da-pf-range" id="displaySizeMax" min="<?php echo $filterConfig['display_size']['min']; ?>" max="<?php echo $filterConfig['display_size']['max']; ?>" step="<?php echo $filterConfig['display_size']['step']; ?>" value="<?php echo $filterConfig['display_size']['max']; ?>">
             </div>
           </div>
 
-          <div class="da-filter-panel">
-            <div class="da-filter-header"><i class="fa fa-compress me-2"></i> Display Resolution</div>
-            <div class="da-filter-body">
-              <label class="da-label text-muted">Min Width (px):</label>
-              <input type="range" class="da-range w-100" id="displayResMin" min="<?php echo $filterConfig['display_resolution']['min']; ?>" max="<?php echo $filterConfig['display_resolution']['max']; ?>" step="10" value="<?php echo $filterConfig['display_resolution']['min']; ?>">
-              <div class="da-range-val text-center mb-2" id="displayResMinValue"><?php echo $filterConfig['display_resolution']['min']; ?></div>
+          <div class="da-pf-panel">
+            <div class="da-pf-header">
+              <div class="da-pf-header-title">
+                <i class="fa fa-compress me-2"></i> Display Resolution
+              </div>
+            </div>
+            <div class="da-pf-body">
+              <div class="da-pf-slider-header">
+                <span class="da-pf-slider-label">Min Width</span>
+                <span class="da-pf-slider-value" id="displayResMinValue"><?php echo $filterConfig['display_resolution']['min']; ?></span>
+              </div>
+              <input type="range" class="da-pf-range" id="displayResMin" min="<?php echo $filterConfig['display_resolution']['min']; ?>" max="<?php echo $filterConfig['display_resolution']['max']; ?>" step="10" value="<?php echo $filterConfig['display_resolution']['min']; ?>">
               
-              <label class="da-label text-muted">Max Width (px):</label>
-              <input type="range" class="da-range w-100" id="displayResMax" min="<?php echo $filterConfig['display_resolution']['min']; ?>" max="<?php echo $filterConfig['display_resolution']['max']; ?>" step="10" value="<?php echo $filterConfig['display_resolution']['max']; ?>">
-              <div class="da-range-val text-center" id="displayResMaxValue"><?php echo $filterConfig['display_resolution']['max']; ?></div>
+              <div class="da-pf-slider-header mt-3">
+                <span class="da-pf-slider-label">Max Width</span>
+                <span class="da-pf-slider-value" id="displayResMaxValue"><?php echo $filterConfig['display_resolution']['max']; ?></span>
+              </div>
+              <input type="range" class="da-pf-range" id="displayResMax" min="<?php echo $filterConfig['display_resolution']['min']; ?>" max="<?php echo $filterConfig['display_resolution']['max']; ?>" step="10" value="<?php echo $filterConfig['display_resolution']['max']; ?>">
             </div>
           </div>
 
-          <div class="da-filter-panel">
-            <div class="da-filter-header"><i class="fa fa-bolt me-2"></i> Refresh Rate (Min Hz)</div>
-            <div class="da-filter-body">
-              <input type="range" class="da-range w-100" id="refreshRateMin" min="<?php echo $filterConfig['refresh_rate']['min']; ?>" max="<?php echo $filterConfig['refresh_rate']['max']; ?>" step="<?php echo $filterConfig['refresh_rate']['step']; ?>" value="<?php echo $filterConfig['refresh_rate']['min']; ?>">
-              <div class="da-range-val text-center mt-2" id="refreshRateMinValue">Any</div>
+          <div class="da-pf-panel">
+            <div class="da-pf-header">
+              <div class="da-pf-header-title">
+                <i class="fa fa-bolt me-2"></i> Refresh Rate (Min Hz)
+              </div>
+              <div class="da-pf-slider-value" id="refreshRateMinValue">Any</div>
+            </div>
+            <div class="da-pf-body">
+              <input type="range" class="da-pf-range" id="refreshRateMin" min="<?php echo $filterConfig['refresh_rate']['min']; ?>" max="<?php echo $filterConfig['refresh_rate']['max']; ?>" step="<?php echo $filterConfig['refresh_rate']['step']; ?>" value="<?php echo $filterConfig['refresh_rate']['min']; ?>">
             </div>
           </div>
 
-          <div class="da-filter-panel">
-            <div class="da-filter-header"><i class="fa fa-tv me-2"></i> Display Tech</div>
-            <div class="da-filter-body" style="max-height: 150px; overflow-y: auto;">
-              <?php foreach($filterConfig['display_technologies'] as $idx => $tech): ?>
-              <label class="da-checkbox-label">
-                <input type="checkbox" name="display_tech[]" value="<?php echo htmlspecialchars($tech); ?>" class="da-check-input" id="tech<?php echo $idx; ?>"> <span><?php echo htmlspecialchars($tech); ?></span>
+          <div class="da-pf-panel">
+            <div class="da-pf-header">
+              <div class="da-pf-header-title">
+                <i class="fa fa-tv me-2"></i> Display Tech
+              </div>
+            </div>
+            <div class="da-pf-body" style="max-height: 150px; overflow-y: auto;">
+              <div class="da-pf-grid-2">
+                <?php foreach($filterConfig['display_technologies'] as $idx => $tech): ?>
+                <label class="da-pf-checkbox">
+                  <input type="checkbox" name="display_tech[]" value="<?php echo htmlspecialchars($tech); ?>" id="tech<?php echo $idx; ?>"> <span><?php echo htmlspecialchars($tech); ?></span>
+                </label>
+                <?php endforeach; ?>
+              </div>
+            </div>
+          </div>
+
+          <div class="da-pf-panel">
+            <div class="da-pf-header">
+              <div class="da-pf-header-title">
+                <i class="fa fa-crop me-2"></i> Display Notch
+              </div>
+            </div>
+            <div class="da-pf-body" style="max-height: 150px; overflow-y: auto;">
+              <div class="da-pf-grid-2">
+                <?php foreach($filterConfig['display_notches'] as $idx => $notch): ?>
+                <label class="da-pf-checkbox">
+                  <input type="checkbox" name="display_notch[]" value="<?php echo htmlspecialchars($notch); ?>" id="notch<?php echo $idx; ?>"> <span><?php echo htmlspecialchars($notch); ?></span>
+                </label>
+                <?php endforeach; ?>
+              </div>
+            </div>
+          </div>
+
+          <div class="da-pf-panel">
+            <div class="da-pf-header">
+              <div class="da-pf-header-title">
+                <i class="fa fa-adjust me-2"></i> Display Extras
+              </div>
+            </div>
+            <div class="da-pf-body">
+              <label class="da-pf-checkbox mb-2">
+                <input type="checkbox" name="hdr" id="hdr"> <span>HDR</span>
               </label>
-              <?php endforeach; ?>
-            </div>
-          </div>
-
-          <div class="da-filter-panel">
-            <div class="da-filter-header"><i class="fa fa-crop me-2"></i> Display Notch</div>
-            <div class="da-filter-body" style="max-height: 150px; overflow-y: auto;">
-              <?php foreach($filterConfig['display_notches'] as $idx => $notch): ?>
-              <label class="da-checkbox-label">
-                <input type="checkbox" name="display_notch[]" value="<?php echo htmlspecialchars($notch); ?>" class="da-check-input" id="notch<?php echo $idx; ?>"> <span><?php echo htmlspecialchars($notch); ?></span>
-              </label>
-              <?php endforeach; ?>
-            </div>
-          </div>
-
-          <div class="da-filter-panel">
-            <div class="da-filter-header"><i class="fa fa-adjust me-2"></i> Display Extras</div>
-            <div class="da-filter-body">
-              <label class="da-checkbox-label">
-                <input type="checkbox" name="hdr" id="hdr" class="da-check-input"> <span>HDR</span>
-              </label>
-              <label class="da-checkbox-label">
-                <input type="checkbox" name="billion_colors" id="billion_colors" class="da-check-input"> <span>1 Billion Colors</span>
+              <label class="da-pf-checkbox">
+                <input type="checkbox" name="billion_colors" id="billion_colors"> <span>1 Billion Colors</span>
               </label>
             </div>
           </div>
 
           <!-- BATTERY & CHARGING -->
-          <div class="da-filter-panel">
-            <div class="da-filter-header"><i class="fa fa-battery-full me-2"></i> Battery (Min mAh)</div>
-            <div class="da-filter-body">
-              <input type="range" class="da-range w-100" id="batteryCapacityMin" min="<?php echo $filterConfig['battery_capacity']['min']; ?>" max="<?php echo $filterConfig['battery_capacity']['max']; ?>" step="<?php echo $filterConfig['battery_capacity']['step']; ?>" value="<?php echo $filterConfig['battery_capacity']['min']; ?>">
-              <div class="da-range-val text-center mt-2" id="batteryCapacityMinValue">Any</div>
+          <div class="da-pf-panel">
+            <div class="da-pf-header">
+              <div class="da-pf-header-title">
+                <i class="fa fa-battery-full me-2"></i> Battery (Min mAh)
+              </div>
+              <div class="da-pf-slider-value" id="batteryCapacityMinValue">Any</div>
+            </div>
+            <div class="da-pf-body">
+              <input type="range" class="da-pf-range" id="batteryCapacityMin" min="<?php echo $filterConfig['battery_capacity']['min']; ?>" max="<?php echo $filterConfig['battery_capacity']['max']; ?>" step="<?php echo $filterConfig['battery_capacity']['step']; ?>" value="<?php echo $filterConfig['battery_capacity']['min']; ?>">
             </div>
           </div>
 
-          <div class="da-filter-panel">
-            <div class="da-filter-header"><i class="fa fa-plug me-2"></i> Wired Charging (Min W)</div>
-            <div class="da-filter-body">
-              <input type="range" class="da-range w-100" id="wiredChargeMin" min="<?php echo $filterConfig['wired_charging']['min']; ?>" max="<?php echo $filterConfig['wired_charging']['max']; ?>" step="<?php echo $filterConfig['wired_charging']['step']; ?>" value="<?php echo $filterConfig['wired_charging']['min']; ?>">
-              <div class="da-range-val text-center mt-2" id="wiredChargeMinValue">Any</div>
+          <div class="da-pf-panel">
+            <div class="da-pf-header">
+              <div class="da-pf-header-title">
+                <i class="fa fa-plug me-2"></i> Wired Charging (Min W)
+              </div>
+              <div class="da-pf-slider-value" id="wiredChargeMinValue">Any</div>
+            </div>
+            <div class="da-pf-body">
+              <input type="range" class="da-pf-range" id="wiredChargeMin" min="<?php echo $filterConfig['wired_charging']['min']; ?>" max="<?php echo $filterConfig['wired_charging']['max']; ?>" step="<?php echo $filterConfig['wired_charging']['step']; ?>" value="<?php echo $filterConfig['wired_charging']['min']; ?>">
             </div>
           </div>
 
-          <div class="da-filter-panel">
-            <div class="da-filter-header"><i class="fa fa-charging-station me-2"></i> Wireless Charging</div>
-            <div class="da-filter-body">
-              <label class="da-checkbox-label">
-                <input type="checkbox" id="wirelessRequired" class="da-check-input"> <span>Required</span>
+          <div class="da-pf-panel">
+            <div class="da-pf-header">
+              <div class="da-pf-header-title">
+                <i class="fa fa-charging-station me-2"></i> Wireless Charging
+              </div>
+            </div>
+            <div class="da-pf-body">
+              <label class="da-pf-checkbox mb-3">
+                <input type="checkbox" id="wirelessRequired"> <span>Required</span>
               </label>
-              <label class="da-label text-muted mt-2">Min Speed (W):</label>
-              <input type="range" class="da-range w-100" id="wirelessChargeMin" min="<?php echo $filterConfig['wireless_charging']['min']; ?>" max="<?php echo $filterConfig['wireless_charging']['max']; ?>" step="<?php echo $filterConfig['wireless_charging']['step']; ?>" value="<?php echo $filterConfig['wireless_charging']['min']; ?>">
-              <div class="da-range-val text-center mt-2" id="wirelessChargeMinValue">Any</div>
+              <div class="da-pf-slider-header">
+                <span class="da-pf-slider-label">Min Speed (W)</span>
+                <span class="da-pf-slider-value" id="wirelessChargeMinValue">Any</span>
+              </div>
+              <input type="range" class="da-pf-range" id="wirelessChargeMin" min="<?php echo $filterConfig['wireless_charging']['min']; ?>" max="<?php echo $filterConfig['wireless_charging']['max']; ?>" step="<?php echo $filterConfig['wireless_charging']['step']; ?>" value="<?php echo $filterConfig['wireless_charging']['min']; ?>">
             </div>
           </div>
 
-          <div class="da-filter-panel">
-            <div class="da-filter-header"><i class="fa fa-car-battery me-2"></i> Battery Extras</div>
-            <div class="da-filter-body">
-              <label class="da-checkbox-label">
-                <input type="checkbox" name="battery_removable" class="da-check-input"> <span>Removable Battery</span>
+          <div class="da-pf-panel">
+            <div class="da-pf-header">
+              <div class="da-pf-header-title">
+                <i class="fa fa-car-battery me-2"></i> Battery Extras
+              </div>
+            </div>
+            <div class="da-pf-body">
+              <label class="da-pf-checkbox mb-2">
+                <input type="checkbox" name="battery_removable"> <span>Removable Battery</span>
               </label>
-              <label class="da-checkbox-label">
-                <input type="checkbox" name="battery_sic" class="da-check-input"> <span>SiC Battery Tech</span>
+              <label class="da-pf-checkbox">
+                <input type="checkbox" name="battery_sic"> <span>SiC Battery Tech</span>
               </label>
             </div>
           </div>
 
           <!-- CAMERA -->
-          <div class="da-filter-panel">
-            <div class="da-filter-header"><i class="fa fa-camera me-2"></i> Main Camera (Min MP)</div>
-            <div class="da-filter-body">
-              <input type="range" class="da-range w-100" id="mainCamMpMin" min="<?php echo $filterConfig['main_camera_mp']['min']; ?>" max="<?php echo $filterConfig['main_camera_mp']['max']; ?>" step="<?php echo $filterConfig['main_camera_mp']['step']; ?>" value="<?php echo $filterConfig['main_camera_mp']['min']; ?>">
-              <div class="da-range-val text-center mt-2" id="mainCamMpMinValue">Any</div>
+          <div class="da-pf-panel">
+            <div class="da-pf-header">
+              <div class="da-pf-header-title">
+                <i class="fa fa-camera me-2"></i> Main Camera (Min MP)
+              </div>
+              <div class="da-pf-slider-value" id="mainCamMpMinValue">Any</div>
+            </div>
+            <div class="da-pf-body">
+              <input type="range" class="da-pf-range" id="mainCamMpMin" min="<?php echo $filterConfig['main_camera_mp']['min']; ?>" max="<?php echo $filterConfig['main_camera_mp']['max']; ?>" step="<?php echo $filterConfig['main_camera_mp']['step']; ?>" value="<?php echo $filterConfig['main_camera_mp']['min']; ?>">
             </div>
           </div>
 
-          <div class="da-filter-panel">
-            <div class="da-filter-header"><i class="fa fa-aperture me-2"></i> F-Number (Max)</div>
-            <div class="da-filter-body">
-              <input type="range" class="da-range w-100" id="fNumberMax" min="<?php echo $filterConfig['f_number']['min']; ?>" max="<?php echo $filterConfig['f_number']['max']; ?>" step="<?php echo $filterConfig['f_number']['step']; ?>" value="<?php echo $filterConfig['f_number']['max']; ?>">
-              <div class="da-range-val text-center mt-2" id="fNumberMaxValue">Any</div>
+          <div class="da-pf-panel">
+            <div class="da-pf-header">
+              <div class="da-pf-header-title">
+                <i class="fa fa-aperture me-2"></i> F-Number (Max)
+              </div>
+              <div class="da-pf-slider-value" id="fNumberMaxValue">Any</div>
+            </div>
+            <div class="da-pf-body">
+              <input type="range" class="da-pf-range" id="fNumberMax" min="<?php echo $filterConfig['f_number']['min']; ?>" max="<?php echo $filterConfig['f_number']['max']; ?>" step="<?php echo $filterConfig['f_number']['step']; ?>" value="<?php echo $filterConfig['f_number']['max']; ?>">
             </div>
           </div>
 
-          <div class="da-filter-panel">
-            <div class="da-filter-header"><i class="fa fa-video me-2"></i> Camera Features</div>
-            <div class="da-filter-body">
-              <label class="da-checkbox-label"><input type="checkbox" name="main_camera_telephoto" class="da-check-input"> <span>Telephoto Lens</span></label>
-              <label class="da-checkbox-label"><input type="checkbox" name="main_camera_ultrawide" class="da-check-input"> <span>Ultrawide Lens</span></label>
-              <label class="da-checkbox-label"><input type="checkbox" name="main_camera_ois" class="da-check-input"> <span>OIS (Optical Image Stabilization)</span></label>
-              <label class="da-checkbox-label"><input type="checkbox" name="selfie_camera_flash" class="da-check-input"> <span>Selfie Flash</span></label>
-              <label class="da-checkbox-label"><input type="checkbox" name="popup_camera" class="da-check-input"> <span>Popup Camera</span></label>
-              <label class="da-checkbox-label"><input type="checkbox" name="under_display_camera" class="da-check-input"> <span>Under Display Camera</span></label>
-              <label class="da-checkbox-label"><input type="checkbox" id="video4k" class="da-check-input"> <span>4K Video</span></label>
-              <label class="da-checkbox-label"><input type="checkbox" id="video8k" class="da-check-input"> <span>8K Video</span></label>
+          <div class="da-pf-panel">
+            <div class="da-pf-header">
+              <div class="da-pf-header-title">
+                <i class="fa fa-video me-2"></i> Camera Features
+              </div>
+            </div>
+            <div class="da-pf-body" style="max-height: 200px; overflow-y: auto;">
+              <label class="da-pf-checkbox mb-2"><input type="checkbox" name="main_camera_telephoto"> <span>Telephoto Lens</span></label>
+              <label class="da-pf-checkbox mb-2"><input type="checkbox" name="main_camera_ultrawide"> <span>Ultrawide Lens</span></label>
+              <label class="da-pf-checkbox mb-2"><input type="checkbox" name="main_camera_ois"> <span>OIS (Optical Image Stabilization)</span></label>
+              <label class="da-pf-checkbox mb-2"><input type="checkbox" name="selfie_camera_flash"> <span>Selfie Flash</span></label>
+              <label class="da-pf-checkbox mb-2"><input type="checkbox" name="popup_camera"> <span>Popup Camera</span></label>
+              <label class="da-pf-checkbox mb-2"><input type="checkbox" name="under_display_camera"> <span>Under Display Camera</span></label>
+              <label class="da-pf-checkbox mb-2"><input type="checkbox" id="video4k"> <span>4K Video</span></label>
+              <label class="da-pf-checkbox"><input type="checkbox" id="video8k"> <span>8K Video</span></label>
             </div>
           </div>
 
           <!-- NETWORK & CONNECTIVITY -->
-          <div class="da-filter-panel">
-            <div class="da-filter-header"><i class="fa fa-globe me-2"></i> Network Bands</div>
-            <div class="da-filter-body" style="max-height: 150px; overflow-y: auto;">
-              <?php foreach (['2g_bands' => '2G', '3g_bands' => '3G', '4g_bands' => '4G', '5g_bands' => '5G'] as $key => $title): 
-                if (isset($filterConfig["network_$key"])): 
-                  foreach ($filterConfig["network_$key"] as $idx => $band): ?>
-                  <label class="da-checkbox-label">
-                    <input type="checkbox" name="network_<?php echo $key; ?>[]" value="<?php echo htmlspecialchars($band['value']); ?>" class="da-check-input network-<?php echo strtolower($title); ?>-band"> 
-                    <span><?php echo htmlspecialchars($band['label']); ?></span>
-                  </label>
-              <?php endforeach; endif; endforeach; ?>
+          <div class="da-pf-panel">
+            <div class="da-pf-header">
+              <div class="da-pf-header-title">
+                <i class="fa fa-globe me-2"></i> Network Bands
+              </div>
+            </div>
+            <div class="da-pf-body" style="max-height: 150px; overflow-y: auto;">
+              <div class="da-pf-grid-2">
+                <?php foreach (['2g_bands' => '2G', '3g_bands' => '3G', '4g_bands' => '4G', '5g_bands' => '5G'] as $key => $title): 
+                  if (isset($filterConfig["network_$key"])): 
+                    foreach ($filterConfig["network_$key"] as $idx => $band): ?>
+                    <label class="da-pf-checkbox">
+                      <input type="checkbox" name="network_<?php echo $key; ?>[]" value="<?php echo htmlspecialchars($band['value']); ?>" class="network-<?php echo strtolower($title); ?>-band"> 
+                      <span><?php echo htmlspecialchars($band['label']); ?></span>
+                    </label>
+                <?php endforeach; endif; endforeach; ?>
+              </div>
             </div>
           </div>
 
-          <div class="da-filter-panel">
-            <div class="da-filter-header"><i class="fa fa-wifi me-2"></i> Connectivity</div>
-            <div class="da-filter-body">
-              <label class="da-checkbox-label"><input type="checkbox" id="dualSim" class="da-check-input"> <span>Dual SIM</span></label>
-              <label class="da-checkbox-label"><input type="checkbox" id="esimSupport" class="da-check-input"> <span>eSIM Support</span></label>
-              <label class="da-checkbox-label"><input type="checkbox" name="card_slot_required" id="cardSlotRequired" class="da-check-input"> <span>Card Slot</span></label>
-              <label class="da-checkbox-label"><input type="checkbox" id="nfcRequired" class="da-check-input"> <span>NFC</span></label>
-              <label class="da-checkbox-label"><input type="checkbox" id="gpsRequired" class="da-check-input"> <span>GPS</span></label>
-              <label class="da-checkbox-label"><input type="checkbox" id="infraredRequired" class="da-check-input"> <span>Infrared (IR)</span></label>
-              <label class="da-checkbox-label"><input type="checkbox" id="fmRadioRequired" class="da-check-input"> <span>FM Radio</span></label>
+          <div class="da-pf-panel">
+            <div class="da-pf-header">
+              <div class="da-pf-header-title">
+                <i class="fa fa-wifi me-2"></i> Connectivity
+              </div>
+            </div>
+            <div class="da-pf-body" style="max-height: 200px; overflow-y: auto;">
+              <label class="da-pf-checkbox mb-2"><input type="checkbox" id="dualSim"> <span>Dual SIM</span></label>
+              <label class="da-pf-checkbox mb-2"><input type="checkbox" id="esimSupport"> <span>eSIM Support</span></label>
+              <label class="da-pf-checkbox mb-2"><input type="checkbox" name="card_slot_required" id="cardSlotRequired"> <span>Card Slot</span></label>
+              <label class="da-pf-checkbox mb-2"><input type="checkbox" id="nfcRequired"> <span>NFC</span></label>
+              <label class="da-pf-checkbox mb-2"><input type="checkbox" id="gpsRequired"> <span>GPS</span></label>
+              <label class="da-pf-checkbox mb-2"><input type="checkbox" id="infraredRequired"> <span>Infrared (IR)</span></label>
+              <label class="da-pf-checkbox"><input type="checkbox" id="fmRadioRequired"> <span>FM Radio</span></label>
             </div>
           </div>
 
-          <div class="da-filter-panel">
-            <div class="da-filter-header"><i class="fa fa-sim-card me-2"></i> SIM Sizes</div>
-            <div class="da-filter-body" style="max-height: 150px; overflow-y: auto;">
-              <?php foreach($filterConfig['sim_types'] as $idx => $sim): ?>
-              <label class="da-checkbox-label">
-                <input type="checkbox" name="sim_sizes[]" value="<?php echo htmlspecialchars($sim); ?>" class="da-check-input" id="sim<?php echo $idx; ?>"> <span><?php echo htmlspecialchars($sim); ?></span>
-              </label>
-              <?php endforeach; ?>
+          <div class="da-pf-panel">
+            <div class="da-pf-header">
+              <div class="da-pf-header-title">
+                <i class="fa fa-sim-card me-2"></i> SIM Sizes
+              </div>
+            </div>
+            <div class="da-pf-body" style="max-height: 150px; overflow-y: auto;">
+              <div class="da-pf-grid-2">
+                <?php foreach($filterConfig['sim_types'] as $idx => $sim): ?>
+                <label class="da-pf-checkbox">
+                  <input type="checkbox" name="sim_sizes[]" value="<?php echo htmlspecialchars($sim); ?>" id="sim<?php echo $idx; ?>"> <span><?php echo htmlspecialchars($sim); ?></span>
+                </label>
+                <?php endforeach; ?>
+              </div>
             </div>
           </div>
 
-          <div class="da-filter-panel">
-            <div class="da-filter-header"><i class="fa fa-bluetooth me-2"></i> Wireless Tech</div>
-            <div class="da-filter-body" style="max-height: 150px; overflow-y: auto;">
-              <strong class="da-label text-muted">WiFi Versions</strong>
-              <?php foreach($filterConfig['wifi_versions'] as $idx => $wifi): ?>
-              <label class="da-checkbox-label"><input type="checkbox" value="<?php echo htmlspecialchars($wifi); ?>" class="da-check-input wifi-version"> <span><?php echo htmlspecialchars($wifi); ?></span></label>
-              <?php endforeach; ?>
+          <div class="da-pf-panel">
+            <div class="da-pf-header">
+              <div class="da-pf-header-title">
+                <i class="fa fa-bluetooth me-2"></i> Wireless Tech
+              </div>
+            </div>
+            <div class="da-pf-body" style="max-height: 150px; overflow-y: auto;">
+              <strong class="da-label text-muted d-block mb-2">WiFi Versions</strong>
+              <div class="da-pf-grid-2 mb-3">
+                <?php foreach($filterConfig['wifi_versions'] as $idx => $wifi): ?>
+                <label class="da-pf-checkbox"><input type="checkbox" value="<?php echo htmlspecialchars($wifi); ?>" class="wifi-version"> <span><?php echo htmlspecialchars($wifi); ?></span></label>
+                <?php endforeach; ?>
+              </div>
               
-              <strong class="da-label text-muted mt-2">Bluetooth Versions</strong>
-              <?php foreach($filterConfig['bluetooth_versions'] as $idx => $bt): ?>
-              <label class="da-checkbox-label"><input type="checkbox" value="<?php echo htmlspecialchars($bt); ?>" class="da-check-input bluetooth-version"> <span><?php echo htmlspecialchars($bt); ?></span></label>
-              <?php endforeach; ?>
+              <strong class="da-label text-muted d-block mb-2">Bluetooth Versions</strong>
+              <div class="da-pf-grid-2">
+                <?php foreach($filterConfig['bluetooth_versions'] as $idx => $bt): ?>
+                <label class="da-pf-checkbox"><input type="checkbox" value="<?php echo htmlspecialchars($bt); ?>" class="bluetooth-version"> <span><?php echo htmlspecialchars($bt); ?></span></label>
+                <?php endforeach; ?>
+              </div>
             </div>
           </div>
 
-          <div class="da-filter-panel">
-            <div class="da-filter-header"><i class="fa fa-usb me-2"></i> USB Types</div>
-            <div class="da-filter-body" style="max-height: 150px; overflow-y: auto;">
-              <?php foreach($filterConfig['usb_types'] as $idx => $usb): ?>
-              <label class="da-checkbox-label">
-                <input type="checkbox" value="<?php echo htmlspecialchars($usb); ?>" class="da-check-input usb-type" id="usb<?php echo $idx; ?>"> <span><?php echo htmlspecialchars($usb); ?></span>
-              </label>
-              <?php endforeach; ?>
+          <div class="da-pf-panel">
+            <div class="da-pf-header">
+              <div class="da-pf-header-title">
+                <i class="fa fa-usb me-2"></i> USB Types
+              </div>
+            </div>
+            <div class="da-pf-body" style="max-height: 150px; overflow-y: auto;">
+              <div class="da-pf-grid-2">
+                <?php foreach($filterConfig['usb_types'] as $idx => $usb): ?>
+                <label class="da-pf-checkbox">
+                  <input type="checkbox" value="<?php echo htmlspecialchars($usb); ?>" class="usb-type" id="usb<?php echo $idx; ?>"> <span><?php echo htmlspecialchars($usb); ?></span>
+                </label>
+                <?php endforeach; ?>
+              </div>
             </div>
           </div>
 
           <!-- BUILD & MATERIALS -->
-          <div class="da-filter-panel">
-            <div class="da-filter-header"><i class="fa fa-cube me-2"></i> Build & Materials</div>
-            <div class="da-filter-body" style="max-height: 150px; overflow-y: auto;">
-              <strong class="da-label text-muted">Frame Materials</strong>
-              <?php foreach($filterConfig['frame_materials'] as $mat): ?>
-              <label class="da-checkbox-label"><input type="checkbox" name="frame_material[]" value="<?php echo htmlspecialchars($mat); ?>" class="da-check-input"> <span><?php echo htmlspecialchars($mat); ?></span></label>
-              <?php endforeach; ?>
+          <div class="da-pf-panel">
+            <div class="da-pf-header">
+              <div class="da-pf-header-title">
+                <i class="fa fa-cube me-2"></i> Build & Materials
+              </div>
+            </div>
+            <div class="da-pf-body" style="max-height: 150px; overflow-y: auto;">
+              <strong class="da-label text-muted d-block mb-2">Frame Materials</strong>
+              <div class="da-pf-grid-2 mb-3">
+                <?php foreach($filterConfig['frame_materials'] as $mat): ?>
+                <label class="da-pf-checkbox"><input type="checkbox" name="frame_material[]" value="<?php echo htmlspecialchars($mat); ?>"> <span><?php echo htmlspecialchars($mat); ?></span></label>
+                <?php endforeach; ?>
+              </div>
               
-              <strong class="da-label text-muted mt-2">Back Materials</strong>
-              <?php foreach($filterConfig['back_materials'] as $mat): ?>
-              <label class="da-checkbox-label"><input type="checkbox" name="back_material[]" value="<?php echo htmlspecialchars($mat); ?>" class="da-check-input"> <span><?php echo htmlspecialchars($mat); ?></span></label>
-              <?php endforeach; ?>
+              <strong class="da-label text-muted d-block mb-2">Back Materials</strong>
+              <div class="da-pf-grid-2">
+                <?php foreach($filterConfig['back_materials'] as $mat): ?>
+                <label class="da-pf-checkbox"><input type="checkbox" name="back_material[]" value="<?php echo htmlspecialchars($mat); ?>"> <span><?php echo htmlspecialchars($mat); ?></span></label>
+                <?php endforeach; ?>
+              </div>
             </div>
           </div>
 
-          <div class="da-filter-panel">
-            <div class="da-filter-header"><i class="fa fa-palette me-2"></i> Colors</div>
-            <div class="da-filter-body" style="max-height: 150px; overflow-y: auto;">
-              <?php foreach($filterConfig['colors'] as $color): ?>
-              <label class="da-checkbox-label">
-                <input type="checkbox" name="color[]" value="<?php echo htmlspecialchars($color); ?>" class="da-check-input"> <span><?php echo htmlspecialchars($color); ?></span>
-              </label>
-              <?php endforeach; ?>
+          <div class="da-pf-panel">
+            <div class="da-pf-header">
+              <div class="da-pf-header-title">
+                <i class="fa fa-palette me-2"></i> Colors
+              </div>
+            </div>
+            <div class="da-pf-body" style="max-height: 150px; overflow-y: auto;">
+              <div class="da-pf-grid-2">
+                <?php foreach($filterConfig['colors'] as $color): ?>
+                <label class="da-pf-checkbox">
+                  <input type="checkbox" name="color[]" value="<?php echo htmlspecialchars($color); ?>"> <span><?php echo htmlspecialchars($color); ?></span>
+                </label>
+                <?php endforeach; ?>
+              </div>
             </div>
           </div>
 
-          <div class="da-filter-panel">
-            <div class="da-filter-header"><i class="fa fa-shield-alt me-2"></i> Durability (IP Rating)</div>
-            <div class="da-filter-body" style="max-height: 150px; overflow-y: auto;">
-              <?php foreach($filterConfig['ip_certificates'] as $ip): ?>
-              <label class="da-checkbox-label">
-                <input type="checkbox" name="ip_certificate[]" value="<?php echo htmlspecialchars($ip); ?>" class="da-check-input"> <span><?php echo htmlspecialchars($ip); ?></span>
-              </label>
-              <?php endforeach; ?>
+          <div class="da-pf-panel">
+            <div class="da-pf-header">
+              <div class="da-pf-header-title">
+                <i class="fa fa-shield-alt me-2"></i> Durability (IP)
+              </div>
+            </div>
+            <div class="da-pf-body" style="max-height: 150px; overflow-y: auto;">
+              <div class="da-pf-grid-2">
+                <?php foreach($filterConfig['ip_certificates'] as $ip): ?>
+                <label class="da-pf-checkbox">
+                  <input type="checkbox" name="ip_certificate[]" value="<?php echo htmlspecialchars($ip); ?>"> <span><?php echo htmlspecialchars($ip); ?></span>
+                </label>
+                <?php endforeach; ?>
+              </div>
             </div>
           </div>
 
-          <div class="da-filter-panel">
-            <div class="da-filter-header"><i class="fa fa-mobile me-2"></i> Form Factor</div>
-            <div class="da-filter-body" style="max-height: 150px; overflow-y: auto;">
-              <?php foreach($filterConfig['form_factors'] as $ff): ?>
-              <label class="da-checkbox-label">
-                <input type="checkbox" name="form_factor[]" value="<?php echo htmlspecialchars($ff); ?>" class="da-check-input"> <span><?php echo htmlspecialchars($ff); ?></span>
-              </label>
-              <?php endforeach; ?>
+          <div class="da-pf-panel">
+            <div class="da-pf-header">
+              <div class="da-pf-header-title">
+                <i class="fa fa-mobile me-2"></i> Form Factor
+              </div>
+            </div>
+            <div class="da-pf-body" style="max-height: 150px; overflow-y: auto;">
+              <div class="da-pf-grid-2">
+                <?php foreach($filterConfig['form_factors'] as $ff): ?>
+                <label class="da-pf-checkbox">
+                  <input type="checkbox" name="form_factor[]" value="<?php echo htmlspecialchars($ff); ?>"> <span><?php echo htmlspecialchars($ff); ?></span>
+                </label>
+                <?php endforeach; ?>
+              </div>
             </div>
           </div>
 
           <!-- SENSORS & AUDIO -->
-          <div class="da-filter-panel">
-            <div class="da-filter-header"><i class="fa fa-wave-square me-2"></i> Sensors</div>
-            <div class="da-filter-body">
+          <div class="da-pf-panel">
+            <div class="da-pf-header">
+              <div class="da-pf-header-title">
+                <i class="fa fa-wave-square me-2"></i> Sensors
+              </div>
+            </div>
+            <div class="da-pf-body" style="max-height: 200px; overflow-y: auto;">
               <?php foreach(['accelerometer' => 'Accelerometer', 'gyro' => 'Gyroscope', 'barometer' => 'Barometer', 'heart_rate' => 'Heart Rate', 'compass' => 'Compass', 'proximity' => 'Proximity'] as $val => $lbl): ?>
-              <label class="da-checkbox-label"><input type="checkbox" name="<?php echo $val; ?>" class="da-check-input"> <span><?php echo $lbl; ?></span></label>
+              <label class="da-pf-checkbox mb-2"><input type="checkbox" name="<?php echo $val; ?>"> <span><?php echo $lbl; ?></span></label>
               <?php endforeach; ?>
             </div>
           </div>
           
-          <div class="da-filter-panel">
-            <div class="da-filter-header"><i class="fa fa-fingerprint me-2"></i> Fingerprint</div>
-            <div class="da-filter-body" id="fingerCollapse">
-              <?php foreach($filterConfig['fingerprint_types'] as $fp): ?>
-              <label class="da-checkbox-label form-check"><input type="checkbox" class="da-check-input"> <span><?php echo htmlspecialchars($fp); ?></span></label>
-              <?php endforeach; ?>
+          <div class="da-pf-panel">
+            <div class="da-pf-header">
+              <div class="da-pf-header-title">
+                <i class="fa fa-fingerprint me-2"></i> Fingerprint
+              </div>
+            </div>
+            <div class="da-pf-body" id="fingerCollapse">
+              <div class="da-pf-grid-2">
+                <?php foreach($filterConfig['fingerprint_types'] as $fp): ?>
+                <label class="da-pf-checkbox"><input type="checkbox"> <span><?php echo htmlspecialchars($fp); ?></span></label>
+                <?php endforeach; ?>
+              </div>
             </div>
           </div>
 
-          <div class="da-filter-panel">
-            <div class="da-filter-header"><i class="fa fa-headphones me-2"></i> Audio</div>
-            <div class="da-filter-body">
-              <label class="da-checkbox-label"><input type="checkbox" name="headphone_jack" id="headphone_jack" class="da-check-input"> <span>3.5mm Headphone Jack</span></label>
-              <label class="da-checkbox-label"><input type="checkbox" name="dual_speakers" class="da-check-input"> <span>Dual Speakers</span></label>
+          <div class="da-pf-panel">
+            <div class="da-pf-header">
+              <div class="da-pf-header-title">
+                <i class="fa fa-headphones me-2"></i> Audio
+              </div>
+            </div>
+            <div class="da-pf-body">
+              <label class="da-pf-checkbox mb-2"><input type="checkbox" name="headphone_jack" id="headphone_jack"> <span>3.5mm Headphone Jack</span></label>
+              <label class="da-pf-checkbox"><input type="checkbox" name="dual_speakers"> <span>Dual Speakers</span></label>
             </div>
           </div>
 
           <!-- OS & DIMENSIONS -->
-          <div class="da-filter-panel">
-            <div class="da-filter-header"><i class="fa fa-brands fa-android me-2"></i> OS Family</div>
-            <div class="da-filter-body" style="max-height: 150px; overflow-y: auto;">
-              <?php foreach($filterConfig['os_families'] as $os): ?>
-              <label class="da-checkbox-label">
-                <input type="checkbox" name="os_family[]" value="<?php echo htmlspecialchars($os); ?>" class="da-check-input"> <span><?php echo htmlspecialchars($os); ?></span>
-              </label>
-              <?php endforeach; ?>
+          <div class="da-pf-panel">
+            <div class="da-pf-header">
+              <div class="da-pf-header-title">
+                <i class="fa fa-brands fa-android me-2"></i> OS Family
+              </div>
+            </div>
+            <div class="da-pf-body" style="max-height: 150px; overflow-y: auto;">
+              <div class="da-pf-grid-2">
+                <?php foreach($filterConfig['os_families'] as $os): ?>
+                <label class="da-pf-checkbox">
+                  <input type="checkbox" name="os_family[]" value="<?php echo htmlspecialchars($os); ?>"> <span><?php echo htmlspecialchars($os); ?></span>
+                </label>
+                <?php endforeach; ?>
+              </div>
             </div>
           </div>
 
-          <div class="da-filter-panel">
-            <div class="da-filter-header"><i class="fa fa-code-branch me-2"></i> OS Version (Min)</div>
-            <div class="da-filter-body">
-              <input type="range" class="da-range w-100" id="osVersionMin" min="<?php echo $filterConfig['os_version']['min']; ?>" max="<?php echo $filterConfig['os_version']['max']; ?>" step="<?php echo $filterConfig['os_version']['step']; ?>" value="<?php echo $filterConfig['os_version']['min']; ?>">
-              <div class="da-range-val text-center mt-2" id="osVersionMinValue">Any</div>
+          <div class="da-pf-panel">
+            <div class="da-pf-header">
+              <div class="da-pf-header-title">
+                <i class="fa fa-code-branch me-2"></i> OS Version (Min)
+              </div>
+              <div class="da-pf-slider-value" id="osVersionMinValue">Any</div>
+            </div>
+            <div class="da-pf-body">
+              <input type="range" class="da-pf-range" id="osVersionMin" min="<?php echo $filterConfig['os_version']['min']; ?>" max="<?php echo $filterConfig['os_version']['max']; ?>" step="<?php echo $filterConfig['os_version']['step']; ?>" value="<?php echo $filterConfig['os_version']['min']; ?>">
             </div>
           </div>
 
-          <div class="da-filter-panel">
-            <div class="da-filter-header"><i class="fa fa-ruler-combined me-2"></i> Dimensions</div>
-            <div class="da-filter-body">
-              <label class="da-label text-muted">Min Height (mm):</label>
-              <input type="range" class="da-range w-100" id="heightMin" min="<?php echo $filterConfig['dimensions']['height_min']; ?>" max="<?php echo $filterConfig['dimensions']['height_max']; ?>" step="<?php echo $filterConfig['dimensions']['height_step']; ?>" value="<?php echo $filterConfig['dimensions']['height_min']; ?>">
-              <div class="da-range-val text-center mb-2" id="heightMinValue">Any</div>
+          <div class="da-pf-panel">
+            <div class="da-pf-header">
+              <div class="da-pf-header-title">
+                <i class="fa fa-ruler-combined me-2"></i> Dimensions
+              </div>
+            </div>
+            <div class="da-pf-body">
+              <div class="da-pf-slider-header">
+                <span class="da-pf-slider-label">Min Height (mm)</span>
+                <span class="da-pf-slider-value" id="heightMinValue">Any</span>
+              </div>
+              <input type="range" class="da-pf-range" id="heightMin" min="<?php echo $filterConfig['dimensions']['height_min']; ?>" max="<?php echo $filterConfig['dimensions']['height_max']; ?>" step="<?php echo $filterConfig['dimensions']['height_step']; ?>" value="<?php echo $filterConfig['dimensions']['height_min']; ?>">
               
-              <label class="da-label text-muted">Min Width (mm):</label>
-              <input type="range" class="da-range w-100" id="widthMin" min="<?php echo $filterConfig['dimensions']['width_min']; ?>" max="<?php echo $filterConfig['dimensions']['width_max']; ?>" step="<?php echo $filterConfig['dimensions']['width_step']; ?>" value="<?php echo $filterConfig['dimensions']['width_min']; ?>">
-              <div class="da-range-val text-center mb-2" id="widthMinValue">Any</div>
+              <div class="da-pf-slider-header mt-3">
+                <span class="da-pf-slider-label">Min Width (mm)</span>
+                <span class="da-pf-slider-value" id="widthMinValue">Any</span>
+              </div>
+              <input type="range" class="da-pf-range" id="widthMin" min="<?php echo $filterConfig['dimensions']['width_min']; ?>" max="<?php echo $filterConfig['dimensions']['width_max']; ?>" step="<?php echo $filterConfig['dimensions']['width_step']; ?>" value="<?php echo $filterConfig['dimensions']['width_min']; ?>">
               
-              <label class="da-label text-muted">Max Thickness (mm):</label>
-              <input type="range" class="da-range w-100" id="thicknessMax" min="<?php echo $filterConfig['dimensions']['thickness_min']; ?>" max="<?php echo $filterConfig['dimensions']['thickness_max']; ?>" step="<?php echo $filterConfig['dimensions']['thickness_step']; ?>" value="<?php echo $filterConfig['dimensions']['thickness_max']; ?>">
-              <div class="da-range-val text-center mb-2" id="thicknessMaxValue">Any</div>
+              <div class="da-pf-slider-header mt-3">
+                <span class="da-pf-slider-label">Max Thickness (mm)</span>
+                <span class="da-pf-slider-value" id="thicknessMaxValue">Any</span>
+              </div>
+              <input type="range" class="da-pf-range" id="thicknessMax" min="<?php echo $filterConfig['dimensions']['thickness_min']; ?>" max="<?php echo $filterConfig['dimensions']['thickness_max']; ?>" step="<?php echo $filterConfig['dimensions']['thickness_step']; ?>" value="<?php echo $filterConfig['dimensions']['thickness_max']; ?>">
               
-              <label class="da-label text-muted">Max Weight (g):</label>
-              <input type="range" class="da-range w-100" id="weightMax" min="<?php echo $filterConfig['dimensions']['weight_min']; ?>" max="<?php echo $filterConfig['dimensions']['weight_max']; ?>" step="<?php echo $filterConfig['dimensions']['weight_step']; ?>" value="<?php echo $filterConfig['dimensions']['weight_max']; ?>">
-              <div class="da-range-val text-center" id="weightMaxValue">Any</div>
+              <div class="da-pf-slider-header mt-3">
+                <span class="da-pf-slider-label">Max Weight (g)</span>
+                <span class="da-pf-slider-value" id="weightMaxValue">Any</span>
+              </div>
+              <input type="range" class="da-pf-range" id="weightMax" min="<?php echo $filterConfig['dimensions']['weight_min']; ?>" max="<?php echo $filterConfig['dimensions']['weight_max']; ?>" step="<?php echo $filterConfig['dimensions']['weight_step']; ?>" value="<?php echo $filterConfig['dimensions']['weight_max']; ?>">
             </div>
           </div>
 
           <!-- MISC & SEARCH BUTTONS -->
-          <div class="da-filter-panel">
-            <div class="da-filter-header"><i class="fa fa-search me-2"></i> Search Text</div>
-            <div class="da-filter-body">
+          <div class="da-pf-panel">
+            <div class="da-pf-header">
+              <div class="da-pf-header-title">
+                <i class="fa fa-search me-2"></i> Search Text
+              </div>
+            </div>
+            <div class="da-pf-body">
               <label class="da-label text-muted">Chipset Query:</label>
-              <input type="text" id="chipsetQuery" class="da-input w-100 mb-2" placeholder="e.g. Snapdragon 8">
+              <input type="text" id="chipsetQuery" class="da-input w-100 mb-3" placeholder="Snapdragon 8">
               <label class="da-label text-muted">General Text Search:</label>
-              <input type="text" class="da-input w-100 life" placeholder="e.g. Stylus, Gorilla Glass">
+              <input type="text" class="da-input w-100 life" placeholder="Stylus, Gorilla Glass">
             </div>
           </div>
 
-          <div class="da-filter-panel">
-            <div class="da-filter-header"><i class="fa fa-sort me-2"></i> Sort Order</div>
-            <div class="da-filter-body" id="popularCollapse">
-              <label class="da-checkbox-label form-check"><input type="radio" name="sort" class="da-check-input" checked> <span>Newest First</span></label>
-              <label class="da-checkbox-label form-check"><input type="radio" name="sort" class="da-check-input"> <span>Popularity</span></label>
-              <label class="da-checkbox-label form-check"><input type="radio" name="sort" class="da-check-input"> <span>Price Low to High</span></label>
-              <label class="da-checkbox-label form-check"><input type="radio" name="sort" class="da-check-input"> <span>Price High to Low</span></label>
+          <div class="da-pf-panel">
+            <div class="da-pf-header">
+              <div class="da-pf-header-title">
+                <i class="fa fa-sort me-2"></i> Sort Order
+              </div>
+            </div>
+            <div class="da-pf-body">
+              <label class="da-pf-checkbox mb-2"><input type="radio" name="sort" checked> <span>Newest First</span></label>
+              <label class="da-pf-checkbox mb-2"><input type="radio" name="sort"> <span>Popularity</span></label>
+              <label class="da-pf-checkbox mb-2"><input type="radio" name="sort"> <span>Price Low to High</span></label>
+              <label class="da-pf-checkbox"><input type="radio" name="sort"> <span>Price High to Low</span></label>
             </div>
           </div>
 
-          <div style="grid-column: 1 / -1; display: flex; gap: 15px; margin-top: 20px;">
-            <button type="button" class="da-cta-btn" id="findDevicesBtn" style="flex: 1; padding: 15px; font-size: 1.1rem; border: none; cursor: pointer;">
+          <div style="grid-column: 1 / -1; display: flex; gap: 16px; margin-top: 24px;">
+            <button type="button" class="da-cta-btn" id="findDevicesBtn" style="flex: 1; padding: 14px; font-size: 1.05rem; border: none; cursor: pointer;">
               <i class="fa fa-search me-2"></i> Find Devices
             </button>
-            <button type="button" class="da-cta-btn secondary" id="resetFiltersBtn" style="flex: 0 0 auto; padding: 15px; cursor: pointer;">
+            <button type="button" class="da-cta-btn secondary" id="resetFiltersBtn" style="flex: 0 0 auto; padding: 14px 20px; cursor: pointer;">
               <i class="fa fa-rotate-right me-2"></i> Reset
             </button>
           </div>
