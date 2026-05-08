@@ -237,12 +237,12 @@ if (file_exists($filterConfigPath)) {
             <div class="da-filter-header"><i class="fa fa-compress me-2"></i> Display Resolution</div>
             <div class="da-filter-body">
               <label class="da-label text-muted">Min Width (px):</label>
-              <input type="range" class="da-range w-100" id="resMin" min="<?php echo $filterConfig['display_resolution']['min']; ?>" max="<?php echo $filterConfig['display_resolution']['max']; ?>" step="10" value="<?php echo $filterConfig['display_resolution']['min']; ?>">
-              <div class="da-range-val text-center mb-2" id="resMinValue"><?php echo $filterConfig['display_resolution']['min']; ?></div>
+              <input type="range" class="da-range w-100" id="displayResMin" min="<?php echo $filterConfig['display_resolution']['min']; ?>" max="<?php echo $filterConfig['display_resolution']['max']; ?>" step="10" value="<?php echo $filterConfig['display_resolution']['min']; ?>">
+              <div class="da-range-val text-center mb-2" id="displayResMinValue"><?php echo $filterConfig['display_resolution']['min']; ?></div>
               
               <label class="da-label text-muted">Max Width (px):</label>
-              <input type="range" class="da-range w-100" id="resMax" min="<?php echo $filterConfig['display_resolution']['min']; ?>" max="<?php echo $filterConfig['display_resolution']['max']; ?>" step="10" value="<?php echo $filterConfig['display_resolution']['max']; ?>">
-              <div class="da-range-val text-center" id="resMaxValue"><?php echo $filterConfig['display_resolution']['max']; ?></div>
+              <input type="range" class="da-range w-100" id="displayResMax" min="<?php echo $filterConfig['display_resolution']['min']; ?>" max="<?php echo $filterConfig['display_resolution']['max']; ?>" step="10" value="<?php echo $filterConfig['display_resolution']['max']; ?>">
+              <div class="da-range-val text-center" id="displayResMaxValue"><?php echo $filterConfig['display_resolution']['max']; ?></div>
             </div>
           </div>
 
