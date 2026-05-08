@@ -4736,3 +4736,87 @@ textarea.da-input {
   background: var(--bg-card-hover);
   border-color: var(--accent);
 }
+
+/* ── SINGLE POST CONTENT STYLING ── */
+.da-post-content {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  padding: 32px;
+  margin-top: 16px;
+  box-shadow: var(--shadow-card);
+}
+.da-post-content h1,
+.da-post-content h2,
+.da-post-content h3,
+.da-post-content h4,
+.da-post-content h5,
+.da-post-content h6 {
+  color: var(--text-primary);
+  font-family: var(--font-display);
+  font-weight: 700;
+  margin-top: 32px;
+  margin-bottom: 16px;
+}
+.da-post-content h1 { font-size: 28px; }
+.da-post-content h2 { font-size: 24px; }
+.da-post-content h3 { font-size: 22px; }
+.da-post-content h4 { font-size: 20px; }
+.da-post-content h5 { font-size: 18px; }
+.da-post-content h6 { font-size: 16px; }
+.da-post-content h1:first-child,
+.da-post-content h2:first-child,
+.da-post-content h3:first-child,
+.da-post-content h4:first-child,
+.da-post-content h5:first-child,
+.da-post-content h6:first-child {
+  margin-top: 0;
+}
+.da-post-content p {
+  color: var(--text-secondary);
+  line-height: 1.8;
+  margin-bottom: 16px;
+  font-size: 16px;
+}
+.da-post-content ul,
+.da-post-content ol {
+  color: var(--text-secondary);
+  line-height: 1.8;
+  margin-bottom: 16px;
+  padding-left: 24px;
+  font-size: 16px;
+}
+.da-post-content li {
+  margin-bottom: 10px;
+}
+.da-post-content strong {
+  color: var(--text-primary);
+  font-weight: 600;
+}
+.da-post-content a {
+  color: var(--accent-blue);
+  font-weight: 600;
+  text-decoration: none;
+  transition: color var(--transition);
+}
+.da-post-content a:hover {
+  color: var(--accent);
+  text-decoration: underline;
+}
+.da-post-content img {
+  max-width: 100%;
+  height: auto;
+  border-radius: var(--radius-sm);
+  margin: 24px auto;
+  display: block;
+}
+.da-post-content blockquote {
+  border-left: 4px solid var(--accent);
+  padding-left: 16px;
+  margin: 24px 0;
+  font-style: italic;
+  color: var(--text-primary);
+  background: var(--bg-card-hover);
+  padding: 16px;
+  border-radius: 0 var(--radius-sm) var(--radius-sm) 0;
+}

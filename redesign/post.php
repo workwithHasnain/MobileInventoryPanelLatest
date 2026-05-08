@@ -497,66 +497,31 @@ function getAvatarDisplay($name, $email)
       <main>
         <div class="da-post-feed-header">
           <div>
-            <div class="da-section-label"><span>About Us</span></div>
-            <h2 class="da-section-title">Who We Are</h2>
+            <div class="da-section-label"><span>Story</span></div>
+            <h2 class="da-section-title">Article Content</h2>
           </div>
         </div>
+        
         <?php if (!empty($post['content_body'])): ?>
-        <div class="gap-portion">
+        <div class="da-post-content">
           <?php
           // Handle both plain text and rich content
           $content = $post['content_body'];
           // Check if content contains HTML tags
           if (strip_tags($content) != $content) {
-            // Content has HTML, display as-is but sanitize
+            // Content has HTML, display as-is
             echo $content;
-          }
-          else {
+          } else {
             // Plain text content, convert line breaks
             echo nl2br(htmlspecialchars($content));
           }
           ?>
         </div>
         <?php else: ?>
-          <p class="classy gap-portion">Content is being updated. Please check back later for the full article.</p>
-        <?php endif; ?>
-        <div class="da-about-content">
-          <h4 class="da-about-heading">About DevicesArena</h4>
-          <p class="da-about-text">DevicesArena is a comprehensive online platform dedicated to smartphones and mobile
-            technology. We provide detailed device specifications, expert reviews, side-by-side comparisons, and the
-            latest tech news to help you make informed decisions.</p>
-
-          <h4 class="da-about-heading">Our Mission</h4>
-          <p class="da-about-text">Our mission is to empower consumers with accurate, up-to-date information about
-            mobile devices. Whether you're researching your next smartphone purchase, comparing specifications, or
-            staying updated on the latest tech trends, DevicesArena is your trusted companion.</p>
-
-          <h4 class="da-about-heading">What We Offer</h4>
-          <ul class="da-about-list">
-            <li><strong>Detailed Specifications:</strong> Comprehensive specs for thousands of smartphones from all
-              major brands.</li>
-            <li><strong>Device Comparisons:</strong> Side-by-side comparisons to help you choose the right device.</li>
-            <li><strong>Expert Reviews:</strong> In-depth reviews covering design, performance, camera quality, and
-              more.</li>
-            <li><strong>Phone Finder:</strong> Advanced filtering tools to discover devices that match your needs and
-              budget.</li>
-            <li><strong>Tech News:</strong> Stay updated with the latest developments in the mobile industry.</li>
-          </ul>
-
-          <h4 class="da-about-heading">Why Trust DevicesArena?</h4>
-          <ul class="da-about-list">
-            <li>Verified specifications sourced from official manufacturers.</li>
-            <li>Regularly updated database with the latest devices.</li>
-            <li>Unbiased reviews and comparisons.</li>
-            <li>Community-driven feedback and ratings.</li>
-            <li>Dedicated team passionate about mobile technology.</li>
-          </ul>
-
-          <h4 class="da-about-heading">Get In Touch</h4>
-          <p class="da-about-text">Have questions, suggestions, or feedback? We'd love to hear from you. Visit our <a
-              href="<?php echo $base; ?>contact-us" class="da-about-link">Contact Us</a> page to get in touch with our
-            team.</p>
+        <div class="da-post-content">
+          <p>Content is being updated. Please check back later for the full article.</p>
         </div>
+        <?php endif; ?>
         <!-- Comments Section -->
         <div class="da-widget mt-4" id="comments">
           <div class="da-widget-header">
