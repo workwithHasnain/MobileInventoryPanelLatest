@@ -72,34 +72,6 @@ try {
   $posts = [];
 }
 
-$filterConfigPath = __DIR__ . '/../filter_config.json';
-$filterConfig = file_exists($filterConfigPath) ? json_decode(file_get_contents($filterConfigPath), true) : [];
-
-function daRange($id, $min, $max, $step, $val, $label) {
-    return '
-    <div class="da-range-wrap">
-      <div class="da-range-header"><span>'.htmlspecialchars($label).'</span> <span class="da-range-val" id="'.htmlspecialchars($id).'Value">'.$val.'</span></div>
-      <input type="range" class="da-range" id="'.htmlspecialchars($id).'" min="'.$min.'" max="'.$max.'" step="'.$step.'" value="'.$val.'">
-    </div>';
-}
-
-function daCheck($name, $val, $label, $id = '') {
-    $idAttr = $id ? ' id="'.htmlspecialchars($id).'"' : '';
-    return '<label class="da-checkbox-label"><input type="checkbox" name="'.htmlspecialchars($name).'" value="'.htmlspecialchars($val).'"'.$idAttr.'> '.htmlspecialchars($label).'</label>';
-}
-
-function daCheckList($items, $name, $class='') {
-    $out = '<div class="da-checkbox-group">';
-    foreach($items as $idx => $item) {
-        $val = is_array($item) ? $item['value'] : $item;
-        $lbl = is_array($item) ? $item['label'] : $item;
-        $classStr = $class ? ' class="'.$class.'"' : '';
-        $out .= '<label class="da-checkbox-label"><input type="checkbox" name="'.htmlspecialchars($name).'" value="'.htmlspecialchars($val).'"'.$classStr.'> '.htmlspecialchars($lbl).'</label>';
-    }
-    $out .= '</div>';
-    return $out;
-}
-
 ?>
 <!DOCTYPE html>
 <html lang="en" id="da-html">
@@ -109,13 +81,13 @@ function daCheckList($items, $name, $class='') {
   <meta name="viewport" content="width=device-width,initial-scale=1.0" />
   <link rel="canonical"
     href="<?php echo $canonicalBase; ?>/compare<?php echo isset($_GET['slugs']) ? '/' . htmlspecialchars($_GET['slugs']) : ''; ?>" />
-  <title><?php echo htmlspecialchars($pageTitle); ?></title>
+  <title>Phone Finder — DevicesArena</title>
   <meta name="description"
-    content="Compare smartphones side by side on DevicesArena. Full specs, display, camera, battery and connectivity." />
+    content="Advanced device finder tool to search and filter smartphones, tablets, and smartwatches." />
   <link rel="icon" type="image/png" sizes="32x32" href="<?php echo $base; ?>imges/icon-32.png">
   <meta name="theme-color" content="#0d0f1a">
-  <meta property="og:title" content="<?php echo htmlspecialchars($pageTitle); ?>" />
-  <meta property="og:description" content="Compare smartphones side by side. Full specs, camera, battery and more." />
+  <meta property="og:title" content="Phone Finder — DevicesArena" />
+  <meta property="og:description" content="Advanced device finder tool to search and filter smartphones, tablets, and smartwatches." />
   <meta property="og:type" content="website" />
 
   <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-9906394285054446"
@@ -151,234 +123,175 @@ function daCheckList($items, $name, $class='') {
   <!-- ══════════════════════════════════════════
      COMPARE PAGE CONTENT
 ══════════════════════════════════════════ -->
-<div class="da-content-area" style="margin-top: 40px; margin-bottom: 40px;">
-    <div class="row">
-      <!-- Filter Sidebar -->
-      <div class="col-lg-4 col-md-5 mb-4">
-        <div class="da-form">
-          <div class="d-flex justify-content-between align-items-center mb-3">
-             <h4 class="text-white mb-0"><i class="fa fa-filter"></i> Filters</h4>
-             <button id="resetFiltersBtn" class="da-cta-btn secondary" style="padding: 4px 10px; font-size: 12px;"><i class="fa fa-rotate-left"></i> Reset</button>
-          </div>
-          
-          <!-- General -->
-          <div class="da-filter-panel">
-            <div class="da-filter-header" data-bs-toggle="collapse" data-bs-target="#fpGeneral">General <i class="fa fa-chevron-down"></i></div>
-            <div class="da-filter-body collapse show" id="fpGeneral">
-               <div class="da-form-group mb-3">
-                 <label>Brand</label>
-                 <div class="da-checkbox-group" style="max-height: 150px; overflow-y: auto;">
-                   <?php foreach($brands as $brand): ?>
-                      <?php echo daCheck('brand[]', $brand['id'], $brand['name']); ?>
-                   <?php endforeach; ?>
-                 </div>
-               </div>
-               <div class="da-form-group mb-3">
-                 <label>Availability</label>
-                 <div class="da-checkbox-group">
-                   <?php echo daCheck('availability', 'Available', 'Available'); ?>
-                   <?php echo daCheck('availability', 'Coming Soon', 'Coming Soon'); ?>
-                   <?php echo daCheck('availability', 'Discontinued', 'Discontinued'); ?>
-                   <?php echo daCheck('availability', 'Rumored', 'Rumored'); ?>
-                 </div>
-               </div>
-               <?php echo daRange('priceMax', 0, 3000, 10, 3000, 'Max Price ($)'); ?>
-               <?php echo daRange('yearMin', 2000, 2026, 1, 2000, 'Min Year'); ?>
-               <?php echo daRange('yearMax', 2000, 2026, 1, 2026, 'Max Year'); ?>
-               <div class="da-form-group mt-3">
-                 <label>Sort By</label>
-                 <div class="da-checkbox-group" id="popularCollapse">
-                    <label class="da-checkbox-label"><input type="radio" name="order" value="newest" checked> Newest First</label>
-                    <label class="da-checkbox-label"><input type="radio" name="order" value="popularity"> Popularity</label>
-                    <label class="da-checkbox-label"><input type="radio" name="order" value="price"> Price (Low to High)</label>
-                    <label class="da-checkbox-label"><input type="radio" name="order" value="camera_battery"> Camera & Battery</label>
-                 </div>
-               </div>
-            </div>
-          </div>
-
-          <!-- Network & Connectivity -->
-          <div class="da-filter-panel">
-            <div class="da-filter-header" data-bs-toggle="collapse" data-bs-target="#fpNetwork">Network & Connectivity <i class="fa fa-chevron-down"></i></div>
-            <div class="da-filter-body collapse" id="fpNetwork">
-               <div class="da-form-group mb-3"><label>2G Bands</label><?php echo daCheckList($filterConfig['network_2g_bands'] ?? [], 'network_2g_bands[]', 'network-2g-band'); ?></div>
-               <div class="da-form-group mb-3"><label>3G Bands</label><?php echo daCheckList($filterConfig['network_3g_bands'] ?? [], 'network_3g_bands[]', 'network-3g-band'); ?></div>
-               <div class="da-form-group mb-3"><label>4G Bands</label><?php echo daCheckList($filterConfig['network_4g_bands'] ?? [], 'network_4g_bands[]', 'network-4g-band'); ?></div>
-               <div class="da-form-group mb-3"><label>5G Bands</label><?php echo daCheckList($filterConfig['network_5g_bands'] ?? [], 'network_5g_bands[]', 'network-5g-band'); ?></div>
-               <div class="da-form-group mb-3">
-                 <label>SIM & Wireless</label>
-                 <div class="da-checkbox-group">
-                   <?php echo daCheck('', '1', 'Dual SIM', 'dualSim'); ?>
-                   <?php echo daCheck('', '1', 'eSIM Support', 'esimSupport'); ?>
-                   <?php echo daCheck('', '1', 'GPS Required', 'gpsRequired'); ?>
-                   <?php echo daCheck('', '1', 'NFC Required', 'nfcRequired'); ?>
-                   <?php echo daCheck('', '1', 'Infrared', 'infraredRequired'); ?>
-                   <?php echo daCheck('', '1', 'FM Radio', 'fmRadioRequired'); ?>
-                 </div>
-               </div>
-               <div class="da-form-group mb-3"><label>SIM Sizes</label><?php echo daCheckList($filterConfig['sim_types'] ?? [], 'sim_sizes[]'); ?></div>
-               <div class="da-form-group mb-3"><label>Wi-Fi Versions</label><?php echo daCheckList($filterConfig['wifi_versions'] ?? [], 'wifi_versions[]', 'wifi-version'); ?></div>
-               <div class="da-form-group mb-3"><label>Bluetooth</label><?php echo daCheckList($filterConfig['bluetooth_versions'] ?? [], 'bluetooth_versions[]', 'bluetooth-version'); ?></div>
-               <div class="da-form-group mb-3"><label>USB Types</label><?php echo daCheckList($filterConfig['usb_types'] ?? [], 'usb_types[]', 'usb-type'); ?></div>
-            </div>
-          </div>
-
-          <!-- Body & Design -->
-          <div class="da-filter-panel">
-            <div class="da-filter-header" data-bs-toggle="collapse" data-bs-target="#fpBody">Body & Design <i class="fa fa-chevron-down"></i></div>
-            <div class="da-filter-body collapse" id="fpBody">
-               <?php echo daRange('heightMin', 0, 300, 1, 0, 'Min Height (mm)'); ?>
-               <?php echo daRange('widthMin', 0, 100, 1, 0, 'Min Width (mm)'); ?>
-               <?php echo daRange('thicknessMax', 0, 30, 0.1, 0, 'Max Thickness (mm)'); ?>
-               <?php echo daRange('weightMax', 0, 400, 5, 0, 'Max Weight (g)'); ?>
-               <div class="da-form-group mb-3"><label>IP Certificate</label><?php echo daCheckList($filterConfig['ip_certificates'] ?? [], 'ip_certificate[]'); ?></div>
-               <div class="da-form-group mb-3"><label>Form Factor</label><?php echo daCheckList($filterConfig['form_factors'] ?? [], 'form_factor[]'); ?></div>
-               <div class="da-form-group mb-3"><label>Frame Material</label><?php echo daCheckList($filterConfig['frame_materials'] ?? [], 'frame_material[]'); ?></div>
-               <div class="da-form-group mb-3"><label>Back Material</label><?php echo daCheckList($filterConfig['back_materials'] ?? [], 'back_material[]'); ?></div>
-               <div class="da-form-group mb-3"><label>Color</label>
-                  <div class="da-checkbox-group" style="max-height:100px; overflow-y:auto;">
-                      <?php echo daCheckList($filterConfig['colors'] ?? [], 'color[]'); ?>
-                  </div>
-               </div>
-            </div>
-          </div>
-
-          <!-- Hardware & Memory -->
-          <div class="da-filter-panel">
-            <div class="da-filter-header" data-bs-toggle="collapse" data-bs-target="#fpHardware">Hardware & Memory <i class="fa fa-chevron-down"></i></div>
-            <div class="da-filter-body collapse" id="fpHardware">
-               <div class="da-form-group mb-3"><label>OS Family</label><?php echo daCheckList($filterConfig['os_families'] ?? [], 'os_family'); ?></div>
-               <?php echo daRange('osVersionMin', 0, 16, 0.5, 0, 'Min OS Version'); ?>
-               <div class="da-form-group mb-3"><label>Chipset</label><input type="text" class="da-input" id="chipsetQuery" placeholder="e.g. Snapdragon 8 Gen 2"></div>
-               <?php echo daRange('cpuClockMin', 0, 4, 0.1, 0, 'Min CPU Clock (GHz)'); ?>
-               <?php echo daRange('ramMin', 0, 24, 1, 0, 'Min RAM (GB)'); ?>
-               <?php echo daRange('storageMin', 0, 2048, 16, 0, 'Min Storage (GB)'); ?>
-               <div class="da-form-group mb-3"><div class="da-checkbox-group"><?php echo daCheck('card_slot_required', '1', 'Card Slot Required', 'cardSlotRequired'); ?></div></div>
-            </div>
-          </div>
-
-          <!-- Display -->
-          <div class="da-filter-panel">
-            <div class="da-filter-header" data-bs-toggle="collapse" data-bs-target="#fpDisplay">Display <i class="fa fa-chevron-down"></i></div>
-            <div class="da-filter-body collapse" id="fpDisplay">
-               <?php echo daRange('displaySizeMin', 3, 8, 0.1, 3, 'Min Size (inches)'); ?>
-               <?php echo daRange('displaySizeMax', 3, 8, 0.1, 8, 'Max Size (inches)'); ?>
-               <?php echo daRange('displayResMin', 480, 4320, 1, 480, 'Min Resolution'); ?>
-               <?php echo daRange('displayResMax', 480, 4320, 1, 4320, 'Max Resolution'); ?>
-               <div class="da-form-group mb-3"><label>Technology</label><?php echo daCheckList($filterConfig['display_technologies'] ?? [], 'display_tech[]'); ?></div>
-               <div class="da-form-group mb-3"><label>Notch Type</label><?php echo daCheckList($filterConfig['display_notches'] ?? [], 'display_notch[]'); ?></div>
-               <?php echo daRange('refreshRateMin', 0, 240, 30, 0, 'Min Refresh Rate (Hz)'); ?>
-               <div class="da-form-group mb-3"><div class="da-checkbox-group">
-                   <?php echo daCheck('hdr', '1', 'HDR Support'); ?>
-                   <?php echo daCheck('billion_colors', '1', '1 Billion Colors'); ?>
-               </div></div>
-            </div>
-          </div>
-
-          <!-- Cameras -->
-          <div class="da-filter-panel">
-            <div class="da-filter-header" data-bs-toggle="collapse" data-bs-target="#fpCamera">Cameras <i class="fa fa-chevron-down"></i></div>
-            <div class="da-filter-body collapse" id="fpCamera">
-               <?php echo daRange('mainCamMpMin', 0, 200, 1, 0, 'Min Main MP'); ?>
-               <?php echo daRange('fNumberMax', 0, 4, 0.1, 0, 'Max Aperture (f-number)'); ?>
-               <div class="da-form-group mb-3">
-                 <label>Main Camera</label>
-                 <div class="da-checkbox-group">
-                   <?php echo daCheck('main_camera_telephoto', '1', 'Telephoto Lens'); ?>
-                   <?php echo daCheck('main_camera_ultrawide', '1', 'Ultrawide Lens'); ?>
-                   <?php echo daCheck('main_camera_ois', '1', 'OIS (Optical Stabilization)'); ?>
-                   <?php echo daCheck('video_4k', '1', '4K Video', 'video4k'); ?>
-                   <?php echo daCheck('video_8k', '1', '8K Video', 'video8k'); ?>
-                 </div>
-               </div>
-               <div class="da-form-group mb-3">
-                 <label>Selfie Camera</label>
-                 <div class="da-checkbox-group">
-                   <?php echo daCheck('selfie_camera_flash', '1', 'Selfie Flash'); ?>
-                   <?php echo daCheck('popup_camera', '1', 'Pop-up Camera'); ?>
-                   <?php echo daCheck('under_display_camera', '1', 'Under-display Camera'); ?>
-                 </div>
-               </div>
-            </div>
-          </div>
-
-          <!-- Battery -->
-          <div class="da-filter-panel">
-            <div class="da-filter-header" data-bs-toggle="collapse" data-bs-target="#fpBattery">Battery & Charging <i class="fa fa-chevron-down"></i></div>
-            <div class="da-filter-body collapse" id="fpBattery">
-               <?php echo daRange('batteryCapacityMin', 0, 10000, 100, 0, 'Min Capacity (mAh)'); ?>
-               <?php echo daRange('wiredChargeMin', 0, 300, 5, 0, 'Min Wired Charge (W)'); ?>
-               <?php echo daRange('wirelessChargeMin', 0, 100, 5, 0, 'Min Wireless Charge (W)'); ?>
-               <div class="da-form-group mb-3"><div class="da-checkbox-group">
-                   <?php echo daCheck('', '1', 'Wireless Charging Required', 'wirelessRequired'); ?>
-                   <?php echo daCheck('battery_sic', '1', 'Si/C Battery'); ?>
-                   <?php echo daCheck('battery_removable', '1', 'Removable Battery'); ?>
-               </div></div>
-            </div>
-          </div>
-
-          <!-- Sensors & Misc -->
-          <div class="da-filter-panel">
-            <div class="da-filter-header" data-bs-toggle="collapse" data-bs-target="#fpSensors">Sensors & Misc <i class="fa fa-chevron-down"></i></div>
-            <div class="da-filter-body collapse" id="fpSensors">
-               <div class="da-form-group mb-3">
-                 <label>Sensors</label>
-                 <div class="da-checkbox-group">
-                   <?php echo daCheck('accelerometer', '1', 'Accelerometer'); ?>
-                   <?php echo daCheck('gyro', '1', 'Gyro'); ?>
-                   <?php echo daCheck('barometer', '1', 'Barometer'); ?>
-                   <?php echo daCheck('heart_rate', '1', 'Heart Rate'); ?>
-                   <?php echo daCheck('compass', '1', 'Compass'); ?>
-                   <?php echo daCheck('proximity', '1', 'Proximity'); ?>
-                 </div>
-               </div>
-               <div class="da-form-group mb-3" id="fingerCollapse">
-                 <label>Fingerprint</label>
-                 <div class="da-checkbox-group">
-                   <?php echo daCheck('fingerprint[]', 'any', 'Any Fingerprint'); ?>
-                   <?php echo daCheck('fingerprint[]', 'rear', 'Rear-mounted'); ?>
-                   <?php echo daCheck('fingerprint[]', 'side', 'Side-mounted'); ?>
-                   <?php echo daCheck('fingerprint[]', 'under_display', 'Under-display'); ?>
-                 </div>
-               </div>
-               <div class="da-form-group mb-3">
-                 <label>Audio</label>
-                 <div class="da-checkbox-group">
-                   <?php echo daCheck('headphone_jack', '1', '3.5mm Headphone Jack'); ?>
-                   <?php echo daCheck('dual_speakers', '1', 'Stereo/Dual Speakers'); ?>
-                 </div>
-               </div>
-               <div class="da-form-group mb-3">
-                 <label>Free Text Query</label>
-                 <input type="text" class="da-input life" placeholder="Search specific features...">
-               </div>
-            </div>
-          </div>
-
-          <button id="findDevicesBtn" class="da-cta-btn w-100 mt-3" style="padding: 12px; font-size: 16px;">
-             <i class="fa fa-search me-2" style="pointer-events: none;"></i><span style="pointer-events: none;">Find Devices</span>
-          </button>
-        </div>
+  <!-- ══════════════════════════════════════════
+     PHONE FINDER CONTENT
+══════════════════════════════════════════ -->
+  <main class="da-content-area" style="padding-top: 40px; padding-bottom: 60px; min-height: 80vh;">
+    <div class="da-container">
+      
+      <div class="da-page-header" style="margin-bottom: 30px;">
+        <h1 class="da-page-title" style="color: var(--text-color);">Phone Finder</h1>
+        <p class="da-page-desc" style="color: var(--text-muted); font-size: 1.1rem;">Use the advanced filters below to find the perfect device matching your exact specifications.</p>
       </div>
 
-      <!-- Results Grid -->
-      <div class="col-lg-8 col-md-7">
-        <div id="resultsSection" style="display: none;">
-          <h3 class="text-white mb-4" style="font-family: var(--font-header);">Results (<span id="resultsCount">0</span>)</h3>
-          <div class="row g-3" id="resultsContainer">
-            <!-- Dynamic da-device-card injection via JS -->
+      <!-- FILTERS SECTION -->
+      <div class="da-filter-container" style="background: var(--bg-card); padding: 25px; border-radius: var(--radius-lg); margin-bottom: 50px; border: 1px solid var(--border-color); box-shadow: 0 4px 20px rgba(0,0,0,0.2);">
+        <form id="da-phonefinder-form" class="da-form" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 25px;">
+          
+          <!-- BRAND -->
+          <div class="da-filter-panel" style="background: var(--bg-body); border-radius: var(--radius-md); padding: 15px; border: 1px solid var(--border-color);">
+            <div class="da-filter-header" style="font-weight: 600; margin-bottom: 15px; color: var(--accent-blue);"><i class="fa fa-tags me-2"></i> Brand</div>
+            <div class="da-filter-body" style="max-height: 180px; overflow-y: auto;">
+              <?php if (!empty($brands)): foreach ($brands as $brand): ?>
+                <label class="da-checkbox-label" style="display: flex; align-items: center; gap: 8px; margin-bottom: 8px; cursor: pointer;">
+                  <input type="checkbox" name="brand[]" value="<?php echo $brand['id']; ?>" class="da-check-input">
+                  <span style="color: var(--text-color);"><?php echo htmlspecialchars($brand['name']); ?></span>
+                </label>
+              <?php endforeach; else: ?>
+                <p style="color: var(--text-muted);">No brands available</p>
+              <?php endif; ?>
+            </div>
           </div>
+
+          <!-- AVAILABILITY -->
+          <div class="da-filter-panel" style="background: var(--bg-body); border-radius: var(--radius-md); padding: 15px; border: 1px solid var(--border-color);">
+            <div class="da-filter-header" style="font-weight: 600; margin-bottom: 15px; color: var(--accent-blue);"><i class="fa fa-calendar-check me-2"></i> Availability</div>
+            <div class="da-filter-body">
+              <label class="da-checkbox-label" style="display: flex; align-items: center; gap: 8px; margin-bottom: 8px; cursor: pointer;">
+                <input type="checkbox" name="availability" value="Available" class="da-check-input"> <span style="color: var(--text-color);">Available</span>
+              </label>
+              <label class="da-checkbox-label" style="display: flex; align-items: center; gap: 8px; margin-bottom: 8px; cursor: pointer;">
+                <input type="checkbox" name="availability" value="Coming Soon" class="da-check-input"> <span style="color: var(--text-color);">Coming Soon</span>
+              </label>
+              <label class="da-checkbox-label" style="display: flex; align-items: center; gap: 8px; margin-bottom: 8px; cursor: pointer;">
+                <input type="checkbox" name="availability" value="Discontinued" class="da-check-input"> <span style="color: var(--text-color);">Discontinued</span>
+              </label>
+              <label class="da-checkbox-label" style="display: flex; align-items: center; gap: 8px; margin-bottom: 8px; cursor: pointer;">
+                <input type="checkbox" name="availability" value="Rumored" class="da-check-input"> <span style="color: var(--text-color);">Rumored</span>
+              </label>
+            </div>
+          </div>
+
+          <!-- PRICE -->
+          <div class="da-filter-panel" style="background: var(--bg-body); border-radius: var(--radius-md); padding: 15px; border: 1px solid var(--border-color);">
+            <div class="da-filter-header" style="font-weight: 600; margin-bottom: 15px; color: var(--accent-blue);"><i class="fa fa-dollar-sign me-2"></i> Price (Max)</div>
+            <div class="da-filter-body">
+              <input type="range" class="da-range w-100" id="priceMax" min="50" max="3000" step="50" value="3000">
+              <div class="da-range-val text-center mt-2" id="priceMaxValue" style="color: var(--text-color); font-weight: 500;">Any</div>
+            </div>
+          </div>
+
+          <!-- YEAR -->
+          <div class="da-filter-panel" style="background: var(--bg-body); border-radius: var(--radius-md); padding: 15px; border: 1px solid var(--border-color);">
+            <div class="da-filter-header" style="font-weight: 600; margin-bottom: 15px; color: var(--accent-blue);"><i class="fa fa-calendar-alt me-2"></i> Release Year</div>
+            <div class="da-filter-body">
+              <label style="color:var(--text-muted); font-size:12px; display:block;">Min Year:</label>
+              <input type="range" class="da-range w-100" id="yearMin" min="2000" max="2025" step="1" value="2000">
+              <div class="da-range-val text-center mb-2" id="yearMinValue" style="color: var(--text-color); font-weight: 500;">2000</div>
+              
+              <label style="color:var(--text-muted); font-size:12px; display:block;">Max Year:</label>
+              <input type="range" class="da-range w-100" id="yearMax" min="2000" max="2025" step="1" value="2025">
+              <div class="da-range-val text-center" id="yearMaxValue" style="color: var(--text-color); font-weight: 500;">2025</div>
+            </div>
+          </div>
+
+          <!-- RAM -->
+          <div class="da-filter-panel" style="background: var(--bg-body); border-radius: var(--radius-md); padding: 15px; border: 1px solid var(--border-color);">
+            <div class="da-filter-header" style="font-weight: 600; margin-bottom: 15px; color: var(--accent-blue);"><i class="fa fa-memory me-2"></i> RAM (Min)</div>
+            <div class="da-filter-body">
+              <input type="range" class="da-range w-100" id="ramMin" min="0" max="32" step="1" value="0">
+              <div class="da-range-val text-center mt-2" id="ramMinValue" style="color: var(--text-color); font-weight: 500;">Any</div>
+            </div>
+          </div>
+
+          <!-- STORAGE -->
+          <div class="da-filter-panel" style="background: var(--bg-body); border-radius: var(--radius-md); padding: 15px; border: 1px solid var(--border-color);">
+            <div class="da-filter-header" style="font-weight: 600; margin-bottom: 15px; color: var(--accent-blue);"><i class="fa fa-hdd me-2"></i> Storage (Min)</div>
+            <div class="da-filter-body">
+              <input type="range" class="da-range w-100" id="storageMin" min="0" max="2048" step="16" value="0">
+              <div class="da-range-val text-center mt-2" id="storageMinValue" style="color: var(--text-color); font-weight: 500;">Any</div>
+            </div>
+          </div>
+
+          <!-- DISPLAY SIZE -->
+          <div class="da-filter-panel" style="background: var(--bg-body); border-radius: var(--radius-md); padding: 15px; border: 1px solid var(--border-color);">
+            <div class="da-filter-header" style="font-weight: 600; margin-bottom: 15px; color: var(--accent-blue);"><i class="fa fa-mobile-screen me-2"></i> Display Size (Inches)</div>
+            <div class="da-filter-body">
+              <label style="color:var(--text-muted); font-size:12px; display:block;">Min Size:</label>
+              <input type="range" class="da-range w-100" id="displaySizeMin" min="3.0" max="8.0" step="0.1" value="3.0">
+              <div class="da-range-val text-center mb-2" id="displaySizeMinValue" style="color: var(--text-color); font-weight: 500;">3.0</div>
+              
+              <label style="color:var(--text-muted); font-size:12px; display:block;">Max Size:</label>
+              <input type="range" class="da-range w-100" id="displaySizeMax" min="3.0" max="8.0" step="0.1" value="8.0">
+              <div class="da-range-val text-center" id="displaySizeMaxValue" style="color: var(--text-color); font-weight: 500;">8.0</div>
+            </div>
+          </div>
+
+          <!-- BATTERY -->
+          <div class="da-filter-panel" style="background: var(--bg-body); border-radius: var(--radius-md); padding: 15px; border: 1px solid var(--border-color);">
+            <div class="da-filter-header" style="font-weight: 600; margin-bottom: 15px; color: var(--accent-blue);"><i class="fa fa-battery-full me-2"></i> Battery (Min mAh)</div>
+            <div class="da-filter-body">
+              <input type="range" class="da-range w-100" id="batteryCapacityMin" min="0" max="10000" step="100" value="0">
+              <div class="da-range-val text-center mt-2" id="batteryCapacityMinValue" style="color: var(--text-color); font-weight: 500;">Any</div>
+            </div>
+          </div>
+
+          <!-- MAIN CAMERA -->
+          <div class="da-filter-panel" style="background: var(--bg-body); border-radius: var(--radius-md); padding: 15px; border: 1px solid var(--border-color);">
+            <div class="da-filter-header" style="font-weight: 600; margin-bottom: 15px; color: var(--accent-blue);"><i class="fa fa-camera me-2"></i> Main Camera (Min MP)</div>
+            <div class="da-filter-body">
+              <input type="range" class="da-range w-100" id="mainCamMpMin" min="0" max="200" step="1" value="0">
+              <div class="da-range-val text-center mt-2" id="mainCamMpMinValue" style="color: var(--text-color); font-weight: 500;">Any</div>
+            </div>
+          </div>
+
+          <!-- NETWORK & CONNECTIVITY -->
+          <div class="da-filter-panel" style="background: var(--bg-body); border-radius: var(--radius-md); padding: 15px; border: 1px solid var(--border-color);">
+            <div class="da-filter-header" style="font-weight: 600; margin-bottom: 15px; color: var(--accent-blue);"><i class="fa fa-wifi me-2"></i> Connectivity</div>
+            <div class="da-filter-body">
+              <label class="da-checkbox-label" style="display: flex; align-items: center; gap: 8px; margin-bottom: 8px; cursor: pointer;">
+                <input type="checkbox" id="dualSim" class="da-check-input"> <span style="color: var(--text-color);">Dual SIM</span>
+              </label>
+              <label class="da-checkbox-label" style="display: flex; align-items: center; gap: 8px; margin-bottom: 8px; cursor: pointer;">
+                <input type="checkbox" id="esimSupport" class="da-check-input"> <span style="color: var(--text-color);">eSIM Support</span>
+              </label>
+              <label class="da-checkbox-label" style="display: flex; align-items: center; gap: 8px; margin-bottom: 8px; cursor: pointer;">
+                <input type="checkbox" name="card_slot_required" id="cardSlotRequired" class="da-check-input"> <span style="color: var(--text-color);">Card Slot</span>
+              </label>
+              <label class="da-checkbox-label" style="display: flex; align-items: center; gap: 8px; margin-bottom: 8px; cursor: pointer;">
+                <input type="checkbox" id="nfcRequired" class="da-check-input"> <span style="color: var(--text-color);">NFC</span>
+              </label>
+              <label class="da-checkbox-label" style="display: flex; align-items: center; gap: 8px; margin-bottom: 8px; cursor: pointer;">
+                <input type="checkbox" id="headphone_jack" name="headphone_jack" class="da-check-input"> <span style="color: var(--text-color);">3.5mm Jack</span>
+              </label>
+            </div>
+          </div>
+
+          <!-- SEARCH BUTTONS -->
+          <div style="grid-column: 1 / -1; display: flex; gap: 15px; margin-top: 20px;">
+            <button type="button" class="da-cta-btn" id="findDevicesBtn" style="flex: 1; padding: 15px; font-size: 1.1rem; border: none; background: var(--accent-blue); color: #fff; border-radius: var(--radius-md); font-weight: 600; cursor: pointer;">
+              <i class="fa fa-search me-2"></i> Find Devices
+            </button>
+            <button type="button" class="da-cta-btn secondary" id="resetFiltersBtn" style="flex: 0 0 auto; padding: 15px; border: 1px solid var(--border-color); background: var(--bg-body); color: var(--text-color); border-radius: var(--radius-md); font-weight: 500; cursor: pointer;">
+              <i class="fa fa-rotate-right me-2"></i> Reset
+            </button>
+          </div>
+
+        </form>
+      </div>
+
+      <!-- RESULTS SECTION -->
+      <div id="resultsSection" style="display: none;">
+        <div class="da-section-label" style="margin-bottom: 20px; border-bottom: 1px solid var(--border-color); padding-bottom: 10px;">
+          <h2 style="color: var(--text-color); font-size: 1.5rem; margin: 0;">Results (<span id="resultsCount" style="color: var(--accent-blue);">0</span>)</h2>
         </div>
-        <!-- Initial empty state or help text could go here -->
-        <div id="initialState" class="da-box text-center p-5">
-           <i class="fa fa-mobile-screen fa-3x mb-3 text-muted"></i>
-           <h4 class="text-white">Advanced Phone Finder</h4>
-           <p class="text-muted">Use the extensive filters on the left to discover exactly the device you are looking for.</p>
+        <div id="resultsContainer" class="row gx-4 gy-4">
+          <!-- Results will be appended here via AJAX. Using standard Bootstrap grid since JS expects it for card wrappers -->
         </div>
       </div>
 
     </div>
-  </div>
+  </main>
   
   <?php include __DIR__ . '/includes/footer.php'; ?>
 
@@ -1248,27 +1161,49 @@ function daCheckList($items, $name, $class='') {
                         findBtn.disabled = false;
                         findBtn.innerHTML = '<i class="fa fa-search me-2" style="pointer-events: none;"></i><span style="pointer-events: none;">Find Devices</span>';
                     });
+                    });
             });
-            
-        function createDeviceCard(device) {
-            const safeName = device.name ? device.name.replace(/"/g, '&quot;') : 'Unknown Device';
-            const slug = device.slug ? encodeURIComponent(device.slug) : encodeURIComponent(device.id);
-            let imgUrl = device.image;
-            if (imgUrl && !imgUrl.startsWith('http')) {
-                imgUrl = window.baseURL + (imgUrl.startsWith('/') ? imgUrl.substring(1) : imgUrl);
-            }
-            
-            return `
-            <div class="col-6 col-md-4 col-lg-3 d-flex">
-                <a href="${window.baseURL}device/${slug}" class="da-device-card w-100" style="margin: 0; min-height: 220px; display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 15px;">
-                    <img src="${imgUrl || window.baseURL + 'imges/default-phone.png'}" alt="${safeName}" onerror="this.src='${window.baseURL}imges/default-phone.png'" style="object-fit: contain; padding: 5px; max-height: 140px; width: auto;">
-                    <div class="da-device-card-name text-center mt-3" style="font-size: 14px; font-weight: 600; text-wrap: balance;">${safeName}</div>
-                </a>
-            </div>
+
+            function createDeviceCard(device) {
+                let badgeClass = 'da-badge-secondary';
+                if (device.availability === 'Available') badgeClass = 'da-badge-success';
+                else if (device.availability === 'Coming Soon') badgeClass = 'da-badge-warning';
+                else if (device.availability === 'Discontinued') badgeClass = 'da-badge-danger';
+                else if (device.availability === 'Rumored') badgeClass = 'da-badge-info';
+                
+                const priceFormatted = device.price ? '$' + parseFloat(device.price).toLocaleString() : 'N/A';
+                
+                return `
+                <div class="col-xl-3 col-lg-4 col-md-6 col-sm-6 col-12 mb-4">
+                    <a href="<?php echo $base; ?>device/${encodeURIComponent(device.slug)}" class="da-device-card text-decoration-none" style="display: block; height: 100%; border-radius: var(--radius-lg); background: var(--bg-card); overflow: hidden; border: 1px solid var(--border-color); transition: all 0.2s ease;">
+                        <div style="aspect-ratio: 3/4; overflow: hidden; display: flex; align-items: center; justify-content: center; background: #fff; padding: 20px;">
+                            <img src="${device.thumbnail}" alt="${device.name}" onerror="this.style.display='none'" style="max-width: 100%; max-height: 100%; object-fit: contain;">
+                        </div>
+                        <div class="da-device-card-body" style="padding: 15px;">
+                            <h5 style="color: var(--text-color); font-size: 1.1rem; font-weight: 600; margin-bottom: 5px;">${device.name}</h5>
+                            
+                            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
+                                <small style="color: var(--text-muted); font-weight: 500;">${device.brand || 'Unknown'}</small>
+                                <span style="background: var(--accent-blue); color: #fff; padding: 2px 8px; border-radius: 4px; font-size: 0.8rem;">${device.year || 'N/A'}</span>
+                            </div>
+
+                            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px;">
+                                <small style="color: var(--text-color); font-weight: 600;">💰 ${priceFormatted}</small>
+                            </div>
+
+                            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 8px; font-size: 0.85rem; color: var(--text-muted);">
+                                ${device.ram ? `<div><i class="fas fa-microchip me-1"></i> ${device.ram}</div>` : ''}
+                                ${device.storage ? `<div><i class="fas fa-database me-1"></i> ${device.storage}</div>` : ''}
+                                ${device.display_size ? `<div><i class="fas fa-desktop me-1"></i> ${device.display_size.replace('"', '')}"</div>` : ''}
+                                ${device.main_camera_resolution ? `<div><i class="fas fa-camera me-1"></i> ${!isNaN(parseFloat(device.main_camera_resolution)) ? device.main_camera_resolution + ' MP' : device.main_camera_resolution}</div>` : ''}
+                            </div>
+                        </div>
+                    </a>
+                </div>
             `;
-        }
-            
-        }); // END DOMContentLoaded
+            }
+        });
+
     window.baseURL = '<?php echo $base; ?>';
 
     // ── Theme Toggle ──
