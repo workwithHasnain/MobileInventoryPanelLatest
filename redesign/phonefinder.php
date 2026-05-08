@@ -72,6 +72,14 @@ try {
   $posts = [];
 }
 
+// Load filter configuration from JSON
+$filterConfigPath = __DIR__ . '/../filter_config.json';
+if (file_exists($filterConfigPath)) {
+    $filterConfig = json_decode(file_get_contents($filterConfigPath), true);
+} else {
+    $filterConfig = [];
+}
+
 ?>
 <!DOCTYPE html>
 <html lang="en" id="da-html">
