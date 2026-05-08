@@ -793,160 +793,18 @@ $da_active_nav = 'compare';
         <p>Search and select devices above. Compare up to 3 phones side by side.</p>
       </div>
     <?php endif; ?>
-
     <!-- ── IN STORES NOW ── -->
-    <section class="da-instore-section" aria-label="In Stores Now">
-      <div class="da-instore-inner">
-        <div class="da-instore-header">
-          <div>
-            <div class="da-section-label"><span>Devices</span></div>
-            <h2 class="da-section-title">In Stores Now</h2>
-          </div>
-          <a href="<?php echo $base; ?>brands" class="da-view-all">Browse All <i class="fa fa-arrow-right"></i></a>
-        </div>
-        <div class="da-slider-wrap">
-          <button class="da-slider-btn prev" aria-label="Previous"><i class="fa fa-chevron-left"></i></button>
-          <button class="da-slider-btn next" aria-label="Next"><i class="fa fa-chevron-right"></i></button>
-          <div class="da-instore-scroll da-auto-slider" id="da-instore-scroll">
-            <?php if (empty($latestDevices)): ?>
-              <div class="da-empty"><i class="fa fa-mobile-alt"></i>No devices.</div>
-            <?php else: ?>
-              <?php foreach ($latestDevices as $device): ?>
-                <a href="<?php echo $base; ?>device/<?php echo urlencode($device['slug']); ?>" class="da-device-card">
-                  <img src="<?php echo htmlspecialchars(getAbsoluteImagePath($device['image'], $base)); ?>"
-                    alt="<?php echo htmlspecialchars($device['name']); ?>" loading="lazy" />
-                  <div class="da-device-card-name"><?php echo htmlspecialchars($device['name']); ?></div>
-                </a>
-              <?php endforeach; ?>
-            <?php endif; ?>
-          </div>
-        </div>
-      </div>
-    </section>
+    <?php include('includes/bottom-area/in-stores-now.php'); ?>
 
     <!-- ── TRENDING COMPARISONS ── -->
-    <?php if (!empty($topComparisons)): ?>
-      <section class="da-trending-section" aria-label="Trending Comparisons">
-        <div class="da-post-feed-header da-trending-header">
-          <div>
-            <div class="da-section-label"><span>Compare</span></div>
-            <h2 class="da-section-title">Trending Comparisons</h2>
-          </div>
-          <a href="<?php echo $base; ?>compare" class="da-view-all">Compare Tool <i class="fa fa-arrow-right"></i></a>
-        </div>
-        <div class="da-slider-wrap">
-          <button class="da-slider-btn prev" aria-label="Previous"><i class="fa fa-chevron-left"></i></button>
-          <button class="da-slider-btn next" aria-label="Next"><i class="fa fa-chevron-right"></i></button>
-          <div class="da-trending-scroll da-auto-slider">
-            <?php foreach ($topComparisons as $cmp):
-              $s1 = $cmp['device1_slug'] ?? $cmp['device1_id'] ?? '';
-              $s2 = $cmp['device2_slug'] ?? $cmp['device2_id'] ?? '';
-              $cUrl = $base . 'compare/' . urlencode($s1) . '-vs-' . urlencode($s2);
-              $n1 = htmlspecialchars($cmp['device1_name'] ?? 'Device 1');
-              $n2 = htmlspecialchars($cmp['device2_name'] ?? 'Device 2');
-              ?>
-              <a href="<?php echo $cUrl; ?>" class="da-vs-card">
-                <div class="da-vs-row">
-                  <div class="da-vs-col">
-                    <?php if (!empty($cmp['device1_image'])): ?><img
-                        src="<?php echo htmlspecialchars(getAbsoluteImagePath($cmp['device1_image'], $base)); ?>"
-                        alt="<?php echo $n1; ?>" class="da-vs-img" loading="lazy" /><?php endif; ?>
-                    <div class="da-vs-device-name"><?php echo $n1; ?></div>
-                  </div>
-                  <div class="da-vs-divider">VS</div>
-                  <div class="da-vs-col">
-                    <?php if (!empty($cmp['device2_image'])): ?><img
-                        src="<?php echo htmlspecialchars(getAbsoluteImagePath($cmp['device2_image'], $base)); ?>"
-                        alt="<?php echo $n2; ?>" class="da-vs-img" loading="lazy" /><?php endif; ?>
-                    <div class="da-vs-device-name"><?php echo $n2; ?></div>
-                  </div>
-                </div>
-                <div class="da-vs-hint">Click to compare →</div>
-              </a>
-            <?php endforeach; ?>
-          </div>
-        </div>
-      </section>
-    <?php endif; ?>
+    <?php include('includes/bottom-area/trending-comparisons.php'); ?>
 
     <!-- ── FEATURED POSTS TICKER ── -->
-    <section class="da-ticker-section" aria-label="All Posts">
-      <div class="da-ticker-header">
-        <div>
-          <div class="da-section-label"><span>Stories</span></div>
-          <h2 class="da-section-title">All Featured Posts</h2>
-        </div>
-        <a href="<?php echo $base; ?>featured" class="da-view-all">See All <i class="fa fa-arrow-right"></i></a>
-      </div>
-      <div class="da-slider-wrap">
-        <button class="da-slider-btn prev" aria-label="Previous"><i class="fa fa-chevron-left"></i></button>
-        <button class="da-slider-btn next" aria-label="Next"><i class="fa fa-chevron-right"></i></button>
-        <div class="da-ticker-scroll da-auto-slider" id="featured-scroll-container">
-          <?php foreach ($posts as $post): ?>
-            <a href="<?php echo $base; ?>post/<?php echo urlencode($post['slug']); ?>" class="da-ticker-item">
-              <div class="da-ticker-item-img">
-                <?php if (!empty($post['featured_image'])): ?>
-                  <img src="<?php echo htmlspecialchars(getAbsoluteImagePath($post['featured_image'], $base)); ?>"
-                    alt="<?php echo htmlspecialchars($post['title']); ?>" loading="lazy" />
-                <?php else: ?>
-                  <div class="da-img-fallback-icon"><i class="fa fa-newspaper"></i></div>
-                <?php endif; ?>
-              </div>
-              <div class="da-ticker-item-body">
-                <div class="da-ticker-item-title"><?php echo htmlspecialchars($post['title']); ?></div>
-              </div>
-            </a>
-          <?php endforeach; ?>
-        </div>
-      </div>
-    </section>
-
+    <?php include('includes/bottom-area/featured-posts.php'); ?>
 
     <!-- ── INFINITE BRAND MARQUEE ── -->
-    <section class="da-marquee-section" aria-label="All Brands">
-      <div class="da-marquee-container">
-        <div class="da-marquee-track">
-          <!-- Original set -->
-          <div class="da-marquee-content">
-            <?php foreach ($brands as $brand):
-              $brandSlug = strtolower(preg_replace('/\s+/', '-', trim($brand['name'])));
-              ?>
-              <a href="<?php echo $base; ?>brand/<?php echo urlencode($brandSlug); ?>"
-                class="da-marquee-pill"><?php echo htmlspecialchars($brand['name']); ?></a>
-            <?php endforeach; ?>
-          </div>
-          <!-- Duplicated set for seamless loop -->
-          <div class="da-marquee-content" aria-hidden="true">
-            <?php foreach ($brands as $brand):
-              $brandSlug = strtolower(preg_replace('/\s+/', '-', trim($brand['name'])));
-              ?>
-              <a href="<?php echo $base; ?>brand/<?php echo urlencode($brandSlug); ?>"
-                class="da-marquee-pill"><?php echo htmlspecialchars($brand['name']); ?></a>
-            <?php endforeach; ?>
-          </div>
-        </div>
-      </div>
-    </section>
-
+    <?php include('includes/bottom-area/brand-marquee.php'); ?>
   </div><!-- /cp-page -->
-
-  <!-- ══ GALLERY MODAL ══ -->
-  <div class="cp-gallery-modal" id="cp-gallery-modal" role="dialog" aria-label="Device Gallery">
-    <div class="cp-gallery-backdrop" onclick="closeGallery()"></div>
-    <div class="cp-gallery-box">
-      <button class="cp-gallery-close" onclick="closeGallery()" aria-label="Close"><i class="fa fa-xmark"></i></button>
-      <h3 class="cp-gallery-title" id="cp-gallery-title">Images</h3>
-      <div class="cp-gallery-main">
-        <button class="cp-gallery-nav prev" id="cp-gallery-prev" onclick="galleryNav(-1)" aria-label="Previous"><i
-            class="fa fa-chevron-left"></i></button>
-        <div class="cp-gallery-img-wrap"><img id="cp-gallery-img" src="" alt="Gallery Image" /></div>
-        <button class="cp-gallery-nav next" id="cp-gallery-next" onclick="galleryNav(1)" aria-label="Next"><i
-            class="fa fa-chevron-right"></i></button>
-      </div>
-      <div class="cp-gallery-dots" id="cp-gallery-dots"></div>
-      <div class="cp-gallery-thumbs" id="cp-gallery-thumbs"></div>
-    </div>
-  </div>
 
   <?php include __DIR__ . '/includes/footer.php'; ?>
 
@@ -1068,43 +926,6 @@ $da_active_nav = 'compare';
       }
     }
 
-    // ══ Gallery ══
-    function showGallery(num) {
-      const images = cpImages[num] || [];
-      const name = cpNames[num] || 'Device';
-      if (!images.length) return;
-      galleryState = { images, index: 0 };
-      document.getElementById('cp-gallery-title').textContent = name + ' — Gallery';
-      renderGallery(0);
-      document.getElementById('cp-gallery-modal').classList.add('open');
-      document.body.style.overflow = 'hidden';
-    }
-    function closeGallery() {
-      document.getElementById('cp-gallery-modal').classList.remove('open');
-      document.body.style.overflow = '';
-    }
-    function galleryNav(dir) {
-      const next = (galleryState.index + dir + galleryState.images.length) % galleryState.images.length;
-      renderGallery(next);
-    }
-    function renderGallery(idx) {
-      const { images } = galleryState;
-      galleryState.index = idx;
-      document.getElementById('cp-gallery-img').src = images[idx];
-      document.getElementById('cp-gallery-dots').innerHTML = images.map((_, i) =>
-        `<button class="cp-gallery-dot${i === idx ? ' active' : ''}" onclick="renderGallery(${i})"></button>`
-      ).join('');
-      document.getElementById('cp-gallery-thumbs').innerHTML = images.map((im, i) =>
-        `<img src="${im}" class="cp-gthumb${i === idx ? ' active' : ''}" onclick="renderGallery(${i})" onerror="this.style.display='none'" alt="Thumb ${i + 1}">`
-      ).join('');
-    }
-    document.addEventListener('keydown', e => {
-      if (!document.getElementById('cp-gallery-modal').classList.contains('open')) return;
-      if (e.key === 'ArrowRight') galleryNav(1);
-      if (e.key === 'ArrowLeft') galleryNav(-1);
-      if (e.key === 'Escape') closeGallery();
-    });
-
     // ══ Theme toggle (shared with index.php) ══
     const themeToggles = [document.getElementById('da-theme-toggle'), document.getElementById('da-mobile-theme-toggle')];
     function updateThemeIcons() {
@@ -1140,6 +961,321 @@ $da_active_nav = 'compare';
     function publicUserLogout() {
       fetch(window.baseURL + 'notification_handler.php', { method: 'POST', headers: { 'Content-Type': 'application/x-www-form-urlencoded' }, body: 'action=reset' })
         .finally(() => fetch(window.baseURL + 'public_auth.php', { method: 'POST', body: new URLSearchParams({ action: 'logout' }) }).then(() => location.reload()));
+    }
+  </script>
+  <script>
+    window.baseURL = '<?php echo $base; ?>';
+
+    // ── Theme Toggle ──
+    const themeToggles = [document.getElementById('da-theme-toggle'), document.getElementById('da-mobile-theme-toggle')];
+
+    function updateThemeIcons() {
+      const isLight = document.documentElement.getAttribute('data-theme') === 'light';
+      themeToggles.forEach(btn => {
+        if (!btn) return;
+        const icon = btn.querySelector('i');
+        if (icon) {
+          icon.className = isLight ? 'fa fa-moon' : 'fa fa-sun';
+        }
+      });
+    }
+    updateThemeIcons();
+
+    themeToggles.forEach(btn => {
+      if (btn) {
+        btn.addEventListener('click', () => {
+          if (document.documentElement.getAttribute('data-theme') === 'light') {
+            document.documentElement.removeAttribute('data-theme');
+            localStorage.setItem('da-theme', 'dark');
+          } else {
+            document.documentElement.setAttribute('data-theme', 'light');
+            localStorage.setItem('da-theme', 'light');
+          }
+          updateThemeIcons();
+        });
+      }
+    });
+
+    // Auto-Sliders moved to redesign/sliders.js
+
+    // ── Navbar scroll effect ──
+    const navbar = document.getElementById('da-navbar');
+    window.addEventListener('scroll', () => {
+      navbar.classList.toggle('scrolled', window.scrollY > 40);
+    }, {
+      passive: true
+    });
+
+    // ── Mobile Menu ──
+    const hamburger = document.getElementById('da-hamburger');
+    const mobileMenu = document.getElementById('da-mobile-menu');
+    hamburger.addEventListener('click', () => {
+      hamburger.classList.toggle('open');
+      mobileMenu.classList.toggle('open');
+      document.body.style.overflow = mobileMenu.classList.contains('open') ? 'hidden' : '';
+    });
+
+    function closeMobileMenu() {
+      hamburger.classList.remove('open');
+      mobileMenu.classList.remove('open');
+      document.body.style.overflow = '';
+    }
+
+    // ── Brand Strip Arrows ──
+    const brandScroll = document.getElementById('brand-strip-scroll');
+    document.getElementById('brand-strip-left').addEventListener('click', () => brandScroll.scrollBy({
+      left: -300,
+      behavior: 'smooth'
+    }));
+    document.getElementById('brand-strip-right').addEventListener('click', () => brandScroll.scrollBy({
+      left: 300,
+      behavior: 'smooth'
+    }));
+
+    // ── Live Search ──
+    const searchInput = document.getElementById('da-search-input');
+    const searchResults = document.getElementById('da-search-results');
+    if (searchInput && searchResults) {
+      let searchTimer;
+      searchInput.addEventListener('input', function() {
+        clearTimeout(searchTimer);
+        const q = this.value.trim();
+        if (q.length < 2) {
+          searchResults.classList.remove('open');
+          return;
+        }
+        searchTimer = setTimeout(() => {
+          Promise.all([
+            fetch(baseURL + 'api_get_devices.php?q=' + encodeURIComponent(q) + '&limit=4').then(r => r.json()).catch(() => ({
+              devices: []
+            })),
+            fetch(baseURL + 'api_get_posts.php?q=' + encodeURIComponent(q) + '&limit=4').then(r => r.json()).catch(() => ({
+              posts: []
+            }))
+          ]).then(([devData, postData]) => {
+            const devices = devData.devices || [];
+            const posts = postData.posts || [];
+            if (!devices.length && !posts.length) {
+              searchResults.innerHTML = '<div class="da-search-result-item"><div class="sr-text">No results found</div></div>';
+              searchResults.classList.add('open');
+              return;
+            }
+            let html = '';
+            devices.forEach(d => {
+              html += `<a href="${baseURL}device/${encodeURIComponent(d.slug || d.id)}" class="da-search-result-item">
+          ${d.image ? `<img src="${d.image}" onerror="this.style.display='none'">` : ''}
+          <div><div class="sr-text">${d.name}</div><div class="sr-meta"><i class="fa fa-mobile-screen me-1"></i>${d.brand_name || 'Device'}</div></div>
+        </a>`;
+            });
+            posts.forEach(p => {
+              html += `<a href="${baseURL}post/${encodeURIComponent(p.slug)}" class="da-search-result-item">
+          ${p.featured_image ? `<img src="${p.featured_image}" onerror="this.style.display='none'">` : ''}
+          <div><div class="sr-text">${p.title}</div><div class="sr-meta"><i class="fa fa-newspaper me-1"></i>${p.created_at ? p.created_at.substring(0,10) : 'Article'}</div></div>
+        </a>`;
+            });
+            searchResults.innerHTML = html;
+            searchResults.classList.add('open');
+          });
+        }, 320);
+      });
+      document.addEventListener('click', (e) => {
+        const wrap = document.getElementById('da-search-wrap');
+        if (wrap && !wrap.contains(e.target)) searchResults.classList.remove('open');
+      });
+    }
+
+    // ── Newsletter ──
+    document.getElementById('da-newsletter-btn').addEventListener('click', function() {
+      const email = document.getElementById('da-newsletter-email').value.trim();
+      const msg = document.getElementById('da-newsletter-msg');
+      if (!email) {
+        msg.textContent = 'Please enter your email.';
+        msg.className = 'error';
+        return;
+      }
+      this.disabled = true;
+      this.textContent = 'Subscribing...';
+      const btn = this;
+      fetch(baseURL + 'handle_newsletter.php', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/x-www-form-urlencoded'
+          },
+          body: 'newsletter_email=' + encodeURIComponent(email)
+        })
+        .then(r => r.json())
+        .then(data => {
+          msg.textContent = data.message;
+          msg.className = data.success ? 'success' : 'error';
+          if (data.success) document.getElementById('da-newsletter-email').value = '';
+          btn.disabled = false;
+          btn.textContent = 'Subscribe';
+        }).catch(() => {
+          msg.textContent = 'An error occurred.';
+          msg.className = 'error';
+          btn.disabled = false;
+          btn.textContent = 'Subscribe';
+        });
+    });
+
+    // ── Notification mark seen ──
+    function markNotificationsAsSeen() {
+      const dots = ['notifDotDesktop'];
+      dots.forEach(id => {
+        const el = document.getElementById(id);
+        if (el) el.style.display = 'none';
+      });
+      fetch(baseURL + 'notification_handler.php', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/x-www-form-urlencoded'
+        },
+        body: 'action=mark_seen'
+      }).catch(() => {});
+    }
+    const bell = document.getElementById('notificationBellDesktop');
+    if (bell) bell.addEventListener('click', () => setTimeout(markNotificationsAsSeen, 100));
+
+    // ── Auth helpers ──
+    function userAuthFetch(action, fd) {
+      fd.append('action', action);
+      return fetch(baseURL + 'user_auth_handler.php', {
+        method: 'POST',
+        body: fd
+      }).then(r => r.json());
+    }
+
+    function showAuthMsg(id, msg, type) {
+      const el = document.getElementById(id);
+      el.className = 'alert alert-' + type + ' alert-dismissible fade show';
+      el.innerHTML = msg + '<button type="button" class="btn-close" data-bs-dismiss="alert"></button>';
+      el.style.display = 'block';
+    }
+
+    const loginForm = document.getElementById('publicLoginForm');
+    if (loginForm) loginForm.addEventListener('submit', function(e) {
+      e.preventDefault();
+      const btn = document.getElementById('loginSubmitBtn');
+      btn.disabled = true;
+      btn.innerHTML = '<i class="fa fa-spinner fa-spin me-1"></i>Logging in...';
+      userAuthFetch('login', new FormData(this)).then(data => {
+        if (data.success) {
+          showAuthMsg('login-message', data.message, 'success');
+          setTimeout(() => location.reload(), 800);
+        } else {
+          showAuthMsg('login-message', data.message, 'danger');
+          btn.disabled = false;
+          btn.innerHTML = '<i class="fa fa-right-to-bracket me-1"></i>Login';
+        }
+      }).catch(() => {
+        showAuthMsg('login-message', 'An error occurred.', 'danger');
+        btn.disabled = false;
+        btn.innerHTML = '<i class="fa fa-right-to-bracket me-1"></i>Login';
+      });
+    });
+
+    const signupForm = document.getElementById('publicSignupForm');
+    if (signupForm) signupForm.addEventListener('submit', function(e) {
+      e.preventDefault();
+      const btn = document.getElementById('signupSubmitBtn');
+      btn.disabled = true;
+      btn.innerHTML = '<i class="fa fa-spinner fa-spin me-1"></i>Creating account...';
+      userAuthFetch('register', new FormData(this)).then(data => {
+        if (data.success) {
+          showAuthMsg('signup-message', data.message, 'success');
+          setTimeout(() => location.reload(), 800);
+        } else {
+          showAuthMsg('signup-message', data.message, 'danger');
+          btn.disabled = false;
+          btn.innerHTML = '<i class="fa fa-user-plus me-1"></i>Create Account';
+        }
+      }).catch(() => {
+        showAuthMsg('signup-message', 'An error occurred.', 'danger');
+        btn.disabled = false;
+        btn.innerHTML = '<i class="fa fa-user-plus me-1"></i>Create Account';
+      });
+    });
+
+    function openProfileModal() {
+      const modal = new bootstrap.Modal(document.getElementById('profileModal'));
+      userAuthFetch('get_profile', new FormData()).then(data => {
+        if (data.success && data.user) {
+          document.getElementById('profile-name').value = data.user.name;
+          document.getElementById('profile-email').value = data.user.email;
+        }
+      });
+      document.getElementById('profile-current-password').value = '';
+      document.getElementById('profile-new-password').value = '';
+      document.getElementById('delete-account-password').value = '';
+      document.getElementById('profile-message').style.display = 'none';
+      modal.show();
+    }
+
+    const profileForm = document.getElementById('profileUpdateForm');
+    if (profileForm) profileForm.addEventListener('submit', function(e) {
+      e.preventDefault();
+      const btn = document.getElementById('profileUpdateBtn');
+      btn.disabled = true;
+      btn.innerHTML = '<i class="fa fa-spinner fa-spin me-1"></i>Saving...';
+      userAuthFetch('update_profile', new FormData(this)).then(data => {
+        showAuthMsg('profile-message', data.message, data.success ? 'success' : 'danger');
+        if (data.success) setTimeout(() => location.reload(), 1000);
+        btn.disabled = false;
+        btn.innerHTML = '<i class="fa fa-save me-1"></i>Save Changes';
+      }).catch(() => {
+        showAuthMsg('profile-message', 'An error occurred.', 'danger');
+        btn.disabled = false;
+        btn.innerHTML = '<i class="fa fa-save me-1"></i>Save Changes';
+      });
+    });
+
+    function deletePublicAccount() {
+      if (!confirm('Permanently delete your account? This cannot be undone.')) return;
+      const pwd = document.getElementById('delete-account-password').value.trim();
+      if (!pwd) {
+        showAuthMsg('profile-message', 'Please enter your password.', 'warning');
+        return;
+      }
+      const btn = document.getElementById('deleteAccountBtn');
+      btn.disabled = true;
+      btn.innerHTML = '<i class="fa fa-spinner fa-spin me-1"></i>Deleting...';
+      const fd = new FormData();
+      fd.append('password', pwd);
+      userAuthFetch('delete_account', fd).then(data => {
+        showAuthMsg('profile-message', data.message, data.success ? 'success' : 'danger');
+        if (data.success) setTimeout(() => location.reload(), 1000);
+        else {
+          btn.disabled = false;
+          btn.innerHTML = '<i class="fa fa-trash me-1"></i>Delete Account';
+        }
+      }).catch(() => {
+        showAuthMsg('profile-message', 'An error occurred.', 'danger');
+        btn.disabled = false;
+        btn.innerHTML = '<i class="fa fa-trash me-1"></i>Delete Account';
+      });
+    }
+
+    function publicUserLogout() {
+      fetch(baseURL + 'notification_handler.php', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/x-www-form-urlencoded'
+          },
+          body: 'action=reset'
+        })
+        .finally(() => {
+          userAuthFetch('logout', new FormData()).then(() => location.reload());
+        });
+    }
+
+    function switchToSignup() {
+      bootstrap.Modal.getInstance(document.getElementById('loginModal')).hide();
+      setTimeout(() => new bootstrap.Modal(document.getElementById('signupModal')).show(), 300);
+    }
+
+    function switchToLogin() {
+      bootstrap.Modal.getInstance(document.getElementById('signupModal')).hide();
+      setTimeout(() => new bootstrap.Modal(document.getElementById('loginModal')).show(), 300);
     }
   </script>
   <script src="<?php echo $base; ?>redesign/sliders.js"></script>

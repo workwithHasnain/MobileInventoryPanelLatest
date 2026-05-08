@@ -980,49 +980,7 @@ function getAvatarDisplay($name, $email)
     function switchToLogin() {
       bootstrap.Modal.getInstance(document.getElementById('signupModal')).hide();
       setTimeout(() => new bootstrap.Modal(document.getElementById('loginModal')).show(), 300);
-    }
-
-    // ── Infinite horizontal post scroll ──
-    (function() {
-      let page = 1,
-        loading = false,
-        hasMore = <?php echo count($posts) >= 20 ? 'true' : 'false'; ?>;
-      const container = document.getElementById('featured-scroll-container');
-      const loader = document.getElementById('featured-load-more');
-      if (!container) return;
-      container.addEventListener('scroll', function() {
-        if (loading || !hasMore) return;
-        if (this.scrollLeft + this.clientWidth >= this.scrollWidth - 300) loadMore();
-      }, {
-        passive: true
-      });
-
-      function loadMore() {
-        if (loading || !hasMore) return;
-        loading = true;
-        page++;
-        if (loader) loader.style.display = 'flex';
-        fetch(baseURL + 'load_posts.php?page=' + page + '&type=all&format=block')
-          .then(r => r.json())
-          .then(data => {
-            if (data.success && data.html) {
-              if (loader) loader.insertAdjacentHTML('beforebegin', data.html);
-              hasMore = data.hasMore;
-              // Re-skin new items
-              container.querySelectorAll('.div-block').forEach(el => {
-                if (!el.classList.contains('da-ticker-item')) el.classList.add('da-ticker-compat');
-              });
-            } else {
-              hasMore = false;
-            }
-            if (!hasMore && loader) loader.style.display = 'none';
-            loading = false;
-          }).catch(() => {
-            loading = false;
-            if (loader) loader.style.display = 'none';
-          });
-      }
-    })();
+    }();
   </script>
   <script src="<?php echo $base; ?>redesign/sliders.js"></script>
 </body>
