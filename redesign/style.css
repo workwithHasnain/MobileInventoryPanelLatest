@@ -4745,6 +4745,10 @@ textarea.da-input {
   padding: 32px;
   margin-top: 16px;
   box-shadow: var(--shadow-card);
+  overflow-wrap: break-word;
+  word-wrap: break-word;
+  word-break: break-word;
+  overflow: hidden;
 }
 .da-post-content h1,
 .da-post-content h2,
@@ -4777,6 +4781,7 @@ textarea.da-input {
   line-height: 1.8;
   margin-bottom: 16px;
   font-size: 16px;
+  white-space: pre-wrap;
 }
 .da-post-content ul,
 .da-post-content ol {
