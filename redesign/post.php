@@ -454,53 +454,48 @@ function getAvatarDisplay($name, $email)
   <!-- ══════════════════════ MAIN PAGE ══════════════════════ -->
   <div class="da-page">
 
-    <!-- ── HERO NEWSROOM ── -->
-    <section class="da-hero" aria-label="Featured News">
-      <!-- Left: hero + stories -->
-      <div class="da-hero-left">
-        <div class="da-section-label"><span>Newsroom</span></div>
-
-        <?php if (!empty($posts)): $hero = $posts[0]; ?>
-          <a href="<?php echo $base; ?>post/<?php echo urlencode($hero['slug']); ?>" class="da-hero-main">
-            <?php if (!empty($hero['featured_image'])): ?>
-              <img src="<?php echo htmlspecialchars(getAbsoluteImagePath($hero['featured_image'], $base)); ?>" alt="<?php echo htmlspecialchars($hero['title']); ?>" loading="eager" />
+    <!-- ── POST FEED + SIDEBAR ── -->
+    <div class="da-content-area" style="padding-top: 32px;">
+      <!-- Post Feed -->
+      <main>
+        <!-- Article Header Image -->
+        <?php if (!empty($post)): ?>
+          <div class="da-hero-main" style="cursor: default; max-height: 480px; margin-bottom: 24px;">
+            <?php if (!empty($post['featured_image'])): ?>
+              <img src="<?php echo htmlspecialchars(getAbsoluteImagePath($post['featured_image'], $base)); ?>" alt="<?php echo htmlspecialchars($post['title']); ?>" loading="eager" />
             <?php else: ?>
               <div class="da-img-fallback"></div>
             <?php endif; ?>
             <div class="da-hero-main-overlay"></div>
             <div class="da-hero-main-content">
-              <div class="da-section-label"><span>TAGS</span></div>
-              <h1 class="da-hero-main-title"><?php echo htmlspecialchars($hero['title']); ?></h1>
+              <?php
+                $tags_html = '';
+                if (!empty($post['tags'])) {
+                  $tags_arr = array_map('trim', explode(',', $post['tags']));
+                  foreach ($tags_arr as $tag) {
+                    if (!empty($tag)) {
+                      $tags_html .= '<span>' . htmlspecialchars(strtoupper($tag)) . '</span> ';
+                    }
+                  }
+                }
+                
+                if (empty($tags_html)) {
+                  $tag_label = 'ARTICLE';
+                  if (!empty($post['is_news'])) $tag_label = 'NEWS';
+                  elseif (!empty($post['is_featured'])) $tag_label = 'FEATURED';
+                  $tags_html = '<span>' . $tag_label . '</span>';
+                }
+              ?>
+              <div class="da-section-label" style="display: flex; gap: 12px; flex-wrap: wrap; margin-bottom: 12px;"><?php echo $tags_html; ?></div>
+              <h1 class="da-hero-main-title" style="font-size: clamp(24px, 3vw, 36px);"><?php echo htmlspecialchars($post['title']); ?></h1>
               <div class="da-hero-meta">
-                <span><i class="fa fa-calendar-alt"></i><?php echo date('M j, Y', strtotime($hero['created_at'])); ?></span>
-                <span><i class="fa fa-comment"></i><?php echo $hero['comment_count']; ?> comments</span>
+                <span><i class="fa fa-user"></i><?php echo htmlspecialchars($post['author']); ?></span>
+                <span><i class="fa fa-calendar-alt"></i><?php echo date('M j, Y', strtotime($post['publish_date'] ?: $post['created_at'])); ?></span>
+                <span><i class="fa fa-comment"></i><?php echo $postCommentCount; ?> comments</span>
               </div>
             </div>
-          </a>
-        <?php endif; ?>
-      </div>
-
-      <!-- Right: Brand panel (Classic Widget) -->
-      <div class="da-hero-right">
-        <?php include('includes/sidebar/brands-area.php'); ?>
-
-        <!-- AD PLACEHOLDER -->
-        <?php include('includes/sidebar/ad-placeholder.php'); ?>
-      </div>
-    </section>
-
-
-
-    <!-- ── POST FEED + SIDEBAR ── -->
-    <div class="da-content-area">
-      <!-- Post Feed -->
-      <main>
-        <div class="da-post-feed-header">
-          <div>
-            <div class="da-section-label"><span>Story</span></div>
-            <h2 class="da-section-title">Article Content</h2>
           </div>
-        </div>
+        <?php endif; ?>
         
         <?php if (!empty($post['content_body'])): ?>
         <div class="da-post-content">
@@ -531,8 +526,8 @@ function getAvatarDisplay($name, $email)
           <div class="da-widget-body">
             
             <div class="da-comments-list">
-              <?php if (!empty($comments)): ?>
-                <?php foreach ($comments as $comment): ?>
+              <?php if (!empty($postComments)): ?>
+                <?php foreach ($postComments as $comment): ?>
                   <div class="da-comment-thread" id="comment-<?php echo $comment['id']; ?>">
                     <div class="da-comment-avatar">
                       <?php echo getAvatarDisplay($comment['name'], $comment['email']); ?>
@@ -591,9 +586,9 @@ function getAvatarDisplay($name, $email)
                 $isUserLoggedIn = true;
               }
               ?>
-              <form id="device-comment-form" method="POST" class="da-form">
-                <input type="hidden" name="action" value="comment_device">
-                <input type="hidden" name="device_id" value="<?php echo htmlspecialchars($device['id']); ?>">
+              <form id="post-comment-form" method="POST" class="da-form">
+                <input type="hidden" name="action" value="comment_post">
+                <input type="hidden" name="post_id" value="<?php echo htmlspecialchars($post['id']); ?>">
                 <input type="hidden" name="parent_id" id="parent_id" value="">
                 
                 <div class="da-form-row">
@@ -608,7 +603,7 @@ function getAvatarDisplay($name, $email)
                 </div>
                 
                 <div class="da-form-group">
-                  <textarea class="da-input" name="comment" rows="4" placeholder="Share your thoughts about this device..." required></textarea>
+                  <textarea class="da-input" name="comment" rows="4" placeholder="Share your thoughts about this article..." required></textarea>
                 </div>
                 
                 <div class="da-form-group da-captcha-group">
@@ -626,7 +621,7 @@ function getAvatarDisplay($name, $email)
                     <small>Comments are moderated and will appear after approval.</small>
                   </div>
                   <div class="da-comments-count-text">
-                    Total reader comments: <b class="text-white"><?php echo $commentCount; ?></b>
+                    Total reader comments: <b class="text-white"><?php echo $postCommentCount; ?></b>
                   </div>
                 </div>
               </form>
