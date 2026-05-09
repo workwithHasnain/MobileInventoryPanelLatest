@@ -5384,24 +5384,26 @@ textarea.da-input {
 .cpt-label-head {
   min-width: 160px;
   width: 180px;
-  background: #37474f;
-  color: #ffffff;
-  font-size: 11.5px;
-  font-weight: 700;
+  background: #e3ebf3;
+  color: #1e293b;
+  font-size: 11px;
+  font-weight: 800;
   text-transform: uppercase;
   letter-spacing: 0.6px;
   padding: 14px;
-  border-right: 1px solid rgba(255,255,255,0.12);
+  border-right: 1px solid rgba(0,0,0,0.06);
+  border-bottom: 1px solid rgba(0,0,0,0.06);
   vertical-align: bottom;
 }
 
 .cpt-dev-head {
-  background: #455a64;
-  color: #ffffff;
+  background: #ebf2f7;
+  color: #1e293b;
   text-align: center;
   padding: 12px 14px;
   min-width: 200px;
-  border-right: 1px solid rgba(255,255,255,0.1);
+  border-right: 1px solid rgba(0,0,0,0.06);
+  border-bottom: 1px solid rgba(0,0,0,0.06);
   vertical-align: bottom;
 }
 
@@ -5412,43 +5414,43 @@ textarea.da-input {
   height: 56px;
   object-fit: contain;
   border-radius: 8px;
-  background: rgba(255,255,255,0.1);
+  background: rgba(255,255,255,0.6);
   padding: 4px;
+  border: 1px solid rgba(0,0,0,0.04);
 }
 
 .cpt-dev-head span {
   font-size: 13px;
-  font-weight: 600;
+  font-weight: 700;
   line-height: 1.3;
   display: block;
 }
 
 /* Section header rows */
 .cpt-section-row td.cpt-section-cell {
-  background: #546e7a;
-  color: #ffffff;
+  background: #dbe5ef;
+  color: #1e293b;
   font-size: 12px;
-  font-weight: 700;
+  font-weight: 800;
   text-transform: uppercase;
-  letter-spacing: 1px;
-  padding: 9px 14px;
-  border-top: 2px solid #37474f;
-  border-bottom: 1px solid #455a64;
+  letter-spacing: 0.8px;
+  padding: 10px 14px;
+  border-bottom: 1px solid rgba(0,0,0,0.05);
 }
 
 [data-theme="dark"] .cpt-section-row td.cpt-section-cell {
-  background: #263238;
-  border-top-color: #1c2529;
-  border-bottom-color: #37474f;
+  background: #1e293b;
+  color: #f1f5f9;
+  border-bottom-color: rgba(255,255,255,0.05);
 }
 
 /* Data rows */
 .cpt-data-row {
-  border-bottom: 1px solid #e8ecee;
+  border-bottom: 1px solid #f1f5f9;
 }
 
 .cpt-data-row:nth-child(even) {
-  background: #f4f7f8;
+  background: #f9fafb;
 }
 
 .cpt-data-row:nth-child(odd) {
@@ -5457,47 +5459,47 @@ textarea.da-input {
 
 [data-theme="dark"] .cpt-data-row:nth-child(even) {
   background: #1a2332;
-  border-bottom-color: rgba(255,255,255,0.06);
+  border-bottom-color: rgba(255,255,255,0.04);
 }
 
 [data-theme="dark"] .cpt-data-row:nth-child(odd) {
   background: #111827;
-  border-bottom-color: rgba(255,255,255,0.06);
+  border-bottom-color: rgba(255,255,255,0.04);
 }
 
 /* Label cell (subtitle column) */
 .cpt-label-cell {
-  background: #eceff1;
-  color: #37474f;
-  font-size: 11.5px;
+  background: #f1f5f9;
+  color: #475569;
+  font-size: 11px;
   font-weight: 700;
   text-transform: uppercase;
   letter-spacing: 0.4px;
   padding: 9px 14px;
-  border-right: 1px solid #cfd8dc;
+  border-right: 1px solid #e2e8f0;
   white-space: nowrap;
   vertical-align: top;
 }
 
 [data-theme="dark"] .cpt-label-cell {
-  background: #1c2b35;
-  color: #90a4ae;
-  border-right-color: rgba(255,255,255,0.08);
+  background: #1e293b;
+  color: #94a3b8;
+  border-right-color: rgba(255,255,255,0.06);
 }
 
 /* Value cells */
 .cpt-val-cell {
-  color: #333333;
+  color: #334155;
   padding: 9px 14px;
   vertical-align: top;
-  border-right: 1px solid #e8ecee;
+  border-right: 1px solid #f1f5f9;
   line-height: 1.5;
   min-width: 200px;
 }
 
 [data-theme="dark"] .cpt-val-cell {
   color: var(--text-secondary);
-  border-right-color: rgba(255,255,255,0.06);
+  border-right-color: rgba(255,255,255,0.04);
 }
 
 .cpt-val-cell:last-child {
@@ -5506,11 +5508,11 @@ textarea.da-input {
 
 /* Identical rows — subtle tint */
 .cpt-data-row.cpt-identical .cpt-val-cell {
-  color: #607d8b;
+  color: #64748b;
 }
 
 [data-theme="dark"] .cpt-data-row.cpt-identical .cpt-val-cell {
-  color: #78909c;
+  color: #94a3b8;
 }
 
 /* "Differences Only" mode */
