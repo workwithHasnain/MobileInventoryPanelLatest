@@ -72,6 +72,12 @@ try {
   $posts = [];
 }
 
+// Load filter configuration from JSON
+$filterConfig = json_decode(file_get_contents(__DIR__ . '/../filter_config.json'), true);
+if (!$filterConfig) {
+    die('Error loading filter configuration');
+}
+
 ?>
 <!DOCTYPE html>
 <html lang="en" id="da-html">
@@ -80,14 +86,15 @@ try {
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1.0" />
   <link rel="canonical"
-    href="<?php echo $canonicalBase; ?>/compare<?php echo isset($_GET['slugs']) ? '/' . htmlspecialchars($_GET['slugs']) : ''; ?>" />
-  <title><?php echo htmlspecialchars($pageTitle); ?></title>
+    href="<?php echo $canonicalBase; ?>/phonefinder<?php echo isset($_GET['slugs']) ? '/' . htmlspecialchars($_GET['slugs']) : ''; ?>" />
+  <title>PhoneFinder - DevicesArena</title>
   <meta name="description"
-    content="Compare smartphones side by side on DevicesArena. Full specs, display, camera, battery and connectivity." />
+    content="Phonefinder - Compare smartphones side by side on DevicesArena. Full specs, display, camera, battery and connectivity." />
   <link rel="icon" type="image/png" sizes="32x32" href="<?php echo $base; ?>imges/icon-32.png">
   <meta name="theme-color" content="#0d0f1a">
-  <meta property="og:title" content="<?php echo htmlspecialchars($pageTitle); ?>" />
-  <meta property="og:description" content="Compare smartphones side by side. Full specs, camera, battery and more." />
+  <meta property="og:title" content="PhoneFinder - DevicesArena" />
+  <meta property="og:description"
+    content="Phonefinder - Compare smartphones side by side on DevicesArena. Full specs, display, camera, battery and connectivity." />
   <meta property="og:type" content="website" />
 
   <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-9906394285054446"
@@ -137,9 +144,8 @@ try {
       <div class="cp-hero-inner">
         <div class="cp-hero-left">
           <div class="cp-hero-label"><span>DevicesArena</span></div>
-          <h1 class="cp-hero-title">Compare Smartphones</h1>
-          <p class="cp-hero-sub">Select up to 3 devices and see their specs side by side. Highlight differences
-            instantly.</p>
+          <h1 class="cp-hero-title">PhoneFinder</h1>
+          <p class="cp-hero-sub">Look for your dream phone from our extensive database of mobile phones with the help of 48 detailed filters.</p>
         </div>
 
         <!-- Right: Brand panel (Classic Widget) -->
@@ -1061,6 +1067,7 @@ try {
                         findBtn.innerHTML = '<i class="fa fa-search me-2" style="pointer-events: none;"></i><span style="pointer-events: none;">Find Devices</span>';
                     });
             });
+        });
     window.baseURL = '<?php echo $base; ?>';
 
     // ── Theme Toggle ──
@@ -1373,7 +1380,7 @@ try {
     function switchToLogin() {
       bootstrap.Modal.getInstance(document.getElementById('signupModal')).hide();
       setTimeout(() => new bootstrap.Modal(document.getElementById('loginModal')).show(), 300);
-    }();
+    }
   </script>
   <script src="<?php echo $base; ?>redesign/sliders.js"></script>
 </body>
