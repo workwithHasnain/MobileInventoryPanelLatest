@@ -884,35 +884,24 @@ $da_active_nav = 'compare';
     }
     function clearSlot(slot) { navigateWithSlug(slot, ''); }
 
+    // PHP injects the already-parsed current slugs — no need to re-parse the URL
+    const cpCurrentSlugs = [
+      <?php echo json_encode($phone1_slug ?? ''); ?>,
+      <?php echo json_encode($phone2_slug ?? ''); ?>,
+      <?php echo json_encode($phone3_slug ?? ''); ?>
+    ];
+
     function navigateWithSlug(changedSlot, newSlug) {
-      // Read current slots — support both clean URL (/compare/s1-vs-s2) and query param fallback
-      const params = new URLSearchParams(window.location.search);
-      let s = ['', '', ''];
-
-      if (params.get('slugs')) {
-        // Arrived via clean URL rewrite: ?slugs=s1-vs-s2-vs-s3
-        const parts = params.get('slugs').split('-vs-');
-        s = [parts[0] || '', parts[1] || '', parts[2] || ''];
-      } else {
-        // Legacy query params
-        s = [
-          params.get('phone1') || '',
-          params.get('phone2') || '',
-          params.get('phone3') || ''
-        ];
-      }
-
-      // Apply the change
+      // Clone current slugs and apply the change
+      const s = cpCurrentSlugs.slice();
       s[changedSlot - 1] = newSlug;
 
-      // Build the filled-slug list (preserve slot order, skip empties)
+      // Build URL from non-empty slots (preserving slot order)
       const nonEmpty = s.filter(x => x);
 
       if (nonEmpty.length) {
-        // Use clean URL: /compare/slug1-vs-slug2  (or -vs-slug3 when 3 selected)
         window.location.href = window.baseURL + 'compare/' + nonEmpty.join('-vs-');
       } else {
-        // No devices selected — go back to bare /compare
         window.location.href = window.baseURL + 'compare';
       }
     }

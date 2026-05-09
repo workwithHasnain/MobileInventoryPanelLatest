@@ -99,6 +99,30 @@
     </div>
   </nav>
 
+  <!-- ══════════════════════ MOBILE SEARCH MODAL ══════════════════════ -->
+  <div id="mobileSearchModal" class="da-msearch-overlay" style="display:none;" aria-modal="true" role="dialog" aria-label="Search">
+    <div class="da-msearch-backdrop" onclick="closeMobileSearch()"></div>
+    <div class="da-msearch-panel">
+      <div class="da-msearch-header">
+        <i class="fa fa-search da-msearch-icon"></i>
+        <input
+          type="text"
+          id="mobileSearchInput"
+          class="da-msearch-input"
+          placeholder="Search phones, brands, articles..."
+          autocomplete="off"
+          autocorrect="off"
+          spellcheck="false"
+        >
+        <button id="mobileSearchClose" class="da-msearch-close" type="button" aria-label="Close search">
+          <i class="fa fa-times"></i>
+        </button>
+      </div>
+      <div class="da-msearch-divider"></div>
+      <div id="mobileSearchResults" class="da-msearch-results"></div>
+    </div>
+  </div>
+
   <!-- ══════════════════════ MOBILE MENU ══════════════════════ -->
    <?php
       $mb_stmt = $pdo->prepare("SELECT b.*,COUNT(p.id) as device_count FROM brands b LEFT JOIN phones p ON b.id=p.brand_id GROUP BY b.id,b.name,b.description,b.logo_url,b.website,b.created_at,b.updated_at ORDER BY COUNT(p.id) DESC,b.name ASC LIMIT 12");
@@ -127,6 +151,7 @@
     </ul>
     <div class="da-mobile-action-btns">
       <button class="da-mobile-action-btn outline" id="da-mobile-theme-toggle" style="grid-column: span 2;"><i class="fa fa-adjust"></i> Toggle Theme</button>
+      <button class="da-mobile-action-btn outline" onclick="openMobileSearch(event)"><i class="fa fa-search"></i> Search</button>
       <a href="<?php echo $base; ?>phonefinder" class="da-mobile-action-btn red"><i class="fa fa-mobile-screen"></i> Phone Finder</a>
       <a href="<?php echo $base; ?>rumored" class="da-mobile-action-btn outline"><i class="fa fa-volume-high"></i> Rumors Mill</a>
     </div>

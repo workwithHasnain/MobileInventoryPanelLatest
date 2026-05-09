@@ -615,9 +615,10 @@ function getAvatarDisplay($name, $email)
                   </div>
                 </div>
                 
+                <div id="post-comment-msg" style="display:none;margin-bottom:12px;"></div>
                 <div class="da-form-footer">
                   <div class="d-flex align-items-center flex-wrap gap-3">
-                    <button type="submit" class="da-cta-btn">Post Your Opinion</button>
+                    <button type="submit" id="post-comment-submit" class="da-cta-btn">Post Your Opinion</button>
                     <small>Comments are moderated and will appear after approval.</small>
                   </div>
                   <div class="da-comments-count-text">
@@ -978,7 +979,84 @@ function getAvatarDisplay($name, $email)
     function switchToLogin() {
       bootstrap.Modal.getInstance(document.getElementById('signupModal')).hide();
       setTimeout(() => new bootstrap.Modal(document.getElementById('loginModal')).show(), 300);
-    }();
+    }
+
+    // ── Comment AJAX ──
+    function refreshCaptcha() {
+      const img = document.getElementById('captcha-image');
+      if (img) img.src = baseURL + 'captcha.php?' + Date.now();
+    }
+
+    (function () {
+      const form = document.getElementById('post-comment-form');
+      const msgBox = document.getElementById('post-comment-msg');
+      if (!form || !msgBox) return;
+
+      // Reply button wiring
+      document.querySelectorAll('.reply-btn').forEach(function (btn) {
+        btn.addEventListener('click', function () {
+          const cid  = this.getAttribute('data-comment-id');
+          const name = this.getAttribute('data-comment-name');
+          document.getElementById('parent_id').value = cid;
+          const indicator = document.getElementById('reply-indicator');
+          const label = document.getElementById('reply-to-name');
+          if (indicator) indicator.classList.remove('d-none');
+          if (label)     label.textContent = name;
+          form.querySelector('textarea[name="comment"]').focus();
+        });
+      });
+
+      const cancelReply = document.getElementById('cancel-reply');
+      if (cancelReply) {
+        cancelReply.addEventListener('click', function () {
+          document.getElementById('parent_id').value = '';
+          const indicator = document.getElementById('reply-indicator');
+          if (indicator) indicator.classList.add('d-none');
+        });
+      }
+
+      // AJAX submit
+      form.addEventListener('submit', function (e) {
+        e.preventDefault();
+        const submitBtn = document.getElementById('post-comment-submit');
+        submitBtn.disabled = true;
+        submitBtn.innerHTML = '<i class="fa fa-spinner fa-spin me-1"></i>Posting...';
+        msgBox.style.display = 'none';
+
+        fetch(baseURL + 'ajax_comment_handler.php', {
+          method: 'POST',
+          body: new FormData(form)
+        })
+          .then(function (r) { return r.json(); })
+          .then(function (data) {
+            msgBox.style.display = 'block';
+            msgBox.className = data.success
+              ? 'da-comment-feedback success'
+              : 'da-comment-feedback error';
+            msgBox.innerHTML = '<i class="fa ' + (data.success ? 'fa-check-circle' : 'fa-exclamation-circle') + ' me-2"></i>' + data.message;
+            if (data.captcha_failed) {
+              refreshCaptcha();
+              document.getElementById('captcha-input').value = '';
+            }
+            if (data.success) {
+              form.reset();
+              document.getElementById('parent_id').value = '';
+              const indicator = document.getElementById('reply-indicator');
+              if (indicator) indicator.classList.add('d-none');
+              refreshCaptcha();
+            }
+            submitBtn.disabled = false;
+            submitBtn.innerHTML = 'Post Your Opinion';
+          })
+          .catch(function () {
+            msgBox.style.display = 'block';
+            msgBox.className = 'da-comment-feedback error';
+            msgBox.innerHTML = '<i class="fa fa-exclamation-circle me-2"></i>Something went wrong. Please try again.';
+            submitBtn.disabled = false;
+            submitBtn.innerHTML = 'Post Your Opinion';
+          });
+      });
+    })();
   </script>
   <script src="<?php echo $base; ?>redesign/sliders.js"></script>
 </body>
