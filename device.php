@@ -316,7 +316,7 @@ function getDeviceDetails($pdo, $device_slug)
   }
 
   // Fallback to JSON files if database fails
-  $phones_json = __DIR__ . '/../data/phones.json';
+  $phones_json = __DIR__ . '/data/phones.json';
   if (file_exists($phones_json)) {
     $phones_data = json_decode(file_get_contents($phones_json), true);
 
@@ -956,8 +956,10 @@ function getAvatarDisplay($name, $email)
   }
 }
 
-// Function to track view
-function trackDeviceView($pdo, $device_id, $ip_address)
+// Function to track content view (uses content_views table)
+// Note: database_functions.php already declares trackDeviceView() for device_views table;
+// this function handles the content_views table to avoid a fatal redeclaration error.
+function trackContentView($pdo, $device_id, $ip_address)
 {
   try {
     $today = date('Y-m-d');
@@ -966,7 +968,7 @@ function trackDeviceView($pdo, $device_id, $ip_address)
     $stmt = $pdo->prepare("
             SELECT COUNT(*) as count 
             FROM content_views 
-            WHERE content_id = ? AND content_type = 'device' AND ip_address = ? AND DATE(viewed_at) = ?
+            WHERE content_id = CAST(? AS VARCHAR) AND content_type = 'device' AND ip_address = ? AND DATE(viewed_at) = ?
         ");
     $stmt->execute([$device_id, $ip_address, $today]);
     $result = $stmt->fetch(PDO::FETCH_ASSOC);
@@ -975,7 +977,7 @@ function trackDeviceView($pdo, $device_id, $ip_address)
       // Insert new view record
       $stmt = $pdo->prepare("
                 INSERT INTO content_views (content_id, content_type, ip_address, viewed_at) 
-                VALUES (?, 'device', ?, NOW())
+                VALUES (CAST(? AS VARCHAR), 'device', ?, NOW())
             ");
       $stmt->execute([$device_id, $ip_address]);
     }
@@ -991,7 +993,7 @@ $device = getDeviceDetails($pdo, $device_slug);
 $device_id = $device['id'] ?? null;
 
 if (!$device) {
-  header("Location: 404.php");
+  header("Location: {$base}404.php");
   exit();
 }
 
@@ -1030,7 +1032,7 @@ $deviceStats = generateDeviceStats($device);
 
 // Track view
 $ip_address = $_SERVER['REMOTE_ADDR'] ?? 'unknown';
-trackDeviceView($pdo, $device_id, $ip_address);
+trackContentView($pdo, $device_id, $ip_address);
 
 // Get comments
 $comments = getDeviceComments($pdo, $device_id);

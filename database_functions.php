@@ -267,7 +267,7 @@ function getPopularComparisons($limit = 10)
         ";
 
         $stmt = $pdo->prepare($query);
-        $stmt->execute([$limit]);
+        $stmt->execute([(int)$limit]);
         $results = $stmt->fetchAll();
 
         // Format results to match the expected structure
