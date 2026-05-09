@@ -4,9 +4,9 @@ session_start();
 // No authentication required
 
 // Database connection
-require_once __DIR__ . '/../config.php';
-require_once __DIR__ . '/../database_functions.php';
-require_once __DIR__ . '/../phone_data.php';
+require_once __DIR__ . '/config.php';
+require_once __DIR__ . '/database_functions.php';
+require_once __DIR__ . '/phone_data.php';
 
 // New clean URL format: domain/device/slug (instead of domain/device.php?slug=xyz)
 // The .htaccess file rewrites clean URLs to this page and passes slug as query parameter
