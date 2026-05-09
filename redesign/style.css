@@ -4936,3 +4936,35 @@ textarea.da-input {
 .custom-range::-moz-range-thumb:hover {
   transform: scale(1.2);
 }
+
+.da-phones-grid {
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
+  gap: 16px;
+  width: 100%;
+}
+
+@media (max-width: 1400px) {
+  .da-phones-grid {
+    grid-template-columns: repeat(4, 1fr);
+  }
+}
+
+@media (max-width: 1100px) {
+  .da-phones-grid {
+    grid-template-columns: repeat(3, 1fr);
+  }
+}
+
+@media (max-width: 768px) {
+  .da-phones-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media (max-width: 480px) {
+  .da-phones-grid {
+    grid-template-columns: repeat(1, 1fr);
+  }
+}
+

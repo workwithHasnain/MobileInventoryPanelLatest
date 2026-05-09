@@ -1699,11 +1699,12 @@ if (!$filterConfig) {
 
                 // Define createDeviceCard for the redesign UI
                 function createDeviceCard(device) {
-                    const img = device.image && (device.image.startsWith('http') || device.image.startsWith('/')) 
-                        ? device.image 
-                        : (device.image ? '/' + device.image : window.baseURL + 'assets/images/placeholder.jpg');
+                    const imgPath = device.thumbnail || '';
+                    const img = imgPath && (imgPath.startsWith('http') || imgPath.startsWith('/')) 
+                        ? imgPath 
+                        : (imgPath ? window.baseURL + imgPath : window.baseURL + 'assets/images/placeholder.jpg');
                     const url = window.baseURL + 'device/' + (device.slug || device.id);
-                    const brandName = device.brand_name || 'Device';
+                    const brandName = device.brand || 'Device';
                     const year = device.year || 'N/A';
                     
                     let badgeClass = 'year';
