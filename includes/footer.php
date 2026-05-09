@@ -14,6 +14,27 @@
         </div>
       </div>
 
+    <!-- ── Newsletter Strip ── -->
+    <div class="da-footer-newsletter">
+      <div class="da-fn-left">
+        <i class="fa fa-envelope-open-text da-fn-icon"></i>
+        <div>
+          <div class="da-fn-title">Stay in the Loop</div>
+          <div class="da-fn-sub">Get the latest device reviews, specs &amp; tech news delivered to your inbox.</div>
+        </div>
+      </div>
+      <div class="da-fn-right">
+        <div class="da-fn-form">
+          <input type="email" id="ft-newsletter-email" class="da-fn-input" placeholder="Enter your email address" autocomplete="email">
+          <button id="ft-newsletter-btn" class="da-fn-btn"><i class="fa fa-paper-plane"></i> Subscribe</button>
+        </div>
+        <div id="ft-newsletter-msg" class="da-fn-msg"></div>
+      </div>
+    </div>
+
+    <!-- ── Newsletter divider ── -->
+    <hr class="da-footer-hr" style="margin-top: 0; margin-bottom: 28px;">
+
       <!-- Middle Row: Company/Licensing & Content/Help -->
       <div class="da-footer-mid-row">
         <!-- Left Column: Company & Licensing -->
@@ -124,3 +145,48 @@
 
     </div>
   </footer>
+
+  <script>
+    (function () {
+      var btn   = document.getElementById('ft-newsletter-btn');
+      var email = document.getElementById('ft-newsletter-email');
+      var msg   = document.getElementById('ft-newsletter-msg');
+      if (!btn || !email || !msg) return;
+
+      btn.addEventListener('click', function () {
+        var val = email.value.trim();
+        if (!val) {
+          msg.textContent = 'Please enter your email address.';
+          msg.className = 'da-fn-msg error';
+          return;
+        }
+        btn.disabled = true;
+        btn.innerHTML = '<i class="fa fa-spinner fa-spin"></i> Subscribing...';
+
+        var base = (window.baseURL || '/');
+        fetch(base + 'handle_newsletter.php', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+          body: 'newsletter_email=' + encodeURIComponent(val)
+        })
+          .then(function (r) { return r.json(); })
+          .then(function (data) {
+            msg.textContent = data.message;
+            msg.className = 'da-fn-msg ' + (data.success ? 'success' : 'error');
+            if (data.success) { email.value = ''; }
+            btn.disabled = false;
+            btn.innerHTML = '<i class="fa fa-paper-plane"></i> Subscribe';
+          })
+          .catch(function () {
+            msg.textContent = 'Something went wrong. Please try again.';
+            msg.className = 'da-fn-msg error';
+            btn.disabled = false;
+            btn.innerHTML = '<i class="fa fa-paper-plane"></i> Subscribe';
+          });
+      });
+
+      email.addEventListener('keydown', function (e) {
+        if (e.key === 'Enter') btn.click();
+      });
+    })();
+  </script>

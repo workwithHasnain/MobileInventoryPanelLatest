@@ -502,37 +502,37 @@ $phones = $phones_stmt->fetchAll();
 
     // ── Navbar scroll effect ──
     const navbar = document.getElementById('da-navbar');
-    window.addEventListener('scroll', () => {
-      navbar.classList.toggle('scrolled', window.scrollY > 40);
-    }, {
-      passive: true
-    });
+    if (navbar) {
+      window.addEventListener('scroll', () => {
+        navbar.classList.toggle('scrolled', window.scrollY > 40);
+      }, { passive: true });
+    }
 
     // ── Mobile Menu ──
     const hamburger = document.getElementById('da-hamburger');
     const mobileMenu = document.getElementById('da-mobile-menu');
-    hamburger.addEventListener('click', () => {
-      hamburger.classList.toggle('open');
-      mobileMenu.classList.toggle('open');
-      document.body.style.overflow = mobileMenu.classList.contains('open') ? 'hidden' : '';
-    });
+    if (hamburger && mobileMenu) {
+      hamburger.addEventListener('click', () => {
+        hamburger.classList.toggle('open');
+        mobileMenu.classList.toggle('open');
+        document.body.style.overflow = mobileMenu.classList.contains('open') ? 'hidden' : '';
+      });
+    }
 
     function closeMobileMenu() {
-      hamburger.classList.remove('open');
-      mobileMenu.classList.remove('open');
+      if (hamburger) hamburger.classList.remove('open');
+      if (mobileMenu) mobileMenu.classList.remove('open');
       document.body.style.overflow = '';
     }
 
     // ── Brand Strip Arrows ──
     const brandScroll = document.getElementById('brand-strip-scroll');
-    document.getElementById('brand-strip-left').addEventListener('click', () => brandScroll.scrollBy({
-      left: -300,
-      behavior: 'smooth'
-    }));
-    document.getElementById('brand-strip-right').addEventListener('click', () => brandScroll.scrollBy({
-      left: 300,
-      behavior: 'smooth'
-    }));
+    const brandLeft = document.getElementById('brand-strip-left');
+    const brandRight = document.getElementById('brand-strip-right');
+    if (brandScroll && brandLeft && brandRight) {
+      brandLeft.addEventListener('click', () => brandScroll.scrollBy({ left: -300, behavior: 'smooth' }));
+      brandRight.addEventListener('click', () => brandScroll.scrollBy({ left: 300, behavior: 'smooth' }));
+    }
 
     // ── Live Search ──
     const searchInput = document.getElementById('da-search-input');
@@ -587,38 +587,36 @@ $phones = $phones_stmt->fetchAll();
     }
 
     // ── Newsletter ──
-    document.getElementById('da-newsletter-btn').addEventListener('click', function () {
-      const email = document.getElementById('da-newsletter-email').value.trim();
-      const msg = document.getElementById('da-newsletter-msg');
-      if (!email) {
-        msg.textContent = 'Please enter your email.';
-        msg.className = 'error';
-        return;
-      }
-      this.disabled = true;
-      this.textContent = 'Subscribing...';
-      const btn = this;
-      fetch(baseURL + 'handle_newsletter.php', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/x-www-form-urlencoded'
-        },
-        body: 'newsletter_email=' + encodeURIComponent(email)
-      })
-        .then(r => r.json())
-        .then(data => {
-          msg.textContent = data.message;
-          msg.className = data.success ? 'success' : 'error';
-          if (data.success) document.getElementById('da-newsletter-email').value = '';
-          btn.disabled = false;
-          btn.textContent = 'Subscribe';
-        }).catch(() => {
-          msg.textContent = 'An error occurred.';
-          msg.className = 'error';
-          btn.disabled = false;
-          btn.textContent = 'Subscribe';
-        });
-    });
+    const newsBtn = document.getElementById('da-newsletter-btn');
+    const newsEmail = document.getElementById('da-newsletter-email');
+    const newsMsg = document.getElementById('da-newsletter-msg');
+    if (newsBtn && newsEmail && newsMsg) {
+      newsBtn.addEventListener('click', function () {
+        const email = newsEmail.value.trim();
+        if (!email) { newsMsg.textContent = 'Please enter your email.'; newsMsg.className = 'error'; return; }
+        this.disabled = true;
+        this.textContent = 'Subscribing...';
+        const btn = this;
+        fetch(baseURL + 'handle_newsletter.php', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+          body: 'newsletter_email=' + encodeURIComponent(email)
+        })
+          .then(r => r.json())
+          .then(data => {
+            newsMsg.textContent = data.message;
+            newsMsg.className = data.success ? 'success' : 'error';
+            if (data.success) newsEmail.value = '';
+            btn.disabled = false;
+            btn.textContent = 'Subscribe';
+          }).catch(() => {
+            newsMsg.textContent = 'An error occurred.';
+            newsMsg.className = 'error';
+            btn.disabled = false;
+            btn.textContent = 'Subscribe';
+          });
+      });
+    }
 
     // ── Notification mark seen ──
     function markNotificationsAsSeen() {

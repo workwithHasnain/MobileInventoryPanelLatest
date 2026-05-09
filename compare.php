@@ -469,8 +469,9 @@ $specs3 = $phone3 ? formatDeviceSpecsStructured($phone3) : [];
 
 // ── Dynamic page title ──
 $pageTitle = 'Compare Smartphones — DevicesArena';
-if ($phone1 || $phone2) {
-  $names = array_filter([getPhoneName($phone1), getPhoneName($phone2), $phone3 ? getPhoneName($phone3) : '']);
+$selectedPhones = array_filter([$phone1, $phone2, $phone3]);
+if (!empty($selectedPhones)) {
+  $names = array_map('getPhoneName', array_values($selectedPhones));
   $pageTitle = implode(' vs ', $names) . ' — DevicesArena';
 }
 
@@ -884,30 +885,35 @@ $da_active_nav = 'compare';
     function clearSlot(slot) { navigateWithSlug(slot, ''); }
 
     function navigateWithSlug(changedSlot, newSlug) {
-      // Read current slots from URL query params (redesign/compare.php uses phone1/phone2/phone3)
+      // Read current slots — support both clean URL (/compare/s1-vs-s2) and query param fallback
       const params = new URLSearchParams(window.location.search);
-      let s = [
-        params.get('phone1') || '',
-        params.get('phone2') || '',
-        params.get('phone3') || ''
-      ];
-      // Also handle slugs= format if arriving from clean URL
-      if (!s.some(x => x) && params.get('slugs')) {
+      let s = ['', '', ''];
+
+      if (params.get('slugs')) {
+        // Arrived via clean URL rewrite: ?slugs=s1-vs-s2-vs-s3
         const parts = params.get('slugs').split('-vs-');
         s = [parts[0] || '', parts[1] || '', parts[2] || ''];
-      }
-      s[changedSlot - 1] = newSlug;
-      const nonEmpty = s.filter(x => x);
-      // Always navigate to redesign/compare.php directly (bypasses .htaccess clean URL routing to old compare.php)
-      const base = window.location.pathname.replace(/\/+$/, '');
-      if (nonEmpty.length) {
-        const q = new URLSearchParams();
-        if (s[0]) q.set('phone1', s[0]);
-        if (s[1]) q.set('phone2', s[1]);
-        if (s[2]) q.set('phone3', s[2]);
-        window.location.href = base + '?' + q.toString();
       } else {
-        window.location.href = base;
+        // Legacy query params
+        s = [
+          params.get('phone1') || '',
+          params.get('phone2') || '',
+          params.get('phone3') || ''
+        ];
+      }
+
+      // Apply the change
+      s[changedSlot - 1] = newSlug;
+
+      // Build the filled-slug list (preserve slot order, skip empties)
+      const nonEmpty = s.filter(x => x);
+
+      if (nonEmpty.length) {
+        // Use clean URL: /compare/slug1-vs-slug2  (or -vs-slug3 when 3 selected)
+        window.location.href = window.baseURL + 'compare/' + nonEmpty.join('-vs-');
+      } else {
+        // No devices selected — go back to bare /compare
+        window.location.href = window.baseURL + 'compare';
       }
     }
 
@@ -963,10 +969,105 @@ $da_active_nav = 'compare';
     }
   </script>
   <script>
-    window.baseURL = '<?php echo $base; ?>';
+    // ── Brand Strip Arrows ──
+    const brandScroll = document.getElementById('brand-strip-scroll');
+    if (document.getElementById('brand-strip-left'))
+      document.getElementById('brand-strip-left').addEventListener('click', () => brandScroll?.scrollBy({ left: -300, behavior: 'smooth' }));
+    if (document.getElementById('brand-strip-right'))
+      document.getElementById('brand-strip-right').addEventListener('click', () => brandScroll?.scrollBy({ left: 300, behavior: 'smooth' }));
 
-    // ── Theme Toggle ──
-    const themeToggles = [document.getElementById('da-theme-toggle'), document.getElementById('da-mobile-theme-toggle')];
+    // ── Navbar scroll effect ──
+    const navbar = document.getElementById('da-navbar');
+    if (navbar) window.addEventListener('scroll', () => navbar.classList.toggle('scrolled', window.scrollY > 40), { passive: true });
+
+    // ── Live Search (navbar) ──
+    const searchInput = document.getElementById('da-search-input');
+    const searchResults = document.getElementById('da-search-results');
+    if (searchInput && searchResults) {
+      let searchTimer;
+      searchInput.addEventListener('input', function() {
+        clearTimeout(searchTimer);
+        const q = this.value.trim();
+        if (q.length < 2) { searchResults.classList.remove('open'); return; }
+        searchTimer = setTimeout(() => {
+          Promise.all([
+            fetch(window.baseURL + 'api_get_devices.php?q=' + encodeURIComponent(q) + '&limit=4').then(r => r.json()).catch(() => ({ devices: [] })),
+            fetch(window.baseURL + 'api_get_posts.php?q=' + encodeURIComponent(q) + '&limit=4').then(r => r.json()).catch(() => ({ posts: [] }))
+          ]).then(([devData, postData]) => {
+            const devices = devData.devices || [];
+            const posts = postData.posts || [];
+            if (!devices.length && !posts.length) {
+              searchResults.innerHTML = '<div class="da-search-result-item"><div class="sr-text">No results found</div></div>';
+              searchResults.classList.add('open'); return;
+            }
+            let html = '';
+            devices.forEach(d => { html += `<a href="${window.baseURL}device/${encodeURIComponent(d.slug || d.id)}" class="da-search-result-item">${d.image ? `<img src="${d.image}" onerror="this.style.display='none'">` : ''}<div><div class="sr-text">${d.name}</div><div class="sr-meta"><i class="fa fa-mobile-screen me-1"></i>${d.brand_name || 'Device'}</div></div></a>`; });
+            posts.forEach(p => { html += `<a href="${window.baseURL}post/${encodeURIComponent(p.slug)}" class="da-search-result-item">${p.featured_image ? `<img src="${p.featured_image}" onerror="this.style.display='none'">` : ''}<div><div class="sr-text">${p.title}</div><div class="sr-meta"><i class="fa fa-newspaper me-1"></i>${p.created_at ? p.created_at.substring(0,10) : 'Article'}</div></div></a>`; });
+            searchResults.innerHTML = html;
+            searchResults.classList.add('open');
+          });
+        }, 320);
+      });
+      document.addEventListener('click', e => { const wrap = document.getElementById('da-search-wrap'); if (wrap && !wrap.contains(e.target)) searchResults.classList.remove('open'); });
+    }
+
+    // ── Newsletter ──
+    const newsletterBtn = document.getElementById('da-newsletter-btn');
+    if (newsletterBtn) newsletterBtn.addEventListener('click', function() {
+      const email = document.getElementById('da-newsletter-email').value.trim();
+      const msg = document.getElementById('da-newsletter-msg');
+      if (!email) { msg.textContent = 'Please enter your email.'; msg.className = 'error'; return; }
+      this.disabled = true; this.textContent = 'Subscribing...';
+      const btn = this;
+      fetch(window.baseURL + 'handle_newsletter.php', { method: 'POST', headers: { 'Content-Type': 'application/x-www-form-urlencoded' }, body: 'newsletter_email=' + encodeURIComponent(email) })
+        .then(r => r.json()).then(data => { msg.textContent = data.message; msg.className = data.success ? 'success' : 'error'; if (data.success) document.getElementById('da-newsletter-email').value = ''; btn.disabled = false; btn.textContent = 'Subscribe'; }).catch(() => { msg.textContent = 'An error occurred.'; msg.className = 'error'; btn.disabled = false; btn.textContent = 'Subscribe'; });
+    });
+
+    // ── Notification ──
+    function markNotificationsAsSeen() {
+      ['notifDotDesktop'].forEach(id => { const el = document.getElementById(id); if (el) el.style.display = 'none'; });
+      fetch(window.baseURL + 'notification_handler.php', { method: 'POST', headers: { 'Content-Type': 'application/x-www-form-urlencoded' }, body: 'action=mark_seen' }).catch(() => {});
+    }
+    const bell = document.getElementById('notificationBellDesktop');
+    if (bell) bell.addEventListener('click', () => setTimeout(markNotificationsAsSeen, 100));
+
+    // ── Auth helpers ──
+    function userAuthFetch(action, fd) {
+      fd.append('action', action);
+      return fetch(window.baseURL + 'user_auth_handler.php', { method: 'POST', body: fd }).then(r => r.json());
+    }
+    function showAuthMsg(id, msg, type) {
+      const el = document.getElementById(id);
+      el.className = 'alert alert-' + type + ' alert-dismissible fade show';
+      el.innerHTML = msg + '<button type="button" class="btn-close" data-bs-dismiss="alert"></button>';
+      el.style.display = 'block';
+    }
+    const loginForm = document.getElementById('publicLoginForm');
+    if (loginForm) loginForm.addEventListener('submit', function(e) {
+      e.preventDefault();
+      const btn = document.getElementById('loginSubmitBtn'); btn.disabled = true; btn.innerHTML = '<i class="fa fa-spinner fa-spin me-1"></i>Logging in...';
+      userAuthFetch('login', new FormData(this)).then(data => { if (data.success) { showAuthMsg('login-message', data.message, 'success'); setTimeout(() => location.reload(), 800); } else { showAuthMsg('login-message', data.message, 'danger'); btn.disabled = false; btn.innerHTML = '<i class="fa fa-right-to-bracket me-1"></i>Login'; } }).catch(() => { showAuthMsg('login-message', 'An error occurred.', 'danger'); btn.disabled = false; btn.innerHTML = '<i class="fa fa-right-to-bracket me-1"></i>Login'; });
+    });
+    const signupForm = document.getElementById('publicSignupForm');
+    if (signupForm) signupForm.addEventListener('submit', function(e) {
+      e.preventDefault();
+      const btn = document.getElementById('signupSubmitBtn'); btn.disabled = true; btn.innerHTML = '<i class="fa fa-spinner fa-spin me-1"></i>Creating account...';
+      userAuthFetch('register', new FormData(this)).then(data => { if (data.success) { showAuthMsg('signup-message', data.message, 'success'); setTimeout(() => location.reload(), 800); } else { showAuthMsg('signup-message', data.message, 'danger'); btn.disabled = false; btn.innerHTML = '<i class="fa fa-user-plus me-1"></i>Create Account'; } }).catch(() => { showAuthMsg('signup-message', 'An error occurred.', 'danger'); btn.disabled = false; btn.innerHTML = '<i class="fa fa-user-plus me-1"></i>Create Account'; });
+    });
+    function deletePublicAccount() {
+      if (!confirm('Permanently delete your account? This cannot be undone.')) return;
+      const pwd = document.getElementById('delete-account-password').value.trim();
+      if (!pwd) { showAuthMsg('profile-message', 'Please enter your password.', 'warning'); return; }
+      const btn = document.getElementById('deleteAccountBtn'); btn.disabled = true; btn.innerHTML = '<i class="fa fa-spinner fa-spin me-1"></i>Deleting...';
+      const fd = new FormData(); fd.append('password', pwd);
+      userAuthFetch('delete_account', fd).then(data => { showAuthMsg('profile-message', data.message, data.success ? 'success' : 'danger'); if (data.success) setTimeout(() => location.reload(), 1000); else { btn.disabled = false; btn.innerHTML = '<i class="fa fa-trash me-1"></i>Delete Account'; } }).catch(() => { showAuthMsg('profile-message', 'An error occurred.', 'danger'); btn.disabled = false; btn.innerHTML = '<i class="fa fa-trash me-1"></i>Delete Account'; });
+    }
+    const profileForm = document.getElementById('profileUpdateForm');
+    if (profileForm) profileForm.addEventListener('submit', function(e) {
+      e.preventDefault();
+      const btn = document.getElementById('profileUpdateBtn'); btn.disabled = true; btn.innerHTML = '<i class="fa fa-spinner fa-spin me-1"></i>Saving...';
+      userAuthFetch('update_profile', new FormData(this)).then(data => { showAuthMsg('profile-message', data.message, data.success ? 'success' : 'danger'); if (data.success) setTimeout(() => location.reload(), 1000); btn.disabled = false; btn.innerHTML = '<i class="fa fa-save me-1"></i>Save Changes'; }).catch(() => { showAuthMsg('profile-message', 'An error occurred.', 'danger'); btn.disabled = false; btn.innerHTML = '<i class="fa fa-save me-1"></i>Save Changes'; });
+    });
 
     function updateThemeIcons() {
       const isLight = document.documentElement.getAttribute('data-theme') === 'light';
