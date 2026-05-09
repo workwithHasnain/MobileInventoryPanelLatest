@@ -235,6 +235,41 @@ if (!$filterConfig) {
                 </div>
               </div>
 
+              <div class="da-range-slider-wrapper mb-3">
+                  <div class="d-flex justify-content-between align-items-center mb-1">
+                      <label class="fw-bold mb-0">Year</label>
+                      <span class="badge bg-secondary"><span id="yearMinValue"><?php echo $filterConfig['year']['default_min']; ?></span> - <span id="yearMaxValue"><?php echo $filterConfig['year']['default_max']; ?></span></span>
+                  </div>
+                  <div class="d-flex align-items-center gap-2">
+                      <input type="range" class="form-range custom-range flex-grow-1" min="<?php echo $filterConfig['year']['min']; ?>" max="<?php echo $filterConfig['year']['max']; ?>" id="yearMin" value="<?php echo $filterConfig['year']['default_min']; ?>" />
+                      <span class="mx-1">-</span>
+                      <input type="range" class="form-range custom-range flex-grow-1" min="<?php echo $filterConfig['year']['min']; ?>" max="<?php echo $filterConfig['year']['max']; ?>" id="yearMax" value="<?php echo $filterConfig['year']['default_max']; ?>" />
+                  </div>
+              </div>
+
+              <div class="da-range-slider-wrapper mb-3">
+                  <div class="d-flex justify-content-between align-items-center mb-1">
+                      <label class="fw-bold mb-0">Max Price (USD)</label>
+                      <span class="badge bg-secondary"><span id="priceMaxValue">Any</span></span>
+                  </div>
+                  <div class="d-flex align-items-center gap-2">
+                      <span class="text-muted small">$<?php echo $filterConfig['price']['min']; ?></span>
+                      <input type="range" class="form-range custom-range flex-grow-1" min="<?php echo $filterConfig['price']['min']; ?>" max="<?php echo $filterConfig['price']['max']; ?>" step="<?php echo $filterConfig['price']['step']; ?>" id="priceMax" />
+                      <span class="text-muted small">$<?php echo $filterConfig['price']['max']; ?></span>
+                  </div>
+              </div>
+
+              <button class="btn btn-outline-secondary w-100 text-start mb-2" type="button" data-bs-toggle="collapse" data-bs-target="#colorCollapse">
+                Color <i class="fa fa-chevron-down float-end mt-1"></i>
+              </button>
+              <div class="collapse" id="colorCollapse">
+                <div class="card card-body mb-3 da-filter-card">
+                  <?php if (isset($filterConfig['colors'])) foreach ($filterConfig['colors'] as $index => $color): ?>
+                    <div class="form-check"><input class="form-check-input" type="checkbox" value="<?php echo htmlspecialchars($color); ?>" id="color<?php echo $index; ?>" name="color[]" /><label class="form-check-label" for="color<?php echo $index; ?>"><?php echo strtoupper(htmlspecialchars($color)); ?></label></div>
+                  <?php endforeach; ?>
+                </div>
+              </div>
+
               <!-- Connectivity -->
               <h5 class="da-section-label mt-4 mb-3"><span>Connectivity Slot</span></h5>
               <div class="row g-2 mb-2">
@@ -258,7 +293,39 @@ if (!$filterConfig) {
                     </div>
                   </div>
                 </div>
+                <div class="col-6">
+                  <button class="btn btn-outline-secondary w-100 text-start" type="button" data-bs-toggle="collapse" data-bs-target="#fourGCollapse">4G <i class="fa fa-chevron-down float-end mt-1"></i></button>
+                  <div class="collapse" id="fourGCollapse">
+                    <div class="card card-body mt-2 da-filter-card">
+                      <?php if (isset($filterConfig['network_4g_bands'])) foreach ($filterConfig['network_4g_bands'] as $index => $band): ?>
+                        <div class="form-check"><input class="form-check-input network-4g-band" type="checkbox" value="<?php echo htmlspecialchars($band['value']); ?>" id="lte<?php echo $index; ?>" name="network_4g_bands[]" /><label class="form-check-label" for="lte<?php echo $index; ?>"><?php echo htmlspecialchars($band['label']); ?></label></div>
+                      <?php endforeach; ?>
+                    </div>
+                  </div>
+                </div>
+                <div class="col-6">
+                  <button class="btn btn-outline-secondary w-100 text-start" type="button" data-bs-toggle="collapse" data-bs-target="#fiveGCollapse">5G <i class="fa fa-chevron-down float-end mt-1"></i></button>
+                  <div class="collapse" id="fiveGCollapse">
+                    <div class="card card-body mt-2 da-filter-card">
+                      <?php if (isset($filterConfig['network_5g_bands'])) foreach ($filterConfig['network_5g_bands'] as $index => $band): ?>
+                        <div class="form-check"><input class="form-check-input network-5g-band" type="checkbox" value="<?php echo htmlspecialchars($band['value']); ?>" id="nr5g<?php echo $index; ?>" name="network_5g_bands[]" /><label class="form-check-label" for="nr5g<?php echo $index; ?>"><?php echo htmlspecialchars($band['label']); ?></label></div>
+                      <?php endforeach; ?>
+                    </div>
+                  </div>
+                </div>
               </div>
+
+              <button class="btn btn-outline-secondary w-100 text-start mb-2" type="button" data-bs-toggle="collapse" data-bs-target="#sizeCollapse">
+                SIM Size <i class="fa fa-chevron-down float-end mt-1"></i>
+              </button>
+              <div class="collapse" id="sizeCollapse">
+                <div class="card card-body mb-3 da-filter-card">
+                  <?php if (isset($filterConfig['sim_types'])) foreach ($filterConfig['sim_types'] as $index => $simType): ?>
+                    <div class="form-check"><input class="form-check-input" type="checkbox" value="<?php echo htmlspecialchars($simType); ?>" id="simType<?php echo $index; ?>" name="sim_sizes[]" /><label class="form-check-label" for="simType<?php echo $index; ?>"><?php echo htmlspecialchars($simType); ?></label></div>
+                  <?php endforeach; ?>
+                </div>
+              </div>
+
               <div class="row g-2 mb-3">
                   <div class="col-6">
                       <div class="form-check form-switch da-custom-switch p-2 border rounded d-flex align-items-center justify-content-between">
@@ -301,6 +368,18 @@ if (!$filterConfig) {
 
               <div class="da-range-slider-wrapper mb-3">
                   <div class="d-flex justify-content-between align-items-center mb-1">
+                      <label class="fw-bold mb-0">Width (min)</label>
+                      <span class="badge bg-secondary"><span id="widthMinValue">Any</span></span>
+                  </div>
+                  <div class="d-flex align-items-center gap-2">
+                      <span class="text-muted small"><?php echo $filterConfig['dimensions']['width_min']; ?></span>
+                      <input type="range" class="form-range custom-range flex-grow-1" min="<?php echo $filterConfig['dimensions']['width_min']; ?>" max="<?php echo $filterConfig['dimensions']['width_max']; ?>" step="<?php echo $filterConfig['dimensions']['width_step']; ?>" id="widthMin" value="<?php echo $filterConfig['dimensions']['width_min']; ?>">
+                      <span class="text-muted small"><?php echo $filterConfig['dimensions']['width_max']; ?></span>
+                  </div>
+              </div>
+
+              <div class="da-range-slider-wrapper mb-3">
+                  <div class="d-flex justify-content-between align-items-center mb-1">
                       <label class="fw-bold mb-0">Thickness (max)</label>
                       <span class="badge bg-secondary"><span id="thicknessMaxValue">Any</span></span>
                   </div>
@@ -308,6 +387,18 @@ if (!$filterConfig) {
                       <span class="text-muted small"><?php echo $filterConfig['dimensions']['thickness_min']; ?></span>
                       <input type="range" class="form-range custom-range flex-grow-1" min="<?php echo $filterConfig['dimensions']['thickness_min']; ?>" max="<?php echo $filterConfig['dimensions']['thickness_max']; ?>" step="<?php echo $filterConfig['dimensions']['thickness_step']; ?>" id="thicknessMax" value="<?php echo $filterConfig['dimensions']['thickness_min']; ?>">
                       <span class="text-muted small"><?php echo $filterConfig['dimensions']['thickness_max']; ?></span>
+                  </div>
+              </div>
+
+              <div class="da-range-slider-wrapper mb-3">
+                  <div class="d-flex justify-content-between align-items-center mb-1">
+                      <label class="fw-bold mb-0">Weight (max)</label>
+                      <span class="badge bg-secondary"><span id="weightMaxValue">Any</span></span>
+                  </div>
+                  <div class="d-flex align-items-center gap-2">
+                      <span class="text-muted small"><?php echo $filterConfig['dimensions']['weight_min']; ?></span>
+                      <input type="range" class="form-range custom-range flex-grow-1" min="<?php echo $filterConfig['dimensions']['weight_min']; ?>" max="<?php echo $filterConfig['dimensions']['weight_max']; ?>" step="<?php echo $filterConfig['dimensions']['weight_step']; ?>" id="weightMax" value="<?php echo $filterConfig['dimensions']['weight_min']; ?>">
+                      <span class="text-muted small"><?php echo $filterConfig['dimensions']['weight_max']; ?></span>
                   </div>
               </div>
 
@@ -322,13 +413,24 @@ if (!$filterConfig) {
                 </div>
               </div>
 
-              <button class="btn btn-outline-secondary w-100 text-start mb-3" type="button" data-bs-toggle="collapse" data-bs-target="#backCollapse">
+              <button class="btn btn-outline-secondary w-100 text-start mb-2" type="button" data-bs-toggle="collapse" data-bs-target="#backCollapse">
                 Back Material <i class="fa fa-chevron-down float-end mt-1"></i>
               </button>
               <div class="collapse" id="backCollapse">
                 <div class="card card-body mb-3 da-filter-card">
                   <?php if (isset($filterConfig['back_materials'])) foreach ($filterConfig['back_materials'] as $index => $material): ?>
                     <div class="form-check"><input class="form-check-input" type="checkbox" value="<?php echo htmlspecialchars($material); ?>" id="backMaterial<?php echo $index; ?>" name="back_material[]" /><label class="form-check-label" for="backMaterial<?php echo $index; ?>"><?php echo htmlspecialchars($material); ?></label></div>
+                  <?php endforeach; ?>
+                </div>
+              </div>
+
+              <button class="btn btn-outline-secondary w-100 text-start mb-3" type="button" data-bs-toggle="collapse" data-bs-target="#frontCollapse">
+                Frame Material <i class="fa fa-chevron-down float-end mt-1"></i>
+              </button>
+              <div class="collapse" id="frontCollapse">
+                <div class="card card-body mb-3 da-filter-card">
+                  <?php if (isset($filterConfig['frame_materials'])) foreach ($filterConfig['frame_materials'] as $index => $material): ?>
+                    <div class="form-check"><input class="form-check-input" type="checkbox" value="<?php echo htmlspecialchars($material); ?>" id="frameMaterial<?php echo $index; ?>" name="frame_material[]" /><label class="form-check-label" for="frameMaterial<?php echo $index; ?>"><?php echo htmlspecialchars($material); ?></label></div>
                   <?php endforeach; ?>
                 </div>
               </div>
@@ -348,6 +450,30 @@ if (!$filterConfig) {
                     <?php endforeach; ?>
                   </div>
                 </div>
+              </div>
+
+              <div class="da-range-slider-wrapper mb-3">
+                  <div class="d-flex justify-content-between align-items-center mb-1">
+                      <label class="fw-bold mb-0">Min OS Version</label>
+                      <span class="badge bg-secondary"><span id="osVersionMinValue">Any</span></span>
+                  </div>
+                  <div class="d-flex align-items-center gap-2">
+                      <span class="text-muted small"><?php echo $filterConfig['os_version']['min']; ?></span>
+                      <input type="range" class="form-range custom-range flex-grow-1" min="<?php echo $filterConfig['os_version']['min']; ?>" max="<?php echo $filterConfig['os_version']['max']; ?>" step="<?php echo $filterConfig['os_version']['step']; ?>" id="osVersionMin" value="<?php echo $filterConfig['os_version']['default']; ?>">
+                      <span class="text-muted small"><?php echo $filterConfig['os_version']['max']; ?></span>
+                  </div>
+              </div>
+
+              <div class="da-range-slider-wrapper mb-3">
+                  <div class="d-flex justify-content-between align-items-center mb-1">
+                      <label class="fw-bold mb-0">Processor (Min GHz)</label>
+                      <span class="badge bg-secondary"><span id="cpuClockMinValue">Any</span></span>
+                  </div>
+                  <div class="d-flex align-items-center gap-2">
+                      <span class="text-muted small"><?php echo $filterConfig['cpu_clock']['min']; ?></span>
+                      <input type="range" class="form-range custom-range flex-grow-1" min="<?php echo $filterConfig['cpu_clock']['min']; ?>" max="<?php echo $filterConfig['cpu_clock']['max']; ?>" step="<?php echo $filterConfig['cpu_clock']['step']; ?>" id="cpuClockMin" value="<?php echo $filterConfig['cpu_clock']['default']; ?>">
+                      <span class="text-muted small"><?php echo $filterConfig['cpu_clock']['max']; ?></span>
+                  </div>
               </div>
 
               <button class="btn btn-outline-secondary w-100 text-start mb-3" type="button" data-bs-toggle="collapse" data-bs-target="#chipsCollapse">
@@ -387,6 +513,29 @@ if (!$filterConfig) {
                           <input class="form-check-input m-0" type="checkbox" id="hrSensor" name="heart_rate" value="1">
                       </div>
                   </div>
+                  <div class="col-6">
+                      <div class="form-check form-switch da-custom-switch p-2 border rounded d-flex align-items-center justify-content-between">
+                          <label class="form-check-label fw-bold mb-0" style="font-size: 0.85rem;" for="compassSensor">COMPASS</label>
+                          <input class="form-check-input m-0" type="checkbox" id="compassSensor" name="compass" value="1">
+                      </div>
+                  </div>
+                  <div class="col-6">
+                      <div class="form-check form-switch da-custom-switch p-2 border rounded d-flex align-items-center justify-content-between">
+                          <label class="form-check-label fw-bold mb-0" style="font-size: 0.85rem;" for="proxSensor">PROXIMITY</label>
+                          <input class="form-check-input m-0" type="checkbox" id="proxSensor" name="proximity" value="1">
+                      </div>
+                  </div>
+              </div>
+
+              <button class="btn btn-outline-secondary w-100 text-start mb-2" type="button" data-bs-toggle="collapse" data-bs-target="#fingerCollapse">
+                Fingerprint <i class="fa fa-chevron-down float-end mt-1"></i>
+              </button>
+              <div class="collapse" id="fingerCollapse">
+                <div class="card card-body mb-3 da-filter-card">
+                  <?php if (isset($filterConfig['fingerprint_types'])) foreach ($filterConfig['fingerprint_types'] as $index => $fpType): ?>
+                    <div class="form-check"><input class="form-check-input" type="checkbox" value="<?php echo htmlspecialchars($fpType); ?>" id="fp<?php echo $index; ?>" name="fingerprint[]" /><label class="form-check-label" for="fp<?php echo $index; ?>"><?php echo htmlspecialchars($fpType); ?></label></div>
+                  <?php endforeach; ?>
+                </div>
               </div>
 
               <!-- System Memory -->
@@ -400,6 +549,18 @@ if (!$filterConfig) {
                       <span class="text-muted small"><?php echo $filterConfig['ram']['min']; ?></span>
                       <input type="range" class="form-range custom-range flex-grow-1" min="<?php echo $filterConfig['ram']['min']; ?>" max="<?php echo $filterConfig['ram']['max']; ?>" step="<?php echo $filterConfig['ram']['step']; ?>" id="ramMin" value="<?php echo $filterConfig['ram']['default']; ?>">
                       <span class="text-muted small"><?php echo $filterConfig['ram']['max']; ?></span>
+                  </div>
+              </div>
+
+              <div class="da-range-slider-wrapper mb-3">
+                  <div class="d-flex justify-content-between align-items-center mb-1">
+                      <label class="fw-bold mb-0">Min Storage (GB)</label>
+                      <span class="badge bg-secondary"><span id="storageMinValue">Any</span></span>
+                  </div>
+                  <div class="d-flex align-items-center gap-2">
+                      <span class="text-muted small"><?php echo $filterConfig['storage']['min']; ?></span>
+                      <input type="range" class="form-range custom-range flex-grow-1" min="<?php echo $filterConfig['storage']['min']; ?>" max="<?php echo $filterConfig['storage']['max']; ?>" step="<?php echo $filterConfig['storage']['step']; ?>" id="storageMin" value="<?php echo $filterConfig['storage']['default']; ?>">
+                      <span class="text-muted small"><?php echo $filterConfig['storage']['max']; ?></span>
                   </div>
               </div>
 
@@ -443,6 +604,18 @@ if (!$filterConfig) {
                       <span class="text-muted small"><?php echo $filterConfig['refresh_rate']['min']; ?></span>
                       <input type="range" class="form-range custom-range flex-grow-1" min="<?php echo $filterConfig['refresh_rate']['min']; ?>" max="<?php echo $filterConfig['refresh_rate']['max']; ?>" step="<?php echo $filterConfig['refresh_rate']['step']; ?>" id="refreshRateMin" value="<?php echo $filterConfig['refresh_rate']['default']; ?>" />
                       <span class="text-muted small"><?php echo $filterConfig['refresh_rate']['max']; ?></span>
+                  </div>
+              </div>
+
+              <div class="da-range-slider-wrapper mb-3">
+                  <div class="d-flex justify-content-between align-items-center mb-1">
+                      <label class="fw-bold mb-0">Resolution (min - max)</label>
+                      <span class="badge bg-secondary"><span id="displayResMinValue">min</span> - <span id="displayResMaxValue">max</span></span>
+                  </div>
+                  <div class="d-flex align-items-center gap-2">
+                      <input type="range" class="form-range custom-range flex-grow-1" min="<?php echo $filterConfig['display_resolution']['min']; ?>" max="<?php echo $filterConfig['display_resolution']['max']; ?>" step="<?php echo $filterConfig['display_resolution']['step']; ?>" id="displayResMin" value="<?php echo $filterConfig['display_resolution']['default_min']; ?>" />
+                      <span class="mx-1">-</span>
+                      <input type="range" class="form-range custom-range flex-grow-1" min="<?php echo $filterConfig['display_resolution']['min']; ?>" max="<?php echo $filterConfig['display_resolution']['max']; ?>" step="<?php echo $filterConfig['display_resolution']['step']; ?>" id="displayResMax" value="<?php echo $filterConfig['display_resolution']['default_max']; ?>" />
                   </div>
               </div>
 
@@ -630,6 +803,44 @@ if (!$filterConfig) {
                       </div>
                   </div>
               </div>
+
+              <!-- Audio -->
+              <h5 class="da-section-label mt-4 mb-3"><span>Audio</span></h5>
+              <div class="row g-2 mb-3">
+                  <div class="col-6">
+                      <div class="form-check form-switch da-custom-switch p-2 border rounded d-flex align-items-center justify-content-between">
+                          <label class="form-check-label fw-bold mb-0" for="headphoneJack">3.5MM JACK</label>
+                          <input class="form-check-input m-0" type="checkbox" id="headphoneJack" name="headphone_jack" value="1">
+                      </div>
+                  </div>
+                  <div class="col-6">
+                      <div class="form-check form-switch da-custom-switch p-2 border rounded d-flex align-items-center justify-content-between">
+                          <label class="form-check-label fw-bold mb-0" for="dualSpeakers">DUAL SPEAKERS</label>
+                          <input class="form-check-input m-0" type="checkbox" id="dualSpeakers" name="dual_speakers" value="1">
+                      </div>
+                  </div>
+              </div>
+
+              <!-- Misc -->
+              <h5 class="da-section-label mt-4 mb-3"><span>Misc</span></h5>
+              <div class="card card-body mb-3 da-filter-card p-3">
+                  <label for="freeTextInput" class="form-label text-muted small mb-1">Free Text Search</label>
+                  <input type="text" id="freeTextInput" class="form-control flex-grow-1 life" placeholder="e.g. Sapphire crystal, Stylus" />
+              </div>
+
+              <!-- Sorting -->
+              <h5 class="da-section-label mt-4 mb-3"><span>Sort By</span></h5>
+              <button class="btn btn-outline-secondary w-100 text-start mb-2" type="button" data-bs-toggle="collapse" data-bs-target="#popularCollapse">
+                Order <i class="fa fa-chevron-down float-end mt-1"></i>
+              </button>
+              <div class="collapse" id="popularCollapse">
+                <div class="card card-body mb-3 da-filter-card">
+                  <div class="form-check"><input class="form-check-input" type="checkbox" value="popularity" id="orderPopularity" name="order[]" /><label class="form-check-label" for="orderPopularity">Popularity</label></div>
+                  <div class="form-check"><input class="form-check-input" type="checkbox" value="price" id="orderPrice" name="order[]" /><label class="form-check-label" for="orderPrice">Price</label></div>
+                  <div class="form-check"><input class="form-check-input" type="checkbox" value="camera_battery" id="orderCamera" name="order[]" /><label class="form-check-label" for="orderCamera">Camera + Battery</label></div>
+                </div>
+              </div>
+
             </div>
           </div>
           
@@ -1488,15 +1699,51 @@ if (!$filterConfig) {
 
                 // Define createDeviceCard for the redesign UI
                 function createDeviceCard(device) {
-                    const img = device.image || (window.baseURL + 'assets/images/placeholder.jpg');
+                    const img = device.image && (device.image.startsWith('http') || device.image.startsWith('/')) 
+                        ? device.image 
+                        : (device.image ? '/' + device.image : window.baseURL + 'assets/images/placeholder.jpg');
                     const url = window.baseURL + 'device/' + (device.slug || device.id);
+                    const brandName = device.brand_name || 'Device';
+                    const year = device.year || 'N/A';
+                    
+                    let badgeClass = 'year';
+                    switch (device.availability) {
+                        case 'Available': badgeClass = 'available'; break;
+                        case 'Coming Soon': badgeClass = 'coming-soon'; break;
+                        case 'Discontinued': badgeClass = 'discontinued'; break;
+                        case 'Rumored': badgeClass = 'rumored'; break;
+                    }
+                    const availability = device.availability || 'Unknown';
+                    const price = device.price ? '$' + parseFloat(device.price).toLocaleString() : 'N/A';
+                    
+                    const ram = device.ram ? `<div class="da-device-spec-item" title="RAM"><i class="fa fa-microchip"></i> ${device.ram}</div>` : '';
+                    const storage = device.storage ? `<div class="da-device-spec-item" title="Storage"><i class="fa fa-hard-drive"></i> ${device.storage}</div>` : '';
+                    const displaySize = device.display_size ? `<div class="da-device-spec-item" title="Display"><i class="fa fa-mobile-screen-button"></i> ${device.display_size.replace('"', '')}"</div>` : '';
+                    const cameraRes = device.main_camera_resolution ? (!isNaN(device.main_camera_resolution) ? device.main_camera_resolution + ' MP' : device.main_camera_resolution) : '';
+                    const camera = cameraRes ? `<div class="da-device-spec-item" title="Camera"><i class="fa fa-camera"></i> ${cameraRes}</div>` : '';
+
                     return `
-                      <a href="${url}" class="da-phone-card text-decoration-none">
-                        <div class="da-pc-img">
-                          <img src="${img}" alt="${device.name}" onerror="this.src='${window.baseURL}assets/images/placeholder.jpg'">
+                      <a href="${url}" class="da-brand-device-card text-decoration-none">
+                        <div class="da-device-img-wrap">
+                          ${img ? `<img src="${img}" alt="${device.name}" onerror="this.style.display='none'">` : `<div class="da-device-img-placeholder"><i class="fa fa-mobile-screen fa-2x"></i></div>`}
                         </div>
-                        <div class="da-pc-body">
-                          <h4 class="da-pc-title">${device.name}</h4>
+                        
+                        <div class="da-device-body">
+                          <h3 class="da-device-title">${device.name}</h3>
+                          
+                          <div class="da-device-brand-row">
+                            <span class="da-device-brand-name">${brandName}</span>
+                            <span class="da-device-badge year">${year}</span>
+                          </div>
+                          
+                          <div class="da-device-badges">
+                            <span class="da-device-price">${price}</span>
+                            <span class="da-device-badge ${badgeClass}">${availability}</span>
+                          </div>
+                          
+                          <div class="da-device-specs">
+                            ${ram}${storage}${displaySize}${camera}
+                          </div>
                         </div>
                       </a>
                     `;
