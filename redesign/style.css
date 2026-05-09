@@ -2367,7 +2367,7 @@ button {
 .da-stat-icon {
   margin-bottom: 6px;
   font-size: 20px;
-  color: var(--accent);
+  color: var(--text-primary);
 }
 
 .da-stat-title {
