@@ -15,21 +15,10 @@
       </div>
 
     <!-- ── Newsletter Strip ── -->
-    <div class="da-footer-newsletter">
-      <div class="da-fn-left">
-        <i class="fa fa-envelope-open-text da-fn-icon"></i>
-        <div>
-          <div class="da-fn-title">Stay in the Loop</div>
-          <div class="da-fn-sub">Get the latest device reviews, specs &amp; tech news delivered to your inbox.</div>
-        </div>
-      </div>
-      <div class="da-fn-right">
-        <div class="da-fn-form">
-          <input type="email" id="ft-newsletter-email" class="da-fn-input" placeholder="Enter your email address" autocomplete="email">
-          <button id="ft-newsletter-btn" class="da-fn-btn"><i class="fa fa-paper-plane"></i> Subscribe</button>
-        </div>
-        <div id="ft-newsletter-msg" class="da-fn-msg"></div>
-      </div>
+    <div class="da-footer-newsletter-slim">
+      <input type="email" id="ft-newsletter-email" class="da-fn-input" placeholder="Your email address" autocomplete="off" autocorrect="off" spellcheck="false">
+      <button id="ft-newsletter-btn" class="da-fn-btn"><i class="fa fa-paper-plane"></i> Subscribe</button>
+      <div id="ft-newsletter-msg" class="da-fn-msg"></div>
     </div>
 
     <!-- ── Newsletter divider ── -->
