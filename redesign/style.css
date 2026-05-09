@@ -5344,4 +5344,216 @@ textarea.da-input {
   transform: scale(1.03);
 }
 
+/* ══════════════════════════════════════════
+   COMPARE — FIXED SPEC TABLE  (.cpt-*)
+   Existing .cp-* styles remain for device
+   cards and search area above.
+══════════════════════════════════════════ */
+
+.cpt-scroll {
+  width: 100%;
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+  scrollbar-width: thin;
+  scrollbar-color: var(--border) transparent;
+  border-radius: var(--radius);
+  border: 1px solid var(--border);
+  margin-top: 12px;
+}
+
+.cpt-table {
+  width: 100%;
+  min-width: 560px;
+  border-collapse: collapse;
+  font-family: var(--font-main);
+  font-size: 13.5px;
+  background: #ffffff;
+}
+
+[data-theme="dark"] .cpt-table {
+  background: #111827;
+}
+
+/* Sticky thead */
+.cpt-thead tr {
+  position: sticky;
+  top: 0;
+  z-index: 10;
+}
+
+.cpt-label-head {
+  min-width: 160px;
+  width: 180px;
+  background: #37474f;
+  color: #ffffff;
+  font-size: 11.5px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.6px;
+  padding: 14px;
+  border-right: 1px solid rgba(255,255,255,0.12);
+  vertical-align: bottom;
+}
+
+.cpt-dev-head {
+  background: #455a64;
+  color: #ffffff;
+  text-align: center;
+  padding: 12px 14px;
+  min-width: 200px;
+  border-right: 1px solid rgba(255,255,255,0.1);
+  vertical-align: bottom;
+}
+
+.cpt-dev-head img {
+  display: block;
+  margin: 0 auto 8px;
+  width: 56px;
+  height: 56px;
+  object-fit: contain;
+  border-radius: 8px;
+  background: rgba(255,255,255,0.1);
+  padding: 4px;
+}
+
+.cpt-dev-head span {
+  font-size: 13px;
+  font-weight: 600;
+  line-height: 1.3;
+  display: block;
+}
+
+/* Section header rows */
+.cpt-section-row td.cpt-section-cell {
+  background: #546e7a;
+  color: #ffffff;
+  font-size: 12px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  padding: 9px 14px;
+  border-top: 2px solid #37474f;
+  border-bottom: 1px solid #455a64;
+}
+
+[data-theme="dark"] .cpt-section-row td.cpt-section-cell {
+  background: #263238;
+  border-top-color: #1c2529;
+  border-bottom-color: #37474f;
+}
+
+/* Data rows */
+.cpt-data-row {
+  border-bottom: 1px solid #e8ecee;
+}
+
+.cpt-data-row:nth-child(even) {
+  background: #f4f7f8;
+}
+
+.cpt-data-row:nth-child(odd) {
+  background: #ffffff;
+}
+
+[data-theme="dark"] .cpt-data-row:nth-child(even) {
+  background: #1a2332;
+  border-bottom-color: rgba(255,255,255,0.06);
+}
+
+[data-theme="dark"] .cpt-data-row:nth-child(odd) {
+  background: #111827;
+  border-bottom-color: rgba(255,255,255,0.06);
+}
+
+/* Label cell (subtitle column) */
+.cpt-label-cell {
+  background: #eceff1;
+  color: #37474f;
+  font-size: 11.5px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.4px;
+  padding: 9px 14px;
+  border-right: 1px solid #cfd8dc;
+  white-space: nowrap;
+  vertical-align: top;
+}
+
+[data-theme="dark"] .cpt-label-cell {
+  background: #1c2b35;
+  color: #90a4ae;
+  border-right-color: rgba(255,255,255,0.08);
+}
+
+/* Value cells */
+.cpt-val-cell {
+  color: #333333;
+  padding: 9px 14px;
+  vertical-align: top;
+  border-right: 1px solid #e8ecee;
+  line-height: 1.5;
+  min-width: 200px;
+}
+
+[data-theme="dark"] .cpt-val-cell {
+  color: var(--text-secondary);
+  border-right-color: rgba(255,255,255,0.06);
+}
+
+.cpt-val-cell:last-child {
+  border-right: none;
+}
+
+/* Identical rows — subtle tint */
+.cpt-data-row.cpt-identical .cpt-val-cell {
+  color: #607d8b;
+}
+
+[data-theme="dark"] .cpt-data-row.cpt-identical .cpt-val-cell {
+  color: #78909c;
+}
+
+/* "Differences Only" mode */
+#cp-spec-table.cp-diff-mode .cpt-identical {
+  display: none;
+}
+
+/* Mobile */
+@media (max-width: 767.98px) {
+  .cpt-label-head,
+  .cpt-label-cell {
+    min-width: 100px;
+    width: 100px;
+    font-size: 10px;
+    padding: 7px 8px;
+    white-space: normal;
+  }
+
+  .cpt-dev-head {
+    min-width: 140px;
+    padding: 10px 8px;
+  }
+
+  .cpt-dev-head img {
+    width: 40px;
+    height: 40px;
+  }
+
+  .cpt-dev-head span {
+    font-size: 11px;
+  }
+
+  .cpt-val-cell {
+    min-width: 140px;
+    padding: 7px 8px;
+    font-size: 12px;
+  }
+
+  .cpt-section-row td.cpt-section-cell {
+    padding: 7px 8px;
+    font-size: 10.5px;
+  }
+}
+
+
 

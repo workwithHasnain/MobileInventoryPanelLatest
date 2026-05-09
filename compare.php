@@ -467,6 +467,21 @@ $specs1 = $phone1 ? formatDeviceSpecsStructured($phone1) : [];
 $specs2 = $phone2 ? formatDeviceSpecsStructured($phone2) : [];
 $specs3 = $phone3 ? formatDeviceSpecsStructured($phone3) : [];
 
+// ── Build field-keyed lookup for fixed-schema table ──
+// Returns [SECTION][field_lowercase] => description
+function buildSpecLookup($specs) {
+  $lookup = [];
+  foreach ($specs as $section => $rows) {
+    foreach ($rows as $row) {
+      $key = strtolower(trim($row['field'] ?? ''));
+      if ($key !== '') {
+        $lookup[$section][$key] = $row['description'] ?? '';
+      }
+    }
+  }
+  return $lookup;
+}
+
 // ── Dynamic page title ──
 $pageTitle = 'Compare Smartphones — DevicesArena';
 $selectedPhones = array_filter([$phone1, $phone2, $phone3]);
@@ -670,119 +685,114 @@ $da_active_nav = 'compare';
           <div class="cp-toggle-bar">
             <div class="cp-toggle-label"><i class="fa fa-table-list"></i> Specifications</div>
             <div class="cp-toggle-btns" role="group">
-              <button class="cp-toggle-btn active" id="cp-btn-all" onclick="setSpecView('all')"><i class="fa fa-list"></i>
-                All Specs</button>
-              <button class="cp-toggle-btn" id="cp-btn-diff" onclick="setSpecView('diff')"><i
-                  class="fa fa-code-compare"></i> Differences Only</button>
+              <button class="cp-toggle-btn active" id="cp-btn-all" onclick="setSpecView('all')"><i class="fa fa-list"></i> All Specs</button>
+              <button class="cp-toggle-btn" id="cp-btn-diff" onclick="setSpecView('diff')"><i class="fa fa-code-compare"></i> Differences Only</button>
             </div>
           </div>
 
-          <!-- Sticky column headers (outside scroll so sticky works, synced via JS) -->
-          <div class="cp-col-heads<?php echo $phone3 ? ' three-phones' : ''; ?>" id="cp-col-heads">
-            <div class="cp-col-heads-inner<?php echo $phone3 ? ' three-phones' : ''; ?>">
-              <?php if ($phone1): ?>
-                <div class="cp-col-head">
-                  <img src="<?php echo getPhoneImage($phone1); ?>" alt="<?php echo getPhoneName($phone1); ?>" />
-                  <span><?php echo getPhoneName($phone1); ?></span>
-                </div>
-              <?php endif; ?>
-              <?php if ($phone2): ?>
-                <div class="cp-col-head">
-                  <img src="<?php echo getPhoneImage($phone2); ?>" alt="<?php echo getPhoneName($phone2); ?>" />
-                  <span><?php echo getPhoneName($phone2); ?></span>
-                </div>
-              <?php endif; ?>
-              <?php if ($phone3): ?>
-                <div class="cp-col-head">
-                  <img src="<?php echo getPhoneImage($phone3); ?>" alt="<?php echo getPhoneName($phone3); ?>" />
-                  <span><?php echo getPhoneName($phone3); ?></span>
-                </div>
-              <?php endif; ?>
-            </div><!-- /cp-col-heads-inner -->
-          </div>
-
-          <!-- Horizontal scroll wrapper (only the table rows scroll) -->
-          <div class="cp-table-scroll" id="cp-table-scroll">
-            <!-- Spec grid -->
-            <div class="cp-table<?php echo $phone3 ? ' three-phones' : ''; ?>" id="cp-spec-table">
-
-              <!-- Detailed JSON-based sections only (highlights shown on cards above) -->
-
-              <!-- Detailed JSON-based sections -->
-              <?php
-              $tokenizeWords = function ($text) {
-                if ($text === '')
-                  return [];
-                return preg_split('/(\s+)/', $text, -1, PREG_SPLIT_DELIM_CAPTURE);
-              };
-              $renderWords = function ($d, $other1, $other2) use ($tokenizeWords) {
-                if ($d === '')
-                  return '<span class="cp-na">—</span>';
-                $tokens = $tokenizeWords($d);
-                $o1 = $other1 ? $tokenizeWords($other1) : [];
-                $o2 = $other2 ? $tokenizeWords($other2) : [];
-
-                $cleanO1 = array_filter($o1, function ($t) {
-                  return trim($t) !== ''; });
-                $cleanO2 = array_filter($o2, function ($t) {
-                  return trim($t) !== ''; });
-
-                $html = '';
-                foreach ($tokens as $token) {
-                  if (trim($token) === '') {
-                    $html .= nl2br(htmlspecialchars($token));
-                  } else {
-                    $isCommon = in_array($token, $cleanO1) || in_array($token, $cleanO2);
-                    $attr = $isCommon ? 'data-common-token="true"' : 'data-unique-token="true"';
-                    $html .= '<span class="spec-word" ' . $attr . '>' . htmlspecialchars($token) . '</span>';
-                  }
-                }
-                return $html;
-              };
-
-              $orderedSections = ['NETWORK', 'LAUNCH', 'BODY', 'DISPLAY', 'HARDWARE', 'MEMORY', 'MAIN CAMERA', 'SELFIE CAMERA', 'MULTIMEDIA', 'CONNECTIVITY', 'FEATURES', 'BATTERY', 'GENERAL INFO'];
-              foreach ($orderedSections as $section):
-                $rows1 = $specs1[$section] ?? [];
-                $rows2 = $specs2[$section] ?? [];
-                $rows3 = $specs3[$section] ?? [];
-                if (empty($rows1) && empty($rows2) && empty($rows3))
-                  continue;
-                $maxRows = max(count($rows1), count($rows2), count($rows3));
+          <!-- Fixed-schema comparison table -->
+          <div class="cpt-scroll">
+            <?php
+            // Fixed spec schema sourced from add_device.php template
+            $specSchema = [
+              'NETWORK'       => ['Technology'],
+              'LAUNCH'        => ['Announced', 'Availability'],
+              'BODY'          => ['Dimensions', 'Weight', 'Materials', 'Connectivity Slot'],
+              'DISPLAY'       => ['Type', 'Size', 'Resolution', 'Protection'],
+              'HARDWARE'      => ['OS', 'System Chip', 'Processor', 'GPU'],
+              'MEMORY'        => ['Expansion Slot', 'Storage'],
+              'MAIN CAMERA'   => ['Dual', 'Features', 'Video Recording'],
+              'SELFIE CAMERA' => ['Single', 'Video Recording'],
+              'MULTIMEDIA'    => ['Audio Output', '3.5mm Jack'],
+              'CONNECTIVITY'  => ['WLAN', 'Bluetooth', 'Location', 'Proximity', 'Infrared Port', 'Radio', 'USB'],
+              'FEATURES'      => ['Sensors'],
+              'BATTERY'       => ['Type', 'Charging', 'Reverse Wired'],
+              'GENERAL INFO'  => ['Colors', 'Versions', 'Price'],
+            ];
+            $sectionDisplayNames = [
+              'NETWORK'       => 'Network',
+              'LAUNCH'        => 'Launch',
+              'BODY'          => 'Body',
+              'DISPLAY'       => 'Display',
+              'HARDWARE'      => 'Hardware',
+              'MEMORY'        => 'System Memory',
+              'MAIN CAMERA'   => 'Main Camera',
+              'SELFIE CAMERA' => 'Selfie Camera',
+              'MULTIMEDIA'    => 'Multimedia',
+              'CONNECTIVITY'  => 'Connectivity',
+              'FEATURES'      => 'Features',
+              'BATTERY'       => 'Battery',
+              'GENERAL INFO'  => 'General Info',
+            ];
+            // Build field lookups
+            $lk1 = buildSpecLookup($specs1);
+            $lk2 = buildSpecLookup($specs2);
+            $lk3 = buildSpecLookup($specs3);
+            // Column count
+            $devCols = ($phone1 ? 1 : 0) + ($phone2 ? 1 : 0) + ($phone3 ? 1 : 0);
+            $totalCols = $devCols + 1;
+            ?>
+            <table class="cpt-table" id="cp-spec-table">
+              <thead class="cpt-thead">
+                <tr>
+                  <th class="cpt-label-head">Specifications</th>
+                  <?php if ($phone1): ?>
+                    <th class="cpt-dev-head">
+                      <img src="<?php echo getPhoneImage($phone1); ?>" alt="<?php echo getPhoneName($phone1); ?>">
+                      <span><?php echo getPhoneName($phone1); ?></span>
+                    </th>
+                  <?php endif; ?>
+                  <?php if ($phone2): ?>
+                    <th class="cpt-dev-head">
+                      <img src="<?php echo getPhoneImage($phone2); ?>" alt="<?php echo getPhoneName($phone2); ?>">
+                      <span><?php echo getPhoneName($phone2); ?></span>
+                    </th>
+                  <?php endif; ?>
+                  <?php if ($phone3): ?>
+                    <th class="cpt-dev-head">
+                      <img src="<?php echo getPhoneImage($phone3); ?>" alt="<?php echo getPhoneName($phone3); ?>">
+                      <span><?php echo getPhoneName($phone3); ?></span>
+                    </th>
+                  <?php endif; ?>
+                </tr>
+              </thead>
+              <tbody>
+                <?php foreach ($specSchema as $sectionKey => $subtitles):
+                  $displayName = $sectionDisplayNames[$sectionKey] ?? ucfirst(strtolower($sectionKey));
                 ?>
-                <div class="cp-section-head"><i class="fa fa-chevron-right"></i> <?php echo htmlspecialchars($section); ?>
-                </div>
-                <?php for ($i = 0; $i < $maxRows; $i++):
-                  $f1 = $rows1[$i]['field'] ?? '';
-                  $f2 = $rows2[$i]['field'] ?? '';
-                  $f3 = $rows3[$i]['field'] ?? '';
-                  $d1 = $rows1[$i]['description'] ?? '';
-                  $d2 = $rows2[$i]['description'] ?? '';
-                  $d3 = $rows3[$i]['description'] ?? '';
-                  $ident = ($d1 !== '' && $d1 === $d2) && (!$phone3 || $d1 === $d3);
-                  ?>
-                  <div class="cp-row cp-row-sub<?php echo $ident ? ' cp-row-identical' : ''; ?>"
-                    data-identical="<?php echo $ident ? '1' : '0'; ?>">
-                    <?php if ($phone1): ?>
-                      <div class="cp-row-cell"><?php if ($f1): ?>
-                          <div class="cp-cell-field"><?php echo htmlspecialchars($f1); ?></div>
-                        <?php endif; ?>        <?php echo $renderWords($d1, $d2, $d3); ?>
-                      </div><?php endif; ?>
-                    <?php if ($phone2): ?>
-                      <div class="cp-row-cell"><?php if ($f2): ?>
-                          <div class="cp-cell-field"><?php echo htmlspecialchars($f2); ?></div>
-                        <?php endif; ?>        <?php echo $renderWords($d2, $d1, $d3); ?>
-                      </div><?php endif; ?>
-                    <?php if ($phone3): ?>
-                      <div class="cp-row-cell"><?php if ($f3): ?>
-                          <div class="cp-cell-field"><?php echo htmlspecialchars($f3); ?></div>
-                        <?php endif; ?>        <?php echo $renderWords($d3, $d1, $d2); ?>
-                      </div><?php endif; ?>
-                  </div>
-                <?php endfor; ?>
-              <?php endforeach; ?>
+                <tr class="cpt-section-row">
+                  <td colspan="<?php echo $totalCols; ?>" class="cpt-section-cell"><?php echo htmlspecialchars($displayName); ?></td>
+                </tr>
+                <?php foreach ($subtitles as $subtitle):
+                  $fk = strtolower($subtitle);
+                  $v1 = ($phone1 !== null) ? ($lk1[$sectionKey][$fk] ?? '') : null;
+                  $v2 = ($phone2 !== null) ? ($lk2[$sectionKey][$fk] ?? '') : null;
+                  $v3 = ($phone3 !== null) ? ($lk3[$sectionKey][$fk] ?? '') : null;
+                  // Identical check across all selected slots
+                  $activeVals = array_filter(
+                    [$v1, $v2, $v3],
+                    fn($v) => $v !== null
+                  );
+                  $identical = (count($activeVals) > 1) && (count(array_unique(array_values($activeVals))) === 1);
+                ?>
+                <tr class="cpt-data-row<?php echo $identical ? ' cpt-identical' : ''; ?>" data-identical="<?php echo $identical ? '1' : '0'; ?>">
+                  <td class="cpt-label-cell"><?php echo htmlspecialchars($subtitle); ?></td>
+                  <?php if ($phone1 !== null): ?>
+                    <td class="cpt-val-cell"><?php echo ($v1 !== '') ? nl2br(htmlspecialchars($v1)) : ''; ?></td>
+                  <?php endif; ?>
+                  <?php if ($phone2 !== null): ?>
+                    <td class="cpt-val-cell"><?php echo ($v2 !== '') ? nl2br(htmlspecialchars($v2)) : ''; ?></td>
+                  <?php endif; ?>
+                  <?php if ($phone3 !== null): ?>
+                    <td class="cpt-val-cell"><?php echo ($v3 !== '') ? nl2br(htmlspecialchars($v3)) : ''; ?></td>
+                  <?php endif; ?>
+                </tr>
+                <?php endforeach; ?>
+                <?php endforeach; ?>
+              </tbody>
+            </table>
+          </div><!-- /cpt-scroll -->
 
-            </div><!-- /cp-table -->
-          </div><!-- /cp-table-scroll -->
         </div><!-- /cp-table-inner -->
       </div><!-- /cp-table-wrap -->
     <?php else: ?>
@@ -911,6 +921,7 @@ $da_active_nav = 'compare';
       const table = document.getElementById('cp-spec-table');
       const btnAll = document.getElementById('cp-btn-all');
       const btnDiff = document.getElementById('cp-btn-diff');
+      if (!table) return;
       if (mode === 'diff') {
         table.classList.add('cp-diff-mode');
         btnDiff.classList.add('active'); btnAll.classList.remove('active');
