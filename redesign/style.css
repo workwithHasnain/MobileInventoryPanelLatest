@@ -5004,3 +5004,17 @@ textarea.da-input {
   transform: rotate(180deg);
 }
 
+/* ══════════════════════════════════════════
+   DEVICE IMAGES GALLERY STYLES
+   ══════════════════════════════════════════ */
+.da-device-image-card:hover {
+  border-color: var(--accent) !important;
+  box-shadow: 0 12px 30px rgba(0, 0, 0, 0.35);
+  transform: translateY(-4px);
+}
+
+.da-device-image-card:hover .da-gallery-img {
+  transform: scale(1.03);
+}
+
+

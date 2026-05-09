@@ -63,13 +63,13 @@ $brands = $brands_stmt->fetchAll();
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1.0" />
-  <link rel="canonical" href="<?php echo $canonicalBase; ?>/featured" />
-  <title>DevicesArena — Featured Content</title>
+  <link rel="canonical" href="<?php echo $canonicalBase; ?>/privacy-policy" />
+  <title>Privacy Policy — DevicesArena</title>
   <meta name="description"
-    content="Curated featured articles, top device reviews, and expert insights about mobile technology on DevicesArena." />
-  <meta property="og:title" content="DevicesArena — Featured Content" />
+    content="Read the DevicesArena Privacy Policy. We value your safety and only collect essential information like name and email for registration." />
+  <meta property="og:title" content="Privacy Policy — DevicesArena" />
   <meta property="og:description"
-    content="Curated featured articles, top device reviews, and expert insights about mobile technology." />
+    content="Your privacy is our priority. Learn about how we handle your data with transparency and security." />
   <meta property="og:image" content="<?php echo $base; ?>imges/icon-256.png" />
   <meta property="og:type" content="website" />
   <meta name="twitter:card" content="summary" />
@@ -96,6 +96,123 @@ $brands = $brands_stmt->fetchAll();
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/css/bootstrap.min.css" rel="stylesheet">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" />
   <link rel="stylesheet" href="<?php echo $base; ?>redesign/style.css">
+
+  <!-- Schema.org Structured Data for About Us Page -->
+  <?php
+  // Build breadcrumb schema for the about us page
+  $breadcrumbItems = [
+    [
+      "@type" => "ListItem",
+      "position" => 1,
+      "name" => "Home",
+      "item" => "https://www.devicesarena.com/"
+    ],
+    [
+      "@type" => "ListItem",
+      "position" => 2,
+      "name" => "Privacy Policy",
+      "item" => "https://www.devicesarena.com/privacy-policy"
+    ]
+  ];
+  ?>
+
+  <!-- Breadcrumb Schema -->
+  <script type="application/ld+json">
+      {
+          "@context": "https://schema.org",
+          "@type": "BreadcrumbList",
+          "itemListElement": <?php echo json_encode($breadcrumbItems, JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE); ?>
+      }
+  </script>
+
+  <!-- Organization Schema with Contact Information -->
+  <script type="application/ld+json">
+      {
+          "@context": "https://schema.org",
+          "@type": "Organization",
+          "name": "DevicesArena",
+          "url": "https://www.devicesarena.com",
+          "logo": "https://www.devicesarena.com/imges/icon-256.png",
+          "description": "Your source for comprehensive device reviews, specifications, comparisons, and tech industry insights.",
+          "breadcrumb": {
+              "@type": "BreadcrumbList",
+              "itemListElement": <?php echo json_encode($breadcrumbItems, JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE); ?>
+          }
+      }
+  </script>
+
+  <!-- PrivacyPolicy Schema -->
+  <script type="application/ld+json">
+      {
+          "@context": "https://schema.org",
+          "@type": "WebPage",
+          "name": "Privacy Policy - DevicesArena",
+          "headline": "Privacy Policy",
+          "description": "Learn about the data collection and privacy practices at DevicesArena. We prioritize user security and transparency.",
+          "url": "https://www.devicesarena.com/privacy-policy",
+          "image": "https://www.devicesarena.com/imges/icon-256.png",
+          "datePublished": "<?php echo date('Y-m-d'); ?>",
+          "publisher": {
+              "@type": "Organization",
+              "name": "DevicesArena",
+              "logo": {
+                  "@type": "ImageObject",
+                  "url": "https://www.devicesarena.com/imges/icon-256.png"
+              }
+          },
+          "breadcrumb": {
+              "@type": "BreadcrumbList",
+              "itemListElement": <?php echo json_encode($breadcrumbItems, JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE); ?>
+          }
+      }
+  </script>
+
+  <!-- FAQ Schema for Privacy Policy Page -->
+  <script type="application/ld+json">
+      {
+          "@context": "https://schema.org",
+          "@type": "FAQPage",
+          "name": "DevicesArena Privacy FAQs",
+          "url": "https://www.devicesarena.com/privacy-policy",
+          "breadcrumb": {
+              "@type": "BreadcrumbList",
+              "itemListElement": <?php echo json_encode($breadcrumbItems, JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE); ?>
+          },
+          "mainEntity": [{
+                  "@type": "Question",
+                  "name": "What data does DevicesArena collect?",
+                  "acceptedAnswer": {
+                      "@type": "Answer",
+                      "text": "For account registration, we only collect your name and email address. We do not collect any non-technical data for secondary purposes."
+                  }
+              },
+              {
+                  "@type": "Question",
+                  "name": "Do you sell my personal information?",
+                  "acceptedAnswer": {
+                      "@type": "Answer",
+                      "text": "No. DevicesArena does not sell, trade, or rent your personal identification information to others. Your trust is our top priority."
+                  }
+              },
+              {
+                  "@type": "Question",
+                  "name": "How is my data used?",
+                  "acceptedAnswer": {
+                      "@type": "Answer",
+                      "text": "Your data is used solely for account management, personalized user experiences (like notifications), and ensuring the security of our platform."
+                  }
+              },
+              {
+                  "@type": "Question",
+                  "name": "Can I delete my data?",
+                  "acceptedAnswer": {
+                      "@type": "Answer",
+                      "text": "Yes, you have full control. You can update your profile or permanently delete your account and associated data through your profile settings at any time."
+                  }
+              }
+          ]
+      }
+  </script>
 
   <!-- Theme Initialization Script (Prevents FOUC) -->
   <script>
@@ -133,16 +250,14 @@ $brands = $brands_stmt->fetchAll();
 
       <!-- Background Image Implementation based on original layout -->
       <div class="cp-hero-bg-container">
-        <img class="cp-hero-bg-img" src="<?php echo $base; ?>hero-images/featured-hero.png"
-          alt="featured smartphones background">
+        <img class="cp-hero-bg-img" src="<?php echo $base; ?>hero-images/privacy-hero.png" alt="privacy policy page background">
       </div>
 
       <div class="cp-hero-inner">
         <div class="cp-hero-left">
-          <div class="cp-hero-label"><span>DevicesArena</span></div>
-          <h1 class="cp-hero-title">Featured Content</h1>
-          <p class="cp-hero-sub">Curated featured articles, top device reviews, and expert insights about mobile
-            technology.</p>
+          <div class="cp-hero-label"><span>Trust & Safety</span></div>
+          <h1 class="cp-hero-title">Privacy Policy</h1>
+          <p class="cp-hero-sub">Your safety and privacy are our top priorities. Learn how we handle your information with transparency, respect, and professional care.</p>
         </div>
 
         <!-- Right: Brand panel (Classic Widget) -->
@@ -182,56 +297,47 @@ $brands = $brands_stmt->fetchAll();
 
       </div>
     </div>
-
-
-
     <!-- ── POST FEED + SIDEBAR ── -->
     <div class="da-content-area">
       <!-- Post Feed -->
       <main>
         <div class="da-post-feed-header">
           <div>
-            <div class="da-section-label"><span>Latest</span></div>
-            <h2 class="da-section-title">Featured Stories</h2>
+            <div class="da-section-label"><span>Policy</span></div>
+            <h2 class="da-section-title">Our Commitment</h2>
           </div>
-          <a href="<?php echo $base; ?>featured" class="da-view-all">View All <i class="fa fa-arrow-right"></i></a>
         </div>
 
-        <?php
-        $feedPosts = array_slice($posts, 4);
-        if (empty($feedPosts)):
-          ?>
-          <div class="da-empty"><i class="fa fa-newspaper"></i>More stories coming soon!</div>
-        <?php else: ?>
-          <div class="da-post-grid" id="da-post-grid">
-            <?php
-            $isFirst = true;
-            foreach ($feedPosts as $post):
-              $cls = $isFirst ? 'da-post-card featured' : 'da-post-card';
-              $isFirst = false;
-              ?>
-              <a href="<?php echo $base; ?>post/<?php echo urlencode($post['slug']); ?>" class="<?php echo $cls; ?>">
-                <div class="da-post-card-img">
-                  <?php if (!empty($post['featured_image'])): ?>
-                    <img src="<?php echo htmlspecialchars(getAbsoluteImagePath($post['featured_image'], $base)); ?>"
-                      alt="<?php echo htmlspecialchars($post['title']); ?>" loading="lazy" />
-                  <?php else: ?>
-                    <div class="da-img-fallback-icon"><i class="fa fa-newspaper"></i></div>
-                  <?php endif; ?>
-                  <span class="da-post-card-tag">Featured</span>
-                </div>
-                <div class="da-post-card-body">
-                  <div class="da-post-card-title"><?php echo htmlspecialchars($post['title']); ?></div>
-                  <div class="da-post-card-meta">
-                    <span><i
-                        class="fa fa-calendar-alt"></i><?php echo date('M j, Y', strtotime($post['created_at'])); ?></span>
-                    <span><i class="fa fa-comment"></i><?php echo $post['comment_count']; ?></span>
-                  </div>
-                </div>
-              </a>
-            <?php endforeach; ?>
-          </div>
-        <?php endif; ?>
+        <div class="da-about-content">
+          <h4 class="da-about-heading">Privacy Matters</h4>
+          <p class="da-about-text">At DevicesArena, we believe in a transparent and secure digital environment. We want you to feel safe while using our platform, which is why we've designed our data collection practices to be as minimal and non-intrusive as possible.</p>
+
+          <h4 class="da-about-heading">Information We Collect</h4>
+          <p class="da-about-text">We keep things simple and relevant. To provide you with a personalized experience, we only collect the following during account registration:</p>
+          <ul class="da-about-list">
+            <li><strong>Full Name:</strong> To personalize your profile and interactions.</li>
+            <li><strong>Email Address:</strong> To manage your account, send notifications, and ensure security.</li>
+          </ul>
+          <p class="da-about-text">We do <strong>not</strong> collect any non-technical personal data for secondary or "lame" reasons. Your privacy is not a commodity to us.</p>
+
+          <h4 class="da-about-heading">Technical & Analytics Data</h4>
+          <p class="da-about-text">Like most modern websites, we collect standard technical information to ensure our platform remains fast and secure. This includes:</p>
+          <ul class="da-about-list">
+            <li>IP addresses and browser types for security monitoring.</li>
+            <li>Cookie-based data to remember your preferences (like dark mode).</li>
+            <li>Anonymous analytics to help us improve the overall site experience.</li>
+          </ul>
+
+          <h4 class="da-about-heading">How We Protect Your Data</h4>
+          <p class="da-about-text">Your data is stored securely and access is strictly limited. Most importantly:</p>
+          <ul class="da-about-list">
+            <li><strong>No Data Selling:</strong> We never sell, trade, or rent your personal information to third parties.</li>
+            <li><strong>Account Control:</strong> You have full control over your data. You can update your details or permanently delete your account at any time through your profile settings.</li>
+          </ul>
+
+          <h4 class="da-about-heading">Contact Us</h4>
+          <p class="da-about-text">If you have any questions regarding our privacy practices or how your data is handled, feel free to reach out to us via our <a href="<?php echo $base; ?>contact-us" class="da-about-link">Contact Us</a> page.</p>
+        </div>
       </main>
 
       <!-- Sidebar -->
@@ -239,15 +345,6 @@ $brands = $brands_stmt->fetchAll();
 
         <!-- Latest Devices -->
         <?php include('includes/sidebar/latest-devices.php'); ?>
-
-        <!-- Popular Comparisons -->
-        <?php include('includes/sidebar/popular-comparisons.php'); ?>
-
-        <!-- Top 10 Daily Interest -->
-        <?php include('includes/sidebar/top-daily-interests.php'); ?>
-
-        <!-- Top 10 by Fans -->
-        <?php include('includes/sidebar/top-by-fans.php'); ?>
 
       </aside>
     </div>
