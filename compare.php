@@ -693,6 +693,34 @@ $da_active_nav = 'compare';
           <!-- Fixed-schema comparison table -->
           <div class="cpt-scroll">
             <?php
+            // Tokenization and word comparison for matching highlights
+            $tokenizeWords = function ($text) {
+              if ($text === '') return [];
+              return preg_split('/(\s+)/', $text, -1, PREG_SPLIT_DELIM_CAPTURE);
+            };
+            $renderWords = function ($d, $other1, $other2) use ($tokenizeWords) {
+              if ($d === null || $d === '') return ''; // Empty cells
+              $tokens = $tokenizeWords($d);
+              $o1 = ($other1 !== null && $other1 !== '') ? $tokenizeWords($other1) : [];
+              $o2 = ($other2 !== null && $other2 !== '') ? $tokenizeWords($other2) : [];
+              
+              $cleanO1 = array_filter($o1, fn($t) => trim($t) !== '');
+              $cleanO2 = array_filter($o2, fn($t) => trim($t) !== '');
+              
+              $html = '';
+              foreach ($tokens as $token) {
+                if (trim($token) === '') {
+                  $html .= nl2br(htmlspecialchars($token));
+                } else {
+                  // Word counts as common if present in at least ONE other device column
+                  $isCommon = in_array($token, $cleanO1) || in_array($token, $cleanO2);
+                  $attr = $isCommon ? 'data-common-token="true"' : 'data-unique-token="true"';
+                  $html .= '<span class="spec-word" ' . $attr . '>' . htmlspecialchars($token) . '</span>';
+                }
+              }
+              return $html;
+            };
+
             // Fixed spec schema sourced from add_device.php template
             $specSchema = [
               'NETWORK'       => ['Technology'],
@@ -778,13 +806,13 @@ $da_active_nav = 'compare';
                 <tr class="cpt-data-row<?php echo $identical ? ' cpt-identical' : ''; ?>" data-identical="<?php echo $identical ? '1' : '0'; ?>">
                   <td class="cpt-label-cell"><?php echo htmlspecialchars($subtitle); ?></td>
                   <?php if ($phone1 !== null): ?>
-                    <td class="cpt-val-cell"><?php echo ($v1 !== '') ? nl2br(htmlspecialchars($v1)) : ''; ?></td>
+                    <td class="cpt-val-cell"><?php echo $renderWords($v1, $v2, $v3); ?></td>
                   <?php endif; ?>
                   <?php if ($phone2 !== null): ?>
-                    <td class="cpt-val-cell"><?php echo ($v2 !== '') ? nl2br(htmlspecialchars($v2)) : ''; ?></td>
+                    <td class="cpt-val-cell"><?php echo $renderWords($v2, $v1, $v3); ?></td>
                   <?php endif; ?>
                   <?php if ($phone3 !== null): ?>
-                    <td class="cpt-val-cell"><?php echo ($v3 !== '') ? nl2br(htmlspecialchars($v3)) : ''; ?></td>
+                    <td class="cpt-val-cell"><?php echo $renderWords($v3, $v1, $v2); ?></td>
                   <?php endif; ?>
                 </tr>
                 <?php endforeach; ?>
@@ -922,12 +950,15 @@ $da_active_nav = 'compare';
       const btnAll = document.getElementById('cp-btn-all');
       const btnDiff = document.getElementById('cp-btn-diff');
       if (!table) return;
+      
       if (mode === 'diff') {
         table.classList.add('cp-diff-mode');
-        btnDiff.classList.add('active'); btnAll.classList.remove('active');
+        btnDiff.classList.add('active'); 
+        btnAll.classList.remove('active');
       } else {
         table.classList.remove('cp-diff-mode');
-        btnAll.classList.add('active'); btnDiff.classList.remove('active');
+        btnAll.classList.add('active'); 
+        btnDiff.classList.remove('active');
       }
     }
 
