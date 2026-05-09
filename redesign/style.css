@@ -4968,3 +4968,39 @@ textarea.da-input {
   }
 }
 
+/* Premium Collapse/Dropdown Button Styles for Phone Finder */
+.pf-main-container .btn-outline-secondary {
+  background-color: var(--bg-card);
+  border-color: var(--border) !important;
+  color: var(--text-primary);
+  font-weight: 600;
+  font-size: 14px;
+  padding: 12px 16px;
+  border-radius: var(--radius-sm);
+  transition: all var(--transition);
+}
+
+.pf-main-container .btn-outline-secondary:hover,
+.pf-main-container .btn-outline-secondary:focus,
+.pf-main-container .btn-outline-secondary:active,
+.pf-main-container .btn-outline-secondary[aria-expanded="true"] {
+  background-color: var(--bg-card-hover);
+  border-color: var(--accent) !important;
+  color: var(--accent) !important;
+  box-shadow: 0 4px 12px rgba(213, 0, 0, 0.15);
+}
+
+.pf-main-container .btn-outline-secondary i {
+  color: var(--text-secondary);
+  transition: transform var(--transition), color var(--transition);
+}
+
+.pf-main-container .btn-outline-secondary:hover i,
+.pf-main-container .btn-outline-secondary[aria-expanded="true"] i {
+  color: var(--accent);
+}
+
+.pf-main-container .btn-outline-secondary[aria-expanded="true"] i {
+  transform: rotate(180deg);
+}
+
