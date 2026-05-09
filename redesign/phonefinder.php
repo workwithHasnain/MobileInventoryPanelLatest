@@ -137,8 +137,8 @@ if (!$filterConfig) {
 
       <!-- Background Image Implementation based on original layout -->
       <div class="cp-hero-bg-container">
-        <img class="cp-hero-bg-img" src="<?php echo $base; ?>hero-images/compare-hero.png"
-          alt="compare smartphones background">
+        <img class="cp-hero-bg-img" src="<?php echo $base; ?>hero-images/phonefinder-hero.png"
+          alt="phone finder smartphones background">
       </div>
 
       <div class="cp-hero-inner">
@@ -185,6 +185,483 @@ if (!$filterConfig) {
 
       </div>
     </div>
+    
+    <!-- ── PHONE FINDER FILTERS ── -->
+    <div class="pf-main-container">
+      <div class="da-widget mb-4">
+        <div class="da-widget-header">
+          <h3>Phone Finder Filters</h3>
+          <div class="da-widget-icon"><i class="fa fa-sliders"></i></div>
+        </div>
+        <div class="da-widget-body">
+          <div class="row">
+            <!-- Left Column -->
+            <div class="col-lg-6 col-12" id="pf-left-col">
+              <!-- General Filters -->
+              <h5 class="da-section-label mt-0 mb-3"><span>General</span></h5>
+              
+              <button class="btn btn-outline-secondary w-100 text-start mb-2" type="button" data-bs-toggle="collapse" data-bs-target="#brandCollapse">
+                Brand <i class="fa fa-chevron-down float-end mt-1"></i>
+              </button>
+              <div class="collapse" id="brandCollapse">
+                <div class="card card-body mb-3 da-filter-card">
+                  <?php
+                  if (!empty($brands)) {
+                    foreach ($brands as $brand) {
+                      $brandCheckboxId = 'brand' . $brand['id'];
+                  ?>
+                      <div class="form-check">
+                        <input class="form-check-input" type="checkbox" value="<?php echo $brand['id']; ?>" id="<?php echo $brandCheckboxId; ?>" name="brand[]" />
+                        <label class="form-check-label" for="<?php echo $brandCheckboxId; ?>"><?php echo htmlspecialchars($brand['name']); ?></label>
+                      </div>
+                  <?php
+                    }
+                  } else {
+                    echo '<p class="text-muted mb-0">No brands available</p>';
+                  }
+                  ?>
+                </div>
+              </div>
+
+              <button class="btn btn-outline-secondary w-100 text-start mb-2" type="button" data-bs-toggle="collapse" data-bs-target="#networkCollapse">
+                Availability <i class="fa fa-chevron-down float-end mt-1"></i>
+              </button>
+              <div class="collapse" id="networkCollapse">
+                <div class="card card-body mb-3 da-filter-card">
+                  <div class="form-check"><input class="form-check-input" type="checkbox" value="Available" id="availabilityAvailable" name="availability" /><label class="form-check-label" for="availabilityAvailable">Available</label></div>
+                  <div class="form-check"><input class="form-check-input" type="checkbox" value="Coming Soon" id="availabilityComingSoon" name="availability" /><label class="form-check-label" for="availabilityComingSoon">Coming Soon</label></div>
+                  <div class="form-check"><input class="form-check-input" type="checkbox" value="Discontinued" id="availabilityDiscontinued" name="availability" /><label class="form-check-label" for="availabilityDiscontinued">Discontinued</label></div>
+                  <div class="form-check"><input class="form-check-input" type="checkbox" value="Rumored" id="availabilityRumored" name="availability" /><label class="form-check-label" for="availabilityRumored">Rumored</label></div>
+                </div>
+              </div>
+
+              <!-- Connectivity -->
+              <h5 class="da-section-label mt-4 mb-3"><span>Connectivity Slot</span></h5>
+              <div class="row g-2 mb-2">
+                <div class="col-6">
+                  <button class="btn btn-outline-secondary w-100 text-start" type="button" data-bs-toggle="collapse" data-bs-target="#simCollapse">2G <i class="fa fa-chevron-down float-end mt-1"></i></button>
+                  <div class="collapse" id="simCollapse">
+                    <div class="card card-body mt-2 da-filter-card">
+                      <?php if (isset($filterConfig['network_2g_bands'])) foreach ($filterConfig['network_2g_bands'] as $index => $band): ?>
+                        <div class="form-check"><input class="form-check-input network-2g-band" type="checkbox" value="<?php echo htmlspecialchars($band['value']); ?>" id="gsm<?php echo $index; ?>" name="network_2g_bands[]" /><label class="form-check-label" for="gsm<?php echo $index; ?>"><?php echo htmlspecialchars($band['label']); ?></label></div>
+                      <?php endforeach; ?>
+                    </div>
+                  </div>
+                </div>
+                <div class="col-6">
+                  <button class="btn btn-outline-secondary w-100 text-start" type="button" data-bs-toggle="collapse" data-bs-target="#simwasCollapse">3G <i class="fa fa-chevron-down float-end mt-1"></i></button>
+                  <div class="collapse" id="simwasCollapse">
+                    <div class="card card-body mt-2 da-filter-card">
+                      <?php if (isset($filterConfig['network_3g_bands'])) foreach ($filterConfig['network_3g_bands'] as $index => $band): ?>
+                        <div class="form-check"><input class="form-check-input network-3g-band" type="checkbox" value="<?php echo htmlspecialchars($band['value']); ?>" id="hspa<?php echo $index; ?>" name="network_3g_bands[]" /><label class="form-check-label" for="hspa<?php echo $index; ?>"><?php echo htmlspecialchars($band['label']); ?></label></div>
+                      <?php endforeach; ?>
+                    </div>
+                  </div>
+                </div>
+              </div>
+              <div class="row g-2 mb-3">
+                  <div class="col-6">
+                      <div class="form-check form-switch da-custom-switch p-2 border rounded d-flex align-items-center justify-content-between">
+                          <label class="form-check-label fw-bold mb-0" for="dualSim">DUAL SIM</label>
+                          <input class="form-check-input m-0" type="checkbox" id="dualSim" name="dual_sim" value="1">
+                      </div>
+                  </div>
+                  <div class="col-6">
+                      <div class="form-check form-switch da-custom-switch p-2 border rounded d-flex align-items-center justify-content-between">
+                          <label class="form-check-label fw-bold mb-0" for="esimSupport">ESIM</label>
+                          <input class="form-check-input m-0" type="checkbox" id="esimSupport" name="esim" value="1">
+                      </div>
+                  </div>
+              </div>
+
+              <!-- Body -->
+              <h5 class="da-section-label mt-4 mb-3"><span>Body</span></h5>
+              <button class="btn btn-outline-secondary w-100 text-start mb-2" type="button" data-bs-toggle="collapse" data-bs-target="#factorCollapse">
+                Form Factor <i class="fa fa-chevron-down float-end mt-1"></i>
+              </button>
+              <div class="collapse" id="factorCollapse">
+                <div class="card card-body mb-3 da-filter-card">
+                  <?php if (isset($filterConfig['form_factors'])) foreach ($filterConfig['form_factors'] as $index => $factor): ?>
+                    <div class="form-check"><input class="form-check-input" type="checkbox" value="<?php echo htmlspecialchars($factor); ?>" id="formFactor<?php echo $index; ?>" name="form_factor[]" /><label class="form-check-label" for="formFactor<?php echo $index; ?>"><?php echo htmlspecialchars($factor); ?></label></div>
+                  <?php endforeach; ?>
+                </div>
+              </div>
+
+              <div class="da-range-slider-wrapper mb-3">
+                  <div class="d-flex justify-content-between align-items-center mb-1">
+                      <label class="fw-bold mb-0">Height (min)</label>
+                      <span class="badge bg-secondary"><span id="heightMinValue">Any</span></span>
+                  </div>
+                  <div class="d-flex align-items-center gap-2">
+                      <span class="text-muted small"><?php echo $filterConfig['dimensions']['height_min']; ?></span>
+                      <input type="range" class="form-range custom-range flex-grow-1" min="<?php echo $filterConfig['dimensions']['height_min']; ?>" max="<?php echo $filterConfig['dimensions']['height_max']; ?>" step="<?php echo $filterConfig['dimensions']['height_step']; ?>" id="heightMin" value="<?php echo $filterConfig['dimensions']['height_min']; ?>">
+                      <span class="text-muted small"><?php echo $filterConfig['dimensions']['height_max']; ?></span>
+                  </div>
+              </div>
+
+              <div class="da-range-slider-wrapper mb-3">
+                  <div class="d-flex justify-content-between align-items-center mb-1">
+                      <label class="fw-bold mb-0">Thickness (max)</label>
+                      <span class="badge bg-secondary"><span id="thicknessMaxValue">Any</span></span>
+                  </div>
+                  <div class="d-flex align-items-center gap-2">
+                      <span class="text-muted small"><?php echo $filterConfig['dimensions']['thickness_min']; ?></span>
+                      <input type="range" class="form-range custom-range flex-grow-1" min="<?php echo $filterConfig['dimensions']['thickness_min']; ?>" max="<?php echo $filterConfig['dimensions']['thickness_max']; ?>" step="<?php echo $filterConfig['dimensions']['thickness_step']; ?>" id="thicknessMax" value="<?php echo $filterConfig['dimensions']['thickness_min']; ?>">
+                      <span class="text-muted small"><?php echo $filterConfig['dimensions']['thickness_max']; ?></span>
+                  </div>
+              </div>
+
+              <button class="btn btn-outline-secondary w-100 text-start mb-2" type="button" data-bs-toggle="collapse" data-bs-target="#ipCollapse">
+                IP Certificate <i class="fa fa-chevron-down float-end mt-1"></i>
+              </button>
+              <div class="collapse" id="ipCollapse">
+                <div class="card card-body mb-3 da-filter-card">
+                  <?php if (isset($filterConfig['ip_certificates'])) foreach ($filterConfig['ip_certificates'] as $index => $ipCert): ?>
+                    <div class="form-check"><input class="form-check-input" type="checkbox" value="<?php echo htmlspecialchars($ipCert); ?>" id="ip<?php echo $index; ?>" name="ip_certificate[]" /><label class="form-check-label" for="ip<?php echo $index; ?>"><?php echo htmlspecialchars($ipCert); ?></label></div>
+                  <?php endforeach; ?>
+                </div>
+              </div>
+
+              <button class="btn btn-outline-secondary w-100 text-start mb-3" type="button" data-bs-toggle="collapse" data-bs-target="#backCollapse">
+                Back Material <i class="fa fa-chevron-down float-end mt-1"></i>
+              </button>
+              <div class="collapse" id="backCollapse">
+                <div class="card card-body mb-3 da-filter-card">
+                  <?php if (isset($filterConfig['back_materials'])) foreach ($filterConfig['back_materials'] as $index => $material): ?>
+                    <div class="form-check"><input class="form-check-input" type="checkbox" value="<?php echo htmlspecialchars($material); ?>" id="backMaterial<?php echo $index; ?>" name="back_material[]" /><label class="form-check-label" for="backMaterial<?php echo $index; ?>"><?php echo htmlspecialchars($material); ?></label></div>
+                  <?php endforeach; ?>
+                </div>
+              </div>
+
+              <!-- Hardware -->
+              <h5 class="da-section-label mt-4 mb-3"><span>Hardware</span></h5>
+              <button class="btn btn-outline-secondary w-100 text-start mb-2" type="button" data-bs-toggle="collapse" data-bs-target="#osCollapse">
+                OS Family <i class="fa fa-chevron-down float-end mt-1"></i>
+              </button>
+              <div class="collapse" id="osCollapse">
+                <div class="card card-body mb-3 da-filter-card">
+                  <div class="row g-2">
+                    <?php if (isset($filterConfig['os_families'])) foreach ($filterConfig['os_families'] as $index => $os): ?>
+                      <div class="col-6">
+                        <div class="form-check"><input class="form-check-input" type="checkbox" value="<?php echo strtolower(htmlspecialchars($os)); ?>" id="os<?php echo $index; ?>" name="os_family" /><label class="form-check-label" for="os<?php echo $index; ?>"><?php echo htmlspecialchars($os); ?></label></div>
+                      </div>
+                    <?php endforeach; ?>
+                  </div>
+                </div>
+              </div>
+
+              <button class="btn btn-outline-secondary w-100 text-start mb-3" type="button" data-bs-toggle="collapse" data-bs-target="#chipsCollapse">
+                Chipset <i class="fa fa-chevron-down float-end mt-1"></i>
+              </button>
+              <div class="collapse" id="chipsCollapse">
+                <div class="card card-body mb-3 da-filter-card">
+                  <label for="chipsetQuery" class="form-label text-muted small">Chipset contains</label>
+                  <input type="text" id="chipsetQuery" class="form-control" placeholder="e.g. Snapdragon 8 Gen, A18" />
+                </div>
+              </div>
+
+              <!-- Sensors -->
+              <h5 class="da-section-label mt-4 mb-3"><span>Sensors</span></h5>
+              <div class="row g-2 mb-2">
+                  <div class="col-6">
+                      <div class="form-check form-switch da-custom-switch p-2 border rounded d-flex align-items-center justify-content-between">
+                          <label class="form-check-label fw-bold mb-0 text-truncate" style="font-size: 0.85rem;" for="accelSensor">ACCELEROMETER</label>
+                          <input class="form-check-input m-0" type="checkbox" id="accelSensor" name="accelerometer" value="1">
+                      </div>
+                  </div>
+                  <div class="col-6">
+                      <div class="form-check form-switch da-custom-switch p-2 border rounded d-flex align-items-center justify-content-between">
+                          <label class="form-check-label fw-bold mb-0" style="font-size: 0.85rem;" for="gyroSensor">GYRO</label>
+                          <input class="form-check-input m-0" type="checkbox" id="gyroSensor" name="gyro" value="1">
+                      </div>
+                  </div>
+                  <div class="col-6">
+                      <div class="form-check form-switch da-custom-switch p-2 border rounded d-flex align-items-center justify-content-between">
+                          <label class="form-check-label fw-bold mb-0" style="font-size: 0.85rem;" for="baroSensor">BAROMETER</label>
+                          <input class="form-check-input m-0" type="checkbox" id="baroSensor" name="barometer" value="1">
+                      </div>
+                  </div>
+                  <div class="col-6">
+                      <div class="form-check form-switch da-custom-switch p-2 border rounded d-flex align-items-center justify-content-between">
+                          <label class="form-check-label fw-bold mb-0" style="font-size: 0.85rem;" for="hrSensor">HEART RATE</label>
+                          <input class="form-check-input m-0" type="checkbox" id="hrSensor" name="heart_rate" value="1">
+                      </div>
+                  </div>
+              </div>
+
+              <!-- System Memory -->
+              <h5 class="da-section-label mt-4 mb-3"><span>System Memory</span></h5>
+              <div class="da-range-slider-wrapper mb-3">
+                  <div class="d-flex justify-content-between align-items-center mb-1">
+                      <label class="fw-bold mb-0">Min RAM</label>
+                      <span class="badge bg-secondary"><span id="ramMinValue">Any</span></span>
+                  </div>
+                  <div class="d-flex align-items-center gap-2">
+                      <span class="text-muted small"><?php echo $filterConfig['ram']['min']; ?></span>
+                      <input type="range" class="form-range custom-range flex-grow-1" min="<?php echo $filterConfig['ram']['min']; ?>" max="<?php echo $filterConfig['ram']['max']; ?>" step="<?php echo $filterConfig['ram']['step']; ?>" id="ramMin" value="<?php echo $filterConfig['ram']['default']; ?>">
+                      <span class="text-muted small"><?php echo $filterConfig['ram']['max']; ?></span>
+                  </div>
+              </div>
+
+              <button class="btn btn-outline-secondary w-100 text-start mb-2" type="button" data-bs-toggle="collapse" data-bs-target="#cardCollapse">
+                Expansion Slot <i class="fa fa-chevron-down float-end mt-1"></i>
+              </button>
+              <div class="collapse" id="cardCollapse">
+                <div class="card card-body mb-3 da-filter-card">
+                  <div class="form-check">
+                    <input class="form-check-input" type="checkbox" id="cardSlotRequired" name="card_slot_required" />
+                    <label class="form-check-label" for="cardSlotRequired">Require card slot</label>
+                  </div>
+                </div>
+              </div>
+            </div>
+            
+            <!-- Right Column -->
+            <div class="col-lg-6 col-12" id="pf-right-col">
+              <!-- Display -->
+              <h5 class="da-section-label mt-0 mb-3"><span>Display</span></h5>
+              <div class="da-range-slider-wrapper mb-3">
+                  <div class="d-flex justify-content-between align-items-center mb-1">
+                      <label class="fw-bold mb-0">Size (min - max)</label>
+                      <span class="badge bg-secondary"><span id="displaySizeMinValue"><?php echo $filterConfig['display_size']['default_min']; ?></span> - <span id="displaySizeMaxValue"><?php echo $filterConfig['display_size']['default_max']; ?></span>"</span>
+                  </div>
+                  <div class="d-flex align-items-center gap-2">
+                      <span class="text-muted small"><?php echo $filterConfig['display_size']['min']; ?></span>
+                      <input type="range" class="form-range custom-range flex-grow-1" min="<?php echo $filterConfig['display_size']['min']; ?>" max="<?php echo $filterConfig['display_size']['max']; ?>" step="<?php echo $filterConfig['display_size']['step']; ?>" id="displaySizeMin" value="<?php echo $filterConfig['display_size']['default_min']; ?>" />
+                      <span class="mx-1">-</span>
+                      <input type="range" class="form-range custom-range flex-grow-1" min="<?php echo $filterConfig['display_size']['min']; ?>" max="<?php echo $filterConfig['display_size']['max']; ?>" step="<?php echo $filterConfig['display_size']['step']; ?>" id="displaySizeMax" value="<?php echo $filterConfig['display_size']['default_max']; ?>" />
+                      <span class="text-muted small"><?php echo $filterConfig['display_size']['max']; ?></span>
+                  </div>
+              </div>
+
+              <div class="da-range-slider-wrapper mb-3">
+                  <div class="d-flex justify-content-between align-items-center mb-1">
+                      <label class="fw-bold mb-0">Refresh Rate (min)</label>
+                      <span class="badge bg-secondary"><span id="refreshRateMinValue">Any</span></span>
+                  </div>
+                  <div class="d-flex align-items-center gap-2">
+                      <span class="text-muted small"><?php echo $filterConfig['refresh_rate']['min']; ?></span>
+                      <input type="range" class="form-range custom-range flex-grow-1" min="<?php echo $filterConfig['refresh_rate']['min']; ?>" max="<?php echo $filterConfig['refresh_rate']['max']; ?>" step="<?php echo $filterConfig['refresh_rate']['step']; ?>" id="refreshRateMin" value="<?php echo $filterConfig['refresh_rate']['default']; ?>" />
+                      <span class="text-muted small"><?php echo $filterConfig['refresh_rate']['max']; ?></span>
+                  </div>
+              </div>
+
+              <button class="btn btn-outline-secondary w-100 text-start mb-2" type="button" data-bs-toggle="collapse" data-bs-target="#techCollapse">
+                Technology <i class="fa fa-chevron-down float-end mt-1"></i>
+              </button>
+              <div class="collapse" id="techCollapse">
+                <div class="card card-body mb-3 da-filter-card">
+                  <?php if (isset($filterConfig['display_technologies'])) foreach ($filterConfig['display_technologies'] as $index => $tech): ?>
+                    <div class="form-check"><input class="form-check-input" type="checkbox" value="<?php echo htmlspecialchars($tech); ?>" id="tech<?php echo $index; ?>" name="display_tech[]" /><label class="form-check-label" for="tech<?php echo $index; ?>"><?php echo htmlspecialchars($tech); ?></label></div>
+                  <?php endforeach; ?>
+                </div>
+              </div>
+
+              <button class="btn btn-outline-secondary w-100 text-start mb-2" type="button" data-bs-toggle="collapse" data-bs-target="#notchCollapse">
+                Notch Style <i class="fa fa-chevron-down float-end mt-1"></i>
+              </button>
+              <div class="collapse" id="notchCollapse">
+                <div class="card card-body mb-3 da-filter-card">
+                  <div class="form-check"><input class="form-check-input" type="checkbox" value="No notch" id="notchNo" name="display_notch[]" /><label class="form-check-label" for="notchNo">No Notch</label></div>
+                  <div class="form-check"><input class="form-check-input" type="checkbox" value="Notch" id="notchYes" name="display_notch[]" /><label class="form-check-label" for="notchYes">Notch</label></div>
+                  <div class="form-check"><input class="form-check-input" type="checkbox" value="Punch hole" id="notchPunch" name="display_notch[]" /><label class="form-check-label" for="notchPunch">Punch hole</label></div>
+                </div>
+              </div>
+
+              <!-- Main Camera -->
+              <h5 class="da-section-label mt-4 mb-3"><span>Main Camera</span></h5>
+              <div class="da-range-slider-wrapper mb-3">
+                  <div class="d-flex justify-content-between align-items-center mb-1">
+                      <label class="fw-bold mb-0">Resolution (min MP)</label>
+                      <span class="badge bg-secondary"><span id="fNumberMaxValue">Any</span></span>
+                  </div>
+                  <div class="d-flex align-items-center gap-2">
+                      <span class="text-muted small"><?php echo $filterConfig['f_number']['min']; ?></span>
+                      <input type="range" class="form-range custom-range flex-grow-1" min="<?php echo $filterConfig['f_number']['min']; ?>" max="<?php echo $filterConfig['f_number']['max']; ?>" step="<?php echo $filterConfig['f_number']['step']; ?>" id="fNumberMax" value="<?php echo $filterConfig['f_number']['default']; ?>" />
+                      <span class="text-muted small"><?php echo $filterConfig['f_number']['max']; ?></span>
+                  </div>
+              </div>
+              
+              <div class="row g-2 mb-2">
+                  <div class="col-6">
+                      <div class="form-check form-switch da-custom-switch p-2 border rounded d-flex align-items-center justify-content-between">
+                          <label class="form-check-label fw-bold mb-0" for="video4k">4K VIDEO</label>
+                          <input class="form-check-input m-0" type="checkbox" id="video4k">
+                      </div>
+                  </div>
+                  <div class="col-6">
+                      <div class="form-check form-switch da-custom-switch p-2 border rounded d-flex align-items-center justify-content-between">
+                          <label class="form-check-label fw-bold mb-0" for="video8k">8K VIDEO</label>
+                          <input class="form-check-input m-0" type="checkbox" id="video8k">
+                      </div>
+                  </div>
+                  <div class="col-6">
+                      <div class="form-check form-switch da-custom-switch p-2 border rounded d-flex align-items-center justify-content-between">
+                          <label class="form-check-label fw-bold mb-0" style="font-size: 0.85rem;" for="camTele">TELEPHOTO</label>
+                          <input class="form-check-input m-0" type="checkbox" id="camTele" name="main_camera_telephoto" value="1">
+                      </div>
+                  </div>
+                  <div class="col-6">
+                      <div class="form-check form-switch da-custom-switch p-2 border rounded d-flex align-items-center justify-content-between">
+                          <label class="form-check-label fw-bold mb-0" style="font-size: 0.85rem;" for="camUltra">ULTRAWIDE</label>
+                          <input class="form-check-input m-0" type="checkbox" id="camUltra" name="main_camera_ultrawide" value="1">
+                      </div>
+                  </div>
+                  <div class="col-6">
+                      <div class="form-check form-switch da-custom-switch p-2 border rounded d-flex align-items-center justify-content-between">
+                          <label class="form-check-label fw-bold mb-0" for="camOis">OIS</label>
+                          <input class="form-check-input m-0" type="checkbox" id="camOis" name="main_camera_ois" value="1">
+                      </div>
+                  </div>
+              </div>
+
+              <!-- Selfie Camera -->
+              <h5 class="da-section-label mt-4 mb-3"><span>Selfie Camera</span></h5>
+              <div class="row g-2 mb-3">
+                  <div class="col-6">
+                      <div class="form-check form-switch da-custom-switch p-2 border rounded d-flex align-items-center justify-content-between">
+                          <label class="form-check-label fw-bold mb-0" style="font-size: 0.85rem;" for="frontFlash">FRONT FLASH</label>
+                          <input class="form-check-input m-0" type="checkbox" id="frontFlash" name="selfie_camera_flash" value="1">
+                      </div>
+                  </div>
+                  <div class="col-6">
+                      <div class="form-check form-switch da-custom-switch p-2 border rounded d-flex align-items-center justify-content-between">
+                          <label class="form-check-label fw-bold mb-0" style="font-size: 0.85rem;" for="popCam">POP-UP CAM</label>
+                          <input class="form-check-input m-0" type="checkbox" id="popCam" name="popup_camera" value="1">
+                      </div>
+                  </div>
+                  <div class="col-12">
+                      <div class="form-check form-switch da-custom-switch p-2 border rounded d-flex align-items-center justify-content-between">
+                          <label class="form-check-label fw-bold mb-0" for="underDisplayCam">UNDER DISPLAY CAMERA</label>
+                          <input class="form-check-input m-0" type="checkbox" id="underDisplayCam" name="under_display_camera" value="1">
+                      </div>
+                  </div>
+              </div>
+
+              <!-- Connectivity Addons -->
+              <h5 class="da-section-label mt-4 mb-3"><span>Connectivity Addons</span></h5>
+              <button class="btn btn-outline-secondary w-100 text-start mb-2" type="button" data-bs-toggle="collapse" data-bs-target="#wlanCollapse">
+                WLAN (Wi-Fi) <i class="fa fa-chevron-down float-end mt-1"></i>
+              </button>
+              <div class="collapse" id="wlanCollapse">
+                <div class="card card-body mb-3 da-filter-card">
+                  <div class="form-check"><input class="form-check-input wifi-version" type="checkbox" value="802.11n" id="wifi4" name="wifi_versions[]" /><label class="form-check-label" for="wifi4">Wi-Fi 4 (802.11n)</label></div>
+                  <div class="form-check"><input class="form-check-input wifi-version" type="checkbox" value="802.11ac" id="wifi5" name="wifi_versions[]" /><label class="form-check-label" for="wifi5">Wi-Fi 5 (802.11ac)</label></div>
+                  <div class="form-check"><input class="form-check-input wifi-version" type="checkbox" value="802.11ax" id="wifi6" name="wifi_versions[]" /><label class="form-check-label" for="wifi6">Wi-Fi 6 (802.11ax)</label></div>
+                  <div class="form-check"><input class="form-check-input wifi-version" type="checkbox" value="802.11be" id="wifi7" name="wifi_versions[]" /><label class="form-check-label" for="wifi7">Wi-Fi 7 (802.11be)</label></div>
+                </div>
+              </div>
+
+              <button class="btn btn-outline-secondary w-100 text-start mb-2" type="button" data-bs-toggle="collapse" data-bs-target="#usbCollapse">
+                USB <i class="fa fa-chevron-down float-end mt-1"></i>
+              </button>
+              <div class="collapse" id="usbCollapse">
+                <div class="card card-body mb-3 da-filter-card">
+                  <div class="form-check"><input class="form-check-input usb-type" type="checkbox" value="USB-C" id="usbTypeC" name="usb_types[]" /><label class="form-check-label" for="usbTypeC">Any USB-C</label></div>
+                  <div class="form-check"><input class="form-check-input usb-type" type="checkbox" value="USB 3" id="usb3" name="usb_types[]" /><label class="form-check-label" for="usb3">USB-C 3.0 and higher</label></div>
+                  <div class="form-check"><input class="form-check-input usb-type" type="checkbox" value="micro USB" id="microUsb" name="usb_types[]" /><label class="form-check-label" for="microUsb">Micro USB</label></div>
+                </div>
+              </div>
+
+              <div class="row g-2 mb-3">
+                  <div class="col-6">
+                      <div class="form-check form-switch da-custom-switch p-2 border rounded d-flex align-items-center justify-content-between">
+                          <label class="form-check-label fw-bold mb-0" for="gpsRequired">GPS</label>
+                          <input class="form-check-input m-0" type="checkbox" id="gpsRequired" name="gps" value="1">
+                      </div>
+                  </div>
+                  <div class="col-6">
+                      <div class="form-check form-switch da-custom-switch p-2 border rounded d-flex align-items-center justify-content-between">
+                          <label class="form-check-label fw-bold mb-0" for="nfcRequired">NFC</label>
+                          <input class="form-check-input m-0" type="checkbox" id="nfcRequired" name="nfc" value="1">
+                      </div>
+                  </div>
+                  <div class="col-6">
+                      <div class="form-check form-switch da-custom-switch p-2 border rounded d-flex align-items-center justify-content-between">
+                          <label class="form-check-label fw-bold mb-0" for="infraredRequired">INFRARED</label>
+                          <input class="form-check-input m-0" type="checkbox" id="infraredRequired" name="infrared" value="1">
+                      </div>
+                  </div>
+                  <div class="col-6">
+                      <div class="form-check form-switch da-custom-switch p-2 border rounded d-flex align-items-center justify-content-between">
+                          <label class="form-check-label fw-bold mb-0" for="fmRadioRequired">FM RADIO</label>
+                          <input class="form-check-input m-0" type="checkbox" id="fmRadioRequired" name="fm_radio" value="1">
+                      </div>
+                  </div>
+              </div>
+
+              <!-- Battery -->
+              <h5 class="da-section-label mt-4 mb-3"><span>Battery</span></h5>
+              <div class="da-range-slider-wrapper mb-3">
+                  <div class="d-flex justify-content-between align-items-center mb-1">
+                      <label class="fw-bold mb-0">Capacity (min mAh)</label>
+                      <span class="badge bg-secondary"><span id="batteryCapacityMinValue">Any</span></span>
+                  </div>
+                  <div class="d-flex align-items-center gap-2">
+                      <span class="text-muted small"><?php echo $filterConfig['battery_capacity']['min']; ?></span>
+                      <input type="range" class="form-range custom-range flex-grow-1" min="<?php echo $filterConfig['battery_capacity']['min']; ?>" max="<?php echo $filterConfig['battery_capacity']['max']; ?>" step="<?php echo $filterConfig['battery_capacity']['step']; ?>" id="batteryCapacityMin" />
+                      <span class="text-muted small"><?php echo $filterConfig['battery_capacity']['max']; ?></span>
+                  </div>
+              </div>
+
+              <div class="da-range-slider-wrapper mb-3">
+                  <div class="d-flex justify-content-between align-items-center mb-1">
+                      <label class="fw-bold mb-0">Wired Charging (min W)</label>
+                      <span class="badge bg-secondary"><span id="wiredChargeMinValue">Any</span></span>
+                  </div>
+                  <div class="d-flex align-items-center gap-2">
+                      <span class="text-muted small"><?php echo $filterConfig['wired_charging']['min']; ?></span>
+                      <input type="range" class="form-range custom-range flex-grow-1" min="<?php echo $filterConfig['wired_charging']['min']; ?>" max="<?php echo $filterConfig['wired_charging']['max']; ?>" step="<?php echo $filterConfig['wired_charging']['step']; ?>" id="wiredChargeMin" />
+                      <span class="text-muted small"><?php echo $filterConfig['wired_charging']['max']; ?></span>
+                  </div>
+              </div>
+              
+              <div class="row g-2 mb-3">
+                  <div class="col-6">
+                      <div class="form-check form-switch da-custom-switch p-2 border rounded d-flex align-items-center justify-content-between">
+                          <label class="form-check-label fw-bold mb-0" for="batRemov">REMOVABLE</label>
+                          <input class="form-check-input m-0" type="checkbox" id="batRemov" name="battery_removable" value="1">
+                      </div>
+                  </div>
+                  <div class="col-6">
+                      <div class="form-check form-switch da-custom-switch p-2 border rounded d-flex align-items-center justify-content-between">
+                          <label class="form-check-label fw-bold mb-0" style="font-size: 0.85rem;" for="wirelessRequired">WIRELESS</label>
+                          <input class="form-check-input m-0" type="checkbox" id="wirelessRequired">
+                      </div>
+                  </div>
+              </div>
+            </div>
+          </div>
+          
+          <!-- Action buttons -->
+          <div class="row mt-5 mb-3">
+              <div class="col-md-6 mb-2">
+                  <button type="button" id="resetFiltersBtn" class="da-btn-secondary w-100 py-3 fw-bold">
+                      <i class="fa fa-undo me-2 pf-icon-none"></i><span class="pf-icon-none">Reset Filters</span>
+                  </button>
+              </div>
+              <div class="col-md-6 mb-2">
+                  <button type="button" id="findDevicesBtn" class="da-btn-primary w-100 py-3 fw-bold">
+                      <i class="fa fa-search me-2 pf-icon-none"></i><span class="pf-icon-none">Find Devices</span>
+                  </button>
+              </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Results section -->
+      <div id="resultsSection" class="da-widget mt-4 pf-hidden">
+        <div class="da-widget-header">
+            <h3>Found <span id="resultsCount">0</span> Devices</h3>
+        </div>
+        <div class="da-widget-body">
+            <div id="resultsContainer" class="da-phones-grid">
+                <!-- Results will be loaded here via AJAX -->
+            </div>
+        </div>
+      </div>
+    </div>
+
     <!-- ── IN STORES NOW ── -->
     <?php include('includes/bottom-area/in-stores-now.php'); ?>
 
@@ -1009,8 +1486,24 @@ if (!$filterConfig) {
                 // Deduplicate and append
                 [...new Set(fpConds)].forEach(v => formData.append('fingerprint[]', v));
 
+                // Define createDeviceCard for the redesign UI
+                function createDeviceCard(device) {
+                    const img = device.image || (window.baseURL + 'assets/images/placeholder.jpg');
+                    const url = window.baseURL + 'device/' + (device.slug || device.id);
+                    return `
+                      <a href="${url}" class="da-phone-card text-decoration-none">
+                        <div class="da-pc-img">
+                          <img src="${img}" alt="${device.name}" onerror="this.src='${window.baseURL}assets/images/placeholder.jpg'">
+                        </div>
+                        <div class="da-pc-body">
+                          <h4 class="da-pc-title">${device.name}</h4>
+                        </div>
+                      </a>
+                    `;
+                }
+
                 // Send AJAX request
-                fetch('/phonefinder_handler.php', {
+                fetch(window.baseURL + 'phonefinder_handler.php', {
                         method: 'POST',
                         body: formData
                     })
@@ -1033,6 +1526,7 @@ if (!$filterConfig) {
                         if (data.success) {
                             // Update results count
                             resultsCount.textContent = data.count;
+                            resultsSection.classList.remove('pf-hidden');
                             resultsSection.style.display = data.count > 0 ? 'block' : 'none';
 
                             // Clear previous results

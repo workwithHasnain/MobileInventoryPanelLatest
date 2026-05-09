@@ -4825,3 +4825,114 @@ textarea.da-input {
   padding: 16px;
   border-radius: 0 var(--radius-sm) var(--radius-sm) 0;
 }
+
+/* ══════════════════════════════════════════
+   PHONE FINDER STYLES
+══════════════════════════════════════════ */
+
+.pf-main-container {
+  max-width: 1400px;
+  margin: 0 auto;
+  padding: 40px 20px;
+}
+
+@media (max-width: 768px) {
+  .pf-main-container {
+    padding: 20px 10px;
+  }
+}
+
+.pf-hidden {
+  display: none !important;
+}
+
+.da-filter-card {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  color: var(--text-primary);
+  font-size: 14px;
+}
+
+.da-filter-card .form-check {
+  margin-bottom: 8px;
+}
+
+.da-filter-card .form-check-input {
+  background-color: var(--bg-card-hover);
+  border-color: var(--border);
+}
+
+.da-filter-card .form-check-input:checked {
+  background-color: var(--accent);
+  border-color: var(--accent);
+}
+
+.da-custom-switch {
+  background-color: var(--bg-card);
+  border-color: var(--border) !important;
+  transition: all var(--transition);
+}
+
+.da-custom-switch:hover {
+  background-color: var(--bg-card-hover);
+}
+
+.da-custom-switch .form-check-input {
+  width: 2.5em;
+  height: 1.2em;
+  background-color: var(--border);
+  border: none;
+  cursor: pointer;
+}
+
+.da-custom-switch .form-check-input:checked {
+  background-color: var(--accent);
+}
+
+.da-range-slider-wrapper {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  padding: 12px;
+}
+
+.custom-range {
+  -webkit-appearance: none;
+  width: 100%;
+  height: 6px;
+  background: var(--border);
+  border-radius: 3px;
+  outline: none;
+}
+
+.custom-range::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 16px;
+  height: 16px;
+  border-radius: 50%;
+  background: var(--accent);
+  cursor: pointer;
+  box-shadow: 0 0 5px rgba(0,0,0,0.2);
+  transition: transform var(--transition);
+}
+
+.custom-range::-webkit-slider-thumb:hover {
+  transform: scale(1.2);
+}
+
+.custom-range::-moz-range-thumb {
+  width: 16px;
+  height: 16px;
+  border-radius: 50%;
+  background: var(--accent);
+  cursor: pointer;
+  border: none;
+  box-shadow: 0 0 5px rgba(0,0,0,0.2);
+  transition: transform var(--transition);
+}
+
+.custom-range::-moz-range-thumb:hover {
+  transform: scale(1.2);
+}
