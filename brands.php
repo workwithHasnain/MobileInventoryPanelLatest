@@ -100,7 +100,7 @@ $allBrands = $all_brands_stmt->fetchAll();
     rel="stylesheet">
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/css/bootstrap.min.css" rel="stylesheet">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" />
-  <link rel="stylesheet" href="<?php echo $base; ?>redesign/style.css">
+  <link rel="stylesheet" href="<?php echo $base; ?>style.css">
 
   <!-- Schema.org Structured Data for About Us Page -->
   <?php
@@ -181,13 +181,13 @@ $allBrands = $all_brands_stmt->fetchAll();
               <?php
               $brandSchemaItems = [];
               foreach ($allBrands as $i => $schemaBrand) {
-                  $slug = !empty($schemaBrand['slug']) ? $schemaBrand['slug'] : strtolower(preg_replace('/[^a-z0-9]+/', '-', $schemaBrand['name']));
-                  $brandSchemaItems[] = json_encode([
-                      "@type" => "ListItem",
-                      "position" => $i + 1,
-                      "name" => $schemaBrand['name'],
-                      "url" => "https://www.devicesarena.com/brand/" . $slug
-                  ], JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE);
+                $slug = !empty($schemaBrand['slug']) ? $schemaBrand['slug'] : strtolower(preg_replace('/[^a-z0-9]+/', '-', $schemaBrand['name']));
+                $brandSchemaItems[] = json_encode([
+                  "@type" => "ListItem",
+                  "position" => $i + 1,
+                  "name" => $schemaBrand['name'],
+                  "url" => "https://www.devicesarena.com/brand/" . $slug
+                ], JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE);
               }
               echo implode(",\n              ", $brandSchemaItems);
               ?>
@@ -238,7 +238,8 @@ $allBrands = $all_brands_stmt->fetchAll();
         <div class="cp-hero-left">
           <div class="cp-hero-label"><span>DevicesArena</span></div>
           <h1 class="cp-hero-title">All Brands</h1>
-          <p class="cp-hero-sub">Browse all smartphone brands on DevicesArena. Find devices from top manufacturers including Samsung, Apple, Xiaomi, and more.</p>
+          <p class="cp-hero-sub">Browse all smartphone brands on DevicesArena. Find devices from top manufacturers
+            including Samsung, Apple, Xiaomi, and more.</p>
         </div>
 
         <!-- Right: Brand panel (Classic Widget) -->
@@ -288,11 +289,12 @@ $allBrands = $all_brands_stmt->fetchAll();
               <div class="da-section-label"><span>Discover</span></div>
               <h2 class="da-section-title">All Brands</h2>
             </div>
-            
+
             <div class="da-brands-sort">
               <span class="da-brands-sort-label">Sort By:</span>
               <div class="dropdown">
-                <button class="da-sort-dropdown-btn dropdown-toggle" type="button" id="sortDropdown" data-bs-toggle="dropdown" aria-expanded="false">
+                <button class="da-sort-dropdown-btn dropdown-toggle" type="button" id="sortDropdown"
+                  data-bs-toggle="dropdown" aria-expanded="false">
                   <span id="currentSort">Name (A-Z)</span>
                 </button>
                 <ul class="dropdown-menu dropdown-menu-end shadow" aria-labelledby="sortDropdown">
@@ -304,17 +306,16 @@ $allBrands = $all_brands_stmt->fetchAll();
           </div>
 
           <div class="row" id="brandsGrid">
-            <?php foreach ($allBrands as $brand): 
-                $slug = !empty($brand['slug']) ? $brand['slug'] : strtolower(preg_replace('/[^a-z0-9]+/', '-', $brand['name']));
-            ?>
+            <?php foreach ($allBrands as $brand):
+              $slug = !empty($brand['slug']) ? $brand['slug'] : strtolower(preg_replace('/[^a-z0-9]+/', '-', $brand['name']));
+              ?>
               <div class="col-6 col-md-4 brand-grid-item-wrapper">
-                <a href="<?php echo $base; ?>brand/<?php echo urlencode($slug); ?>"
-                   class="da-brand-grid-item" 
-                   data-brand-id="<?php echo $brand['id']; ?>" 
-                   data-name="<?php echo htmlspecialchars(strtolower($brand['name'])); ?>" 
-                   data-count="<?php echo (int)$brand['device_count']; ?>">
+                <a href="<?php echo $base; ?>brand/<?php echo urlencode($slug); ?>" class="da-brand-grid-item"
+                  data-brand-id="<?php echo $brand['id']; ?>"
+                  data-name="<?php echo htmlspecialchars(strtolower($brand['name'])); ?>"
+                  data-count="<?php echo (int) $brand['device_count']; ?>">
                   <span class="da-brand-name"><?php echo htmlspecialchars($brand['name']); ?></span>
-                  <span class="da-brand-device-count"><?php echo (int)$brand['device_count']; ?> devices</span>
+                  <span class="da-brand-device-count"><?php echo (int) $brand['device_count']; ?> devices</span>
                 </a>
               </div>
             <?php endforeach; ?>
@@ -403,7 +404,7 @@ $allBrands = $all_brands_stmt->fetchAll();
       }
     });
 
-    // Auto-Sliders moved to redesign/sliders.js
+    // Auto-Sliders moved to sliders.js
 
     // ── Navbar scroll effect ──
     const navbar = document.getElementById('da-navbar');
@@ -730,74 +731,74 @@ $allBrands = $all_brands_stmt->fetchAll();
   <!-- Separate Script Block for Brands Sorting to avoid being blocked by other errors -->
   <script>
     // ── Sorting functionality for Brands ──
-    document.addEventListener('DOMContentLoaded', function() {
-        const brandsGrid = document.getElementById('brandsGrid');
-        const sortOptions = document.querySelectorAll('.sort-option');
-        const currentSortLabel = document.getElementById('currentSort');
-        const sortDropdownBtn = document.getElementById('sortDropdown');
+    document.addEventListener('DOMContentLoaded', function () {
+      const brandsGrid = document.getElementById('brandsGrid');
+      const sortOptions = document.querySelectorAll('.sort-option');
+      const currentSortLabel = document.getElementById('currentSort');
+      const sortDropdownBtn = document.getElementById('sortDropdown');
 
-        if (!brandsGrid) return;
+      if (!brandsGrid) return;
 
-        sortOptions.forEach(option => {
-            option.addEventListener('click', function(e) {
-                e.preventDefault();
-                const criteria = this.dataset.sort;
-                
-                // Update UI state
-                sortOptions.forEach(opt => opt.classList.remove('active'));
-                this.classList.add('active');
-                if (currentSortLabel) {
-                    currentSortLabel.textContent = this.textContent;
-                }
+      sortOptions.forEach(option => {
+        option.addEventListener('click', function (e) {
+          e.preventDefault();
+          const criteria = this.dataset.sort;
 
-                sortBrands(criteria);
-            });
+          // Update UI state
+          sortOptions.forEach(opt => opt.classList.remove('active'));
+          this.classList.add('active');
+          if (currentSortLabel) {
+            currentSortLabel.textContent = this.textContent;
+          }
+
+          sortBrands(criteria);
         });
+      });
 
-        function sortBrands(criteria) {
-            try {
-                const brandWrappers = Array.from(brandsGrid.querySelectorAll('.brand-grid-item-wrapper'));
-                
-                brandWrappers.sort((a, b) => {
-                    const itemA = a.querySelector('.da-brand-grid-item');
-                    const itemB = b.querySelector('.da-brand-grid-item');
-                    
-                    if (!itemA || !itemB) return 0;
-                    
-                    const nameA = itemA.dataset.name || '';
-                    const nameB = itemB.dataset.name || '';
+      function sortBrands(criteria) {
+        try {
+          const brandWrappers = Array.from(brandsGrid.querySelectorAll('.brand-grid-item-wrapper'));
 
-                    if (criteria === 'name') {
-                        return nameA.localeCompare(nameB);
-                    } else if (criteria === 'count') {
-                        const countA = parseInt(itemA.dataset.count, 10) || 0;
-                        const countB = parseInt(itemB.dataset.count, 10) || 0;
-                        if (countA !== countB) {
-                            return countB - countA; // Descending
-                        }
-                        return nameA.localeCompare(nameB);
-                    }
-                    return 0;
-                });
+          brandWrappers.sort((a, b) => {
+            const itemA = a.querySelector('.da-brand-grid-item');
+            const itemB = b.querySelector('.da-brand-grid-item');
 
-                // Re-render with a subtle fade effect
-                brandsGrid.style.opacity = '0.5';
-                brandsGrid.style.transition = 'opacity 0.2s ease';
-                
-                setTimeout(() => {
-                    brandsGrid.innerHTML = ''; // Safely clear all old nodes including text nodes
-                    brandWrappers.forEach(wrapper => {
-                        brandsGrid.appendChild(wrapper);
-                    });
-                    brandsGrid.style.opacity = '1';
-                }, 200);
-            } catch (err) {
-                console.error("Sorting failed", err);
+            if (!itemA || !itemB) return 0;
+
+            const nameA = itemA.dataset.name || '';
+            const nameB = itemB.dataset.name || '';
+
+            if (criteria === 'name') {
+              return nameA.localeCompare(nameB);
+            } else if (criteria === 'count') {
+              const countA = parseInt(itemA.dataset.count, 10) || 0;
+              const countB = parseInt(itemB.dataset.count, 10) || 0;
+              if (countA !== countB) {
+                return countB - countA; // Descending
+              }
+              return nameA.localeCompare(nameB);
             }
+            return 0;
+          });
+
+          // Re-render with a subtle fade effect
+          brandsGrid.style.opacity = '0.5';
+          brandsGrid.style.transition = 'opacity 0.2s ease';
+
+          setTimeout(() => {
+            brandsGrid.innerHTML = ''; // Safely clear all old nodes including text nodes
+            brandWrappers.forEach(wrapper => {
+              brandsGrid.appendChild(wrapper);
+            });
+            brandsGrid.style.opacity = '1';
+          }, 200);
+        } catch (err) {
+          console.error("Sorting failed", err);
         }
+      }
     });
   </script>
-  <script src="<?php echo $base; ?>redesign/sliders.js"></script>
+  <script src="<?php echo $base; ?>sliders.js"></script>
 </body>
 
 </html>

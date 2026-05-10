@@ -95,7 +95,7 @@ $brands = $brands_stmt->fetchAll();
     rel="stylesheet">
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/css/bootstrap.min.css" rel="stylesheet">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" />
-  <link rel="stylesheet" href="<?php echo $base; ?>redesign/style.css">
+  <link rel="stylesheet" href="<?php echo $base; ?>style.css">
 
   <!-- Schema.org Structured Data for About Us Page -->
   <?php
@@ -250,14 +250,16 @@ $brands = $brands_stmt->fetchAll();
 
       <!-- Background Image Implementation based on original layout -->
       <div class="cp-hero-bg-container">
-        <img class="cp-hero-bg-img" src="<?php echo $base; ?>hero-images/privacy-hero.png" alt="privacy policy page background">
+        <img class="cp-hero-bg-img" src="<?php echo $base; ?>hero-images/privacy-hero.png"
+          alt="privacy policy page background">
       </div>
 
       <div class="cp-hero-inner">
         <div class="cp-hero-left">
           <div class="cp-hero-label"><span>Trust & Safety</span></div>
           <h1 class="cp-hero-title">Privacy Policy</h1>
-          <p class="cp-hero-sub">Your safety and privacy are our top priorities. Learn how we handle your information with transparency, respect, and professional care.</p>
+          <p class="cp-hero-sub">Your safety and privacy are our top priorities. Learn how we handle your information
+            with transparency, respect, and professional care.</p>
         </div>
 
         <!-- Right: Brand panel (Classic Widget) -->
@@ -310,18 +312,23 @@ $brands = $brands_stmt->fetchAll();
 
         <div class="da-about-content">
           <h4 class="da-about-heading">Privacy Matters</h4>
-          <p class="da-about-text">At DevicesArena, we believe in a transparent and secure digital environment. We want you to feel safe while using our platform, which is why we've designed our data collection practices to be as minimal and non-intrusive as possible.</p>
+          <p class="da-about-text">At DevicesArena, we believe in a transparent and secure digital environment. We want
+            you to feel safe while using our platform, which is why we've designed our data collection practices to be
+            as minimal and non-intrusive as possible.</p>
 
           <h4 class="da-about-heading">Information We Collect</h4>
-          <p class="da-about-text">We keep things simple and relevant. To provide you with a personalized experience, we only collect the following during account registration:</p>
+          <p class="da-about-text">We keep things simple and relevant. To provide you with a personalized experience, we
+            only collect the following during account registration:</p>
           <ul class="da-about-list">
             <li><strong>Full Name:</strong> To personalize your profile and interactions.</li>
             <li><strong>Email Address:</strong> To manage your account, send notifications, and ensure security.</li>
           </ul>
-          <p class="da-about-text">We do <strong>not</strong> collect any non-technical personal data for secondary or "lame" reasons. Your privacy is not a commodity to us.</p>
+          <p class="da-about-text">We do <strong>not</strong> collect any non-technical personal data for secondary or
+            "lame" reasons. Your privacy is not a commodity to us.</p>
 
           <h4 class="da-about-heading">Technical & Analytics Data</h4>
-          <p class="da-about-text">Like most modern websites, we collect standard technical information to ensure our platform remains fast and secure. This includes:</p>
+          <p class="da-about-text">Like most modern websites, we collect standard technical information to ensure our
+            platform remains fast and secure. This includes:</p>
           <ul class="da-about-list">
             <li>IP addresses and browser types for security monitoring.</li>
             <li>Cookie-based data to remember your preferences (like dark mode).</li>
@@ -331,12 +338,16 @@ $brands = $brands_stmt->fetchAll();
           <h4 class="da-about-heading">How We Protect Your Data</h4>
           <p class="da-about-text">Your data is stored securely and access is strictly limited. Most importantly:</p>
           <ul class="da-about-list">
-            <li><strong>No Data Selling:</strong> We never sell, trade, or rent your personal information to third parties.</li>
-            <li><strong>Account Control:</strong> You have full control over your data. You can update your details or permanently delete your account at any time through your profile settings.</li>
+            <li><strong>No Data Selling:</strong> We never sell, trade, or rent your personal information to third
+              parties.</li>
+            <li><strong>Account Control:</strong> You have full control over your data. You can update your details or
+              permanently delete your account at any time through your profile settings.</li>
           </ul>
 
           <h4 class="da-about-heading">Contact Us</h4>
-          <p class="da-about-text">If you have any questions regarding our privacy practices or how your data is handled, feel free to reach out to us via our <a href="<?php echo $base; ?>contact-us" class="da-about-link">Contact Us</a> page.</p>
+          <p class="da-about-text">If you have any questions regarding our privacy practices or how your data is
+            handled, feel free to reach out to us via our <a href="<?php echo $base; ?>contact-us"
+              class="da-about-link">Contact Us</a> page.</p>
         </div>
       </main>
 
@@ -406,7 +417,7 @@ $brands = $brands_stmt->fetchAll();
       }
     });
 
-    // Auto-Sliders moved to redesign/sliders.js
+    // Auto-Sliders moved to sliders.js
 
     // ── Navbar scroll effect ──
     const navbar = document.getElementById('da-navbar');
@@ -730,7 +741,7 @@ $brands = $brands_stmt->fetchAll();
       }
     })();
   </script>
-  <script src="<?php echo $base; ?>redesign/sliders.js"></script>
+  <script src="<?php echo $base; ?>sliders.js"></script>
 </body>
 
 </html>

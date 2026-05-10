@@ -469,7 +469,8 @@ $specs3 = $phone3 ? formatDeviceSpecsStructured($phone3) : [];
 
 // ── Build field-keyed lookup for fixed-schema table ──
 // Returns [SECTION][field_lowercase] => description
-function buildSpecLookup($specs) {
+function buildSpecLookup($specs)
+{
   $lookup = [];
   foreach ($specs as $section => $rows) {
     foreach ($rows as $row) {
@@ -520,7 +521,7 @@ $da_active_nav = 'compare';
     rel="stylesheet">
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/css/bootstrap.min.css" rel="stylesheet">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" />
-  <link rel="stylesheet" href="<?php echo $base; ?>redesign/style.css">
+  <link rel="stylesheet" href="<?php echo $base; ?>style.css">
 
   <!-- Theme init (prevents FOUC) -->
   <script>
@@ -685,8 +686,10 @@ $da_active_nav = 'compare';
           <div class="cp-toggle-bar">
             <div class="cp-toggle-label"><i class="fa fa-table-list"></i> Specifications</div>
             <div class="cp-toggle-btns" role="group">
-              <button class="cp-toggle-btn active" id="cp-btn-all" onclick="setSpecView('all')"><i class="fa fa-list"></i> All Specs</button>
-              <button class="cp-toggle-btn" id="cp-btn-diff" onclick="setSpecView('diff')"><i class="fa fa-code-compare"></i> Differences Only</button>
+              <button class="cp-toggle-btn active" id="cp-btn-all" onclick="setSpecView('all')"><i class="fa fa-list"></i>
+                All Specs</button>
+              <button class="cp-toggle-btn" id="cp-btn-diff" onclick="setSpecView('diff')"><i
+                  class="fa fa-code-compare"></i> Differences Only</button>
             </div>
           </div>
 
@@ -695,34 +698,34 @@ $da_active_nav = 'compare';
             <?php
             // Fixed spec schema sourced from add_device.php template
             $specSchema = [
-              'NETWORK'       => ['Technology'],
-              'LAUNCH'        => ['Announced', 'Availability'],
-              'BODY'          => ['Dimensions', 'Weight', 'Materials', 'Connectivity Slot'],
-              'DISPLAY'       => ['Type', 'Size', 'Resolution', 'Protection'],
-              'HARDWARE'      => ['OS', 'System Chip', 'Processor', 'GPU'],
-              'MEMORY'        => ['Expansion Slot', 'Storage'],
-              'MAIN CAMERA'   => ['Dual', 'Features', 'Video Recording'],
+              'NETWORK' => ['Technology'],
+              'LAUNCH' => ['Announced', 'Availability'],
+              'BODY' => ['Dimensions', 'Weight', 'Materials', 'Connectivity Slot'],
+              'DISPLAY' => ['Type', 'Size', 'Resolution', 'Protection'],
+              'HARDWARE' => ['OS', 'System Chip', 'Processor', 'GPU'],
+              'MEMORY' => ['Expansion Slot', 'Storage'],
+              'MAIN CAMERA' => ['Dual', 'Features', 'Video Recording'],
               'SELFIE CAMERA' => ['Single', 'Video Recording'],
-              'MULTIMEDIA'    => ['Audio Output', '3.5mm Jack'],
-              'CONNECTIVITY'  => ['WLAN', 'Bluetooth', 'Location', 'Proximity', 'Infrared Port', 'Radio', 'USB'],
-              'FEATURES'      => ['Sensors'],
-              'BATTERY'       => ['Type', 'Charging', 'Reverse Wired'],
-              'GENERAL INFO'  => ['Colors', 'Versions', 'Price'],
+              'MULTIMEDIA' => ['Audio Output', '3.5mm Jack'],
+              'CONNECTIVITY' => ['WLAN', 'Bluetooth', 'Location', 'Proximity', 'Infrared Port', 'Radio', 'USB'],
+              'FEATURES' => ['Sensors'],
+              'BATTERY' => ['Type', 'Charging', 'Reverse Wired'],
+              'GENERAL INFO' => ['Colors', 'Versions', 'Price'],
             ];
             $sectionDisplayNames = [
-              'NETWORK'       => 'Network',
-              'LAUNCH'        => 'Launch',
-              'BODY'          => 'Body',
-              'DISPLAY'       => 'Display',
-              'HARDWARE'      => 'Hardware',
-              'MEMORY'        => 'System Memory',
-              'MAIN CAMERA'   => 'Main Camera',
+              'NETWORK' => 'Network',
+              'LAUNCH' => 'Launch',
+              'BODY' => 'Body',
+              'DISPLAY' => 'Display',
+              'HARDWARE' => 'Hardware',
+              'MEMORY' => 'System Memory',
+              'MAIN CAMERA' => 'Main Camera',
               'SELFIE CAMERA' => 'Selfie Camera',
-              'MULTIMEDIA'    => 'Multimedia',
-              'CONNECTIVITY'  => 'Connectivity',
-              'FEATURES'      => 'Features',
-              'BATTERY'       => 'Battery',
-              'GENERAL INFO'  => 'General Info',
+              'MULTIMEDIA' => 'Multimedia',
+              'CONNECTIVITY' => 'Connectivity',
+              'FEATURES' => 'Features',
+              'BATTERY' => 'Battery',
+              'GENERAL INFO' => 'General Info',
             ];
             // Build field lookups
             $lk1 = buildSpecLookup($specs1);
@@ -759,35 +762,38 @@ $da_active_nav = 'compare';
               <tbody>
                 <?php foreach ($specSchema as $sectionKey => $subtitles):
                   $displayName = $sectionDisplayNames[$sectionKey] ?? ucfirst(strtolower($sectionKey));
-                ?>
-                <tr class="cpt-section-row">
-                  <td colspan="<?php echo $totalCols; ?>" class="cpt-section-cell"><?php echo htmlspecialchars($displayName); ?></td>
-                </tr>
-                <?php foreach ($subtitles as $subtitle):
-                  $fk = strtolower($subtitle);
-                  $v1 = ($phone1 !== null) ? ($lk1[$sectionKey][$fk] ?? '') : null;
-                  $v2 = ($phone2 !== null) ? ($lk2[$sectionKey][$fk] ?? '') : null;
-                  $v3 = ($phone3 !== null) ? ($lk3[$sectionKey][$fk] ?? '') : null;
-                  // Identical check across all selected slots
-                  $activeVals = array_filter(
-                    [$v1, $v2, $v3],
-                    fn($v) => $v !== null
-                  );
-                  $identical = (count($activeVals) > 1) && (count(array_unique(array_values($activeVals))) === 1);
-                ?>
-                <tr class="cpt-data-row<?php echo $identical ? ' cpt-identical' : ''; ?>" data-identical="<?php echo $identical ? '1' : '0'; ?>">
-                  <td class="cpt-label-cell"><?php echo htmlspecialchars($subtitle); ?></td>
-                  <?php if ($phone1 !== null): ?>
-                    <td class="cpt-val-cell"><?php echo ($v1 !== '') ? nl2br(htmlspecialchars($v1)) : ''; ?></td>
-                  <?php endif; ?>
-                  <?php if ($phone2 !== null): ?>
-                    <td class="cpt-val-cell"><?php echo ($v2 !== '') ? nl2br(htmlspecialchars($v2)) : ''; ?></td>
-                  <?php endif; ?>
-                  <?php if ($phone3 !== null): ?>
-                    <td class="cpt-val-cell"><?php echo ($v3 !== '') ? nl2br(htmlspecialchars($v3)) : ''; ?></td>
-                  <?php endif; ?>
-                </tr>
-                <?php endforeach; ?>
+                  ?>
+                  <tr class="cpt-section-row">
+                    <td colspan="<?php echo $totalCols; ?>" class="cpt-section-cell">
+                      <?php echo htmlspecialchars($displayName); ?>
+                    </td>
+                  </tr>
+                  <?php foreach ($subtitles as $subtitle):
+                    $fk = strtolower($subtitle);
+                    $v1 = ($phone1 !== null) ? ($lk1[$sectionKey][$fk] ?? '') : null;
+                    $v2 = ($phone2 !== null) ? ($lk2[$sectionKey][$fk] ?? '') : null;
+                    $v3 = ($phone3 !== null) ? ($lk3[$sectionKey][$fk] ?? '') : null;
+                    // Identical check across all selected slots
+                    $activeVals = array_filter(
+                      [$v1, $v2, $v3],
+                      fn($v) => $v !== null
+                    );
+                    $identical = (count($activeVals) > 1) && (count(array_unique(array_values($activeVals))) === 1);
+                    ?>
+                    <tr class="cpt-data-row<?php echo $identical ? ' cpt-identical' : ''; ?>"
+                      data-identical="<?php echo $identical ? '1' : '0'; ?>">
+                      <td class="cpt-label-cell"><?php echo htmlspecialchars($subtitle); ?></td>
+                      <?php if ($phone1 !== null): ?>
+                        <td class="cpt-val-cell"><?php echo ($v1 !== '') ? nl2br(htmlspecialchars($v1)) : ''; ?></td>
+                      <?php endif; ?>
+                      <?php if ($phone2 !== null): ?>
+                        <td class="cpt-val-cell"><?php echo ($v2 !== '') ? nl2br(htmlspecialchars($v2)) : ''; ?></td>
+                      <?php endif; ?>
+                      <?php if ($phone3 !== null): ?>
+                        <td class="cpt-val-cell"><?php echo ($v3 !== '') ? nl2br(htmlspecialchars($v3)) : ''; ?></td>
+                      <?php endif; ?>
+                    </tr>
+                  <?php endforeach; ?>
                 <?php endforeach; ?>
               </tbody>
             </table>
@@ -985,7 +991,7 @@ $da_active_nav = 'compare';
     const searchResults = document.getElementById('da-search-results');
     if (searchInput && searchResults) {
       let searchTimer;
-      searchInput.addEventListener('input', function() {
+      searchInput.addEventListener('input', function () {
         clearTimeout(searchTimer);
         const q = this.value.trim();
         if (q.length < 2) { searchResults.classList.remove('open'); return; }
@@ -1002,7 +1008,7 @@ $da_active_nav = 'compare';
             }
             let html = '';
             devices.forEach(d => { html += `<a href="${window.baseURL}device/${encodeURIComponent(d.slug || d.id)}" class="da-search-result-item">${d.image ? `<img src="${d.image}" onerror="this.style.display='none'">` : ''}<div><div class="sr-text">${d.name}</div><div class="sr-meta"><i class="fa fa-mobile-screen me-1"></i>${d.brand_name || 'Device'}</div></div></a>`; });
-            posts.forEach(p => { html += `<a href="${window.baseURL}post/${encodeURIComponent(p.slug)}" class="da-search-result-item">${p.featured_image ? `<img src="${p.featured_image}" onerror="this.style.display='none'">` : ''}<div><div class="sr-text">${p.title}</div><div class="sr-meta"><i class="fa fa-newspaper me-1"></i>${p.created_at ? p.created_at.substring(0,10) : 'Article'}</div></div></a>`; });
+            posts.forEach(p => { html += `<a href="${window.baseURL}post/${encodeURIComponent(p.slug)}" class="da-search-result-item">${p.featured_image ? `<img src="${p.featured_image}" onerror="this.style.display='none'">` : ''}<div><div class="sr-text">${p.title}</div><div class="sr-meta"><i class="fa fa-newspaper me-1"></i>${p.created_at ? p.created_at.substring(0, 10) : 'Article'}</div></div></a>`; });
             searchResults.innerHTML = html;
             searchResults.classList.add('open');
           });
@@ -1013,7 +1019,7 @@ $da_active_nav = 'compare';
 
     // ── Newsletter ──
     const newsletterBtn = document.getElementById('da-newsletter-btn');
-    if (newsletterBtn) newsletterBtn.addEventListener('click', function() {
+    if (newsletterBtn) newsletterBtn.addEventListener('click', function () {
       const email = document.getElementById('da-newsletter-email').value.trim();
       const msg = document.getElementById('da-newsletter-msg');
       if (!email) { msg.textContent = 'Please enter your email.'; msg.className = 'error'; return; }
@@ -1026,7 +1032,7 @@ $da_active_nav = 'compare';
     // ── Notification ──
     function markNotificationsAsSeen() {
       ['notifDotDesktop'].forEach(id => { const el = document.getElementById(id); if (el) el.style.display = 'none'; });
-      fetch(window.baseURL + 'notification_handler.php', { method: 'POST', headers: { 'Content-Type': 'application/x-www-form-urlencoded' }, body: 'action=mark_seen' }).catch(() => {});
+      fetch(window.baseURL + 'notification_handler.php', { method: 'POST', headers: { 'Content-Type': 'application/x-www-form-urlencoded' }, body: 'action=mark_seen' }).catch(() => { });
     }
     const bell = document.getElementById('notificationBellDesktop');
     if (bell) bell.addEventListener('click', () => setTimeout(markNotificationsAsSeen, 100));
@@ -1043,13 +1049,13 @@ $da_active_nav = 'compare';
       el.style.display = 'block';
     }
     const loginForm = document.getElementById('publicLoginForm');
-    if (loginForm) loginForm.addEventListener('submit', function(e) {
+    if (loginForm) loginForm.addEventListener('submit', function (e) {
       e.preventDefault();
       const btn = document.getElementById('loginSubmitBtn'); btn.disabled = true; btn.innerHTML = '<i class="fa fa-spinner fa-spin me-1"></i>Logging in...';
       userAuthFetch('login', new FormData(this)).then(data => { if (data.success) { showAuthMsg('login-message', data.message, 'success'); setTimeout(() => location.reload(), 800); } else { showAuthMsg('login-message', data.message, 'danger'); btn.disabled = false; btn.innerHTML = '<i class="fa fa-right-to-bracket me-1"></i>Login'; } }).catch(() => { showAuthMsg('login-message', 'An error occurred.', 'danger'); btn.disabled = false; btn.innerHTML = '<i class="fa fa-right-to-bracket me-1"></i>Login'; });
     });
     const signupForm = document.getElementById('publicSignupForm');
-    if (signupForm) signupForm.addEventListener('submit', function(e) {
+    if (signupForm) signupForm.addEventListener('submit', function (e) {
       e.preventDefault();
       const btn = document.getElementById('signupSubmitBtn'); btn.disabled = true; btn.innerHTML = '<i class="fa fa-spinner fa-spin me-1"></i>Creating account...';
       userAuthFetch('register', new FormData(this)).then(data => { if (data.success) { showAuthMsg('signup-message', data.message, 'success'); setTimeout(() => location.reload(), 800); } else { showAuthMsg('signup-message', data.message, 'danger'); btn.disabled = false; btn.innerHTML = '<i class="fa fa-user-plus me-1"></i>Create Account'; } }).catch(() => { showAuthMsg('signup-message', 'An error occurred.', 'danger'); btn.disabled = false; btn.innerHTML = '<i class="fa fa-user-plus me-1"></i>Create Account'; });
@@ -1063,7 +1069,7 @@ $da_active_nav = 'compare';
       userAuthFetch('delete_account', fd).then(data => { showAuthMsg('profile-message', data.message, data.success ? 'success' : 'danger'); if (data.success) setTimeout(() => location.reload(), 1000); else { btn.disabled = false; btn.innerHTML = '<i class="fa fa-trash me-1"></i>Delete Account'; } }).catch(() => { showAuthMsg('profile-message', 'An error occurred.', 'danger'); btn.disabled = false; btn.innerHTML = '<i class="fa fa-trash me-1"></i>Delete Account'; });
     }
     const profileForm = document.getElementById('profileUpdateForm');
-    if (profileForm) profileForm.addEventListener('submit', function(e) {
+    if (profileForm) profileForm.addEventListener('submit', function (e) {
       e.preventDefault();
       const btn = document.getElementById('profileUpdateBtn'); btn.disabled = true; btn.innerHTML = '<i class="fa fa-spinner fa-spin me-1"></i>Saving...';
       userAuthFetch('update_profile', new FormData(this)).then(data => { showAuthMsg('profile-message', data.message, data.success ? 'success' : 'danger'); if (data.success) setTimeout(() => location.reload(), 1000); btn.disabled = false; btn.innerHTML = '<i class="fa fa-save me-1"></i>Save Changes'; }).catch(() => { showAuthMsg('profile-message', 'An error occurred.', 'danger'); btn.disabled = false; btn.innerHTML = '<i class="fa fa-save me-1"></i>Save Changes'; });
@@ -1096,7 +1102,7 @@ $da_active_nav = 'compare';
       }
     });
 
-    // Auto-Sliders moved to redesign/sliders.js
+    // Auto-Sliders moved to sliders.js
 
     // ── Navbar scroll effect ──
     const navbar = document.getElementById('da-navbar');
@@ -1137,7 +1143,7 @@ $da_active_nav = 'compare';
     const searchResults = document.getElementById('da-search-results');
     if (searchInput && searchResults) {
       let searchTimer;
-      searchInput.addEventListener('input', function() {
+      searchInput.addEventListener('input', function () {
         clearTimeout(searchTimer);
         const q = this.value.trim();
         if (q.length < 2) {
@@ -1170,7 +1176,7 @@ $da_active_nav = 'compare';
             posts.forEach(p => {
               html += `<a href="${baseURL}post/${encodeURIComponent(p.slug)}" class="da-search-result-item">
           ${p.featured_image ? `<img src="${p.featured_image}" onerror="this.style.display='none'">` : ''}
-          <div><div class="sr-text">${p.title}</div><div class="sr-meta"><i class="fa fa-newspaper me-1"></i>${p.created_at ? p.created_at.substring(0,10) : 'Article'}</div></div>
+          <div><div class="sr-text">${p.title}</div><div class="sr-meta"><i class="fa fa-newspaper me-1"></i>${p.created_at ? p.created_at.substring(0, 10) : 'Article'}</div></div>
         </a>`;
             });
             searchResults.innerHTML = html;
@@ -1185,7 +1191,7 @@ $da_active_nav = 'compare';
     }
 
     // ── Newsletter ──
-    document.getElementById('da-newsletter-btn').addEventListener('click', function() {
+    document.getElementById('da-newsletter-btn').addEventListener('click', function () {
       const email = document.getElementById('da-newsletter-email').value.trim();
       const msg = document.getElementById('da-newsletter-msg');
       if (!email) {
@@ -1197,12 +1203,12 @@ $da_active_nav = 'compare';
       this.textContent = 'Subscribing...';
       const btn = this;
       fetch(baseURL + 'handle_newsletter.php', {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/x-www-form-urlencoded'
-          },
-          body: 'newsletter_email=' + encodeURIComponent(email)
-        })
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/x-www-form-urlencoded'
+        },
+        body: 'newsletter_email=' + encodeURIComponent(email)
+      })
         .then(r => r.json())
         .then(data => {
           msg.textContent = data.message;
@@ -1231,7 +1237,7 @@ $da_active_nav = 'compare';
           'Content-Type': 'application/x-www-form-urlencoded'
         },
         body: 'action=mark_seen'
-      }).catch(() => {});
+      }).catch(() => { });
     }
     const bell = document.getElementById('notificationBellDesktop');
     if (bell) bell.addEventListener('click', () => setTimeout(markNotificationsAsSeen, 100));
@@ -1253,7 +1259,7 @@ $da_active_nav = 'compare';
     }
 
     const loginForm = document.getElementById('publicLoginForm');
-    if (loginForm) loginForm.addEventListener('submit', function(e) {
+    if (loginForm) loginForm.addEventListener('submit', function (e) {
       e.preventDefault();
       const btn = document.getElementById('loginSubmitBtn');
       btn.disabled = true;
@@ -1275,7 +1281,7 @@ $da_active_nav = 'compare';
     });
 
     const signupForm = document.getElementById('publicSignupForm');
-    if (signupForm) signupForm.addEventListener('submit', function(e) {
+    if (signupForm) signupForm.addEventListener('submit', function (e) {
       e.preventDefault();
       const btn = document.getElementById('signupSubmitBtn');
       btn.disabled = true;
@@ -1312,7 +1318,7 @@ $da_active_nav = 'compare';
     }
 
     const profileForm = document.getElementById('profileUpdateForm');
-    if (profileForm) profileForm.addEventListener('submit', function(e) {
+    if (profileForm) profileForm.addEventListener('submit', function (e) {
       e.preventDefault();
       const btn = document.getElementById('profileUpdateBtn');
       btn.disabled = true;
@@ -1357,12 +1363,12 @@ $da_active_nav = 'compare';
 
     function publicUserLogout() {
       fetch(baseURL + 'notification_handler.php', {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/x-www-form-urlencoded'
-          },
-          body: 'action=reset'
-        })
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/x-www-form-urlencoded'
+        },
+        body: 'action=reset'
+      })
         .finally(() => {
           userAuthFetch('logout', new FormData()).then(() => location.reload());
         });
@@ -1378,7 +1384,7 @@ $da_active_nav = 'compare';
       setTimeout(() => new bootstrap.Modal(document.getElementById('loginModal')).show(), 300);
     }
   </script>
-  <script src="<?php echo $base; ?>redesign/sliders.js"></script>
+  <script src="<?php echo $base; ?>sliders.js"></script>
 </body>
 
 </html>

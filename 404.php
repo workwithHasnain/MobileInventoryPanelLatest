@@ -68,8 +68,7 @@ $brands = $brands_stmt->fetchAll();
   <meta name="description"
     content="Oops! The page you are looking for does not exist on DevicesArena. Browse our latest smartphones and tech news instead." />
   <meta property="og:title" content="Page Not Found — DevicesArena" />
-  <meta property="og:description"
-    content="The requested page could not be found. Let's get you back on track." />
+  <meta property="og:description" content="The requested page could not be found. Let's get you back on track." />
   <meta property="og:image" content="<?php echo $base; ?>imges/icon-256.png" />
   <meta property="og:type" content="website" />
   <meta name="twitter:card" content="summary" />
@@ -95,7 +94,7 @@ $brands = $brands_stmt->fetchAll();
     rel="stylesheet">
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/css/bootstrap.min.css" rel="stylesheet">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" />
-  <link rel="stylesheet" href="<?php echo $base; ?>redesign/style.css">
+  <link rel="stylesheet" href="<?php echo $base; ?>style.css">
 
   <!-- Schema.org Structured Data for About Us Page -->
   <?php
@@ -225,8 +224,9 @@ $brands = $brands_stmt->fetchAll();
         <div class="da-404-container">
           <div class="da-404-number">404!</div>
           <h2 class="da-404-title">Page Not Found!</h2>
-          <p class="da-404-text">The link you followed might be broken, or the page may have been moved. Either way, we've got plenty of other tech to explore.</p>
-          
+          <p class="da-404-text">The link you followed might be broken, or the page may have been moved. Either way,
+            we've got plenty of other tech to explore.</p>
+
           <div class="da-404-btn-group">
             <a href="<?php echo $base; ?>" class="da-404-btn primary">
               <i class="fa fa-home"></i> Back to Home
@@ -310,7 +310,7 @@ $brands = $brands_stmt->fetchAll();
       }
     });
 
-    // Auto-Sliders moved to redesign/sliders.js
+    // Auto-Sliders moved to sliders.js
 
     // ── Navbar scroll effect ──
     const navbar = document.getElementById('da-navbar');
@@ -634,7 +634,7 @@ $brands = $brands_stmt->fetchAll();
       }
     })();
   </script>
-  <script src="<?php echo $base; ?>redesign/sliders.js"></script>
+  <script src="<?php echo $base; ?>sliders.js"></script>
 </body>
 
 </html>

@@ -15,11 +15,14 @@ require_once __DIR__ . '/phone_data.php';
 // Helper function to make image paths absolute
 function getAbsoluteImagePath($imagePath, $base)
 {
-  if (empty($imagePath)) return '';
+  if (empty($imagePath))
+    return '';
   // Already an absolute URL
-  if (filter_var($imagePath, FILTER_VALIDATE_URL)) return $imagePath;
+  if (filter_var($imagePath, FILTER_VALIDATE_URL))
+    return $imagePath;
   // Already an absolute path starting with /
-  if (strpos($imagePath, '/') === 0) return $imagePath;
+  if (strpos($imagePath, '/') === 0)
+    return $imagePath;
   // Relative path - prepend base
   return $base . ltrim($imagePath, '/');
 }
@@ -70,14 +73,14 @@ function extractPriceFromMisc($miscJson)
 
   // Search for price field in misc data
   foreach ($decoded as $row) {
-    $field = isset($row['field']) ? trim(strtolower((string)$row['field'])) : '';
-    $desc = isset($row['description']) ? trim((string)$row['description']) : '';
+    $field = isset($row['field']) ? trim(strtolower((string) $row['field'])) : '';
+    $desc = isset($row['description']) ? trim((string) $row['description']) : '';
 
     if ($field === 'price' && $desc !== '') {
       // Extract numeric value from description (e.g., "$999" or "999 USD" or "999")
       $priceStr = preg_replace('/[^0-9.]/', '', $desc);
       if ($priceStr !== '' && is_numeric($priceStr)) {
-        return (float)$priceStr;
+        return (float) $priceStr;
       }
     }
   }
@@ -93,7 +96,8 @@ $pdo = getConnection();
 $isPublicUser = !empty($_SESSION['public_user_id']);
 $publicUserName = $_SESSION['public_user_name'] ?? '';
 $publicUserInitial = $isPublicUser ? strtoupper(substr($publicUserName, 0, 1)) : '';
-if (!isset($_SESSION['notif_seen'])) $_SESSION['notif_seen'] = false;
+if (!isset($_SESSION['notif_seen']))
+  $_SESSION['notif_seen'] = false;
 $hasUnreadNotifications = $isPublicUser && !$_SESSION['notif_seen'];
 
 // Weekly posts for notification bell
@@ -246,7 +250,8 @@ function getDeviceImages($device)
             foreach ($parts as $part) {
               $cleaned = trim($part);
               // Remove quotes if present
-              if ((strlen($cleaned) >= 2) &&
+              if (
+                (strlen($cleaned) >= 2) &&
                 (($cleaned[0] === '"' && substr($cleaned, -1) === '"') ||
                   ($cleaned[0] === "'" && substr($cleaned, -1) === "'"))
               ) {
@@ -370,7 +375,8 @@ function formatDeviceSpecs($device)
 
   // Helper: parse a section from JSON and return structured data (not concatenated HTML)
   $parseJsonSection = function ($jsonValue, $sectionName = '') {
-    if (!isset($jsonValue) || $jsonValue === '' || $jsonValue === null) return [];
+    if (!isset($jsonValue) || $jsonValue === '' || $jsonValue === null)
+      return [];
     $decoded = json_decode($jsonValue, true);
     if (json_last_error() !== JSON_ERROR_NONE || !is_array($decoded)) {
       return [];
@@ -380,10 +386,11 @@ function formatDeviceSpecs($device)
     $currentField = null;
 
     foreach ($decoded as $row) {
-      $field = isset($row['field']) ? trim((string)$row['field']) : '';
-      $desc = isset($row['description']) ? trim((string)$row['description']) : '';
+      $field = isset($row['field']) ? trim((string) $row['field']) : '';
+      $desc = isset($row['description']) ? trim((string) $row['description']) : '';
 
-      if ($field === '' && $desc === '') continue;
+      if ($field === '' && $desc === '')
+        continue;
 
       // Each field becomes a separate row: field is subtitle, desc is description
       if ($field !== '') {
@@ -433,16 +440,23 @@ function formatDeviceSpecs($device)
   // Legacy fallback: Network
   if (!isset($specs['NETWORK'])) {
     $network_tech = [];
-    if (!empty($device['network_2g'])) $network_tech[] = '2G';
-    if (!empty($device['network_3g'])) $network_tech[] = '3G';
-    if (!empty($device['network_4g'])) $network_tech[] = '4G';
-    if (!empty($device['network_5g'])) $network_tech[] = '5G';
+    if (!empty($device['network_2g']))
+      $network_tech[] = '2G';
+    if (!empty($device['network_3g']))
+      $network_tech[] = '3G';
+    if (!empty($device['network_4g']))
+      $network_tech[] = '4G';
+    if (!empty($device['network_5g']))
+      $network_tech[] = '5G';
 
     if (!empty($network_tech)) {
       $network_details = '<strong>Technology</strong> ' . $truncateText(implode(' / ', $network_tech), 60);
-      if (!empty($device['dual_sim'])) $network_details .= '<br><strong>Connectivity Slot</strong> ' . $truncateText('Dual SIM', 60);
-      if (!empty($device['esim'])) $network_details .= ', eSIM';
-      if (!empty($device['sim_size'])) $network_details .= ' (' . $device['sim_size'] . ')';
+      if (!empty($device['dual_sim']))
+        $network_details .= '<br><strong>Connectivity Slot</strong> ' . $truncateText('Dual SIM', 60);
+      if (!empty($device['esim']))
+        $network_details .= ', eSIM';
+      if (!empty($device['sim_size']))
+        $network_details .= ' (' . $device['sim_size'] . ')';
       $specs['NETWORK'] = $network_details;
     }
   }
@@ -454,7 +468,8 @@ function formatDeviceSpecs($device)
       $launch_details .= '<strong>Released</strong> ' . $truncateText(date('F j, Y', strtotime($device['release_date'])), 60);
     }
     if (!empty($device['availability'])) {
-      if ($launch_details) $launch_details .= '<br>';
+      if ($launch_details)
+        $launch_details .= '<br>';
       $launch_details .= '<strong>Availability</strong> ' . $truncateText($device['availability'], 60);
     }
     if (!empty($device['price'])) {
@@ -480,7 +495,8 @@ function formatDeviceSpecs($device)
       $body_details .= '<strong>Dimensions</strong> ' . $truncateText($dims, 60);
     }
     if (!empty($device['weight'])) {
-      if ($body_details) $body_details .= '<br>';
+      if ($body_details)
+        $body_details .= '<br>';
       $body_details .= '<strong>Weight</strong> ' . $truncateText($device['weight'] . ' g', 60);
     }
     $specs['BODY'] = $body_details;
@@ -491,18 +507,24 @@ function formatDeviceSpecs($device)
     $display_details = '';
     if (!empty($device['display_type'])) {
       $displayType = $device['display_type'];
-      if (!empty($device['display_technology'])) $displayType .= ', ' . $device['display_technology'];
-      if (!empty($device['refresh_rate'])) $displayType .= ', ' . $device['refresh_rate'] . 'Hz';
-      if (!empty($device['hdr'])) $displayType .= ', HDR';
-      if (!empty($device['billion_colors'])) $displayType .= ', 1B colors';
+      if (!empty($device['display_technology']))
+        $displayType .= ', ' . $device['display_technology'];
+      if (!empty($device['refresh_rate']))
+        $displayType .= ', ' . $device['refresh_rate'] . 'Hz';
+      if (!empty($device['hdr']))
+        $displayType .= ', HDR';
+      if (!empty($device['billion_colors']))
+        $displayType .= ', 1B colors';
       $display_details .= '<strong>Type</strong> ' . $truncateText($displayType, 60);
     }
     if (!empty($device['display_size'])) {
-      if ($display_details) $display_details .= '<br>';
+      if ($display_details)
+        $display_details .= '<br>';
       $display_details .= '<strong>Size</strong> ' . $truncateText($device['display_size'] . ' inches', 60);
     }
     if (!empty($device['display_resolution'])) {
-      if ($display_details) $display_details .= '<br>';
+      if ($display_details)
+        $display_details .= '<br>';
       $display_details .= '<strong>Resolution</strong> ' . $truncateText($device['display_resolution'], 60);
     }
     $specs['DISPLAY'] = $display_details;
@@ -515,18 +537,23 @@ function formatDeviceSpecs($device)
       $platform_details .= '<strong>OS</strong> ' . $truncateText($device['os'], 60);
     }
     if (!empty($device['chipset_name'])) {
-      if ($platform_details) $platform_details .= '<br>';
+      if ($platform_details)
+        $platform_details .= '<br>';
       $platform_details .= '<strong>System Chip</strong> ' . $truncateText($device['chipset_name'], 60);
     }
     if (!empty($device['cpu_cores']) || !empty($device['cpu_frequency'])) {
-      if ($platform_details) $platform_details .= '<br>';
+      if ($platform_details)
+        $platform_details .= '<br>';
       $cpu_info = '';
-      if (!empty($device['cpu_cores'])) $cpu_info .= $device['cpu_cores'] . '-core';
-      if (!empty($device['cpu_frequency'])) $cpu_info .= ' (' . $device['cpu_frequency'] . ' GHz)';
+      if (!empty($device['cpu_cores']))
+        $cpu_info .= $device['cpu_cores'] . '-core';
+      if (!empty($device['cpu_frequency']))
+        $cpu_info .= ' (' . $device['cpu_frequency'] . ' GHz)';
       $platform_details .= '<strong>Processor</strong> ' . $truncateText($cpu_info, 60);
     }
     if (!empty($device['gpu'])) {
-      if ($platform_details) $platform_details .= '<br>';
+      if ($platform_details)
+        $platform_details .= '<br>';
       $platform_details .= '<strong>GPU</strong> ' . $truncateText($device['gpu'], 60);
     }
     $specs['HARDWARE'] = $platform_details;
@@ -539,10 +566,13 @@ function formatDeviceSpecs($device)
       $memory_details .= '<strong>Expansion Slot</strong> ' . $truncateText(htmlspecialchars($device['card_slot']), 60);
     }
     if (!empty($device['storage']) || !empty($device['ram'])) {
-      if ($memory_details) $memory_details .= '<br>';
+      if ($memory_details)
+        $memory_details .= '<br>';
       $storage_info = '';
-      if (!empty($device['storage'])) $storage_info .= $device['storage'];
-      if (!empty($device['ram'])) $storage_info .= ' RAM: ' . $device['ram'];
+      if (!empty($device['storage']))
+        $storage_info .= $device['storage'];
+      if (!empty($device['ram']))
+        $storage_info .= ' RAM: ' . $device['ram'];
       $memory_details .= '<strong>Storage</strong> ' . $truncateText($storage_info, 60);
     }
     $specs['MEMORY'] = $memory_details;
@@ -562,11 +592,16 @@ function formatDeviceSpecs($device)
 
     // Camera features
     $features = [];
-    if (!empty($device['main_camera_ois'])) $features[] = 'OIS';
-    if (!empty($device['main_camera_telephoto'])) $features[] = 'Telephoto';
-    if (!empty($device['main_camera_ultrawide'])) $features[] = 'Ultrawide';
-    if (!empty($device['main_camera_macro'])) $features[] = 'Macro';
-    if (!empty($device['main_camera_flash'])) $features[] = 'Flash';
+    if (!empty($device['main_camera_ois']))
+      $features[] = 'OIS';
+    if (!empty($device['main_camera_telephoto']))
+      $features[] = 'Telephoto';
+    if (!empty($device['main_camera_ultrawide']))
+      $features[] = 'Ultrawide';
+    if (!empty($device['main_camera_macro']))
+      $features[] = 'Macro';
+    if (!empty($device['main_camera_flash']))
+      $features[] = 'Flash';
     if (isset($device['main_camera_features']) && is_array($device['main_camera_features'])) {
       $features = array_merge($features, $device['main_camera_features']);
     } elseif (isset($device['main_camera_features']) && is_string($device['main_camera_features'])) {
@@ -617,7 +652,8 @@ function formatDeviceSpecs($device)
       $sound_details .= '<strong>Audio Output</strong> ' . ($device['dual_speakers'] ? 'Yes' : 'No');
     }
     if (isset($device['headphone_jack']) && $device['headphone_jack'] !== null) {
-      if ($sound_details) $sound_details .= '<br>';
+      if ($sound_details)
+        $sound_details .= '<br>';
       $sound_details .= '<strong>3.5mm jack</strong> ' . ($device['headphone_jack'] ? 'Yes' : 'No');
     }
     $specs['MULTIMEDIA'] = $sound_details;
@@ -630,23 +666,28 @@ function formatDeviceSpecs($device)
       $comms_details .= '<strong>WLAN</strong> ' . $truncateText($device['wifi'], 60);
     }
     if (!empty($device['bluetooth'])) {
-      if ($comms_details) $comms_details .= '<br>';
+      if ($comms_details)
+        $comms_details .= '<br>';
       $comms_details .= '<strong>Bluetooth</strong> ' . $truncateText($device['bluetooth'], 60);
     }
     if (isset($device['gps']) && $device['gps'] !== null) {
-      if ($comms_details) $comms_details .= '<br>';
+      if ($comms_details)
+        $comms_details .= '<br>';
       $comms_details .= '<strong>Location</strong> ' . ($device['gps'] ? 'GPS' : 'No');
     }
     if (isset($device['nfc']) && $device['nfc'] !== null) {
-      if ($comms_details) $comms_details .= '<br>';
+      if ($comms_details)
+        $comms_details .= '<br>';
       $comms_details .= '<strong>Proximity</strong> ' . ($device['nfc'] ? 'Yes' : 'No');
     }
     if (isset($device['fm_radio']) && $device['fm_radio'] !== null) {
-      if ($comms_details) $comms_details .= '<br>';
+      if ($comms_details)
+        $comms_details .= '<br>';
       $comms_details .= '<strong>Radio</strong> ' . ($device['fm_radio'] ? 'Yes' : 'No');
     }
     if (!empty($device['usb'])) {
-      if ($comms_details) $comms_details .= '<br>';
+      if ($comms_details)
+        $comms_details .= '<br>';
       $comms_details .= '<strong>USB</strong> ' . $truncateText($device['usb'], 60);
     }
     if ($comms_details) {
@@ -663,15 +704,22 @@ function formatDeviceSpecs($device)
 
     // Build sensors list from individual sensor fields
     $sensors = [];
-    if (!empty($device['accelerometer'])) $sensors[] = 'Accelerometer';
-    if (!empty($device['gyro'])) $sensors[] = 'Gyro';
-    if (!empty($device['compass'])) $sensors[] = 'Compass';
-    if (!empty($device['proximity'])) $sensors[] = 'Proximity';
-    if (!empty($device['barometer'])) $sensors[] = 'Barometer';
-    if (!empty($device['heart_rate'])) $sensors[] = 'Heart Rate';
+    if (!empty($device['accelerometer']))
+      $sensors[] = 'Accelerometer';
+    if (!empty($device['gyro']))
+      $sensors[] = 'Gyro';
+    if (!empty($device['compass']))
+      $sensors[] = 'Compass';
+    if (!empty($device['proximity']))
+      $sensors[] = 'Proximity';
+    if (!empty($device['barometer']))
+      $sensors[] = 'Barometer';
+    if (!empty($device['heart_rate']))
+      $sensors[] = 'Heart Rate';
 
     if (!empty($sensors)) {
-      if ($features_details) $features_details .= '<br>';
+      if ($features_details)
+        $features_details .= '<br>';
       $features_details .= '<strong>Sensors</strong> ' . $truncateText(implode(', ', $sensors), 60);
     }
 
@@ -685,22 +733,27 @@ function formatDeviceSpecs($device)
     $battery_details = '';
     if (!empty($device['battery_capacity'])) {
       $battery_capacity = $device['battery_capacity'];
-      if (!empty($device['battery_sic'])) $battery_capacity .= ' (Silicon)';
+      if (!empty($device['battery_sic']))
+        $battery_capacity .= ' (Silicon)';
       $battery_details .= '<strong>Capacity</strong> ' . $truncateText($battery_capacity, 60);
     }
 
     if (isset($device['battery_removable']) && $device['battery_removable'] !== null) {
-      if ($battery_details) $battery_details .= '<br>';
+      if ($battery_details)
+        $battery_details .= '<br>';
       $battery_details .= '<strong>Removable</strong> ' . ($device['battery_removable'] ? 'Yes' : 'No');
     }
 
     // Charging information
     $charging = [];
-    if (!empty($device['wired_charging'])) $charging[] = 'Wired: ' . $device['wired_charging'];
-    if (!empty($device['wireless_charging'])) $charging[] = 'Wireless: ' . $device['wireless_charging'];
+    if (!empty($device['wired_charging']))
+      $charging[] = 'Wired: ' . $device['wired_charging'];
+    if (!empty($device['wireless_charging']))
+      $charging[] = 'Wireless: ' . $device['wireless_charging'];
 
     if (!empty($charging)) {
-      if ($battery_details) $battery_details .= '<br>';
+      if ($battery_details)
+        $battery_details .= '<br>';
       $battery_details .= '<strong>Charging</strong> ' . $truncateText(implode(', ', $charging), 60);
     }
 
@@ -793,7 +846,7 @@ function generateDeviceStats($device)
   // Camera stats
   $camera_title = 'N/A';
   $camera_subtitle = 'N/A';
-  $resolutionText = (string)($device['main_camera_resolution'] ?? '');
+  $resolutionText = (string) ($device['main_camera_resolution'] ?? '');
   if (!empty($device['main_camera_resolution'])) {
     // Extract MP from resolution
     if (preg_match('/(\d+)\s*MP/', $resolutionText, $matches)) {
@@ -936,11 +989,16 @@ function timeAgo($datetime)
 {
   $time = time() - strtotime($datetime);
 
-  if ($time < 60) return 'just now';
-  if ($time < 3600) return floor($time / 60) . ' minutes ago';
-  if ($time < 86400) return floor($time / 3600) . ' hours ago';
-  if ($time < 2592000) return floor($time / 86400) . ' days ago';
-  if ($time < 31536000) return floor($time / 2592000) . ' months ago';
+  if ($time < 60)
+    return 'just now';
+  if ($time < 3600)
+    return floor($time / 60) . ' minutes ago';
+  if ($time < 86400)
+    return floor($time / 3600) . ' hours ago';
+  if ($time < 2592000)
+    return floor($time / 86400) . ' days ago';
+  if ($time < 31536000)
+    return floor($time / 2592000) . ' months ago';
 
   return floor($time / 31536000) . ' years ago';
 }
@@ -1066,11 +1124,16 @@ $commentCount = getDeviceCommentCount($pdo, $device_id);
     $meta_description = htmlspecialchars($device['meta_desc']);
   } else {
     $desc_parts = [];
-    if (!empty($device['display_size'])) $desc_parts[] = $device['display_size'] . '" display';
-    if (!empty($device['main_camera_resolution'])) $desc_parts[] = $device['main_camera_resolution'] . ' camera';
-    if (!empty($device['battery_capacity'])) $desc_parts[] = $device['battery_capacity'] . ' battery';
-    if (!empty($device['ram'])) $desc_parts[] = $device['ram'] . ' RAM';
-    if (!empty($device['storage'])) $desc_parts[] = $device['storage'] . ' storage';
+    if (!empty($device['display_size']))
+      $desc_parts[] = $device['display_size'] . '" display';
+    if (!empty($device['main_camera_resolution']))
+      $desc_parts[] = $device['main_camera_resolution'] . ' camera';
+    if (!empty($device['battery_capacity']))
+      $desc_parts[] = $device['battery_capacity'] . ' battery';
+    if (!empty($device['ram']))
+      $desc_parts[] = $device['ram'] . ' RAM';
+    if (!empty($device['storage']))
+      $desc_parts[] = $device['storage'] . ' storage';
 
     $specs_text = !empty($desc_parts) ? implode(', ', $desc_parts) : 'full specifications';
     $meta_description = htmlspecialchars("Explore detailed specifications, reviews, and features of the {$brand_name} {$device_name}. {$specs_text} and more on DevicesArena.");
@@ -1093,8 +1156,9 @@ $commentCount = getDeviceCommentCount($pdo, $device_id);
   <link rel="icon" type="image/png" sizes="32x32" href="<?php echo $base; ?>imges/icon-32.png">
   <link rel="shortcut icon" href="<?php echo $base; ?>imges/icon-32.png">
   <meta name="theme-color" content="#0d0f1a">
-  
-  <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-9906394285054446" crossorigin="anonymous"></script>
+
+  <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-9906394285054446"
+    crossorigin="anonymous"></script>
   <!-- Google Analytics -->
   <script async src="https://www.googletagmanager.com/gtag/js?id=G-2LDCSSMXJT"></script>
   <script>
@@ -1104,13 +1168,15 @@ $commentCount = getDeviceCommentCount($pdo, $device_id);
     gtag('config', 'G-2LDCSSMXJT');
   </script>
 
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link
+    href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=Space+Grotesk:wght@400;500;600;700&display=swap"
+    rel="stylesheet">
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/css/bootstrap.min.css" rel="stylesheet">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" />
-  <link rel="stylesheet" href="<?php echo $base; ?>redesign/style.css">
+  <link rel="stylesheet" href="<?php echo $base; ?>style.css">
 
   <script>
-    (function() {
+    (function () {
       var savedTheme = localStorage.getItem('da-theme');
       if (savedTheme === 'light' || (!savedTheme && window.matchMedia('(prefers-color-scheme: light)').matches)) {
         document.documentElement.setAttribute('data-theme', 'light');
@@ -1128,17 +1194,25 @@ $commentCount = getDeviceCommentCount($pdo, $device_id);
     $deviceType = "Smartphone";
     if (isset($device['type'])) {
       $type_lower = strtolower($device['type']);
-      if (strpos($type_lower, 'tablet') !== false) $deviceType = "Tablets";
-      elseif (strpos($type_lower, 'watch') !== false) $deviceType = "Smartwatches";
-      else $deviceType = "Smartphones";
+      if (strpos($type_lower, 'tablet') !== false)
+        $deviceType = "Tablets";
+      elseif (strpos($type_lower, 'watch') !== false)
+        $deviceType = "Smartwatches";
+      else
+        $deviceType = "Smartphones";
     }
 
     $breadcrumbItems[] = [
-      "@type" => "ListItem", "position" => 2, "name" => $deviceType, "item" => "https://www.devicesarena.com/" . strtolower(str_replace(" ", "", $deviceType))
+      "@type" => "ListItem",
+      "position" => 2,
+      "name" => $deviceType,
+      "item" => "https://www.devicesarena.com/" . strtolower(str_replace(" ", "", $deviceType))
     ];
 
     $breadcrumbItems[] = [
-      "@type" => "ListItem", "position" => 3, "name" => (isset($device['brand_name']) ? $device['brand_name'] . " " : "") . (isset($device['name']) ? $device['name'] : "Device"),
+      "@type" => "ListItem",
+      "position" => 3,
+      "name" => (isset($device['brand_name']) ? $device['brand_name'] . " " : "") . (isset($device['name']) ? $device['name'] : "Device"),
       "item" => "https://www.devicesarena.com/device/" . htmlspecialchars($device_slug)
     ];
   }
@@ -1170,11 +1244,14 @@ $commentCount = getDeviceCommentCount($pdo, $device_id);
         <!-- Device Hero -->
         <div class="da-device-hero">
           <!-- Phone Image -->
-          <div class="da-device-img" onclick="window.location.href='<?php echo $base; ?>device/<?php echo htmlspecialchars($device_slug); ?>/images'" title="View all images">
+          <div class="da-device-img"
+            onclick="window.location.href='<?php echo $base; ?>device/<?php echo htmlspecialchars($device_slug); ?>/images'"
+            title="View all images">
             <?php
             $heroImage = $device["image"] ?? $device["image_1"] ?? "";
             if (!empty($heroImage)): ?>
-              <img src="<?php echo htmlspecialchars(getAbsoluteImagePath($heroImage, $base)); ?>" alt="<?php echo htmlspecialchars($page_title); ?>">
+              <img src="<?php echo htmlspecialchars(getAbsoluteImagePath($heroImage, $base)); ?>"
+                alt="<?php echo htmlspecialchars($page_title); ?>">
               <div class="da-device-img-overlay"><i class="fa fa-images"></i> <span>Gallery</span></div>
             <?php else: ?>
               <div class="da-img-fallback"><i class="fa fa-mobile-screen"></i></div>
@@ -1190,54 +1267,60 @@ $commentCount = getDeviceCommentCount($pdo, $device_id);
             </div>
 
             <!-- Device Name -->
-            <h1 class="da-device-title"><?php echo htmlspecialchars(($device['brand_name'] ?? '') . ' ' . ($device['name'] ?? 'Device')); ?></h1>
+            <h1 class="da-device-title">
+              <?php echo htmlspecialchars(($device['brand_name'] ?? '') . ' ' . ($device['name'] ?? 'Device')); ?>
+            </h1>
 
             <!-- KEY HIGHLIGHTS + CTA — two-column layout -->
             <div class="da-hero-mid-row">
 
               <!-- LEFT: Key Highlight Chips (red bg) -->
               <?php if (!empty($deviceHighlights)): ?>
-              <?php
-              $highlightIconMap = [
-                'release'     => ['icon' => 'fa-calendar-days',  'label' => 'Released'],
-                'weight_dims' => ['icon' => 'fa-weight-hanging', 'label' => 'Build'],
-                'os'          => ['icon' => 'fa-mobile-screen',  'label' => 'OS'],
-                'storage'     => ['icon' => 'fa-hard-drive',     'label' => 'Storage'],
-              ];
-              $hiIdx = 0;
-              ?>
-              <div class="da-highlights-col">
-                <?php foreach ($deviceHighlights as $hKey => $highlight):
-                  $meta = $highlightIconMap[$hKey] ?? ['icon' => 'fa-circle-info', 'label' => ucfirst($hKey)];
-                  $cleanText = htmlspecialchars(preg_replace('/^[\x{1F300}-\x{1FAFF}\x{2600}-\x{26FF}\x{2700}-\x{27BF}\x{FE00}-\x{FEFF}\x{200D}]+\s*/u', '', strip_tags($highlight)));
+                <?php
+                $highlightIconMap = [
+                  'release' => ['icon' => 'fa-calendar-days', 'label' => 'Released'],
+                  'weight_dims' => ['icon' => 'fa-weight-hanging', 'label' => 'Build'],
+                  'os' => ['icon' => 'fa-mobile-screen', 'label' => 'OS'],
+                  'storage' => ['icon' => 'fa-hard-drive', 'label' => 'Storage'],
+                ];
+                $hiIdx = 0;
                 ?>
-                <div class="da-highlight-chip" style="--chip-delay:<?php echo $hiIdx++ * 0.08; ?>s">
-                  <div class="da-highlight-chip-icon"><i class="fa <?php echo $meta['icon']; ?>"></i></div>
-                  <div class="da-highlight-chip-text">
-                    <span class="da-highlight-chip-label"><?php echo $meta['label']; ?></span>
-                    <span class="da-highlight-chip-val"><?php echo $cleanText; ?></span>
-                  </div>
+                <div class="da-highlights-col">
+                  <?php foreach ($deviceHighlights as $hKey => $highlight):
+                    $meta = $highlightIconMap[$hKey] ?? ['icon' => 'fa-circle-info', 'label' => ucfirst($hKey)];
+                    $cleanText = htmlspecialchars(preg_replace('/^[\x{1F300}-\x{1FAFF}\x{2600}-\x{26FF}\x{2700}-\x{27BF}\x{FE00}-\x{FEFF}\x{200D}]+\s*/u', '', strip_tags($highlight)));
+                    ?>
+                    <div class="da-highlight-chip" style="--chip-delay:<?php echo $hiIdx++ * 0.08; ?>s">
+                      <div class="da-highlight-chip-icon"><i class="fa <?php echo $meta['icon']; ?>"></i></div>
+                      <div class="da-highlight-chip-text">
+                        <span class="da-highlight-chip-label"><?php echo $meta['label']; ?></span>
+                        <span class="da-highlight-chip-val"><?php echo $cleanText; ?></span>
+                      </div>
+                    </div>
+                  <?php endforeach; ?>
                 </div>
-                <?php endforeach; ?>
-              </div>
               <?php endif; ?>
 
               <!-- RIGHT: CTA Buttons (floating shadow, red on hover) -->
               <div class="da-cta-col">
                 <?php if ($review_post): ?>
-                  <a class="da-float-btn da-float-btn-primary" href="<?php echo $base; ?>post/<?php echo urlencode($review_post['slug']); ?>">
+                  <a class="da-float-btn da-float-btn-primary"
+                    href="<?php echo $base; ?>post/<?php echo urlencode($review_post['slug']); ?>">
                     <i class="fa fa-star"></i><span>Review</span>
                   </a>
                 <?php else: ?>
                   <span class="da-float-btn da-float-btn-disabled"><i class="fa fa-star"></i><span>Review</span></span>
                 <?php endif; ?>
-                <a class="da-float-btn" href="<?php echo $base; ?>compare/<?php echo htmlspecialchars($device['slug'] ?? $device_slug); ?>">
+                <a class="da-float-btn"
+                  href="<?php echo $base; ?>compare/<?php echo htmlspecialchars($device['slug'] ?? $device_slug); ?>">
                   <i class="fa fa-scale-balanced"></i><span>Compare</span>
                 </a>
-                <button class="da-float-btn" onclick="document.getElementById('comments').scrollIntoView({behavior:'smooth',block:'start'})">
+                <button class="da-float-btn"
+                  onclick="document.getElementById('comments').scrollIntoView({behavior:'smooth',block:'start'})">
                   <i class="fa fa-comments"></i><span>Opinions</span>
                 </button>
-                <a class="da-float-btn" href="<?php echo $base; ?>device/<?php echo htmlspecialchars($device_slug); ?>/images">
+                <a class="da-float-btn"
+                  href="<?php echo $base; ?>device/<?php echo htmlspecialchars($device_slug); ?>/images">
                   <i class="fa fa-images"></i><span>Pictures</span>
                 </a>
                 <button class="da-float-btn" onclick="showRelatedPhonesModal()">
@@ -1251,16 +1334,17 @@ $commentCount = getDeviceCommentCount($pdo, $device_id);
             <div class="da-device-stats" id="da-stats-bar">
               <?php
               $statMeta = [
-                'display'     => ['icon' => 'fa-expand',      'unit' => '"'],
-                'camera'      => ['icon' => 'fa-camera',      'unit' => ''],
-                'performance' => ['icon' => 'fa-microchip',   'unit' => ''],
-                'battery'     => ['icon' => 'fa-battery-full','unit' => ''],
+                'display' => ['icon' => 'fa-expand', 'unit' => '"'],
+                'camera' => ['icon' => 'fa-camera', 'unit' => ''],
+                'performance' => ['icon' => 'fa-microchip', 'unit' => ''],
+                'battery' => ['icon' => 'fa-battery-full', 'unit' => ''],
               ];
               $si = 0;
               foreach ($statMeta as $key => $meta):
-                if (!isset($deviceStats[$key])) continue;
+                if (!isset($deviceStats[$key]))
+                  continue;
                 $stat = $deviceStats[$key];
-              ?>
+                ?>
                 <div class="da-stat-box" style="--stat-delay:<?php echo $si++ * 0.1; ?>s">
                   <div class="da-stat-icon"><i class="fa <?php echo $meta['icon']; ?>"></i></div>
                   <div class="da-stat-title"><?php echo htmlspecialchars($stat['title']); ?></div>
@@ -1286,9 +1370,9 @@ $commentCount = getDeviceCommentCount($pdo, $device_id);
                       <?php foreach ($rows as $rowIndex => $rowData): ?>
                         <?php if ($category === 'NETWORK' && $rowIndex > 0): ?>
                           <tr class="da-specs-row network-row da-d-none">
-                        <?php else: ?>
+                          <?php else: ?>
                           <tr class="da-specs-row">
-                        <?php endif; ?>
+                          <?php endif; ?>
                           <?php if ($rowIndex === 0): ?>
                             <th class="da-specs-category" rowspan="<?php echo ($category === 'NETWORK') ? '1' : count($rows); ?>">
                               <?php echo htmlspecialchars($category); ?>
@@ -1327,7 +1411,8 @@ $commentCount = getDeviceCommentCount($pdo, $device_id);
                 <?php endif; ?>
               </tbody>
             </table>
-            <div class="da-specs-disclaimer"><i class="fa fa-circle-info"></i> Disclaimer: We can not guarantee that the information on this page is 100% correct.</div>
+            <div class="da-specs-disclaimer"><i class="fa fa-circle-info"></i> Disclaimer: We can not guarantee that the
+              information on this page is 100% correct.</div>
           </div>
         </div>
 
@@ -1338,7 +1423,7 @@ $commentCount = getDeviceCommentCount($pdo, $device_id);
             <div class="da-widget-icon"><i class="fa fa-comments"></i></div>
           </div>
           <div class="da-widget-body">
-            
+
             <div class="da-comments-list">
               <?php if (!empty($comments)): ?>
                 <?php foreach ($comments as $comment): ?>
@@ -1349,10 +1434,13 @@ $commentCount = getDeviceCommentCount($pdo, $device_id);
                     <div class="da-comment-content">
                       <div class="da-comment-header">
                         <span class="da-comment-name"><?php echo htmlspecialchars($comment['name']); ?></span>
-                        <span class="da-comment-time"><i class="fa fa-clock"></i> <?php echo timeAgo($comment['created_at']); ?></span>
+                        <span class="da-comment-time"><i class="fa fa-clock"></i>
+                          <?php echo timeAgo($comment['created_at']); ?></span>
                       </div>
                       <div class="da-comment-text"><?php echo nl2br(htmlspecialchars($comment['comment'])); ?></div>
-                      <button class="da-reply-btn reply-btn" data-comment-id="<?php echo $comment['id']; ?>" data-comment-name="<?php echo htmlspecialchars($comment['name']); ?>"><i class="fa fa-reply"></i> Reply</button>
+                      <button class="da-reply-btn reply-btn" data-comment-id="<?php echo $comment['id']; ?>"
+                        data-comment-name="<?php echo htmlspecialchars($comment['name']); ?>"><i class="fa fa-reply"></i>
+                        Reply</button>
                     </div>
                   </div>
                   <?php if (!empty($comment['replies'])): ?>
@@ -1365,17 +1453,21 @@ $commentCount = getDeviceCommentCount($pdo, $device_id);
                           <div class="da-comment-header">
                             <span class="da-comment-name"><?php echo htmlspecialchars($reply['name']); ?></span>
                             <small class="da-replied-tag"><i class="fa fa-reply fa-xs"></i> replied</small>
-                            <span class="da-comment-time"><i class="fa fa-clock"></i> <?php echo timeAgo($reply['created_at']); ?></span>
+                            <span class="da-comment-time"><i class="fa fa-clock"></i>
+                              <?php echo timeAgo($reply['created_at']); ?></span>
                           </div>
                           <div class="da-comment-text"><?php echo nl2br(htmlspecialchars($reply['comment'])); ?></div>
-                          <button class="da-reply-btn reply-btn" data-comment-id="<?php echo $comment['id']; ?>" data-comment-name="<?php echo htmlspecialchars($comment['name']); ?>"><i class="fa fa-reply"></i> Reply</button>
+                          <button class="da-reply-btn reply-btn" data-comment-id="<?php echo $comment['id']; ?>"
+                            data-comment-name="<?php echo htmlspecialchars($comment['name']); ?>"><i class="fa fa-reply"></i>
+                            Reply</button>
                         </div>
                       </div>
                     <?php endforeach; ?>
                   <?php endif; ?>
                 <?php endforeach; ?>
               <?php else: ?>
-                <div class="da-empty"><i class="fa fa-comments"></i>No comments yet. Be the first to share your opinion!</div>
+                <div class="da-empty"><i class="fa fa-comments"></i>No comments yet. Be the first to share your opinion!
+                </div>
               <?php endif; ?>
             </div>
 
@@ -1404,31 +1496,39 @@ $commentCount = getDeviceCommentCount($pdo, $device_id);
                 <input type="hidden" name="action" value="comment_device">
                 <input type="hidden" name="device_id" value="<?php echo htmlspecialchars($device['id']); ?>">
                 <input type="hidden" name="parent_id" id="parent_id" value="">
-                
+
                 <div class="da-form-row">
                   <div class="da-form-group">
-                    <input type="text" class="da-input" name="name" placeholder="Your Name" required <?php if ($isUserLoggedIn && $loggedInName): ?>value="<?php echo htmlspecialchars($loggedInName); ?>" disabled<?php endif; ?>>
-                    <?php if ($isUserLoggedIn && $loggedInName): ?><input type="hidden" name="name" value="<?php echo htmlspecialchars($loggedInName); ?>"><?php endif; ?>
+                    <input type="text" class="da-input" name="name" placeholder="Your Name" required <?php if ($isUserLoggedIn && $loggedInName): ?>value="<?php echo htmlspecialchars($loggedInName); ?>"
+                        disabled<?php endif; ?>>
+                    <?php if ($isUserLoggedIn && $loggedInName): ?><input type="hidden" name="name"
+                        value="<?php echo htmlspecialchars($loggedInName); ?>"><?php endif; ?>
                   </div>
                   <div class="da-form-group">
-                    <input type="email" class="da-input" name="email" placeholder="Your Email (optional)" <?php if ($isUserLoggedIn && $loggedInEmail): ?>value="<?php echo htmlspecialchars($loggedInEmail); ?>" disabled<?php endif; ?>>
-                    <?php if ($isUserLoggedIn && $loggedInEmail): ?><input type="hidden" name="email" value="<?php echo htmlspecialchars($loggedInEmail); ?>"><?php endif; ?>
+                    <input type="email" class="da-input" name="email" placeholder="Your Email (optional)" <?php if ($isUserLoggedIn && $loggedInEmail): ?>value="<?php echo htmlspecialchars($loggedInEmail); ?>"
+                        disabled<?php endif; ?>>
+                    <?php if ($isUserLoggedIn && $loggedInEmail): ?><input type="hidden" name="email"
+                        value="<?php echo htmlspecialchars($loggedInEmail); ?>"><?php endif; ?>
                   </div>
                 </div>
-                
+
                 <div class="da-form-group">
-                  <textarea class="da-input" name="comment" rows="4" placeholder="Share your thoughts about this device..." required></textarea>
+                  <textarea class="da-input" name="comment" rows="4"
+                    placeholder="Share your thoughts about this device..." required></textarea>
                 </div>
-                
+
                 <div class="da-form-group da-captcha-group">
                   <label>Type the words shown below</label>
                   <div class="da-captcha-box">
-                    <img src="<?php echo $base; ?>captcha.php" id="captcha-image" alt="CAPTCHA" onclick="refreshCaptcha()">
-                    <button type="button" class="da-cta-btn secondary" onclick="refreshCaptcha()"><i class="fa fa-rotate-right"></i></button>
-                    <input type="text" class="da-input" name="captcha" id="captcha-input" placeholder="Enter the words" required autocomplete="off">
+                    <img src="<?php echo $base; ?>captcha.php" id="captcha-image" alt="CAPTCHA"
+                      onclick="refreshCaptcha()">
+                    <button type="button" class="da-cta-btn secondary" onclick="refreshCaptcha()"><i
+                        class="fa fa-rotate-right"></i></button>
+                    <input type="text" class="da-input" name="captcha" id="captcha-input" placeholder="Enter the words"
+                      required autocomplete="off">
                   </div>
                 </div>
-                
+
                 <div id="device-comment-msg" style="display:none;margin-bottom:12px;"></div>
                 <div class="da-form-footer">
                   <div class="d-flex align-items-center flex-wrap gap-3">
@@ -1468,7 +1568,7 @@ $commentCount = getDeviceCommentCount($pdo, $device_id);
   <?php include(__DIR__ . '/includes/footer.php'); ?>
 
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/js/bootstrap.bundle.min.js"></script>
-  
+
   <script>
     window.baseURL = '<?php echo $base; ?>';
     var COMMENT_AJAX_BASE = '<?php echo $base; ?>';
@@ -1509,23 +1609,23 @@ $commentCount = getDeviceCommentCount($pdo, $device_id);
     // ── Navbar scroll effect ──
     const navbar = document.getElementById('da-navbar');
     window.addEventListener('scroll', () => {
-      if(navbar) navbar.classList.toggle('scrolled', window.scrollY > 40);
+      if (navbar) navbar.classList.toggle('scrolled', window.scrollY > 40);
     }, { passive: true });
 
     // ── Mobile Menu ──
     const hamburger = document.getElementById('da-hamburger');
     const mobileMenu = document.getElementById('da-mobile-menu');
-    if(hamburger && mobileMenu) {
-        hamburger.addEventListener('click', () => {
+    if (hamburger && mobileMenu) {
+      hamburger.addEventListener('click', () => {
         hamburger.classList.toggle('open');
         mobileMenu.classList.toggle('open');
         document.body.style.overflow = mobileMenu.classList.contains('open') ? 'hidden' : '';
-        });
+      });
     }
 
     function closeMobileMenu() {
-      if(hamburger) hamburger.classList.remove('open');
-      if(mobileMenu) mobileMenu.classList.remove('open');
+      if (hamburger) hamburger.classList.remove('open');
+      if (mobileMenu) mobileMenu.classList.remove('open');
       document.body.style.overflow = '';
     }
 
@@ -1547,7 +1647,7 @@ $commentCount = getDeviceCommentCount($pdo, $device_id);
     }
 
     // ── Expand Dots Logic ──
-    document.addEventListener('click', function(e) {
+    document.addEventListener('click', function (e) {
       if (e.target.classList.contains('expand-dots')) {
         const fullText = e.target.getAttribute('data-full');
         if (fullText) {
@@ -1572,20 +1672,20 @@ $commentCount = getDeviceCommentCount($pdo, $device_id);
 
     // ── Device Comment AJAX ──
     (function () {
-      const form    = document.getElementById('device-comment-form');
-      const msgBox  = document.getElementById('device-comment-msg');
+      const form = document.getElementById('device-comment-form');
+      const msgBox = document.getElementById('device-comment-msg');
       if (!form || !msgBox) return;
 
       // Reply button wiring
       document.querySelectorAll('.reply-btn').forEach(function (btn) {
         btn.addEventListener('click', function () {
-          const cid  = this.getAttribute('data-comment-id');
+          const cid = this.getAttribute('data-comment-id');
           const name = this.getAttribute('data-comment-name');
           document.getElementById('parent_id').value = cid;
           const indicator = document.getElementById('reply-indicator');
-          const label     = document.getElementById('reply-to-name');
+          const label = document.getElementById('reply-to-name');
           if (indicator) indicator.classList.remove('d-none');
-          if (label)     label.textContent = name;
+          if (label) label.textContent = name;
           form.querySelector('textarea[name="comment"]').focus();
         });
       });
@@ -1642,6 +1742,7 @@ $commentCount = getDeviceCommentCount($pdo, $device_id);
       });
     })();
   </script>
-  <script src="<?php echo $base; ?>redesign/sliders.js"></script>
+  <script src="<?php echo $base; ?>sliders.js"></script>
 </body>
+
 </html>

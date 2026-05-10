@@ -61,8 +61,8 @@ $brands = $brands_stmt->fetchAll();
 $brandSlug = isset($_GET['slug']) ? trim($_GET['slug']) : '';
 
 if (empty($brandSlug)) {
-    header('Location: ' . $base . 'brands');
-    exit;
+  header('Location: ' . $base . 'brands');
+  exit;
 }
 
 // Convert slug to brand name pattern for fallback matching
@@ -76,9 +76,9 @@ $brand_stmt->execute(['slug' => $brandSlug, 'name' => $brandNamePattern]);
 $brandData = $brand_stmt->fetch();
 
 if (!$brandData) {
-    header('HTTP/1.0 404 Not Found');
-    include '404.php';
-    exit;
+  header('HTTP/1.0 404 Not Found');
+  include '404.php';
+  exit;
 }
 
 $brandName = $brandData['name'];
@@ -138,7 +138,7 @@ $phones = $phones_stmt->fetchAll();
     rel="stylesheet">
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/css/bootstrap.min.css" rel="stylesheet">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" />
-  <link rel="stylesheet" href="<?php echo $base; ?>redesign/style.css">
+  <link rel="stylesheet" href="<?php echo $base; ?>style.css">
 
   <!-- Schema.org Structured Data for About Us Page -->
   <?php
@@ -225,12 +225,12 @@ $phones = $phones_stmt->fetchAll();
               <?php
               $deviceSchemaItems = [];
               foreach ($phones as $i => $schemaPhone) {
-                  $deviceSchemaItems[] = json_encode([
-                      "@type" => "ListItem",
-                      "position" => $i + 1,
-                      "name" => $schemaPhone['name'],
-                      "url" => "https://www.devicesarena.com/device/" . ($schemaPhone['slug'] ?? $schemaPhone['id'])
-                  ], JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE);
+                $deviceSchemaItems[] = json_encode([
+                  "@type" => "ListItem",
+                  "position" => $i + 1,
+                  "name" => $schemaPhone['name'],
+                  "url" => "https://www.devicesarena.com/device/" . ($schemaPhone['slug'] ?? $schemaPhone['id'])
+                ], JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE);
               }
               echo implode(",\n              ", $deviceSchemaItems);
               ?>
@@ -274,14 +274,16 @@ $phones = $phones_stmt->fetchAll();
 
       <!-- Background Image Implementation based on original layout -->
       <div class="cp-hero-bg-container">
-        <img class="cp-hero-bg-img" src="<?php echo $base; ?>hero-images/brand-hero.png" alt="<?php echo htmlspecialchars($brandName); ?> phones on DevicesArena">
+        <img class="cp-hero-bg-img" src="<?php echo $base; ?>hero-images/brand-hero.png"
+          alt="<?php echo htmlspecialchars($brandName); ?> phones on DevicesArena">
       </div>
 
       <div class="cp-hero-inner">
         <div class="cp-hero-left">
           <div class="cp-hero-label"><span>DevicesArena</span></div>
           <h1 class="cp-hero-title"><?php echo htmlspecialchars($brandName); ?> phones</h1>
-          <p class="cp-hero-sub">Browse all <?php echo htmlspecialchars($brandName); ?> phones and devices on DevicesArena. View specifications, images, and pricing.</p>
+          <p class="cp-hero-sub">Browse all <?php echo htmlspecialchars($brandName); ?> phones and devices on
+            DevicesArena. View specifications, images, and pricing.</p>
         </div>
 
         <!-- Right: Brand panel (Classic Widget) -->
@@ -332,7 +334,7 @@ $phones = $phones_stmt->fetchAll();
               <h2 class="da-section-title"><?php echo htmlspecialchars($brandName); ?> phones</h2>
               <div class="da-brand-device-count"><?php echo $totalDevicesCount; ?> devices</div>
             </div>
-            
+
             <div class="da-brands-sort">
               <span class="da-brands-sort-label">Sort By:</span>
               <div class="dropdown">
@@ -350,57 +352,75 @@ $phones = $phones_stmt->fetchAll();
           </div>
 
           <div class="da-brand-device-grid" id="brandDeviceGrid">
-            <?php foreach ($phones as $phone): 
-                $imagePath = $phone['image'] ?? '';
-                if ($imagePath && !str_starts_with($imagePath, '/') && !str_starts_with($imagePath, 'http')) {
-                    $imagePath = '/' . $imagePath;
-                }
-                $deviceSlug = $phone['slug'] ?? $phone['id'];
-                
-                $badgeClass = 'year'; // Default
-                switch ($phone['availability']) {
-                    case 'Available': $badgeClass = 'available'; break;
-                    case 'Coming Soon': $badgeClass = 'coming-soon'; break;
-                    case 'Discontinued': $badgeClass = 'discontinued'; break;
-                    case 'Rumored': $badgeClass = 'rumored'; break;
-                }
-            ?>
-              <a href="<?php echo $base; ?>device/<?php echo htmlspecialchars($deviceSlug); ?>" class="da-brand-device-card">
+            <?php foreach ($phones as $phone):
+              $imagePath = $phone['image'] ?? '';
+              if ($imagePath && !str_starts_with($imagePath, '/') && !str_starts_with($imagePath, 'http')) {
+                $imagePath = '/' . $imagePath;
+              }
+              $deviceSlug = $phone['slug'] ?? $phone['id'];
+
+              $badgeClass = 'year'; // Default
+              switch ($phone['availability']) {
+                case 'Available':
+                  $badgeClass = 'available';
+                  break;
+                case 'Coming Soon':
+                  $badgeClass = 'coming-soon';
+                  break;
+                case 'Discontinued':
+                  $badgeClass = 'discontinued';
+                  break;
+                case 'Rumored':
+                  $badgeClass = 'rumored';
+                  break;
+              }
+              ?>
+              <a href="<?php echo $base; ?>device/<?php echo htmlspecialchars($deviceSlug); ?>"
+                class="da-brand-device-card">
                 <div class="da-device-img-wrap">
                   <?php if ($imagePath): ?>
-                    <img src="<?php echo htmlspecialchars($imagePath); ?>" alt="<?php echo htmlspecialchars($phone['name']); ?>" onerror="this.style.display='none'">
+                    <img src="<?php echo htmlspecialchars($imagePath); ?>"
+                      alt="<?php echo htmlspecialchars($phone['name']); ?>" onerror="this.style.display='none'">
                   <?php else: ?>
                     <div class="da-device-img-placeholder">
                       <i class="fa fa-mobile-screen fa-2x"></i>
                     </div>
                   <?php endif; ?>
                 </div>
-                
+
                 <div class="da-device-body">
                   <h3 class="da-device-title"><?php echo htmlspecialchars($phone['name']); ?></h3>
-                  
+
                   <div class="da-device-brand-row">
-                    <span class="da-device-brand-name"><?php echo htmlspecialchars($phone['brand_name'] ?? $brandName); ?></span>
+                    <span
+                      class="da-device-brand-name"><?php echo htmlspecialchars($phone['brand_name'] ?? $brandName); ?></span>
                     <span class="da-device-badge year"><?php echo htmlspecialchars($phone['year'] ?? 'N/A'); ?></span>
                   </div>
-                  
+
                   <div class="da-device-badges">
-                    <span class="da-device-price"><?php echo !empty($phone['price']) ? '$' . number_format((float)$phone['price'], 0) : 'N/A'; ?></span>
-                    <span class="da-device-badge <?php echo $badgeClass; ?>"><?php echo htmlspecialchars($phone['availability'] ?? 'Unknown'); ?></span>
+                    <span
+                      class="da-device-price"><?php echo !empty($phone['price']) ? '$' . number_format((float) $phone['price'], 0) : 'N/A'; ?></span>
+                    <span
+                      class="da-device-badge <?php echo $badgeClass; ?>"><?php echo htmlspecialchars($phone['availability'] ?? 'Unknown'); ?></span>
                   </div>
-                  
+
                   <div class="da-device-specs">
                     <?php if (!empty($phone['ram'])): ?>
-                      <div class="da-device-spec-item" title="RAM"><i class="fa fa-microchip"></i> <?php echo htmlspecialchars($phone['ram']); ?></div>
+                      <div class="da-device-spec-item" title="RAM"><i class="fa fa-microchip"></i>
+                        <?php echo htmlspecialchars($phone['ram']); ?></div>
                     <?php endif; ?>
                     <?php if (!empty($phone['storage'])): ?>
-                      <div class="da-device-spec-item" title="Storage"><i class="fa fa-hard-drive"></i> <?php echo htmlspecialchars($phone['storage']); ?></div>
+                      <div class="da-device-spec-item" title="Storage"><i class="fa fa-hard-drive"></i>
+                        <?php echo htmlspecialchars($phone['storage']); ?></div>
                     <?php endif; ?>
                     <?php if (!empty($phone['display_size'])): ?>
-                      <div class="da-device-spec-item" title="Display"><i class="fa fa-mobile-screen-button"></i> <?php echo htmlspecialchars(str_replace('"', '', $phone['display_size'])) . '"'; ?></div>
+                      <div class="da-device-spec-item" title="Display"><i class="fa fa-mobile-screen-button"></i>
+                        <?php echo htmlspecialchars(str_replace('"', '', $phone['display_size'])) . '"'; ?></div>
                     <?php endif; ?>
                     <?php if (!empty($phone['main_camera_resolution'])): ?>
-                      <div class="da-device-spec-item" title="Camera"><i class="fa fa-camera"></i> <?php echo is_numeric($phone['main_camera_resolution']) ? htmlspecialchars($phone['main_camera_resolution']) . ' MP' : htmlspecialchars($phone['main_camera_resolution']); ?></div>
+                      <div class="da-device-spec-item" title="Camera"><i class="fa fa-camera"></i>
+                        <?php echo is_numeric($phone['main_camera_resolution']) ? htmlspecialchars($phone['main_camera_resolution']) . ' MP' : htmlspecialchars($phone['main_camera_resolution']); ?>
+                      </div>
                     <?php endif; ?>
                   </div>
                 </div>
@@ -414,7 +434,7 @@ $phones = $phones_stmt->fetchAll();
               </div>
             <?php endif; ?>
           </div>
-          
+
           <?php if ($totalDevicesCount > 50): ?>
             <div class="da-load-more-container mt-4" id="brandLoadMoreContainer">
               <button id="brandLoadMoreBtn" class="da-load-more-btn">Load More</button>
@@ -498,7 +518,7 @@ $phones = $phones_stmt->fetchAll();
       }
     });
 
-    // Auto-Sliders moved to redesign/sliders.js
+    // Auto-Sliders moved to sliders.js
 
     // ── Navbar scroll effect ──
     const navbar = document.getElementById('da-navbar');
@@ -831,32 +851,32 @@ $phones = $phones_stmt->fetchAll();
     const brandName = "<?php echo htmlspecialchars($brandName); ?>";
     const baseUri = "<?php echo $base; ?>";
     let currentPage = 1;
-    
+
     function getBrandDeviceCard(phone) {
-        const imagePath = phone.image ? (phone.image.startsWith('/') || phone.image.startsWith('http') ? phone.image : '/' + phone.image) : '';
-        const deviceSlug = phone.slug || phone.id;
-        
-        let badgeClass = 'year';
-        switch (phone.availability) {
-            case 'Available': badgeClass = 'available'; break;
-            case 'Coming Soon': badgeClass = 'coming-soon'; break;
-            case 'Discontinued': badgeClass = 'discontinued'; break;
-            case 'Rumored': badgeClass = 'rumored'; break;
-        }
-        
-        let imageHtml = imagePath ? `<img src="${imagePath}" alt="${phone.name}" onerror="this.style.display='none'">` : `<div class="da-device-img-placeholder"><i class="fa fa-mobile-screen fa-2x"></i></div>`;
-        
-        let specsHtml = '';
-        if (phone.ram) specsHtml += `<div class="da-device-spec-item" title="RAM"><i class="fa fa-microchip"></i> ${phone.ram}</div>`;
-        if (phone.storage) specsHtml += `<div class="da-device-spec-item" title="Storage"><i class="fa fa-hard-drive"></i> ${phone.storage}</div>`;
-        if (phone.display_size) specsHtml += `<div class="da-device-spec-item" title="Display"><i class="fa fa-mobile-screen-button"></i> ${phone.display_size.replace('"', '')}"</div>`;
-        if (phone.main_camera_resolution) specsHtml += `<div class="da-device-spec-item" title="Camera"><i class="fa fa-camera"></i> ${!isNaN(phone.main_camera_resolution) ? phone.main_camera_resolution + ' MP' : phone.main_camera_resolution}</div>`;
+      const imagePath = phone.image ? (phone.image.startsWith('/') || phone.image.startsWith('http') ? phone.image : '/' + phone.image) : '';
+      const deviceSlug = phone.slug || phone.id;
 
-        const price = parseFloat(phone.price);
-        const priceHtml = (!isNaN(price) && price > 0) ? '$' + price.toLocaleString() : 'N/A';
-        const year = phone.year || 'N/A';
+      let badgeClass = 'year';
+      switch (phone.availability) {
+        case 'Available': badgeClass = 'available'; break;
+        case 'Coming Soon': badgeClass = 'coming-soon'; break;
+        case 'Discontinued': badgeClass = 'discontinued'; break;
+        case 'Rumored': badgeClass = 'rumored'; break;
+      }
 
-        return `
+      let imageHtml = imagePath ? `<img src="${imagePath}" alt="${phone.name}" onerror="this.style.display='none'">` : `<div class="da-device-img-placeholder"><i class="fa fa-mobile-screen fa-2x"></i></div>`;
+
+      let specsHtml = '';
+      if (phone.ram) specsHtml += `<div class="da-device-spec-item" title="RAM"><i class="fa fa-microchip"></i> ${phone.ram}</div>`;
+      if (phone.storage) specsHtml += `<div class="da-device-spec-item" title="Storage"><i class="fa fa-hard-drive"></i> ${phone.storage}</div>`;
+      if (phone.display_size) specsHtml += `<div class="da-device-spec-item" title="Display"><i class="fa fa-mobile-screen-button"></i> ${phone.display_size.replace('"', '')}"</div>`;
+      if (phone.main_camera_resolution) specsHtml += `<div class="da-device-spec-item" title="Camera"><i class="fa fa-camera"></i> ${!isNaN(phone.main_camera_resolution) ? phone.main_camera_resolution + ' MP' : phone.main_camera_resolution}</div>`;
+
+      const price = parseFloat(phone.price);
+      const priceHtml = (!isNaN(price) && price > 0) ? '$' + price.toLocaleString() : 'N/A';
+      const year = phone.year || 'N/A';
+
+      return `
           <a href="${baseUri}device/${deviceSlug}" class="da-brand-device-card">
             <div class="da-device-img-wrap">
               ${imageHtml}
@@ -878,85 +898,85 @@ $phones = $phones_stmt->fetchAll();
           </a>
         `;
     }
-    
-    function loadBrandDevices(page, isAppend) {
-        const sort = document.getElementById('brandDeviceSorter').value;
-        const container = document.getElementById('brandDeviceGrid');
-        let btn = document.getElementById('brandLoadMoreBtn');
-        let btnContainer = document.getElementById('brandLoadMoreContainer');
-        
-        if (!isAppend) {
-            container.innerHTML = '<div class="da-empty-state"><i class="fa fa-spinner fa-spin fa-3x text-muted mb-3"></i><p>Loading devices...</p></div>';
-        } else if (btn) {
-            btn.innerHTML = '<i class="fa fa-spinner fa-spin me-2"></i>Loading...';
-            btn.disabled = true;
-        }
-        
-        fetch(`${baseUri}api_get_brand_devices.php?brand_id=${brandId}&page=${page}&sort=${sort}`)
-            .then(res => res.json())
-            .then(data => {
-                if (data.success) {
-                    if (!isAppend) container.innerHTML = '';
-                    
-                    // Refetch elements since DOM might have changed
-                    btnContainer = document.getElementById('brandLoadMoreContainer');
-                    btn = document.getElementById('brandLoadMoreBtn');
-                    
-                    if (btnContainer && btnContainer.parentNode) {
-                        btnContainer.parentNode.removeChild(btnContainer);
-                    }
-                    
-                    if (data.devices.length === 0 && !isAppend) {
-                        container.innerHTML = '<div class="da-empty-state"><i class="fa fa-mobile-screen fa-3x text-muted mb-3"></i><p class="text-muted">No devices available.</p></div>';
-                        return;
-                    }
 
-                    data.devices.forEach(device => {
-                        container.insertAdjacentHTML('beforeend', getBrandDeviceCard(device));
-                    });
-                    
-                    currentPage = page;
-                    
-                    if (data.page < data.total_pages) {
-                        container.insertAdjacentHTML('afterend', `
+    function loadBrandDevices(page, isAppend) {
+      const sort = document.getElementById('brandDeviceSorter').value;
+      const container = document.getElementById('brandDeviceGrid');
+      let btn = document.getElementById('brandLoadMoreBtn');
+      let btnContainer = document.getElementById('brandLoadMoreContainer');
+
+      if (!isAppend) {
+        container.innerHTML = '<div class="da-empty-state"><i class="fa fa-spinner fa-spin fa-3x text-muted mb-3"></i><p>Loading devices...</p></div>';
+      } else if (btn) {
+        btn.innerHTML = '<i class="fa fa-spinner fa-spin me-2"></i>Loading...';
+        btn.disabled = true;
+      }
+
+      fetch(`${baseUri}api_get_brand_devices.php?brand_id=${brandId}&page=${page}&sort=${sort}`)
+        .then(res => res.json())
+        .then(data => {
+          if (data.success) {
+            if (!isAppend) container.innerHTML = '';
+
+            // Refetch elements since DOM might have changed
+            btnContainer = document.getElementById('brandLoadMoreContainer');
+            btn = document.getElementById('brandLoadMoreBtn');
+
+            if (btnContainer && btnContainer.parentNode) {
+              btnContainer.parentNode.removeChild(btnContainer);
+            }
+
+            if (data.devices.length === 0 && !isAppend) {
+              container.innerHTML = '<div class="da-empty-state"><i class="fa fa-mobile-screen fa-3x text-muted mb-3"></i><p class="text-muted">No devices available.</p></div>';
+              return;
+            }
+
+            data.devices.forEach(device => {
+              container.insertAdjacentHTML('beforeend', getBrandDeviceCard(device));
+            });
+
+            currentPage = page;
+
+            if (data.page < data.total_pages) {
+              container.insertAdjacentHTML('afterend', `
                             <div class="da-load-more-container mt-4" id="brandLoadMoreContainer">
                                 <button id="brandLoadMoreBtn" class="da-load-more-btn">Load More</button>
                             </div>
                         `);
-                        document.getElementById('brandLoadMoreBtn').addEventListener('click', function() {
-                            loadBrandDevices(currentPage + 1, true);
-                        });
-                    }
-                }
-            })
-            .catch(err => {
-                console.error("Failed to load devices", err);
-                if (!isAppend) {
-                    container.innerHTML = '<div class="da-empty-state">Failed to load.</div>';
-                } else if (btn) {
-                    btn.innerHTML = 'Load More';
-                    btn.disabled = false;
-                }
-            });
-    }
-    
-    document.addEventListener('DOMContentLoaded', function() {
-        const sorter = document.getElementById('brandDeviceSorter');
-        if (sorter) {
-            sorter.addEventListener('change', function() {
-                loadBrandDevices(1, false);
-            });
-        }
-        
-        const btn = document.getElementById('brandLoadMoreBtn');
-        if (btn) {
-            btn.addEventListener('click', function() {
+              document.getElementById('brandLoadMoreBtn').addEventListener('click', function () {
                 loadBrandDevices(currentPage + 1, true);
-            });
-        }
+              });
+            }
+          }
+        })
+        .catch(err => {
+          console.error("Failed to load devices", err);
+          if (!isAppend) {
+            container.innerHTML = '<div class="da-empty-state">Failed to load.</div>';
+          } else if (btn) {
+            btn.innerHTML = 'Load More';
+            btn.disabled = false;
+          }
+        });
+    }
+
+    document.addEventListener('DOMContentLoaded', function () {
+      const sorter = document.getElementById('brandDeviceSorter');
+      if (sorter) {
+        sorter.addEventListener('change', function () {
+          loadBrandDevices(1, false);
+        });
+      }
+
+      const btn = document.getElementById('brandLoadMoreBtn');
+      if (btn) {
+        btn.addEventListener('click', function () {
+          loadBrandDevices(currentPage + 1, true);
+        });
+      }
     });
   </script>
-  <script src="<?php echo $base; ?>redesign/sliders.js"></script>
+  <script src="<?php echo $base; ?>sliders.js"></script>
 </body>
 
 </html>

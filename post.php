@@ -6,9 +6,12 @@ require_once __DIR__ . '/phone_data.php';
 
 function getAbsoluteImagePath($imagePath, $base)
 {
-  if (empty($imagePath)) return '';
-  if (filter_var($imagePath, FILTER_VALIDATE_URL)) return $imagePath;
-  if (strpos($imagePath, '/') === 0) return $imagePath;
+  if (empty($imagePath))
+    return '';
+  if (filter_var($imagePath, FILTER_VALIDATE_URL))
+    return $imagePath;
+  if (strpos($imagePath, '/') === 0)
+    return $imagePath;
   return $base . ltrim($imagePath, '/');
 }
 
@@ -19,7 +22,8 @@ $isPublicUser = !empty($_SESSION['public_user_id']);
 $publicUserName = $_SESSION['public_user_name'] ?? '';
 $publicUserInitial = $isPublicUser ? strtoupper(substr($publicUserName, 0, 1)) : '';
 
-if (!isset($_SESSION['notif_seen'])) $_SESSION['notif_seen'] = false;
+if (!isset($_SESSION['notif_seen']))
+  $_SESSION['notif_seen'] = false;
 $hasUnreadNotifications = $isPublicUser && !$_SESSION['notif_seen'];
 
 // Weekly posts for notifications
@@ -58,25 +62,25 @@ $brands = $brands_stmt->fetchAll();
 $slug = $_GET['slug'] ?? $_GET['id'] ?? null;
 
 if (!$slug) {
-    header('Location: index.php');
-    exit;
+  header('Location: index.php');
+  exit;
 }
 
 
 // Try to get post by slug first, then by ID if it's numeric
 if (is_numeric($slug)) {
-    $stmt = $pdo->prepare("SELECT * FROM posts WHERE (slug = ? OR id = ?) AND status ILIKE 'published'");
-    $stmt->execute([$slug, intval($slug)]);
+  $stmt = $pdo->prepare("SELECT * FROM posts WHERE (slug = ? OR id = ?) AND status ILIKE 'published'");
+  $stmt->execute([$slug, intval($slug)]);
 } else {
-    $stmt = $pdo->prepare("SELECT * FROM posts WHERE slug = ? AND status ILIKE 'published'");
-    $stmt->execute([$slug]);
+  $stmt = $pdo->prepare("SELECT * FROM posts WHERE slug = ? AND status ILIKE 'published'");
+  $stmt->execute([$slug]);
 }
 $post = $stmt->fetch();
 
 if (!$post) {
-    header('HTTP/1.0 404 Not Found');
-    include '404.php';
-    exit;
+  header('HTTP/1.0 404 Not Found');
+  include '404.php';
+  exit;
 }
 // Get post comments and comment count
 $postComments = getPostComments($post['id']);
@@ -87,98 +91,103 @@ $user_ip = $_SERVER['REMOTE_ADDR'] ?? '127.0.0.1';
 $user_agent = $_SERVER['HTTP_USER_AGENT'] ?? '';
 
 try {
-    $view_stmt = $pdo->prepare("INSERT INTO content_views (content_type, content_id, ip_address, user_agent) VALUES ('post', CAST(? AS VARCHAR), ?, ?) ON CONFLICT (content_type, content_id, ip_address) DO NOTHING");
-    $view_stmt->execute([$post['id'], $user_ip, $user_agent]);
+  $view_stmt = $pdo->prepare("INSERT INTO content_views (content_type, content_id, ip_address, user_agent) VALUES ('post', CAST(? AS VARCHAR), ?, ?) ON CONFLICT (content_type, content_id, ip_address) DO NOTHING");
+  $view_stmt->execute([$post['id'], $user_ip, $user_agent]);
 
-    // Update view count in posts table
-    $update_view_stmt = $pdo->prepare("UPDATE posts SET view_count = (SELECT COUNT(*) FROM content_views WHERE content_type = 'post' AND content_id = CAST(? AS VARCHAR)) WHERE id = ?");
-    $update_view_stmt->execute([$post['id'], $post['id']]);
+  // Update view count in posts table
+  $update_view_stmt = $pdo->prepare("UPDATE posts SET view_count = (SELECT COUNT(*) FROM content_views WHERE content_type = 'post' AND content_id = CAST(? AS VARCHAR)) WHERE id = ?");
+  $update_view_stmt->execute([$post['id'], $post['id']]);
 } catch (Exception $e) {
-    // Silently ignore view tracking errors
+  // Silently ignore view tracking errors
 }
 
 // Get comments for posts (threaded: parents first, then replies grouped)
 function getPostComments($post_id)
 {
-    global $pdo;
-    $stmt = $pdo->prepare("SELECT * FROM post_comments WHERE post_id = ? AND status = 'approved' ORDER BY created_at ASC");
-    $stmt->execute([$post_id]);
-    $all = $stmt->fetchAll();
+  global $pdo;
+  $stmt = $pdo->prepare("SELECT * FROM post_comments WHERE post_id = ? AND status = 'approved' ORDER BY created_at ASC");
+  $stmt->execute([$post_id]);
+  $all = $stmt->fetchAll();
 
-    // Build threaded structure: parent comments with nested replies (1 level deep)
-    $parents = [];
-    $replies = [];
-    foreach ($all as $c) {
-        if (empty($c['parent_id'])) {
-            $c['replies'] = [];
-            $parents[$c['id']] = $c;
-        } else {
-            $replies[] = $c;
-        }
+  // Build threaded structure: parent comments with nested replies (1 level deep)
+  $parents = [];
+  $replies = [];
+  foreach ($all as $c) {
+    if (empty($c['parent_id'])) {
+      $c['replies'] = [];
+      $parents[$c['id']] = $c;
+    } else {
+      $replies[] = $c;
     }
-    // Attach replies to their parent (or to the root parent if reply-to-reply)
-    foreach ($replies as $r) {
-        $pid = $r['parent_id'];
-        if (isset($parents[$pid])) {
-            $parents[$pid]['replies'][] = $r;
-        } else {
-            // reply-to-reply: find root parent
-            foreach ($parents as &$p) {
-                foreach ($p['replies'] as $existingReply) {
-                    if ($existingReply['id'] == $pid) {
-                        $p['replies'][] = $r;
-                        break 2;
-                    }
-                }
-            }
-            unset($p);
+  }
+  // Attach replies to their parent (or to the root parent if reply-to-reply)
+  foreach ($replies as $r) {
+    $pid = $r['parent_id'];
+    if (isset($parents[$pid])) {
+      $parents[$pid]['replies'][] = $r;
+    } else {
+      // reply-to-reply: find root parent
+      foreach ($parents as &$p) {
+        foreach ($p['replies'] as $existingReply) {
+          if ($existingReply['id'] == $pid) {
+            $p['replies'][] = $r;
+            break 2;
+          }
         }
+      }
+      unset($p);
     }
-    // Return as indexed array, newest parents first
-    return array_reverse(array_values($parents));
+  }
+  // Return as indexed array, newest parents first
+  return array_reverse(array_values($parents));
 }
 
 // Get post comment count
 function getPostCommentCount($post_id)
 {
-    global $pdo;
-    $stmt = $pdo->prepare("SELECT COUNT(*) as count FROM post_comments WHERE post_id = ? AND status = 'approved'");
-    $stmt->execute([$post_id]);
-    return $stmt->fetch(PDO::FETCH_ASSOC)['count'] ?? 0;
+  global $pdo;
+  $stmt = $pdo->prepare("SELECT COUNT(*) as count FROM post_comments WHERE post_id = ? AND status = 'approved'");
+  $stmt->execute([$post_id]);
+  return $stmt->fetch(PDO::FETCH_ASSOC)['count'] ?? 0;
 }
 
 // Function to generate gravatar URL
 function getGravatarUrl($email, $size = 50)
 {
-    $hash = md5(strtolower(trim($email)));
-    return "https://www.gravatar.com/avatar/{$hash}?r=g&s={$size}&d=identicon";
+  $hash = md5(strtolower(trim($email)));
+  return "https://www.gravatar.com/avatar/{$hash}?r=g&s={$size}&d=identicon";
 }
 
 // Function to format time ago
 function timeAgo($datetime)
 {
-    $time = time() - strtotime($datetime);
+  $time = time() - strtotime($datetime);
 
-    if ($time < 60) return 'just now';
-    if ($time < 3600) return floor($time / 60) . ' minutes ago';
-    if ($time < 86400) return floor($time / 3600) . ' hours ago';
-    if ($time < 2592000) return floor($time / 86400) . ' days ago';
-    if ($time < 31536000) return floor($time / 2592000) . ' months ago';
+  if ($time < 60)
+    return 'just now';
+  if ($time < 3600)
+    return floor($time / 60) . ' minutes ago';
+  if ($time < 86400)
+    return floor($time / 3600) . ' hours ago';
+  if ($time < 2592000)
+    return floor($time / 86400) . ' days ago';
+  if ($time < 31536000)
+    return floor($time / 2592000) . ' months ago';
 
-    return floor($time / 31536000) . ' years ago';
+  return floor($time / 31536000) . ' years ago';
 }
 
 // Function to generate avatar display
 function getAvatarDisplay($name, $email)
 {
-    if (!empty($email)) {
-        return '<img src="' . getGravatarUrl($email) . '" alt="' . htmlspecialchars($name) . '">';
-    } else {
-        $initials = strtoupper(substr($name, 0, 1));
-        $colors = ['#007bff', '#28a745', '#dc3545', '#ffc107', '#17a2b8', '#6f42c1', '#e83e8c'];
-        $color = $colors[abs(crc32($name)) % count($colors)];
-        return '<span class="avatar-box" style="background-color: ' . $color . '; color: white;">' . $initials . '</span>';
-    }
+  if (!empty($email)) {
+    return '<img src="' . getGravatarUrl($email) . '" alt="' . htmlspecialchars($name) . '">';
+  } else {
+    $initials = strtoupper(substr($name, 0, 1));
+    $colors = ['#007bff', '#28a745', '#dc3545', '#ffc107', '#17a2b8', '#6f42c1', '#e83e8c'];
+    $color = $colors[abs(crc32($name)) % count($colors)];
+    return '<span class="avatar-box" style="background-color: ' . $color . '; color: white;">' . $initials . '</span>';
+  }
 }
 
 ?>
@@ -189,7 +198,8 @@ function getAvatarDisplay($name, $email)
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <link rel="canonical" href="<?php echo $canonicalBase; ?>/post/<?php echo htmlspecialchars($slug); ?>" />
-  <meta name="description" content="<?php echo htmlspecialchars($post['meta_description'] ?? $post['short_description'] ?? substr($post['content_body'], 0, 160) . '...'); ?>" />
+  <meta name="description"
+    content="<?php echo htmlspecialchars($post['meta_description'] ?? $post['short_description'] ?? substr($post['content_body'], 0, 160) . '...'); ?>" />
   <title><?php echo htmlspecialchars($post['meta_title'] ?? $post['title']); ?> - DevicesArena</title>
 
   <!-- Favicon & Icons -->
@@ -215,7 +225,8 @@ function getAvatarDisplay($name, $email)
   <!-- Open Graph Meta Tags (Social Media Sharing) -->
   <meta property="og:site_name" content="DevicesArena">
   <meta property="og:title" content="DevicesArena - Smartphone Reviews & Comparisons">
-  <meta property="og:description" content="Explore the latest smartphones, detailed specifications, reviews, and comparisons on DevicesArena.">
+  <meta property="og:description"
+    content="Explore the latest smartphones, detailed specifications, reviews, and comparisons on DevicesArena.">
   <meta property="og:image" content="<?php echo $base; ?>imges/icon-256.png">
   <meta property="og:image:type" content="image/png">
   <meta property="og:image:width" content="256">
@@ -225,13 +236,15 @@ function getAvatarDisplay($name, $email)
   <!-- Twitter Card Meta Tags -->
   <meta name="twitter:card" content="summary">
   <meta name="twitter:title" content="DevicesArena">
-  <meta name="twitter:description" content="<?php echo htmlspecialchars($post['meta_description'] ?? $post['short_description'] ?? substr($post['content_body'], 0, 160) . '...'); ?>">
+  <meta name="twitter:description"
+    content="<?php echo htmlspecialchars($post['meta_description'] ?? $post['short_description'] ?? substr($post['content_body'], 0, 160) . '...'); ?>">
   <meta name="twitter:image" content="<?php echo $base; ?>imges/icon-256.png">
 
   <!-- PWA Manifest -->
   <link rel="manifest" href="<?php echo $base; ?>manifest.json">
   <meta name="theme-color" content="#0d0f1a">
-  <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-9906394285054446"crossorigin="anonymous"></script>
+  <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-9906394285054446"
+    crossorigin="anonymous"></script>
   <!-- Google Analytics -->
   <script async src="https://www.googletagmanager.com/gtag/js?id=G-2LDCSSMXJT"></script>
   <script>
@@ -244,14 +257,16 @@ function getAvatarDisplay($name, $email)
     gtag('config', 'G-2LDCSSMXJT');
   </script>
 
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link
+    href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=Space+Grotesk:wght@400;500;600;700&display=swap"
+    rel="stylesheet">
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/css/bootstrap.min.css" rel="stylesheet">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" />
-  <link rel="stylesheet" href="<?php echo $base; ?>redesign/style.css">
+  <link rel="stylesheet" href="<?php echo $base; ?>style.css">
 
   <!-- Theme Initialization Script (Prevents FOUC) -->
   <script>
-    (function() {
+    (function () {
       var savedTheme = localStorage.getItem('da-theme');
       if (savedTheme === 'light' || (!savedTheme && window.matchMedia('(prefers-color-scheme: light)').matches)) {
         document.documentElement.setAttribute('data-theme', 'light');
@@ -259,32 +274,33 @@ function getAvatarDisplay($name, $email)
     })();
   </script>
 
-  <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-4554952734894265" crossorigin="anonymous"></script>
+  <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-4554952734894265"
+    crossorigin="anonymous"></script>
 
   <?php
   // Build breadcrumb schema for the blog post
   $breadcrumbItems = [
-      [
-          "@type" => "ListItem",
-          "position" => 1,
-          "name" => "Home",
-          "item" => "https://www.devicesarena.com/"
-      ],
-      [
-          "@type" => "ListItem",
-          "position" => 2,
-          "name" => "Blog",
-          "item" => "https://www.devicesarena.com/posts"
-      ]
+    [
+      "@type" => "ListItem",
+      "position" => 1,
+      "name" => "Home",
+      "item" => "https://www.devicesarena.com/"
+    ],
+    [
+      "@type" => "ListItem",
+      "position" => 2,
+      "name" => "Blog",
+      "item" => "https://www.devicesarena.com/posts"
+    ]
   ];
 
   if ($post) {
-      $breadcrumbItems[] = [
-          "@type" => "ListItem",
-          "position" => 3,
-          "name" => $post['title'],
-          "item" => "https://www.devicesarena.com/post/" . htmlspecialchars($post['slug'])
-      ];
+    $breadcrumbItems[] = [
+      "@type" => "ListItem",
+      "position" => 3,
+      "name" => $post['title'],
+      "item" => "https://www.devicesarena.com/post/" . htmlspecialchars($post['slug'])
+    ];
   }
   ?>
 
@@ -300,47 +316,47 @@ function getAvatarDisplay($name, $email)
   <?php
   // Build BlogPosting schema with full article details
   if ($post) {
-      $blogPostingSchema = [
-          "@context" => "https://schema.org",
-          "@type" => "BlogPosting",
-          "headline" => $post['title'],
-          "description" => isset($post['excerpt']) && !empty($post['excerpt']) ? substr($post['excerpt'], 0, 160) : substr(strip_tags($post['content_body'] ?? ''), 0, 160),
-          "articleBody" => isset($post['content_body']) && !empty($post['content_body']) ? strip_tags($post['content_body']) : "",
-          "url" => "https://www.devicesarena.com/post/" . htmlspecialchars($post['slug']),
-          "datePublished" => isset($post['created_at']) ? date('Y-m-d', strtotime($post['created_at'])) : date('Y-m-d'),
-          "dateModified" => isset($post['updated_at']) && !empty($post['updated_at']) ? date('Y-m-d', strtotime($post['updated_at'])) : (isset($post['created_at']) ? date('Y-m-d', strtotime($post['created_at'])) : date('Y-m-d'))
-      ];
+    $blogPostingSchema = [
+      "@context" => "https://schema.org",
+      "@type" => "BlogPosting",
+      "headline" => $post['title'],
+      "description" => isset($post['excerpt']) && !empty($post['excerpt']) ? substr($post['excerpt'], 0, 160) : substr(strip_tags($post['content_body'] ?? ''), 0, 160),
+      "articleBody" => isset($post['content_body']) && !empty($post['content_body']) ? strip_tags($post['content_body']) : "",
+      "url" => "https://www.devicesarena.com/post/" . htmlspecialchars($post['slug']),
+      "datePublished" => isset($post['created_at']) ? date('Y-m-d', strtotime($post['created_at'])) : date('Y-m-d'),
+      "dateModified" => isset($post['updated_at']) && !empty($post['updated_at']) ? date('Y-m-d', strtotime($post['updated_at'])) : (isset($post['created_at']) ? date('Y-m-d', strtotime($post['created_at'])) : date('Y-m-d'))
+    ];
 
-      // Add author if available
-      $blogPostingSchema["author"] = [
-          "@type" => "Organization",
-          "name" => "DevicesArena"
-      ];
+    // Add author if available
+    $blogPostingSchema["author"] = [
+      "@type" => "Organization",
+      "name" => "DevicesArena"
+    ];
 
-      // Add featured image if available
-      if (isset($post['featured_image']) && !empty($post['featured_image'])) {
-          $imageUrl = getAbsoluteImagePath($post['featured_image'], 'https://www.devicesarena.com/');
-          $blogPostingSchema["image"] = $imageUrl;
-      } else {
-          $blogPostingSchema["image"] = "https://www.devicesarena.com/imges/icon-256.png";
-      }
+    // Add featured image if available
+    if (isset($post['featured_image']) && !empty($post['featured_image'])) {
+      $imageUrl = getAbsoluteImagePath($post['featured_image'], 'https://www.devicesarena.com/');
+      $blogPostingSchema["image"] = $imageUrl;
+    } else {
+      $blogPostingSchema["image"] = "https://www.devicesarena.com/imges/icon-256.png";
+    }
 
-      // Add comment count if available
-      if (isset($postCommentCount) && $postCommentCount > 0) {
-          $blogPostingSchema["commentCount"] = $postCommentCount;
-      }
+    // Add comment count if available
+    if (isset($postCommentCount) && $postCommentCount > 0) {
+      $blogPostingSchema["commentCount"] = $postCommentCount;
+    }
 
-      // Add keywords/article section if available
-      $blogPostingSchema["keywords"] = "smartphones, devices, reviews, specifications, tech news, mobile devices";
-      $blogPostingSchema["articleSection"] = "Technology";
+    // Add keywords/article section if available
+    $blogPostingSchema["keywords"] = "smartphones, devices, reviews, specifications, tech news, mobile devices";
+    $blogPostingSchema["articleSection"] = "Technology";
   }
   ?>
 
   <!-- BlogPosting Schema for Detailed Article Information -->
   <?php if ($post && isset($blogPostingSchema)): ?>
-      <script type="application/ld+json">
-          <?php echo json_encode($blogPostingSchema, JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE | JSON_PRETTY_PRINT); ?>
-      </script>
+    <script type="application/ld+json">
+            <?php echo json_encode($blogPostingSchema, JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE | JSON_PRETTY_PRINT); ?>
+        </script>
   <?php endif; ?>
 
   <!-- Organization Schema for Author -->
@@ -462,60 +478,66 @@ function getAvatarDisplay($name, $email)
         <?php if (!empty($post)): ?>
           <div class="da-hero-main" style="cursor: default; max-height: 480px; margin-bottom: 24px;">
             <?php if (!empty($post['featured_image'])): ?>
-              <img src="<?php echo htmlspecialchars(getAbsoluteImagePath($post['featured_image'], $base)); ?>" alt="<?php echo htmlspecialchars($post['title']); ?>" loading="eager" />
+              <img src="<?php echo htmlspecialchars(getAbsoluteImagePath($post['featured_image'], $base)); ?>"
+                alt="<?php echo htmlspecialchars($post['title']); ?>" loading="eager" />
             <?php else: ?>
               <div class="da-img-fallback"></div>
             <?php endif; ?>
             <div class="da-hero-main-overlay"></div>
             <div class="da-hero-main-content">
               <?php
-                $tags_html = '';
-                if (!empty($post['tags'])) {
-                  $tags_arr = array_map('trim', explode(',', $post['tags']));
-                  foreach ($tags_arr as $tag) {
-                    if (!empty($tag)) {
-                      $tags_html .= '<span>' . htmlspecialchars(strtoupper($tag)) . '</span> ';
-                    }
+              $tags_html = '';
+              if (!empty($post['tags'])) {
+                $tags_arr = array_map('trim', explode(',', $post['tags']));
+                foreach ($tags_arr as $tag) {
+                  if (!empty($tag)) {
+                    $tags_html .= '<span>' . htmlspecialchars(strtoupper($tag)) . '</span> ';
                   }
                 }
-                
-                if (empty($tags_html)) {
-                  $tag_label = 'ARTICLE';
-                  if (!empty($post['is_news'])) $tag_label = 'NEWS';
-                  elseif (!empty($post['is_featured'])) $tag_label = 'FEATURED';
-                  $tags_html = '<span>' . $tag_label . '</span>';
-                }
+              }
+
+              if (empty($tags_html)) {
+                $tag_label = 'ARTICLE';
+                if (!empty($post['is_news']))
+                  $tag_label = 'NEWS';
+                elseif (!empty($post['is_featured']))
+                  $tag_label = 'FEATURED';
+                $tags_html = '<span>' . $tag_label . '</span>';
+              }
               ?>
-              <div class="da-section-label" style="display: flex; gap: 12px; flex-wrap: wrap; margin-bottom: 12px;"><?php echo $tags_html; ?></div>
-              <h1 class="da-hero-main-title" style="font-size: clamp(24px, 3vw, 36px);"><?php echo htmlspecialchars($post['title']); ?></h1>
+              <div class="da-section-label" style="display: flex; gap: 12px; flex-wrap: wrap; margin-bottom: 12px;">
+                <?php echo $tags_html; ?></div>
+              <h1 class="da-hero-main-title" style="font-size: clamp(24px, 3vw, 36px);">
+                <?php echo htmlspecialchars($post['title']); ?></h1>
               <div class="da-hero-meta">
                 <span><i class="fa fa-user"></i><?php echo htmlspecialchars($post['author']); ?></span>
-                <span><i class="fa fa-calendar-alt"></i><?php echo date('M j, Y', strtotime($post['publish_date'] ?: $post['created_at'])); ?></span>
+                <span><i
+                    class="fa fa-calendar-alt"></i><?php echo date('M j, Y', strtotime($post['publish_date'] ?: $post['created_at'])); ?></span>
                 <span><i class="fa fa-comment"></i><?php echo $postCommentCount; ?> comments</span>
               </div>
             </div>
           </div>
         <?php endif; ?>
-        
+
         <?php if (!empty($post['content_body'])): ?>
-        <div class="da-post-content">
-          <?php
-          // Handle both plain text and rich content
-          $content = $post['content_body'];
-          // Check if content contains HTML tags
-          if (strip_tags($content) != $content) {
-            // Content has HTML, display as-is
-            echo $content;
-          } else {
-            // Plain text content, convert line breaks
-            echo nl2br(htmlspecialchars($content));
-          }
-          ?>
-        </div>
+          <div class="da-post-content">
+            <?php
+            // Handle both plain text and rich content
+            $content = $post['content_body'];
+            // Check if content contains HTML tags
+            if (strip_tags($content) != $content) {
+              // Content has HTML, display as-is
+              echo $content;
+            } else {
+              // Plain text content, convert line breaks
+              echo nl2br(htmlspecialchars($content));
+            }
+            ?>
+          </div>
         <?php else: ?>
-        <div class="da-post-content">
-          <p>Content is being updated. Please check back later for the full article.</p>
-        </div>
+          <div class="da-post-content">
+            <p>Content is being updated. Please check back later for the full article.</p>
+          </div>
         <?php endif; ?>
         <!-- Comments Section -->
         <div class="da-widget mt-4" id="comments">
@@ -524,7 +546,7 @@ function getAvatarDisplay($name, $email)
             <div class="da-widget-icon"><i class="fa fa-comments"></i></div>
           </div>
           <div class="da-widget-body">
-            
+
             <div class="da-comments-list">
               <?php if (!empty($postComments)): ?>
                 <?php foreach ($postComments as $comment): ?>
@@ -535,10 +557,13 @@ function getAvatarDisplay($name, $email)
                     <div class="da-comment-content">
                       <div class="da-comment-header">
                         <span class="da-comment-name"><?php echo htmlspecialchars($comment['name']); ?></span>
-                        <span class="da-comment-time"><i class="fa fa-clock"></i> <?php echo timeAgo($comment['created_at']); ?></span>
+                        <span class="da-comment-time"><i class="fa fa-clock"></i>
+                          <?php echo timeAgo($comment['created_at']); ?></span>
                       </div>
                       <div class="da-comment-text"><?php echo nl2br(htmlspecialchars($comment['comment'])); ?></div>
-                      <button class="da-reply-btn reply-btn" data-comment-id="<?php echo $comment['id']; ?>" data-comment-name="<?php echo htmlspecialchars($comment['name']); ?>"><i class="fa fa-reply"></i> Reply</button>
+                      <button class="da-reply-btn reply-btn" data-comment-id="<?php echo $comment['id']; ?>"
+                        data-comment-name="<?php echo htmlspecialchars($comment['name']); ?>"><i class="fa fa-reply"></i>
+                        Reply</button>
                     </div>
                   </div>
                   <?php if (!empty($comment['replies'])): ?>
@@ -551,17 +576,21 @@ function getAvatarDisplay($name, $email)
                           <div class="da-comment-header">
                             <span class="da-comment-name"><?php echo htmlspecialchars($reply['name']); ?></span>
                             <small class="da-replied-tag"><i class="fa fa-reply fa-xs"></i> replied</small>
-                            <span class="da-comment-time"><i class="fa fa-clock"></i> <?php echo timeAgo($reply['created_at']); ?></span>
+                            <span class="da-comment-time"><i class="fa fa-clock"></i>
+                              <?php echo timeAgo($reply['created_at']); ?></span>
                           </div>
                           <div class="da-comment-text"><?php echo nl2br(htmlspecialchars($reply['comment'])); ?></div>
-                          <button class="da-reply-btn reply-btn" data-comment-id="<?php echo $comment['id']; ?>" data-comment-name="<?php echo htmlspecialchars($comment['name']); ?>"><i class="fa fa-reply"></i> Reply</button>
+                          <button class="da-reply-btn reply-btn" data-comment-id="<?php echo $comment['id']; ?>"
+                            data-comment-name="<?php echo htmlspecialchars($comment['name']); ?>"><i class="fa fa-reply"></i>
+                            Reply</button>
                         </div>
                       </div>
                     <?php endforeach; ?>
                   <?php endif; ?>
                 <?php endforeach; ?>
               <?php else: ?>
-                <div class="da-empty"><i class="fa fa-comments"></i>No comments yet. Be the first to share your opinion!</div>
+                <div class="da-empty"><i class="fa fa-comments"></i>No comments yet. Be the first to share your opinion!
+                </div>
               <?php endif; ?>
             </div>
 
@@ -590,31 +619,39 @@ function getAvatarDisplay($name, $email)
                 <input type="hidden" name="action" value="comment_post">
                 <input type="hidden" name="post_id" value="<?php echo htmlspecialchars($post['id']); ?>">
                 <input type="hidden" name="parent_id" id="parent_id" value="">
-                
+
                 <div class="da-form-row">
                   <div class="da-form-group">
-                    <input type="text" class="da-input" name="name" placeholder="Your Name" required <?php if ($isUserLoggedIn && $loggedInName): ?>value="<?php echo htmlspecialchars($loggedInName); ?>" disabled<?php endif; ?>>
-                    <?php if ($isUserLoggedIn && $loggedInName): ?><input type="hidden" name="name" value="<?php echo htmlspecialchars($loggedInName); ?>"><?php endif; ?>
+                    <input type="text" class="da-input" name="name" placeholder="Your Name" required <?php if ($isUserLoggedIn && $loggedInName): ?>value="<?php echo htmlspecialchars($loggedInName); ?>"
+                        disabled<?php endif; ?>>
+                    <?php if ($isUserLoggedIn && $loggedInName): ?><input type="hidden" name="name"
+                        value="<?php echo htmlspecialchars($loggedInName); ?>"><?php endif; ?>
                   </div>
                   <div class="da-form-group">
-                    <input type="email" class="da-input" name="email" placeholder="Your Email (optional)" <?php if ($isUserLoggedIn && $loggedInEmail): ?>value="<?php echo htmlspecialchars($loggedInEmail); ?>" disabled<?php endif; ?>>
-                    <?php if ($isUserLoggedIn && $loggedInEmail): ?><input type="hidden" name="email" value="<?php echo htmlspecialchars($loggedInEmail); ?>"><?php endif; ?>
+                    <input type="email" class="da-input" name="email" placeholder="Your Email (optional)" <?php if ($isUserLoggedIn && $loggedInEmail): ?>value="<?php echo htmlspecialchars($loggedInEmail); ?>"
+                        disabled<?php endif; ?>>
+                    <?php if ($isUserLoggedIn && $loggedInEmail): ?><input type="hidden" name="email"
+                        value="<?php echo htmlspecialchars($loggedInEmail); ?>"><?php endif; ?>
                   </div>
                 </div>
-                
+
                 <div class="da-form-group">
-                  <textarea class="da-input" name="comment" rows="4" placeholder="Share your thoughts about this article..." required></textarea>
+                  <textarea class="da-input" name="comment" rows="4"
+                    placeholder="Share your thoughts about this article..." required></textarea>
                 </div>
-                
+
                 <div class="da-form-group da-captcha-group">
                   <label>Type the words shown below</label>
                   <div class="da-captcha-box">
-                    <img src="<?php echo $base; ?>captcha.php" id="captcha-image" alt="CAPTCHA" onclick="refreshCaptcha()">
-                    <button type="button" class="da-cta-btn secondary" onclick="refreshCaptcha()"><i class="fa fa-rotate-right"></i></button>
-                    <input type="text" class="da-input" name="captcha" id="captcha-input" placeholder="Enter the words" required autocomplete="off">
+                    <img src="<?php echo $base; ?>captcha.php" id="captcha-image" alt="CAPTCHA"
+                      onclick="refreshCaptcha()">
+                    <button type="button" class="da-cta-btn secondary" onclick="refreshCaptcha()"><i
+                        class="fa fa-rotate-right"></i></button>
+                    <input type="text" class="da-input" name="captcha" id="captcha-input" placeholder="Enter the words"
+                      required autocomplete="off">
                   </div>
                 </div>
-                
+
                 <div id="post-comment-msg" style="display:none;margin-bottom:12px;"></div>
                 <div class="da-form-footer">
                   <div class="d-flex align-items-center flex-wrap gap-3">
@@ -645,11 +682,11 @@ function getAvatarDisplay($name, $email)
 
         <!-- Top 10 by Fans -->
         <?php include('includes/sidebar/top-by-fans.php'); ?>
-        
+
       </aside>
     </div>
     <!-- BOTTOM AREA -->
-    
+
     <!-- ── IN STORES NOW ── -->
     <?php include('includes/bottom-area/in-stores-now.php'); ?>
 
@@ -701,7 +738,7 @@ function getAvatarDisplay($name, $email)
       }
     });
 
-    // Auto-Sliders moved to redesign/sliders.js
+    // Auto-Sliders moved to sliders.js
 
     // ── Navbar scroll effect ──
     const navbar = document.getElementById('da-navbar');
@@ -742,7 +779,7 @@ function getAvatarDisplay($name, $email)
     const searchResults = document.getElementById('da-search-results');
     if (searchInput && searchResults) {
       let searchTimer;
-      searchInput.addEventListener('input', function() {
+      searchInput.addEventListener('input', function () {
         clearTimeout(searchTimer);
         const q = this.value.trim();
         if (q.length < 2) {
@@ -775,7 +812,7 @@ function getAvatarDisplay($name, $email)
             posts.forEach(p => {
               html += `<a href="${baseURL}post/${encodeURIComponent(p.slug)}" class="da-search-result-item">
           ${p.featured_image ? `<img src="${p.featured_image}" onerror="this.style.display='none'">` : ''}
-          <div><div class="sr-text">${p.title}</div><div class="sr-meta"><i class="fa fa-newspaper me-1"></i>${p.created_at ? p.created_at.substring(0,10) : 'Article'}</div></div>
+          <div><div class="sr-text">${p.title}</div><div class="sr-meta"><i class="fa fa-newspaper me-1"></i>${p.created_at ? p.created_at.substring(0, 10) : 'Article'}</div></div>
         </a>`;
             });
             searchResults.innerHTML = html;
@@ -794,7 +831,7 @@ function getAvatarDisplay($name, $email)
     const newsEmail = document.getElementById('da-newsletter-email');
     const newsMsg = document.getElementById('da-newsletter-msg');
     if (newsBtn && newsEmail && newsMsg) {
-      newsBtn.addEventListener('click', function() {
+      newsBtn.addEventListener('click', function () {
         const email = newsEmail.value.trim();
         if (!email) { newsMsg.textContent = 'Please enter your email.'; newsMsg.className = 'error'; return; }
         this.disabled = true;
@@ -834,7 +871,7 @@ function getAvatarDisplay($name, $email)
           'Content-Type': 'application/x-www-form-urlencoded'
         },
         body: 'action=mark_seen'
-      }).catch(() => {});
+      }).catch(() => { });
     }
     const bell = document.getElementById('notificationBellDesktop');
     if (bell) bell.addEventListener('click', () => setTimeout(markNotificationsAsSeen, 100));
@@ -856,7 +893,7 @@ function getAvatarDisplay($name, $email)
     }
 
     const loginForm = document.getElementById('publicLoginForm');
-    if (loginForm) loginForm.addEventListener('submit', function(e) {
+    if (loginForm) loginForm.addEventListener('submit', function (e) {
       e.preventDefault();
       const btn = document.getElementById('loginSubmitBtn');
       btn.disabled = true;
@@ -878,7 +915,7 @@ function getAvatarDisplay($name, $email)
     });
 
     const signupForm = document.getElementById('publicSignupForm');
-    if (signupForm) signupForm.addEventListener('submit', function(e) {
+    if (signupForm) signupForm.addEventListener('submit', function (e) {
       e.preventDefault();
       const btn = document.getElementById('signupSubmitBtn');
       btn.disabled = true;
@@ -915,7 +952,7 @@ function getAvatarDisplay($name, $email)
     }
 
     const profileForm = document.getElementById('profileUpdateForm');
-    if (profileForm) profileForm.addEventListener('submit', function(e) {
+    if (profileForm) profileForm.addEventListener('submit', function (e) {
       e.preventDefault();
       const btn = document.getElementById('profileUpdateBtn');
       btn.disabled = true;
@@ -960,12 +997,12 @@ function getAvatarDisplay($name, $email)
 
     function publicUserLogout() {
       fetch(baseURL + 'notification_handler.php', {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/x-www-form-urlencoded'
-          },
-          body: 'action=reset'
-        })
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/x-www-form-urlencoded'
+        },
+        body: 'action=reset'
+      })
         .finally(() => {
           userAuthFetch('logout', new FormData()).then(() => location.reload());
         });
@@ -995,13 +1032,13 @@ function getAvatarDisplay($name, $email)
       // Reply button wiring
       document.querySelectorAll('.reply-btn').forEach(function (btn) {
         btn.addEventListener('click', function () {
-          const cid  = this.getAttribute('data-comment-id');
+          const cid = this.getAttribute('data-comment-id');
           const name = this.getAttribute('data-comment-name');
           document.getElementById('parent_id').value = cid;
           const indicator = document.getElementById('reply-indicator');
           const label = document.getElementById('reply-to-name');
           if (indicator) indicator.classList.remove('d-none');
-          if (label)     label.textContent = name;
+          if (label) label.textContent = name;
           form.querySelector('textarea[name="comment"]').focus();
         });
       });
@@ -1058,7 +1095,7 @@ function getAvatarDisplay($name, $email)
       });
     })();
   </script>
-  <script src="<?php echo $base; ?>redesign/sliders.js"></script>
+  <script src="<?php echo $base; ?>sliders.js"></script>
 </body>
 
 </html>

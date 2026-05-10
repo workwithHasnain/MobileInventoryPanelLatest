@@ -95,7 +95,7 @@ $brands = $brands_stmt->fetchAll();
     rel="stylesheet">
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/css/bootstrap.min.css" rel="stylesheet">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" />
-  <link rel="stylesheet" href="<?php echo $base; ?>redesign/style.css">
+  <link rel="stylesheet" href="<?php echo $base; ?>style.css">
 
   <!-- Schema.org Structured Data for Contact Page -->
   <?php
@@ -266,14 +266,16 @@ $brands = $brands_stmt->fetchAll();
 
       <!-- Background Image Implementation based on original layout -->
       <div class="cp-hero-bg-container">
-        <img class="cp-hero-bg-img" src="<?php echo $base; ?>hero-images/contact-hero.png" alt="contact us page background">
+        <img class="cp-hero-bg-img" src="<?php echo $base; ?>hero-images/contact-hero.png"
+          alt="contact us page background">
       </div>
 
       <div class="cp-hero-inner">
         <div class="cp-hero-left">
           <div class="cp-hero-label"><span>DevicesArena</span></div>
           <h1 class="cp-hero-title">Contact Us</h1>
-          <p class="cp-hero-sub">Get in touch with DevicesArena for any inquiries, suggestions, or feedback about smartphones and mobile technology.</p>
+          <p class="cp-hero-sub">Get in touch with DevicesArena for any inquiries, suggestions, or feedback about
+            smartphones and mobile technology.</p>
         </div>
 
         <!-- Right: Brand panel (Classic Widget) -->
@@ -348,29 +350,34 @@ $brands = $brands_stmt->fetchAll();
 
         <div class="da-about-content mt-4">
           <h4 class="da-about-heading mt-0 mb-4">Send us a message</h4>
-          
+
           <div id="contact_message_container"></div>
-          
+
           <form id="contact_form" class="da-form" novalidate>
             <input type="hidden" name="query_type" value="contact">
-            
+
             <div class="da-form-row">
               <div class="da-form-group">
-                <input type="text" class="da-input" id="contact_name" name="contact_name" placeholder="Your Name *" maxlength="100" required>
+                <input type="text" class="da-input" id="contact_name" name="contact_name" placeholder="Your Name *"
+                  maxlength="100" required>
                 <div class="da-error-msg" id="name_error"></div>
               </div>
               <div class="da-form-group">
-                <input type="email" class="da-input" id="contact_email" name="contact_email" placeholder="Your Email *" maxlength="255" required>
+                <input type="email" class="da-input" id="contact_email" name="contact_email" placeholder="Your Email *"
+                  maxlength="255" required>
                 <div class="da-error-msg" id="email_error"></div>
               </div>
             </div>
-            
+
             <div class="da-form-group">
-              <textarea class="da-input" id="contact_query" name="contact_query" rows="5" placeholder="Please describe your inquiry in detail (no links allowed)..." maxlength="5000" required></textarea>
+              <textarea class="da-input" id="contact_query" name="contact_query" rows="5"
+                placeholder="Please describe your inquiry in detail (no links allowed)..." maxlength="5000"
+                required></textarea>
               <div class="da-error-msg" id="query_error"></div>
-              <div class="text-end mt-1"><small class="text-muted"><span id="char_count">0</span>/5000 characters</small></div>
+              <div class="text-end mt-1"><small class="text-muted"><span id="char_count">0</span>/5000
+                  characters</small></div>
             </div>
-            
+
             <div class="da-form-footer">
               <div class="d-flex align-items-center flex-wrap gap-3 w-100 justify-content-between">
                 <button type="submit" id="contact_submit_btn" class="da-cta-btn">Send Message</button>
@@ -450,20 +457,20 @@ $brands = $brands_stmt->fetchAll();
     // ── Navbar scroll effect ──
     const navbar = document.getElementById('da-navbar');
     if (navbar) {
-        window.addEventListener('scroll', () => {
-            navbar.classList.toggle('scrolled', window.scrollY > 40);
-        }, { passive: true });
+      window.addEventListener('scroll', () => {
+        navbar.classList.toggle('scrolled', window.scrollY > 40);
+      }, { passive: true });
     }
 
     // ── Mobile Menu ──
     const hamburger = document.getElementById('da-hamburger');
     const mobileMenu = document.getElementById('da-mobile-menu');
     if (hamburger && mobileMenu) {
-        hamburger.addEventListener('click', () => {
-            hamburger.classList.toggle('open');
-            mobileMenu.classList.toggle('open');
-            document.body.style.overflow = mobileMenu.classList.contains('open') ? 'hidden' : '';
-        });
+      hamburger.addEventListener('click', () => {
+        hamburger.classList.toggle('open');
+        mobileMenu.classList.toggle('open');
+        document.body.style.overflow = mobileMenu.classList.contains('open') ? 'hidden' : '';
+      });
     }
 
     function closeMobileMenu() {
@@ -477,8 +484,8 @@ $brands = $brands_stmt->fetchAll();
     const brandLeft = document.getElementById('brand-strip-left');
     const brandRight = document.getElementById('brand-strip-right');
     if (brandScroll && brandLeft && brandRight) {
-        brandLeft.addEventListener('click', () => brandScroll.scrollBy({ left: -300, behavior: 'smooth' }));
-        brandRight.addEventListener('click', () => brandScroll.scrollBy({ left: 300, behavior: 'smooth' }));
+      brandLeft.addEventListener('click', () => brandScroll.scrollBy({ left: -300, behavior: 'smooth' }));
+      brandRight.addEventListener('click', () => brandScroll.scrollBy({ left: 300, behavior: 'smooth' }));
     }
 
     // ── Live Search ──
@@ -538,35 +545,35 @@ $brands = $brands_stmt->fetchAll();
     const newsEmail = document.getElementById('da-newsletter-email');
     const newsMsg = document.getElementById('da-newsletter-msg');
     if (newsBtn && newsEmail && newsMsg) {
-        newsBtn.addEventListener('click', function () {
-            const email = newsEmail.value.trim();
-            if (!email) {
-                newsMsg.textContent = 'Please enter your email.';
-                newsMsg.className = 'error';
-                return;
-            }
-            this.disabled = true;
-            this.textContent = 'Subscribing...';
-            const btn = this;
-            fetch(window.baseURL + 'handle_newsletter.php', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-                body: 'newsletter_email=' + encodeURIComponent(email)
-            })
-            .then(r => r.json())
-            .then(data => {
-                newsMsg.textContent = data.message;
-                newsMsg.className = data.success ? 'success' : 'error';
-                if (data.success) newsEmail.value = '';
-                btn.disabled = false;
-                btn.textContent = 'Subscribe';
-            }).catch(() => {
-                newsMsg.textContent = 'An error occurred.';
-                newsMsg.className = 'error';
-                btn.disabled = false;
-                btn.textContent = 'Subscribe';
-            });
-        });
+      newsBtn.addEventListener('click', function () {
+        const email = newsEmail.value.trim();
+        if (!email) {
+          newsMsg.textContent = 'Please enter your email.';
+          newsMsg.className = 'error';
+          return;
+        }
+        this.disabled = true;
+        this.textContent = 'Subscribing...';
+        const btn = this;
+        fetch(window.baseURL + 'handle_newsletter.php', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+          body: 'newsletter_email=' + encodeURIComponent(email)
+        })
+          .then(r => r.json())
+          .then(data => {
+            newsMsg.textContent = data.message;
+            newsMsg.className = data.success ? 'success' : 'error';
+            if (data.success) newsEmail.value = '';
+            btn.disabled = false;
+            btn.textContent = 'Subscribe';
+          }).catch(() => {
+            newsMsg.textContent = 'An error occurred.';
+            newsMsg.className = 'error';
+            btn.disabled = false;
+            btn.textContent = 'Subscribe';
+          });
+      });
     }
 
     // ── Notification mark seen ──
@@ -771,128 +778,128 @@ $brands = $brands_stmt->fetchAll();
       }
     })();
     // ── Contact Form Handler ──
-    (function() {
-        const contactForm = document.getElementById('contact_form');
-        const contactMsg = document.getElementById('contact_message_container');
-        const charCount = document.getElementById('char_count');
-        const queryField = document.getElementById('contact_query');
+    (function () {
+      const contactForm = document.getElementById('contact_form');
+      const contactMsg = document.getElementById('contact_message_container');
+      const charCount = document.getElementById('char_count');
+      const queryField = document.getElementById('contact_query');
 
-        if (queryField && charCount) {
-            queryField.addEventListener('input', function() {
-                charCount.textContent = this.value.length;
+      if (queryField && charCount) {
+        queryField.addEventListener('input', function () {
+          charCount.textContent = this.value.length;
+        });
+      }
+
+      function containsLinks(text) {
+        const patterns = [
+          /https?:\/\/[^\s]+/i,
+          /www\.[^\s]+/i,
+          /[a-zA-Z0-9.-]+\.(com|net|org|info|biz|xyz|ru|cn|tk|ml|ga|cf|gq|top|work|click|link|site|online|store|shop|buzz|pw|cc|io|co|me)\b/i,
+          /\[url[=\]].*?\[\/url\]/i,
+          /<a\s[^>]*href[^>]*>/i,
+          /href\s*=\s*["'][^"']*["']/i,
+        ];
+        for (const p of patterns) {
+          if (p.test(text)) return true;
+        }
+        return false;
+      }
+
+      function clearErrors() {
+        document.querySelectorAll('#contact_form .da-input').forEach(el => el.classList.remove('is-invalid'));
+        document.querySelectorAll('#contact_form .da-error-msg').forEach(el => el.classList.remove('show-error'));
+      }
+
+      function setError(fieldId, errorId, msg) {
+        document.getElementById(fieldId).classList.add('is-invalid');
+        document.getElementById(errorId).textContent = msg;
+        document.getElementById(errorId).classList.add('show-error');
+      }
+
+      function showContactMessage(message, type) {
+        const alertClass = type === 'success' ? 'alert-success' : 'alert-danger';
+        contactMsg.innerHTML = '<div class="alert ' + alertClass + ' alert-dismissible fade show">' + message + '<button type="button" class="btn-close" data-bs-dismiss="alert"></button></div>';
+        if (type === 'success') {
+          setTimeout(() => {
+            contactMsg.innerHTML = '';
+          }, 8000);
+        }
+      }
+
+      if (contactForm) {
+        contactForm.addEventListener('submit', function (e) {
+          e.preventDefault();
+          clearErrors();
+
+          const name = document.getElementById('contact_name').value.trim();
+          const email = document.getElementById('contact_email').value.trim();
+          const query = queryField.value.trim();
+          let hasError = false;
+
+          if (!name) {
+            setError('contact_name', 'name_error', 'Please enter your name.');
+            hasError = true;
+          } else if (containsLinks(name)) {
+            setError('contact_name', 'name_error', 'Links are not allowed in the name field.');
+            hasError = true;
+          }
+
+          if (!email) {
+            setError('contact_email', 'email_error', 'Please enter your email.');
+            hasError = true;
+          } else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+            setError('contact_email', 'email_error', 'Please enter a valid email address.');
+            hasError = true;
+          }
+
+          if (!query) {
+            setError('contact_query', 'query_error', 'Please enter your message.');
+            hasError = true;
+          } else if (query.length < 10) {
+            setError('contact_query', 'query_error', 'Your message is too short (minimum 10 characters).');
+            hasError = true;
+          } else if (containsLinks(query)) {
+            setError('contact_query', 'query_error', 'Links/URLs are not allowed in the message. Please remove any links and try again.');
+            hasError = true;
+          }
+
+          if (hasError) return;
+
+          const btn = document.getElementById('contact_submit_btn');
+          const originalHTML = btn.innerHTML;
+          btn.disabled = true;
+          btn.innerHTML = '<i class="fas fa-spinner fa-spin me-2"></i>Sending...';
+
+          fetch(window.baseURL + 'handle_contact.php', {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/x-www-form-urlencoded'
+            },
+            body: 'contact_name=' + encodeURIComponent(name) +
+              '&contact_email=' + encodeURIComponent(email) +
+              '&contact_query=' + encodeURIComponent(query) +
+              '&query_type=contact'
+          })
+            .then(r => r.json())
+            .then(data => {
+              showContactMessage(data.message, data.success ? 'success' : 'error');
+              if (data.success) {
+                contactForm.reset();
+                if (charCount) charCount.textContent = '0';
+              }
+              btn.disabled = false;
+              btn.innerHTML = originalHTML;
+            })
+            .catch(() => {
+              showContactMessage('An error occurred. Please try again later.', 'error');
+              btn.disabled = false;
+              btn.innerHTML = originalHTML;
             });
-        }
-
-        function containsLinks(text) {
-            const patterns = [
-                /https?:\/\/[^\s]+/i,
-                /www\.[^\s]+/i,
-                /[a-zA-Z0-9.-]+\.(com|net|org|info|biz|xyz|ru|cn|tk|ml|ga|cf|gq|top|work|click|link|site|online|store|shop|buzz|pw|cc|io|co|me)\b/i,
-                /\[url[=\]].*?\[\/url\]/i,
-                /<a\s[^>]*href[^>]*>/i,
-                /href\s*=\s*["'][^"']*["']/i,
-            ];
-            for (const p of patterns) {
-                if (p.test(text)) return true;
-            }
-            return false;
-        }
-
-        function clearErrors() {
-            document.querySelectorAll('#contact_form .da-input').forEach(el => el.classList.remove('is-invalid'));
-            document.querySelectorAll('#contact_form .da-error-msg').forEach(el => el.classList.remove('show-error'));
-        }
-
-        function setError(fieldId, errorId, msg) {
-            document.getElementById(fieldId).classList.add('is-invalid');
-            document.getElementById(errorId).textContent = msg;
-            document.getElementById(errorId).classList.add('show-error');
-        }
-
-        function showContactMessage(message, type) {
-            const alertClass = type === 'success' ? 'alert-success' : 'alert-danger';
-            contactMsg.innerHTML = '<div class="alert ' + alertClass + ' alert-dismissible fade show">' + message + '<button type="button" class="btn-close" data-bs-dismiss="alert"></button></div>';
-            if (type === 'success') {
-                setTimeout(() => {
-                    contactMsg.innerHTML = '';
-                }, 8000);
-            }
-        }
-
-        if (contactForm) {
-            contactForm.addEventListener('submit', function(e) {
-                e.preventDefault();
-                clearErrors();
-
-                const name = document.getElementById('contact_name').value.trim();
-                const email = document.getElementById('contact_email').value.trim();
-                const query = queryField.value.trim();
-                let hasError = false;
-
-                if (!name) {
-                    setError('contact_name', 'name_error', 'Please enter your name.');
-                    hasError = true;
-                } else if (containsLinks(name)) {
-                    setError('contact_name', 'name_error', 'Links are not allowed in the name field.');
-                    hasError = true;
-                }
-
-                if (!email) {
-                    setError('contact_email', 'email_error', 'Please enter your email.');
-                    hasError = true;
-                } else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
-                    setError('contact_email', 'email_error', 'Please enter a valid email address.');
-                    hasError = true;
-                }
-
-                if (!query) {
-                    setError('contact_query', 'query_error', 'Please enter your message.');
-                    hasError = true;
-                } else if (query.length < 10) {
-                    setError('contact_query', 'query_error', 'Your message is too short (minimum 10 characters).');
-                    hasError = true;
-                } else if (containsLinks(query)) {
-                    setError('contact_query', 'query_error', 'Links/URLs are not allowed in the message. Please remove any links and try again.');
-                    hasError = true;
-                }
-
-                if (hasError) return;
-
-                const btn = document.getElementById('contact_submit_btn');
-                const originalHTML = btn.innerHTML;
-                btn.disabled = true;
-                btn.innerHTML = '<i class="fas fa-spinner fa-spin me-2"></i>Sending...';
-
-                fetch(window.baseURL + 'handle_contact.php', {
-                        method: 'POST',
-                        headers: {
-                            'Content-Type': 'application/x-www-form-urlencoded'
-                        },
-                        body: 'contact_name=' + encodeURIComponent(name) +
-                            '&contact_email=' + encodeURIComponent(email) +
-                            '&contact_query=' + encodeURIComponent(query) +
-                            '&query_type=contact'
-                    })
-                    .then(r => r.json())
-                    .then(data => {
-                        showContactMessage(data.message, data.success ? 'success' : 'error');
-                        if (data.success) {
-                            contactForm.reset();
-                            if(charCount) charCount.textContent = '0';
-                        }
-                        btn.disabled = false;
-                        btn.innerHTML = originalHTML;
-                    })
-                    .catch(() => {
-                        showContactMessage('An error occurred. Please try again later.', 'error');
-                        btn.disabled = false;
-                        btn.innerHTML = originalHTML;
-                    });
-            });
-        }
+        });
+      }
     })();
   </script>
-  <script src="<?php echo $base; ?>redesign/sliders.js"></script>
+  <script src="<?php echo $base; ?>sliders.js"></script>
 </body>
 
 </html>
