@@ -957,7 +957,7 @@ function getAvatarDisplay($name, $email)
 }
 
 // Function to track view
-function trackDeviceView($pdo, $device_id, $ip_address)
+function trackContentView_Images($pdo, $device_id, $ip_address)
 {
   try {
     $today = date('Y-m-d');
@@ -1030,7 +1030,7 @@ $deviceStats = generateDeviceStats($device);
 
 // Track view
 $ip_address = $_SERVER['REMOTE_ADDR'] ?? 'unknown';
-trackDeviceView($pdo, $device_id, $ip_address);
+trackContentView_Images($pdo, $device_id, $ip_address);
 
 // Get comments
 $comments = getDeviceComments($pdo, $device_id);
