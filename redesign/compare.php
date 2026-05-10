@@ -954,9 +954,7 @@ $da_active_nav = 'compare';
       if (mobileMenu?.classList.contains('open') && !mobileMenu.contains(e.target) && !hamburger.contains(e.target)) closeMobileMenu();
     });
 
-, body: 'action=reset' })
-        .finally(() => fetch(window.baseURL + 'public_auth.php', { method: 'POST', body: new URLSearchParams({ action: 'logout' }) }).then(() => location.reload()));
-    }
+
   </script>
   <script>
     window.baseURL = '<?php echo $base; ?>';
