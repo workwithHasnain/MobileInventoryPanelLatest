@@ -539,6 +539,14 @@ $da_active_nav = 'compare';
 <body>
 
   <?php include __DIR__ . '/includes/navbar.php'; ?>
+  <!-- ══════════════════════ AUTH MODALS ══════════════════════ -->
+  <!-- Login -->
+  <?php include('includes/login-modal.php'); ?>
+  <!-- Sign Up -->
+  <?php include('includes/signup-modal.php'); ?>
+
+  <!-- Profile -->
+  <?php include('includes/profile-modal.php'); ?>
 
   <!-- ══════════════════════════════════════════
      COMPARE PAGE CONTENT
@@ -825,7 +833,6 @@ $da_active_nav = 'compare';
   <?php include __DIR__ . '/includes/footer.php'; ?>
 
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/js/bootstrap.bundle.min.js"></script>
-  <script src="<?php echo $base; ?>script.js"></script>
   <script>
     window.baseURL = '<?php echo $base; ?>';
 
@@ -965,29 +972,27 @@ $da_active_nav = 'compare';
       if (mobileMenu?.classList.contains('open') && !mobileMenu.contains(e.target) && !hamburger.contains(e.target)) closeMobileMenu();
     });
 
+    // ── Navbar scroll effect ──
+    const navbarEl = document.getElementById('da-navbar');
+    if (navbarEl) window.addEventListener('scroll', () => navbarEl.classList.toggle('scrolled', window.scrollY > 40), { passive: true });
 
-  <script>
     // ── Brand Strip Arrows ──
     const brandScroll = document.getElementById('brand-strip-scroll');
-    if (document.getElementById('brand-strip-left'))
-      document.getElementById('brand-strip-left').addEventListener('click', () => brandScroll?.scrollBy({ left: -300, behavior: 'smooth' }));
-    if (document.getElementById('brand-strip-right'))
-      document.getElementById('brand-strip-right').addEventListener('click', () => brandScroll?.scrollBy({ left: 300, behavior: 'smooth' }));
-
-    // ── Navbar scroll effect ──
-    const navbar = document.getElementById('da-navbar');
-    if (navbar) window.addEventListener('scroll', () => navbar.classList.toggle('scrolled', window.scrollY > 40), { passive: true });
+    const bsLeft = document.getElementById('brand-strip-left');
+    const bsRight = document.getElementById('brand-strip-right');
+    if (bsLeft) bsLeft.addEventListener('click', () => brandScroll?.scrollBy({ left: -300, behavior: 'smooth' }));
+    if (bsRight) bsRight.addEventListener('click', () => brandScroll?.scrollBy({ left: 300, behavior: 'smooth' }));
 
     // ── Live Search (navbar) ──
-    const searchInput = document.getElementById('da-search-input');
-    const searchResults = document.getElementById('da-search-results');
-    if (searchInput && searchResults) {
-      let searchTimer;
-      searchInput.addEventListener('input', function () {
-        clearTimeout(searchTimer);
+    const navSearchInput = document.getElementById('da-search-input');
+    const navSearchResults = document.getElementById('da-search-results');
+    if (navSearchInput && navSearchResults) {
+      let navSearchTimer;
+      navSearchInput.addEventListener('input', function () {
+        clearTimeout(navSearchTimer);
         const q = this.value.trim();
-        if (q.length < 2) { searchResults.classList.remove('open'); return; }
-        searchTimer = setTimeout(() => {
+        if (q.length < 2) { navSearchResults.classList.remove('open'); return; }
+        navSearchTimer = setTimeout(() => {
           Promise.all([
             fetch(window.baseURL + 'api_get_devices.php?q=' + encodeURIComponent(q) + '&limit=4').then(r => r.json()).catch(() => ({ devices: [] })),
             fetch(window.baseURL + 'api_get_posts.php?q=' + encodeURIComponent(q) + '&limit=4').then(r => r.json()).catch(() => ({ posts: [] }))
@@ -995,41 +1000,27 @@ $da_active_nav = 'compare';
             const devices = devData.devices || [];
             const posts = postData.posts || [];
             if (!devices.length && !posts.length) {
-              searchResults.innerHTML = '<div class="da-search-result-item"><div class="sr-text">No results found</div></div>';
-              searchResults.classList.add('open'); return;
+              navSearchResults.innerHTML = '<div class="da-search-result-item"><div class="sr-text">No results found</div></div>';
+              navSearchResults.classList.add('open'); return;
             }
             let html = '';
             devices.forEach(d => { html += `<a href="${window.baseURL}device/${encodeURIComponent(d.slug || d.id)}" class="da-search-result-item">${d.image ? `<img src="${d.image}" onerror="this.style.display='none'">` : ''}<div><div class="sr-text">${d.name}</div><div class="sr-meta"><i class="fa fa-mobile-screen me-1"></i>${d.brand_name || 'Device'}</div></div></a>`; });
             posts.forEach(p => { html += `<a href="${window.baseURL}post/${encodeURIComponent(p.slug)}" class="da-search-result-item">${p.featured_image ? `<img src="${p.featured_image}" onerror="this.style.display='none'">` : ''}<div><div class="sr-text">${p.title}</div><div class="sr-meta"><i class="fa fa-newspaper me-1"></i>${p.created_at ? p.created_at.substring(0, 10) : 'Article'}</div></div></a>`; });
-            searchResults.innerHTML = html;
-            searchResults.classList.add('open');
+            navSearchResults.innerHTML = html;
+            navSearchResults.classList.add('open');
           });
         }, 320);
       });
-      document.addEventListener('click', e => { const wrap = document.getElementById('da-search-wrap'); if (wrap && !wrap.contains(e.target)) searchResults.classList.remove('open'); });
+      document.addEventListener('click', e => { const wrap = document.getElementById('da-search-wrap'); if (wrap && !wrap.contains(e.target)) navSearchResults.classList.remove('open'); });
     }
 
-    // ── Newsletter ──
-    const newsletterBtn = document.getElementById('da-newsletter-btn');
-    if (newsletterBtn) newsletterBtn.addEventListener('click', function () {
-      const email = document.getElementById('da-newsletter-email').value.trim();
-      const msg = document.getElementById('da-newsletter-msg');
-      if (!email) { msg.textContent = 'Please enter your email.'; msg.className = 'error'; return; }
-      this.disabled = true; this.textContent = 'Subscribing...';
-      const btn = this;
-      fetch(window.baseURL + 'handle_newsletter.php', { method: 'POST', headers: { 'Content-Type': 'application/x-www-form-urlencoded' }, body: 'newsletter_email=' + encodeURIComponent(email) })
-        .then(r => r.json()).then(data => { msg.textContent = data.message; msg.className = data.success ? 'success' : 'error'; if (data.success) document.getElementById('da-newsletter-email').value = ''; btn.disabled = false; btn.textContent = 'Subscribe'; }).catch(() => { msg.textContent = 'An error occurred.'; msg.className = 'error'; btn.disabled = false; btn.textContent = 'Subscribe'; });
-    });
-
-    // ── Notification ──
+    // ── Notification bell ──
     function markNotificationsAsSeen() {
       ['notifDotDesktop'].forEach(id => { const el = document.getElementById(id); if (el) el.style.display = 'none'; });
-      fetch(window.baseURL + 'notification_handler.php', { method: 'POST', headers: { 'Content-Type': 'application/x-www-form-urlencoded' }, body: 'action=mark_seen' }).catch(() => { });
+      fetch(window.baseURL + 'notification_handler.php', { method: 'POST', headers: { 'Content-Type': 'application/x-www-form-urlencoded' }, body: 'action=mark_seen' }).catch(() => {});
     }
-    const bell = document.getElementById('notificationBellDesktop');
-    if (bell) bell.addEventListener('click', () => setTimeout(markNotificationsAsSeen, 100));
-
-
+    const notifBell = document.getElementById('notificationBellDesktop');
+    if (notifBell) notifBell.addEventListener('click', () => setTimeout(markNotificationsAsSeen, 100));
   </script>
   <script src="<?php echo $base; ?>sliders.js"></script>
 </body>

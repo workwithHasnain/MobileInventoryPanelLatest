@@ -68,3 +68,11 @@ document.querySelectorAll('.da-slider-wrap').forEach(wrap => {
 
   if (window.innerWidth >= 1024) startAuto();
 });
+
+// ── Load auth.js after Bootstrap is ready ──
+(function () {
+  if (typeof window.authInitialized !== 'undefined') return;
+  var s = document.createElement('script');
+  s.src = (window.baseURL || '/') + 'js/auth.js';
+  document.head.appendChild(s);
+})();

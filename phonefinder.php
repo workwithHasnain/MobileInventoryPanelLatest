@@ -126,6 +126,14 @@ if (!$filterConfig) {
 <body>
 
   <?php include __DIR__ . '/includes/navbar.php'; ?>
+  <!-- ══════════════════════ AUTH MODALS ══════════════════════ -->
+  <!-- Login -->
+  <?php include('includes/login-modal.php'); ?>
+  <!-- Sign Up -->
+  <?php include('includes/signup-modal.php'); ?>
+
+  <!-- Profile -->
+  <?php include('includes/profile-modal.php'); ?>
 
   <!-- ══════════════════════════════════════════
      COMPARE PAGE CONTENT
