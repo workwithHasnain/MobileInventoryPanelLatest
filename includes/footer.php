@@ -179,3 +179,4 @@
       });
     })();
   </script>
+  <script src="<?php echo $base; ?>js/auth.js"></script>
