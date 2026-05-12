@@ -206,7 +206,8 @@ if ($_POST) {
             // Convert PHP arrays to PostgreSQL array literal format
             function to_pg_array($set)
             {
-                if (empty($set)) return '{}';
+                if (empty($set))
+                    return '{}';
                 foreach ($set as &$v) {
                     $v = '"' . str_replace('"', '""', $v) . '"';
                 }
@@ -321,7 +322,8 @@ include 'includes/header.php';
                         <div class="row">
                             <div class="col-md-6">
                                 <div class="mb-3">
-                                    <label for="title" class="form-label">Title <span class="text-danger">*</span></label>
+                                    <label for="title" class="form-label">Title <span
+                                            class="text-danger">*</span></label>
                                     <input type="text" class="form-control" id="title" name="title"
                                         value="<?php echo htmlspecialchars($_POST['title'] ?? $post['title']); ?>"
                                         required onkeyup="generateSlugFromTitle()">
@@ -344,9 +346,12 @@ include 'includes/header.php';
                             </div>
                             <div class="col-md-6">
                                 <div class="mb-3">
-                                    <label for="publish_date" class="form-label">Publish Date/Time <span class="text-danger">*</span></label>
-                                    <input type="datetime-local" class="form-control" id="publish_date" name="publish_date"
-                                        value="<?php echo $_POST['publish_date'] ?? date('Y-m-d\TH:i', strtotime($post['publish_date'])); ?>" required>
+                                    <label for="publish_date" class="form-label">Publish Date/Time <span
+                                            class="text-danger">*</span></label>
+                                    <input type="datetime-local" class="form-control" id="publish_date"
+                                        name="publish_date"
+                                        value="<?php echo $_POST['publish_date'] ?? date('Y-m-d\TH:i', strtotime($post['publish_date'])); ?>"
+                                        required>
                                 </div>
                             </div>
                         </div>
@@ -368,17 +373,20 @@ include 'includes/header.php';
                                     <p class="text-muted small mt-1">Current featured image</p>
                                 </div>
                             <?php endif; ?>
-                            <input type="file" class="form-control" id="featured_image" name="featured_image" accept="image/*">
-                            <div class="form-text">Leave empty to keep current image. Upload new image to replace (JPG, PNG, GIF, WebP)</div>
+                            <input type="file" class="form-control" id="featured_image" name="featured_image"
+                                accept="image/*">
+                            <div class="form-text">Leave empty to keep current image. Upload new image to replace (JPG,
+                                PNG, GIF, WebP)</div>
 
                             <!-- Image Guidance Feedback Area -->
                             <div id="image-guidance" class="mt-3" style="display: none;"></div>
                         </div>
 
                         <div class="mb-3">
-                            <label for="short_description" class="form-label">Short Description/Excerpt <span class="text-danger">*</span></label>
-                            <textarea class="form-control" id="short_description" name="short_description"
-                                rows="3" maxlength="200" required
+                            <label for="short_description" class="form-label">Short Description/Excerpt <span
+                                    class="text-danger">*</span></label>
+                            <textarea class="form-control" id="short_description" name="short_description" rows="3"
+                                maxlength="200" required
                                 placeholder="Brief description of your post (max 200 characters)"><?php echo htmlspecialchars($_POST['short_description'] ?? $post['short_description']); ?></textarea>
                             <div class="form-text">
                                 <span id="char_count">0</span>/200 characters
@@ -386,58 +394,71 @@ include 'includes/header.php';
                         </div>
 
                         <div class="mb-3">
-                            <label for="content_body" class="form-label">Content Body <span class="text-danger">*</span></label>
+                            <label for="content_body" class="form-label">Content Body <span
+                                    class="text-danger">*</span></label>
 
                             <!-- Rich Text Editor Toolbar -->
                             <div class="border rounded-top p-2 bg-light" id="editor-toolbar">
                                 <div class="btn-group btn-group-sm me-2" role="group">
-                                    <button type="button" class="btn btn-outline-secondary" onclick="formatText('bold')" title="Bold">
+                                    <button type="button" class="btn btn-outline-secondary" onclick="formatText('bold')"
+                                        title="Bold">
                                         <i class="fas fa-bold"></i>
                                     </button>
-                                    <button type="button" class="btn btn-outline-secondary" onclick="formatText('italic')" title="Italic">
+                                    <button type="button" class="btn btn-outline-secondary"
+                                        onclick="formatText('italic')" title="Italic">
                                         <i class="fas fa-italic"></i>
                                     </button>
-                                    <button type="button" class="btn btn-outline-secondary" onclick="formatText('underline')" title="Underline">
+                                    <button type="button" class="btn btn-outline-secondary"
+                                        onclick="formatText('underline')" title="Underline">
                                         <i class="fas fa-underline"></i>
                                     </button>
                                 </div>
 
                                 <div class="btn-group btn-group-sm me-2" role="group">
-                                    <button type="button" class="btn btn-outline-secondary" onclick="formatHeading('h1')" title="Heading 1">H1</button>
-                                    <button type="button" class="btn btn-outline-secondary" onclick="formatHeading('h2')" title="Heading 2">H2</button>
-                                    <button type="button" class="btn btn-outline-secondary" onclick="formatHeading('h3')" title="Heading 3">H3</button>
+                                    <button type="button" class="btn btn-outline-secondary"
+                                        onclick="formatHeading('h1')" title="Heading 1">H1</button>
+                                    <button type="button" class="btn btn-outline-secondary"
+                                        onclick="formatHeading('h2')" title="Heading 2">H2</button>
+                                    <button type="button" class="btn btn-outline-secondary"
+                                        onclick="formatHeading('h3')" title="Heading 3">H3</button>
                                 </div>
 
                                 <div class="btn-group btn-group-sm me-2" role="group">
-                                    <button type="button" class="btn btn-outline-secondary" onclick="formatList('insertUnorderedList')" title="Bullet List">
+                                    <button type="button" class="btn btn-outline-secondary"
+                                        onclick="formatList('insertUnorderedList')" title="Bullet List">
                                         <i class="fas fa-list-ul"></i>
                                     </button>
-                                    <button type="button" class="btn btn-outline-secondary" onclick="formatList('insertOrderedList')" title="Numbered List">
+                                    <button type="button" class="btn btn-outline-secondary"
+                                        onclick="formatList('insertOrderedList')" title="Numbered List">
                                         <i class="fas fa-list-ol"></i>
                                     </button>
                                 </div>
 
                                 <div class="btn-group btn-group-sm me-2" role="group">
-                                    <button type="button" class="btn btn-outline-secondary" onclick="formatText('justifyLeft')" title="Align Left">
+                                    <button type="button" class="btn btn-outline-secondary"
+                                        onclick="formatText('justifyLeft')" title="Align Left">
                                         <i class="fas fa-align-left"></i>
                                     </button>
-                                    <button type="button" class="btn btn-outline-secondary" onclick="formatText('justifyCenter')" title="Align Center">
+                                    <button type="button" class="btn btn-outline-secondary"
+                                        onclick="formatText('justifyCenter')" title="Align Center">
                                         <i class="fas fa-align-center"></i>
                                     </button>
-                                    <button type="button" class="btn btn-outline-secondary" onclick="formatText('justifyRight')" title="Align Right">
+                                    <button type="button" class="btn btn-outline-secondary"
+                                        onclick="formatText('justifyRight')" title="Align Right">
                                         <i class="fas fa-align-right"></i>
                                     </button>
                                 </div>
                             </div>
 
                             <!-- Rich Text Editor Content Area -->
-                            <div class="form-control" id="editor-content"
-                                contenteditable="true"
+                            <div class="form-control" id="editor-content" contenteditable="true"
                                 style="min-height: 300px; border-top: none; border-top-left-radius: 0; border-top-right-radius: 0;"
-                                placeholder="Write your post content here..."><?php echo $_POST['content_body'] ?? $post['content_body']; ?></div>
+                                placeholder="Write your post content here...">
+                                <?php echo $_POST['content_body'] ?? $post['content_body']; ?></div>
 
                             <!-- Hidden textarea to store the content for form submission -->
-                            <textarea class="d-none" id="content_body" name="content_body" required><?php echo htmlspecialchars($_POST['content_body'] ?? $post['content_body']); ?></textarea>
+                            <textarea class="d-none" id="content_body" name="content_body"
+                                required><?php echo htmlspecialchars($_POST['content_body'] ?? $post['content_body']); ?></textarea>
 
                             <div class="form-text">Full content of your post with rich text formatting</div>
                         </div>
@@ -452,9 +473,9 @@ include 'includes/header.php';
                                         ?>
                                             <div class="col-md-2 mb-2">
                                                 <img src="<?php //echo htmlspecialchars($image); 
-                                                            ?>"
+                                                ?>"
                                                     alt="Gallery image <?php //echo $index + 1; 
-                                                                        ?>"
+                                                    ?>"
                                                     class="img-thumbnail" style="width: 100%; height: 100px; object-fit: cover;">
                                             </div>
                                         <?php //endforeach; 
@@ -486,13 +507,13 @@ include 'includes/header.php';
                                         <div class="form-check">
                                             <input class="form-check-input" type="checkbox"
                                                 name="categories[]" value="<?php //echo htmlspecialchars($category['name']); 
-                                                                            ?>"
+                                                ?>"
                                                 id="cat_<?php //echo $category['id']; 
-                                                        ?>"
+                                                ?>"
                                                 <?php //echo (isset($_POST['categories']) ? (in_array($category['name'], $_POST['categories'])) : (in_array($category['name'], $post_categories))) ? 'checked' : ''; 
                                                 ?>>
                                             <label class="form-check-label" for="cat_<?php //echo $category['id']; 
-                                                                                        ?>">
+                                            ?>">
                                                 <?php //echo htmlspecialchars($category['name']); 
                                                 ?>
                                             </label>
@@ -528,8 +549,8 @@ include 'includes/header.php';
                         </div>
                         <div class="mb-3">
                             <label for="meta_description" class="form-label">Meta Description</label>
-                            <textarea class="form-control" id="meta_description" name="meta_description"
-                                rows="3" placeholder="Brief description for search engines"><?php echo htmlspecialchars($_POST['meta_description'] ?? $post['meta_description']); ?></textarea>
+                            <textarea class="form-control" id="meta_description" name="meta_description" rows="3"
+                                placeholder="Brief description for search engines"><?php echo htmlspecialchars($_POST['meta_description'] ?? $post['meta_description']); ?></textarea>
                         </div>
                     </div>
                 </div>
@@ -551,14 +572,15 @@ include 'includes/header.php';
 
                         <div class="mb-3">
                             <div class="form-check">
-                                <input class="form-check-input" type="checkbox" id="is_featured" name="is_featured" value="1"
-                                    <?php echo (isset($_POST['is_featured']) ? $_POST['is_featured'] : ($post['is_featured'] ?? false)) ? 'checked' : ''; ?>>
+                                <input class="form-check-input" type="checkbox" id="is_featured" name="is_featured"
+                                    value="1" <?php echo (isset($_POST['is_featured']) ? $_POST['is_featured'] : ($post['is_featured'] ?? false)) ? 'checked' : ''; ?>>
                                 <label class="form-check-label" for="is_featured">
                                     <i class="fas fa-star text-warning me-1"></i>
                                     <strong>Featured Post</strong>
                                 </label>
                                 <div class="form-text">
-                                    Featured posts will be highlighted on the Featured Posts page and given priority display.
+                                    Featured posts will be highlighted on the Featured Posts page and given priority
+                                    display.
                                 </div>
                             </div>
                         </div>
@@ -572,7 +594,8 @@ include 'includes/header.php';
                                     <strong>News Article</strong>
                                 </label>
                                 <div class="form-text">
-                                    Mark this post as a news article. News articles will appear on the News page and be treated as news content.
+                                    Mark this post as a news article. News articles will appear on the News page and be
+                                    treated as news content.
                                 </div>
                             </div>
                         </div>
@@ -601,7 +624,7 @@ include 'includes/header.php';
     const OPTIMAL_HEIGHT = 653;
 
     // Handle featured image file selection
-    document.getElementById('featured_image').addEventListener('change', function(e) {
+    document.getElementById('featured_image').addEventListener('change', function (e) {
         const file = e.target.files[0];
         const guidanceDiv = document.getElementById('image-guidance');
 
@@ -612,9 +635,9 @@ include 'includes/header.php';
 
         // Read the image file to get dimensions
         const reader = new FileReader();
-        reader.onload = function(event) {
+        reader.onload = function (event) {
             const img = new Image();
-            img.onload = function() {
+            img.onload = function () {
                 const uploadedWidth = img.naturalWidth;
                 const uploadedHeight = img.naturalHeight;
 
@@ -714,7 +737,7 @@ include 'includes/header.php';
     }
 
     // Character counter for short description
-    document.getElementById('short_description').addEventListener('input', function() {
+    document.getElementById('short_description').addEventListener('input', function () {
         const charCount = this.value.length;
         document.getElementById('char_count').textContent = charCount;
 
@@ -790,7 +813,7 @@ include 'includes/header.php';
     }
 
     // Handle paste events - strip formatting but allow images
-    document.getElementById('editor-content').addEventListener('paste', function(e) {
+    document.getElementById('editor-content').addEventListener('paste', function (e) {
         e.preventDefault();
 
         // Try to get HTML content first (for images)
@@ -846,7 +869,7 @@ include 'includes/header.php';
     document.getElementById('editor-content').addEventListener('blur', updateHiddenTextarea);
 
     // Initialize editor with existing content
-    document.addEventListener('DOMContentLoaded', function() {
+    document.addEventListener('DOMContentLoaded', function () {
         const hiddenTextarea = document.getElementById('content_body');
         const editorContent = document.getElementById('editor-content');
 
@@ -855,13 +878,13 @@ include 'includes/header.php';
         }
 
         // Set placeholder behavior
-        editorContent.addEventListener('focus', function() {
+        editorContent.addEventListener('focus', function () {
             if (this.innerHTML === '' || this.innerHTML === '<br>') {
                 this.innerHTML = '';
             }
         });
 
-        editorContent.addEventListener('blur', function() {
+        editorContent.addEventListener('blur', function () {
             if (this.innerHTML === '' || this.innerHTML === '<br>') {
                 this.innerHTML = '';
             }
@@ -870,4 +893,4 @@ include 'includes/header.php';
     });
 </script>
 
-<?php include 'includes/footer.php'; ?>
+<?php include 'includes/dash-footer.php'; ?>

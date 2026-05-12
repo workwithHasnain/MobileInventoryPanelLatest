@@ -8,7 +8,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action'])) {
     if ($_POST['action'] === 'add_brand') {
         $name = trim($_POST['brand_name']);
         $description = trim($_POST['brand_description']);
-        
+
         if (!empty($name)) {
             $brand_data = [
                 'id' => time() . '_' . rand(1000, 9999),
@@ -51,7 +51,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action'])) {
     } elseif ($_POST['action'] === 'add_chipset') {
         $name = trim($_POST['chipset_name']);
         $description = trim($_POST['chipset_description']);
-        
+
         if (!empty($name)) {
             $chipset_data = [
                 'id' => time() . '_' . rand(1000, 9999),
@@ -110,12 +110,14 @@ $chipsets = getAllChipsets();
             <!-- Navigation Tabs -->
             <ul class="nav nav-tabs" id="managementTabs" role="tablist">
                 <li class="nav-item" role="presentation">
-                    <button class="nav-link active" id="brands-tab" data-bs-toggle="tab" data-bs-target="#brands" type="button" role="tab" aria-controls="brands" aria-selected="true">
+                    <button class="nav-link active" id="brands-tab" data-bs-toggle="tab" data-bs-target="#brands"
+                        type="button" role="tab" aria-controls="brands" aria-selected="true">
                         <i class="fas fa-tag"></i> Brands
                     </button>
                 </li>
                 <li class="nav-item" role="presentation">
-                    <button class="nav-link" id="chipsets-tab" data-bs-toggle="tab" data-bs-target="#chipsets" type="button" role="tab" aria-controls="chipsets" aria-selected="false">
+                    <button class="nav-link" id="chipsets-tab" data-bs-toggle="tab" data-bs-target="#chipsets"
+                        type="button" role="tab" aria-controls="chipsets" aria-selected="false">
                         <i class="fas fa-microchip"></i> Chipsets
                     </button>
                 </li>
@@ -135,10 +137,12 @@ $chipsets = getAllChipsets();
                                 <input type="hidden" name="action" value="add_brand">
                                 <div class="row">
                                     <div class="col-md-4">
-                                        <input type="text" class="form-control" name="brand_name" placeholder="Brand Name" required>
+                                        <input type="text" class="form-control" name="brand_name"
+                                            placeholder="Brand Name" required>
                                     </div>
                                     <div class="col-md-6">
-                                        <input type="text" class="form-control" name="brand_description" placeholder="Description (optional)">
+                                        <input type="text" class="form-control" name="brand_description"
+                                            placeholder="Description (optional)">
                                     </div>
                                     <div class="col-md-2">
                                         <button type="submit" class="btn btn-primary w-100">
@@ -170,23 +174,28 @@ $chipsets = getAllChipsets();
                                                 <tr>
                                                     <td><strong><?php echo htmlspecialchars($brand['name']); ?></strong></td>
                                                     <td><?php echo htmlspecialchars($brand['slug'] ?? 'N/A'); ?></td>
-                                                    <td><?php echo htmlspecialchars($brand['description'] ?? 'No description'); ?></td>
-                                                    <td><?php 
-                                                        $timestamp = $brand['created_at'] ?? time();
-                                                        if (!is_numeric($timestamp)) {
-                                                            $timestamp = strtotime($timestamp) ?: time();
-                                                        }
-                                                        echo date('M j, Y', $timestamp); 
+                                                    <td><?php echo htmlspecialchars($brand['description'] ?? 'No description'); ?>
+                                                    </td>
+                                                    <td><?php
+                                                    $timestamp = $brand['created_at'] ?? time();
+                                                    if (!is_numeric($timestamp)) {
+                                                        $timestamp = strtotime($timestamp) ?: time();
+                                                    }
+                                                    echo date('M j, Y', $timestamp);
                                                     ?></td>
                                                     <td>
-                                                        <form method="POST" style="display: inline;" 
-                                                              onsubmit="return confirm('Are you sure you want to delete this brand?');">
+                                                        <form method="POST" style="display: inline;"
+                                                            onsubmit="return confirm('Are you sure you want to delete this brand?');">
                                                             <input type="hidden" name="action" value="delete_brand">
-                                                            <input type="hidden" name="brand_id" value="<?php echo $brand['id']; ?>">
-                                                            <button type="button" class="btn btn-sm btn-primary" title="Edit Brand" data-id="<?php echo $brand['id']; ?>" onclick="editBrand(this)">
+                                                            <input type="hidden" name="brand_id"
+                                                                value="<?php echo $brand['id']; ?>">
+                                                            <button type="button" class="btn btn-sm btn-primary"
+                                                                title="Edit Brand" data-id="<?php echo $brand['id']; ?>"
+                                                                onclick="editBrand(this)">
                                                                 <i class="fas fa-edit"></i>
                                                             </button>
-                                                            <button type="submit" class="btn btn-sm btn-danger" title="Delete Brand">
+                                                            <button type="submit" class="btn btn-sm btn-danger"
+                                                                title="Delete Brand">
                                                                 <i class="fas fa-trash"></i>
                                                             </button>
                                                         </form>
@@ -213,10 +222,12 @@ $chipsets = getAllChipsets();
                                 <input type="hidden" name="action" value="add_chipset">
                                 <div class="row">
                                     <div class="col-md-4">
-                                        <input type="text" class="form-control" name="chipset_name" placeholder="Chipset Name" required>
+                                        <input type="text" class="form-control" name="chipset_name"
+                                            placeholder="Chipset Name" required>
                                     </div>
                                     <div class="col-md-6">
-                                        <input type="text" class="form-control" name="chipset_description" placeholder="Description (optional)">
+                                        <input type="text" class="form-control" name="chipset_description"
+                                            placeholder="Description (optional)">
                                     </div>
                                     <div class="col-md-2">
                                         <button type="submit" class="btn btn-primary w-100">
@@ -246,20 +257,23 @@ $chipsets = getAllChipsets();
                                             <?php foreach ($chipsets as $chipset): ?>
                                                 <tr>
                                                     <td><strong><?php echo htmlspecialchars($chipset['name']); ?></strong></td>
-                                                    <td><?php echo htmlspecialchars($chipset['description'] ?? 'No description'); ?></td>
-                                                    <td><?php 
-                                                        $timestamp = $chipset['created_at'] ?? time();
-                                                        if (!is_numeric($timestamp)) {
-                                                            $timestamp = strtotime($timestamp) ?: time();
-                                                        }
-                                                        echo date('M j, Y', $timestamp); 
+                                                    <td><?php echo htmlspecialchars($chipset['description'] ?? 'No description'); ?>
+                                                    </td>
+                                                    <td><?php
+                                                    $timestamp = $chipset['created_at'] ?? time();
+                                                    if (!is_numeric($timestamp)) {
+                                                        $timestamp = strtotime($timestamp) ?: time();
+                                                    }
+                                                    echo date('M j, Y', $timestamp);
                                                     ?></td>
                                                     <td>
-                                                        <form method="POST" style="display: inline;" 
-                                                              onsubmit="return confirm('Are you sure you want to delete this chipset?');">
+                                                        <form method="POST" style="display: inline;"
+                                                            onsubmit="return confirm('Are you sure you want to delete this chipset?');">
                                                             <input type="hidden" name="action" value="delete_chipset">
-                                                            <input type="hidden" name="chipset_id" value="<?php echo $chipset['id']; ?>">
-                                                            <button type="submit" class="btn btn-sm btn-danger" title="Delete Chipset">
+                                                            <input type="hidden" name="chipset_id"
+                                                                value="<?php echo $chipset['id']; ?>">
+                                                            <button type="submit" class="btn btn-sm btn-danger"
+                                                                title="Delete Chipset">
                                                                 <i class="fas fa-trash"></i>
                                                             </button>
                                                         </form>
@@ -279,39 +293,39 @@ $chipsets = getAllChipsets();
 </div>
 
 <script>
-document.addEventListener('DOMContentLoaded', function() {
-    // Auto-dismiss alerts after 5 seconds
-    setTimeout(function() {
-        const alerts = document.querySelectorAll('.alert');
-        alerts.forEach(function(alert) {
-            const bsAlert = new bootstrap.Alert(alert);
-            bsAlert.close();
-        });
-    }, 5000);
-});
+    document.addEventListener('DOMContentLoaded', function () {
+        // Auto-dismiss alerts after 5 seconds
+        setTimeout(function () {
+            const alerts = document.querySelectorAll('.alert');
+            alerts.forEach(function (alert) {
+                const bsAlert = new bootstrap.Alert(alert);
+                bsAlert.close();
+            });
+        }, 5000);
+    });
 
-function editBrand(btn) {
-    let tr = btn.closest('tr');
-    let id = btn.dataset.id;
-    let name = tr.cells[0].innerText.trim();
-    let desc = tr.cells[2].innerText.trim();
-    if (desc === 'No description') desc = '';
-    
-    let newName = prompt("Edit Brand Name:", name);
-    if (newName === null) return;
-    
-    let newDesc = prompt("Edit Description:", desc);
-    if (newDesc === null) return;
-    
-    let f = document.createElement('form');
-    f.method = 'POST';
-    f.innerHTML = '<input type="hidden" name="action" value="edit_brand">' +
-                  '<input type="hidden" name="brand_id" value="'+id+'">' +
-                  '<input type="hidden" name="brand_name" value="'+newName+'">' +
-                  '<input type="hidden" name="brand_description" value="'+newDesc+'">';
-    document.body.appendChild(f);
-    f.submit();
-}
+    function editBrand(btn) {
+        let tr = btn.closest('tr');
+        let id = btn.dataset.id;
+        let name = tr.cells[0].innerText.trim();
+        let desc = tr.cells[2].innerText.trim();
+        if (desc === 'No description') desc = '';
+
+        let newName = prompt("Edit Brand Name:", name);
+        if (newName === null) return;
+
+        let newDesc = prompt("Edit Description:", desc);
+        if (newDesc === null) return;
+
+        let f = document.createElement('form');
+        f.method = 'POST';
+        f.innerHTML = '<input type="hidden" name="action" value="edit_brand">' +
+            '<input type="hidden" name="brand_id" value="' + id + '">' +
+            '<input type="hidden" name="brand_name" value="' + newName + '">' +
+            '<input type="hidden" name="brand_description" value="' + newDesc + '">';
+        document.body.appendChild(f);
+        f.submit();
+    }
 </script>
 
-<?php include 'includes/footer.php'; ?>
+<?php include 'includes/dash-footer.php'; ?>

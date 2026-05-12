@@ -1426,4 +1426,4 @@ $pref_meta_desc = $device['meta_desc'] ?? '';
     })();
 </script>
 
-<?php include 'includes/footer.php'; ?>
+<?php include 'includes/dash-footer.php'; ?>

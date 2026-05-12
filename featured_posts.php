@@ -421,7 +421,7 @@ $popular_tags = array_slice($all_tags, 0, 10, true);
                 </div>
             </div>
         </div>
-    </footer>
+    <dash-footer>
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
     <script src="js/scripts.js"></script>

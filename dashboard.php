@@ -41,7 +41,7 @@ ksort($yearStats);
 
 // Price statistics
 $prices = array_filter(array_map(function ($phone) {
-    return !empty($phone['price']) && is_numeric($phone['price']) ? (float)$phone['price'] : null;
+    return !empty($phone['price']) && is_numeric($phone['price']) ? (float) $phone['price'] : null;
 }, $phones));
 
 $avgPrice = count($prices) > 0 ? array_sum($prices) / count($prices) : 0;
@@ -115,25 +115,30 @@ if (isset($_SESSION['success_message'])) {
             <button type="button" class="btn btn-warning ms-2" data-bs-toggle="modal" data-bs-target="#authModal">
                 <i class="fas fa-lock"></i> Authentication
             </button>
-            <button type="button" class="btn btn-secondary ms-2" data-bs-toggle="modal" data-bs-target="#filterSettingsModal">
+            <button type="button" class="btn btn-secondary ms-2" data-bs-toggle="modal"
+                data-bs-target="#filterSettingsModal">
                 <i class="fas fa-sliders-h"></i> Filter Settings
             </button>
             <button type="button" class="btn btn-dark ms-2" data-bs-toggle="modal" data-bs-target="#heroImagesModal">
                 <i class="fas fa-image"></i> Header Images
             </button>
-            <button type="button" class="btn btn-outline-primary ms-2" data-bs-toggle="modal" data-bs-target="#canonicalBaseModal">
+            <button type="button" class="btn btn-outline-primary ms-2" data-bs-toggle="modal"
+                data-bs-target="#canonicalBaseModal">
                 <i class="fas fa-link"></i> Canonical Base
             </button>
-            <button type="button" class="btn btn-outline-info ms-2" data-bs-toggle="modal" data-bs-target="#sitemapModal">
+            <button type="button" class="btn btn-outline-info ms-2" data-bs-toggle="modal"
+                data-bs-target="#sitemapModal">
                 <i class="fas fa-sitemap"></i> Sitemap
             </button>
             <button onclick="window.location.href='import_device.php'" type="button" class="btn btn-outline-info ms-2">
                 <i class="fas fa-sitemap"></i> Data Import
             </button>
-            <button type="button" class="btn btn-outline-warning ms-2" data-bs-toggle="modal" data-bs-target="#queriesModal">
+            <button type="button" class="btn btn-outline-warning ms-2" data-bs-toggle="modal"
+                data-bs-target="#queriesModal">
                 <i class="fas fa-question-circle"></i> Queries
             </button>
-            <button type="button" class="btn btn-outline-success ms-2" data-bs-toggle="modal" data-bs-target="#publicUsersModal">
+            <button type="button" class="btn btn-outline-success ms-2" data-bs-toggle="modal"
+                data-bs-target="#publicUsersModal">
                 <i class="fas fa-users"></i> User Accounts
             </button>
         </div>
@@ -204,7 +209,8 @@ if (isset($_SESSION['success_message'])) {
                     </div>
                 </div>
                 <div class="card-footer">
-                    <small>Range: $<?php echo number_format($minPrice, 0); ?> - $<?php echo number_format($maxPrice, 0); ?></small>
+                    <small>Range: $<?php echo number_format($minPrice, 0); ?> -
+                        $<?php echo number_format($maxPrice, 0); ?></small>
                 </div>
             </div>
         </div>
@@ -284,7 +290,8 @@ if (isset($_SESSION['success_message'])) {
                                                             $badge_class = 'bg-secondary';
                                                     }
                                                     ?>
-                                                    <span class="badge <?php echo $badge_class; ?>"><?php echo htmlspecialchars($status); ?></span>
+                                                    <span
+                                                        class="badge <?php echo $badge_class; ?>"><?php echo htmlspecialchars($status); ?></span>
                                                 </td>
                                                 <td><?php echo $count; ?></td>
                                                 <td>
@@ -411,9 +418,11 @@ if (isset($_SESSION['success_message'])) {
                                         $maxViews = max(array_column($topViewedDevices, 'view_count'));
                                         foreach ($topViewedDevices as $device):
                                             $deviceUrl = '/device/' . htmlspecialchars($device['slug']);
-                                        ?>
-                                            <tr style="cursor: pointer;" onclick="window.location.href='<?php echo $deviceUrl; ?>';">
-                                                <td><strong><?php echo htmlspecialchars($device['brand_name'] . ' ' . $device['name']); ?></strong></td>
+                                            ?>
+                                            <tr style="cursor: pointer;"
+                                                onclick="window.location.href='<?php echo $deviceUrl; ?>';">
+                                                <td><strong><?php echo htmlspecialchars($device['brand_name'] . ' ' . $device['name']); ?></strong>
+                                                </td>
                                                 <td><?php echo $device['view_count']; ?></td>
                                                 <td>
                                                     <div class="progress" style="height: 20px;">
@@ -460,7 +469,7 @@ if (isset($_SESSION['success_message'])) {
                                         $maxPostViews = max(array_column($topViewedPosts, 'view_count'));
                                         foreach ($topViewedPosts as $post):
                                             $postUrl = '/post/' . htmlspecialchars($post['slug']);
-                                        ?>
+                                            ?>
                                             <tr style="cursor: pointer;" onclick="window.location.href='<?php echo $postUrl; ?>';">
                                                 <td><strong><?php echo htmlspecialchars($post['title']); ?></strong></td>
                                                 <td><?php echo $post['view_count']; ?></td>
@@ -499,7 +508,8 @@ if (isset($_SESSION['success_message'])) {
                     <i class="fas fa-star me-2"></i>Phone Reviews
                 </h5>
                 <div class="ms-auto">
-                    <button type="button" class="btn btn-sm btn-success" data-bs-toggle="modal" data-bs-target="#addReviewModal">
+                    <button type="button" class="btn btn-sm btn-success" data-bs-toggle="modal"
+                        data-bs-target="#addReviewModal">
                         <i class="fas fa-plus me-1"></i>Add Review
                     </button>
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
@@ -573,13 +583,15 @@ if (isset($_SESSION['success_message'])) {
                 <div class="card mb-4">
                     <div class="card-header d-flex justify-content-between align-items-center">
                         <h6 class="card-title mb-0"><i class="fas fa-plus me-2"></i>Add New Subscriber</h6>
-                        <button class="btn btn-sm btn-success" type="button" id="export_subscribers_btn" data-bs-toggle="modal" data-bs-target="#exportSubscribersModal">
+                        <button class="btn btn-sm btn-success" type="button" id="export_subscribers_btn"
+                            data-bs-toggle="modal" data-bs-target="#exportSubscribersModal">
                             <i class="fas fa-download me-1"></i>Export
                         </button>
                     </div>
                     <div class="card-body">
                         <div class="input-group">
-                            <input type="email" id="new_subscriber_email" class="form-control" placeholder="Enter email address">
+                            <input type="email" id="new_subscriber_email" class="form-control"
+                                placeholder="Enter email address">
                             <button class="btn btn-primary" type="button" id="add_subscriber_btn">
                                 <i class="fas fa-plus me-1"></i>Add
                             </button>
@@ -601,7 +613,8 @@ if (isset($_SESSION['success_message'])) {
 </div>
 
 <!-- Export Subscribers Modal -->
-<div class="modal fade" id="exportSubscribersModal" tabindex="-1" aria-labelledby="exportSubscribersLabel" aria-hidden="true">
+<div class="modal fade" id="exportSubscribersModal" tabindex="-1" aria-labelledby="exportSubscribersLabel"
+    aria-hidden="true">
     <div class="modal-dialog modal-dialog-centered">
         <div class="modal-content">
             <div class="modal-header">
@@ -678,13 +691,15 @@ if (isset($_SESSION['success_message'])) {
                     <div class="card-body">
                         <div class="row g-2">
                             <div class="col-md-3">
-                                <input type="text" id="pu_new_name" class="form-control" placeholder="Full Name" minlength="2">
+                                <input type="text" id="pu_new_name" class="form-control" placeholder="Full Name"
+                                    minlength="2">
                             </div>
                             <div class="col-md-3">
                                 <input type="email" id="pu_new_email" class="form-control" placeholder="Email Address">
                             </div>
                             <div class="col-md-3">
-                                <input type="password" id="pu_new_password" class="form-control" placeholder="Password (min 6)" minlength="6">
+                                <input type="password" id="pu_new_password" class="form-control"
+                                    placeholder="Password (min 6)" minlength="6">
                             </div>
                             <div class="col-md-3">
                                 <button class="btn btn-primary w-100" type="button" id="pu_add_btn">
@@ -729,10 +744,12 @@ if (isset($_SESSION['success_message'])) {
                     <div class="card-body">
                         <div class="row g-2">
                             <div class="col-md-4">
-                                <input type="text" id="new_username" class="form-control" placeholder="Username" minlength="3">
+                                <input type="text" id="new_username" class="form-control" placeholder="Username"
+                                    minlength="3">
                             </div>
                             <div class="col-md-4">
-                                <input type="password" id="new_password" class="form-control" placeholder="Password" minlength="4">
+                                <input type="password" id="new_password" class="form-control" placeholder="Password"
+                                    minlength="4">
                             </div>
                             <div class="col-md-4">
                                 <button class="btn btn-primary w-100" type="button" id="add_auth_user_btn">
@@ -849,7 +866,8 @@ if (isset($_SESSION['success_message'])) {
 </div>
 
 <!-- Upload Hero Image Modal -->
-<div class="modal fade" id="uploadHeroImageModal" tabindex="-1" aria-labelledby="uploadHeroImageLabel" aria-hidden="true">
+<div class="modal fade" id="uploadHeroImageModal" tabindex="-1" aria-labelledby="uploadHeroImageLabel"
+    aria-hidden="true">
     <div class="modal-dialog modal-dialog-centered">
         <div class="modal-content">
             <div class="modal-header">
@@ -905,7 +923,8 @@ if (isset($_SESSION['success_message'])) {
                 <div id="canonical_message" style="display: none;"></div>
                 <div class="mb-3">
                     <label for="canonicalBaseInput" class="form-label">Canonical Base URL</label>
-                    <input type="url" class="form-control" id="canonicalBaseInput" placeholder="https://www.example.com" required>
+                    <input type="url" class="form-control" id="canonicalBaseInput" placeholder="https://www.example.com"
+                        required>
                     <small class="text-muted d-block mt-2">
                         <i class="fas fa-info-circle me-1"></i>
                         The primary domain URL for all canonical links (e.g., https://www.example.com)
@@ -940,7 +959,8 @@ if (isset($_SESSION['success_message'])) {
                 <div id="sitemap_message" style="display: none;"></div>
                 <div class="mb-3">
                     <label for="sitemapContent" class="form-label">Sitemap XML Content</label>
-                    <textarea class="form-control" id="sitemapContent" rows="15" style="font-family: 'Courier New', monospace; font-size: 12px;"></textarea>
+                    <textarea class="form-control" id="sitemapContent" rows="15"
+                        style="font-family: 'Courier New', monospace; font-size: 12px;"></textarea>
                     <small class="text-muted d-block mt-2">
                         <i class="fas fa-info-circle me-1"></i>
                         XML will be validated before saving. Only valid XML will be accepted.
@@ -961,20 +981,20 @@ if (isset($_SESSION['success_message'])) {
 </div>
 
 <script>
-    document.addEventListener('DOMContentLoaded', function() {
+    document.addEventListener('DOMContentLoaded', function () {
         // ===== REVIEWS MANAGEMENT =====
         const reviewsModal = document.getElementById('reviewsModal');
         const addReviewModal = document.getElementById('addReviewModal');
         const submitReviewBtn = document.getElementById('submitReviewBtn');
 
         if (reviewsModal) {
-            reviewsModal.addEventListener('show.bs.modal', function() {
+            reviewsModal.addEventListener('show.bs.modal', function () {
                 loadReviews();
             });
         }
 
         if (addReviewModal) {
-            addReviewModal.addEventListener('show.bs.modal', function() {
+            addReviewModal.addEventListener('show.bs.modal', function () {
                 initSelect2();
             });
         }
@@ -992,23 +1012,23 @@ if (isset($_SESSION['success_message'])) {
                     url: 'manage_reviews.php',
                     dataType: 'json',
                     delay: 250,
-                    data: function(params) {
+                    data: function (params) {
                         return {
                             action: 'search_phones',
                             term: params.term
                         };
                     },
-                    processResults: function(data) {
+                    processResults: function (data) {
                         return {
                             results: data.data
                         };
                     }
                 },
-                templateResult: function(data) {
+                templateResult: function (data) {
                     if (!data.id) return data.text;
                     return $('<span><img src="' + data.image + '" style="width: 30px; height: 30px; margin-right: 10px; vertical-align: middle;"/> ' + data.text + '</span>');
                 },
-                templateSelection: function(data) {
+                templateSelection: function (data) {
                     if (!data.id) return data.text;
                     return $('<span><img src="' + data.image + '" style="width: 20px; height: 20px; margin-right: 8px; vertical-align: middle;"/> ' + data.text + '</span>');
                 }
@@ -1022,23 +1042,23 @@ if (isset($_SESSION['success_message'])) {
                     url: 'manage_reviews.php',
                     dataType: 'json',
                     delay: 250,
-                    data: function(params) {
+                    data: function (params) {
                         return {
                             action: 'search_posts',
                             term: params.term
                         };
                     },
-                    processResults: function(data) {
+                    processResults: function (data) {
                         return {
                             results: data.data
                         };
                     }
                 },
-                templateResult: function(data) {
+                templateResult: function (data) {
                     if (!data.id) return data.text;
                     return $('<span><img src="' + data.image + '" style="width: 30px; height: 30px; margin-right: 10px; vertical-align: middle;"/> ' + data.text + '</span>');
                 },
-                templateSelection: function(data) {
+                templateSelection: function (data) {
                     if (!data.id) return data.text;
                     return $('<span><img src="' + data.image + '" style="width: 20px; height: 20px; margin-right: 8px; vertical-align: middle;"/> ' + data.text + '</span>');
                 }
@@ -1049,12 +1069,12 @@ if (isset($_SESSION['success_message'])) {
             const container = document.getElementById('reviews_list_container');
 
             fetch('manage_reviews.php', {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/x-www-form-urlencoded'
-                    },
-                    body: 'action=list'
-                })
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/x-www-form-urlencoded'
+                },
+                body: 'action=list'
+            })
                 .then(response => response.json())
                 .then(data => {
                     if (data.success) {
@@ -1108,18 +1128,18 @@ if (isset($_SESSION['success_message'])) {
             container.innerHTML = html;
         }
 
-        window.deleteReview = function(id) {
+        window.deleteReview = function (id) {
             if (!confirm('Are you sure you want to delete this review?')) {
                 return;
             }
 
             fetch('manage_reviews.php', {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/x-www-form-urlencoded'
-                    },
-                    body: 'action=delete&id=' + id
-                })
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/x-www-form-urlencoded'
+                },
+                body: 'action=delete&id=' + id
+            })
                 .then(response => response.json())
                 .then(data => {
                     if (data.success) {
@@ -1147,12 +1167,12 @@ if (isset($_SESSION['success_message'])) {
             submitReviewBtn.innerHTML = '<i class="fas fa-spinner fa-spin me-1"></i>Creating...';
 
             fetch('manage_reviews.php', {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/x-www-form-urlencoded'
-                    },
-                    body: 'action=add&phone_id=' + phoneId + '&post_id=' + postId
-                })
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/x-www-form-urlencoded'
+                },
+                body: 'action=add&phone_id=' + phoneId + '&post_id=' + postId
+            })
                 .then(response => response.json())
                 .then(data => {
                     if (data.success) {
@@ -1197,7 +1217,7 @@ if (isset($_SESSION['success_message'])) {
         const saveBtn = document.getElementById('saveFilterSettingsBtn');
 
         // Load filter settings when modal opens
-        filterModal.addEventListener('show.bs.modal', function() {
+        filterModal.addEventListener('show.bs.modal', function () {
             loadFilterSettings();
         });
 
@@ -1238,9 +1258,9 @@ if (isset($_SESSION['success_message'])) {
         }
 
         fetch('manage_filter_settings.php', {
-                method: 'POST',
-                body: formData
-            })
+            method: 'POST',
+            body: formData
+        })
             .then(response => response.json())
             .then(data => {
                 if (data.success) {
@@ -1261,12 +1281,12 @@ if (isset($_SESSION['success_message'])) {
     const addSubscriberBtn = document.getElementById('add_subscriber_btn');
     const newSubscriberEmail = document.getElementById('new_subscriber_email');
 
-    newsletterModal.addEventListener('show.bs.modal', function() {
+    newsletterModal.addEventListener('show.bs.modal', function () {
         loadNewsletterSubscribers();
     });
 
     addSubscriberBtn.addEventListener('click', addSubscriber);
-    newSubscriberEmail.addEventListener('keypress', function(e) {
+    newSubscriberEmail.addEventListener('keypress', function (e) {
         if (e.key === 'Enter') {
             addSubscriber();
         }
@@ -1276,12 +1296,12 @@ if (isset($_SESSION['success_message'])) {
         const container = document.getElementById('subscribers_list_container');
 
         fetch('manage_newsletter_subscribers.php', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/x-www-form-urlencoded'
-                },
-                body: 'action=list'
-            })
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/x-www-form-urlencoded'
+            },
+            body: 'action=list'
+        })
             .then(response => response.json())
             .then(data => {
                 if (data.success) {
@@ -1349,12 +1369,12 @@ if (isset($_SESSION['success_message'])) {
         addSubscriberBtn.innerHTML = '<i class="fas fa-spinner fa-spin me-1"></i>Adding...';
 
         fetch('manage_newsletter_subscribers.php', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/x-www-form-urlencoded'
-                },
-                body: 'action=add&email=' + encodeURIComponent(email)
-            })
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/x-www-form-urlencoded'
+            },
+            body: 'action=add&email=' + encodeURIComponent(email)
+        })
             .then(response => response.json())
             .then(data => {
                 if (data.success) {
@@ -1383,12 +1403,12 @@ if (isset($_SESSION['success_message'])) {
         }
 
         fetch('manage_newsletter_subscribers.php', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/x-www-form-urlencoded'
-                },
-                body: 'action=remove&id=' + id
-            })
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/x-www-form-urlencoded'
+            },
+            body: 'action=remove&id=' + id
+        })
             .then(response => response.json())
             .then(data => {
                 if (data.success) {
@@ -1407,12 +1427,12 @@ if (isset($_SESSION['success_message'])) {
         const newStatus = currentStatus === 'active' ? 'inactive' : 'active';
 
         fetch('manage_newsletter_subscribers.php', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/x-www-form-urlencoded'
-                },
-                body: 'action=status&id=' + id + '&status=' + newStatus
-            })
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/x-www-form-urlencoded'
+            },
+            body: 'action=status&id=' + id + '&status=' + newStatus
+        })
             .then(response => response.json())
             .then(data => {
                 if (data.success) {
@@ -1456,19 +1476,19 @@ if (isset($_SESSION['success_message'])) {
     const exportAllBtn = document.getElementById('export_all_btn');
 
     if (exportActiveBtn) {
-        exportActiveBtn.addEventListener('click', function() {
+        exportActiveBtn.addEventListener('click', function () {
             exportSubscribers('active');
         });
     }
 
     if (exportInactiveBtn) {
-        exportInactiveBtn.addEventListener('click', function() {
+        exportInactiveBtn.addEventListener('click', function () {
             exportSubscribers('inactive');
         });
     }
 
     if (exportAllBtn) {
-        exportAllBtn.addEventListener('click', function() {
+        exportAllBtn.addEventListener('click', function () {
             exportSubscribers('all');
         });
     }
@@ -1485,12 +1505,12 @@ if (isset($_SESSION['success_message'])) {
         allBtn.disabled = true;
 
         fetch('manage_newsletter_subscribers.php', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/x-www-form-urlencoded'
-                },
-                body: 'action=export&status=' + encodeURIComponent(status)
-            })
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/x-www-form-urlencoded'
+            },
+            body: 'action=export&status=' + encodeURIComponent(status)
+        })
             .then(response => response.text())
             .then(data => {
                 // Create a blob and download
@@ -1530,7 +1550,7 @@ if (isset($_SESSION['success_message'])) {
     const authModal = document.getElementById('authModal');
 
     if (authModal) {
-        authModal.addEventListener('show.bs.modal', function() {
+        authModal.addEventListener('show.bs.modal', function () {
             loadAuthUsers();
         });
 
@@ -1541,14 +1561,14 @@ if (isset($_SESSION['success_message'])) {
         const container = document.getElementById('auth_users_container');
 
         fetch('auth_management_handler.php', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/x-www-form-urlencoded',
-                },
-                body: new URLSearchParams({
-                    action: 'list'
-                })
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/x-www-form-urlencoded',
+            },
+            body: new URLSearchParams({
+                action: 'list'
             })
+        })
             .then(response => response.json())
             .then(data => {
                 if (data.success && data.users) {
@@ -1616,16 +1636,16 @@ if (isset($_SESSION['success_message'])) {
         btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Adding...';
 
         fetch('auth_management_handler.php', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/x-www-form-urlencoded',
-                },
-                body: new URLSearchParams({
-                    action: 'add',
-                    username: username,
-                    password: password
-                })
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/x-www-form-urlencoded',
+            },
+            body: new URLSearchParams({
+                action: 'add',
+                username: username,
+                password: password
             })
+        })
             .then(response => response.json())
             .then(data => {
                 if (data.success) {
@@ -1672,17 +1692,17 @@ if (isset($_SESSION['success_message'])) {
         }
 
         fetch('auth_management_handler.php', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/x-www-form-urlencoded',
-                },
-                body: new URLSearchParams({
-                    action: 'update',
-                    id: id,
-                    username: username,
-                    password: password
-                })
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/x-www-form-urlencoded',
+            },
+            body: new URLSearchParams({
+                action: 'update',
+                id: id,
+                username: username,
+                password: password
             })
+        })
             .then(response => response.json())
             .then(data => {
                 if (data.success) {
@@ -1707,15 +1727,15 @@ if (isset($_SESSION['success_message'])) {
         }
 
         fetch('auth_management_handler.php', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/x-www-form-urlencoded',
-                },
-                body: new URLSearchParams({
-                    action: 'delete',
-                    id: id
-                })
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/x-www-form-urlencoded',
+            },
+            body: new URLSearchParams({
+                action: 'delete',
+                id: id
             })
+        })
             .then(response => response.json())
             .then(data => {
                 if (data.success) {
@@ -1747,7 +1767,7 @@ if (isset($_SESSION['success_message'])) {
     const currentCanonicalBaseSpan = document.getElementById('currentCanonicalBase');
 
     if (canonicalBaseModal) {
-        canonicalBaseModal.addEventListener('show.bs.modal', function() {
+        canonicalBaseModal.addEventListener('show.bs.modal', function () {
             loadCanonicalBase();
         });
     }
@@ -1758,12 +1778,12 @@ if (isset($_SESSION['success_message'])) {
 
     function loadCanonicalBase() {
         fetch('manage_canonical_base.php', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/x-www-form-urlencoded'
-                },
-                body: 'action=get'
-            })
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/x-www-form-urlencoded'
+            },
+            body: 'action=get'
+        })
             .then(response => response.json())
             .then(data => {
                 if (data.success) {
@@ -1802,12 +1822,12 @@ if (isset($_SESSION['success_message'])) {
         saveCanonicalBaseBtn.innerHTML = '<i class="fas fa-spinner fa-spin me-1"></i>Saving...';
 
         fetch('manage_canonical_base.php', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/x-www-form-urlencoded'
-                },
-                body: 'action=save&canonicalBase=' + encodeURIComponent(newValue)
-            })
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/x-www-form-urlencoded'
+            },
+            body: 'action=save&canonicalBase=' + encodeURIComponent(newValue)
+        })
             .then(response => response.json())
             .then(data => {
                 if (data.success) {
@@ -1844,7 +1864,7 @@ if (isset($_SESSION['success_message'])) {
     const updateSitemapBtn = document.getElementById('updateSitemapBtn');
 
     if (sitemapModal) {
-        sitemapModal.addEventListener('show.bs.modal', function() {
+        sitemapModal.addEventListener('show.bs.modal', function () {
             loadSitemap();
         });
     }
@@ -1859,12 +1879,12 @@ if (isset($_SESSION['success_message'])) {
 
     function loadSitemap() {
         fetch('manage_sitemap.php', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/x-www-form-urlencoded'
-                },
-                body: 'action=read'
-            })
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/x-www-form-urlencoded'
+            },
+            body: 'action=read'
+        })
             .then(response => response.text())
             .then(data => {
                 if (data.startsWith('ERROR:')) {
@@ -1891,12 +1911,12 @@ if (isset($_SESSION['success_message'])) {
         saveSitemapBtn.innerHTML = '<i class="fas fa-spinner fa-spin me-1"></i>Saving...';
 
         fetch('manage_sitemap.php', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/x-www-form-urlencoded'
-                },
-                body: 'action=save&content=' + encodeURIComponent(content)
-            })
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/x-www-form-urlencoded'
+            },
+            body: 'action=save&content=' + encodeURIComponent(content)
+        })
             .then(response => response.text())
             .then(data => {
                 if (data.startsWith('ERROR:')) {
@@ -1923,8 +1943,8 @@ if (isset($_SESSION['success_message'])) {
         updateSitemapBtn.innerHTML = '<i class="fas fa-spinner fa-spin me-1"></i>Updating...';
 
         fetch('generate_sitemap_links.php', {
-                method: 'GET'
-            })
+            method: 'GET'
+        })
             .then(response => response.text())
             .then(data => {
                 // Show the script's response
@@ -1956,14 +1976,14 @@ if (isset($_SESSION['success_message'])) {
     const queriesModal = document.getElementById('queriesModal');
 
     if (queriesModal) {
-        queriesModal.addEventListener('show.bs.modal', function() {
+        queriesModal.addEventListener('show.bs.modal', function () {
             loadQueries('all');
         });
     }
 
     // Query type tab clicks
     document.querySelectorAll('#queriesTabs .nav-link').forEach(tab => {
-        tab.addEventListener('click', function() {
+        tab.addEventListener('click', function () {
             document.querySelectorAll('#queriesTabs .nav-link').forEach(t => t.classList.remove('active'));
             this.classList.add('active');
             currentQueryFilter = this.getAttribute('data-query-type');
@@ -1976,12 +1996,12 @@ if (isset($_SESSION['success_message'])) {
         container.innerHTML = '<div class="text-center py-4"><div class="spinner-border" role="status"><span class="visually-hidden">Loading...</span></div></div>';
 
         fetch('manage_queries.php', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/x-www-form-urlencoded'
-                },
-                body: 'action=list&type=' + encodeURIComponent(type)
-            })
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/x-www-form-urlencoded'
+            },
+            body: 'action=list&type=' + encodeURIComponent(type)
+        })
             .then(response => response.json())
             .then(data => {
                 if (data.success) {
@@ -2066,12 +2086,12 @@ if (isset($_SESSION['success_message'])) {
         viewModal.show();
 
         fetch('manage_queries.php', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/x-www-form-urlencoded'
-                },
-                body: 'action=view&id=' + id
-            })
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/x-www-form-urlencoded'
+            },
+            body: 'action=view&id=' + id
+        })
             .then(response => response.json())
             .then(data => {
                 if (data.success && data.query) {
@@ -2119,12 +2139,12 @@ if (isset($_SESSION['success_message'])) {
 
     function updateQueryStatus(id, status) {
         fetch('manage_queries.php', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/x-www-form-urlencoded'
-                },
-                body: 'action=update_status&id=' + id + '&status=' + encodeURIComponent(status)
-            })
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/x-www-form-urlencoded'
+            },
+            body: 'action=update_status&id=' + id + '&status=' + encodeURIComponent(status)
+        })
             .then(response => response.json())
             .then(data => {
                 if (data.success) {
@@ -2143,12 +2163,12 @@ if (isset($_SESSION['success_message'])) {
         if (!confirm('Are you sure you want to delete this query? This cannot be undone.')) return;
 
         fetch('manage_queries.php', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/x-www-form-urlencoded'
-                },
-                body: 'action=delete&id=' + id
-            })
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/x-www-form-urlencoded'
+            },
+            body: 'action=delete&id=' + id
+        })
             .then(response => response.json())
             .then(data => {
                 if (data.success) {
@@ -2180,13 +2200,13 @@ if (isset($_SESSION['success_message'])) {
     const uploadHeroBtn = document.getElementById('upload_hero_btn');
 
     if (heroImagesModal) {
-        heroImagesModal.addEventListener('show.bs.modal', function() {
+        heroImagesModal.addEventListener('show.bs.modal', function () {
             loadHeroImages();
         });
     }
 
     if (heroImageFileInput) {
-        heroImageFileInput.addEventListener('change', function(e) {
+        heroImageFileInput.addEventListener('change', function (e) {
             const file = e.target.files[0];
             if (file) {
                 validateAndPreviewImage(file);
@@ -2232,15 +2252,15 @@ if (isset($_SESSION['success_message'])) {
                             <h6 class="mb-0"><i class="fas fa-file-alt me-2"></i>${escapeHtml(displayName)}</h6>
                         </div>
                         <div class="card-body">
-                            ${imageExists ? 
-                                `<img src="${imagePath}?t=${Date.now()}" class="img-fluid rounded mb-3" alt="${escapeHtml(displayName)}" style="width: 100%; height: 170px; object-fit: cover;">` :
-                                `<div class="bg-light rounded d-flex align-items-center justify-content-center mb-3" style="width: 100%; height: 170px;">
+                            ${imageExists ?
+                    `<img src="${imagePath}?t=${Date.now()}" class="img-fluid rounded mb-3" alt="${escapeHtml(displayName)}" style="width: 100%; height: 170px; object-fit: cover;">` :
+                    `<div class="bg-light rounded d-flex align-items-center justify-content-center mb-3" style="width: 100%; height: 170px;">
                                     <div class="text-center text-muted">
                                         <i class="fas fa-image fa-3x mb-2"></i>
                                         <p class="mb-0 small">No image uploaded</p>
                                     </div>
                                 </div>`
-                            }
+                }
                             <p class="small text-muted mb-2">
                                 <strong>File:</strong> ${pageName}-hero.png<br>
                                 <strong>Size:</strong> 712 x 340 px
@@ -2295,9 +2315,9 @@ if (isset($_SESSION['success_message'])) {
 
         // Preview image and check dimensions
         const reader = new FileReader();
-        reader.onload = function(e) {
+        reader.onload = function (e) {
             const img = new Image();
-            img.onload = function() {
+            img.onload = function () {
                 const width = this.width;
                 const height = this.height;
 
@@ -2342,9 +2362,9 @@ if (isset($_SESSION['success_message'])) {
         uploadHeroBtn.innerHTML = '<i class="fas fa-spinner fa-spin me-1"></i>Uploading...';
 
         fetch('manage_hero_images.php', {
-                method: 'POST',
-                body: formData
-            })
+            method: 'POST',
+            body: formData
+        })
             .then(response => response.json())
             .then(data => {
                 if (data.success) {
@@ -2387,7 +2407,7 @@ if (isset($_SESSION['success_message'])) {
     // ===== Public User Accounts Management =====
     const publicUsersModal = document.getElementById('publicUsersModal');
     if (publicUsersModal) {
-        publicUsersModal.addEventListener('show.bs.modal', function() {
+        publicUsersModal.addEventListener('show.bs.modal', function () {
             loadPublicUsers();
         });
         document.getElementById('pu_add_btn').addEventListener('click', addPublicUser);
@@ -2396,14 +2416,14 @@ if (isset($_SESSION['success_message'])) {
     function loadPublicUsers() {
         const container = document.getElementById('pu_users_container');
         fetch('manage_users.php', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/x-www-form-urlencoded'
-                },
-                body: new URLSearchParams({
-                    action: 'list'
-                })
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/x-www-form-urlencoded'
+            },
+            body: new URLSearchParams({
+                action: 'list'
             })
+        })
             .then(r => r.json())
             .then(data => {
                 if (data.success && data.users) {
@@ -2463,17 +2483,17 @@ if (isset($_SESSION['success_message'])) {
         btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Adding...';
 
         fetch('manage_users.php', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/x-www-form-urlencoded'
-                },
-                body: new URLSearchParams({
-                    action: 'add',
-                    name,
-                    email,
-                    password
-                })
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/x-www-form-urlencoded'
+            },
+            body: new URLSearchParams({
+                action: 'add',
+                name,
+                email,
+                password
             })
+        })
             .then(r => r.json())
             .then(data => {
                 if (data.success) {
@@ -2495,7 +2515,7 @@ if (isset($_SESSION['success_message'])) {
             });
     }
 
-    window.updatePublicUser = function(id) {
+    window.updatePublicUser = function (id) {
         const name = document.querySelector('.pu-name[data-uid="' + id + '"]').value.trim();
         const email = document.querySelector('.pu-email[data-uid="' + id + '"]').value.trim();
         const password = document.querySelector('.pu-pass[data-uid="' + id + '"]').value.trim();
@@ -2507,19 +2527,19 @@ if (isset($_SESSION['success_message'])) {
         }
 
         fetch('manage_users.php', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/x-www-form-urlencoded'
-                },
-                body: new URLSearchParams({
-                    action: 'update',
-                    id,
-                    name,
-                    email,
-                    password,
-                    status
-                })
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/x-www-form-urlencoded'
+            },
+            body: new URLSearchParams({
+                action: 'update',
+                id,
+                name,
+                email,
+                password,
+                status
             })
+        })
             .then(r => r.json())
             .then(data => {
                 if (data.success) {
@@ -2533,19 +2553,19 @@ if (isset($_SESSION['success_message'])) {
             .catch(err => showPUMessage('Error: ' + err, 'danger'));
     };
 
-    window.deletePublicUser = function(id) {
+    window.deletePublicUser = function (id) {
         if (!confirm('Are you sure you want to permanently delete this user?')) return;
 
         fetch('manage_users.php', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/x-www-form-urlencoded'
-                },
-                body: new URLSearchParams({
-                    action: 'delete',
-                    id
-                })
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/x-www-form-urlencoded'
+            },
+            body: new URLSearchParams({
+                action: 'delete',
+                id
             })
+        })
             .then(r => r.json())
             .then(data => {
                 if (data.success) {
@@ -2582,4 +2602,4 @@ if (isset($_SESSION['success_message'])) {
 
 </div>
 
-<?php include 'includes/footer.php'; ?>
+<?php include 'includes/dash-footer.php'; ?>

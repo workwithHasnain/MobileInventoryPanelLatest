@@ -59,13 +59,15 @@ include 'includes/header.php';
                                     <i class="fas fa-user"></i> <?php echo htmlspecialchars($post['author']); ?>
                                 </span>
                                 <span class="text-muted">
-                                    <i class="fas fa-calendar"></i> <?php echo date('F j, Y', strtotime($post['publish_date'])); ?>
+                                    <i class="fas fa-calendar"></i>
+                                    <?php echo date('F j, Y', strtotime($post['publish_date'])); ?>
                                 </span>
                                 <span class="text-muted">
-                                    <i class="fas fa-clock"></i> <?php echo date('g:i A', strtotime($post['publish_date'])); ?>
+                                    <i class="fas fa-clock"></i>
+                                    <?php echo date('g:i A', strtotime($post['publish_date'])); ?>
                                 </span>
                                 <?php
-                                $status_class = match($post['status']) {
+                                $status_class = match ($post['status']) {
                                     'Published' => 'bg-success',
                                     'Draft' => 'bg-warning',
                                     'Archived' => 'bg-secondary',
@@ -82,8 +84,8 @@ include 'includes/header.php';
                         </div>
                         <div class="col-md-4">
                             <?php if (!empty($post['featured_image'])): ?>
-                                <img src="<?php echo htmlspecialchars($post['featured_image']); ?>" 
-                                     alt="Featured image" class="img-fluid rounded">
+                                <img src="<?php echo htmlspecialchars($post['featured_image']); ?>" alt="Featured image"
+                                    class="img-fluid rounded">
                             <?php endif; ?>
                         </div>
                     </div>
@@ -110,7 +112,7 @@ include 'includes/header.php';
                         </div>
                         <div class="card-body">
                             <div class="content-body" style="line-height: 1.6;">
-                                <?php 
+                                <?php
                                 // Display HTML content (since it's from TinyMCE editor)
                                 // Basic sanitization - in production, use HTMLPurifier or similar
                                 $allowed_tags = '<p><br><strong><b><em><i><u><h1><h2><h3><h4><h5><h6><ul><ol><li><blockquote><a><img>';
@@ -130,12 +132,10 @@ include 'includes/header.php';
                                 <div class="row">
                                     <?php foreach ($post_media_gallery as $index => $image): ?>
                                         <div class="col-md-4 mb-3">
-                                            <img src="<?php echo htmlspecialchars($image); ?>" 
-                                                 alt="Gallery image <?php echo $index + 1; ?>" 
-                                                 class="img-fluid rounded shadow-sm"
-                                                 data-bs-toggle="modal" 
-                                                 data-bs-target="#imageModal<?php echo $index; ?>"
-                                                 style="cursor: pointer;">
+                                            <img src="<?php echo htmlspecialchars($image); ?>"
+                                                alt="Gallery image <?php echo $index + 1; ?>"
+                                                class="img-fluid rounded shadow-sm" data-bs-toggle="modal"
+                                                data-bs-target="#imageModal<?php echo $index; ?>" style="cursor: pointer;">
                                         </div>
 
                                         <!-- Image Modal -->
@@ -144,12 +144,12 @@ include 'includes/header.php';
                                                 <div class="modal-content">
                                                     <div class="modal-header">
                                                         <h5 class="modal-title">Gallery Image <?php echo $index + 1; ?></h5>
-                                                        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                                                        <button type="button" class="btn-close"
+                                                            data-bs-dismiss="modal"></button>
                                                     </div>
                                                     <div class="modal-body text-center">
-                                                        <img src="<?php echo htmlspecialchars($image); ?>" 
-                                                             alt="Gallery image <?php echo $index + 1; ?>" 
-                                                             class="img-fluid">
+                                                        <img src="<?php echo htmlspecialchars($image); ?>"
+                                                            alt="Gallery image <?php echo $index + 1; ?>" class="img-fluid">
                                                     </div>
                                                 </div>
                                             </div>
@@ -186,7 +186,7 @@ include 'includes/header.php';
                         </div>
                         <div class="card-body">
                             <?php if (!empty($post['tags'])): ?>
-                                <?php 
+                                <?php
                                 $tags = array_map('trim', explode(',', $post['tags']));
                                 foreach ($tags as $tag): ?>
                                     <span class="badge bg-secondary me-1 mb-1"><?php echo htmlspecialchars($tag); ?></span>
@@ -205,11 +205,14 @@ include 'includes/header.php';
                         <div class="card-body">
                             <div class="mb-3">
                                 <strong>Meta Title:</strong>
-                                <p class="text-muted"><?php echo htmlspecialchars($post['meta_title'] ?: $post['title']); ?></p>
+                                <p class="text-muted">
+                                    <?php echo htmlspecialchars($post['meta_title'] ?: $post['title']); ?></p>
                             </div>
                             <div class="mb-3">
                                 <strong>Meta Description:</strong>
-                                <p class="text-muted"><?php echo htmlspecialchars($post['meta_description'] ?: 'No meta description set'); ?></p>
+                                <p class="text-muted">
+                                    <?php echo htmlspecialchars($post['meta_description'] ?: 'No meta description set'); ?>
+                                </p>
                             </div>
                         </div>
                     </div>
@@ -222,15 +225,18 @@ include 'includes/header.php';
                         <div class="card-body">
                             <div class="mb-2">
                                 <strong>Created:</strong>
-                                <p class="text-muted small"><?php echo date('F j, Y g:i A', strtotime($post['created_at'])); ?></p>
+                                <p class="text-muted small">
+                                    <?php echo date('F j, Y g:i A', strtotime($post['created_at'])); ?></p>
                             </div>
                             <div class="mb-2">
                                 <strong>Last Updated:</strong>
-                                <p class="text-muted small"><?php echo date('F j, Y g:i A', strtotime($post['updated_at'])); ?></p>
+                                <p class="text-muted small">
+                                    <?php echo date('F j, Y g:i A', strtotime($post['updated_at'])); ?></p>
                             </div>
                             <div class="mb-2">
                                 <strong>Content Length:</strong>
-                                <p class="text-muted small"><?php echo number_format(strlen($post['content_body'])); ?> characters</p>
+                                <p class="text-muted small"><?php echo number_format(strlen($post['content_body'])); ?>
+                                    characters</p>
                             </div>
                             <?php if (!empty($post_media_gallery)): ?>
                                 <div class="mb-2">
@@ -246,4 +252,4 @@ include 'includes/header.php';
     </div>
 </div>
 
-<?php include 'includes/footer.php'; ?>
+<?php include 'includes/dash-footer.php'; ?>

@@ -216,7 +216,7 @@ $device_type_filter = isset($_GET['device_type']) ? trim($_GET['device_type']) :
             </div>
         </div>
     </div>
-    <?php include 'includes/footer.php'; ?>
+    <?php include 'includes/dash-footer.php'; ?>
 
     <script>
         let currentPage = 1;
