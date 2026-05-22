@@ -134,10 +134,10 @@
           Get the latest mobile reviews, breaking news, and deals delivered to your inbox.
           No spam. Unsubscribe anytime.
         </p>
+      </div>
         <p class="da-fn-legal">
           &copy; <?php echo date('Y'); ?> DevicesArena. All rights reserved.
         </p>
-      </div>
     </div>
   </footer>
 
