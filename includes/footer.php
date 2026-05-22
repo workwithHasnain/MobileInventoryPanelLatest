@@ -6,25 +6,23 @@
         <a class="da-logo" href="<?php echo $base; ?>">
           <img src="<?php echo $base; ?>imges/logo-wide.svg" alt="DevicesArena" />
         </a>
-        <div class="da-footer-right-block">
-          <div class="da-social-icons-top">
-            <a href="https://www.facebook.com/profile.php?id=61585936163841" target="_blank" title="Facebook" class="fb"><i class="fab fa-facebook-f"></i></a>
-            <a href="https://youtube.com/@devicesarena" target="_blank" title="YouTube" class="yt"><i class="fab fa-youtube"></i></a>
-            <a href="https://twitter.com/" target="_blank" title="X" class="tt"><i class="fa-brands fa-x-twitter"></i></a>
-            <a href="https://www.instagram.com/devicesarenaofficial" target="_blank" title="Instagram" class="ig"><i class="fab fa-instagram"></i></a>
-          </div>
-
-          <!-- ── Newsletter Strip ── -->
-          <div class="da-footer-newsletter-slim">
-            <input type="email" id="ft-newsletter-email" class="da-fn-input" placeholder="Your email address" autocomplete="off" autocorrect="off" spellcheck="false">
-            <button id="ft-newsletter-btn" class="da-fn-btn"><i class="fa fa-paper-plane"></i> Subscribe</button>
-            <div id="ft-newsletter-msg" class="da-fn-msg"></div>
-          </div>
+        <div class="da-social-icons-top">
+          <a href="https://www.facebook.com/profile.php?id=61585936163841" target="_blank" title="Facebook" class="fb"><i class="fab fa-facebook-f"></i></a>
+          <a href="https://youtube.com/@devicesarena" target="_blank" title="YouTube" class="yt"><i class="fab fa-youtube"></i></a>
+          <a href="https://twitter.com/" target="_blank" title="X" class="tt"><i class="fa-brands fa-x-twitter"></i></a>
+          <a href="https://www.instagram.com/devicesarenaofficial" target="_blank" title="Instagram" class="ig"><i class="fab fa-instagram"></i></a>
         </div>
       </div>
 
-      <!-- ── Newsletter divider ── -->
-      <hr class="da-footer-hr">
+    <!-- ── Newsletter Strip ── -->
+    <div class="da-footer-newsletter-slim">
+      <input type="email" id="ft-newsletter-email" class="da-fn-input" placeholder="Your email address" autocomplete="off" autocorrect="off" spellcheck="false">
+      <button id="ft-newsletter-btn" class="da-fn-btn"><i class="fa fa-paper-plane"></i> Subscribe</button>
+      <div id="ft-newsletter-msg" class="da-fn-msg"></div>
+    </div>
+
+    <!-- ── Newsletter divider ── -->
+    <hr class="da-footer-hr">
 
       <!-- Middle Row: Company/Licensing & Content/Help -->
       <div class="da-footer-mid-row">
