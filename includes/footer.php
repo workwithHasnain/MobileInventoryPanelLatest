@@ -130,8 +130,14 @@
         <input type="email" id="ft-newsletter-email" class="da-fn-input" placeholder="Your email address" autocomplete="off" autocorrect="off" spellcheck="false">
         <button id="ft-newsletter-btn" class="da-fn-btn"><i class="fa fa-paper-plane"></i> Subscribe</button>
         <div id="ft-newsletter-msg" class="da-fn-msg"></div>
+        <p class="da-fn-desc">
+          Get the latest mobile reviews, breaking news, and deals delivered to your inbox.
+          No spam. Unsubscribe anytime.
+        </p>
+        <p class="da-fn-legal">
+          &copy; <?php echo date('Y'); ?> DevicesArena. All rights reserved.
+        </p>
       </div>
-
     </div>
   </footer>
 
