@@ -14,16 +14,6 @@
         </div>
       </div>
 
-    <!-- ── Newsletter Strip ── -->
-    <div class="da-footer-newsletter-slim">
-      <input type="email" id="ft-newsletter-email" class="da-fn-input" placeholder="Your email address" autocomplete="off" autocorrect="off" spellcheck="false">
-      <button id="ft-newsletter-btn" class="da-fn-btn"><i class="fa fa-paper-plane"></i> Subscribe</button>
-      <div id="ft-newsletter-msg" class="da-fn-msg"></div>
-    </div>
-
-    <!-- ── Newsletter divider ── -->
-    <hr class="da-footer-hr">
-
       <!-- Middle Row: Company/Licensing & Content/Help -->
       <div class="da-footer-mid-row">
         <!-- Left Column: Company & Licensing -->
@@ -130,6 +120,16 @@
             <li><a href="#">Best Galaxy Watch</a></li>
           </ul>
         </div>
+      </div>
+
+      <!-- ── Newsletter divider ── -->
+      <hr class="da-footer-hr">
+
+      <!-- ── Newsletter Strip ── -->
+      <div class="da-footer-newsletter-slim">
+        <input type="email" id="ft-newsletter-email" class="da-fn-input" placeholder="Your email address" autocomplete="off" autocorrect="off" spellcheck="false">
+        <button id="ft-newsletter-btn" class="da-fn-btn"><i class="fa fa-paper-plane"></i> Subscribe</button>
+        <div id="ft-newsletter-msg" class="da-fn-msg"></div>
       </div>
 
     </div>

@@ -1966,9 +1966,9 @@ button {
 .da-footer-newsletter-slim {
   display: flex;
   flex-direction: column;
-  align-items: flex-end;
+  align-items: center;
   gap: 8px;
-  margin-bottom: 28px;
+  margin-bottom: 0;
 }
 
 .da-fn-input {
@@ -2025,7 +2025,7 @@ button {
   font-size: 12px;
   font-weight: 500;
   min-height: 18px;
-  text-align: right;
+  text-align: center;
 }
 
 .da-fn-msg.success { color: #4ade80; }
