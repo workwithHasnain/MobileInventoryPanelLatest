@@ -5499,6 +5499,63 @@ textarea.da-input {
   vertical-align: top;
 }
 
+/* ══════════════════════════════════════════
+   HEADING JUMP DROPDOWN (POST.PHP)
+══════════════════════════════════════════ */
+.da-heading-jump-container {
+  margin-bottom: 24px;
+}
+
+.da-heading-jump {
+  display: flex;
+  align-items: center;
+  width: 100%;
+}
+
+.da-heading-dropdown {
+  background-color: var(--bg-card) !important;
+  color: var(--text-primary) !important;
+  border: 1px solid var(--border) !important;
+  border-radius: 999px !important;
+  padding: 6px 36px 6px 16px !important;
+  font-family: var(--font-main);
+  font-size: 14px;
+  flex: 1;
+  min-width: 0;
+  box-shadow: none !important;
+  transition: var(--transition);
+}
+
+.da-heading-dropdown:focus {
+  border-color: var(--accent-blue) !important;
+  box-shadow: 0 0 0 3px var(--accent-blue-dim) !important;
+}
+
+.da-heading-nav-btn {
+  background-color: var(--bg-card);
+  border: 1px solid var(--border);
+  color: var(--text-primary);
+  border-radius: 50%;
+  width: 36px;
+  height: 36px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  transition: var(--transition);
+  flex-shrink: 0;
+}
+
+.da-heading-nav-btn:hover:not(:disabled) {
+  background-color: var(--bg-card-hover);
+  color: var(--accent);
+  border-color: var(--accent);
+}
+
+.da-heading-nav-btn:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+
 [data-theme="dark"] .cpt-label-cell {
   background: #1e293b;
   color: #94a3b8;
@@ -5574,6 +5631,3 @@ textarea.da-input {
     font-size: 10.5px;
   }
 }
-
-
-

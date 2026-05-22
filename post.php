@@ -520,6 +520,17 @@ function getAvatarDisplay($name, $email)
         <?php endif; ?>
 
         <?php if (!empty($post['content_body'])): ?>
+          <div class="da-heading-jump-container mb-3">
+            <div class="da-heading-jump d-flex align-items-center">
+              <button id="headingPrev" type="button" class="da-heading-nav-btn me-2 flex-shrink-0" title="Previous section" aria-label="Previous section" style="display:none;">
+                <i class="fa-solid fa-chevron-left"></i>
+              </button>
+              <select id="headingDropdown" class="form-select form-select-sm da-heading-dropdown flex-grow-1" aria-label="Jump to section" style="display:none;"></select>
+              <button id="headingNext" type="button" class="da-heading-nav-btn ms-2 flex-shrink-0" title="Next section" aria-label="Next section" style="display:none;">
+                <i class="fa-solid fa-chevron-right"></i>
+              </button>
+            </div>
+          </div>
           <div class="da-post-content">
             <?php
             // Handle both plain text and rich content
@@ -954,6 +965,107 @@ function getAvatarDisplay($name, $email)
           });
       });
     })();
+
+    // ── Jump to Section (Heading Dropdown) ──
+    window.addEventListener('load', function() {
+        try {
+            const container = document.querySelector('.da-post-content');
+            const dropdown = document.getElementById('headingDropdown');
+            if (!container || !dropdown) return;
+
+            const headings = container.querySelectorAll('h1, h2, h3');
+            if (!headings.length) return;
+
+            dropdown.innerHTML = '';
+            const placeholder = document.createElement('option');
+            placeholder.value = '';
+            placeholder.textContent = 'Jump to section…';
+            placeholder.disabled = true;
+            placeholder.selected = true;
+            dropdown.appendChild(placeholder);
+
+            const usedIds = new Set();
+            const makeSlug = (str) => {
+                return str.toLowerCase().replace(/[^a-z0-9\s-]/g, '').replace(/\s+/g, '-').replace(/-+/g, '-').replace(/^-+|-+$/g, '');
+            };
+
+            headings.forEach((h, idx) => {
+                let text = (h.textContent || '').trim().replace(/\s+/g, ' ');
+                if (!text) text = `Section ${idx + 1}`;
+
+                let slug = h.id || makeSlug(text) || `section-${idx + 1}`;
+                let base = slug;
+                let counter = 2;
+                while (usedIds.has(slug) || document.getElementById(slug)) {
+                    slug = `${base}-${counter++}`;
+                }
+                if (!h.id) h.id = slug;
+                usedIds.add(slug);
+
+                const opt = document.createElement('option');
+                opt.value = `#${slug}`;
+                opt.textContent = text.length > 80 ? text.slice(0, 77) + '…' : text;
+                dropdown.appendChild(opt);
+            });
+
+            dropdown.style.display = 'inline-block';
+            const prevBtn = document.getElementById('headingPrev');
+            const nextBtn = document.getElementById('headingNext');
+            const headingEls = Array.from(headings);
+            let activeIdx = -1;
+
+            const fixed = document.querySelector('.da-navbar-inner') || document.querySelector('#da-navbar');
+            const getOffsetTop = (el) => {
+                const offset = (fixed ? fixed.offsetHeight : 0) + 12;
+                return el.getBoundingClientRect().top + window.pageYOffset - offset;
+            };
+            const scrollToEl = (el) => {
+                window.scrollTo({ top: getOffsetTop(el), behavior: 'smooth' });
+            };
+            const updateButtons = () => {
+                if (!prevBtn || !nextBtn) return;
+                prevBtn.disabled = activeIdx <= 0;
+                nextBtn.disabled = (activeIdx >= headingEls.length - 1) && activeIdx !== -1;
+            };
+
+            if (prevBtn && nextBtn && headingEls.length) {
+                prevBtn.style.display = 'inline-flex';
+                nextBtn.style.display = 'inline-flex';
+                updateButtons();
+            }
+
+            const setActiveByIndex = (idx) => {
+                if (idx < 0 || idx >= headingEls.length) return;
+                activeIdx = idx;
+                dropdown.selectedIndex = idx + 1;
+                updateButtons();
+                scrollToEl(headingEls[idx]);
+            };
+
+            dropdown.addEventListener('change', function() {
+                const selIndex = dropdown.selectedIndex;
+                const idx = selIndex - 1;
+                if (idx >= 0 && idx < headingEls.length) {
+                    setActiveByIndex(idx);
+                }
+            });
+
+            if (prevBtn) {
+                prevBtn.addEventListener('click', function() {
+                    if (activeIdx === -1) setActiveByIndex(0);
+                    else if (activeIdx > 0) setActiveByIndex(activeIdx - 1);
+                });
+            }
+            if (nextBtn) {
+                nextBtn.addEventListener('click', function() {
+                    if (activeIdx === -1) setActiveByIndex(0);
+                    else if (activeIdx < headingEls.length - 1) setActiveByIndex(activeIdx + 1);
+                });
+            }
+        } catch (e) {
+            console.error('Heading dropdown init failed:', e);
+        }
+    });
   </script>
   <script src="<?php echo $base; ?>sliders.js"></script>
 </body>
