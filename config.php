@@ -53,10 +53,13 @@ $_ENV['APP_NAME'] = $_ENV['APP_NAME'] ?? 'Mobile Phone Management System';
 $_ENV['APP_ENV'] = $_ENV['APP_ENV'] ?? 'development';
 $_ENV['APP_DEBUG'] = $_ENV['APP_DEBUG'] ?? 'true';
 
-// Base URL configuration - Change based on environment
-// Localhost: /MobileInventoryPanelLatest/
-// Production: /
-$base = '/'; // Adjust this if deploying to production or a different subdirectory
+// Base URL configuration - Automatically detects if in subdirectory (localhost) or root (production)
+$docRoot = rtrim(str_replace('\\', '/', $_SERVER['DOCUMENT_ROOT']), '/');
+$dir = str_replace('\\', '/', __DIR__);
+$base = str_replace($docRoot, '', $dir) . '/';
+if (empty($base) || $base === '/') {
+    $base = '/';
+}
 
 // Canonical base URL for SEO (fixed domain)
 $canonicalBase = 'https://www.devicesarena.com';

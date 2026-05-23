@@ -1,8 +1,7 @@
 # Enable mod_rewrite
 <IfModule mod_rewrite.c>
     RewriteEngine On
-    # RewriteBase /MobileInventoryPanelLatest/
-    RewriteBase /
+    # RewriteBase is removed so that Apache handles subdirectories dynamically
     
     # Don't rewrite if it's a real file or directory
     RewriteCond %{REQUEST_FILENAME} !-f
@@ -20,7 +19,7 @@
 
     # Route for brands.php: /brands
     RewriteCond %{THE_REQUEST} \.php [NC]
-    RewriteRule ^brands\.php/?$ /brands [R=301,L]
+    RewriteRule ^brands\.php/?$ brands [R=301,L]
     RewriteRule ^brands/?$ brands.php [L,QSA]
 
     # Route for /brand (no slug) -> redirect to /brands
@@ -31,7 +30,7 @@
 
     # Route for compare.php: /compare
     RewriteCond %{THE_REQUEST} \.php [NC]
-    RewriteRule ^compare\.php/?$ /compare [R=301,L]
+    RewriteRule ^compare\.php/?$ compare [R=301,L]
     RewriteRule ^compare/?$ compare.php [L,QSA]
 
     # Route for compare.php: compare/slug1-vs-slug2-vs-slug3
@@ -48,48 +47,48 @@
 
     # Route for featured.php: /featured
     RewriteCond %{THE_REQUEST} \.php [NC]
-    RewriteRule ^featured\.php/?$ /featured [R=301,L]
+    RewriteRule ^featured\.php/?$ featured [R=301,L]
     RewriteRule ^featured/?$ featured.php [L,QSA]
 
     # Route for reviews.php: /reviews
     RewriteCond %{THE_REQUEST} \.php [NC]
-    RewriteRule ^reviews\.php/?$ /reviews [R=301,L]
+    RewriteRule ^reviews\.php/?$ reviews [R=301,L]
     RewriteRule ^reviews/?$ reviews.php [L,QSA]
 
     # Route for news.php: /news
     RewriteCond %{THE_REQUEST} \.php [NC]
-    RewriteRule ^news\.php/?$ /news [R=301,L]
+    RewriteRule ^news\.php/?$ news [R=301,L]
     RewriteRule ^news/?$ news.php [L,QSA]
 
     # Route for rumored.php: /rumored
     RewriteCond %{THE_REQUEST} \.php [NC]
-    RewriteRule ^rumored\.php/?$ /rumored [R=301,L]
+    RewriteRule ^rumored\.php/?$ rumored [R=301,L]
     RewriteRule ^rumored/?$ rumored.php [L,QSA]
 
     # Route for phonefinder.php: /phonefinder
     RewriteCond %{THE_REQUEST} \.php [NC]
-    RewriteRule ^phonefinder\.php/?$ /phonefinder [R=301,L]
+    RewriteRule ^phonefinder\.php/?$ phonefinder [R=301,L]
     RewriteRule ^phonefinder/?$ phonefinder.php [L,QSA]
 
     # Route for about-us.php: /about-us
     RewriteCond %{THE_REQUEST} \.php [NC]
-    RewriteRule ^about-us\.php/?$ /about-us [R=301,L]
+    RewriteRule ^about-us\.php/?$ about-us [R=301,L]
     RewriteRule ^about-us/?$ about-us.php [L,QSA]
 
     # Route for contact-us.php: /contact-us
     RewriteCond %{THE_REQUEST} \.php [NC]
-    RewriteRule ^contact-us\.php/?$ /contact-us [R=301,L]
+    RewriteRule ^contact-us\.php/?$ contact-us [R=301,L]
     RewriteRule ^contact-us/?$ contact-us.php [L,QSA]
 
     # Route for advertise-with-us.php: /advertise-with-us
     RewriteCond %{THE_REQUEST} \.php [NC]
-    RewriteRule ^advertise-with-us\.php/?$ /advertise-with-us [R=301,L]
+    RewriteRule ^advertise-with-us\.php/?$ advertise-with-us [R=301,L]
     RewriteRule ^advertise-with-us/?$ advertise-with-us.php [L,QSA]
 
-    # Redirect /home to /
-    RewriteRule ^home/?$ / [R=301,L]
+    # Redirect /home to current directory root
+    RewriteRule ^home/?$ ./ [R=301,L]
 
-    # Redirect /index.php to /
-    RewriteRule ^index\.php/?$ / [R=301,L]
+    # Redirect /index.php to current directory root
+    RewriteRule ^index\.php/?$ ./ [R=301,L]
 
 </IfModule>
