@@ -3,7 +3,6 @@ session_start();
 require_once __DIR__ . '/config.php';
 require_once __DIR__ . '/phone_data.php';
 require_once __DIR__ . '/database_functions.php';
-require_once __DIR__ . '/includes/database_functions.php';
 
 function getAbsoluteImagePath($imagePath, $base)
 {
