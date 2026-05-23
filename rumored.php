@@ -243,15 +243,14 @@ $phones = $phones_stmt->fetchAll();
       <!-- Background Image Implementation based on original layout -->
       <div class="cp-hero-bg-container">
         <img class="cp-hero-bg-img" src="<?php echo $base; ?>hero-images/brand-hero.png"
-          alt="<?php echo htmlspecialchars($brandName); ?> phones on DevicesArena">
+          alt="Rumored phones on DevicesArena">
       </div>
 
       <div class="cp-hero-inner">
         <div class="cp-hero-left">
           <div class="cp-hero-label"><span>DevicesArena</span></div>
-          <h1 class="cp-hero-title"><?php echo htmlspecialchars($brandName); ?> phones</h1>
-          <p class="cp-hero-sub">Browse all <?php echo htmlspecialchars($brandName); ?> phones and devices on
-            DevicesArena. View specifications, images, and pricing.</p>
+          <h1 class="cp-hero-title">Rumored phones</h1>
+          <p class="cp-hero-sub">Browse all upcoming and rumored phones on DevicesArena. View specifications, images, and pricing.</p>
         </div>
 
         <!-- Right: Brand panel (Classic Widget) -->
@@ -361,7 +360,7 @@ $phones = $phones_stmt->fetchAll();
 
                   <div class="da-device-brand-row">
                     <span
-                      class="da-device-brand-name"><?php echo htmlspecialchars($phone['brand_name'] ?? $brandName); ?></span>
+                      class="da-device-brand-name"><?php echo htmlspecialchars($phone['brand_name'] ?? ''); ?></span>
                     <span class="da-device-badge year"><?php echo htmlspecialchars($phone['year'] ?? 'N/A'); ?></span>
                   </div>
 
@@ -792,12 +791,7 @@ $phones = $phones_stmt->fetchAll();
         });
       }
 
-      const btn = document.getElementById('brandLoadMoreBtn');
-      if (btn) {
-        btn.addEventListener('click', function () {
-          loadBrandDevices(currentPage + 1, true);
-        });
-      }
+
     });
   </script>
   <script src="<?php echo $base; ?>sliders.js"></script>
