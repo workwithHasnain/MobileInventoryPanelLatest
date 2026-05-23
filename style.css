@@ -1838,10 +1838,24 @@ button {
 }
 
 .da-footer-top-row .da-social-icons-top a {
-  color: #3b82f6;
-  /* Soft blue for social icons */
   font-size: 20px;
   transition: opacity 0.2s;
+}
+
+.da-footer-top-row .da-social-icons-top a.fb {
+  color: #1877f2;
+}
+
+.da-footer-top-row .da-social-icons-top a.yt {
+  color: #ff0000;
+}
+
+.da-footer-top-row .da-social-icons-top a.tt {
+  color: #ffffff;
+}
+
+.da-footer-top-row .da-social-icons-top a.ig {
+  color: #e4405f;
 }
 
 .da-footer-top-row .da-social-icons-top a:hover {
