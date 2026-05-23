@@ -72,7 +72,7 @@ try {
 }
 
 // Load filter configuration from JSON
-$filterConfig = json_decode(file_get_contents(__DIR__ . '/../filter_config.json'), true);
+$filterConfig = json_decode(file_get_contents(__DIR__ . 'filter_config.json'), true);
 if (!$filterConfig) {
   die('Error loading filter configuration');
 }
