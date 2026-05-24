@@ -177,6 +177,53 @@ button {
   transform: translateY(-7px) rotate(-45deg);
 }
 
+.da-logo-container {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+
+/* Desktop Hamburger */
+.da-hamburger-desktop {
+  display: none;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  width: 40px;
+  height: 40px;
+  gap: 5px;
+  background: none;
+  border: none;
+  padding: 0;
+  flex-shrink: 0;
+  cursor: pointer;
+}
+
+.da-hamburger-desktop span {
+  display: block;
+  width: 22px;
+  height: 2px;
+  background: #fff;
+  border-radius: 2px;
+  transition: var(--transition, 0.2s ease);
+}
+
+.da-hamburger-desktop:hover span {
+  background: #ffcc00;
+}
+
+.da-hamburger-desktop.collapsed span:nth-child(1) {
+  transform: translateY(7px) rotate(45deg);
+}
+
+.da-hamburger-desktop.collapsed span:nth-child(2) {
+  opacity: 0;
+}
+
+.da-hamburger-desktop.collapsed span:nth-child(3) {
+  transform: translateY(-7px) rotate(-45deg);
+}
+
 .da-logo {
   display: flex;
   align-items: center;
@@ -370,6 +417,22 @@ button {
   position: sticky;
   top: 0;
   z-index: 999;
+  max-height: 80px;
+  opacity: 1;
+  transform: translateY(0);
+  transition: max-height 0.3s cubic-bezier(0.4, 0, 0.2, 1), 
+              opacity 0.3s cubic-bezier(0.4, 0, 0.2, 1), 
+              transform 0.3s cubic-bezier(0.4, 0, 0.2, 1),
+              border-color 0.3s ease;
+  overflow: hidden;
+}
+
+.da-navbar-bottom.collapsed {
+  max-height: 0;
+  opacity: 0;
+  transform: translateY(-15px);
+  border-bottom-color: transparent;
+  pointer-events: none;
 }
 
 [data-theme="dark"] .da-navbar-bottom {

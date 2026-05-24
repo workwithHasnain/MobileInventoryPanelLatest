@@ -2,14 +2,23 @@
     <!-- Desktop Two-Tier Navbar -->
     <div class="da-navbar-top">
       <div class="nav-container-top">
-        <!-- Hamburger appended here for mobile -->
-        <button class="da-hamburger d-lg-none" type="button" aria-label="Menu" id="da-hamburger">
-          <span></span><span></span><span></span>
-        </button>
-        <!-- Logo -->
-        <a class="da-logo" href="<?php echo $base; ?>">
-          <img src="<?php echo $base; ?>imges/logo-wide.svg" alt="DevicesArena" />
-        </a>
+        <!-- Logo Container to group hamburger and logo together -->
+        <div class="da-logo-container">
+          <!-- Hamburger appended here for mobile -->
+          <button class="da-hamburger d-lg-none" type="button" aria-label="Menu" id="da-hamburger">
+            <span></span><span></span><span></span>
+          </button>
+          
+          <!-- Desktop Hamburger to toggle bottom menu -->
+          <button class="da-hamburger-desktop d-none d-lg-flex" type="button" aria-label="Toggle Menu" id="da-menu-toggle">
+            <span></span><span></span><span></span>
+          </button>
+
+          <!-- Logo -->
+          <a class="da-logo" href="<?php echo $base; ?>">
+            <img src="<?php echo $base; ?>imges/logo-wide.svg" alt="DevicesArena" />
+          </a>
+        </div>
 
         <!-- Large Center Search (Desktop) -->
         <form class="da-search-large d-none d-lg-flex" action="<?php echo $base; ?>search" method="GET">
@@ -162,3 +171,23 @@
       <a href="<?php echo $base; ?>brands" class="da-mobile-brand-pill" style="background:rgba(213,0,0,0.15);border-color:rgba(213,0,0,0.3);color:#d50000;">All Brands →</a>
     </div>
   </div>
+
+  <script>
+    (function() {
+      function initDesktopMenuToggle() {
+        var menuToggle = document.getElementById('da-menu-toggle');
+        var bottomNavbar = document.querySelector('.da-navbar-bottom');
+        if (menuToggle && bottomNavbar) {
+          menuToggle.addEventListener('click', function () {
+            bottomNavbar.classList.toggle('collapsed');
+            menuToggle.classList.toggle('collapsed');
+          });
+        }
+      }
+      if (document.readyState === 'loading') {
+        document.addEventListener('DOMContentLoaded', initDesktopMenuToggle);
+      } else {
+        initDesktopMenuToggle();
+      }
+    })();
+  </script>
