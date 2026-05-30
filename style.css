@@ -1235,7 +1235,7 @@ button {
 
 .da-post-card-img {
   position: relative;
-  aspect-ratio: 16/9;
+  aspect-ratio: 2/1;
   overflow: hidden;
   background: #1a1c2e;
 }
@@ -1266,22 +1266,22 @@ button {
 }
 
 .da-post-card-body {
-  padding: 16px;
+  padding: 12px 16px;
   display: flex;
   flex-direction: column;
-  gap: 8px;
+  gap: 6px;
   flex: 1;
 }
 
 .da-post-card-title {
   font-family: var(--font-display);
-  font-size: 14.5px;
+  font-size: 13.5px;
   font-weight: 700;
   color: var(--text-primary);
   line-height: 1.35;
   display: -webkit-box;
-  line-clamp: 3;
-  -webkit-line-clamp: 3;
+  line-clamp: 2;
+  -webkit-line-clamp: 2;
   -webkit-box-orient: vertical;
   overflow: hidden;
 }
@@ -1290,7 +1290,7 @@ button {
   display: flex;
   align-items: center;
   gap: 12px;
-  font-size: 11.5px;
+  font-size: 11px;
   color: var(--text-muted);
   margin-top: auto;
 }
@@ -1309,17 +1309,17 @@ button {
   width: 45%;
   flex-shrink: 0;
   aspect-ratio: unset;
-  min-height: 200px;
+  height: 160px;
 }
 
 .da-post-card.featured .da-post-card-title {
-  font-size: 17px;
-  line-clamp: 4;
-  -webkit-line-clamp: 4;
+  font-size: 15px;
+  line-clamp: 2;
+  -webkit-line-clamp: 2;
 }
 
 .da-post-card.featured .da-post-card-body {
-  padding: 24px;
+  padding: 16px 20px;
   justify-content: center;
 }
 
