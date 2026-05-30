@@ -185,3 +185,8 @@
       });
     })();
   </script>
+
+  <!-- Google Identity Services -->
+  <script src="https://accounts.google.com/gsi/client" async defer></script>
+  <!-- Authentication Logic -->
+  <script src="<?php echo $base; ?>js/auth.js"></script>

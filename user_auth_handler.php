@@ -47,6 +47,9 @@ try {
         case 'get_profile':
             handleGetProfile($pdo, $response);
             break;
+        case 'google_login':
+            handleGoogleLogin($pdo, $response);
+            break;
         default:
             $response['message'] = 'Invalid action';
     }
@@ -283,4 +286,53 @@ function handleDeleteAccount($pdo, &$response)
 
     $response['success'] = true;
     $response['message'] = 'Your account has been deleted.';
+}
+
+// ─── GOOGLE LOGIN ───
+function handleGoogleLogin($pdo, &$response)
+{
+    $email = trim($_POST['email'] ?? '');
+    $name  = trim($_POST['name'] ?? '');
+
+    if (empty($email) || empty($name)) {
+        $response['message'] = 'Google account details missing';
+        return;
+    }
+
+    $stmt = $pdo->prepare("SELECT id, name, email, status FROM users WHERE LOWER(email) = LOWER(?)");
+    $stmt->execute([$email]);
+    $user = $stmt->fetch(PDO::FETCH_ASSOC);
+
+    if ($user) {
+        if ($user['status'] !== 'active') {
+            $response['message'] = 'Your account has been deactivated. Please contact support.';
+            return;
+        }
+        $userId = $user['id'];
+        $userName = $user['name'];
+        $userEmail = $user['email'];
+    } else {
+        $randomPass = bin2hex(random_bytes(16));
+        $hashedPassword = password_hash($randomPass, PASSWORD_BCRYPT);
+        
+        $stmt = $pdo->prepare("INSERT INTO users (name, email, password) VALUES (?, ?, ?) RETURNING id, name, email");
+        $stmt->execute([$name, $email, $hashedPassword]);
+        $newUser = $stmt->fetch(PDO::FETCH_ASSOC);
+        
+        if (!$newUser) {
+            $response['message'] = 'Failed to create account via Google';
+            return;
+        }
+        $userId = $newUser['id'];
+        $userName = $newUser['name'];
+        $userEmail = $newUser['email'];
+    }
+
+    $_SESSION['public_user_id']    = $userId;
+    $_SESSION['public_user_name']  = $userName;
+    $_SESSION['public_user_email'] = $userEmail;
+
+    $response['success'] = true;
+    $response['message'] = 'Login successful!';
+    $response['user'] = ['name' => $userName, 'email' => $userEmail];
 }
