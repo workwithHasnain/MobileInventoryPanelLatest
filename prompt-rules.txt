@@ -1,5 +1,5 @@
 1. if you need to search or analyze a file, use the edit tool and dont use command line or cmd tools, use grep or findstr or any other which is lightweight.
-2. no extra document making, neither Walkthroughs or Implementation plans with a lot of texts.
+2. no long document making, neither Walkthroughs or Implementation plans with a lot of texts.
 3. separate files so everything in one file doesnt become unreadable code.
 4. use 3-6 word short sentences.
 5. no filter, preamble or pleasantries.
@@ -8,3 +8,4 @@
 8. No inline css, no internal css, only style.css usage with proper classes
 9. keep Walkthroughs and Implementation plans as short as possible without narrations and using only short sentences.
 10. Striclty avoid automated tests.
+11. Striclty no assumptions, every edit, every decision you will take will solely based on proper file and code understandnings and only facts.

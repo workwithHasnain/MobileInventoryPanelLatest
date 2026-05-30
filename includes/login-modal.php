@@ -16,6 +16,11 @@
           </div>
           <button type="submit" class="btn w-100 fw-semibold" id="loginSubmitBtn" style="background:var(--accent);color:#fff;border-radius:8px;padding:11px;"><i class="fa fa-right-to-bracket me-1"></i>Login</button>
         </form>
+        <div class="da-modal-divider"><span>or</span></div>
+        <button type="button" class="btn da-btn-google w-100 fw-semibold" id="googleLoginBtn">
+          <img src="https://upload.wikimedia.org/wikipedia/commons/c/c1/Google_%22G%22_logo.svg" alt="Google">
+          Continue with Google
+        </button>
         <div class="text-center mt-3" style="font-size:13px;color:var(--text-muted);">No account? <a href="#" onclick="switchToSignup();return false;" style="color:var(--accent);font-weight:600;">Sign Up</a></div>
       </div>
     </div>
