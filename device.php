@@ -1290,8 +1290,14 @@ $commentCount = getDeviceCommentCount($pdo, $device_id);
                     $meta = $highlightIconMap[$hKey] ?? ['icon' => 'fa-circle-info', 'label' => ucfirst($hKey)];
                     $cleanText = preg_replace('/^[\x{1F300}-\x{1FAFF}\x{2600}-\x{26FF}\x{2700}-\x{27BF}\x{FE00}-\x{FEFF}\x{200D}]+\s*/u', '', strip_tags($highlight));
                     $displayVal = $cleanText;
-                    if (mb_strlen($cleanText) > 35) {
-                      $displayVal = mb_substr($cleanText, 0, 35) . '...';
+                    if (function_exists('mb_strlen') && function_exists('mb_substr')) {
+                      if (mb_strlen($cleanText) > 35) {
+                        $displayVal = mb_substr($cleanText, 0, 35) . '...';
+                      }
+                    } else {
+                      if (strlen($cleanText) > 35) {
+                        $displayVal = substr($cleanText, 0, 35) . '...';
+                      }
                     }
                     ?>
                     <div class="da-highlight-chip" style="--chip-delay:<?php echo $hiIdx++ * 0.08; ?>s">
