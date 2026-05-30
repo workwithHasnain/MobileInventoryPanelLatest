@@ -1288,13 +1288,17 @@ $commentCount = getDeviceCommentCount($pdo, $device_id);
                 <div class="da-highlights-col">
                   <?php foreach ($deviceHighlights as $hKey => $highlight):
                     $meta = $highlightIconMap[$hKey] ?? ['icon' => 'fa-circle-info', 'label' => ucfirst($hKey)];
-                    $cleanText = htmlspecialchars(preg_replace('/^[\x{1F300}-\x{1FAFF}\x{2600}-\x{26FF}\x{2700}-\x{27BF}\x{FE00}-\x{FEFF}\x{200D}]+\s*/u', '', strip_tags($highlight)));
+                    $cleanText = preg_replace('/^[\x{1F300}-\x{1FAFF}\x{2600}-\x{26FF}\x{2700}-\x{27BF}\x{FE00}-\x{FEFF}\x{200D}]+\s*/u', '', strip_tags($highlight));
+                    $displayVal = $cleanText;
+                    if (mb_strlen($cleanText) > 35) {
+                      $displayVal = mb_substr($cleanText, 0, 35) . '...';
+                    }
                     ?>
                     <div class="da-highlight-chip" style="--chip-delay:<?php echo $hiIdx++ * 0.08; ?>s">
                       <div class="da-highlight-chip-icon"><i class="fa <?php echo $meta['icon']; ?>"></i></div>
                       <div class="da-highlight-chip-text">
                         <span class="da-highlight-chip-label"><?php echo $meta['label']; ?></span>
-                        <span class="da-highlight-chip-val"><?php echo $cleanText; ?></span>
+                        <span class="da-highlight-chip-val" title="<?php echo htmlspecialchars($cleanText); ?>"><?php echo htmlspecialchars($displayVal); ?></span>
                       </div>
                     </div>
                   <?php endforeach; ?>
