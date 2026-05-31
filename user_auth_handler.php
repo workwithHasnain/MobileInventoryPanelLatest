@@ -97,7 +97,7 @@ function handleRegister($pdo, &$response)
     }
 
     $hashedPassword = password_hash($password, PASSWORD_BCRYPT);
-    $stmt = $pdo->prepare("INSERT INTO users (name, email, password) VALUES (?, ?, ?) RETURNING id, name, email");
+    $stmt = $pdo->prepare("INSERT INTO users (name, email, password, auth_provider, last_password_updated) VALUES (?, ?, ?, 'local', NOW()) RETURNING id, name, email");
     $stmt->execute([$name, $email, $hashedPassword]);
     $user = $stmt->fetch(PDO::FETCH_ASSOC);
 
@@ -165,7 +165,7 @@ function handleGetProfile($pdo, &$response)
         return;
     }
 
-    $stmt = $pdo->prepare("SELECT id, name, email, created_at FROM users WHERE id = ? AND status = 'active'");
+    $stmt = $pdo->prepare("SELECT id, name, email, created_at, auth_provider, last_password_updated FROM users WHERE id = ? AND status = 'active'");
     $stmt->execute([$_SESSION['public_user_id']]);
     $user = $stmt->fetch(PDO::FETCH_ASSOC);
 
@@ -214,29 +214,36 @@ function handleUpdateProfile($pdo, &$response)
         return;
     }
 
+    $isGoogleVerified = !empty($_SESSION['google_verified_at']) && ($_SESSION['google_verified_at'] > time() - 300);
+
     // If changing password, verify current password
     if (!empty($newPassword)) {
-        if (empty($currentPassword)) {
-            $response['message'] = 'Current password is required to set a new password';
-            return;
+        $stmt = $pdo->prepare("SELECT password, last_password_updated FROM users WHERE id = ?");
+        $stmt->execute([$userId]);
+        $row = $stmt->fetch(PDO::FETCH_ASSOC);
+
+        $needsCurrentPassword = ($row['last_password_updated'] !== null);
+
+        if ($needsCurrentPassword && !$isGoogleVerified) {
+            if (empty($currentPassword)) {
+                $response['message'] = 'Current password is required to set a new password';
+                return;
+            }
+            if (!$row || !password_verify($currentPassword, $row['password'])) {
+                $response['message'] = 'Current password is incorrect';
+                return;
+            }
         }
+
         if (strlen($newPassword) < 6) {
             $response['message'] = 'New password must be at least 6 characters';
             return;
         }
 
-        $stmt = $pdo->prepare("SELECT password FROM users WHERE id = ?");
-        $stmt->execute([$userId]);
-        $row = $stmt->fetch(PDO::FETCH_ASSOC);
-
-        if (!$row || !password_verify($currentPassword, $row['password'])) {
-            $response['message'] = 'Current password is incorrect';
-            return;
-        }
-
         $hashedPassword = password_hash($newPassword, PASSWORD_BCRYPT);
-        $stmt = $pdo->prepare("UPDATE users SET name = ?, email = ?, password = ?, updated_at = NOW() WHERE id = ?");
+        $stmt = $pdo->prepare("UPDATE users SET name = ?, email = ?, password = ?, last_password_updated = NOW(), updated_at = NOW() WHERE id = ?");
         $stmt->execute([$name, $email, $hashedPassword, $userId]);
+        unset($_SESSION['google_verified_at']);
     } else {
         $stmt = $pdo->prepare("UPDATE users SET name = ?, email = ?, updated_at = NOW() WHERE id = ?");
         $stmt->execute([$name, $email, $userId]);
@@ -262,19 +269,23 @@ function handleDeleteAccount($pdo, &$response)
     $userId  = $_SESSION['public_user_id'];
     $password = trim($_POST['password'] ?? '');
 
-    if (empty($password)) {
-        $response['message'] = 'Please enter your password to confirm account deletion';
-        return;
-    }
+    $isGoogleVerified = !empty($_SESSION['google_verified_at']) && ($_SESSION['google_verified_at'] > time() - 300);
 
-    // Verify password
-    $stmt = $pdo->prepare("SELECT password FROM users WHERE id = ?");
-    $stmt->execute([$userId]);
-    $row = $stmt->fetch(PDO::FETCH_ASSOC);
+    if (!$isGoogleVerified) {
+        if (empty($password)) {
+            $response['message'] = 'Please enter your password to confirm account deletion';
+            return;
+        }
 
-    if (!$row || !password_verify($password, $row['password'])) {
-        $response['message'] = 'Incorrect password';
-        return;
+        // Verify password
+        $stmt = $pdo->prepare("SELECT password FROM users WHERE id = ?");
+        $stmt->execute([$userId]);
+        $row = $stmt->fetch(PDO::FETCH_ASSOC);
+
+        if (!$row || !password_verify($password, $row['password'])) {
+            $response['message'] = 'Incorrect password';
+            return;
+        }
     }
 
     // Soft-delete: set status to 'deleted'
@@ -299,6 +310,17 @@ function handleGoogleLogin($pdo, &$response)
         return;
     }
 
+    if (!empty($_SESSION['public_user_id'])) {
+        if (strtolower($email) === strtolower($_SESSION['public_user_email'])) {
+            $_SESSION['google_verified_at'] = time();
+            $response['success'] = true;
+            $response['message'] = 'Verified successfully via Google!';
+        } else {
+            $response['message'] = 'This Google account does not match your profile email.';
+        }
+        return;
+    }
+
     $stmt = $pdo->prepare("SELECT id, name, email, status FROM users WHERE LOWER(email) = LOWER(?)");
     $stmt->execute([$email]);
     $user = $stmt->fetch(PDO::FETCH_ASSOC);
@@ -315,7 +337,7 @@ function handleGoogleLogin($pdo, &$response)
         $randomPass = bin2hex(random_bytes(16));
         $hashedPassword = password_hash($randomPass, PASSWORD_BCRYPT);
         
-        $stmt = $pdo->prepare("INSERT INTO users (name, email, password) VALUES (?, ?, ?) RETURNING id, name, email");
+        $stmt = $pdo->prepare("INSERT INTO users (name, email, password, auth_provider) VALUES (?, ?, ?, 'google') RETURNING id, name, email");
         $stmt->execute([$name, $email, $hashedPassword]);
         $newUser = $stmt->fetch(PDO::FETCH_ASSOC);
         

@@ -103,13 +103,50 @@ if (typeof window.authInitialized === 'undefined') {
       if (data.success && data.user) {
         document.getElementById('profile-name').value = data.user.name;
         document.getElementById('profile-email').value = data.user.email;
+        
+        const isGoogleLinked = (data.user.auth_provider === 'google');
+        const hasSetPassword = (data.user.last_password_updated !== null);
+        
+        const badge = document.getElementById('google-linked-badge');
+        const curPassGroup = document.getElementById('current-password-group');
+        const curPassInput = document.getElementById('profile-current-password');
+        const lastUpdated = document.getElementById('last-password-updated-text');
+        
+        const verifyBtnProf = document.getElementById('profileVerifyGoogleBtn');
+        const verifyBtnDel = document.getElementById('deleteVerifyGoogleBtn');
+        const delPassWrap = document.getElementById('delete-password-wrapper');
+        
+        if (badge) badge.style.display = isGoogleLinked ? 'block' : 'none';
+        
+        if (hasSetPassword) {
+            if (curPassGroup) curPassGroup.style.display = 'block';
+            if (curPassInput) { curPassInput.style.display = 'block'; curPassInput.required = false; }
+            if (lastUpdated) {
+                lastUpdated.style.display = 'block';
+                lastUpdated.innerHTML = '<i class="fa fa-clock me-1"></i>Last updated: ' + data.user.last_password_updated;
+            }
+            if (delPassWrap) delPassWrap.style.display = 'block';
+            if (verifyBtnProf) verifyBtnProf.style.display = isGoogleLinked ? 'block' : 'none';
+            if (verifyBtnDel) verifyBtnDel.style.display = isGoogleLinked ? 'block' : 'none';
+        } else {
+            if (curPassGroup) curPassGroup.style.display = 'none';
+            if (curPassInput) { curPassInput.style.display = 'none'; curPassInput.required = false; }
+            if (lastUpdated) lastUpdated.style.display = 'none';
+            if (delPassWrap) delPassWrap.style.display = 'none';
+            if (verifyBtnProf) verifyBtnProf.style.display = 'none';
+            if (verifyBtnDel) verifyBtnDel.style.display = 'none';
+        }
       }
     });
     
-    document.getElementById('profile-current-password').value = '';
-    document.getElementById('profile-new-password').value = '';
-    document.getElementById('delete-account-password').value = '';
-    document.getElementById('profile-message').style.display = 'none';
+    const curPassInput = document.getElementById('profile-current-password');
+    if (curPassInput) curPassInput.value = '';
+    const newPassInput = document.getElementById('profile-new-password');
+    if (newPassInput) newPassInput.value = '';
+    const delPassInput = document.getElementById('delete-account-password');
+    if (delPassInput) delPassInput.value = '';
+    const profMsg = document.getElementById('profile-message');
+    if (profMsg) profMsg.style.display = 'none';
     
     modal.show();
   };
@@ -181,9 +218,11 @@ if (typeof window.authInitialized === 'undefined') {
   };
 
   // ── Google Auth ──
-  window.handleGoogleAuthClick = function (btnId, msgId) {
+  window.handleGoogleAuthClick = function (btnId, msgId, onSuccess) {
     const btn = document.getElementById(btnId);
+    let originalHtml = '';
     if (btn) {
+      originalHtml = btn.innerHTML;
       btn.disabled = true;
       btn.innerHTML = '<i class="fa fa-spinner fa-spin me-1"></i>Connecting...';
     }
@@ -192,7 +231,7 @@ if (typeof window.authInitialized === 'undefined') {
         showAuthMsg(msgId, 'Google sign-in is not loaded.', 'danger');
         if (btn) {
             btn.disabled = false;
-            btn.innerHTML = '<img src="https://upload.wikimedia.org/wikipedia/commons/c/c1/Google_%22G%22_logo.svg" alt="Google"> Continue with Google';
+            btn.innerHTML = originalHtml;
         }
         return;
     }
@@ -213,20 +252,24 @@ if (typeof window.authInitialized === 'undefined') {
             fd.append('name', profile.name || 'Google User');
             userAuthFetch('google_login', fd).then(data => {
               if (data.success) {
-                showAuthMsg(msgId, data.message, 'success');
-                setTimeout(() => location.reload(), 800);
+                if (onSuccess) {
+                    onSuccess(data);
+                } else {
+                    showAuthMsg(msgId, data.message, 'success');
+                    setTimeout(() => location.reload(), 800);
+                }
               } else {
                 showAuthMsg(msgId, data.message, 'danger');
                 if (btn) {
                   btn.disabled = false;
-                  btn.innerHTML = '<img src="https://upload.wikimedia.org/wikipedia/commons/c/c1/Google_%22G%22_logo.svg" alt="Google"> Continue with Google';
+                  btn.innerHTML = originalHtml;
                 }
               }
             }).catch(() => {
               showAuthMsg(msgId, 'An error occurred.', 'danger');
               if (btn) {
                 btn.disabled = false;
-                btn.innerHTML = '<img src="https://upload.wikimedia.org/wikipedia/commons/c/c1/Google_%22G%22_logo.svg" alt="Google"> Continue with Google';
+                btn.innerHTML = originalHtml;
               }
             });
           })
@@ -234,13 +277,13 @@ if (typeof window.authInitialized === 'undefined') {
             showAuthMsg(msgId, 'Failed to get Google profile.', 'danger');
             if (btn) {
               btn.disabled = false;
-              btn.innerHTML = '<img src="https://upload.wikimedia.org/wikipedia/commons/c/c1/Google_%22G%22_logo.svg" alt="Google"> Continue with Google';
+              btn.innerHTML = originalHtml;
             }
           });
         } else {
           if (btn) {
             btn.disabled = false;
-            btn.innerHTML = '<img src="https://upload.wikimedia.org/wikipedia/commons/c/c1/Google_%22G%22_logo.svg" alt="Google"> Continue with Google';
+            btn.innerHTML = originalHtml;
           }
         }
       },
@@ -260,6 +303,34 @@ if (typeof window.authInitialized === 'undefined') {
       gsBtn.addEventListener('click', () => {
         window.handleGoogleAuthClick('googleSignupBtn', 'signup-message');
       });
+    }
+
+    const pvgBtn = document.getElementById('profileVerifyGoogleBtn');
+    if (pvgBtn) {
+        pvgBtn.addEventListener('click', () => {
+            window.handleGoogleAuthClick('profileVerifyGoogleBtn', 'profile-message', (data) => {
+                showAuthMsg('profile-message', 'Verified via Google! You can now save changes without your current password.', 'success');
+                const curPassGroup = document.getElementById('current-password-group');
+                if (curPassGroup) curPassGroup.style.display = 'none';
+                pvgBtn.style.display = 'none';
+                pvgBtn.disabled = false;
+                pvgBtn.innerHTML = '<img src="https://upload.wikimedia.org/wikipedia/commons/c/c1/Google_%22G%22_logo.svg" alt="Google" style="width:16px;margin-right:8px;"> Verify with Google instead';
+            });
+        });
+    }
+
+    const dvgBtn = document.getElementById('deleteVerifyGoogleBtn');
+    if (dvgBtn) {
+        dvgBtn.addEventListener('click', () => {
+            window.handleGoogleAuthClick('deleteVerifyGoogleBtn', 'profile-message', (data) => {
+                showAuthMsg('profile-message', 'Verified via Google! You can now delete your account without a password.', 'success');
+                const delPassWrap = document.getElementById('delete-password-wrapper');
+                if (delPassWrap) delPassWrap.style.display = 'none';
+                dvgBtn.style.display = 'none';
+                dvgBtn.disabled = false;
+                dvgBtn.innerHTML = '<img src="https://upload.wikimedia.org/wikipedia/commons/c/c1/Google_%22G%22_logo.svg" alt="Google" style="width:14px;margin-right:6px;">Verify';
+            });
+        });
     }
   });
 }
