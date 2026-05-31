@@ -111,6 +111,9 @@ if (typeof window.authInitialized === 'undefined') {
         const curPassGroup = document.getElementById('current-password-group');
         const curPassInput = document.getElementById('profile-current-password');
         const lastUpdated = document.getElementById('last-password-updated-text');
+        const newPassLabel = document.getElementById('new-password-label');
+        const newPassInput = document.getElementById('profile-new-password');
+        const delBtn = document.getElementById('deleteAccountBtn');
         
         const verifyBtnProf = document.getElementById('profileVerifyGoogleBtn');
         const verifyBtnDel = document.getElementById('deleteVerifyGoogleBtn');
@@ -119,6 +122,10 @@ if (typeof window.authInitialized === 'undefined') {
         if (badge) badge.style.display = isGoogleLinked ? 'block' : 'none';
         
         if (hasSetPassword) {
+            if (newPassLabel) newPassLabel.innerText = 'New Password';
+            if (newPassInput) newPassInput.disabled = false;
+            if (delBtn) delBtn.disabled = false;
+            
             if (curPassGroup) curPassGroup.style.display = 'block';
             if (curPassInput) { curPassInput.style.display = 'block'; curPassInput.required = false; }
             if (lastUpdated) {
@@ -126,15 +133,31 @@ if (typeof window.authInitialized === 'undefined') {
                 lastUpdated.innerHTML = '<i class="fa fa-clock me-1"></i>Last updated: ' + data.user.last_password_updated;
             }
             if (delPassWrap) delPassWrap.style.display = 'block';
-            if (verifyBtnProf) verifyBtnProf.style.display = isGoogleLinked ? 'block' : 'none';
-            if (verifyBtnDel) verifyBtnDel.style.display = isGoogleLinked ? 'block' : 'none';
+            if (verifyBtnProf) {
+                verifyBtnProf.style.display = isGoogleLinked ? 'block' : 'none';
+                verifyBtnProf.innerHTML = '<img src="https://upload.wikimedia.org/wikipedia/commons/c/c1/Google_%22G%22_logo.svg" alt="Google" style="width:16px;margin-right:8px;"> Verify with Google instead';
+            }
+            if (verifyBtnDel) {
+                verifyBtnDel.style.display = isGoogleLinked ? 'block' : 'none';
+                verifyBtnDel.innerHTML = '<img src="https://upload.wikimedia.org/wikipedia/commons/c/c1/Google_%22G%22_logo.svg" alt="Google" style="width:14px;margin-right:6px;">Verify instead';
+            }
         } else {
+            if (newPassLabel) newPassLabel.innerText = 'Setup a password';
+            if (newPassInput) newPassInput.disabled = true;
+            if (delBtn) delBtn.disabled = true;
+            
             if (curPassGroup) curPassGroup.style.display = 'none';
             if (curPassInput) { curPassInput.style.display = 'none'; curPassInput.required = false; }
             if (lastUpdated) lastUpdated.style.display = 'none';
             if (delPassWrap) delPassWrap.style.display = 'none';
-            if (verifyBtnProf) verifyBtnProf.style.display = 'none';
-            if (verifyBtnDel) verifyBtnDel.style.display = 'none';
+            if (verifyBtnProf) {
+                verifyBtnProf.style.display = 'block';
+                verifyBtnProf.innerHTML = '<img src="https://upload.wikimedia.org/wikipedia/commons/c/c1/Google_%22G%22_logo.svg" alt="Google" style="width:16px;margin-right:8px;"> Verify with Google to setup password';
+            }
+            if (verifyBtnDel) {
+                verifyBtnDel.style.display = 'block';
+                verifyBtnDel.innerHTML = '<img src="https://upload.wikimedia.org/wikipedia/commons/c/c1/Google_%22G%22_logo.svg" alt="Google" style="width:14px;margin-right:6px;">Verify with Google to delete';
+            }
         }
       }
     });
@@ -153,9 +176,13 @@ if (typeof window.authInitialized === 'undefined') {
 
   window.deletePublicAccount = function () {
     if (!confirm('Permanently delete your account? This cannot be undone.')) return;
+    
+    const pwdWrap = document.getElementById('delete-password-wrapper');
+    const isVerified = pwdWrap && pwdWrap.style.display === 'none';
+    
     const pwdEl = document.getElementById('delete-account-password');
     const pwd = pwdEl ? pwdEl.value.trim() : '';
-    if (!pwd) {
+    if (!isVerified && !pwd) {
       showAuthMsg('profile-message', 'Please enter your password.', 'warning');
       return;
     }
@@ -309,12 +336,19 @@ if (typeof window.authInitialized === 'undefined') {
     if (pvgBtn) {
         pvgBtn.addEventListener('click', () => {
             window.handleGoogleAuthClick('profileVerifyGoogleBtn', 'profile-message', (data) => {
-                showAuthMsg('profile-message', 'Verified via Google! You can now save changes without your current password.', 'success');
+                const newPassLabel = document.getElementById('new-password-label');
+                const isSetup = newPassLabel && newPassLabel.innerText.includes('Setup');
+                const msg = isSetup ? 'Verified via Google! You can now setup your password.' : 'Verified via Google! You can now save changes without your current password.';
+                
+                showAuthMsg('profile-message', msg, 'success');
                 const curPassGroup = document.getElementById('current-password-group');
                 if (curPassGroup) curPassGroup.style.display = 'none';
+                
+                const newPassInput = document.getElementById('profile-new-password');
+                if (newPassInput) newPassInput.disabled = false;
+                
                 pvgBtn.style.display = 'none';
                 pvgBtn.disabled = false;
-                pvgBtn.innerHTML = '<img src="https://upload.wikimedia.org/wikipedia/commons/c/c1/Google_%22G%22_logo.svg" alt="Google" style="width:16px;margin-right:8px;"> Verify with Google instead';
             });
         });
     }
@@ -326,9 +360,12 @@ if (typeof window.authInitialized === 'undefined') {
                 showAuthMsg('profile-message', 'Verified via Google! You can now delete your account without a password.', 'success');
                 const delPassWrap = document.getElementById('delete-password-wrapper');
                 if (delPassWrap) delPassWrap.style.display = 'none';
+                
+                const delBtn = document.getElementById('deleteAccountBtn');
+                if (delBtn) delBtn.disabled = false;
+                
                 dvgBtn.style.display = 'none';
                 dvgBtn.disabled = false;
-                dvgBtn.innerHTML = '<img src="https://upload.wikimedia.org/wikipedia/commons/c/c1/Google_%22G%22_logo.svg" alt="Google" style="width:14px;margin-right:6px;">Verify';
             });
         });
     }

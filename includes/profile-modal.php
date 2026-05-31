@@ -32,7 +32,7 @@
               <div class="input-group"><span class="input-group-text"><i class="fa fa-key"></i></span><input type="password" class="form-control" name="current_password" id="profile-current-password" placeholder="Required to change password"></div>
               <div id="last-password-updated-text" style="font-size:11px;color:var(--text-muted);margin-top:6px;display:none;"></div>
             </div>
-            <div class="mb-3"><label class="form-label">New Password</label>
+            <div class="mb-3"><label class="form-label" id="new-password-label">New Password</label>
               <div class="input-group"><span class="input-group-text"><i class="fa fa-lock"></i></span><input type="password" class="form-control" name="new_password" id="profile-new-password" placeholder="Min 6 characters" minlength="6"></div>
             </div>
             <button type="button" class="btn btn-outline-secondary w-100 mb-2 mt-1" id="profileVerifyGoogleBtn" style="display:none;border-color:var(--border);"><img src="https://upload.wikimedia.org/wikipedia/commons/c/c1/Google_%22G%22_logo.svg" alt="Google" style="width:16px;margin-right:8px;"> Verify with Google instead</button>
