@@ -36,8 +36,8 @@ if (empty($remoteUrl)) {
 
 // Ensure it ends with /import_device.php
 $remoteUrl = rtrim($remoteUrl, '/');
-if (!str_ends_with($remoteUrl, '/import_device.php')) {
-    $remoteUrl .= '/import_device.php';
+if (!str_ends_with($remoteUrl, '/handlers/import_device.php')) {
+    $remoteUrl .= '/handlers/import_device.php';
 }
 
 $apiKey = $_SERVER['HTTP_X_API_KEY'] ?? '';
