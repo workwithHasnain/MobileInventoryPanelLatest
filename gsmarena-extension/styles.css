@@ -397,3 +397,87 @@ body::-webkit-scrollbar-thumb {
 body::-webkit-scrollbar-thumb:hover {
     background: #888;
 }
+
+/* ===== Swap Review UI ===== */
+.swap-section-header {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    padding: 6px 8px;
+    background: #e8eaf6;
+    border-radius: 4px;
+    margin-bottom: 2px;
+    font-weight: 700;
+    font-size: 12px;
+}
+
+.swap-row {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    padding: 3px 8px 3px 20px;
+    border-bottom: 1px solid #f0f0f0;
+    font-size: 11px;
+}
+
+.swap-row:last-child {
+    border-bottom: none;
+    margin-bottom: 6px;
+}
+
+.swap-gsm-label {
+    min-width: 90px;
+    color: #555;
+    font-style: italic;
+}
+
+.swap-gsm-sub {
+    min-width: 90px;
+    color: #777;
+    font-style: italic;
+}
+
+.swap-arrow {
+    color: #999;
+    font-size: 12px;
+    flex-shrink: 0;
+}
+
+.swap-input {
+    flex: 1;
+    padding: 3px 6px;
+    border: 1px solid #ddd;
+    border-radius: 3px;
+    font-size: 11px;
+    font-family: inherit;
+    background: #fafafa;
+    transition: border-color 0.15s;
+    min-width: 0;
+}
+
+.swap-input:focus {
+    outline: none;
+    border-color: #1a237e;
+    background: #fff;
+}
+
+.swap-input.swap-changed {
+    border-color: #f59e0b;
+    background: #fffbf0;
+}
+
+.swap-badge {
+    font-size: 9px;
+    font-weight: 700;
+    padding: 1px 5px;
+    border-radius: 3px;
+    background: #f59e0b;
+    color: #fff;
+    flex-shrink: 0;
+    text-transform: uppercase;
+    letter-spacing: 0.3px;
+}
+
+.swap-badge-new {
+    background: #0891b2;
+}

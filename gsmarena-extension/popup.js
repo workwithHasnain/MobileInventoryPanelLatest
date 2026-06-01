@@ -141,6 +141,39 @@ const SECTION_MAP = {
 };
 
 /**
+ * GSMArena section (title) name → Our site's display label.
+ * These are purely for display / stored field labels — DB columns are unchanged.
+ */
+const TITLE_SWAP = {
+    'Platform':     'Hardware',
+    'Memory':       'System Memory',
+    'Sound':        'Multimedia',
+    'Comms':        'Connectivity',
+    'Misc':         'General Info'
+    // Others match already: Network, Launch, Body, Display, Main Camera, Selfie camera, Features, Battery
+};
+
+/**
+ * GSMArena subtitle (field) name → Our site's display label.
+ * Key = exactly as GSMArena scrapes it. Value = our label.
+ */
+const SUBTITLE_SWAP = {
+    'Status':            'Availability',
+    'Build':             'Materials',
+    'SIM':               'Connectivity Slot',
+    'Chipset':           'System Chip',
+    'CPU':               'Processor',
+    'Card slot':         'Expansion Slot',
+    'Internal':          'Storage',
+    'Video':             'Video Recording',
+    'Loudspeaker':       'Audio Output',
+    'Positioning':       'Location',
+    'NFC':               'Proximity',
+    'Reverse charging':  'Reverse wired',
+    'Models':            'Versions'
+};
+
+/**
  * Extract structured device data from raw scraped data.
  * Parses individual fields and maps grouped specs to DB columns.
  */
@@ -327,6 +360,142 @@ function extractDeviceData(scraped) {
     }
 
     return data;
+}
+
+
+// ======================================================================
+// 2b. LABEL SWAP ENGINE
+// ======================================================================
+
+/**
+ * Apply TITLE_SWAP and SUBTITLE_SWAP to a deviceData.groupedSpecs.
+ * Each spec row's `field` string is renamed from GSMArena label to our label.
+ * Swaps are recorded in deviceData.swapLog for the UI.
+ * Swaps can be user-overridden via deviceData.userSwapOverrides.
+ */
+function applyLabelSwaps(deviceData) {
+    deviceData.swapLog = []; // { dbColumn, sectionLabel, gsm, ours, rowIndex, type:'title'|'subtitle'|'new' }
+    const overrides = deviceData.userSwapOverrides || {};
+
+    for (const [dbColumn, rows] of Object.entries(deviceData.groupedSpecs)) {
+        // Determine the GSM section title for this column (reverse SECTION_MAP)
+        const gsmTitle = Object.keys(SECTION_MAP).find(k => SECTION_MAP[k] === dbColumn) || dbColumn;
+        const ourTitle = overrides[dbColumn + '__title'] !== undefined
+            ? overrides[dbColumn + '__title']
+            : (TITLE_SWAP[gsmTitle] || gsmTitle);
+
+        const wasSwapped = gsmTitle !== ourTitle;
+        deviceData.swapLog.push({
+            dbColumn,
+            rowIndex: null,
+            type: wasSwapped ? 'title' : 'same-title',
+            gsm: gsmTitle,
+            ours: ourTitle,
+            overrideKey: dbColumn + '__title'
+        });
+
+        for (let i = 0; i < rows.length; i++) {
+            const originalField = rows[i]._originalField !== undefined ? rows[i]._originalField : rows[i].field;
+            rows[i]._originalField = originalField;
+
+            const overrideKey = dbColumn + '__sub__' + i;
+            let ourField;
+            if (overrides[overrideKey] !== undefined) {
+                ourField = overrides[overrideKey];
+            } else if (originalField && SUBTITLE_SWAP[originalField] !== undefined) {
+                ourField = SUBTITLE_SWAP[originalField];
+            } else {
+                ourField = originalField;
+            }
+
+            const isNew = originalField && !SUBTITLE_SWAP.hasOwnProperty(originalField) && originalField !== '';
+            const wasSubSwapped = ourField !== originalField;
+
+            rows[i].field = ourField;
+
+            if (originalField !== '') {
+                deviceData.swapLog.push({
+                    dbColumn,
+                    rowIndex: i,
+                    type: wasSubSwapped ? 'subtitle' : (isNew ? 'new' : 'same'),
+                    gsm: originalField,
+                    ours: ourField,
+                    overrideKey
+                });
+            }
+        }
+    }
+}
+
+/**
+ * Build the Spec Labels swap review section in the popup.
+ * Shows a compact table: GSMArena label → arrow → our label (editable input).
+ * Title swaps shown separately with a header badge.
+ */
+function buildSwapUI(deviceData) {
+    const container = document.getElementById('swap-body');
+    if (!container) return;
+    container.innerHTML = '';
+
+    // Group by dbColumn
+    const byColumn = {};
+    for (const entry of deviceData.swapLog) {
+        if (!byColumn[entry.dbColumn]) byColumn[entry.dbColumn] = { titleEntry: null, subs: [] };
+        if (entry.rowIndex === null) byColumn[entry.dbColumn].titleEntry = entry;
+        else byColumn[entry.dbColumn].subs.push(entry);
+    }
+
+    for (const [dbColumn, group] of Object.entries(byColumn)) {
+        const te = group.titleEntry;
+        if (!te) continue;
+
+        // Section header
+        const secHeader = document.createElement('div');
+        secHeader.className = 'swap-section-header';
+
+        const titleSwapped = te.type === 'title';
+        secHeader.innerHTML = `
+            <span class="swap-gsm-label">${te.gsm}</span>
+            <span class="swap-arrow">→</span>
+            <input class="swap-input ${titleSwapped ? 'swap-changed' : ''}" 
+                   data-key="${te.overrideKey}" 
+                   value="${te.ours}" />
+            ${titleSwapped ? '<span class="swap-badge">renamed</span>' : ''}
+        `;
+        container.appendChild(secHeader);
+
+        // Subtitle rows
+        for (const sub of group.subs) {
+            const row = document.createElement('div');
+            row.className = 'swap-row';
+
+            let badgeHtml = '';
+            if (sub.type === 'subtitle') badgeHtml = '<span class="swap-badge">renamed</span>';
+            else if (sub.type === 'new') badgeHtml = '<span class="swap-badge swap-badge-new">new</span>';
+
+            row.innerHTML = `
+                <span class="swap-gsm-sub">${sub.gsm || '—'}</span>
+                <span class="swap-arrow">→</span>
+                <input class="swap-input ${sub.type === 'subtitle' ? 'swap-changed' : ''}" 
+                       data-key="${sub.overrideKey}" 
+                       value="${sub.ours || sub.gsm || ''}" />
+                ${badgeHtml}
+            `;
+            container.appendChild(row);
+        }
+    }
+
+    // Wire input changes → re-apply swaps
+    container.querySelectorAll('.swap-input').forEach(input => {
+        input.addEventListener('change', () => {
+            if (!currentDeviceData) return;
+            if (!currentDeviceData.userSwapOverrides) currentDeviceData.userSwapOverrides = {};
+            currentDeviceData.userSwapOverrides[input.dataset.key] = input.value;
+            // Re-apply swaps with updated overrides
+            applyLabelSwaps(currentDeviceData);
+            buildSwapUI(currentDeviceData);
+        });
+    });
 }
 
 
@@ -818,7 +987,9 @@ document.addEventListener('DOMContentLoaded', async () => {
         }
 
         const deviceData = extractDeviceData(scraped);
+        applyLabelSwaps(deviceData);
         populateUI(deviceData);
+        buildSwapUI(deviceData);
 
         document.getElementById('main-content').style.display = 'block';
         setStatus(`✅ ${deviceData.fullName} scraped`, 'success');
