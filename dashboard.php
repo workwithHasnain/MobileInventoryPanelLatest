@@ -136,6 +136,15 @@ if (isset($_SESSION['success_message'])) {
             <button type="button" class="btn btn-outline-secondary ms-2" data-bs-toggle="modal" data-bs-target="#extensionKeyModal">
                 <i class="fas fa-puzzle-piece"></i> Extension Key
             </button>
+            <?php if (file_exists(__DIR__ . '/gsmarena-extension.zip')): ?>
+            <a href="gsmarena-extension.zip" download class="btn btn-outline-dark ms-2">
+                <i class="fas fa-download"></i> Download Extension
+            </a>
+            <?php else: ?>
+            <button class="btn btn-outline-dark ms-2" disabled title="Place gsmarena-extension.zip in the root directory first">
+                <i class="fas fa-download"></i> Download Extension
+            </button>
+            <?php endif; ?>
             <button type="button" class="btn btn-outline-warning ms-2" data-bs-toggle="modal"
                 data-bs-target="#queriesModal">
                 <i class="fas fa-question-circle"></i> Queries
