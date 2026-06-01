@@ -383,7 +383,7 @@ function renderPhoneCard($phone, $slot, $base)
   $html .= '<div class="cp-phone-halo cp-phone-halo-2"></div>';
   $html .= '<img src="' . $img . '" alt="' . $brand . ' ' . $name . '" class="cp-img-float" onclick="showGallery(' . $slot . ')" />';
   $html .= '<div class="cp-scanline"></div>';
-  $html .= '<div class="cp-gallery-badge" onclick="showGallery(' . $slot . ')"><i class="fa fa-images"></i> Gallery</div>';
+  $html .= '<div class="cp-gallery-badge" onclick="location.href=\'' . $base . 'device/' . $slug . '/images\'" ><i class="fa fa-images"></i> Gallery</div>';
   $html .= '</div>';
   $html .= '<div class="cp-device-identity">';
   $html .= '<div class="cp-device-brand">' . $brand . '</div>';

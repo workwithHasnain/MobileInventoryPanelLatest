@@ -5533,7 +5533,7 @@ textarea.da-input {
   scrollbar-width: thin;
   scrollbar-color: var(--border) transparent;
   border-radius: var(--radius);
-  border: 1px solid var(--border);
+  border: 1px solid #94a3b8;
   margin-top: 12px;
 }
 
@@ -5544,6 +5544,10 @@ textarea.da-input {
   font-family: var(--font-main);
   font-size: 13.5px;
   background: #ffffff;
+}
+
+[data-theme="dark"] .cpt-scroll {
+  border-color: rgba(255, 255, 255, 0.25);
 }
 
 [data-theme="dark"] .cpt-table {
@@ -5567,8 +5571,8 @@ textarea.da-input {
   text-transform: uppercase;
   letter-spacing: 0.6px;
   padding: 14px;
-  border-right: 1px solid rgba(0,0,0,0.06);
-  border-bottom: 1px solid rgba(0,0,0,0.06);
+  border-right: 1px solid #94a3b8;
+  border-bottom: 2px solid #94a3b8;
   vertical-align: bottom;
 }
 
@@ -5578,8 +5582,8 @@ textarea.da-input {
   text-align: center;
   padding: 12px 14px;
   min-width: 200px;
-  border-right: 1px solid rgba(0,0,0,0.06);
-  border-bottom: 1px solid rgba(0,0,0,0.06);
+  border-right: 1px solid #94a3b8;
+  border-bottom: 2px solid #94a3b8;
   vertical-align: bottom;
 }
 
@@ -5611,18 +5615,18 @@ textarea.da-input {
   text-transform: uppercase;
   letter-spacing: 0.8px;
   padding: 10px 14px;
-  border-bottom: 1px solid rgba(0,0,0,0.05);
+  border-bottom: 2px solid #94a3b8;
 }
 
 [data-theme="dark"] .cpt-section-row td.cpt-section-cell {
   background: #1e293b;
   color: #f1f5f9;
-  border-bottom-color: rgba(255,255,255,0.05);
+  border-bottom: 2px solid rgba(255, 255, 255, 0.25);
 }
 
 /* Data rows */
 .cpt-data-row {
-  border-bottom: 1px solid #f1f5f9;
+  border-bottom: 1px solid #cbd5e1;
 }
 
 .cpt-data-row:nth-child(even) {
@@ -5635,12 +5639,12 @@ textarea.da-input {
 
 [data-theme="dark"] .cpt-data-row:nth-child(even) {
   background: #1a2332;
-  border-bottom-color: rgba(255,255,255,0.04);
+  border-bottom-color: rgba(255, 255, 255, 0.18);
 }
 
 [data-theme="dark"] .cpt-data-row:nth-child(odd) {
   background: #111827;
-  border-bottom-color: rgba(255,255,255,0.04);
+  border-bottom-color: rgba(255, 255, 255, 0.18);
 }
 
 /* Label cell (subtitle column) */
@@ -5652,7 +5656,7 @@ textarea.da-input {
   text-transform: uppercase;
   letter-spacing: 0.4px;
   padding: 9px 14px;
-  border-right: 1px solid #e2e8f0;
+  border-right: 1px solid #94a3b8;
   white-space: nowrap;
   vertical-align: top;
 }
@@ -5717,7 +5721,7 @@ textarea.da-input {
 [data-theme="dark"] .cpt-label-cell {
   background: #1e293b;
   color: #94a3b8;
-  border-right-color: rgba(255,255,255,0.06);
+  border-right-color: rgba(255, 255, 255, 0.25);
 }
 
 /* Value cells */
@@ -5725,14 +5729,14 @@ textarea.da-input {
   color: #334155;
   padding: 9px 14px;
   vertical-align: top;
-  border-right: 1px solid #f1f5f9;
+  border-right: 1px solid #cbd5e1;
   line-height: 1.5;
   min-width: 200px;
 }
 
 [data-theme="dark"] .cpt-val-cell {
   color: var(--text-secondary);
-  border-right-color: rgba(255,255,255,0.04);
+  border-right-color: rgba(255, 255, 255, 0.15);
 }
 
 .cpt-val-cell:last-child {
