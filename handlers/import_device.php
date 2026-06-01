@@ -46,9 +46,29 @@ require_once 'simple_device_insert.php';
 require_once 'sitemap_management.php';
 
 // ====================================================================
-// Configuration
+// Configuration — key loaded from DB misc table
 // ====================================================================
-$API_KEY = 'devicearena-import-2026'; // Change this to your own secret key
+function getExtensionApiKey() {
+    try {
+        $pdo = getConnection();
+        $stmt = $pdo->prepare("SELECT value FROM misc WHERE key = 'extension_api_key'");
+        $stmt->execute();
+        $row = $stmt->fetch(PDO::FETCH_ASSOC);
+        return $row['value'] ?? '';
+    } catch (Throwable $e) {
+        return '';
+    }
+}
+$API_KEY = getExtensionApiKey();
+if (empty($API_KEY)) {
+    // No key set yet — block all extension requests until admin sets one
+    if ($hasApiKey ?? false) {
+        header('Content-Type: application/json');
+        http_response_code(503);
+        echo json_encode(['success' => false, 'error' => 'Extension API key not configured. Set it from the Dashboard.']);
+        exit;
+    }
+}
 
 // ====================================================================
 // Route the request
@@ -114,11 +134,11 @@ function handleJsonImport($apiKey)
 {
     header('Content-Type: application/json');
 
-    // Verify API key
+    // Verify API key — timing-safe to prevent timing attacks
     $providedKey = $_SERVER['HTTP_X_API_KEY'] ?? '';
-    if ($providedKey !== $apiKey) {
+    if (empty($providedKey) || !hash_equals($apiKey, $providedKey)) {
         http_response_code(401);
-        echo json_encode(['success' => false, 'error' => 'Invalid API key']);
+        echo json_encode(['success' => false, 'error' => 'Unauthorized']);
         exit;
     }
 
@@ -246,11 +266,11 @@ function handleMultipartImport($apiKey)
 {
     header('Content-Type: application/json');
 
-    // Verify API key
+    // Verify API key — timing-safe to prevent timing attacks
     $providedKey = $_SERVER['HTTP_X_API_KEY'] ?? '';
-    if ($providedKey !== $apiKey) {
+    if (empty($providedKey) || !hash_equals($apiKey, $providedKey)) {
         http_response_code(401);
-        echo json_encode(['success' => false, 'error' => 'Invalid API key']);
+        echo json_encode(['success' => false, 'error' => 'Unauthorized']);
         exit;
     }
 
@@ -630,6 +650,25 @@ function handleSqlImport()
 
     try {
         $pdo = getConnection();
+
+        // Check for existing device by slug before executing
+        foreach ($slugsToAdd as $checkSlug) {
+            $dupCheck = $pdo->prepare("SELECT name, brand FROM phones WHERE slug = ?");
+            $dupCheck->execute([$checkSlug]);
+            $existing = $dupCheck->fetch(PDO::FETCH_ASSOC);
+            if ($existing) {
+                // Clean up any uploaded images since we won't proceed
+                foreach ($uploaded_paths as $path) {
+                    $fullPath = __DIR__ . '/..' . '/' . $path;
+                    if (file_exists($fullPath)) unlink($fullPath);
+                }
+                $message = 'Device already exists: "' . htmlspecialchars($existing['brand'] . ' ' . $existing['name']) . '" (slug: ' . htmlspecialchars($checkSlug) . '). Import blocked.';
+                $messageType = 'error';
+                showImportForm($message, $messageType, $sql);
+                return;
+            }
+        }
+
         $pdo->beginTransaction();
         $pdo->exec($sql);
         $pdo->commit();

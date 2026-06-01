@@ -133,6 +133,9 @@ if (isset($_SESSION['success_message'])) {
             <button onclick="window.location.href='import_device.php'" type="button" class="btn btn-outline-info ms-2">
                 <i class="fas fa-sitemap"></i> Data Import
             </button>
+            <button type="button" class="btn btn-outline-secondary ms-2" data-bs-toggle="modal" data-bs-target="#extensionKeyModal">
+                <i class="fas fa-puzzle-piece"></i> Extension Key
+            </button>
             <button type="button" class="btn btn-outline-warning ms-2" data-bs-toggle="modal"
                 data-bs-target="#queriesModal">
                 <i class="fas fa-question-circle"></i> Queries
@@ -497,6 +500,45 @@ if (isset($_SESSION['success_message'])) {
             </div>
         </div>
     <?php endif; ?>
+</div>
+
+<!-- Extension API Key Modal -->
+<div class="modal fade" id="extensionKeyModal" tabindex="-1" aria-labelledby="extensionKeyLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="extensionKeyLabel">
+                    <i class="fas fa-puzzle-piece me-2"></i>Extension API Key
+                </h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <p class="text-muted small">This key is entered in the browser extension's Server Config tab. Min 6 characters.</p>
+                <div class="mb-3">
+                    <label class="form-label fw-bold">Current Key</label>
+                    <div class="input-group">
+                        <input type="text" id="ext_key_current" class="form-control font-monospace" readonly placeholder="(not set)">
+                        <button class="btn btn-outline-secondary" type="button" id="ext_key_copy_btn" title="Copy">
+                            <i class="fas fa-copy"></i>
+                        </button>
+                    </div>
+                </div>
+                <hr>
+                <div class="mb-3">
+                    <label class="form-label fw-bold">Set New Key</label>
+                    <input type="text" id="ext_key_new" class="form-control font-monospace" placeholder="Enter any string, min 6 chars" minlength="6">
+                    <div class="form-text">Any string works — e.g. <code>mykey2026</code> or <code>import@arena</code></div>
+                </div>
+                <div id="ext_key_message" style="display:none;"></div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                <button type="button" class="btn btn-primary" id="ext_key_save_btn">
+                    <i class="fas fa-save me-1"></i>Save Key
+                </button>
+            </div>
+        </div>
+    </div>
 </div>
 
 <!-- Reviews Modal -->
@@ -2586,6 +2628,57 @@ if (isset($_SESSION['success_message'])) {
         if (type === 'success') setTimeout(() => {
             el.style.display = 'none';
         }, 3000);
+    }
+
+    // ---- Extension API Key Modal ----
+    const extKeyModal = document.getElementById('extensionKeyModal');
+    if (extKeyModal) {
+        extKeyModal.addEventListener('show.bs.modal', () => {
+            fetch('handlers/extension_api_key_handler.php?action=get')
+                .then(r => r.json())
+                .then(d => {
+                    document.getElementById('ext_key_current').value = d.key || '';
+                });
+        });
+
+        document.getElementById('ext_key_save_btn').addEventListener('click', () => {
+            const newKey = document.getElementById('ext_key_new').value.trim();
+            const msgEl = document.getElementById('ext_key_message');
+            if (newKey.length < 6) {
+                msgEl.className = 'alert alert-danger';
+                msgEl.textContent = 'Key must be at least 6 characters.';
+                msgEl.style.display = 'block';
+                return;
+            }
+            const fd = new FormData();
+            fd.append('action', 'save');
+            fd.append('api_key', newKey);
+            fetch('handlers/extension_api_key_handler.php', { method: 'POST', body: fd })
+                .then(r => r.json())
+                .then(d => {
+                    if (d.success) {
+                        document.getElementById('ext_key_current').value = newKey;
+                        document.getElementById('ext_key_new').value = '';
+                        msgEl.className = 'alert alert-success';
+                        msgEl.textContent = '✅ Key saved!';
+                    } else {
+                        msgEl.className = 'alert alert-danger';
+                        msgEl.textContent = '❌ ' + (d.error || 'Failed');
+                    }
+                    msgEl.style.display = 'block';
+                    setTimeout(() => msgEl.style.display = 'none', 3000);
+                });
+        });
+
+        document.getElementById('ext_key_copy_btn').addEventListener('click', () => {
+            const val = document.getElementById('ext_key_current').value;
+            if (!val) return;
+            navigator.clipboard.writeText(val).then(() => {
+                const btn = document.getElementById('ext_key_copy_btn');
+                btn.innerHTML = '<i class="fas fa-check"></i>';
+                setTimeout(() => btn.innerHTML = '<i class="fas fa-copy"></i>', 1500);
+            });
+        });
     }
 </script>
 

@@ -435,7 +435,7 @@ function applyLabelSwaps(deviceData) {
 function buildSwapUI(deviceData) {
     const container = document.getElementById('swap-body');
     if (!container) return;
-    container.innerHTML = '';
+    container.innerHTML = '<div class="hint" style="margin-bottom:8px;">Edit any label to override. <span class="swap-badge">renamed</span> = auto-swapped &nbsp; <span class="swap-badge swap-badge-new">new</span> = pass-through</div>';
 
     // Group by dbColumn
     const byColumn = {};
