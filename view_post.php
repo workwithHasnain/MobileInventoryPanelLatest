@@ -1,5 +1,6 @@
 <?php
-require_once 'auth.php';
+require_once __DIR__ . '/handlers/auth.php';
+require_once __DIR__ . '/handlers/database_functions.php';
 
 // Require login for this page
 requireLogin();
@@ -12,7 +13,6 @@ if (!$post_id) {
 }
 
 // Initialize database
-require_once 'database_functions.php';
 $pdo = getConnection();
 
 // Get post data

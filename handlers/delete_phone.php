@@ -13,7 +13,7 @@ $id = isset($_GET['id']) ? (int)$_GET['id'] : -1;
 $phone = getPhoneById($id);
 if (!$phone) {
     $_SESSION['success_message'] = 'Phone not found!';
-    header('Location: devices.php');
+    header('Location: ../devices.php');
     exit();
 }
 
@@ -34,5 +34,5 @@ if (deletePhone($id)) {
 }
 
 // Redirect to devices page
-header('Location: devices.php');
+header('Location: ../devices.php');
 exit();

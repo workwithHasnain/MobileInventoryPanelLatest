@@ -2,12 +2,13 @@
 ob_start(); // Start output buffering to ensure redirects work
 error_reporting(E_ALL);
 ini_set('display_errors', 1);
-require_once 'auth.php';
-require_once 'phone_data.php'; // Keep for getAllPhones function
-require_once 'brand_data.php';
-require_once 'simple_device_update.php';
-require_once 'image_compression.php'; // Add image compression function
-require_once 'sitemap_management.php'; // Add sitemap management functions
+require_once __DIR__ . '/handlers/auth.php';
+require_once __DIR__ . '/handlers/phone_data.php'; // Keep for getAllPhones function
+require_once __DIR__ . '/handlers/brand_data.php';
+require_once __DIR__ . '/handlers/simple_device_update.php';
+require_once __DIR__ . '/handlers/image_compression.php'; // Add image compression function
+require_once __DIR__ . '/handlers/sitemap_management.php'; // Add sitemap management functions
+require_once __DIR__ . '/handlers/database_functions.php';
 // Note: This page is for editing an existing device; insertion/update wiring will be added later.
 
 // Require login for this page
@@ -177,7 +178,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         }
 
         // Ensure slug is unique (excluding current device)
-        require_once 'database_functions.php';
         $pdo = getConnection();
         $slugCheck = $pdo->prepare("SELECT COUNT(*) FROM phones WHERE slug = ? AND id != ?");
         $slugCheck->execute([$slug, $id]);

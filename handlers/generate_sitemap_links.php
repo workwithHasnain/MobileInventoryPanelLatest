@@ -9,7 +9,7 @@ require_once 'phone_data.php';
  * Prevents duplicates
  */
 
-$sitemap_file = __DIR__ . '/sitemap.xml';
+$sitemap_file = __DIR__ . '/../sitemap.xml';
 
 // Read existing sitemap
 if (!file_exists($sitemap_file)) {

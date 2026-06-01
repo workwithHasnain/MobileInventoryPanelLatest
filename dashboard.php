@@ -1,8 +1,8 @@
 <?php
-require_once 'auth.php';
-require_once 'phone_data.php';
-require_once 'brand_data.php';
-require_once 'filter_config.php';
+require_once __DIR__ . '/handlers/auth.php';
+require_once __DIR__ . '/handlers/phone_data.php';
+require_once __DIR__ . '/handlers/brand_data.php';
+require_once __DIR__ . '/handlers/filter_config.php';
 
 // Require login for this page
 requireLogin();

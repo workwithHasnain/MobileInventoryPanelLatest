@@ -32,7 +32,7 @@ function isEmployee() {
  */
 function requireLogin() {
     if (!isLoggedIn()) {
-        header("Location: login.php");
+        header("Location: ../login.php");
         exit();
     }
 }
@@ -44,7 +44,7 @@ function requireAdmin() {
     requireLogin();
     if (!isAdmin()) {
         $_SESSION['error'] = "You don't have permission to access this page.";
-        header("Location: dashboard.php");
+        header("Location: ../dashboard.php");
         exit();
     }
 }

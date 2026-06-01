@@ -1,8 +1,9 @@
 <?php
 ob_start();
-require_once 'auth.php';
-require_once 'image_compression.php'; // Add image compression function
-require_once 'sitemap_management.php'; // Add sitemap management functions
+require_once __DIR__ . '/handlers/auth.php';
+require_once __DIR__ . '/handlers/image_compression.php'; // Add image compression function
+require_once __DIR__ . '/handlers/sitemap_management.php'; // Add sitemap management functions
+require_once __DIR__ . '/handlers/database_functions.php';
 
 // Require login for this page
 requireLogin();
@@ -11,7 +12,6 @@ $user_role = $_SESSION['role'] ?? 'employee';
 $current_user = $_SESSION['username'] ?? 'Unknown';
 
 // Initialize database
-require_once 'database_functions.php';
 $pdo = getConnection();
 
 $errors = [];

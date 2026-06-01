@@ -1,5 +1,5 @@
 <?php
-require_once 'includes/database_functions.php';
+require_once 'database_functions.php';
 
 header('Content-Type: application/json');
 

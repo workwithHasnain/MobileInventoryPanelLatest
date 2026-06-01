@@ -14,7 +14,7 @@ require_once 'config.php';
  */
 function getSitemapUrls()
 {
-    $sitemap_file = __DIR__ . '/sitemap.xml';
+    $sitemap_file = __DIR__ . '/../sitemap.xml';
 
     if (!file_exists($sitemap_file)) {
         return [];
@@ -58,7 +58,7 @@ function addPostToSitemap($slug, $lastmod = null)
         return false;
     }
 
-    $sitemap_file = __DIR__ . '/sitemap.xml';
+    $sitemap_file = __DIR__ . '/../sitemap.xml';
 
     if (!file_exists($sitemap_file)) {
         return false;
@@ -104,7 +104,7 @@ function removePostFromSitemap($slug)
         return false;
     }
 
-    $sitemap_file = __DIR__ . '/sitemap.xml';
+    $sitemap_file = __DIR__ . '/../sitemap.xml';
 
     if (!file_exists($sitemap_file)) {
         return false;
@@ -141,7 +141,7 @@ function updatePostInSitemap($old_slug, $new_slug, $lastmod = null)
         return false;
     }
 
-    $sitemap_file = __DIR__ . '/sitemap.xml';
+    $sitemap_file = __DIR__ . '/../sitemap.xml';
 
     if (!file_exists($sitemap_file)) {
         return false;
@@ -191,7 +191,7 @@ function updatePostLastmodInSitemap($slug, $lastmod = null)
         return false;
     }
 
-    $sitemap_file = __DIR__ . '/sitemap.xml';
+    $sitemap_file = __DIR__ . '/../sitemap.xml';
 
     if (!file_exists($sitemap_file)) {
         return false;
@@ -233,7 +233,7 @@ function addDeviceToSitemap($slug, $lastmod = null)
         return false;
     }
 
-    $sitemap_file = __DIR__ . '/sitemap.xml';
+    $sitemap_file = __DIR__ . '/../sitemap.xml';
 
     if (!file_exists($sitemap_file)) {
         return false;
@@ -279,7 +279,7 @@ function removeDeviceFromSitemap($slug)
         return false;
     }
 
-    $sitemap_file = __DIR__ . '/sitemap.xml';
+    $sitemap_file = __DIR__ . '/../sitemap.xml';
 
     if (!file_exists($sitemap_file)) {
         return false;
@@ -316,7 +316,7 @@ function updateDeviceInSitemap($old_slug, $new_slug, $lastmod = null)
         return false;
     }
 
-    $sitemap_file = __DIR__ . '/sitemap.xml';
+    $sitemap_file = __DIR__ . '/../sitemap.xml';
 
     if (!file_exists($sitemap_file)) {
         return false;
@@ -366,7 +366,7 @@ function updateDeviceLastmodInSitemap($slug, $lastmod = null)
         return false;
     }
 
-    $sitemap_file = __DIR__ . '/sitemap.xml';
+    $sitemap_file = __DIR__ . '/../sitemap.xml';
 
     if (!file_exists($sitemap_file)) {
         return false;

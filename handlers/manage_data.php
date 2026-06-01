@@ -81,14 +81,14 @@ $brands = getAllBrands();
 $chipsets = getAllChipsets();
 ?>
 
-<?php include 'includes/header.php'; ?>
+<?php include '../includes/header.php'; ?>
 
 <div class="container mt-4">
     <div class="row">
         <div class="col-md-12">
             <div class="d-flex justify-content-between align-items-center mb-4">
                 <h2><i class="fas fa-cogs"></i> Data Management</h2>
-                <a href="dashboard.php" class="btn btn-secondary">
+                <a href="../dashboard.php" class="btn btn-secondary">
                     <i class="fas fa-arrow-left"></i> Back to Dashboard
                 </a>
             </div>
@@ -328,4 +328,4 @@ $chipsets = getAllChipsets();
     }
 </script>
 
-<?php include 'includes/dash-footer.php'; ?>
+<?php include '../includes/dash-footer.php'; ?>

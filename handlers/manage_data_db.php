@@ -1,11 +1,11 @@
 <?php
 session_start();
 require_once 'auth.php';
-require_once 'includes/database_functions.php';
+require_once 'database_functions.php';
 
 // Check if user is logged in and is admin
 if (!isLoggedIn() || $_SESSION['role'] !== 'admin') {
-    header('Location: login.php');
+    header('Location: ../login.php');
     exit;
 }
 
@@ -109,7 +109,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 $brands = getAllBrandsDB();
 $chipsets = getAllChipsetsDB();
 
-require_once 'includes/header.php';
+require_once '../includes/header.php';
 ?>
 
 <div class="container mt-4">
@@ -403,4 +403,4 @@ setTimeout(() => {
 }, 5000);
 </script>
 
-<?php require_once 'includes/dash-footer.php'; ?>
+<?php require_once '../includes/dash-footer.php'; ?>

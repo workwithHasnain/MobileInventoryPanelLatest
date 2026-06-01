@@ -1,7 +1,7 @@
 <?php
-require_once 'auth.php';
-require_once 'phone_data.php';
-require_once 'brand_data.php';
+require_once 'handlers/auth.php';
+require_once 'handlers/phone_data.php';
+require_once 'handlers/brand_data.php';
 
 // Require login for this page
 requireLogin();

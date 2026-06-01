@@ -1,8 +1,8 @@
 <?php
 session_start();
-require_once __DIR__ . '/config.php';
-require_once __DIR__ . '/phone_data.php';
-require_once __DIR__ . '/database_functions.php';
+require_once __DIR__ . '/handlers/config.php';
+require_once __DIR__ . '/handlers/phone_data.php';
+require_once __DIR__ . '/handlers/database_functions.php';
 
 function getAbsoluteImagePath($imagePath, $base)
 {
@@ -72,7 +72,7 @@ try {
 }
 
 // Load filter configuration from JSON
-$filterConfig = json_decode(file_get_contents(__DIR__ . '/filter_config.json'), true);
+$filterConfig = json_decode(file_get_contents(__DIR__ . '/handlers/filter_config.json'), true);
 if (!$filterConfig) {
   die('Error loading filter configuration');
 }
@@ -1982,7 +1982,7 @@ if (!$filterConfig) {
         }
 
         // Send AJAX request
-        fetch(window.baseURL + 'phonefinder_handler.php', {
+        fetch(window.baseURL + 'handlers/phonefinder_handler.php', {
           method: 'POST',
           body: formData
         })
@@ -2202,7 +2202,7 @@ if (!$filterConfig) {
         const el = document.getElementById(id);
         if (el) el.style.display = 'none';
       });
-      fetch(baseURL + 'notification_handler.php', {
+      fetch(baseURL + 'handlers/notification_handler.php', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/x-www-form-urlencoded'

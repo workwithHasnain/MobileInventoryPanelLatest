@@ -5,7 +5,7 @@
  * Returns JSON: { exists: true/false, message: "..." }
  */
 
-require_once __DIR__ . '/auth.php';
+require_once 'auth.php';
 requireLogin();
 
 header('Content-Type: application/json');
@@ -20,7 +20,7 @@ if ($name === '') {
     exit;
 }
 
-require_once __DIR__ . '/database_functions.php';
+require_once 'database_functions.php';
 
 try {
     $pdo = getConnection();

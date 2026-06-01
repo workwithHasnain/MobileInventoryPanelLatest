@@ -3,7 +3,7 @@
 // No authentication required
 
 // Database connection
-require_once 'database_functions.php';
+require_once __DIR__ . '/handlers/database_functions.php';
 $pdo = getConnection();
 
 // Get selected tag from URL

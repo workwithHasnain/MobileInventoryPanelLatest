@@ -3,7 +3,7 @@
 /** Database connection and utility functions for PostgreSQL */
 
 // Load configuration
-require_once __DIR__ . '/config.php';
+require_once 'config.php';
 
 /**
  * Generate a URL-friendly slug from string

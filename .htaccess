@@ -7,6 +7,20 @@
     RewriteCond %{REQUEST_FILENAME} !-f
     RewriteCond %{REQUEST_FILENAME} !-d
     
+    # Route AJAX and other handlers to handlers/ directory
+    RewriteRule ^api_get_devices\.php$ handlers/api_get_devices.php [L,QSA]
+    RewriteRule ^api_get_posts\.php$ handlers/api_get_posts.php [L,QSA]
+    RewriteRule ^api_get_rumored_devices\.php$ handlers/api_get_rumored_devices.php [L,QSA]
+    RewriteRule ^api_get_brand_devices\.php$ handlers/api_get_brand_devices.php [L,QSA]
+    RewriteRule ^handle_newsletter\.php$ handlers/handle_newsletter.php [L,QSA]
+    RewriteRule ^notification_handler\.php$ handlers/notification_handler.php [L,QSA]
+    RewriteRule ^load_posts\.php$ handlers/load_posts.php [L,QSA]
+    RewriteRule ^ajax_comment_handler\.php$ handlers/ajax_comment_handler.php [L,QSA]
+    RewriteRule ^handle_contact\.php$ handlers/handle_contact.php [L,QSA]
+    RewriteRule ^manifest\.json$ handlers/manifest.json [L,QSA]
+    RewriteRule ^captcha\.php$ handlers/captcha.php [L,QSA]
+    RewriteRule ^search\.php$ handlers/search.php [L,QSA]
+    
     # Redirect to https://www (only on production, not localhost)
     RewriteCond %{HTTP_HOST} ^devicesarena\.com$ [NC]
     RewriteRule ^(.*)$ https://www.devicesarena.com/$1 [R=301,L]

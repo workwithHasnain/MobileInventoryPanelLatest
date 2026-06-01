@@ -5,7 +5,7 @@
  */
 
 session_start();
-require_once __DIR__ . '/database_functions.php';
+require_once 'database_functions.php';
 
 header('Content-Type: application/json');
 

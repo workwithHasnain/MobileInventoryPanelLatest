@@ -40,10 +40,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'OPTIONS') {
     exit;
 }
 
-require_once __DIR__ . '/config.php';
-require_once __DIR__ . '/database_functions.php';
-require_once __DIR__ . '/simple_device_insert.php';
-require_once __DIR__ . '/sitemap_management.php';
+require_once 'config.php';
+require_once 'database_functions.php';
+require_once 'simple_device_insert.php';
+require_once 'sitemap_management.php';
 
 // ====================================================================
 // Configuration
@@ -285,8 +285,8 @@ function handleMultipartImport($apiKey)
         $max_images = 5;
 
         // Create uploads directory if it doesn't exist
-        if (!file_exists(__DIR__ . '/uploads')) {
-            mkdir(__DIR__ . '/uploads', 0777, true);
+        if (!file_exists(__DIR__ . '/..' . '/uploads')) {
+            mkdir(__DIR__ . '/..' . '/uploads', 0777, true);
         }
 
         for ($i = 0; $i < min(count($_FILES['images']['name']), $max_images); $i++) {
@@ -310,7 +310,7 @@ function handleMultipartImport($apiKey)
                 $file_extension = pathinfo($_FILES['images']['name'][$i], PATHINFO_EXTENSION);
                 $filename = 'device_' . time() . '_' . uniqid() . '_' . ($i + 1) . '.' . $file_extension;
                 $upload_path = 'uploads/' . $filename;
-                $full_path = __DIR__ . '/' . $upload_path;
+                $full_path = __DIR__ . '/..' . '/uploads/' . $filename;
 
                 if (move_uploaded_file($_FILES['images']['tmp_name'][$i], $full_path)) {
                     $image_paths[] = $upload_path;
@@ -420,14 +420,14 @@ function handleMultipartImport($apiKey)
     } elseif (is_array($result) && isset($result['error'])) {
         // Clean up uploaded files on failure
         foreach ($image_paths as $path) {
-            $fullPath = __DIR__ . '/' . $path;
+            $fullPath = __DIR__ . '/..' . '/' . $path;
             if (file_exists($fullPath)) unlink($fullPath);
         }
         echo json_encode(['success' => false, 'error' => $result['error']]);
     } else {
         // Clean up uploaded files on failure
         foreach ($image_paths as $path) {
-            $fullPath = __DIR__ . '/' . $path;
+            $fullPath = __DIR__ . '/..' . '/' . $path;
             if (file_exists($fullPath)) unlink($fullPath);
         }
         echo json_encode(['success' => false, 'error' => 'Unknown error during import']);
@@ -547,8 +547,8 @@ function handleSqlImport()
         $allowed_types = ['image/jpeg', 'image/png', 'image/gif', 'image/webp'];
         $max_size = 5 * 1024 * 1024; // 5MB
 
-        if (!file_exists(__DIR__ . '/uploads')) {
-            mkdir(__DIR__ . '/uploads', 0777, true);
+        if (!file_exists(__DIR__ . '/..' . '/uploads')) {
+            mkdir(__DIR__ . '/..' . '/uploads', 0777, true);
         }
 
         for ($i = 0; $i < min(count($_FILES['images']['name']), 5); $i++) {
@@ -572,7 +572,7 @@ function handleSqlImport()
                 $ext = pathinfo($_FILES['images']['name'][$i], PATHINFO_EXTENSION);
                 $filename = 'device_' . time() . '_' . uniqid() . '_' . ($i + 1) . '.' . $ext;
                 $upload_path = 'uploads/' . $filename;
-                $full_path = __DIR__ . '/' . $upload_path;
+                $full_path = __DIR__ . '/..' . '/' . $upload_path;
 
                 if (move_uploaded_file($_FILES['images']['tmp_name'][$i], $full_path)) {
                     $uploaded_paths[] = $upload_path;
@@ -653,7 +653,7 @@ function handleSqlImport()
         }
         // Clean up uploaded files on failure
         foreach ($uploaded_paths as $path) {
-            $fullPath = __DIR__ . '/' . $path;
+            $fullPath = __DIR__ . '/..' . '/' . $path;
             if (file_exists($fullPath)) unlink($fullPath);
         }
         $message = 'SQL Error: ' . $e->getMessage();
@@ -716,7 +716,7 @@ function showImportForm($message = '', $messageType = '', $lastSql = '')
             <div class="card shadow">
                 <div class="card-header bg-dark text-white d-flex justify-content-between align-items-center">
                     <h4 class="mb-0"><i class="fas fa-database me-2"></i>Import Device from GSMArena</h4>
-                    <a href="dashboard.php" class="btn btn-outline-light btn-sm">
+                    <a href="../dashboard.php" class="btn btn-outline-light btn-sm">
                         <i class="fas fa-arrow-left me-1"></i> Dashboard
                     </a>
                 </div>

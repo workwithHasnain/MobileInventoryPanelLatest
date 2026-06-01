@@ -6,7 +6,7 @@ if (!isset($_SESSION['role']) || $_SESSION['role'] !== 'admin') {
     die('ERROR: Admin only');
 }
 
-$file = __DIR__ . '/sitemap.xml';
+$file = __DIR__ . '/../sitemap.xml';
 $action = $_POST['action'] ?? '';
 
 if ($action === 'read') {

@@ -5,7 +5,7 @@
  */
 
 // Include the main database functions file
-require_once __DIR__ . '/../database_functions.php';
+require_once __DIR__ . '/../handlers/database_functions.php';
 
 // Legacy compatibility - create aliases if needed
 if (!function_exists('getDatabaseConnection')) {

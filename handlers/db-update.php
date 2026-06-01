@@ -2,7 +2,7 @@
 // db-update.php
 // Minimal helper script for Database operations
 
-require_once __DIR__ . '/includes/database.php';
+require_once __DIR__ . '/../includes/database.php';
 
 $message = '';
 $error = '';

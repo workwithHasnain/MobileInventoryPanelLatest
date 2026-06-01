@@ -19,7 +19,7 @@ $heroPages = [
     'rumored' => 'Rumored Phones Page'
 ];
 
-$heroImagesDir = __DIR__ . '/hero-images/';
+$heroImagesDir = __DIR__ . '/../hero-images/';
 
 // Ensure hero-images directory exists
 if (!is_dir($heroImagesDir)) {

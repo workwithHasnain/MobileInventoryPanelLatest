@@ -1,6 +1,5 @@
 <?php
 require_once 'database_functions.php';
-require_once 'includes/database_functions.php';
 $pdo = getConnection();
 
 $device_id = $_GET['id'] ?? '';

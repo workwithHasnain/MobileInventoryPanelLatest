@@ -3,7 +3,7 @@
 /**
  * Configuration loader for the Mobile Phone Management System
  */
-
+$envFile = __DIR__ . '/../.env';
 // Load environment variables from .env file
 function loadEnv($path)
 {
@@ -35,7 +35,6 @@ function loadEnv($path)
 }
 
 // Load .env file
-$envFile = __DIR__ . '/.env';
 if (file_exists($envFile)) {
     loadEnv($envFile);
 } else {
@@ -55,7 +54,7 @@ $_ENV['APP_DEBUG'] = $_ENV['APP_DEBUG'] ?? 'true';
 
 // Base URL configuration - Automatically detects if in subdirectory (localhost) or root (production)
 $docRoot = rtrim(str_replace('\\', '/', $_SERVER['DOCUMENT_ROOT']), '/');
-$dir = str_replace('\\', '/', __DIR__);
+$dir = str_replace('\\', '/', dirname(__DIR__));
 $base = str_replace($docRoot, '', $dir) . '/';
 if (empty($base) || $base === '/') {
     $base = '/';
