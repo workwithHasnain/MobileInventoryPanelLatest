@@ -1119,7 +1119,7 @@ if (isset($_SESSION['success_message'])) {
         function loadReviews() {
             const container = document.getElementById('reviews_list_container');
 
-            fetch('manage_reviews.php', {
+            fetch('handlers/manage_reviews.php', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/x-www-form-urlencoded'
@@ -1184,7 +1184,7 @@ if (isset($_SESSION['success_message'])) {
                 return;
             }
 
-            fetch('manage_reviews.php', {
+            fetch('handlers/manage_reviews.php', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/x-www-form-urlencoded'
@@ -1217,7 +1217,7 @@ if (isset($_SESSION['success_message'])) {
             submitReviewBtn.disabled = true;
             submitReviewBtn.innerHTML = '<i class="fas fa-spinner fa-spin me-1"></i>Creating...';
 
-            fetch('manage_reviews.php', {
+            fetch('handlers/manage_reviews.php', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/x-www-form-urlencoded'
@@ -1280,7 +1280,7 @@ if (isset($_SESSION['success_message'])) {
         const filterContent = document.getElementById('filterSettingsContent');
 
         // Load the filter settings form via AJAX
-        fetch('manage_filter_settings.php?action=load')
+        fetch('handlers/manage_filter_settings.php?action=load')
             .then(response => response.text())
             .then(html => {
                 filterContent.innerHTML = html;
@@ -1308,7 +1308,7 @@ if (isset($_SESSION['success_message'])) {
             return;
         }
 
-        fetch('manage_filter_settings.php', {
+        fetch('handlers/manage_filter_settings.php', {
             method: 'POST',
             body: formData
         })
@@ -1346,7 +1346,7 @@ if (isset($_SESSION['success_message'])) {
     function loadNewsletterSubscribers() {
         const container = document.getElementById('subscribers_list_container');
 
-        fetch('manage_newsletter_subscribers.php', {
+        fetch('handlers/manage_newsletter_subscribers.php', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/x-www-form-urlencoded'
@@ -1419,7 +1419,7 @@ if (isset($_SESSION['success_message'])) {
         addSubscriberBtn.disabled = true;
         addSubscriberBtn.innerHTML = '<i class="fas fa-spinner fa-spin me-1"></i>Adding...';
 
-        fetch('manage_newsletter_subscribers.php', {
+        fetch('handlers/manage_newsletter_subscribers.php', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/x-www-form-urlencoded'
@@ -1453,7 +1453,7 @@ if (isset($_SESSION['success_message'])) {
             return;
         }
 
-        fetch('manage_newsletter_subscribers.php', {
+        fetch('handlers/manage_newsletter_subscribers.php', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/x-www-form-urlencoded'
@@ -1477,7 +1477,7 @@ if (isset($_SESSION['success_message'])) {
     function toggleSubscriberStatus(id, currentStatus) {
         const newStatus = currentStatus === 'active' ? 'inactive' : 'active';
 
-        fetch('manage_newsletter_subscribers.php', {
+        fetch('handlers/manage_newsletter_subscribers.php', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/x-www-form-urlencoded'
@@ -1555,7 +1555,7 @@ if (isset($_SESSION['success_message'])) {
         inactiveBtn.disabled = true;
         allBtn.disabled = true;
 
-        fetch('manage_newsletter_subscribers.php', {
+        fetch('handlers/manage_newsletter_subscribers.php', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/x-www-form-urlencoded'
@@ -1828,7 +1828,7 @@ if (isset($_SESSION['success_message'])) {
     }
 
     function loadCanonicalBase() {
-        fetch('manage_canonical_base.php', {
+        fetch('handlers/manage_canonical_base.php', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/x-www-form-urlencoded'
@@ -1872,7 +1872,7 @@ if (isset($_SESSION['success_message'])) {
         saveCanonicalBaseBtn.disabled = true;
         saveCanonicalBaseBtn.innerHTML = '<i class="fas fa-spinner fa-spin me-1"></i>Saving...';
 
-        fetch('manage_canonical_base.php', {
+        fetch('handlers/manage_canonical_base.php', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/x-www-form-urlencoded'
@@ -1929,7 +1929,7 @@ if (isset($_SESSION['success_message'])) {
     }
 
     function loadSitemap() {
-        fetch('manage_sitemap.php', {
+        fetch('handlers/manage_sitemap.php', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/x-www-form-urlencoded'
@@ -1961,7 +1961,7 @@ if (isset($_SESSION['success_message'])) {
         saveSitemapBtn.disabled = true;
         saveSitemapBtn.innerHTML = '<i class="fas fa-spinner fa-spin me-1"></i>Saving...';
 
-        fetch('manage_sitemap.php', {
+        fetch('handlers/manage_sitemap.php', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/x-www-form-urlencoded'
@@ -2046,7 +2046,7 @@ if (isset($_SESSION['success_message'])) {
         const container = document.getElementById('queries_list_container');
         container.innerHTML = '<div class="text-center py-4"><div class="spinner-border" role="status"><span class="visually-hidden">Loading...</span></div></div>';
 
-        fetch('manage_queries.php', {
+        fetch('handlers/manage_queries.php', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/x-www-form-urlencoded'
@@ -2136,7 +2136,7 @@ if (isset($_SESSION['success_message'])) {
         const viewModal = new bootstrap.Modal(document.getElementById('viewQueryModal'));
         viewModal.show();
 
-        fetch('manage_queries.php', {
+        fetch('handlers/manage_queries.php', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/x-www-form-urlencoded'
@@ -2189,7 +2189,7 @@ if (isset($_SESSION['success_message'])) {
     }
 
     function updateQueryStatus(id, status) {
-        fetch('manage_queries.php', {
+        fetch('handlers/manage_queries.php', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/x-www-form-urlencoded'
@@ -2213,7 +2213,7 @@ if (isset($_SESSION['success_message'])) {
     function deleteQuery(id) {
         if (!confirm('Are you sure you want to delete this query? This cannot be undone.')) return;
 
-        fetch('manage_queries.php', {
+        fetch('handlers/manage_queries.php', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/x-www-form-urlencoded'
@@ -2272,7 +2272,7 @@ if (isset($_SESSION['success_message'])) {
     function loadHeroImages() {
         const container = document.getElementById('hero_images_container');
 
-        fetch('manage_hero_images.php?action=list')
+        fetch('handlers/manage_hero_images.php?action=list')
             .then(response => response.json())
             .then(data => {
                 if (data.success) {
@@ -2412,7 +2412,7 @@ if (isset($_SESSION['success_message'])) {
         uploadHeroBtn.disabled = true;
         uploadHeroBtn.innerHTML = '<i class="fas fa-spinner fa-spin me-1"></i>Uploading...';
 
-        fetch('manage_hero_images.php', {
+        fetch('handlers/manage_hero_images.php', {
             method: 'POST',
             body: formData
         })
@@ -2466,7 +2466,7 @@ if (isset($_SESSION['success_message'])) {
 
     function loadPublicUsers() {
         const container = document.getElementById('pu_users_container');
-        fetch('manage_users.php', {
+        fetch('handlers/manage_users.php', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/x-www-form-urlencoded'
@@ -2533,7 +2533,7 @@ if (isset($_SESSION['success_message'])) {
         btn.disabled = true;
         btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Adding...';
 
-        fetch('manage_users.php', {
+        fetch('handlers/manage_users.php', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/x-www-form-urlencoded'
@@ -2577,7 +2577,7 @@ if (isset($_SESSION['success_message'])) {
             return;
         }
 
-        fetch('manage_users.php', {
+        fetch('handlers/manage_users.php', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/x-www-form-urlencoded'
@@ -2607,7 +2607,7 @@ if (isset($_SESSION['success_message'])) {
     window.deletePublicUser = function (id) {
         if (!confirm('Are you sure you want to permanently delete this user?')) return;
 
-        fetch('manage_users.php', {
+        fetch('handlers/manage_users.php', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/x-www-form-urlencoded'
