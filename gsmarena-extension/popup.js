@@ -802,9 +802,7 @@ function updateImagePreviews() {
 document.addEventListener('DOMContentLoaded', async () => {
     // --- Load saved settings ---
     try {
-        const saved = await chrome.storage.local.get(['bridgeUrl', 'serverUrl', 'apiKey']);
-        if (saved.bridgeUrl) document.getElementById('bridge-url').value = saved.bridgeUrl;
-        if (saved.serverUrl) document.getElementById('server-url').value = saved.serverUrl;
+        const saved = await chrome.storage.local.get(['apiKey']);
         if (saved.apiKey) document.getElementById('api-key').value = saved.apiKey;
     } catch (e) { /* ignore */ }
 
@@ -871,12 +869,9 @@ document.addEventListener('DOMContentLoaded', async () => {
         if (!currentDeviceData) { showResult('No device data scraped yet.', 'error'); return; }
         syncFieldsToData();
 
-        const bridgeUrl = document.getElementById('bridge-url').value.trim().replace(/\/+$/, '');
-        const serverUrl = document.getElementById('server-url').value.trim().replace(/\/+$/, '');
+        const bridgeUrl = 'http://localhost/gsmarena-extension/bridge_import.php';
+        const serverUrl = 'https://www.devicesarena.com';
         const apiKey = document.getElementById('api-key').value.trim();
-
-        if (!bridgeUrl) { showResult('Please set the local bridge URL.', 'error'); return; }
-        if (!serverUrl) { showResult('Please set the remote server URL.', 'error'); return; }
 
         const imageFiles = getImageFiles();
         if (imageFiles.length === 0) {
@@ -896,7 +891,7 @@ document.addEventListener('DOMContentLoaded', async () => {
 
         // Save settings
         try {
-            await chrome.storage.local.set({ bridgeUrl, serverUrl, apiKey });
+            await chrome.storage.local.set({ apiKey });
         } catch (e) { /* ignore */ }
 
         // Build FormData with files + JSON device data
@@ -916,6 +911,13 @@ document.addEventListener('DOMContentLoaded', async () => {
         importBtn.textContent = '⏳ Uploading via Bridge...';
 
         try {
+            // Generate Dynamic P2P Handshake Signature
+            const timestamp = Math.floor(Date.now() / 1000).toString();
+            const msgBuffer = new TextEncoder().encode(timestamp + apiKey);
+            const hashBuffer = await crypto.subtle.digest('SHA-256', msgBuffer);
+            const hashArray = Array.from(new Uint8Array(hashBuffer));
+            const signature = hashArray.map(b => b.toString(16).padStart(2, '0')).join('');
+
             // Send to LOCAL bridge, which forwards to remote server
             console.log('[DeviceArena] Sending to bridge:', bridgeUrl);
             console.log('[DeviceArena] Remote target:', serverUrl);
@@ -923,7 +925,8 @@ document.addEventListener('DOMContentLoaded', async () => {
             const resp = await fetch(bridgeUrl, {
                 method: 'POST',
                 headers: {
-                    'X-API-Key': apiKey,
+                    'X-Extension-Timestamp': timestamp,
+                    'X-Extension-Signature': signature,
                     'X-Remote-URL': serverUrl
                 },
                 body: formData

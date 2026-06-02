@@ -36,13 +36,15 @@ if (empty($remoteUrl)) {
 
 // Ensure it ends with /import_device.php
 $remoteUrl = rtrim($remoteUrl, '/');
-if (!str_ends_with($remoteUrl, '/handlers/import_device.php')) {
+if (!str_ends_with(strtolower($remoteUrl), '.php')) {
     $remoteUrl .= '/handlers/import_device.php';
 }
 
-$apiKey = $_SERVER['HTTP_X_API_KEY'] ?? '';
-if (empty($apiKey)) {
-    echo json_encode(['success' => false, 'error' => 'Missing X-API-Key header']);
+$timestamp = $_SERVER['HTTP_X_EXTENSION_TIMESTAMP'] ?? '';
+$signature = $_SERVER['HTTP_X_EXTENSION_SIGNATURE'] ?? '';
+
+if (empty($timestamp) || empty($signature)) {
+    echo json_encode(['success' => false, 'error' => 'Missing handshake headers. Please update your extension.']);
     exit;
 }
 
@@ -99,7 +101,8 @@ curl_setopt_array($ch, [
     CURLOPT_TIMEOUT        => 60,
     CURLOPT_CONNECTTIMEOUT => 15,
     CURLOPT_HTTPHEADER     => [
-        'X-API-Key: ' . $apiKey,
+        'X-Extension-Timestamp: ' . $timestamp,
+        'X-Extension-Signature: ' . $signature,
     ],
     CURLOPT_SSL_VERIFYPEER => true,
     CURLOPT_FOLLOWLOCATION => false, // Don't follow redirects — they strip custom headers

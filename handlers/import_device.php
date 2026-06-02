@@ -1,30 +1,9 @@
 <?php
 require_once 'auth.php';
-
-// Bypass login requirement when the request comes from the extension (has API key header)
-$allHeadersTop = function_exists('getallheaders') ? getallheaders() : [];
-$extensionApiKey = $_SERVER['HTTP_X_API_KEY']
-    ?? $_SERVER['HTTP_X_Api_Key']
-    ?? $allHeadersTop['X-API-Key']
-    ?? $allHeadersTop['X-Api-Key']
-    ?? $allHeadersTop['x-api-key']
-    ?? '';
-$isExtensionRequest = !empty($extensionApiKey);
-
-if (!$isExtensionRequest) {
-    // Require login only for web/form access, not extension imports
-    requireLogin();
-}
-/**
- * import_device.php - Import device from GSMArena scraper extension
- * 
- * Supports two modes:
- * 1. JSON POST (from browser extension) - Content-Type: application/json
- * 2. Web form (paste SQL manually) - regular form POST
- * 
- * Security: Requires API key header (X-API-Key) for JSON imports.
- * Change the API key below before deploying.
- */
+require_once 'config.php';
+require_once 'database_functions.php';
+require_once 'simple_device_insert.php';
+require_once 'sitemap_management.php';
 
 error_reporting(E_ALL);
 ini_set('display_errors', 0); // Don't leak HTML errors into JSON responses
@@ -32,18 +11,13 @@ ini_set('display_errors', 0); // Don't leak HTML errors into JSON responses
 // CORS headers for browser extension
 header('Access-Control-Allow-Origin: *');
 header('Access-Control-Allow-Methods: POST, GET, OPTIONS');
-header('Access-Control-Allow-Headers: Content-Type, X-API-Key');
+header('Access-Control-Allow-Headers: Content-Type, X-Extension-Timestamp, X-Extension-Signature');
 
 // Handle preflight
 if ($_SERVER['REQUEST_METHOD'] === 'OPTIONS') {
     http_response_code(200);
     exit;
 }
-
-require_once 'config.php';
-require_once 'database_functions.php';
-require_once 'simple_device_insert.php';
-require_once 'sitemap_management.php';
 
 // ====================================================================
 // Configuration — key loaded from DB misc table
@@ -60,35 +34,67 @@ function getExtensionApiKey() {
     }
 }
 $API_KEY = getExtensionApiKey();
-if (empty($API_KEY)) {
-    // No key set yet — block all extension requests until admin sets one
-    if ($hasApiKey ?? false) {
+
+// ====================================================================
+// Extension Handshake Authentication
+// ====================================================================
+$allHeadersTop = function_exists('getallheaders') ? getallheaders() : [];
+$extTimestamp = $_SERVER['HTTP_X_EXTENSION_TIMESTAMP'] ?? $allHeadersTop['X-Extension-Timestamp'] ?? '';
+$extSignature = $_SERVER['HTTP_X_EXTENSION_SIGNATURE'] ?? $allHeadersTop['X-Extension-Signature'] ?? '';
+
+$isExtensionRequest = false;
+
+if (!empty($extTimestamp) && !empty($extSignature)) {
+    if (empty($API_KEY)) {
         header('Content-Type: application/json');
         http_response_code(503);
         echo json_encode(['success' => false, 'error' => 'Extension API key not configured. Set it from the Dashboard.']);
         exit;
     }
+    
+    // Verify timestamp is within 5 minutes (300 seconds)
+    if (abs(time() - (int)$extTimestamp) > 300) {
+        header('Content-Type: application/json');
+        http_response_code(403);
+        echo json_encode(['success' => false, 'error' => 'Request expired or invalid timestamp.']);
+        exit;
+    }
+    
+    // Verify signature
+    $expectedSignature = hash('sha256', $extTimestamp . $API_KEY);
+    if (hash_equals($expectedSignature, $extSignature)) {
+        $isExtensionRequest = true;
+    } else {
+        header('Content-Type: application/json');
+        http_response_code(403);
+        echo json_encode(['success' => false, 'error' => 'Invalid extension signature. Handshake failed.']);
+        exit;
+    }
 }
+
+if (!$isExtensionRequest) {
+    // Require login only for web/form access, not extension imports
+    requireLogin();
+}
+
+/**
+ * import_device.php - Import device from GSMArena scraper extension
+ * 
+ * Supports two modes:
+ * 1. JSON POST (from browser extension) - Content-Type: application/json
+ * 2. Web form (paste SQL manually) - regular form POST
+ * 
+ * Security: Uses dynamic HMAC-SHA256 signature handshake for JSON imports.
+ */
 
 // ====================================================================
 // Route the request
 // ====================================================================
 $contentType = $_SERVER['CONTENT_TYPE'] ?? ($_SERVER['HTTP_CONTENT_TYPE'] ?? '');
 
-// The X-API-Key header is the definitive signal that this request is from the extension.
-// The web form never sends this header. Check multiple ways since servers vary.
-$allHeaders = function_exists('getallheaders') ? getallheaders() : [];
-$apiKeyFromHeader = $_SERVER['HTTP_X_API_KEY']
-    ?? $_SERVER['HTTP_X_Api_Key']
-    ?? $allHeaders['X-API-Key']
-    ?? $allHeaders['X-Api-Key']
-    ?? $allHeaders['x-api-key']
-    ?? '';
-$hasApiKey = !empty($apiKeyFromHeader);
-
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
-    if ($hasApiKey) {
+    if ($isExtensionRequest) {
         // ---- EXTENSION REQUEST ----
         // Always return JSON, never HTML. Wrap in try/catch.
         header('Content-Type: application/json');
