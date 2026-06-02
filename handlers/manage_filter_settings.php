@@ -567,7 +567,9 @@ function saveFilterSettings()
         }
 
         if (file_put_contents($configPath, $jsonContent) === false) {
-            throw new Exception('Failed to write to filter_config.json');
+            $error = error_get_last();
+            $errorMsg = $error ? $error['message'] : 'Unknown error';
+            throw new Exception('Failed to write to filter_config.json. System error: ' . $errorMsg);
         }
 
         // Clear the cached config
