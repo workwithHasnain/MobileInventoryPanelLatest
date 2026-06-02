@@ -1611,7 +1611,7 @@ if (isset($_SESSION['success_message'])) {
     function loadAuthUsers() {
         const container = document.getElementById('auth_users_container');
 
-        fetch('auth_management_handler.php', {
+        fetch('handlers/auth_management_handler.php', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/x-www-form-urlencoded',
@@ -1686,7 +1686,7 @@ if (isset($_SESSION['success_message'])) {
         btn.disabled = true;
         btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Adding...';
 
-        fetch('auth_management_handler.php', {
+        fetch('handlers/auth_management_handler.php', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/x-www-form-urlencoded',
@@ -1742,7 +1742,7 @@ if (isset($_SESSION['success_message'])) {
             return;
         }
 
-        fetch('auth_management_handler.php', {
+        fetch('handlers/auth_management_handler.php', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/x-www-form-urlencoded',
@@ -1777,7 +1777,7 @@ if (isset($_SESSION['success_message'])) {
             return;
         }
 
-        fetch('auth_management_handler.php', {
+        fetch('handlers/auth_management_handler.php', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/x-www-form-urlencoded',
