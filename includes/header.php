@@ -44,12 +44,12 @@ if (session_status() === PHP_SESSION_NONE) {
                             <a class="nav-link" href="posts.php">Posts</a>
                         </li>
                         <li class="nav-item">
-                            <a class="nav-link" href="handlers/manage_comments.php">Comments</a>
+                            <a class="nav-link" href="manage_comments.php">Comments</a>
                         </li>
 
                         <?php if (isset($_SESSION['role']) && $_SESSION['role'] === 'admin'): ?>
                             <li class="nav-item">
-                                <a class="nav-link" href="handlers/manage_data_db.php">Manage Data
+                                <a class="nav-link" href="manage_data_db.php">Manage Brands
                                 </a>
                             </li>
                         <?php endif; ?>

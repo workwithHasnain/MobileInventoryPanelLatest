@@ -1,5 +1,5 @@
 <?php
-require_once 'auth.php';
+require_once 'handlers/auth.php';
 
 // Require login for this page
 requireLogin();
@@ -7,7 +7,7 @@ requireLogin();
 $user_role = $_SESSION['role'] ?? 'employee';
 
 // Initialize database
-require_once 'database_functions.php';
+require_once 'handlers/database_functions.php';
 $pdo = getConnection();
 
 $message = '';
@@ -183,11 +183,11 @@ $recent_approved = array_slice($recent_approved, 0, 20);
     <title>Manage Comments - Admin Panel</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
-    <link href="../css/styles.css" rel="stylesheet">
+    <link href="css/styles.css" rel="stylesheet">
 </head>
 
 <body>
-    <?php include '../includes/header.php'; ?>
+    <?php include 'includes/header.php'; ?>
 
     <div class="container mt-4">
         <div class="d-flex justify-content-between align-items-center mb-4">
@@ -297,7 +297,7 @@ $recent_approved = array_slice($recent_approved, 0, 20);
                                                     <?php echo $post_group['comment_count']; ?> pending comment(s)
                                                 </small>
                                             </div>
-                                            <a href="../post.php?slug=<?php echo htmlspecialchars($post_group['slug']); ?>"
+                                            <a href="post.php?slug=<?php echo htmlspecialchars($post_group['slug']); ?>"
                                                 class="btn btn-sm btn-outline-primary" target="_blank">
                                                 <i class="fas fa-external-link-alt me-1"></i>View Post
                                             </a>
@@ -488,7 +488,7 @@ $recent_approved = array_slice($recent_approved, 0, 20);
     </div>
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
-    <script src="../js/scripts.js"></script>
+    <script src="js/scripts.js"></script>
 
     <script>
         // Auto-dismiss alerts after 5 seconds

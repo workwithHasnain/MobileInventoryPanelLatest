@@ -1,11 +1,11 @@
 <?php
 session_start();
-require_once 'auth.php';
-require_once 'database_functions.php';
+require_once 'handlers/auth.php';
+require_once 'handlers/database_functions.php';
 
 // Check if user is logged in and is admin
 if (!isLoggedIn() || $_SESSION['role'] !== 'admin') {
-    header('Location: ../login.php');
+    header('Location: login.php');
     exit;
 }
 
@@ -59,64 +59,20 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 $error = 'Failed to delete brand.';
             }
             break;
-            
-        case 'add_chipset':
-            $name = trim($_POST['chipset_name'] ?? '');
-            $description = trim($_POST['chipset_description'] ?? '');
-            
-            if (empty($name)) {
-                $error = 'Chipset name is required.';
-            } else {
-                $result = addChipsetDB($name, $description);
-                if ($result) {
-                    $message = 'Chipset added successfully!';
-                } else {
-                    $error = 'Chipset already exists or failed to add.';
-                }
-            }
-            break;
-            
-        case 'edit_chipset':
-            $id = $_POST['chipset_id'] ?? '';
-            $name = trim($_POST['chipset_name'] ?? '');
-            $description = trim($_POST['chipset_description'] ?? '');
-            
-            if (empty($name)) {
-                $error = 'Chipset name is required.';
-            } else {
-                $result = updateChipsetDB($id, $name, $description);
-                if ($result) {
-                    $message = 'Chipset updated successfully!';
-                } else {
-                    $error = 'Failed to update chipset or chipset with same name already exists.';
-                }
-            }
-            break;
-            
-        case 'delete_chipset':
-            $id = $_POST['chipset_id'] ?? '';
-            $result = deleteChipsetDB($id);
-            if ($result) {
-                $message = 'Chipset deleted successfully!';
-            } else {
-                $error = 'Failed to delete chipset.';
-            }
-            break;
     }
 }
 
-// Get all brands and chipsets
+// Get all brands
 $brands = getAllBrandsDB();
-$chipsets = getAllChipsetsDB();
 
-require_once '../includes/header.php';
+require_once 'includes/header.php';
 ?>
 
 <div class="container mt-4">
     <div class="row">
         <div class="col-12">
             <h2><i class="fas fa-database"></i> Data Management (PostgreSQL)</h2>
-            <p class="text-muted">Manage brands and chipsets using PostgreSQL database</p>
+            <p class="text-muted">Manage Brands using PostgreSQL database</p>
             
             <?php if ($message): ?>
                 <div class="alert alert-success alert-dismissible fade show" role="alert">
@@ -190,53 +146,6 @@ require_once '../includes/header.php';
                 </div>
             </div>
         </div>
-        
-        <!-- Chipsets Tab -->
-        <div class="tab-pane fade" id="chipsets" role="tabpanel">
-            <div class="card mt-3">
-                <div class="card-header">
-                    <h5 class="mb-0">
-                        <i class="fas fa-microchip"></i> Chipsets Management
-                        <button class="btn btn-primary btn-sm float-end" data-bs-toggle="modal" data-bs-target="#addChipsetModal">
-                            <i class="fas fa-plus"></i> Add Chipset
-                        </button>
-                    </h5>
-                </div>
-                <div class="card-body">
-                    <div class="table-responsive">
-                        <table class="table table-striped">
-                            <thead>
-                                <tr>
-                                    <th>ID</th>
-                                    <th>Name</th>
-                                    <th>Description</th>
-                                    <th>Created</th>
-                                    <th>Actions</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                <?php foreach ($chipsets as $chipset): ?>
-                                <tr>
-                                    <td><?php echo $chipset['id']; ?></td>
-                                    <td><strong><?php echo htmlspecialchars($chipset['name']); ?></strong></td>
-                                    <td><?php echo htmlspecialchars($chipset['description'] ?? ''); ?></td>
-                                    <td><?php echo date('Y-m-d H:i', strtotime($chipset['created_at'])); ?></td>
-                                    <td>
-                                        <button class="btn btn-sm btn-warning me-1" onclick="editChipset(<?php echo $chipset['id']; ?>, '<?php echo addslashes($chipset['name']); ?>', '<?php echo addslashes($chipset['description'] ?? ''); ?>')">
-                                            <i class="fas fa-edit"></i>
-                                        </button>
-                                        <button class="btn btn-sm btn-danger" onclick="deleteChipset(<?php echo $chipset['id']; ?>, '<?php echo addslashes($chipset['name']); ?>')">
-                                            <i class="fas fa-trash"></i>
-                                        </button>
-                                    </td>
-                                </tr>
-                                <?php endforeach; ?>
-                            </tbody>
-                        </table>
-                    </div>
-                </div>
-            </div>
-        </div>
     </div>
 </div>
 
@@ -299,65 +208,6 @@ require_once '../includes/header.php';
     </div>
 </div>
 
-<!-- Add Chipset Modal -->
-<div class="modal fade" id="addChipsetModal" tabindex="-1">
-    <div class="modal-dialog">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h5 class="modal-title">Add New Chipset</h5>
-                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
-            </div>
-            <form method="POST">
-                <div class="modal-body">
-                    <input type="hidden" name="action" value="add_chipset">
-                    <div class="mb-3">
-                        <label for="chipset_name" class="form-label">Chipset Name *</label>
-                        <input type="text" class="form-control" id="chipset_name" name="chipset_name" required>
-                    </div>
-                    <div class="mb-3">
-                        <label for="chipset_description" class="form-label">Description</label>
-                        <textarea class="form-control" id="chipset_description" name="chipset_description" rows="3"></textarea>
-                    </div>
-                </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
-                    <button type="submit" class="btn btn-primary">Add Chipset</button>
-                </div>
-            </form>
-        </div>
-    </div>
-</div>
-
-<!-- Edit Chipset Modal -->
-<div class="modal fade" id="editChipsetModal" tabindex="-1">
-    <div class="modal-dialog">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h5 class="modal-title">Edit Chipset</h5>
-                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
-            </div>
-            <form method="POST" id="editChipsetForm">
-                <div class="modal-body">
-                    <input type="hidden" name="action" value="edit_chipset">
-                    <input type="hidden" name="chipset_id" id="edit_chipset_id">
-                    <div class="mb-3">
-                        <label for="edit_chipset_name" class="form-label">Chipset Name *</label>
-                        <input type="text" class="form-control" id="edit_chipset_name" name="chipset_name" required>
-                    </div>
-                    <div class="mb-3">
-                        <label for="edit_chipset_description" class="form-label">Description</label>
-                        <textarea class="form-control" id="edit_chipset_description" name="chipset_description" rows="3"></textarea>
-                    </div>
-                </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
-                    <button type="submit" class="btn btn-primary">Update Chipset</button>
-                </div>
-            </form>
-        </div>
-    </div>
-</div>
-
 <script>
 function editBrand(id, name, description) {
     document.getElementById('edit_brand_id').value = id;
@@ -376,23 +226,6 @@ function deleteBrand(id, name) {
     }
 }
 
-function editChipset(id, name, description) {
-    document.getElementById('edit_chipset_id').value = id;
-    document.getElementById('edit_chipset_name').value = name;
-    document.getElementById('edit_chipset_description').value = description;
-    new bootstrap.Modal(document.getElementById('editChipsetModal')).show();
-}
-
-function deleteChipset(id, name) {
-    if (confirm('Are you sure you want to delete the chipset "' + name + '"?')) {
-        const form = document.createElement('form');
-        form.method = 'POST';
-        form.innerHTML = '<input type="hidden" name="action" value="delete_chipset"><input type="hidden" name="chipset_id" value="' + id + '">';
-        document.body.appendChild(form);
-        form.submit();
-    }
-}
-
 // Auto-hide alerts after 5 seconds
 setTimeout(() => {
     const alerts = document.querySelectorAll('.alert');
@@ -403,4 +236,4 @@ setTimeout(() => {
 }, 5000);
 </script>
 
-<?php require_once '../includes/dash-footer.php'; ?>
+<?php require_once 'includes/dash-footer.php'; ?>
