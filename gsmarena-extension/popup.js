@@ -686,7 +686,10 @@ function showResult(text, type = 'success') {
     el.textContent = text;
     el.className = type;
     el.style.display = 'block';
-    setTimeout(() => { el.style.display = 'none'; }, 6000);
+}
+
+function hideResult() {
+    document.getElementById('result-message').style.display = 'none';
 }
 
 /** Get all selected image files from the file inputs */
@@ -823,6 +826,7 @@ document.addEventListener('DOMContentLoaded', async () => {
 
     // --- Generate SQL button ---
     document.getElementById('btn-generate-sql').addEventListener('click', async () => {
+        hideResult();
         if (!currentDeviceData) { showResult('No device data scraped yet.', 'error'); return; }
         syncFieldsToData();
 
@@ -866,10 +870,11 @@ document.addEventListener('DOMContentLoaded', async () => {
 
     // --- Import to server button ---
     document.getElementById('btn-import').addEventListener('click', async () => {
+        hideResult();
         if (!currentDeviceData) { showResult('No device data scraped yet.', 'error'); return; }
         syncFieldsToData();
 
-        const bridgeUrl = 'http://localhost/gsmarena-extension/bridge_import.php';
+        const bridgeUrl = 'http://localhost/MobileInventoryPanelLatest/gsmarena-extension/bridge_import.php';
         const serverUrl = 'https://www.devicesarena.com';
         const apiKey = document.getElementById('api-key').value.trim();
 

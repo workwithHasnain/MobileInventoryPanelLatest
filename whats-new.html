@@ -1,0 +1,184 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>What's New & Revisions</title>
+    <style>
+        :root {
+            --primary-color: #4f46e5;
+            --primary-hover: #4338ca;
+            --bg-color: #f9fafb;
+            --card-bg: #ffffff;
+            --text-main: #111827;
+            --text-muted: #6b7280;
+            --highlight-new: #10b981; /* Emerald */
+            --highlight-rev: #f59e0b; /* Amber */
+        }
+        
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-main);
+            line-height: 1.6;
+            margin: 0;
+            padding: 2rem;
+        }
+
+        .container {
+            max-width: 900px;
+            margin: 0 auto;
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 3rem;
+        }
+
+        .header h1 {
+            font-size: 2.5rem;
+            font-weight: 800;
+            color: var(--primary-color);
+            margin-bottom: 0.5rem;
+        }
+
+        .header p {
+            color: var(--text-muted);
+            font-size: 1.1rem;
+        }
+
+        .grid {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 2rem;
+        }
+
+        @media (min-width: 768px) {
+            .grid {
+                grid-template-columns: 1fr 1fr;
+            }
+        }
+
+        .card {
+            background-color: var(--card-bg);
+            border-radius: 12px;
+            padding: 2.5rem 2rem;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+            transition: transform 0.2s ease-in-out, box-shadow 0.2s ease-in-out;
+        }
+
+        .card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+        }
+
+        .card h2 {
+            display: flex;
+            align-items: center;
+            font-size: 1.5rem;
+            margin-top: 0;
+            margin-bottom: 1.5rem;
+            border-bottom: 2px solid var(--bg-color);
+            padding-bottom: 0.75rem;
+        }
+
+        .card-new h2 {
+            color: var(--highlight-new);
+            border-color: #d1fae5;
+        }
+
+        .card-rev h2 {
+            color: var(--highlight-rev);
+            border-color: #fef3c7;
+        }
+
+        .icon {
+            margin-right: 0.75rem;
+            width: 24px;
+            height: 24px;
+        }
+
+        .item-list {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+        }
+
+        .item-list li {
+            position: relative;
+            padding-left: 1.5rem;
+            margin-bottom: 1.25rem;
+            font-size: 1.05rem;
+        }
+
+        .item-list li::before {
+            content: "•";
+            position: absolute;
+            left: 0;
+            font-size: 1.5rem;
+            line-height: 1;
+            top: -3px;
+        }
+
+        .card-new .item-list li::before {
+            color: var(--highlight-new);
+        }
+
+        .card-rev .item-list li::before {
+            color: var(--highlight-rev);
+        }
+        
+        .highlight {
+            font-weight: 600;
+            background-color: #f3f4f6;
+            padding: 0.2rem 0.5rem;
+            border-radius: 6px;
+            color: var(--primary-color);
+        }
+    </style>
+    <!-- Import Google Font -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&display=swap" rel="stylesheet">
+</head>
+<body>
+    <div class="container">
+        <header class="header">
+            <h1>Release Notes & Updates</h1>
+            <p>A summary of requirements and their fulfillment prepared for the team.</p>
+        </header>
+
+        <div class="grid">
+            <!-- New Features Section -->
+            <section class="card card-new">
+                <h2>
+                    <svg class="icon" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 3v4M3 5h4M6 17v4m-2-2h4m5-16l2.286 6.857L21 12l-5.714 2.143L13 21l-2.286-6.857L5 12l5.714-2.143L13 3z"></path></svg>
+                    New Features
+                </h2>
+                <ul class="item-list" id="new-features-list">
+                    <li>Designed <span class="highlight">17 distinct pages</span> and fully implemented the new design system to overhaul the user interface.</li>
+                    <li>Implemented <span class="highlight">Auto Sign-in via Google Auth</span> to provide a seamless and secure authentication experience.</li>
+                    <li>Added the <span class="highlight">hamburger feature</span> to the navbar, which wasn't in the original new design.</li>
+                    <li>Major update: Implemented <span class="highlight">title swapping</span> in the extension.</li>
+                    <li>Redesigned the entire <span class="highlight">comparison table</span>, leading to a new update for <span class="highlight">fixed subtitles</span>.</li>
+                    <li>Added <span class="highlight">sorting filters</span> to the single brand page and the main brands page.</li>
+                    <li>Implemented <span class="highlight">slugs</span> for brands.</li>
+                </ul>
+            </section>
+
+            <!-- Revisions Section -->
+            <section class="card card-rev">
+                <h2>
+                    <svg class="icon" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"></path></svg>
+                    Revisions
+                </h2>
+                <ul class="item-list" id="revisions-list">
+                    <li>Revised the <span class="highlight">navbar design</span> to improve navigation.</li>
+                    <li>Revised the <span class="highlight">navbar aesthetics</span> to include light shades on both sides, similar to GSMArena.</li>
+                    <li>Revised the <span class="highlight">number of posts</span> displayed across various pages.</li>
+                </ul>
+            </section>
+        </div>
+    </div>
+</body>
+</html>
