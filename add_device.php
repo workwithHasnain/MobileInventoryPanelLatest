@@ -243,7 +243,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             <div class="tab-content" id="deviceTypeTabContent">
                 <!-- Phone Form Tab -->
                 <div class="tab-pane fade show active" id="phone-form" role="tabpanel">
-                    <form id="add-device-form" method="post" action="<?php echo htmlspecialchars($_SERVER['PHP_SELF']); ?>" enctype="multipart/form-data">
+                    <form id="add-device-form" method="post" action="add_device.php" enctype="multipart/form-data">
 
 
                         <!-- 1. Launch Section -->

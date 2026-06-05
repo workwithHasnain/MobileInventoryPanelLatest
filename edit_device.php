@@ -343,7 +343,7 @@ $pref_meta_desc = $device['meta_desc'] ?? '';
             <div class="tab-content" id="deviceTypeTabContent">
                 <!-- Phone Form Tab -->
                 <div class="tab-pane fade show active" id="phone-form" role="tabpanel">
-                    <form id="add-device-form" method="post" action="<?php echo htmlspecialchars($_SERVER['PHP_SELF'] . '?id=' . $id); ?>" enctype="multipart/form-data">
+                    <form id="add-device-form" method="post" action="edit_device.php?id=<?php echo $id; ?>" enctype="multipart/form-data">
 
 
                         <!-- 1. Launch Section -->
