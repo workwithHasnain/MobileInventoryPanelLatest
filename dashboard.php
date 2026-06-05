@@ -130,7 +130,7 @@ if (isset($_SESSION['success_message'])) {
                 data-bs-target="#sitemapModal">
                 <i class="fas fa-sitemap"></i> Sitemap
             </button>
-            <button onclick="window.location.href='import_device.php'" type="button" class="btn btn-outline-info ms-2">
+            <button onclick="window.location.href='handlers/import_device.php'" type="button" class="btn btn-outline-info ms-2">
                 <i class="fas fa-sitemap"></i> Data Import
             </button>
             <button type="button" class="btn btn-outline-secondary ms-2" data-bs-toggle="modal" data-bs-target="#extensionKeyModal">
