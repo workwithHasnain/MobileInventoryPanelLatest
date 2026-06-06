@@ -1,4 +1,4 @@
-<div class="da-widget">
+<div class="da-widget da-widget-popular-comparisons">
           <div class="da-widget-header">
             <h3>Popular Comparisons</h3>
             <div class="da-widget-icon"><i class="fa fa-scale-balanced"></i></div>
