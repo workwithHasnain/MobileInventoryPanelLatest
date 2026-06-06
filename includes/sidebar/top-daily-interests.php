@@ -7,7 +7,7 @@
     $topViewedDevices = [];
   }
 ?>
-<div class="da-widget">
+<div class="da-widget da-widget-top-daily">
           <div class="da-widget-header">
             <h3>Top 10 Daily Interest</h3>
             <div class="da-widget-icon da-widget-icon-red"><i class="fa fa-fire"></i></div>

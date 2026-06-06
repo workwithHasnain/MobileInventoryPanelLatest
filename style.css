@@ -5793,3 +5793,21 @@ textarea.da-input {
     font-size: 10.5px;
   }
 }
+
+/* ══════════════════════════════════════════
+   MOBILE VISIBILITY OVERRIDES
+══════════════════════════════════════════ */
+
+/* Hide brands widget in hero-right when layout is vertical (stacked) */
+@media (max-width: 1024px) {
+  .da-hero-right .da-section-label,
+  .da-hero-right .da-classic-brand-widget {
+    display: none;
+  }
+
+  /* Hide Top 10 sidebar widgets on mobile */
+  .da-widget-top-daily,
+  .da-widget-top-fans {
+    display: none;
+  }
+}

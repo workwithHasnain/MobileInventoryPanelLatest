@@ -8,7 +8,7 @@ try {
 }
 ?>
 
-<div class="da-widget">
+<div class="da-widget da-widget-top-fans">
           <div class="da-widget-header">
             <h3>Top 10 by Fans</h3>
             <div class="da-widget-icon da-widget-icon-blue"><i class="fa fa-star"></i></div>
