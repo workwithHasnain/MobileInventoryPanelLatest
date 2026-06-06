@@ -5808,7 +5808,8 @@ textarea.da-input {
   /* Hide Top 10 sidebar widgets on mobile */
   .da-widget-top-daily,
   .da-widget-top-fans,
-  .da-widget-popular-comparisons {
+  .da-widget-popular-comparisons,
+  .da-widget-latest-devices {
     display: none;
   }
 }

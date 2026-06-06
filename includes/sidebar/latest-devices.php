@@ -1,3 +1,4 @@
+<div class="da-widget-latest-devices">
 <div class="da-section-label"><span>Devices</span></div>
         <div class="da-widget">
           <div class="da-widget-header">
@@ -34,3 +35,4 @@
             <?php endif; ?>
           </div>
         </div>
+</div>
