@@ -2605,6 +2605,21 @@ button {
   text-decoration: underline !important;
 }
 
+/* Mobile reading optimizations */
+@media (max-width: 768px) {
+  .da-post-content {
+    margin-left: -8px;
+    margin-right: -8px;
+    padding: 0 4px;
+  }
+  .da-post-content p {
+    text-align: justify !important;
+    text-justify: inter-word;
+    margin-bottom: 16px;
+    padding: 0 8px;
+  }
+}
+
 /* Hide on mobile/touch */
 
 /* ══════════════════════════════════════════
