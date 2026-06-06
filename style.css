@@ -2551,7 +2551,7 @@ button {
 }
 
 /* ══════════════════════════════════════════
-   POST ARTICLE CONTENT
+   POST ARTICLE CONTENT (post.php)
 ══════════════════════════════════════════ */
 .da-post-content {
   font-size: 15.5px;
@@ -2560,11 +2560,20 @@ button {
   margin-bottom: 32px;
 }
 
+/* We use !important here because some older articles have inline styles 
+   like style="color: #212529" saved directly in the database from copy/pasting.
+   This forces them to adapt to your dark theme regardless of inline styles. */
+.da-post-content * {
+  background-color: transparent !important;
+}
+
 .da-post-content p,
 .da-post-content ul,
 .da-post-content ol,
-.da-post-content li {
-  color: var(--text-secondary);
+.da-post-content li,
+.da-post-content span,
+.da-post-content div {
+  color: var(--text-secondary) !important;
 }
 
 .da-post-content h1,
@@ -2575,18 +2584,28 @@ button {
 .da-post-content h6,
 .da-post-content strong,
 .da-post-content b {
-  color: var(--text-primary);
+  color: var(--text-primary) !important;
+}
+
+.da-post-content h1,
+.da-post-content h2,
+.da-post-content h3,
+.da-post-content h4,
+.da-post-content h5,
+.da-post-content h6 {
   margin-top: 24px;
   margin-bottom: 12px;
 }
 
 .da-post-content a {
-  color: var(--accent-blue);
+  color: var(--accent-blue) !important;
 }
 
 .da-post-content a:hover {
-  text-decoration: underline;
+  text-decoration: underline !important;
 }
+
+/* Hide on mobile/touch */
 
 /* ══════════════════════════════════════════
    UTILITY
