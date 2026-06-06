@@ -59,7 +59,7 @@
             <h4>HELP</h4>
             <ul class="da-footer-links inline-list">
               <li><a href="#">Terms of Use</a></li>
-              <li><a href="#">Privacy Policy</a></li>
+              <li><a href="<?php echo $base; ?>privacy-policy">Privacy Policy</a></li>
               <li><a href="#">Web Notifications</a></li>
               <li><a href="#">Cookies</a></li>
             </ul>

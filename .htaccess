@@ -99,6 +99,11 @@
     RewriteRule ^advertise-with-us\.php/?$ advertise-with-us [R=301,L]
     RewriteRule ^advertise-with-us/?$ advertise-with-us.php [L,QSA]
 
+    # Route for privacy-policy.php: /privacy-policy
+    RewriteCond %{THE_REQUEST} \.php [NC]
+    RewriteRule ^privacy-policy\.php/?$ privacy-policy [R=301,L]
+    RewriteRule ^privacy-policy/?$ privacy-policy.php [L,QSA]
+
     # Redirect /home to current directory root
     RewriteRule ^home/?$ ./ [R=301,L]
 
