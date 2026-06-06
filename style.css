@@ -2553,6 +2553,39 @@ button {
 /* ══════════════════════════════════════════
    POST ARTICLE CONTENT (post.php)
 ══════════════════════════════════════════ */
+
+/* Extracted inline styles from post.php */
+.avatar-box {
+  background-color: var(--avatar-bg, var(--accent-blue));
+  color: white;
+}
+
+.da-content-area.da-post-area {
+  padding-top: 32px;
+}
+
+.da-hero-main.da-post-hero {
+  cursor: default;
+  max-height: 480px;
+  margin-bottom: 24px;
+}
+
+.da-section-label.da-post-tags {
+  display: flex;
+  gap: 12px;
+  flex-wrap: wrap;
+  margin-bottom: 12px;
+}
+
+.da-hero-main-title.da-post-title {
+  font-size: clamp(24px, 3vw, 36px);
+}
+
+.da-comment-msg {
+  display: none;
+  margin-bottom: 12px;
+}
+
 .da-post-content {
   font-size: 15.5px;
   line-height: 1.7;
@@ -2608,15 +2641,26 @@ button {
 /* Mobile reading optimizations */
 @media (max-width: 768px) {
   .da-post-content {
-    margin-left: -8px;
-    margin-right: -8px;
-    padding: 0 4px;
+    margin-left: 0 !important;
+    margin-right: 0 !important;
+    padding-left: 0 !important;
+    padding-right: 0 !important;
   }
-  .da-post-content p {
+  
+  .da-post-content * {
+    margin-left: 0 !important;
+    margin-right: 0 !important;
+  }
+
+  .da-post-content p,
+  .da-post-content blockquote,
+  .da-post-content ul,
+  .da-post-content ol,
+  .da-post-content div {
     text-align: justify !important;
     text-justify: inter-word;
-    margin-bottom: 16px;
-    padding: 0 8px;
+    padding-left: 0 !important;
+    padding-right: 0 !important;
   }
 }
 

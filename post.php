@@ -186,7 +186,7 @@ function getAvatarDisplay($name, $email)
     $initials = strtoupper(substr($name, 0, 1));
     $colors = ['#007bff', '#28a745', '#dc3545', '#ffc107', '#17a2b8', '#6f42c1', '#e83e8c'];
     $color = $colors[abs(crc32($name)) % count($colors)];
-    return '<span class="avatar-box" style="background-color: ' . $color . '; color: white;">' . $initials . '</span>';
+    return '<span class="avatar-box" style="--avatar-bg: ' . $color . ';">' . $initials . '</span>';
   }
 }
 
@@ -471,12 +471,12 @@ function getAvatarDisplay($name, $email)
   <div class="da-page">
 
     <!-- ── POST FEED + SIDEBAR ── -->
-    <div class="da-content-area" style="padding-top: 32px;">
+    <div class="da-content-area da-post-area">
       <!-- Post Feed -->
       <main>
         <!-- Article Header Image -->
         <?php if (!empty($post)): ?>
-          <div class="da-hero-main" style="cursor: default; max-height: 480px; margin-bottom: 24px;">
+          <div class="da-hero-main da-post-hero">
             <?php if (!empty($post['featured_image'])): ?>
               <img src="<?php echo htmlspecialchars(getAbsoluteImagePath($post['featured_image'], $base)); ?>"
                 alt="<?php echo htmlspecialchars($post['title']); ?>" loading="eager" />
@@ -505,9 +505,9 @@ function getAvatarDisplay($name, $email)
                 $tags_html = '<span>' . $tag_label . '</span>';
               }
               ?>
-              <div class="da-section-label" style="display: flex; gap: 12px; flex-wrap: wrap; margin-bottom: 12px;">
+              <div class="da-section-label da-post-tags">
                 <?php echo $tags_html; ?></div>
-              <h1 class="da-hero-main-title" style="font-size: clamp(24px, 3vw, 36px);">
+              <h1 class="da-hero-main-title da-post-title">
                 <?php echo htmlspecialchars($post['title']); ?></h1>
               <div class="da-hero-meta">
                 <span><i class="fa fa-user"></i><?php echo htmlspecialchars($post['author']); ?></span>
@@ -522,11 +522,11 @@ function getAvatarDisplay($name, $email)
         <?php if (!empty($post['content_body'])): ?>
           <div class="da-heading-jump-container mb-3">
             <div class="da-heading-jump d-flex align-items-center">
-              <button id="headingPrev" type="button" class="da-heading-nav-btn me-2 flex-shrink-0" title="Previous section" aria-label="Previous section" style="display:none;">
+              <button id="headingPrev" type="button" class="da-heading-nav-btn me-2 flex-shrink-0 d-none" title="Previous section" aria-label="Previous section">
                 <i class="fa-solid fa-chevron-left"></i>
               </button>
-              <select id="headingDropdown" class="form-select form-select-sm da-heading-dropdown flex-grow-1" aria-label="Jump to section" style="display:none;"></select>
-              <button id="headingNext" type="button" class="da-heading-nav-btn ms-2 flex-shrink-0" title="Next section" aria-label="Next section" style="display:none;">
+              <select id="headingDropdown" class="form-select form-select-sm da-heading-dropdown flex-grow-1 d-none" aria-label="Jump to section"></select>
+              <button id="headingNext" type="button" class="da-heading-nav-btn ms-2 flex-shrink-0 d-none" title="Next section" aria-label="Next section">
                 <i class="fa-solid fa-chevron-right"></i>
               </button>
             </div>
@@ -663,7 +663,7 @@ function getAvatarDisplay($name, $email)
                   </div>
                 </div>
 
-                <div id="post-comment-msg" style="display:none;margin-bottom:12px;"></div>
+                <div id="post-comment-msg" class="da-comment-msg"></div>
                 <div class="da-form-footer">
                   <div class="d-flex align-items-center flex-wrap gap-3">
                     <button type="submit" id="post-comment-submit" class="da-cta-btn">Post Your Opinion</button>
@@ -816,13 +816,13 @@ function getAvatarDisplay($name, $email)
             let html = '';
             devices.forEach(d => {
               html += `<a href="${baseURL}device/${encodeURIComponent(d.slug || d.id)}" class="da-search-result-item">
-          ${d.image ? `<img src="${d.image}" onerror="this.style.display='none'">` : ''}
+          ${d.image ? `<img src="${d.image}" onerror="this.classList.add('d-none')">` : ''}
           <div><div class="sr-text">${d.name}</div><div class="sr-meta"><i class="fa fa-mobile-screen me-1"></i>${d.brand_name || 'Device'}</div></div>
         </a>`;
             });
             posts.forEach(p => {
               html += `<a href="${baseURL}post/${encodeURIComponent(p.slug)}" class="da-search-result-item">
-          ${p.featured_image ? `<img src="${p.featured_image}" onerror="this.style.display='none'">` : ''}
+          ${p.featured_image ? `<img src="${p.featured_image}" onerror="this.classList.add('d-none')">` : ''}
           <div><div class="sr-text">${p.title}</div><div class="sr-meta"><i class="fa fa-newspaper me-1"></i>${p.created_at ? p.created_at.substring(0, 10) : 'Article'}</div></div>
         </a>`;
             });
@@ -874,7 +874,7 @@ function getAvatarDisplay($name, $email)
       const dots = ['notifDotDesktop'];
       dots.forEach(id => {
         const el = document.getElementById(id);
-        if (el) el.style.display = 'none';
+        if (el) el.classList.add('d-none');
       });
       fetch(baseURL + 'notification_handler.php', {
         method: 'POST',
@@ -929,7 +929,8 @@ function getAvatarDisplay($name, $email)
         const submitBtn = document.getElementById('post-comment-submit');
         submitBtn.disabled = true;
         submitBtn.innerHTML = '<i class="fa fa-spinner fa-spin me-1"></i>Posting...';
-        msgBox.style.display = 'none';
+        msgBox.classList.add('d-none');
+        msgBox.classList.remove('d-block');
 
         fetch(baseURL + 'ajax_comment_handler.php', {
           method: 'POST',
@@ -937,7 +938,8 @@ function getAvatarDisplay($name, $email)
         })
           .then(function (r) { return r.json(); })
           .then(function (data) {
-            msgBox.style.display = 'block';
+            msgBox.classList.remove('d-none');
+            msgBox.classList.add('d-block');
             msgBox.className = data.success
               ? 'da-comment-feedback success'
               : 'da-comment-feedback error';
@@ -957,8 +959,8 @@ function getAvatarDisplay($name, $email)
             submitBtn.innerHTML = 'Post Your Opinion';
           })
           .catch(function () {
-            msgBox.style.display = 'block';
-            msgBox.className = 'da-comment-feedback error';
+            msgBox.classList.remove('d-none');
+            msgBox.classList.add('d-block', 'da-comment-feedback', 'error');
             msgBox.innerHTML = '<i class="fa fa-exclamation-circle me-2"></i>Something went wrong. Please try again.';
             submitBtn.disabled = false;
             submitBtn.innerHTML = 'Post Your Opinion';
@@ -1008,7 +1010,8 @@ function getAvatarDisplay($name, $email)
                 dropdown.appendChild(opt);
             });
 
-            dropdown.style.display = 'inline-block';
+            dropdown.classList.remove('d-none');
+            dropdown.classList.add('d-inline-block');
             const prevBtn = document.getElementById('headingPrev');
             const nextBtn = document.getElementById('headingNext');
             const headingEls = Array.from(headings);
@@ -1029,8 +1032,10 @@ function getAvatarDisplay($name, $email)
             };
 
             if (prevBtn && nextBtn && headingEls.length) {
-                prevBtn.style.display = 'inline-flex';
-                nextBtn.style.display = 'inline-flex';
+                prevBtn.classList.remove('d-none');
+                prevBtn.classList.add('d-inline-flex');
+                nextBtn.classList.remove('d-none');
+                nextBtn.classList.add('d-inline-flex');
                 updateButtons();
             }
 
