@@ -138,14 +138,17 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 // ====================================================================
 function handleJsonImport($apiKey)
 {
+    global $isExtensionRequest;
     header('Content-Type: application/json');
 
     // Verify API key — timing-safe to prevent timing attacks
-    $providedKey = $_SERVER['HTTP_X_API_KEY'] ?? '';
-    if (empty($providedKey) || !hash_equals($apiKey, $providedKey)) {
-        http_response_code(401);
-        echo json_encode(['success' => false, 'error' => 'Unauthorized']);
-        exit;
+    if (!$isExtensionRequest) {
+        $providedKey = $_SERVER['HTTP_X_API_KEY'] ?? '';
+        if (empty($providedKey) || !hash_equals($apiKey, $providedKey)) {
+            http_response_code(401);
+            echo json_encode(['success' => false, 'error' => 'Unauthorized']);
+            exit;
+        }
     }
 
     // Parse JSON body
@@ -270,14 +273,17 @@ function handleJsonImport($apiKey)
 // ====================================================================
 function handleMultipartImport($apiKey)
 {
+    global $isExtensionRequest;
     header('Content-Type: application/json');
 
     // Verify API key — timing-safe to prevent timing attacks
-    $providedKey = $_SERVER['HTTP_X_API_KEY'] ?? '';
-    if (empty($providedKey) || !hash_equals($apiKey, $providedKey)) {
-        http_response_code(401);
-        echo json_encode(['success' => false, 'error' => 'Unauthorized']);
-        exit;
+    if (!$isExtensionRequest) {
+        $providedKey = $_SERVER['HTTP_X_API_KEY'] ?? '';
+        if (empty($providedKey) || !hash_equals($apiKey, $providedKey)) {
+            http_response_code(401);
+            echo json_encode(['success' => false, 'error' => 'Unauthorized']);
+            exit;
+        }
     }
 
     // Parse device data from the form field
