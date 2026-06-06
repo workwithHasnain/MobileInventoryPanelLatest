@@ -2550,7 +2550,43 @@ button {
   }
 }
 
-/* Hide on mobile/touch */
+/* ══════════════════════════════════════════
+   POST ARTICLE CONTENT
+══════════════════════════════════════════ */
+.da-post-content {
+  font-size: 15.5px;
+  line-height: 1.7;
+  color: var(--text-secondary);
+  margin-bottom: 32px;
+}
+
+.da-post-content p,
+.da-post-content ul,
+.da-post-content ol,
+.da-post-content li {
+  color: var(--text-secondary);
+}
+
+.da-post-content h1,
+.da-post-content h2,
+.da-post-content h3,
+.da-post-content h4,
+.da-post-content h5,
+.da-post-content h6,
+.da-post-content strong,
+.da-post-content b {
+  color: var(--text-primary);
+  margin-top: 24px;
+  margin-bottom: 12px;
+}
+
+.da-post-content a {
+  color: var(--accent-blue);
+}
+
+.da-post-content a:hover {
+  text-decoration: underline;
+}
 
 /* ══════════════════════════════════════════
    UTILITY
