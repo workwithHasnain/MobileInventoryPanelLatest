@@ -190,3 +190,5 @@
   <script src="https://accounts.google.com/gsi/client" async defer></script>
   <!-- Authentication Logic -->
   <script src="<?php echo $base; ?>js/auth.js"></script>
+  <!-- Main Site Scripts (Mega Dropdown Search, etc) -->
+  <script src="<?php echo $base; ?>script.js"></script>

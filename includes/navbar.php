@@ -20,11 +20,41 @@
           </a>
         </div>
 
-        <!-- Large Center Search (Desktop) -->
-        <form class="da-search-large d-none d-lg-flex" action="<?php echo $base; ?>search" method="GET">
-          <input type="text" name="q" placeholder="Search in devices arena" autocomplete="off" required>
-          <button type="submit" aria-label="Search"><i class="fa fa-search"></i></button>
-        </form>
+        <!-- Large Center Search (Desktop) — Mega Dropdown -->
+        <div class="da-search-large-wrap d-none d-lg-flex" id="da-search-wrap">
+          <div class="da-search-large" id="da-search-field-group">
+            <i class="fa fa-search da-search-field-icon"></i>
+            <input
+              type="text"
+              id="da-desktop-search-input"
+              name="q"
+              placeholder="Search devices, reviews, news..."
+              autocomplete="off"
+              autocorrect="off"
+              spellcheck="false"
+              aria-label="Search"
+              aria-autocomplete="list"
+              aria-controls="da-search-dropdown"
+              aria-expanded="false"
+            >
+            <button type="button" id="da-search-clear-btn" class="da-search-clear-btn" aria-label="Clear search" style="display:none;">
+              <i class="fa fa-times"></i>
+            </button>
+            <button type="button" class="da-search-submit-btn" aria-label="Search">
+              <i class="fa fa-search"></i>
+            </button>
+          </div>
+          <!-- Mega Dropdown Panel -->
+          <div id="da-search-dropdown" class="da-search-dropdown" role="listbox" style="display:none;">
+            <div id="da-search-dropdown-inner" class="da-search-dropdown-inner">
+              <!-- Hint state (default) -->
+              <div class="da-search-hint" id="da-search-hint">
+                <i class="fa fa-magnifying-glass"></i>
+                <span>Start typing to search devices, reviews, news &amp; posts</span>
+              </div>
+            </div>
+          </div>
+        </div>
 
         <!-- Right Actions -->
         <div class="da-top-actions">
