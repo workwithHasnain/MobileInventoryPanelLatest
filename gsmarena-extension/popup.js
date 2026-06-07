@@ -874,7 +874,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         if (!currentDeviceData) { showResult('No device data scraped yet.', 'error'); return; }
         syncFieldsToData();
 
-        const bridgeUrl = 'http://localhost/MobileInventoryPanelLatest/gsmarena-extension/bridge_import.php';
+        const bridgeUrl = 'http://localhost/gsmarena-extension/bridge_import.php';
         const serverUrl = 'https://www.devicesarena.com';
         const apiKey = document.getElementById('api-key').value.trim();
 
