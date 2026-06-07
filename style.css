@@ -351,6 +351,10 @@ button {
   padding: 0 24px;
   display: flex;
   flex-direction: column;
+  max-height: 380px;
+  overflow-y: auto;
+  scrollbar-width: thin;
+  scrollbar-color: rgba(255,255,255,0.1) transparent;
 }
 
 [data-theme="light"] .da-search-dropdown {
@@ -364,12 +368,7 @@ button {
   to   { opacity: 1; transform: translateY(0); }
 }
 
-.da-search-dropdown-inner {
-  max-height: 520px;
-  overflow-y: auto;
-  scrollbar-width: thin;
-  scrollbar-color: rgba(255,255,255,0.1) transparent;
-}
+
 
 /* 4-column grid header */
 .da-search-cols {
