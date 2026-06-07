@@ -52,11 +52,10 @@ $_ENV['APP_NAME'] = $_ENV['APP_NAME'] ?? 'Mobile Phone Management System';
 $_ENV['APP_ENV'] = $_ENV['APP_ENV'] ?? 'development';
 $_ENV['APP_DEBUG'] = $_ENV['APP_DEBUG'] ?? 'true';
 
-// Base URL configuration - Automatically detects if in subdirectory (localhost) or root (production)
-$docRoot = rtrim(str_replace('\\', '/', $_SERVER['DOCUMENT_ROOT']), '/');
-$dir = str_replace('\\', '/', dirname(__DIR__));
-$base = str_replace($docRoot, '', $dir) . '/';
-if (empty($base) || $base === '/') {
+// Base URL configuration - Keep it simple
+if (in_array($_SERVER['HTTP_HOST'] ?? '', ['localhost'])) {
+    $base = '/MobileInventoryPanelLatest/';
+} else {
     $base = '/';
 }
 

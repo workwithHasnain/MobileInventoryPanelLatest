@@ -15,7 +15,7 @@
           </button>
 
           <!-- Logo -->
-          <a class="da-logo" href="https://www.devicesarena.com">
+          <a class="da-logo" href="<?php echo $base; ?>">
             <img src="<?php echo $base; ?>imges/logo-wide.svg" alt="DevicesArena" />
           </a>
         </div>
