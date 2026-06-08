@@ -167,7 +167,13 @@ $brands = $brands_stmt->fetchAll();
                   <div class="da-img-fallback"></div>
                 <?php endif; ?>
                 <div class="da-story-card-overlay"></div>
-                <div class="da-story-card-title"><?php echo htmlspecialchars($story['title']); ?></div>
+                <div class="da-story-card-content">
+                  <div class="da-story-card-title"><?php echo htmlspecialchars($story['title']); ?></div>
+                  <div class="da-story-card-meta">
+                    <span><i class="fa fa-calendar-alt"></i><?php echo date('M j, Y', strtotime($story['created_at'])); ?></span>
+                    <span><i class="fa fa-comment"></i><?php echo $story['comment_count']; ?></span>
+                  </div>
+                </div>
               </a>
             <?php endforeach; ?>
           </div>
