@@ -1170,7 +1170,7 @@ button {
   cursor: pointer;
   background: #1a1c2e;
   aspect-ratio: 1.532 / 1;
-  max-height: 360px;
+  max-height: none;
 }
 
 .da-hero-main img {
@@ -2931,7 +2931,7 @@ button {
 
 .da-hero-main.da-post-hero {
   cursor: default;
-  max-height: 480px;
+  max-height: none;
   margin-bottom: 24px;
 }
 
