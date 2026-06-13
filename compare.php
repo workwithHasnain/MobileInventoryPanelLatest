@@ -746,23 +746,39 @@ $da_active_nav = 'compare';
             <table class="cpt-table" id="cp-spec-table">
               <thead class="cpt-thead">
                 <tr>
-                  <th class="cpt-label-head">Specifications</th>
+                  <!-- Section column corner -->
+                  <th class="cpt-corner-head" colspan="2"></th>
                   <?php if ($phone1): ?>
                     <th class="cpt-dev-head">
-                      <img src="<?php echo getPhoneImage($phone1); ?>" alt="<?php echo getPhoneName($phone1); ?>">
-                      <span><?php echo getPhoneName($phone1); ?></span>
+                      <div class="cpt-dev-head-inner">
+                        <img src="<?php echo getPhoneImage($phone1); ?>" alt="<?php echo getPhoneName($phone1); ?>">
+                        <div class="cpt-dev-head-text">
+                          <div class="cpt-dev-head-label">Compare With</div>
+                          <span><?php echo getPhoneName($phone1); ?></span>
+                        </div>
+                      </div>
                     </th>
                   <?php endif; ?>
                   <?php if ($phone2): ?>
                     <th class="cpt-dev-head">
-                      <img src="<?php echo getPhoneImage($phone2); ?>" alt="<?php echo getPhoneName($phone2); ?>">
-                      <span><?php echo getPhoneName($phone2); ?></span>
+                      <div class="cpt-dev-head-inner">
+                        <img src="<?php echo getPhoneImage($phone2); ?>" alt="<?php echo getPhoneName($phone2); ?>">
+                        <div class="cpt-dev-head-text">
+                          <div class="cpt-dev-head-label">Compare With</div>
+                          <span><?php echo getPhoneName($phone2); ?></span>
+                        </div>
+                      </div>
                     </th>
                   <?php endif; ?>
                   <?php if ($phone3): ?>
                     <th class="cpt-dev-head">
-                      <img src="<?php echo getPhoneImage($phone3); ?>" alt="<?php echo getPhoneName($phone3); ?>">
-                      <span><?php echo getPhoneName($phone3); ?></span>
+                      <div class="cpt-dev-head-inner">
+                        <img src="<?php echo getPhoneImage($phone3); ?>" alt="<?php echo getPhoneName($phone3); ?>">
+                        <div class="cpt-dev-head-text">
+                          <div class="cpt-dev-head-label">Compare With</div>
+                          <span><?php echo getPhoneName($phone3); ?></span>
+                        </div>
+                      </div>
                     </th>
                   <?php endif; ?>
                 </tr>
@@ -770,13 +786,8 @@ $da_active_nav = 'compare';
               <tbody>
                 <?php foreach ($specSchema as $sectionKey => $subtitles):
                   $displayName = $sectionDisplayNames[$sectionKey] ?? ucfirst(strtolower($sectionKey));
-                  ?>
-                  <tr class="cpt-section-row">
-                    <td colspan="<?php echo $totalCols; ?>" class="cpt-section-cell">
-                      <?php echo htmlspecialchars($displayName); ?>
-                    </td>
-                  </tr>
-                  <?php foreach ($subtitles as $subtitle):
+                  $rowCount = count($subtitles);
+                  foreach ($subtitles as $rowIdx => $subtitle):
                     $fk = strtolower($subtitle);
                     $v1 = ($phone1 !== null) ? ($lk1[$sectionKey][$fk] ?? '') : null;
                     $v2 = ($phone2 !== null) ? ($lk2[$sectionKey][$fk] ?? '') : null;
@@ -787,22 +798,38 @@ $da_active_nav = 'compare';
                       fn($v) => $v !== null
                     );
                     $identical = (count($activeVals) > 1) && (count(array_unique(array_values($activeVals))) === 1);
+                    $isLastInSection = ($rowIdx === $rowCount - 1);
+                    $rowClasses = 'cpt-data-row';
+                    if ($identical) $rowClasses .= ' cpt-identical';
+                    if ($isLastInSection) $rowClasses .= ' cpt-section-end';
                     ?>
-                    <tr class="cpt-data-row<?php echo $identical ? ' cpt-identical' : ''; ?>"
-                      data-identical="<?php echo $identical ? '1' : '0'; ?>">
+                    <tr class="<?php echo $rowClasses; ?>" data-identical="<?php echo $identical ? '1' : '0'; ?>">
+                      <?php if ($rowIdx === 0): ?>
+                        <!-- Section name cell — spans all rows of this section -->
+                        <td class="cpt-section-cell" rowspan="<?php echo $rowCount; ?>">
+                          <?php echo htmlspecialchars($displayName); ?>
+                        </td>
+                      <?php endif; ?>
                       <td class="cpt-label-cell"><?php echo htmlspecialchars($subtitle); ?></td>
                       <?php if ($phone1 !== null): ?>
-                        <td class="cpt-val-cell"><?php echo ($v1 !== '') ? nl2br(htmlspecialchars($v1)) : ''; ?></td>
+                        <td class="cpt-val-cell"><?php echo ($v1 !== '') ? nl2br(htmlspecialchars($v1)) : '<span class="cp-na">—</span>'; ?></td>
                       <?php endif; ?>
                       <?php if ($phone2 !== null): ?>
-                        <td class="cpt-val-cell"><?php echo ($v2 !== '') ? nl2br(htmlspecialchars($v2)) : ''; ?></td>
+                        <td class="cpt-val-cell"><?php echo ($v2 !== '') ? nl2br(htmlspecialchars($v2)) : '<span class="cp-na">—</span>'; ?></td>
                       <?php endif; ?>
                       <?php if ($phone3 !== null): ?>
-                        <td class="cpt-val-cell"><?php echo ($v3 !== '') ? nl2br(htmlspecialchars($v3)) : ''; ?></td>
+                        <td class="cpt-val-cell"><?php echo ($v3 !== '') ? nl2br(htmlspecialchars($v3)) : '<span class="cp-na">—</span>'; ?></td>
                       <?php endif; ?>
                     </tr>
                   <?php endforeach; ?>
                 <?php endforeach; ?>
+                <!-- Fallback row shown by JS when zero differences exist -->
+                <tr id="cp-no-diff-row" style="display:none">
+                  <td colspan="<?php echo $devCols + 2; ?>" style="text-align:center;padding:28px;color:#94a3b8;font-size:13px;">
+                    <i class="fa fa-check-circle" style="color:#22c55e;margin-right:8px;"></i>
+                    All specifications are identical — no differences to show.
+                  </td>
+                </tr>
               </tbody>
             </table>
           </div><!-- /cpt-scroll -->
@@ -929,18 +956,74 @@ $da_active_nav = 'compare';
       }
     }
 
-    // ══ Spec view toggle ══
+    // ══ Spec view toggle (rowspan-aware) ══
     function setSpecView(mode) {
       const table = document.getElementById('cp-spec-table');
-      const btnAll = document.getElementById('cp-btn-all');
+      const btnAll  = document.getElementById('cp-btn-all');
       const btnDiff = document.getElementById('cp-btn-diff');
       if (!table) return;
+
+      // Always collect ALL data rows (including currently hidden ones)
+      const rows = Array.from(table.querySelectorAll('tbody tr.cpt-data-row'));
+
+      // ── Step 1: Restore everything to its original state ──
+      // Show all rows
+      rows.forEach(r => r.style.display = '');
+
+      // Move any displaced section-cells back to their original row
+      table.querySelectorAll('td.cpt-section-cell[data-orig-row]').forEach(cell => {
+        const origIdx   = parseInt(cell.getAttribute('data-orig-row'));
+        const origSpan  = parseInt(cell.getAttribute('data-orig-rowspan'));
+        const origRow   = rows[origIdx];
+        if (origRow) {
+          cell.setAttribute('rowspan', origSpan);
+          cell.removeAttribute('data-orig-row');
+          cell.removeAttribute('data-orig-rowspan');
+          origRow.insertBefore(cell, origRow.firstChild);
+        }
+      });
+
       if (mode === 'diff') {
-        table.classList.add('cp-diff-mode');
         btnDiff.classList.add('active'); btnAll.classList.remove('active');
+
+        // ── Step 2: For each identical row, handle rowspan then hide ──
+        rows.forEach((row, idx) => {
+          if (row.getAttribute('data-identical') !== '1') return;
+
+          // If this row carries a section-cell, move it to next non-identical row
+          const sectionCell = row.querySelector('td.cpt-section-cell');
+          if (sectionCell) {
+            const span = parseInt(sectionCell.getAttribute('rowspan') || '1');
+            let moved = false;
+            for (let i = 1; i < span; i++) {
+              const candidate = rows[idx + i];
+              if (candidate && candidate.getAttribute('data-identical') !== '1') {
+                // Record original position so we can restore later
+                sectionCell.setAttribute('data-orig-row',     idx);
+                sectionCell.setAttribute('data-orig-rowspan', span);
+                sectionCell.setAttribute('rowspan', span - i);
+                candidate.insertBefore(sectionCell, candidate.firstChild);
+                moved = true;
+                break;
+              }
+            }
+            // If not moved, all rows in the section are identical — cell
+            // disappears with its row, which is fine (whole section hides).
+          }
+
+          row.style.display = 'none';
+        });
+
+        // If every row ended up hidden, show a "no differences" message row
+        const visible = rows.filter(r => r.style.display !== 'none');
+        const noDiffRow = document.getElementById('cp-no-diff-row');
+        if (noDiffRow) noDiffRow.style.display = visible.length ? 'none' : '';
+
       } else {
-        table.classList.remove('cp-diff-mode');
         btnAll.classList.add('active'); btnDiff.classList.remove('active');
+        // All rows already restored in Step 1
+        const noDiffRow = document.getElementById('cp-no-diff-row');
+        if (noDiffRow) noDiffRow.style.display = 'none';
       }
     }
 
