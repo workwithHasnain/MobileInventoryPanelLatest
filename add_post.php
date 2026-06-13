@@ -508,11 +508,11 @@ include 'includes/header.php';
 <script>
     // Image Upload Guidance System
     // =============================
-    // Required aspect ratio constant: 1.532:1 (width:height)
-    const REQUIRED_ASPECT_RATIO = 1.532;
-    const RATIO_TOLERANCE = 0.01; // Allow ±0.01 variation
+    // Required aspect ratio constant: 2:1 (width:height)
+    const REQUIRED_ASPECT_RATIO = 2.0;
+    const RATIO_TOLERANCE = 0.05; // Allow ±0.05 variation
     const OPTIMAL_WIDTH = 1000;
-    const OPTIMAL_HEIGHT = 653;
+    const OPTIMAL_HEIGHT = 500;
 
     // Handle featured image file selection
     document.getElementById('featured_image').addEventListener('change', function(e) {

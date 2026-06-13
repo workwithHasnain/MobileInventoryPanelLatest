@@ -444,7 +444,7 @@ button {
 .da-search-result-thumb {
   width: 60px;
   height: auto;
-  aspect-ratio: 1.532 / 1;
+  aspect-ratio: 2 / 1;
   border-radius: 6px;
   object-fit: cover;
   flex-shrink: 0;
@@ -1169,8 +1169,8 @@ button {
   overflow: hidden;
   cursor: pointer;
   background: #1a1c2e;
-  aspect-ratio: 1.532 / 1;
-  max-height: none;
+  aspect-ratio: 2 / 1;
+  max-height: 500px;
 }
 
 .da-hero-main img {
@@ -1259,7 +1259,7 @@ button {
   overflow: hidden;
   cursor: pointer;
   background: #1a1c2e;
-  aspect-ratio: 1.532 / 1;
+  aspect-ratio: 2 / 1;
 }
 
 .da-story-card img {
@@ -1663,7 +1663,7 @@ button {
 
 .da-post-card-img {
   position: relative;
-  aspect-ratio: 1.532 / 1;
+  aspect-ratio: 2 / 1;
   overflow: hidden;
   background: #1a1c2e;
 }
@@ -2187,7 +2187,7 @@ button {
 }
 
 .da-ticker-item-img {
-  aspect-ratio: 1.532 / 1;
+  aspect-ratio: 2 / 1;
   overflow: hidden;
   background: #1a1c2e;
 }
@@ -2931,7 +2931,7 @@ button {
 
 .da-hero-main.da-post-hero {
   cursor: default;
-  max-height: none;
+  max-height: 500px;
   margin-bottom: 24px;
 }
 
@@ -6886,7 +6886,7 @@ textarea.da-input {
 .da-search-result-item img {
   width: 55px;
   height: auto;
-  aspect-ratio: 1.532 / 1;
+  aspect-ratio: 2 / 1;
   object-fit: cover;
   border-radius: var(--radius-sm);
   flex-shrink: 0;
