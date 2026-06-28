@@ -3185,6 +3185,7 @@ button {
     align-items: center;
     padding: 12px;
     gap: 16px;
+    grid-column: 1 / -1;
   }
 
   .da-post-card-img, .da-post-card.featured .da-post-card-img {
