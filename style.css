@@ -3177,15 +3177,35 @@ button {
 
   .da-post-grid {
     grid-template-columns: 1fr;
+    gap: 12px;
   }
 
-  .da-post-card.featured {
-    flex-direction: column;
+  .da-post-card, .da-post-card.featured {
+    flex-direction: row;
+    align-items: center;
+    padding: 12px;
+    gap: 16px;
   }
 
-  .da-post-card.featured .da-post-card-img {
-    width: 100%;
+  .da-post-card-img, .da-post-card.featured .da-post-card-img {
+    width: 100px;
+    height: 100px;
     min-height: unset;
+    aspect-ratio: 1;
+    flex-shrink: 0;
+    border-radius: 8px;
+  }
+
+  .da-post-card-body, .da-post-card.featured .da-post-card-body {
+    padding: 0;
+    justify-content: center;
+  }
+
+  .da-post-card-tag {
+    font-size: 9px;
+    padding: 2px 6px;
+    top: 6px;
+    left: 6px;
   }
 
   .da-instore-inner {
