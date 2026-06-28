@@ -66,7 +66,7 @@ $mobile_brands = $mobile_brands_stmt->fetchAll();
             </button>
 
             <a class="navbar-brand d-flex align-items-center" href="<?php echo $base; ?>">
-                <img src="<?php echo $base; ?>imges/logo-wide.svg" alt="DevicesArena Logo" style="height: min-content; width: min-content; max-height: 50px; max-width: 200px;" />
+                <img src="<?php echo $base; ?>imges/logo-wide.png" alt="DevicesArena Logo" style="height: min-content; width: min-content; max-height: 50px; max-width: 200px;" />
             </a>
         </div>
 
@@ -184,7 +184,7 @@ $mobile_brands = $mobile_brands_stmt->fetchAll();
             alt="">
     </button>
     <a class="navbar-brand d-flex align-items-center" href="<?php echo $base; ?>home">
-        <img src="<?php echo $base; ?>imges/logo-wide.svg" alt="DevicesArena Logo" style="height: min-content; width: min-content; max-height: 30px; max-width: 150px;" />
+        <img src="<?php echo $base; ?>imges/logo-wide.png" alt="DevicesArena Logo" style="height: min-content; width: min-content; max-height: 30px; max-width: 150px;" />
     </a>
     <!-- User Auth Button (Mobile) -->
     <div class="ms-auto me-2 d-flex align-items-center gap-2" id="mobile-user-area">
