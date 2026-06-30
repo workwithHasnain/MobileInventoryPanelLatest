@@ -25,19 +25,19 @@
           <h4>COMPANY</h4>
           <ul class="da-footer-links">
             <li><a href="<?php echo $base; ?>about-us">About Us</a></li>
-            <li><a href="#">Team</a></li>
+            <li><a href="<?php echo $base; ?>team">Team</a></li>
             <li><a href="<?php echo $base; ?>contact-us">Contact Us</a></li>
-            <li><a href="#">Careers</a></li>
-            <li><a href="#">Ethics statement</a></li>
-            <li><a href="#">How we rate</a></li>
-            <li><a href="#">AI at DevicesArena</a></li>
+            <li><a href="<?php echo $base; ?>careers">Careers</a></li>
+            <li><a href="<?php echo $base; ?>ethics-statement">Ethics statement</a></li>
+            <li><a href="<?php echo $base; ?>how-we-rate">How we rate</a></li>
+            <li><a href="<?php echo $base; ?>ai-at-devicesarena">AI at DevicesArena</a></li>
           </ul>
         </div>
         <div class="da-footer-section">
           <h4>LICENSING</h4>
           <ul class="da-footer-links">
-            <li><a href="#">Reprint & Permissions</a></li>
-            <li><a href="#">Database Licensing</a></li>
+            <li><a href="<?php echo $base; ?>reprint-and-publishing">Reprint & Permissions</a></li>
+            <li><a href="<?php echo $base; ?>database-licensing">Database Licensing</a></li>
             <li><a href="<?php echo $base; ?>advertise-with-us">Advertise with us</a></li>
           </ul>
         </div>
@@ -54,17 +54,17 @@
             <li><a href="#">Carriers</a></li>
             <li><a href="<?php echo $base; ?>reviews">Reviews</a></li>
             <li><a href="<?php echo $base; ?>sitemap">Sitemap</a></li>
-            <li><a href="#">News Archive</a></li>
-            <li><a href="#">Reviews Archive</a></li>
+            <li><a href="<?php echo $base; ?>news-archive">News Archive</a></li>
+            <li><a href="<?php echo $base; ?>reviews-archive">Reviews Archive</a></li>
           </ul>
         </div>
         <div class="da-footer-section">
           <h4>HELP</h4>
           <ul class="da-footer-links inline-list">
-            <li><a href="#">Terms of Use</a></li>
+            <li><a href="<?php echo $base; ?>terms-of-use">Terms of Use</a></li>
             <li><a href="<?php echo $base; ?>privacy-policy">Privacy Policy</a></li>
-            <li><a href="#">Web Notifications</a></li>
-            <li><a href="#">Cookies</a></li>
+            <li><a href="<?php echo $base; ?>web-notifications">Web Notifications</a></li>
+            <li><a href="<?php echo $base; ?>cookies">Cookies</a></li>
           </ul>
         </div>
       </div>

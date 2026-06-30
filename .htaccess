@@ -110,4 +110,59 @@
     # Redirect /index.php to current directory root
     RewriteRule ^index\.php/?$ ./ [R=301,L]
 
+
+    # Routes for new pages
+
+    RewriteCond %{THE_REQUEST} \.php [NC]
+    RewriteRule ^terms-of-use\.php/?$ terms-of-use [R=301,L]
+    RewriteRule ^terms-of-use/?$ terms-of-use.php [L,QSA]
+
+    RewriteCond %{THE_REQUEST} \.php [NC]
+    RewriteRule ^web-notifications\.php/?$ web-notifications [R=301,L]
+    RewriteRule ^web-notifications/?$ web-notifications.php [L,QSA]
+
+    RewriteCond %{THE_REQUEST} \.php [NC]
+    RewriteRule ^cookies\.php/?$ cookies [R=301,L]
+    RewriteRule ^cookies/?$ cookies.php [L,QSA]
+
+    RewriteCond %{THE_REQUEST} \.php [NC]
+    RewriteRule ^reprint-and-publishing\.php/?$ reprint-and-publishing [R=301,L]
+    RewriteRule ^reprint-and-publishing/?$ reprint-and-publishing.php [L,QSA]
+
+    RewriteCond %{THE_REQUEST} \.php [NC]
+    RewriteRule ^database-licensing\.php/?$ database-licensing [R=301,L]
+    RewriteRule ^database-licensing/?$ database-licensing.php [L,QSA]
+
+    RewriteCond %{THE_REQUEST} \.php [NC]
+    RewriteRule ^ethics-statement\.php/?$ ethics-statement [R=301,L]
+    RewriteRule ^ethics-statement/?$ ethics-statement.php [L,QSA]
+
+    RewriteCond %{THE_REQUEST} \.php [NC]
+    RewriteRule ^how-we-rate\.php/?$ how-we-rate [R=301,L]
+    RewriteRule ^how-we-rate/?$ how-we-rate.php [L,QSA]
+
+    RewriteCond %{THE_REQUEST} \.php [NC]
+    RewriteRule ^ai-at-devicesarena\.php/?$ ai-at-devicesarena [R=301,L]
+    RewriteRule ^ai-at-devicesarena/?$ ai-at-devicesarena.php [L,QSA]
+
+    RewriteCond %{THE_REQUEST} \.php [NC]
+    RewriteRule ^team\.php/?$ team [R=301,L]
+    RewriteRule ^team/?$ team.php [L,QSA]
+
+    RewriteCond %{THE_REQUEST} \.php [NC]
+    RewriteRule ^careers\.php/?$ careers [R=301,L]
+    RewriteRule ^careers/?$ careers.php [L,QSA]
+
+    RewriteCond %{THE_REQUEST} \.php [NC]
+    RewriteRule ^news-archive\.php/?$ news-archive [R=301,L]
+    RewriteRule ^news-archive/?$ news-archive.php [L,QSA]
+
+    RewriteCond %{THE_REQUEST} \.php [NC]
+    RewriteRule ^reviews-archive\.php/?$ reviews-archive [R=301,L]
+    RewriteRule ^reviews-archive/?$ reviews-archive.php [L,QSA]
+
+    RewriteCond %{THE_REQUEST} \.php [NC]
+    RewriteRule ^sitemap\.php/?$ sitemap [R=301,L]
+    RewriteRule ^sitemap/?$ sitemap.php [L,QSA]
+
 </IfModule>
