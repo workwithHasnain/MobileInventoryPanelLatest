@@ -317,12 +317,8 @@ $brands = $brands_stmt->fetchAll();
                 if (preg_match_all('/<url>(.*?)<\/url>/is', $xml, $urlBlocks)) {
                     foreach ($urlBlocks[1] as $block) {
                         preg_match('/<loc>(.*?)<\/loc>/i', $block, $locMatch);
-                        preg_match('/<lastmod>(.*?)<\/lastmod>/i', $block, $modMatch);
-                        preg_match('/<changefreq>(.*?)<\/changefreq>/i', $block, $freqMatch);
                         
                         $loc = $locMatch[1] ?? '';
-                        $lastmod = $modMatch[1] ?? '';
-                        $changefreq = $freqMatch[1] ?? '';
                         
                         if (empty($loc)) continue;
                         
@@ -340,16 +336,6 @@ $brands = $brands_stmt->fetchAll();
                         echo '  <a href="' . htmlspecialchars($loc) . '" style="color: var(--text-primary); font-size: 1.1rem; font-weight: 600; text-decoration: none; display: block; margin-bottom: 5px;">';
                         echo '    <i class="fa fa-link" style="color: var(--accent); margin-right: 8px; font-size: 0.9em;"></i> ' . htmlspecialchars($name);
                         echo '  </a>';
-                        echo '  <div style="font-size: 0.85rem; color: var(--text-muted); display: flex; gap: 15px;">';
-                        
-                        if (!empty($lastmod)) {
-                            echo '<span><i class="fa fa-clock me-1"></i> Updated: ' . htmlspecialchars($lastmod) . '</span>';
-                        }
-                        if (!empty($changefreq)) {
-                            echo '<span><i class="fa fa-sync me-1"></i> Freq: ' . ucfirst(htmlspecialchars($changefreq)) . '</span>';
-                        }
-                        
-                        echo '  </div>';
                         echo '</li>';
                     }
                 } else {
