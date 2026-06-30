@@ -1680,16 +1680,16 @@ button {
 }
 
 .da-post-card-tag {
-  position: absolute;
-  top: 10px;
-  left: 10px;
-  background: var(--accent);
+  display: inline-block;
+  background: #2080ff;
   color: #fff;
-  font-size: 10px;
-  font-weight: 700;
+  font-size: 9px;
+  font-weight: 800;
   text-transform: uppercase;
   letter-spacing: 0.05em;
-  padding: 3px 8px;
+  padding: 3px 6px;
+  margin-right: 6px;
+  vertical-align: middle;
   border-radius: 4px;
 }
 
@@ -3183,18 +3183,24 @@ button {
   .da-post-card, .da-post-card.featured {
     flex-direction: row;
     align-items: center;
-    padding: 12px;
+    padding: 0;
+    padding-bottom: 16px;
+    border: none;
+    background: transparent;
+    border-radius: 0;
+    border-bottom: 1px solid var(--border);
+    box-shadow: none;
     gap: 16px;
     grid-column: 1 / -1;
   }
 
   .da-post-card-img, .da-post-card.featured .da-post-card-img {
-    width: 100px;
-    height: 100px;
+    width: 120px;
+    height: 80px;
     min-height: unset;
-    aspect-ratio: 1;
+    aspect-ratio: 3 / 2;
     flex-shrink: 0;
-    border-radius: 8px;
+    border-radius: 6px;
   }
 
   .da-post-card-body, .da-post-card.featured .da-post-card-body {

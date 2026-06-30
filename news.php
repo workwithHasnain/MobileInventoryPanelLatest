@@ -214,11 +214,11 @@ $brands = $brands_stmt->fetchAll();
                   <?php else: ?>
                     <div class="da-img-fallback-icon"><i class="fa fa-newspaper"></i></div>
                   <?php endif; ?>
-                  <span class="da-post-card-tag">News</span>
                 </div>
                 <div class="da-post-card-body">
                   <div class="da-post-card-title"><?php echo htmlspecialchars($post['title']); ?></div>
                   <div class="da-post-card-meta">
+                    <span class="da-post-card-tag">News</span>
                     <span><i
                         class="fa fa-calendar-alt"></i><?php echo date('M j, Y', strtotime($post['created_at'])); ?></span>
                     <span><i class="fa fa-comment"></i><?php echo $post['comment_count']; ?></span>
