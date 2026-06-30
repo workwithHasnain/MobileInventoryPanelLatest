@@ -304,14 +304,54 @@ $brands = $brands_stmt->fetchAll();
       <main>
         <div class="da-post-feed-header">
           <div>
-            <div class="da-section-label"><span>Information</span></div>
-            <h2 class="da-section-title">Coming Soon</h2>
+            <div class="da-section-label"><span>Navigation</span></div>
+            <h2 class="da-section-title">Site Directory</h2>
           </div>
         </div>
-        <div class="da-about-content" style="min-height: 40vh; display: flex; align-items: center; justify-content: center; flex-direction: column;">
-          <i class="fa fa-tools" style="font-size: 3rem; color: var(--text-muted); margin-bottom: 15px;"></i>
-          <h3 style="color: var(--text-primary); margin-bottom: 10px;">Page Under Construction</h3>
-          <p style="color: var(--text-muted);">We are working hard to bring you this content. Please check back later.</p>
+        <div class="da-about-content">
+          <ul class="da-sitemap-list" style="list-style: none; padding: 0;">
+            <?php
+            $sitemapFile = __DIR__ . '/sitemap.xml';
+            if (file_exists($sitemapFile)) {
+                $xml = simplexml_load_file($sitemapFile);
+                if ($xml) {
+                    foreach ($xml->url as $urlNode) {
+                        $loc = (string)$urlNode->loc;
+                        
+                        // Parse name from URL
+                        $path = parse_url($loc, PHP_URL_PATH);
+                        $path = trim($path, '/');
+                        
+                        if (empty($path)) {
+                            $name = 'Home';
+                        } else {
+                            $name = ucwords(str_replace('-', ' ', $path));
+                        }
+                        
+                        echo '<li style="margin-bottom: 15px; border-bottom: 1px solid var(--border); padding-bottom: 10px;">';
+                        echo '  <a href="' . htmlspecialchars($loc) . '" style="color: var(--text-primary); font-size: 1.1rem; font-weight: 600; text-decoration: none; display: block; margin-bottom: 5px;">';
+                        echo '    <i class="fa fa-link" style="color: var(--accent); margin-right: 8px; font-size: 0.9em;"></i> ' . htmlspecialchars($name);
+                        echo '  </a>';
+                        echo '  <div style="font-size: 0.85rem; color: var(--text-muted); display: flex; gap: 15px;">';
+                        
+                        if (isset($urlNode->lastmod)) {
+                            echo '<span><i class="fa fa-clock me-1"></i> Updated: ' . htmlspecialchars($urlNode->lastmod) . '</span>';
+                        }
+                        if (isset($urlNode->changefreq)) {
+                            echo '<span><i class="fa fa-sync me-1"></i> Freq: ' . ucfirst(htmlspecialchars($urlNode->changefreq)) . '</span>';
+                        }
+                        
+                        echo '  </div>';
+                        echo '</li>';
+                    }
+                } else {
+                    echo '<li><p style="color: var(--text-muted);">Could not parse sitemap.xml.</p></li>';
+                }
+            } else {
+                echo '<li><p style="color: var(--text-muted);">Sitemap not found.</p></li>';
+            }
+            ?>
+          </ul>
         </div>
       </main>
 
