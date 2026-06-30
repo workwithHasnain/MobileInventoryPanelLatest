@@ -63,8 +63,8 @@ $brands = $brands_stmt->fetchAll();
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1.0" />
-  <link rel="canonical" href="<?php echo $canonicalBase; ?>/reprint-and-publishing" />
-  <title>Reprint & Permissions — DevicesArena</title>
+  <link rel="canonical" href="<?php echo $canonicalBase; ?>/carriers" />
+  <title>Carriers — DevicesArena</title>
   <meta name="description"
     content="Read the DevicesArena Privacy Policy. We value your safety and only collect essential information like name and email for registration." />
   <meta property="og:title" content="Privacy Policy — DevicesArena" />
@@ -257,7 +257,7 @@ $brands = $brands_stmt->fetchAll();
       <div class="cp-hero-inner">
         <div class="cp-hero-left">
           <div class="cp-hero-label"><span>Devices Arena</span></div>
-          <h1 class="cp-hero-title">Reprint & Permissions</h1>
+          <h1 class="cp-hero-title">Carriers</h1>
           
         </div>
 

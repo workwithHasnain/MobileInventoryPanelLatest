@@ -256,10 +256,9 @@ $brands = $brands_stmt->fetchAll();
 
       <div class="cp-hero-inner">
         <div class="cp-hero-left">
-          <div class="cp-hero-label"><span>Company</span></div>
+          <div class="cp-hero-label"><span>Devices Arena</span></div>
           <h1 class="cp-hero-title">Careers</h1>
-          <p class="cp-hero-sub">Your safety and privacy are our top priorities. Learn how we handle your information
-            with transparency, respect, and professional care.</p>
+          
         </div>
 
         <!-- Right: Brand panel (Classic Widget) -->

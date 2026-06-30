@@ -165,4 +165,9 @@
     RewriteRule ^sitemap\.php/?$ sitemap [R=301,L]
     RewriteRule ^sitemap/?$ sitemap.php [L,QSA]
 
+
+    RewriteCond %{THE_REQUEST} \.php [NC]
+    RewriteRule ^carriers\.php/?$ carriers [R=301,L]
+    RewriteRule ^carriers/?$ carriers.php [L,QSA]
+
 </IfModule>
