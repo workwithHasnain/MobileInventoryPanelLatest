@@ -313,10 +313,18 @@ $brands = $brands_stmt->fetchAll();
             <?php
             $sitemapFile = __DIR__ . '/sitemap.xml';
             if (file_exists($sitemapFile)) {
-                $xml = simplexml_load_file($sitemapFile);
-                if ($xml) {
-                    foreach ($xml->url as $urlNode) {
-                        $loc = (string)$urlNode->loc;
+                $xml = file_get_contents($sitemapFile);
+                if (preg_match_all('/<url>(.*?)<\/url>/is', $xml, $urlBlocks)) {
+                    foreach ($urlBlocks[1] as $block) {
+                        preg_match('/<loc>(.*?)<\/loc>/i', $block, $locMatch);
+                        preg_match('/<lastmod>(.*?)<\/lastmod>/i', $block, $modMatch);
+                        preg_match('/<changefreq>(.*?)<\/changefreq>/i', $block, $freqMatch);
+                        
+                        $loc = $locMatch[1] ?? '';
+                        $lastmod = $modMatch[1] ?? '';
+                        $changefreq = $freqMatch[1] ?? '';
+                        
+                        if (empty($loc)) continue;
                         
                         // Parse name from URL
                         $path = parse_url($loc, PHP_URL_PATH);
@@ -334,11 +342,11 @@ $brands = $brands_stmt->fetchAll();
                         echo '  </a>';
                         echo '  <div style="font-size: 0.85rem; color: var(--text-muted); display: flex; gap: 15px;">';
                         
-                        if (isset($urlNode->lastmod)) {
-                            echo '<span><i class="fa fa-clock me-1"></i> Updated: ' . htmlspecialchars($urlNode->lastmod) . '</span>';
+                        if (!empty($lastmod)) {
+                            echo '<span><i class="fa fa-clock me-1"></i> Updated: ' . htmlspecialchars($lastmod) . '</span>';
                         }
-                        if (isset($urlNode->changefreq)) {
-                            echo '<span><i class="fa fa-sync me-1"></i> Freq: ' . ucfirst(htmlspecialchars($urlNode->changefreq)) . '</span>';
+                        if (!empty($changefreq)) {
+                            echo '<span><i class="fa fa-sync me-1"></i> Freq: ' . ucfirst(htmlspecialchars($changefreq)) . '</span>';
                         }
                         
                         echo '  </div>';
