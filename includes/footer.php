@@ -50,7 +50,7 @@
           <ul class="da-footer-links inline-list">
             <li><a href="<?php echo $base; ?>home">Home</a></li>
             <li><a href="<?php echo $base; ?>news">News</a></li>
-            <li><a href="#">Manufacturers</a></li>
+            <li><a href="<?php echo $base; ?>brands">Manufacturers</a></li>
             <li><a href="#">Carriers</a></li>
             <li><a href="<?php echo $base; ?>reviews">Reviews</a></li>
             <li><a href="<?php echo $base; ?>sitemap">Sitemap</a></li>
