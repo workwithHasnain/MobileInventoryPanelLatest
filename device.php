@@ -1677,7 +1677,7 @@ $commentCount = getDeviceCommentCount($pdo, $device_id);
     // ── CAPTCHA refresh ──
     function refreshCaptcha() {
       const img = document.getElementById('captcha-image');
-      if (img) img.src = baseURL + 'captcha.php?' + Date.now();
+      if (img) img.src = baseURL + 'handlers/captcha.php?' + Date.now();
     }
 
     // ── Device Comment AJAX ──
@@ -1717,7 +1717,7 @@ $commentCount = getDeviceCommentCount($pdo, $device_id);
         submitBtn.innerHTML = '<i class="fa fa-spinner fa-spin me-1"></i>Posting...';
         msgBox.style.display = 'none';
 
-        fetch(baseURL + 'ajax_comment_handler.php', {
+        fetch(baseURL + 'handlers/ajax_comment_handler.php', {
           method: 'POST',
           body: new FormData(form)
         })

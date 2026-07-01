@@ -1378,7 +1378,7 @@ $pref_meta_desc = $device['meta_desc'] ?? '';
                 isDuplicate = false;
                 return;
             }
-            fetch('check_device_name.php?name=' + encodeURIComponent(name) + '&brand=' + encodeURIComponent(brand) + '&exclude_id=' + excludeId)
+            fetch('handlers/check_device_name.php?name=' + encodeURIComponent(name) + '&brand=' + encodeURIComponent(brand) + '&exclude_id=' + excludeId)
                 .then(r => r.json())
                 .then(data => {
                     if (data.exists) {

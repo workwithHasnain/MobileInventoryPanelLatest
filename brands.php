@@ -454,10 +454,10 @@ $allBrands = $all_brands_stmt->fetchAll();
         }
         searchTimer = setTimeout(() => {
           Promise.all([
-            fetch(baseURL + 'api_get_devices.php?q=' + encodeURIComponent(q) + '&limit=4').then(r => r.json()).catch(() => ({
+            fetch(baseURL + 'handlers/api_get_devices.php?q=' + encodeURIComponent(q) + '&limit=4').then(r => r.json()).catch(() => ({
               devices: []
             })),
-            fetch(baseURL + 'api_get_posts.php?q=' + encodeURIComponent(q) + '&limit=4').then(r => r.json()).catch(() => ({
+            fetch(baseURL + 'handlers/api_get_posts.php?q=' + encodeURIComponent(q) + '&limit=4').then(r => r.json()).catch(() => ({
               posts: []
             }))
           ]).then(([devData, postData]) => {
@@ -503,7 +503,7 @@ $allBrands = $all_brands_stmt->fetchAll();
         this.disabled = true;
         this.textContent = 'Subscribing...';
         const btn = this;
-        fetch(baseURL + 'handle_newsletter.php', {
+        fetch(baseURL + 'handlers/handle_newsletter.php', {
           method: 'POST',
           headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
           body: 'newsletter_email=' + encodeURIComponent(email)
@@ -531,7 +531,7 @@ $allBrands = $all_brands_stmt->fetchAll();
         const el = document.getElementById(id);
         if (el) el.style.display = 'none';
       });
-      fetch(baseURL + 'notification_handler.php', {
+      fetch(baseURL + 'handlers/notification_handler.php', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/x-www-form-urlencoded'
@@ -564,7 +564,7 @@ $allBrands = $all_brands_stmt->fetchAll();
         loading = true;
         page++;
         if (loader) loader.style.display = 'flex';
-        fetch(baseURL + 'load_posts.php?page=' + page + '&type=featured&format=block')
+        fetch(baseURL + 'handlers/load_posts.php?page=' + page + '&type=featured&format=block')
           .then(r => r.json())
           .then(data => {
             if (data.success && data.html) {

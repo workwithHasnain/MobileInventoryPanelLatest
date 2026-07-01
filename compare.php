@@ -1077,8 +1077,8 @@ $da_active_nav = 'compare';
         if (q.length < 2) { navSearchResults.classList.remove('open'); return; }
         navSearchTimer = setTimeout(() => {
           Promise.all([
-            fetch(window.baseURL + 'api_get_devices.php?q=' + encodeURIComponent(q) + '&limit=4').then(r => r.json()).catch(() => ({ devices: [] })),
-            fetch(window.baseURL + 'api_get_posts.php?q=' + encodeURIComponent(q) + '&limit=4').then(r => r.json()).catch(() => ({ posts: [] }))
+            fetch(window.baseURL + 'handlers/api_get_devices.php?q=' + encodeURIComponent(q) + '&limit=4').then(r => r.json()).catch(() => ({ devices: [] })),
+            fetch(window.baseURL + 'handlers/api_get_posts.php?q=' + encodeURIComponent(q) + '&limit=4').then(r => r.json()).catch(() => ({ posts: [] }))
           ]).then(([devData, postData]) => {
             const devices = devData.devices || [];
             const posts = postData.posts || [];
@@ -1100,7 +1100,7 @@ $da_active_nav = 'compare';
     // ── Notification bell ──
     function markNotificationsAsSeen() {
       ['notifDotDesktop'].forEach(id => { const el = document.getElementById(id); if (el) el.style.display = 'none'; });
-      fetch(window.baseURL + 'notification_handler.php', { method: 'POST', headers: { 'Content-Type': 'application/x-www-form-urlencoded' }, body: 'action=mark_seen' }).catch(() => {});
+      fetch(window.baseURL + 'handlers/notification_handler.php', { method: 'POST', headers: { 'Content-Type': 'application/x-www-form-urlencoded' }, body: 'action=mark_seen' }).catch(() => {});
     }
     const notifBell = document.getElementById('notificationBellDesktop');
     if (notifBell) notifBell.addEventListener('click', () => setTimeout(markNotificationsAsSeen, 100));

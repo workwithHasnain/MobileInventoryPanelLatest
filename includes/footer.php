@@ -163,7 +163,7 @@
       btn.innerHTML = '<i class="fa fa-spinner fa-spin"></i> Subscribing...';
 
       var base = (window.baseURL || '/');
-      fetch(base + 'handle_newsletter.php', {
+      fetch(base + 'handlers/handle_newsletter.php', {
         method: 'POST',
         headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
         body: 'newsletter_email=' + encodeURIComponent(val)

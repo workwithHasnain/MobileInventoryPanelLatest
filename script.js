@@ -185,7 +185,7 @@ document.addEventListener('DOMContentLoaded', function () {
             }
         }
         const baseURL = window.baseURL;
-        const url = baseURL + 'search.php?q=' + encodeURIComponent(currentQuery) + '&limit=50&offset=' + currentOffset;
+        const url = baseURL + 'handlers/search.php?q=' + encodeURIComponent(currentQuery) + '&limit=50&offset=' + currentOffset;
         fetch(url, { signal: controller.signal })
             .then(function (res) { return res.json(); })
             .then(function (data) {

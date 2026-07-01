@@ -295,7 +295,7 @@ $device_type_filter = isset($_GET['device_type']) ? trim($_GET['device_type']) :
                                 <button type="button" class="btn btn-outline-info btn-sm" data-bs-toggle="modal" data-bs-target="#viewModal${index}" title="View">
                                     <i class="fas fa-eye"></i>
                                 </button>
-                                <a href="delete_phone.php?id=${phone.id}" class="btn btn-outline-danger btn-sm" onclick="return confirm('Delete this device?')" title="Delete">
+                                <a href="handlers/delete_phone.php?id=${phone.id}" class="btn btn-outline-danger btn-sm" onclick="return confirm('Delete this device?')" title="Delete">
                                     <i class="fas fa-trash"></i>
                                 </a>
                             </div>

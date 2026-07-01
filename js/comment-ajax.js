@@ -11,7 +11,7 @@ function refreshCaptcha() {
     var basePath = (typeof COMMENT_AJAX_BASE !== 'undefined') ? COMMENT_AJAX_BASE : '/';
     var img = document.getElementById('captcha-image');
     if (img) {
-        img.src = basePath + 'captcha.php?t=' + Date.now();
+        img.src = basePath + 'handlers/captcha.php?t=' + Date.now();
     }
     var captchaInput = document.getElementById('captcha-input');
     if (captchaInput) {
@@ -122,7 +122,7 @@ function submitComment(form) {
     var basePath = (typeof COMMENT_AJAX_BASE !== 'undefined') ? COMMENT_AJAX_BASE : '/';
 
     // Make AJAX request
-    fetch(basePath + 'ajax_comment_handler.php', {
+    fetch(basePath + 'handlers/ajax_comment_handler.php', {
         method: 'POST',
         body: formData
     })

@@ -208,7 +208,7 @@ if (typeof window.authInitialized === 'undefined') {
 
   window.publicUserLogout = function () {
     const base = window.baseURL || '/';
-    fetch(base + 'notification_handler.php', {
+    fetch(base + 'handlers/notification_handler.php', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/x-www-form-urlencoded'

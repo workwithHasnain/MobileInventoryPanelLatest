@@ -2123,10 +2123,10 @@ if (!$filterConfig) {
         }
         searchTimer = setTimeout(() => {
           Promise.all([
-            fetch(baseURL + 'api_get_devices.php?q=' + encodeURIComponent(q) + '&limit=4').then(r => r.json()).catch(() => ({
+            fetch(baseURL + 'handlers/api_get_devices.php?q=' + encodeURIComponent(q) + '&limit=4').then(r => r.json()).catch(() => ({
               devices: []
             })),
-            fetch(baseURL + 'api_get_posts.php?q=' + encodeURIComponent(q) + '&limit=4').then(r => r.json()).catch(() => ({
+            fetch(baseURL + 'handlers/api_get_posts.php?q=' + encodeURIComponent(q) + '&limit=4').then(r => r.json()).catch(() => ({
               posts: []
             }))
           ]).then(([devData, postData]) => {
@@ -2173,7 +2173,7 @@ if (!$filterConfig) {
       this.disabled = true;
       this.textContent = 'Subscribing...';
       const btn = this;
-      fetch(baseURL + 'handle_newsletter.php', {
+      fetch(baseURL + 'handlers/handle_newsletter.php', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/x-www-form-urlencoded'

@@ -1143,7 +1143,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 isDuplicate = false;
                 return;
             }
-            fetch('check_device_name.php?name=' + encodeURIComponent(name) + '&brand=' + encodeURIComponent(brand))
+            fetch('handlers/check_device_name.php?name=' + encodeURIComponent(name) + '&brand=' + encodeURIComponent(brand))
                 .then(r => r.json())
                 .then(data => {
                     if (data.exists) {

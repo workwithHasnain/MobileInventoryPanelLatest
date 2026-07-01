@@ -241,7 +241,7 @@ function getAvatarDisplay($name, $email)
   <meta name="twitter:image" content="<?php echo $base; ?>imges/icon-256.png">
 
   <!-- PWA Manifest -->
-  <link rel="manifest" href="<?php echo $base; ?>manifest.json">
+  <link rel="manifest" href="<?php echo $base; ?>handlers/manifest.json">
   <meta name="theme-color" content="#0d0f1a">
   <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-9906394285054446"
     crossorigin="anonymous"></script>
@@ -799,10 +799,10 @@ function getAvatarDisplay($name, $email)
         }
         searchTimer = setTimeout(() => {
           Promise.all([
-            fetch(baseURL + 'api_get_devices.php?q=' + encodeURIComponent(q) + '&limit=4').then(r => r.json()).catch(() => ({
+            fetch(baseURL + 'handlers/api_get_devices.php?q=' + encodeURIComponent(q) + '&limit=4').then(r => r.json()).catch(() => ({
               devices: []
             })),
-            fetch(baseURL + 'api_get_posts.php?q=' + encodeURIComponent(q) + '&limit=4').then(r => r.json()).catch(() => ({
+            fetch(baseURL + 'handlers/api_get_posts.php?q=' + encodeURIComponent(q) + '&limit=4').then(r => r.json()).catch(() => ({
               posts: []
             }))
           ]).then(([devData, postData]) => {
@@ -848,7 +848,7 @@ function getAvatarDisplay($name, $email)
         this.disabled = true;
         this.textContent = 'Subscribing...';
         const btn = this;
-        fetch(baseURL + 'handle_newsletter.php', {
+        fetch(baseURL + 'handlers/handle_newsletter.php', {
           method: 'POST',
           headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
           body: 'newsletter_email=' + encodeURIComponent(email)
@@ -876,7 +876,7 @@ function getAvatarDisplay($name, $email)
         const el = document.getElementById(id);
         if (el) el.classList.add('d-none');
       });
-      fetch(baseURL + 'notification_handler.php', {
+      fetch(baseURL + 'handlers/notification_handler.php', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/x-www-form-urlencoded'
@@ -892,7 +892,7 @@ function getAvatarDisplay($name, $email)
     // ── Comment AJAX ──
     function refreshCaptcha() {
       const img = document.getElementById('captcha-image');
-      if (img) img.src = baseURL + 'captcha.php?' + Date.now();
+      if (img) img.src = baseURL + 'handlers/captcha.php?' + Date.now();
     }
 
     (function () {
@@ -932,7 +932,7 @@ function getAvatarDisplay($name, $email)
         msgBox.classList.add('d-none');
         msgBox.classList.remove('d-block');
 
-        fetch(baseURL + 'ajax_comment_handler.php', {
+        fetch(baseURL + 'handlers/ajax_comment_handler.php', {
           method: 'POST',
           body: new FormData(form)
         })
