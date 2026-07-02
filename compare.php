@@ -878,7 +878,7 @@ $da_active_nav = 'compare';
       }
       $name = trim(($p['brand_name'] ?? '') . ' ' . ($p['name'] ?? ''));
       return ['slug' => $p['slug'] ?? (string) $p['id'], 'name' => $name ?: 'Unknown', 'image' => $img];
-    }, $phones), JSON_HEX_TAG | JSON_HEX_APOS | JSON_HEX_AMP | JSON_UNESCAPED_UNICODE);
+    }, array_reverse($phones)), JSON_HEX_TAG | JSON_HEX_APOS | JSON_HEX_AMP | JSON_UNESCAPED_UNICODE);
     ?>;
 
     const cpImages = {
